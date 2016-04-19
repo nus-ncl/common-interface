@@ -19,9 +19,9 @@ public interface Credentials {
     String getPassword();
 
     /**
-     * Returns the hash type.
-     * @return the hash type.
+     * Returns the hashing algorithm.
+     * @return the hashing algorithm.
      */
-    String getHashType();
+    String getHashingAlgorithm();
 
 }
