@@ -1,4 +1,4 @@
-package sg.ncl.testbed_interface.repositories.jpa;
+package sg.ncl.testbed_interface.repositories.jpa.entities;
 
 import sg.ncl.testbed_interface.domain.Credentials;
 
