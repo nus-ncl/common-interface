@@ -24,4 +24,9 @@ public interface Credentials {
      */
     String getHashingAlgorithm();
 
+    /**
+     * Returns the {@link User} associated to this {@link Credentials}.
+     * @return the {@link User} associated to this {@link Credentials}.
+     */
+    User getUser();
 }

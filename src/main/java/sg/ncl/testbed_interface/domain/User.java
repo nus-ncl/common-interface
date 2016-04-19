@@ -15,13 +15,6 @@ public interface User {
     String getId();
 
     /**
-     * Returns the {@link Credentials} of this {@link User}.
-     *
-     * @return the {@link Credentials} of this {@link User}.
-     */
-    Credentials getCredentials();
-
-    /**
      * Returns the {@link PersonalDetails} of this {@link User}.
      *
      * @return the {@link PersonalDetails} of this {@link User}.

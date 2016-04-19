@@ -25,6 +25,10 @@ public class CredentialsEntity extends AbstractEntity implements Credentials {
     @Column(name = "hashing_algorithm", nullable = false)
     private String hashingAlgorithm;
 
+    @OneToOne(optional = false, cascade = {CascadeType.ALL})
+    @JoinColumn(name = "user_id", nullable = false, unique = true)
+    private UserEntity user;
+
     @Override
     public String getUsername() {
         return username;
@@ -52,6 +56,15 @@ public class CredentialsEntity extends AbstractEntity implements Credentials {
     }
 
     @Override
+    public UserEntity getUser() {
+        return this.user;
+    }
+
+    public void setUser(UserEntity user) {
+        this.user = user;
+    }
+
+    @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
@@ -73,6 +86,7 @@ public class CredentialsEntity extends AbstractEntity implements Credentials {
         sb.append(", username='").append(username).append('\'');
         sb.append(", password='").append(password).append('\'');
         sb.append(", hashingAlgorithm='").append(hashingAlgorithm).append('\'');
+        sb.append(", user=").append(user);
         sb.append(", createdDate=").append(getCreatedDate());
         sb.append(", lastModifiedDate=").append(getLastModifiedDate());
         sb.append('}');
