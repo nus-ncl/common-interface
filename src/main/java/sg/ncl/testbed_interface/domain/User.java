@@ -1,4 +1,4 @@
-package sg.ncl.testbed_interface.i;
+package sg.ncl.testbed_interface.domain;
 
 /**
  * The {@link User} interface represents a user.

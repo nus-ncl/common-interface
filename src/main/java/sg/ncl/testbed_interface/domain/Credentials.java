@@ -1,4 +1,4 @@
-package sg.ncl.testbed_interface.i;
+package sg.ncl.testbed_interface.domain;
 
 /**
  * The {@link Credentials} interface represents the credentials of a {@link User}.
