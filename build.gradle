@@ -12,7 +12,6 @@ plugins {
     id 'idea'
     id 'io.spring.dependency-management' version '0.5.4.RELEASE'
 }
-
 apply plugin: 'spring-boot'
 
 sourceCompatibility = 1.8
@@ -24,10 +23,13 @@ repositories {
 
 dependencies {
     compile('org.springframework.boot:spring-boot-starter-web')
+    compile('org.springframework.boot:spring-boot-starter-data-jpa')
     compile('javax.inject:javax.inject:1')
 
     testCompile('junit:junit')
     testCompile('org.springframework.boot:spring-boot-starter-test')
+
+    runtime('mysql:mysql-connector-java')
 }
 
 task wrapper(type: Wrapper) {
