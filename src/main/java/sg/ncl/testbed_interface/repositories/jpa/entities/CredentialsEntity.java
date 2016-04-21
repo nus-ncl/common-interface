@@ -22,9 +22,6 @@ public class CredentialsEntity extends AbstractEntity implements Credentials {
     @Column(name = "password", nullable = false)
     private String password;
 
-    @Column(name = "hashing_algorithm", nullable = false)
-    private String hashingAlgorithm;
-
     @OneToOne(optional = false, cascade = {CascadeType.ALL})
     @JoinColumn(name = "user_id", nullable = false, unique = true)
     private UserEntity user;
@@ -45,14 +42,6 @@ public class CredentialsEntity extends AbstractEntity implements Credentials {
 
     public void setPassword(final String password) {
         this.password = password;
-    }
-
-    public String getHashingAlgorithm() {
-        return hashingAlgorithm;
-    }
-
-    public void setHashingAlgorithm(final String hashingAlgorithm) {
-        this.hashingAlgorithm = hashingAlgorithm;
     }
 
     @Override
@@ -85,7 +74,6 @@ public class CredentialsEntity extends AbstractEntity implements Credentials {
         sb.append("id=").append(id);
         sb.append(", username='").append(username).append('\'');
         sb.append(", password='").append(password).append('\'');
-        sb.append(", hashingAlgorithm='").append(hashingAlgorithm).append('\'');
         sb.append(", user=").append(user);
         sb.append(", createdDate=").append(getCreatedDate());
         sb.append(", lastModifiedDate=").append(getLastModifiedDate());
