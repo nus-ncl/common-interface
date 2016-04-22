@@ -15,10 +15,10 @@ public interface User {
     String getId();
 
     /**
-     * Returns the {@link PersonalDetails} of this {@link User}.
+     * Returns the {@link UserDetails} of this {@link User}.
      *
-     * @return the {@link PersonalDetails} of this {@link User}.
+     * @return the {@link UserDetails} of this {@link User}.
      */
-    PersonalDetails getPersonalDetails();
+    UserDetails getUserDetails();
 
 }

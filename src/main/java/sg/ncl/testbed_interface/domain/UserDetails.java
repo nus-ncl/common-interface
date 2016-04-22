@@ -1,11 +1,11 @@
 package sg.ncl.testbed_interface.domain;
 
 /**
- * The {@link PersonalDetails} interface represents the personal details of a {@link User}.
+ * The {@link UserDetails} interface represents the personal details of a {@link User}.
  *
  * @author Christopher Zhong
  */
-public interface PersonalDetails {
+public interface UserDetails {
 
     /**
      * Returns the first name of the associated {@link User}.

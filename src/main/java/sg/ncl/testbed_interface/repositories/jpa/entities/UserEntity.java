@@ -3,7 +3,14 @@ package sg.ncl.testbed_interface.repositories.jpa.entities;
 import org.hibernate.annotations.GenericGenerator;
 import sg.ncl.testbed_interface.domain.User;
 
-import javax.persistence.*;
+import javax.persistence.CascadeType;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.OneToOne;
+import javax.persistence.Table;
 
 /**
  * @author Christopher Zhong
@@ -19,8 +26,8 @@ public class UserEntity extends AbstractEntity implements User {
     private String id;
 
     @OneToOne(optional = false, cascade = {CascadeType.ALL})
-    @JoinColumn(name = "personal_details_id", nullable = false, unique = true)
-    private PersonalDetailsEntity personalDetails;
+    @JoinColumn(name = "user_details_id", nullable = false, unique = true)
+    private UserDetailsEntity userDetails;
 
     @Override
     public String getId() {
@@ -31,13 +38,12 @@ public class UserEntity extends AbstractEntity implements User {
         this.id = id;
     }
 
-    @Override
-    public PersonalDetailsEntity getPersonalDetails() {
-        return personalDetails;
+    public UserDetailsEntity getUserDetails() {
+        return userDetails;
     }
 
-    public void setPersonalDetails(final PersonalDetailsEntity personalDetails) {
-        this.personalDetails = personalDetails;
+    public void setUserDetails(final UserDetailsEntity userDetails) {
+        this.userDetails = userDetails;
     }
 
     @Override
@@ -59,7 +65,7 @@ public class UserEntity extends AbstractEntity implements User {
     public String toString() {
         final StringBuilder sb = new StringBuilder("UserEntity{");
         sb.append("id='").append(id).append('\'');
-        sb.append(", personalDetails=").append(personalDetails);
+        sb.append(", userDetails=").append(userDetails);
         sb.append(", createdDate=").append(getCreatedDate());
         sb.append(", lastModifiedDate=").append(getLastModifiedDate());
         sb.append('}');
