@@ -34,6 +34,14 @@ public class UserCredentialsEntity extends AbstractEntity implements UserCredent
     @JoinColumn(name = "user_id", nullable = false, unique = true)
     private UserEntity user;
 
+    public Long getId() {
+        return this.id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
     @Override
     public String getUsername() {
         return username;
