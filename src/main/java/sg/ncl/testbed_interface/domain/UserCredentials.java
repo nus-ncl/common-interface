@@ -1,11 +1,11 @@
 package sg.ncl.testbed_interface.domain;
 
 /**
- * The {@link Credentials} interface represents the credentials of a {@link User}.
+ * The {@link UserCredentials} interface represents the credentials of a {@link User}.
  *
  * @author Christopher Zhong
  */
-public interface Credentials {
+public interface UserCredentials {
 
     /**
      * Returns the username.
@@ -22,9 +22,9 @@ public interface Credentials {
     String getPassword();
 
     /**
-     * Returns the {@link User} associated to this {@link Credentials}.
+     * Returns the {@link User} associated to this {@link UserCredentials}.
      *
-     * @return the {@link User} associated to this {@link Credentials}.
+     * @return the {@link User} associated to this {@link UserCredentials}.
      */
     User getUser();
 }

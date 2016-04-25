@@ -1,15 +1,23 @@
 package sg.ncl.testbed_interface.repositories.jpa.entities;
 
-import sg.ncl.testbed_interface.domain.Credentials;
+import sg.ncl.testbed_interface.domain.UserCredentials;
 
-import javax.persistence.*;
+import javax.persistence.CascadeType;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
+import javax.persistence.Index;
+import javax.persistence.JoinColumn;
+import javax.persistence.OneToOne;
+import javax.persistence.Table;
 
 /**
  * @author Christopher Zhong
  */
 @Entity
-@Table(name = "credentials", indexes = {@Index(columnList = "username")})
-public class CredentialsEntity extends AbstractEntity implements Credentials {
+@Table(name = "user_credentials", indexes = {@Index(columnList = "username")})
+public class UserCredentialsEntity extends AbstractEntity implements UserCredentials {
 
     @Id
     @GeneratedValue
@@ -58,7 +66,7 @@ public class CredentialsEntity extends AbstractEntity implements Credentials {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
 
-        Credentials that = (Credentials) o;
+        UserCredentials that = (UserCredentials) o;
 
         return getUsername().equals(that.getUsername());
     }
@@ -70,7 +78,7 @@ public class CredentialsEntity extends AbstractEntity implements Credentials {
 
     @Override
     public String toString() {
-        final StringBuilder sb = new StringBuilder("CredentialsEntity{");
+        final StringBuilder sb = new StringBuilder("UserCredentialsEntity{");
         sb.append("id=").append(id);
         sb.append(", username='").append(username).append('\'');
         sb.append(", password='").append(password).append('\'');
