@@ -12,7 +12,7 @@ import javax.persistence.Table;
  * @author Christopher Zhong
  */
 @Entity
-@Table(name = "personal_details")
+@Table(name = "user_details")
 public class UserDetailsEntity extends AbstractEntity implements UserDetails {
 
     @Id
