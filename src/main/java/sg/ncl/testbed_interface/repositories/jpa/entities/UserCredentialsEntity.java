@@ -35,7 +35,7 @@ public class UserCredentialsEntity extends AbstractEntity implements UserCredent
     private UserEntity user;
 
     public Long getId() {
-        return this.id;
+        return id;
     }
 
     public void setId(Long id) {
@@ -62,7 +62,7 @@ public class UserCredentialsEntity extends AbstractEntity implements UserCredent
 
     @Override
     public UserEntity getUser() {
-        return this.user;
+        return user;
     }
 
     public void setUser(UserEntity user) {
@@ -76,12 +76,12 @@ public class UserCredentialsEntity extends AbstractEntity implements UserCredent
 
         UserCredentials that = (UserCredentials) o;
 
-        return getUsername().equals(that.getUsername());
+        return getUsername() == null ? that.getUsername() == null : getUsername().equals(that.getUsername());
     }
 
     @Override
     public int hashCode() {
-        return getUsername().hashCode();
+        return getUsername() == null ? 0 : getUsername().hashCode();
     }
 
     @Override
