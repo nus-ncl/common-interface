@@ -116,7 +116,6 @@ public class UserEntityTest {
         assertThat(userEntity1, is(equalTo(userEntity2)));
 
         final String id1 = "id1";
-        final String id2 = "id2";
         userEntity1.setId(id1);
 
         assertThat(userEntity1, is(not(equalTo(userEntity2))));
@@ -125,6 +124,7 @@ public class UserEntityTest {
 
         assertThat(userEntity1, is(equalTo(userEntity2)));
 
+        final String id2 = "id2";
         userEntity2.setId(id2);
 
         assertThat(userEntity1, is(not(equalTo(userEntity2))));
@@ -138,7 +138,6 @@ public class UserEntityTest {
         assertThat(userEntity1.hashCode(), is(equalTo(userEntity2.hashCode())));
 
         final String id1 = "id1";
-        final String id2 = "id2";
         userEntity1.setId(id1);
 
         assertThat(userEntity1.hashCode(), is(not(equalTo(userEntity2.hashCode()))));
@@ -147,6 +146,7 @@ public class UserEntityTest {
 
         assertThat(userEntity1.hashCode(), is(equalTo(userEntity2.hashCode())));
 
+        final String id2 = "id2";
         userEntity2.setId(id2);
 
         assertThat(userEntity1.hashCode(), is(not(equalTo(userEntity2.hashCode()))));
