@@ -115,12 +115,13 @@ public class UserEntity extends AbstractEntity implements User {
 
         User that = (User) o;
 
-        return getId().equals(that.getId());
+        return getId() == null ? that.getId() == null : getId().equals(that.getId());
+
     }
 
     @Override
     public int hashCode() {
-        return getId().hashCode();
+        return getId() == null ? 0 : getId().hashCode();
     }
 
     @Override
