@@ -1,10 +1,13 @@
 package sg.ncl.testbed_interface.repositories.jpa.entities;
 
 import sg.ncl.testbed_interface.domain.UserCredentials;
+import sg.ncl.testbed_interface.domain.UserCredentialsStatus;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.Index;
@@ -22,17 +25,21 @@ public class UserCredentialsEntity extends AbstractEntity implements UserCredent
     @Id
     @GeneratedValue
     @Column(name = "id", nullable = false, unique = true, updatable = false)
-    private Long id;
+    private Long id = null;
 
     @Column(name = "username", nullable = false, unique = true)
-    private String username;
+    private String username = null;
 
     @Column(name = "password", nullable = false)
-    private String password;
+    private String password = null;
 
     @OneToOne(optional = false, cascade = {CascadeType.ALL})
     @JoinColumn(name = "user_id", nullable = false, unique = true)
-    private UserEntity user;
+    private UserEntity user = null;
+
+    @Column(name = "status", nullable = false)
+    @Enumerated(EnumType.STRING)
+    private UserCredentialsStatus status = UserCredentialsStatus.ACTIVE;
 
     public Long getId() {
         return id;
@@ -65,8 +72,17 @@ public class UserCredentialsEntity extends AbstractEntity implements UserCredent
         return user;
     }
 
-    public void setUser(UserEntity user) {
+    public void setUser(final UserEntity user) {
         this.user = user;
+    }
+
+    @Override
+    public UserCredentialsStatus getStatus() {
+        return status;
+    }
+
+    public void setStatus(final UserCredentialsStatus status) {
+        this.status = status;
     }
 
     @Override

@@ -27,4 +27,12 @@ public interface UserCredentials {
      * @return the {@link User} associated to this {@link UserCredentials}.
      */
     User getUser();
+
+    /**
+     * Returns the {@link UserCredentialsStatus} of this {@link UserCredentials}.
+     *
+     * @return the {@link UserCredentialsStatus} of this {@link UserCredentials}.
+     */
+    UserCredentialsStatus getStatus();
+
 }
