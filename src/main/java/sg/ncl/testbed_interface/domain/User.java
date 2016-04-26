@@ -9,8 +9,6 @@ import java.time.ZonedDateTime;
  */
 public interface User {
 
-    public enum Status {}
-
     /**
      * Returns a {@link String} that represents the unique identifier of this {@link User}.
      *
@@ -33,11 +31,11 @@ public interface User {
     boolean isEmailVerified();
 
     /**
-     * Returns the {@link Status} of this {@link User}.
+     * Returns the {@link UserStatus} of this {@link User}.
      *
-     * @return the {@link Status} of this {@link User}.
+     * @return the {@link UserStatus} of this {@link User}.
      */
-    Status getStatus();
+    UserStatus getStatus();
 
     /**
      * Returns the {@link ZonedDateTime} of when this {@link User} applied for an account.

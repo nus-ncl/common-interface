@@ -4,6 +4,7 @@ import org.hibernate.annotations.GenericGenerator;
 import org.hibernate.annotations.Type;
 import sg.ncl.testbed_interface.domain.User;
 import sg.ncl.testbed_interface.domain.UserActivity;
+import sg.ncl.testbed_interface.domain.UserStatus;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -42,7 +43,7 @@ public class UserEntity extends AbstractEntity implements User {
 
     @Column(name = "status", nullable = false)
     @Enumerated(EnumType.STRING)
-    private Status status;
+    private UserStatus status;
 
     @Column(name = "registration_date", nullable = false)
     private ZonedDateTime registrationDate;
@@ -81,11 +82,11 @@ public class UserEntity extends AbstractEntity implements User {
     }
 
     @Override
-    public Status getStatus() {
+    public UserStatus getStatus() {
         return status;
     }
 
-    public void setStatus(final Status status) {
+    public void setStatus(final UserStatus status) {
         this.status = status;
     }
 
