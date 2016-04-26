@@ -18,6 +18,7 @@ import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import java.time.ZonedDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -31,29 +32,29 @@ public class UserEntity extends AbstractEntity implements User {
     @GeneratedValue(generator = "uuid2")
     @GenericGenerator(name = "uuid2", strategy = "uuid2")
     @Column(name = "id", nullable = false, unique = true, updatable = false)
-    private String id;
+    private String id = null;
 
     @OneToOne(optional = false, cascade = {CascadeType.ALL})
     @JoinColumn(name = "user_details_id", nullable = false, unique = true)
-    private UserDetailsEntity userDetails;
+    private UserDetailsEntity userDetails = null;
 
     @Column(name = "is_email_verified", nullable = false)
     @Type(type = "yes_no")
-    private boolean emailVerified;
+    private boolean emailVerified = false;
 
     @Column(name = "status", nullable = false)
     @Enumerated(EnumType.STRING)
-    private UserStatus status;
+    private UserStatus status = UserStatus.PENDING;
 
     @Column(name = "registration_date", nullable = false)
-    private ZonedDateTime registrationDate;
+    private ZonedDateTime registrationDate = null;
 
     @Column(name = "processed_date")
-    private ZonedDateTime processedDate;
+    private ZonedDateTime processedDate = null;
 
     @OneToMany(cascade = {CascadeType.ALL})
     @JoinColumn(name = "user_id")
-    private List<UserActivity> userActivities;
+    private List<UserActivity> userActivities = new ArrayList<>();
 
     @Override
     public String getId() {
