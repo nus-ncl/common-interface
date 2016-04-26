@@ -1,4 +1,4 @@
-package sg.ncl.testbed_interface;
+package sg.ncl.testbed_interface.dtos;
 
 import java.time.LocalDateTime;
 
@@ -12,7 +12,7 @@ public class VersionInfo {
     private final String build;
     private final LocalDateTime date;
 
-    protected VersionInfo(final int major, final int minor, final String build, final LocalDateTime date) {
+    public VersionInfo(int major, int minor, String build, LocalDateTime date) {
         this.major = major;
         this.minor = minor;
         this.build = build;
@@ -20,40 +20,40 @@ public class VersionInfo {
     }
 
     public int getMajor() {
-        return this.major;
+        return major;
     }
 
     public int getMinor() {
-        return this.minor;
+        return minor;
     }
 
     public String getBuild() {
-        return this.build;
+        return build;
     }
 
     public LocalDateTime getDate() {
-        return this.date;
+        return date;
     }
 
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (o == null || this.getClass() != o.getClass()) return false;
+        if (o == null || getClass() != o.getClass()) return false;
 
         VersionInfo that = (VersionInfo) o;
 
-        if (this.getMajor() != that.getMajor()) return false;
-        if (this.getMinor() != that.getMinor()) return false;
-        if (!this.getBuild().equals(that.getBuild())) return false;
-        return this.getDate().equals(that.getDate());
+        if (getMajor() != that.getMajor()) return false;
+        if (getMinor() != that.getMinor()) return false;
+        if (!getBuild().equals(that.getBuild())) return false;
+        return getDate().equals(that.getDate());
     }
 
     @Override
     public int hashCode() {
-        int result = this.getMajor();
-        result = 31 * result + this.getMinor();
-        result = 31 * result + this.getBuild().hashCode();
-        result = 31 * result + this.getDate().hashCode();
+        int result = getMajor();
+        result = 31 * result + getMinor();
+        result = 31 * result + getBuild().hashCode();
+        result = 31 * result + getDate().hashCode();
         return result;
     }
 
