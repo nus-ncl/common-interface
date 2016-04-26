@@ -28,6 +28,7 @@ dependencies {
 
     testCompile('junit:junit')
     testCompile('org.springframework.boot:spring-boot-starter-test')
+    testCompile('org.apache.commons:commons-lang3:3.4')
 
     runtime('mysql:mysql-connector-java')
 }
