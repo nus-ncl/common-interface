@@ -44,7 +44,7 @@ public class UserDetailsEntity extends AbstractEntity implements UserDetails {
         return id;
     }
 
-    public void setId(final Long id) {
+    protected void setId(final Long id) {
         this.id = id;
     }
 
