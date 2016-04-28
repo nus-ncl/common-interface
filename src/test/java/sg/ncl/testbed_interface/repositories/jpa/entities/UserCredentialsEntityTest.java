@@ -137,4 +137,23 @@ public class UserCredentialsEntityTest {
         assertThat(userCredentialsEntity1.hashCode(), is(not(equalTo(userCredentialsEntity2.hashCode()))));
     }
 
+    @Test
+    public void testToString() throws Exception {
+        final UserCredentialsEntity userCredentialsEntity = new UserCredentialsEntity();
+        final Long id = new Random().nextLong();
+        userCredentialsEntity.setId(id);
+        final String username = RandomStringUtils.randomAlphanumeric(20);
+        userCredentialsEntity.setUsername(username);
+        final String password = RandomStringUtils.randomAlphanumeric(20);
+        userCredentialsEntity.setPassword(password);
+        userCredentialsEntity.setStatus(UserCredentialsStatus.ACTIVE);
+
+        final String toString = userCredentialsEntity.toString();
+
+        assertThat(toString, containsString(id.toString()));
+        assertThat(toString, containsString(username));
+        assertThat(toString, containsString(password));
+        assertThat(toString, containsString(UserCredentialsStatus.ACTIVE.toString()));
+    }
+
 }

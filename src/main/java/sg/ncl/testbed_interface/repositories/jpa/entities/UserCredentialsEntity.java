@@ -108,8 +108,7 @@ public class UserCredentialsEntity extends AbstractEntity implements UserCredent
         sb.append(", password='").append(password).append('\'');
         sb.append(", user=").append(user);
         sb.append(", status=").append(status);
-        sb.append(", createdDate=").append(getCreatedDate());
-        sb.append(", lastModifiedDate=").append(getLastModifiedDate());
+        sb.append(", super=").append(super.toString());
         sb.append('}');
         return sb.toString();
     }
