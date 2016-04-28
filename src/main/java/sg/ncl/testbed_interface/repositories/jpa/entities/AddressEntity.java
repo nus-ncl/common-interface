@@ -13,7 +13,7 @@ import javax.persistence.Table;
  */
 @Entity
 @Table(name = "addresses")
-public class AddressEntity implements Address {
+public class AddressEntity extends AbstractEntity implements Address {
 
     @Id
     @GeneratedValue
@@ -86,6 +86,20 @@ public class AddressEntity implements Address {
 
     public void setZipCode(final String zipCode) {
         this.zipCode = zipCode;
+    }
+
+    @Override
+    public String toString() {
+        final StringBuilder sb = new StringBuilder("AddressEntity{");
+        sb.append("id=").append(id);
+        sb.append(", address1='").append(address1).append('\'');
+        sb.append(", address2='").append(address2).append('\'');
+        sb.append(", country='").append(country).append('\'');
+        sb.append(", region='").append(region).append('\'');
+        sb.append(", zipCode='").append(zipCode).append('\'');
+        sb.append(", super=").append(super.toString());
+        sb.append('}');
+        return sb.toString();
     }
 
 }
