@@ -7,6 +7,7 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 import javax.persistence.Column;
 import javax.persistence.EntityListeners;
 import javax.persistence.MappedSuperclass;
+import javax.persistence.Version;
 import java.time.ZonedDateTime;
 
 /**
@@ -32,12 +33,32 @@ public class AbstractEntity {
     @LastModifiedDate
     private ZonedDateTime lastModifiedDate;
 
+    @Version
+    @Column(name = "version", nullable = false)
+    private Long version = 0L;
+
     public ZonedDateTime getCreatedDate() {
         return createdDate;
     }
 
+    protected void setCreatedDate(final ZonedDateTime createdDate) {
+        this.createdDate = createdDate;
+    }
+
     public ZonedDateTime getLastModifiedDate() {
         return lastModifiedDate;
+    }
+
+    protected void setLastModifiedDate(final ZonedDateTime lastModifiedDate) {
+        this.lastModifiedDate = lastModifiedDate;
+    }
+
+    public Long getVersion() {
+        return version;
+    }
+
+    protected void setVersion(final Long version) {
+        this.version = version;
     }
 
 }
