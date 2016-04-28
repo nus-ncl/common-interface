@@ -15,7 +15,7 @@ import java.time.ZonedDateTime;
  */
 @MappedSuperclass
 @EntityListeners({AuditingEntityListener.class})
-public class AbstractEntity {
+public abstract class AbstractEntity {
 
 //    @Column(name = "created_by")
 //    @CreatedBy
