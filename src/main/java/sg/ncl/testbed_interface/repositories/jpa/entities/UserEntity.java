@@ -3,7 +3,6 @@ package sg.ncl.testbed_interface.repositories.jpa.entities;
 import org.hibernate.annotations.GenericGenerator;
 import org.hibernate.annotations.Type;
 import sg.ncl.testbed_interface.domain.User;
-import sg.ncl.testbed_interface.domain.UserActivity;
 import sg.ncl.testbed_interface.domain.UserStatus;
 
 import javax.persistence.CascadeType;
@@ -54,7 +53,7 @@ public class UserEntity extends AbstractEntity implements User {
 
     @OneToMany(cascade = {CascadeType.ALL})
     @JoinColumn(name = "user_id")
-    private List<UserActivity> userActivities = new ArrayList<>();
+    private List<LoginActivityEntity> loginActivities = new ArrayList<>();
 
     @Override
     public String getId() {
@@ -100,12 +99,22 @@ public class UserEntity extends AbstractEntity implements User {
         this.registrationDate = registrationDate;
     }
 
+    @Override
     public ZonedDateTime getProcessedDate() {
         return this.processedDate;
     }
 
     public void setProcessedDate(ZonedDateTime processedDate) {
         this.processedDate = processedDate;
+    }
+
+    @Override
+    public List<LoginActivityEntity> getLoginActivities() {
+        return loginActivities;
+    }
+
+    public void addLoginActivity(final LoginActivityEntity loginActivity) {
+        loginActivities.add(loginActivity);
     }
 
     @Override
@@ -133,7 +142,7 @@ public class UserEntity extends AbstractEntity implements User {
         sb.append(", status=").append(status);
         sb.append(", registrationDate=").append(registrationDate);
         sb.append(", processedDate=").append(processedDate);
-        sb.append(", userActivities=").append(userActivities);
+        sb.append(", loginActivities=").append(loginActivities);
         sb.append(", super=").append(super.toString());
         sb.append('}');
         return sb.toString();

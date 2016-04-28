@@ -1,6 +1,7 @@
 package sg.ncl.testbed_interface.domain;
 
 import java.time.ZonedDateTime;
+import java.util.List;
 
 /**
  * The {@link User} interface represents a user.
@@ -51,4 +52,5 @@ public interface User {
      */
     ZonedDateTime getProcessedDate();
 
+    List<? extends LoginActivity> getLoginActivities();
 }
