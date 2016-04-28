@@ -1,6 +1,5 @@
 package sg.ncl.testbed_interface.repositories.jpa.entities;
 
-import sg.ncl.testbed_interface.domain.Address;
 import sg.ncl.testbed_interface.domain.UserDetails;
 
 import javax.persistence.CascadeType;
@@ -32,7 +31,7 @@ public class UserDetailsEntity extends AbstractEntity implements UserDetails {
 
     @OneToMany(cascade = {CascadeType.ALL})
     @JoinColumn(name = "address_id", nullable = false)
-    private Address address = null;
+    private AddressEntity address = null;
 
     @Column(name = "enail", nullable = false)
     private String email = null;
@@ -67,11 +66,11 @@ public class UserDetailsEntity extends AbstractEntity implements UserDetails {
     }
 
     @Override
-    public Address getAddress() {
+    public AddressEntity getAddress() {
         return address;
     }
 
-    public void setAddress(final Address address) {
+    public void setAddress(final AddressEntity address) {
         this.address = address;
     }
 

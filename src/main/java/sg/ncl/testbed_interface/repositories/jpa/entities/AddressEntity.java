@@ -1,0 +1,91 @@
+package sg.ncl.testbed_interface.repositories.jpa.entities;
+
+import sg.ncl.testbed_interface.domain.Address;
+
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
+import javax.persistence.Table;
+
+/**
+ * @author Christopher Zhong
+ */
+@Entity
+@Table(name = "addresses")
+public class AddressEntity implements Address {
+
+    @Id
+    @GeneratedValue
+    @Column(name = "id", nullable = false, unique = true, updatable = false)
+    private Long id = null;
+
+    @Column(name = "address_1", nullable = false)
+    private String address1 = null;
+
+    @Column(name = "address_2")
+    private String address2 = null;
+
+    @Column(name = "country", nullable = false)
+    private String country = null;
+
+    @Column(name = "region")
+    private String region = null;
+
+    @Column(name = "zip_code", nullable = false)
+    private String zipCode = null;
+
+    public Long getId() {
+        return id;
+    }
+
+    protected void setId(final Long id) {
+        this.id = id;
+    }
+
+    @Override
+    public String getAddress1() {
+        return address1;
+    }
+
+    public void setAddress1(final String address1) {
+        this.address1 = address1;
+    }
+
+    @Override
+    public String getAddress2() {
+        return address2;
+    }
+
+    public void setAddress2(final String address2) {
+        this.address2 = address2;
+    }
+
+    @Override
+    public String getCountry() {
+        return country;
+    }
+
+    public void setCountry(final String country) {
+        this.country = country;
+    }
+
+    @Override
+    public String getRegion() {
+        return region;
+    }
+
+    public void setRegion(final String region) {
+        this.region = region;
+    }
+
+    @Override
+    public String getZipCode() {
+        return zipCode;
+    }
+
+    public void setZipCode(final String zipCode) {
+        this.zipCode = zipCode;
+    }
+
+}
