@@ -1,11 +1,15 @@
 package sg.ncl.testbed_interface.repositories.jpa.entities;
 
+import sg.ncl.testbed_interface.domain.Address;
 import sg.ncl.testbed_interface.domain.UserDetails;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
 /**
@@ -18,13 +22,23 @@ public class UserDetailsEntity extends AbstractEntity implements UserDetails {
     @Id
     @GeneratedValue
     @Column(name = "id", nullable = false, unique = true, updatable = false)
-    private Long id;
+    private Long id = null;
 
     @Column(name = "first_name", nullable = false)
-    private String firstName;
+    private String firstName = null;
 
     @Column(name = "last_name", nullable = false)
-    private String lastName;
+    private String lastName = null;
+
+    @OneToMany(cascade = {CascadeType.ALL})
+    @JoinColumn(name = "address_id", nullable = false)
+    private Address address = null;
+
+    @Column(name = "enail", nullable = false)
+    private String email = null;
+
+    @Column(name = "phone", nullable = false)
+    private String phone = null;
 
     public Long getId() {
         return id;
@@ -53,13 +67,58 @@ public class UserDetailsEntity extends AbstractEntity implements UserDetails {
     }
 
     @Override
+    public Address getAddress() {
+        return address;
+    }
+
+    public void setAddress(final Address address) {
+        this.address = address;
+    }
+
+    @Override
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(final String email) {
+        this.email = email;
+    }
+
+    @Override
+    public String getPhone() {
+        return phone;
+    }
+
+    public void setPhone(final String phone) {
+        this.phone = phone;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        UserDetails that = (UserDetails) o;
+
+        return getEmail() == null ? that.getEmail() == null : getEmail().equals(that.getEmail());
+
+    }
+
+    @Override
+    public int hashCode() {
+        return getEmail() == null ? 0 : getEmail().hashCode();
+    }
+
+    @Override
     public String toString() {
         final StringBuilder sb = new StringBuilder("UserDetailsEntity{");
         sb.append("id=").append(id);
         sb.append(", firstName='").append(firstName).append('\'');
         sb.append(", lastName='").append(lastName).append('\'');
-        sb.append(", createdDate=").append(getCreatedDate());
-        sb.append(", lastModifiedDate=").append(getLastModifiedDate());
+        sb.append(", address=").append(address);
+        sb.append(", email='").append(email).append('\'');
+        sb.append(", phone='").append(phone).append('\'');
+        sb.append(", super=").append(super.toString());
         sb.append('}');
         return sb.toString();
     }
