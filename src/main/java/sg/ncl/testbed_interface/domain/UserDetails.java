@@ -23,18 +23,21 @@ public interface UserDetails {
 
     /**
      * Returns the {@link Address} of the associated {@link User}.
+     *
      * @return the {@link Address} of the associated {@link User}.
      */
     Address getAddress();
 
     /**
      * Returns the email address of the associated {@link User}.
+     *
      * @return the email address of the associated {@link User}.
      */
     String getEmail();
 
     /**
      * Returns the phone number of the associated {@link User}.
+     *
      * @return the phone number of the associated {@link User}.
      */
     String getPhone();
