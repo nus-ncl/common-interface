@@ -5,6 +5,7 @@ import org.junit.Test;
 import sg.ncl.testbed_interface.domain.UserStatus;
 
 import java.time.ZonedDateTime;
+import java.util.List;
 
 import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.assertThat;
@@ -106,6 +107,35 @@ public class UserEntityTest {
         userEntity.setProcessedDate(now);
 
         assertThat(userEntity.getProcessedDate(), is(equalTo(now)));
+    }
+
+    @Test
+    public void testGetLoginActivities() throws Exception {
+        final UserEntity userEntity = new UserEntity();
+
+        final List<LoginActivityEntity> loginActivities = userEntity.getLoginActivities();
+        assertThat(loginActivities, is(not(nullValue())));
+        assertThat(loginActivities, is(empty()));
+    }
+
+    @Test
+    public void testAddLoginActivity() throws Exception {
+        final UserEntity userEntity = new UserEntity();
+        final LoginActivityEntity loginActivity1 = new LoginActivityEntity();
+        userEntity.addLoginActivity(loginActivity1);
+
+        final List<LoginActivityEntity> loginActivities = userEntity.getLoginActivities();
+
+        assertThat(loginActivities, is(not(nullValue())));
+        assertThat(loginActivities, is(not(empty())));
+        assertThat(loginActivities, contains(loginActivity1));
+        assertThat(loginActivities.size(), is(equalTo(1)));
+
+        final LoginActivityEntity loginActivity2 = new LoginActivityEntity();
+        userEntity.addLoginActivity(loginActivity2);
+
+        assertThat(loginActivities, contains(loginActivity1, loginActivity2));
+        assertThat(loginActivities.size(), is(equalTo(2)));
     }
 
     @Test
