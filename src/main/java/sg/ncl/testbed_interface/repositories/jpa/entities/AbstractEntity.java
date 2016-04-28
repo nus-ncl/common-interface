@@ -61,4 +61,14 @@ public class AbstractEntity {
         this.version = version;
     }
 
+    @Override
+    public String toString() {
+        final StringBuilder sb = new StringBuilder("AbstractEntity{");
+        sb.append("createdDate=").append(createdDate);
+        sb.append(", lastModifiedDate=").append(lastModifiedDate);
+        sb.append(", version=").append(version);
+        sb.append('}');
+        return sb.toString();
+    }
+
 }

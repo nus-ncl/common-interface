@@ -5,6 +5,7 @@ import org.junit.Test;
 import sg.ncl.testbed_interface.domain.UserStatus;
 
 import java.time.ZonedDateTime;
+import java.util.Random;
 
 import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.assertThat;
@@ -150,6 +151,39 @@ public class UserEntityTest {
         userEntity2.setId(id2);
 
         assertThat(userEntity1.hashCode(), is(not(equalTo(userEntity2.hashCode()))));
+    }
+
+    @Test
+    public void testToString() throws Exception {
+        final UserEntity userEntity = new UserEntity();
+        final String id = RandomStringUtils.randomAlphanumeric(20);
+        userEntity.setId(id);
+        final UserStatus status = UserStatus.APPROVED;
+        userEntity.setStatus(status);
+        userEntity.setEmailVerified(true);
+        final ZonedDateTime now = ZonedDateTime.now();
+        final ZonedDateTime registrationDate = now.minusYears(1);
+        userEntity.setRegistrationDate(registrationDate);
+        final ZonedDateTime processedDate = now.minusMonths(1);
+        userEntity.setProcessedDate(processedDate);
+        final ZonedDateTime createdDate = now.minusWeeks(1);
+        userEntity.setCreatedDate(createdDate);
+        final ZonedDateTime lastModifiedDate = now.minusDays(1);
+        userEntity.setLastModifiedDate(lastModifiedDate);
+        final long version = new Random().nextLong();
+        userEntity.setVersion(version);
+
+        final String toString = userEntity.toString();
+
+        assertThat(toString, containsString(id));
+        assertThat(toString, containsString(status.toString()));
+        assertThat(toString, containsString(String.valueOf(true)));
+        assertThat(toString, containsString(String.valueOf("null")));
+        assertThat(toString, containsString(registrationDate.toString()));
+        assertThat(toString, containsString(processedDate.toString()));
+        assertThat(toString, containsString(createdDate.toString()));
+        assertThat(toString, containsString(lastModifiedDate.toString()));
+        assertThat(toString, containsString(String.valueOf(version)));
     }
 
 }

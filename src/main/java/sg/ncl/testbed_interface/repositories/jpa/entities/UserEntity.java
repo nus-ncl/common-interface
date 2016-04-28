@@ -134,8 +134,7 @@ public class UserEntity extends AbstractEntity implements User {
         sb.append(", registrationDate=").append(registrationDate);
         sb.append(", processedDate=").append(processedDate);
         sb.append(", userActivities=").append(userActivities);
-        sb.append(", createdDate=").append(getCreatedDate());
-        sb.append(", lastModifiedDate=").append(getLastModifiedDate());
+        sb.append(", super=").append(super.toString());
         sb.append('}');
         return sb.toString();
     }
