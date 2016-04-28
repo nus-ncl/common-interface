@@ -5,7 +5,6 @@ import org.junit.Test;
 import sg.ncl.testbed_interface.domain.UserStatus;
 
 import java.time.ZonedDateTime;
-import java.util.Random;
 
 import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.assertThat;
@@ -166,12 +165,6 @@ public class UserEntityTest {
         userEntity.setRegistrationDate(registrationDate);
         final ZonedDateTime processedDate = now.minusMonths(1);
         userEntity.setProcessedDate(processedDate);
-        final ZonedDateTime createdDate = now.minusWeeks(1);
-        userEntity.setCreatedDate(createdDate);
-        final ZonedDateTime lastModifiedDate = now.minusDays(1);
-        userEntity.setLastModifiedDate(lastModifiedDate);
-        final long version = new Random().nextLong();
-        userEntity.setVersion(version);
 
         final String toString = userEntity.toString();
 
@@ -181,9 +174,6 @@ public class UserEntityTest {
         assertThat(toString, containsString(String.valueOf("null")));
         assertThat(toString, containsString(registrationDate.toString()));
         assertThat(toString, containsString(processedDate.toString()));
-        assertThat(toString, containsString(createdDate.toString()));
-        assertThat(toString, containsString(lastModifiedDate.toString()));
-        assertThat(toString, containsString(String.valueOf(version)));
     }
 
 }
