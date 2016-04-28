@@ -52,5 +52,10 @@ public interface User {
      */
     ZonedDateTime getProcessedDate();
 
+    /**
+     * Returns a list of {@link LoginActivity} for this {@link User}.
+     *
+     * @return a list of {@link LoginActivity} for this {@link User}.
+     */
     List<? extends LoginActivity> getLoginActivities();
 }
