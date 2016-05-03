@@ -60,7 +60,7 @@ public class UserEntity extends AbstractEntity implements User {
         return id;
     }
 
-    protected void setId(final String id) {
+    void setId(final String id) {
         this.id = id;
     }
 
