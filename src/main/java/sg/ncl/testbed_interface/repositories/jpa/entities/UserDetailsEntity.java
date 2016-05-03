@@ -8,7 +8,7 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
-import javax.persistence.OneToMany;
+import javax.persistence.OneToOne;
 import javax.persistence.Table;
 
 /**
@@ -29,7 +29,7 @@ public class UserDetailsEntity extends AbstractEntity implements UserDetails {
     @Column(name = "last_name", nullable = false)
     private String lastName = null;
 
-    @OneToMany(cascade = {CascadeType.ALL})
+    @OneToOne(cascade = {CascadeType.ALL})
     @JoinColumn(name = "address_id", nullable = false)
     private AddressEntity address = null;
 
