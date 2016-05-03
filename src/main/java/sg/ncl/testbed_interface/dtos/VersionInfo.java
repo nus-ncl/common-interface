@@ -1,6 +1,6 @@
 package sg.ncl.testbed_interface.dtos;
 
-import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 
 /**
  * @author Christopher Zhong
@@ -10,9 +10,9 @@ public class VersionInfo {
     private final int major;
     private final int minor;
     private final String build;
-    private final LocalDateTime date;
+    private final ZonedDateTime date;
 
-    public VersionInfo(int major, int minor, String build, LocalDateTime date) {
+    public VersionInfo(int major, int minor, String build, ZonedDateTime date) {
         this.major = major;
         this.minor = minor;
         this.build = build;
@@ -31,7 +31,7 @@ public class VersionInfo {
         return build;
     }
 
-    public LocalDateTime getDate() {
+    public ZonedDateTime getDate() {
         return date;
     }
 
