@@ -81,16 +81,16 @@ public class UserEntityTest {
     public void testGetRegistrationDate() throws Exception {
         final UserEntity userEntity = new UserEntity();
 
-        assertThat(userEntity.getRegistrationDate(), is(nullValue()));
+        assertThat(userEntity.getApplicationDate(), is(nullValue()));
     }
 
     @Test
     public void testSetRegistrationDate() throws Exception {
         final UserEntity userEntity = new UserEntity();
         final ZonedDateTime now = ZonedDateTime.now();
-        userEntity.setRegistrationDate(now);
+        userEntity.setApplicationDate(now);
 
-        assertThat(userEntity.getRegistrationDate(), is(equalTo(now)));
+        assertThat(userEntity.getApplicationDate(), is(equalTo(now)));
     }
 
     @Test
@@ -192,7 +192,7 @@ public class UserEntityTest {
         userEntity.setEmailVerified(true);
         final ZonedDateTime now = ZonedDateTime.now();
         final ZonedDateTime registrationDate = now.minusYears(1);
-        userEntity.setRegistrationDate(registrationDate);
+        userEntity.setApplicationDate(registrationDate);
         final ZonedDateTime processedDate = now.minusMonths(1);
         userEntity.setProcessedDate(processedDate);
 

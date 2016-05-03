@@ -7,18 +7,23 @@ import sg.ncl.testbed_interface.domain.UserStatus;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
+import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
+import javax.persistence.ManyToMany;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
  * @author Christopher Zhong
@@ -45,15 +50,19 @@ public class UserEntity extends AbstractEntity implements User {
     @Enumerated(EnumType.STRING)
     private UserStatus status = UserStatus.PENDING;
 
-    @Column(name = "registration_date", nullable = false)
-    private ZonedDateTime registrationDate = null;
+    @Column(name = "application_date", nullable = false)
+    private ZonedDateTime applicationDate = null;
 
     @Column(name = "processed_date")
     private ZonedDateTime processedDate = null;
 
     @OneToMany(cascade = {CascadeType.ALL})
     @JoinColumn(name = "user_id")
-    private List<LoginActivityEntity> loginActivities = new ArrayList<>();
+    private final List<LoginActivityEntity> loginActivities = new CopyOnWriteArrayList<>();
+
+    @ManyToMany(mappedBy = "members")
+    @ElementCollection
+    private final ConcurrentMap<String, TeamEntity> teams = new ConcurrentHashMap<>();
 
     @Override
     public String getId() {
@@ -91,12 +100,12 @@ public class UserEntity extends AbstractEntity implements User {
     }
 
     @Override
-    public ZonedDateTime getRegistrationDate() {
-        return this.registrationDate;
+    public ZonedDateTime getApplicationDate() {
+        return this.applicationDate;
     }
 
-    public void setRegistrationDate(ZonedDateTime registrationDate) {
-        this.registrationDate = registrationDate;
+    public void setApplicationDate(ZonedDateTime applicationDate) {
+        this.applicationDate = applicationDate;
     }
 
     @Override
@@ -118,14 +127,26 @@ public class UserEntity extends AbstractEntity implements User {
     }
 
     @Override
+    public List<TeamEntity> getTeams() {
+        return new ArrayList<>(teams.values());
+    }
+
+    TeamEntity addTeam(final TeamEntity team) {
+        return teams.putIfAbsent(team.getId(), team);
+    }
+
+    TeamEntity removeTeam(final TeamEntity team) {
+        return teams.remove(team.getId());
+    }
+
+    @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
 
-        User that = (User) o;
+        final User that = (User) o;
 
         return getId() == null ? that.getId() == null : getId().equals(that.getId());
-
     }
 
     @Override
@@ -140,7 +161,7 @@ public class UserEntity extends AbstractEntity implements User {
         sb.append(", userDetails=").append(userDetails);
         sb.append(", emailVerified=").append(emailVerified);
         sb.append(", status=").append(status);
-        sb.append(", registrationDate=").append(registrationDate);
+        sb.append(", applicationDate=").append(applicationDate);
         sb.append(", processedDate=").append(processedDate);
         sb.append(", loginActivities=").append(loginActivities);
         sb.append(", super=").append(super.toString());

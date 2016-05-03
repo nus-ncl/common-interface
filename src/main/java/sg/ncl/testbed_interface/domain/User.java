@@ -43,7 +43,7 @@ public interface User {
      *
      * @return the {@link ZonedDateTime} of when this {@link User} applied for an account.
      */
-    ZonedDateTime getRegistrationDate();
+    ZonedDateTime getApplicationDate();
 
     /**
      * Returns the {@link ZonedDateTime} of when this {@link User}'s application was processed.
@@ -58,4 +58,12 @@ public interface User {
      * @return a list of {@link LoginActivity} for this {@link User}.
      */
     List<? extends LoginActivity> getLoginActivities();
+
+    /**
+     * Returns a list of {@link Team} for this {@link User}.
+     *
+     * @return a list of {@link Team} for this {@link User}.
+     */
+    List<? extends Team> getTeams();
+
 }
