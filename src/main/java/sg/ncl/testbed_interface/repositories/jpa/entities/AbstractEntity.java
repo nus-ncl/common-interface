@@ -8,6 +8,7 @@ import javax.persistence.Column;
 import javax.persistence.EntityListeners;
 import javax.persistence.MappedSuperclass;
 import javax.persistence.Version;
+import java.io.Serializable;
 import java.time.ZonedDateTime;
 
 /**
@@ -15,7 +16,7 @@ import java.time.ZonedDateTime;
  */
 @MappedSuperclass
 @EntityListeners({AuditingEntityListener.class})
-public abstract class AbstractEntity {
+public abstract class AbstractEntity implements Serializable {
 
 //    @Column(name = "created_by")
 //    @CreatedBy
@@ -41,7 +42,7 @@ public abstract class AbstractEntity {
         return createdDate;
     }
 
-    protected void setCreatedDate(final ZonedDateTime createdDate) {
+    void setCreatedDate(final ZonedDateTime createdDate) {
         this.createdDate = createdDate;
     }
 
@@ -49,7 +50,7 @@ public abstract class AbstractEntity {
         return lastModifiedDate;
     }
 
-    protected void setLastModifiedDate(final ZonedDateTime lastModifiedDate) {
+    void setLastModifiedDate(final ZonedDateTime lastModifiedDate) {
         this.lastModifiedDate = lastModifiedDate;
     }
 
@@ -57,7 +58,7 @@ public abstract class AbstractEntity {
         return version;
     }
 
-    protected void setVersion(final Long version) {
+    void setVersion(final Long version) {
         this.version = version;
     }
 
