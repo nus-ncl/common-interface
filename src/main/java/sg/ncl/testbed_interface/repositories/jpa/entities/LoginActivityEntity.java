@@ -31,23 +31,25 @@ public class LoginActivityEntity extends AbstractEntity implements LoginActivity
         return id;
     }
 
-    protected void setId(final Long id) {
+    void setId(final Long id) {
         this.id = id;
     }
 
+    @Override
     public String getIpAddress() {
         return ipAddress;
     }
 
-    public void setIpAddress(final String ipAddress) {
+    void setIpAddress(final String ipAddress) {
         this.ipAddress = ipAddress;
     }
 
+    @Override
     public ZonedDateTime getDate() {
         return date;
     }
 
-    public void setDate(final ZonedDateTime date) {
+    void setDate(final ZonedDateTime date) {
         this.date = date;
     }
 
