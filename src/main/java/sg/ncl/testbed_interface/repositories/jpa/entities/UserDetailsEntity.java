@@ -1,6 +1,6 @@
 package sg.ncl.testbed_interface.repositories.jpa.entities;
 
-import sg.ncl.testbed_interface.domain.UserDetails;
+import sg.ncl.domain.UserDetails;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;

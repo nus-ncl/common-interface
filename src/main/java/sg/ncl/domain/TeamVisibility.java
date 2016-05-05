@@ -1,4 +1,4 @@
-package sg.ncl.testbed_interface.domain;
+package sg.ncl.domain;
 
 /**
  * The {@link TeamVisibility} enumerates all the types of visibility of a {@link Team}.

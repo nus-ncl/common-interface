@@ -1,7 +1,7 @@
 package sg.ncl.testbed_interface.repositories.jpa.entities;
 
-import sg.ncl.testbed_interface.domain.UserCredentials;
-import sg.ncl.testbed_interface.domain.UserCredentialsStatus;
+import sg.ncl.domain.UserCredentials;
+import sg.ncl.domain.UserCredentialsStatus;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;

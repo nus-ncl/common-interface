@@ -2,7 +2,7 @@ package sg.ncl.testbed_interface.repositories.jpa.entities;
 
 import org.apache.commons.lang3.RandomStringUtils;
 import org.junit.Test;
-import sg.ncl.testbed_interface.domain.UserCredentialsStatus;
+import sg.ncl.domain.UserCredentialsStatus;
 
 import java.util.Random;
 

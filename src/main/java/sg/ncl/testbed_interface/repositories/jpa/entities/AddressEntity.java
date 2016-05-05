@@ -1,6 +1,6 @@
 package sg.ncl.testbed_interface.repositories.jpa.entities;
 
-import sg.ncl.testbed_interface.domain.Address;
+import sg.ncl.domain.Address;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;

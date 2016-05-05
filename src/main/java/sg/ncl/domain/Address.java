@@ -1,4 +1,4 @@
-package sg.ncl.testbed_interface.domain;
+package sg.ncl.domain;
 
 /**
  * The {@link Address} interface represents a typical physical address.

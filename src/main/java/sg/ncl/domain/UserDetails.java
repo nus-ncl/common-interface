@@ -1,4 +1,4 @@
-package sg.ncl.testbed_interface.domain;
+package sg.ncl.domain;
 
 /**
  * The {@link UserDetails} interface represents the personal details of a {@link User}.

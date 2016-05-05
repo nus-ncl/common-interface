@@ -1,4 +1,4 @@
-package sg.ncl.testbed_interface.domain;
+package sg.ncl.domain;
 
 /**
  * The {@link UserStatus} enumerates the statuses of a {@link User}.

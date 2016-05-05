@@ -2,8 +2,8 @@ package sg.ncl.testbed_interface.repositories.jpa.entities;
 
 import org.hibernate.annotations.GenericGenerator;
 import org.hibernate.annotations.Type;
-import sg.ncl.testbed_interface.domain.User;
-import sg.ncl.testbed_interface.domain.UserStatus;
+import sg.ncl.domain.User;
+import sg.ncl.domain.UserStatus;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;

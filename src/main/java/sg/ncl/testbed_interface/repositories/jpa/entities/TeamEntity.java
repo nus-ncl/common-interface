@@ -1,9 +1,9 @@
 package sg.ncl.testbed_interface.repositories.jpa.entities;
 
 import org.hibernate.annotations.GenericGenerator;
-import sg.ncl.testbed_interface.domain.Team;
-import sg.ncl.testbed_interface.domain.TeamStatus;
-import sg.ncl.testbed_interface.domain.TeamVisibility;
+import sg.ncl.domain.Team;
+import sg.ncl.domain.TeamStatus;
+import sg.ncl.domain.TeamVisibility;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;

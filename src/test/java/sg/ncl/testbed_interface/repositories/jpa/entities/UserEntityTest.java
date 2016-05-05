@@ -2,7 +2,7 @@ package sg.ncl.testbed_interface.repositories.jpa.entities;
 
 import org.apache.commons.lang3.RandomStringUtils;
 import org.junit.Test;
-import sg.ncl.testbed_interface.domain.UserStatus;
+import sg.ncl.domain.UserStatus;
 
 import java.time.ZonedDateTime;
 import java.util.List;
