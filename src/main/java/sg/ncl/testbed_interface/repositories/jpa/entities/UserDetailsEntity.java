@@ -7,6 +7,7 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import javax.persistence.Index;
 import javax.persistence.JoinColumn;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
@@ -15,7 +16,7 @@ import javax.persistence.Table;
  * @author Christopher Zhong
  */
 @Entity
-@Table(name = "user_details")
+@Table(name = "user_details", indexes = {@Index(columnList = "email", unique = true)})
 public class UserDetailsEntity extends AbstractEntity implements UserDetails {
 
     @Id
@@ -33,7 +34,7 @@ public class UserDetailsEntity extends AbstractEntity implements UserDetails {
     @JoinColumn(name = "address_id", nullable = false)
     private AddressEntity address = null;
 
-    @Column(name = "enail", nullable = false)
+    @Column(name = "email", nullable = false)
     private String email = null;
 
     @Column(name = "phone", nullable = false)
@@ -43,7 +44,7 @@ public class UserDetailsEntity extends AbstractEntity implements UserDetails {
         return id;
     }
 
-    protected void setId(final Long id) {
+    void setId(final Long id) {
         this.id = id;
     }
 
@@ -52,7 +53,7 @@ public class UserDetailsEntity extends AbstractEntity implements UserDetails {
         return firstName;
     }
 
-    public void setFirstName(final String firstName) {
+    void setFirstName(final String firstName) {
         this.firstName = firstName;
     }
 
@@ -61,7 +62,7 @@ public class UserDetailsEntity extends AbstractEntity implements UserDetails {
         return lastName;
     }
 
-    public void setLastName(final String lastName) {
+    void setLastName(final String lastName) {
         this.lastName = lastName;
     }
 
@@ -70,7 +71,7 @@ public class UserDetailsEntity extends AbstractEntity implements UserDetails {
         return address;
     }
 
-    public void setAddress(final AddressEntity address) {
+    void setAddress(final AddressEntity address) {
         this.address = address;
     }
 
@@ -79,7 +80,7 @@ public class UserDetailsEntity extends AbstractEntity implements UserDetails {
         return email;
     }
 
-    public void setEmail(final String email) {
+    void setEmail(final String email) {
         this.email = email;
     }
 
@@ -88,7 +89,7 @@ public class UserDetailsEntity extends AbstractEntity implements UserDetails {
         return phone;
     }
 
-    public void setPhone(final String phone) {
+    void setPhone(final String phone) {
         this.phone = phone;
     }
 
@@ -100,7 +101,6 @@ public class UserDetailsEntity extends AbstractEntity implements UserDetails {
         UserDetails that = (UserDetails) o;
 
         return getEmail() == null ? that.getEmail() == null : getEmail().equals(that.getEmail());
-
     }
 
     @Override
@@ -121,4 +121,5 @@ public class UserDetailsEntity extends AbstractEntity implements UserDetails {
         sb.append('}');
         return sb.toString();
     }
+
 }
