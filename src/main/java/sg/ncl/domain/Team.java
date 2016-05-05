@@ -17,18 +17,53 @@ public interface Team {
      */
     String getId();
 
+    /**
+     * Returns the name of this {@link Team}.
+     *
+     * @return the name of this {@link Team}.
+     */
     String getName();
 
+    /**
+     * Returns the description of this {@link Team}.
+     *
+     * @return the description of this {@link Team}.
+     */
     String getDescription();
 
+    /**
+     * Returns the {@link TeamVisibility} of this {@link Team}.
+     *
+     * @return the {@link TeamVisibility} of this {@link Team}.
+     */
     TeamVisibility getVisibility();
 
+    /**
+     * Returns the {@link TeamStatus} of this {@link Team}.
+     *
+     * @return the {@link TeamStatus} of this {@link Team}.
+     */
     TeamStatus getStatus();
 
+    /**
+     * Returns the time when this {@link Team} was created.
+     *
+     * @return the time when this {@link Team} was created.
+     */
     ZonedDateTime getApplicationDate();
 
+    /**
+     * Returns the time when this {@link Team} was approved.
+     *
+     * @return the time when this {@link Team} was approved.
+     */
     ZonedDateTime getProcessedDate();
 
+    /**
+     * Returns the members of this {@link Team}.
+     *
+     * @return the members of this {@link Team}.
+     */
     List<? extends TeamMember> getMembers();
 
 }
