@@ -19,7 +19,7 @@ import javax.persistence.Table;
  * @author Christopher Zhong
  */
 @Entity
-@Table(name = "user_credentials", indexes = {@Index(columnList = "username")})
+@Table(name = "user_credentials", indexes = {@Index(columnList = "username", unique = true)})
 public class UserCredentialsEntity extends AbstractEntity implements UserCredentials {
 
     @Id
@@ -45,7 +45,7 @@ public class UserCredentialsEntity extends AbstractEntity implements UserCredent
         return id;
     }
 
-    protected void setId(Long id) {
+    void setId(Long id) {
         this.id = id;
     }
 
@@ -54,7 +54,7 @@ public class UserCredentialsEntity extends AbstractEntity implements UserCredent
         return username;
     }
 
-    public void setUsername(final String username) {
+    void setUsername(final String username) {
         this.username = username;
     }
 
@@ -63,7 +63,7 @@ public class UserCredentialsEntity extends AbstractEntity implements UserCredent
         return password;
     }
 
-    public void setPassword(final String password) {
+    void setPassword(final String password) {
         this.password = password;
     }
 
@@ -72,7 +72,7 @@ public class UserCredentialsEntity extends AbstractEntity implements UserCredent
         return user;
     }
 
-    public void setUser(final UserEntity user) {
+    void setUser(final UserEntity user) {
         this.user = user;
     }
 
@@ -81,7 +81,7 @@ public class UserCredentialsEntity extends AbstractEntity implements UserCredent
         return status;
     }
 
-    public void setStatus(final UserCredentialsStatus status) {
+    void setStatus(final UserCredentialsStatus status) {
         this.status = status;
     }
 
