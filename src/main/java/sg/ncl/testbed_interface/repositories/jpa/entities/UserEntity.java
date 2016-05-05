@@ -7,23 +7,22 @@ import sg.ncl.testbed_interface.domain.UserStatus;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
-import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
-import javax.persistence.ManyToMany;
+import javax.persistence.MapKey;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentMap;
-import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * @author Christopher Zhong
@@ -58,11 +57,11 @@ public class UserEntity extends AbstractEntity implements User {
 
     @OneToMany(cascade = {CascadeType.ALL})
     @JoinColumn(name = "user_id")
-    private final List<LoginActivityEntity> loginActivities = new CopyOnWriteArrayList<>();
+    private final List<LoginActivityEntity> loginActivities = new ArrayList<>();
 
-    @ManyToMany(mappedBy = "members")
-    @ElementCollection
-    private final ConcurrentMap<String, TeamEntity> teams = new ConcurrentHashMap<>();
+    @OneToMany(cascade = {CascadeType.ALL}, mappedBy = "user")
+    @MapKey(name = "team")
+    private final Map<String, TeamMemberEntity> teams = new HashMap<>();
 
     @Override
     public String getId() {
@@ -77,7 +76,7 @@ public class UserEntity extends AbstractEntity implements User {
         return userDetails;
     }
 
-    public void setUserDetails(final UserDetailsEntity userDetails) {
+    void setUserDetails(final UserDetailsEntity userDetails) {
         this.userDetails = userDetails;
     }
 
@@ -86,7 +85,7 @@ public class UserEntity extends AbstractEntity implements User {
         return emailVerified;
     }
 
-    public void setEmailVerified(final boolean emailVerified) {
+    void setEmailVerified(final boolean emailVerified) {
         this.emailVerified = emailVerified;
     }
 
@@ -95,7 +94,7 @@ public class UserEntity extends AbstractEntity implements User {
         return status;
     }
 
-    public void setStatus(final UserStatus status) {
+    void setStatus(final UserStatus status) {
         this.status = status;
     }
 
@@ -104,7 +103,7 @@ public class UserEntity extends AbstractEntity implements User {
         return this.applicationDate;
     }
 
-    public void setApplicationDate(ZonedDateTime applicationDate) {
+    void setApplicationDate(ZonedDateTime applicationDate) {
         this.applicationDate = applicationDate;
     }
 
@@ -113,7 +112,7 @@ public class UserEntity extends AbstractEntity implements User {
         return this.processedDate;
     }
 
-    public void setProcessedDate(ZonedDateTime processedDate) {
+    void setProcessedDate(ZonedDateTime processedDate) {
         this.processedDate = processedDate;
     }
 
@@ -122,21 +121,21 @@ public class UserEntity extends AbstractEntity implements User {
         return loginActivities;
     }
 
-    public void addLoginActivity(final LoginActivityEntity loginActivity) {
+    void addLoginActivity(final LoginActivityEntity loginActivity) {
         loginActivities.add(loginActivity);
     }
 
     @Override
     public List<TeamEntity> getTeams() {
-        return new ArrayList<>(teams.values());
+        return teams.values().stream().map(TeamMemberEntity::getTeam).collect(Collectors.toCollection(ArrayList::new));
     }
 
-    TeamEntity addTeam(final TeamEntity team) {
-        return teams.putIfAbsent(team.getId(), team);
+    TeamMemberEntity addTeam(final TeamMemberEntity team) {
+        return teams.putIfAbsent(team.getTeam().getId(), team);
     }
 
-    TeamEntity removeTeam(final TeamEntity team) {
-        return teams.remove(team.getId());
+    TeamMemberEntity removeTeam(final TeamMemberEntity team) {
+        return teams.remove(team.getTeam().getId());
     }
 
     @Override

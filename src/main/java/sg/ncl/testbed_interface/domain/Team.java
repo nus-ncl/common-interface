@@ -29,6 +29,6 @@ public interface Team {
 
     ZonedDateTime getProcessedDate();
 
-    List<? extends User> getMembers();
+    List<? extends TeamMember> getMembers();
 
 }

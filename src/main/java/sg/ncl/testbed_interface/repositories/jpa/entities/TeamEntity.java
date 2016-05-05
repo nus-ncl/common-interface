@@ -5,20 +5,21 @@ import sg.ncl.testbed_interface.domain.Team;
 import sg.ncl.testbed_interface.domain.TeamStatus;
 import sg.ncl.testbed_interface.domain.TeamVisibility;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
-import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.ManyToMany;
+import javax.persistence.MapKey;
 import javax.persistence.Table;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentMap;
+import java.util.Map;
 
 /**
  * @author Christopher Zhong
@@ -53,9 +54,9 @@ public class TeamEntity extends AbstractEntity implements Team {
     @Column(name = "processed_date")
     private ZonedDateTime processedDate = null;
 
-    @ManyToMany
-    @ElementCollection
-    private final ConcurrentMap<String, UserEntity> members = new ConcurrentHashMap<>();
+    @ManyToMany(cascade = {CascadeType.ALL}, mappedBy = "team")
+    @MapKey(name = "user")
+    private final Map<String, TeamMemberEntity> members = new HashMap<>();
 
     @Override
     public String getId() {
@@ -121,7 +122,39 @@ public class TeamEntity extends AbstractEntity implements Team {
     }
 
     @Override
-    public List<UserEntity> getMembers() {
+    public List<TeamMemberEntity> getMembers() {
         return new ArrayList<>(members.values());
     }
+
+    @Override
+    public boolean equals(final Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        final Team that = (Team) o;
+
+        return getId() == null ? that.getId() == null : getId().equals(that.getId());
+    }
+
+    @Override
+    public int hashCode() {
+        return getId() == null ? 0 : getId().hashCode();
+    }
+
+    @Override
+    public String toString() {
+        final StringBuilder sb = new StringBuilder("TeamEntity{");
+        sb.append("id='").append(id).append('\'');
+        sb.append(", name='").append(name).append('\'');
+        sb.append(", description='").append(description).append('\'');
+        sb.append(", visibility=").append(visibility);
+        sb.append(", status=").append(status);
+        sb.append(", applicationDate=").append(applicationDate);
+        sb.append(", processedDate=").append(processedDate);
+        sb.append(", members=").append(members);
+        sb.append(", super=").append(super.toString());
+        sb.append('}');
+        return sb.toString();
+    }
+
 }
