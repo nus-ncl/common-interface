@@ -1,4 +1,4 @@
-package sg.ncl.testbed_interface.controllers;
+package controllers;
 
 import org.junit.Before;
 import org.junit.Test;

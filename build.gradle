@@ -17,6 +17,24 @@ apply plugin: 'spring-boot'
 sourceCompatibility = 1.8
 targetCompatibility = 1.8
 
+sourceSets {
+    integrationTest {
+        java {
+            compileClasspath += main.output + test.output
+            runtimeClasspath += main.output + test.output
+            srcDir('src/test-integration/java')
+        }
+        resources {
+            srcDir('src/test-integration/resources')
+        }
+    }
+}
+
+configurations {
+    integrationTestCompile.extendsFrom testCompile
+    integrationTestRuntime.extendsFrom testRuntime
+}
+
 repositories {
     jcenter()
 }
@@ -26,14 +44,27 @@ dependencies {
     compile('org.springframework.boot:spring-boot-starter-data-jpa')
     compile('javax.inject:javax.inject:1')
 
+    runtime('mysql:mysql-connector-java')
+
     testCompile('junit:junit')
-    testCompile('org.springframework.boot:spring-boot-starter-test')
+    testCompile('org.hamcrest:hamcrest-library')
     testCompile('org.apache.commons:commons-lang3:3.4')
 
-    runtime('mysql:mysql-connector-java')
+    integrationTestCompile('org.springframework.boot:spring-boot-starter-test')
+}
+
+task integrationTest(type: Test) {
+    check.dependsOn integrationTest
+    integrationTest.mustRunAfter test
+    testClassesDir = sourceSets.integrationTest.output.classesDir
+    classpath = sourceSets.integrationTest.runtimeClasspath
 }
 
 task wrapper(type: Wrapper) {
     gradleVersion = '2.12'
     distributionUrl = "https://services.gradle.org/distributions/gradle-${gradleVersion}-all.zip"
+}
+
+tasks.withType(Test) {
+    reports.html.destination = file("${reporting.baseDir}/${name}")
 }
