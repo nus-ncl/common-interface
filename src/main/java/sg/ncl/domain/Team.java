@@ -39,6 +39,13 @@ public interface Team {
     TeamVisibility getVisibility();
 
     /**
+     * Returns the {@link TeamPrivacy} of this {@link Team}.
+     *
+     * @return the {@link TeamPrivacy} of this {@link Team}.
+     */
+    TeamPrivacy getPrivacy();
+
+    /**
      * Returns the {@link TeamStatus} of this {@link Team}.
      *
      * @return the {@link TeamStatus} of this {@link Team}.

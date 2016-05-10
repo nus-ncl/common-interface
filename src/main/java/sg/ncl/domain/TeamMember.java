@@ -1,5 +1,7 @@
 package sg.ncl.domain;
 
+import java.time.ZonedDateTime;
+
 /**
  * The {@link TeamMember} interface represents a {@link User} that is part of a {@link Team}.
  *
@@ -20,5 +22,12 @@ public interface TeamMember {
      * @return the associated {@link User}.
      */
     User getUser();
+
+    /**
+     * Returns the {@link ZonedDateTime} that the associated {@link User} joined the {@link Team}.
+     *
+     * @return the {@link ZonedDateTime} that the associated {@link User} joined the {@link Team}.
+     */
+    ZonedDateTime getJoinedDate();
 
 }
