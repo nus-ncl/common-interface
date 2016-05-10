@@ -1,7 +1,8 @@
-package sg.ncl.testbed_interface.repositories.jpa.entities;
+package sg.ncl.testbed_interface.data.jpa.entities;
 
 import org.hibernate.annotations.GenericGenerator;
 import sg.ncl.domain.Team;
+import sg.ncl.domain.TeamPrivacy;
 import sg.ncl.domain.TeamStatus;
 import sg.ncl.domain.TeamVisibility;
 
@@ -43,6 +44,10 @@ public class TeamEntity extends AbstractEntity implements Team {
     @Column(name = "visibility", nullable = false)
     @Enumerated(EnumType.STRING)
     private TeamVisibility visibility = TeamVisibility.PUBLIC;
+
+    @Column(name = "privacy", nullable = false)
+    @Enumerated(EnumType.STRING)
+    private TeamPrivacy privacy = TeamPrivacy.OPEN;
 
     @Column(name = "status", nullable = false)
     @Enumerated(EnumType.STRING)
@@ -92,6 +97,15 @@ public class TeamEntity extends AbstractEntity implements Team {
 
     void setVisibility(final TeamVisibility visibility) {
         this.visibility = visibility;
+    }
+
+    @Override
+    public TeamPrivacy getPrivacy() {
+        return privacy;
+    }
+
+    void setPrivacy(final TeamPrivacy privacy) {
+        this.privacy = privacy;
     }
 
     @Override

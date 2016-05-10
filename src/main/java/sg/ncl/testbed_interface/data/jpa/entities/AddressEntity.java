@@ -1,4 +1,4 @@
-package sg.ncl.testbed_interface.repositories.jpa.entities;
+package sg.ncl.testbed_interface.data.jpa.entities;
 
 import sg.ncl.domain.Address;
 

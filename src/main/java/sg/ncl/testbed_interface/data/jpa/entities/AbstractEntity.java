@@ -1,4 +1,4 @@
-package sg.ncl.testbed_interface.repositories.jpa.entities;
+package sg.ncl.testbed_interface.data.jpa.entities;
 
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;

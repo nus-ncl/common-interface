@@ -1,4 +1,4 @@
-package sg.ncl.testbed_interface.repositories.jpa.entities;
+package sg.ncl.testbed_interface.data.jpa.entities;
 
 import sg.ncl.domain.TeamMember;
 
@@ -11,6 +11,7 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import javax.persistence.UniqueConstraint;
+import java.time.ZonedDateTime;
 
 /**
  * @author Christopher Zhong
@@ -31,6 +32,9 @@ public class TeamMemberEntity extends AbstractEntity implements TeamMember {
     @ManyToOne(cascade = {CascadeType.ALL}, optional = false)
     @JoinColumn(name = "user_id", nullable = false)
     private UserEntity user = null;
+
+    @Column(name = "joined_date", nullable = false)
+    private ZonedDateTime joinedDate = null;
 
     public Long getId() {
         return id;
@@ -56,6 +60,15 @@ public class TeamMemberEntity extends AbstractEntity implements TeamMember {
 
     void setUser(final UserEntity user) {
         this.user = user;
+    }
+
+    @Override
+    public ZonedDateTime getJoinedDate() {
+        return joinedDate;
+    }
+
+    void setJoinedDate(final ZonedDateTime joinedDate) {
+        this.joinedDate = joinedDate;
     }
 
 }

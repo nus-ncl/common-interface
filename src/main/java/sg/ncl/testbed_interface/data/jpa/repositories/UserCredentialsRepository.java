@@ -1,7 +1,7 @@
-package sg.ncl.testbed_interface.repositories.jpa.repositories;
+package sg.ncl.testbed_interface.data.jpa.repositories;
 
 import org.springframework.data.repository.PagingAndSortingRepository;
-import sg.ncl.testbed_interface.repositories.jpa.entities.UserCredentialsEntity;
+import sg.ncl.testbed_interface.data.jpa.entities.UserCredentialsEntity;
 
 /**
  * @author Christopher Zhong
