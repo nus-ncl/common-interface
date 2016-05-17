@@ -35,32 +35,32 @@ public class UserEntity extends AbstractEntity implements User {
     @GeneratedValue(generator = "uuid2")
     @GenericGenerator(name = "uuid2", strategy = "uuid2")
     @Column(name = "id", nullable = false, unique = true, updatable = false)
-    private String id = null;
+    private String id;
 
-    @OneToOne(optional = false, cascade = {CascadeType.ALL})
+    @OneToOne(optional = false, cascade = CascadeType.ALL)
     @JoinColumn(name = "user_details_id", nullable = false, unique = true)
-    private UserDetailsEntity userDetails = null;
+    private UserDetailsEntity userDetails;
 
     @Column(name = "is_email_verified", nullable = false)
     @Type(type = "yes_no")
-    private boolean emailVerified = false;
+    private boolean emailVerified;
 
     @Column(name = "status", nullable = false)
     @Enumerated(EnumType.STRING)
     private UserStatus status = UserStatus.PENDING;
 
     @Column(name = "application_date", nullable = false)
-    private ZonedDateTime applicationDate = null;
+    private ZonedDateTime applicationDate;
 
     @Column(name = "processed_date")
-    private ZonedDateTime processedDate = null;
+    private ZonedDateTime processedDate;
 
-    @OneToMany(cascade = {CascadeType.ALL})
+    @OneToMany(cascade = CascadeType.ALL)
     @JoinColumn(name = "user_id")
     private final List<LoginActivityEntity> loginActivities = new ArrayList<>();
 
     @ElementCollection
-    @CollectionTable(name = "users_teams", joinColumns = {@JoinColumn(name = "user_id", nullable = false, updatable = false)}, indexes = {@Index(columnList = "user_id"), @Index(columnList = "team_id")}, uniqueConstraints = {@UniqueConstraint(columnNames = {"user_id", "team_id"})})
+    @CollectionTable(name = "users_teams", joinColumns = @JoinColumn(name = "user_id", nullable = false, updatable = false), indexes = {@Index(columnList = "user_id"), @Index(columnList = "team_id")}, uniqueConstraints = @UniqueConstraint(columnNames = {"user_id", "team_id"}))
     @Column(name = "team_id", nullable = false, updatable = false)
     private final List<String> teams = new ArrayList<>();
 
@@ -73,6 +73,7 @@ public class UserEntity extends AbstractEntity implements User {
         this.id = id;
     }
 
+    @Override
     public UserDetailsEntity getUserDetails() {
         return userDetails;
     }
@@ -101,19 +102,19 @@ public class UserEntity extends AbstractEntity implements User {
 
     @Override
     public ZonedDateTime getApplicationDate() {
-        return this.applicationDate;
+        return applicationDate;
     }
 
-    void setApplicationDate(ZonedDateTime applicationDate) {
+    void setApplicationDate(final ZonedDateTime applicationDate) {
         this.applicationDate = applicationDate;
     }
 
     @Override
     public ZonedDateTime getProcessedDate() {
-        return this.processedDate;
+        return processedDate;
     }
 
-    void setProcessedDate(ZonedDateTime processedDate) {
+    void setProcessedDate(final ZonedDateTime processedDate) {
         this.processedDate = processedDate;
     }
 
@@ -127,25 +128,25 @@ public class UserEntity extends AbstractEntity implements User {
     }
 
     @Override
-    public List<String> getTeams() {
+    public List<String> getTeamIds() {
         return new ArrayList<>(teams);
     }
 
-    void addTeam(final String teamId) {
+    void addTeamId(final String teamId) {
         if (teams.contains(teamId)) {
             return;
         }
         teams.add(teamId);
     }
 
-    void removeTeam(final String teamId) {
+    void removeTeamId(final String teamId) {
         if (teams.contains(teamId)) {
             teams.remove(teamId);
         }
     }
 
     @Override
-    public boolean equals(Object o) {
+    public boolean equals(final Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
 

@@ -1,7 +1,6 @@
 package sg.ncl.service.team.data.jpa.entities;
 
 import sg.ncl.service.team.domain.TeamMember;
-import sg.ncl.service.user.data.jpa.entities.UserEntity;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -18,7 +17,7 @@ import java.time.ZonedDateTime;
  * @author Christopher Zhong
  */
 @Entity
-@Table(name = "team_members", uniqueConstraints = {@UniqueConstraint(columnNames = {"team_id", "user_id"})})
+@Table(name = "team_members", uniqueConstraints = @UniqueConstraint(columnNames = {"team_id", "user_id"}))
 public class TeamMemberEntity extends AbstractEntity implements TeamMember {
 
     @Id
@@ -26,16 +25,16 @@ public class TeamMemberEntity extends AbstractEntity implements TeamMember {
     @Column(name = "id", nullable = false, unique = true, updatable = false)
     private Long id;
 
-    @ManyToOne(cascade = {CascadeType.ALL}, optional = false)
-    @JoinColumn(name = "team_id", nullable = false)
-    private TeamEntity team = null;
+    @ManyToOne(cascade = CascadeType.ALL, optional = false)
+    @JoinColumn(name = "team_id", nullable = false, updatable = false)
+    private TeamEntity team;
 
-    @ManyToOne(cascade = {CascadeType.ALL}, optional = false)
-    @JoinColumn(name = "user_id", nullable = false)
-    private UserEntity user = null;
+    @ManyToOne(cascade = CascadeType.ALL, optional = false)
+    @JoinColumn(name = "user_id", nullable = false, updatable = false)
+    private String userId;
 
     @Column(name = "joined_date", nullable = false)
-    private ZonedDateTime joinedDate = null;
+    private ZonedDateTime joinedDate;
 
     public Long getId() {
         return id;
@@ -55,12 +54,12 @@ public class TeamMemberEntity extends AbstractEntity implements TeamMember {
     }
 
     @Override
-    public UserEntity getUser() {
-        return user;
+    public String getUserId() {
+        return userId;
     }
 
-    void setUser(final UserEntity user) {
-        this.user = user;
+    void setUser(final String userId) {
+        this.userId = userId;
     }
 
     @Override

@@ -1,7 +1,6 @@
 package sg.ncl.service.user.data.jpa.entities;
 
 import org.junit.Test;
-import sg.ncl.service.team.data.jpa.entities.AbstractEntity;
 
 import java.time.ZonedDateTime;
 import java.util.Random;
