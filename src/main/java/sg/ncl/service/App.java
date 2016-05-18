@@ -11,7 +11,7 @@ import org.springframework.context.ConfigurableApplicationContext;
 public class App {
 
     public static void main(String[] args) {
-        ConfigurableApplicationContext context = SpringApplication.run(App.class, args);
+        ConfigurableApplicationContext context = SpringApplication.run(sg.ncl.service.user.App.class, args);
 //        UserCredentialsRepository repository = context.getBean(UserCredentialsRepository.class);
 //        UserCredentialsEntity credentials = new UserCredentialsEntity();
 //        credentials.setUsername("abc");

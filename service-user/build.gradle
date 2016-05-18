@@ -41,15 +41,17 @@ repositories {
 }
 
 dependencies {
-    compile project(':service-user')
-    compile project(':service-team')
-    compile project(':service-version')
+    compile('org.springframework.boot:spring-boot-starter-web')
+    compile('org.springframework.boot:spring-boot-starter-data-jpa')
+    compile('javax.inject:javax.inject:1')
 
     runtime('mysql:mysql-connector-java')
 
-    testCompile project(':service-version')
+    testCompile('junit:junit')
+    testCompile('org.hamcrest:hamcrest-library')
+    testCompile('org.apache.commons:commons-lang3:3.4')
 
-    integrationTestCompile project(':service-version')
+    integrationTestCompile('org.springframework.boot:spring-boot-starter-test')
 
     integrationTestRuntime('com.h2database:h2')
 }

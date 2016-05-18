@@ -1,22 +1,12 @@
 package sg.ncl.service;
 
-import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Scope;
-import sg.ncl.service.version.domain.VersionInfo;
-
-import java.time.ZonedDateTime;
+import org.springframework.context.annotation.Import;
 
 /**
  * @author Christopher Zhong
  */
 @Configuration
+@Import({sg.ncl.service.user.AppConfig.class, sg.ncl.service.team.AppConfig.class, sg.ncl.service.version.AppConfig.class})
 public class AppConfig {
-
-    @Bean
-    @Scope("singleton")
-    VersionInfo versionInfo() {
-        return new VersionInfo(1, 0, "3ade5", ZonedDateTime.now());
-    }
-
 }
