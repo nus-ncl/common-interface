@@ -10,13 +10,6 @@ import java.time.ZonedDateTime;
 public interface TeamMember {
 
     /**
-     * Returns the associated {@link Team}.
-     *
-     * @return the associated {@link Team}.
-     */
-    Team getTeam();
-
-    /**
      * Returns the associated user ID.
      *
      * @return the associated user ID.

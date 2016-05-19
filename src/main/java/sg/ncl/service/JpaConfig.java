@@ -8,7 +8,7 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 /**
  * @author Christopher Zhong
  */
-@Configuration
+@Configuration("sg.ncl.service.JpaConfig")
 @EnableJpaRepositories
 @EnableJpaAuditing
 @EnableTransactionManagement

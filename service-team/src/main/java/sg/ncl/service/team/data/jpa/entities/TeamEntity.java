@@ -60,7 +60,7 @@ public class TeamEntity extends AbstractEntity implements Team {
     private ZonedDateTime processedDate;
 
     @ManyToMany(cascade = CascadeType.ALL, mappedBy = "team")
-    @MapKey(name = "user")
+    @MapKey(name = "userId")
     private final Map<String, TeamMemberEntity> members = new HashMap<>();
 
     @Override

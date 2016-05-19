@@ -5,6 +5,6 @@ import org.springframework.context.annotation.Configuration;
 /**
  * @author Christopher Zhong
  */
-@Configuration
+@Configuration("sg.ncl.service.user.AppConfig")
 public class AppConfig {
 }

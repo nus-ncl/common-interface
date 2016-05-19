@@ -10,7 +10,7 @@ import java.time.ZonedDateTime;
 /**
  * @author Christopher Zhong
  */
-@Configuration
+@Configuration("sg.ncl.service.version.AppConfig")
 public class AppConfig {
 
     @Bean

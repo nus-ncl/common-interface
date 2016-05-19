@@ -12,7 +12,7 @@ import javax.inject.Inject;
  * @author Christopher Zhong
  */
 @RestController
-@RequestMapping(path = "/version")
+@RequestMapping(path = "/version", produces = MediaType.APPLICATION_JSON_VALUE)
 public class VersionController {
 
     private final VersionInfo versionInfo;
@@ -22,7 +22,7 @@ public class VersionController {
         this.versionInfo = versionInfo;
     }
 
-    @RequestMapping(method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+    @RequestMapping(path = "", method = RequestMethod.GET)
     public VersionInfo version() {
         return versionInfo;
     }

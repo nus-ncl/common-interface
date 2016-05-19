@@ -29,8 +29,7 @@ public class TeamMemberEntity extends AbstractEntity implements TeamMember {
     @JoinColumn(name = "team_id", nullable = false, updatable = false)
     private TeamEntity team;
 
-    @ManyToOne(cascade = CascadeType.ALL, optional = false)
-    @JoinColumn(name = "user_id", nullable = false, updatable = false)
+    @Column(name = "user_id", nullable = false, updatable = false)
     private String userId;
 
     @Column(name = "joined_date", nullable = false)
@@ -44,7 +43,6 @@ public class TeamMemberEntity extends AbstractEntity implements TeamMember {
         this.id = id;
     }
 
-    @Override
     public TeamEntity getTeam() {
         return team;
     }
@@ -58,7 +56,7 @@ public class TeamMemberEntity extends AbstractEntity implements TeamMember {
         return userId;
     }
 
-    void setUser(final String userId) {
+    void setUserId(final String userId) {
         this.userId = userId;
     }
 
