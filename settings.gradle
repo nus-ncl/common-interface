@@ -1,2 +1,3 @@
 rootProject.name = 'common-interface'
+include 'common-jpa'
 include 'service-user', 'service-team', 'service-version', 'service-experiment', 'service-realization'

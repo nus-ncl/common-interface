@@ -2,7 +2,7 @@
 # For more information, please read http://docs.spring.io/spring-boot/docs/current/reference/html/index.html
 spring:
   datasource:
-    url: jdbc:mysql://${jdbc.mysql.host}:3306/test # please set your environment variable
+    url: jdbc:mysql://${jdbc.mysql.host}:3306/${jdbc.mysql.schema} # please set your environment variable
     username: ${jdbc.mysql.username} # please set your environment variable
     password: ${jdbc.mysql.password} # please set your environment variable
   jpa:
