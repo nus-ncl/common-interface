@@ -6,10 +6,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
-import sg.ncl.service.user.data.jpa.entities.UserCredentialsEntity;
-import sg.ncl.service.user.data.jpa.entities.UserDetailsEntity;
-import sg.ncl.service.user.data.jpa.entities.UserEntity;
-import sg.ncl.service.user.data.jpa.repositories.UserRepository;
+import sg.ncl.service.user.UserService;
 import sg.ncl.service.user.domain.User;
 
 import javax.inject.Inject;
@@ -22,29 +19,29 @@ import javax.validation.Valid;
 @RequestMapping(path = "/users", produces = MediaType.APPLICATION_JSON_VALUE)
 public class UsersController {
 
-    private final UserRepository userRepository;
+    private final UserService userService;
 
     @Inject
-    protected UsersController(final UserRepository userRepository) {
-        this.userRepository = userRepository;
+    protected UsersController(final UserService userService) {
+        this.userService = userService;
     }
 
     @RequestMapping(path = "", method = RequestMethod.POST)
     public void addUser(@RequestBody @Valid User user) {
-        final UserEntity userEntity = new UserEntity();
-        final UserDetailsEntity userDetailsEntity = new UserDetailsEntity();
+//        final UserEntity userEntity = new UserEntity();
+//        final UserDetailsEntity userDetailsEntity = new UserDetailsEntity();
 //        userDetailsEntity.setFirstName("");
 //        userDetailsEntity.setLastName("");
 //        userEntity.setUserDetails(userDetailsEntity);
-        new UserCredentialsEntity();
-        userRepository.save(userEntity);
+//        new UserCredentialsEntity();
+//        userService.save(userEntity);
         return;
     }
 
     @RequestMapping(path = "/{id}", method = RequestMethod.GET)
     public User getUser(@PathVariable String id) {
-        final UserEntity user = userRepository.findOne(id);
-        return user;
+//        final UserEntity user = userService.findOne(id);
+        return null;
     }
 
     @RequestMapping(path = "/{id}", method = RequestMethod.PUT)

@@ -1,10 +1,9 @@
-package sg.ncl.service.user.data.jpa.entities;
+package sg.ncl.service.authentication.data.jpa.entities;
 
 import sg.ncl.common.jpa.AbstractEntity;
-import sg.ncl.service.user.domain.UserCredentials;
-import sg.ncl.service.user.domain.UserCredentialsStatus;
+import sg.ncl.service.authentication.domain.Credentials;
+import sg.ncl.service.authentication.domain.CredentialsStatus;
 
-import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
@@ -12,16 +11,14 @@ import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.Index;
-import javax.persistence.JoinColumn;
-import javax.persistence.OneToOne;
 import javax.persistence.Table;
 
 /**
  * @author Christopher Zhong
  */
 @Entity
-@Table(name = "user_credentials", indexes = @Index(columnList = "username", unique = true))
-public class UserCredentialsEntity extends AbstractEntity implements UserCredentials {
+@Table(name = "credentials", indexes = @Index(columnList = "username", unique = true))
+public class CredentialsEntity extends AbstractEntity implements Credentials {
 
     @Id
     @GeneratedValue
@@ -34,19 +31,18 @@ public class UserCredentialsEntity extends AbstractEntity implements UserCredent
     @Column(name = "password", nullable = false)
     private String password;
 
-    @OneToOne(optional = false, cascade = CascadeType.ALL)
-    @JoinColumn(name = "user_id", nullable = false, unique = true)
-    private UserEntity user;
+    @Column(name = "user_id", nullable = false, unique = true)
+    private String userId;
 
     @Column(name = "status", nullable = false)
     @Enumerated(EnumType.STRING)
-    private UserCredentialsStatus status = UserCredentialsStatus.ACTIVE;
+    private CredentialsStatus status = CredentialsStatus.ACTIVE;
 
     public Long getId() {
         return id;
     }
 
-    void setId(Long id) {
+    void setId(final Long id) {
         this.id = id;
     }
 
@@ -69,29 +65,29 @@ public class UserCredentialsEntity extends AbstractEntity implements UserCredent
     }
 
     @Override
-    public UserEntity getUser() {
-        return user;
+    public String getUserId() {
+        return userId;
     }
 
-    void setUser(final UserEntity user) {
-        this.user = user;
+    void setUserId(final String userId) {
+        this.userId = userId;
     }
 
     @Override
-    public UserCredentialsStatus getStatus() {
+    public CredentialsStatus getStatus() {
         return status;
     }
 
-    void setStatus(final UserCredentialsStatus status) {
+    void setStatus(final CredentialsStatus status) {
         this.status = status;
     }
 
     @Override
-    public boolean equals(Object o) {
+    public boolean equals(final Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
 
-        UserCredentials that = (UserCredentials) o;
+        final Credentials that = (Credentials) o;
 
         return getUsername() == null ? that.getUsername() == null : getUsername().equals(that.getUsername());
     }
@@ -103,11 +99,11 @@ public class UserCredentialsEntity extends AbstractEntity implements UserCredent
 
     @Override
     public String toString() {
-        final StringBuilder sb = new StringBuilder("UserCredentialsEntity{");
+        final StringBuilder sb = new StringBuilder("CredentialsEntity{");
         sb.append("id=").append(id);
         sb.append(", username='").append(username).append('\'');
         sb.append(", password='").append(password).append('\'');
-        sb.append(", user=").append(user);
+        sb.append(", userId=").append(userId);
         sb.append(", status=").append(status);
         sb.append(", super=").append(super.toString());
         sb.append('}');
