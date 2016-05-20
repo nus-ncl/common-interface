@@ -52,8 +52,7 @@ dependencies {
     testCompile('org.apache.commons:commons-lang3:3.4')
 
     integrationTestCompile('org.springframework.boot:spring-boot-starter-test')
-
-    integrationTestRuntime('com.h2database:h2')
+    integrationTestCompile('com.h2database:h2')
 }
 
 task integrationTest(type: Test) {
