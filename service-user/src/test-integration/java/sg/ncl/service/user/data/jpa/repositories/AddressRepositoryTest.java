@@ -1,8 +1,6 @@
 package sg.ncl.service.user.data.jpa.repositories;
 
 import org.apache.commons.lang3.RandomStringUtils;
-import org.h2.jdbc.JdbcSQLException;
-import org.hibernate.exception.ConstraintViolationException;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
@@ -78,13 +76,6 @@ public class AddressRepositoryTest extends AbstractTest {
             return;
         }
         exception.expect(DataIntegrityViolationException.class);
-    }
-
-    private void checkException(final Exception e, final String message) {
-        assertThat(e, is(instanceOf(DataIntegrityViolationException.class)));
-        assertThat(e.getCause(), is(instanceOf(ConstraintViolationException.class)));
-        assertThat(e.getCause().getCause(), is(instanceOf(JdbcSQLException.class)));
-        assertThat(e.getCause().getCause().getMessage(), containsString(message));
     }
 
     public static AddressEntity getAddressEntity() {
