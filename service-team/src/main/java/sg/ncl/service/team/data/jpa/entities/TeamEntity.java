@@ -1,6 +1,7 @@
 package sg.ncl.service.team.data.jpa.entities;
 
 import org.hibernate.annotations.GenericGenerator;
+import sg.ncl.common.jpa.AbstractEntity;
 import sg.ncl.service.team.domain.Team;
 import sg.ncl.service.team.domain.TeamPrivacy;
 import sg.ncl.service.team.domain.TeamStatus;
