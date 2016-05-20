@@ -1,6 +1,7 @@
 package sg.ncl.service.realization.data.jpa.entities;
 
 import org.hibernate.annotations.GenericGenerator;
+import sg.ncl.common.jpa.AbstractEntity;
 import sg.ncl.service.realization.domain.Realization;
 
 import javax.persistence.Column;
