@@ -1,6 +1,7 @@
 package sg.ncl.service.experiment.data.jpa.entities;
 
 import org.hibernate.annotations.GenericGenerator;
+import sg.ncl.common.jpa.AbstractEntity;
 import sg.ncl.service.experiment.domain.Experiment;
 
 import javax.persistence.Column;
