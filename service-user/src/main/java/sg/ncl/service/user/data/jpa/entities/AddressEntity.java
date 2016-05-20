@@ -48,7 +48,7 @@ public class AddressEntity extends AbstractEntity implements Address {
         return address1;
     }
 
-    void setAddress1(final String address1) {
+    public void setAddress1(final String address1) {
         this.address1 = address1;
     }
 
@@ -57,7 +57,7 @@ public class AddressEntity extends AbstractEntity implements Address {
         return address2;
     }
 
-    void setAddress2(final String address2) {
+    public void setAddress2(final String address2) {
         this.address2 = address2;
     }
 
@@ -66,7 +66,7 @@ public class AddressEntity extends AbstractEntity implements Address {
         return country;
     }
 
-    void setCountry(final String country) {
+    public void setCountry(final String country) {
         this.country = country;
     }
 
@@ -75,7 +75,7 @@ public class AddressEntity extends AbstractEntity implements Address {
         return region;
     }
 
-    void setRegion(final String region) {
+    public void setRegion(final String region) {
         this.region = region;
     }
 
@@ -84,7 +84,7 @@ public class AddressEntity extends AbstractEntity implements Address {
         return zipCode;
     }
 
-    void setZipCode(final String zipCode) {
+    public void setZipCode(final String zipCode) {
         this.zipCode = zipCode;
     }
 
