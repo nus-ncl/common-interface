@@ -53,7 +53,7 @@ public class UserDetailsEntity extends AbstractEntity implements UserDetails {
         return firstName;
     }
 
-    void setFirstName(final String firstName) {
+    public void setFirstName(final String firstName) {
         this.firstName = firstName;
     }
 
@@ -62,7 +62,7 @@ public class UserDetailsEntity extends AbstractEntity implements UserDetails {
         return lastName;
     }
 
-    void setLastName(final String lastName) {
+    public void setLastName(final String lastName) {
         this.lastName = lastName;
     }
 
@@ -71,7 +71,7 @@ public class UserDetailsEntity extends AbstractEntity implements UserDetails {
         return address;
     }
 
-    void setAddress(final AddressEntity address) {
+    public void setAddress(final AddressEntity address) {
         this.address = address;
     }
 
@@ -80,7 +80,7 @@ public class UserDetailsEntity extends AbstractEntity implements UserDetails {
         return email;
     }
 
-    void setEmail(final String email) {
+    public void setEmail(final String email) {
         this.email = email;
     }
 
@@ -89,7 +89,7 @@ public class UserDetailsEntity extends AbstractEntity implements UserDetails {
         return phone;
     }
 
-    void setPhone(final String phone) {
+    public void setPhone(final String phone) {
         this.phone = phone;
     }
 
