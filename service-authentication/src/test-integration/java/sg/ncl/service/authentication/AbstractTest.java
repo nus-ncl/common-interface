@@ -19,10 +19,19 @@ import static org.junit.Assert.assertThat;
 @SpringApplicationConfiguration(classes = {App.class, TestConfig.class})
 @WebAppConfiguration
 public abstract class AbstractTest extends AbstractTransactionalJUnit4SpringContextTests {
+
     protected void checkException(final Exception e, final String message) {
         assertThat(e, is(instanceOf(DataIntegrityViolationException.class)));
         assertThat(e.getCause(), is(instanceOf(ConstraintViolationException.class)));
         assertThat(e.getCause().getCause(), is(instanceOf(JdbcSQLException.class)));
         assertThat(e.getCause().getCause().getMessage(), containsString(message));
     }
+
+    protected void checkException(final Exception e, final String startWithMessage, final String containsMessage) {
+        assertThat(e, is(instanceOf(DataIntegrityViolationException.class)));
+        assertThat(e.getCause(), is(instanceOf(ConstraintViolationException.class)));
+        assertThat(e.getCause().getCause(), is(instanceOf(JdbcSQLException.class)));
+        assertThat(e.getCause().getCause().getMessage(), allOf(startsWith(startWithMessage), containsString(containsMessage)));
+    }
+
 }

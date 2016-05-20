@@ -17,7 +17,7 @@ import javax.persistence.Table;
  * @author Christopher Zhong
  */
 @Entity
-@Table(name = "credentials", indexes = @Index(columnList = "username", unique = true))
+@Table(name = "credentials", indexes = {@Index(columnList = "username"), @Index(columnList = "user_id")})
 public class CredentialsEntity extends AbstractEntity implements Credentials {
 
     @Id
@@ -31,7 +31,7 @@ public class CredentialsEntity extends AbstractEntity implements Credentials {
     @Column(name = "password", nullable = false)
     private String password;
 
-    @Column(name = "user_id", nullable = false, unique = true)
+    @Column(name = "user_id", nullable = false, unique = true, updatable = false)
     private String userId;
 
     @Column(name = "status", nullable = false)
@@ -51,7 +51,7 @@ public class CredentialsEntity extends AbstractEntity implements Credentials {
         return username;
     }
 
-    void setUsername(final String username) {
+    public void setUsername(final String username) {
         this.username = username;
     }
 
@@ -60,7 +60,7 @@ public class CredentialsEntity extends AbstractEntity implements Credentials {
         return password;
     }
 
-    void setPassword(final String password) {
+    public void setPassword(final String password) {
         this.password = password;
     }
 
@@ -69,7 +69,7 @@ public class CredentialsEntity extends AbstractEntity implements Credentials {
         return userId;
     }
 
-    void setUserId(final String userId) {
+    public void setUserId(final String userId) {
         this.userId = userId;
     }
 
@@ -78,7 +78,7 @@ public class CredentialsEntity extends AbstractEntity implements Credentials {
         return status;
     }
 
-    void setStatus(final CredentialsStatus status) {
+    public void setStatus(final CredentialsStatus status) {
         this.status = status;
     }
 
