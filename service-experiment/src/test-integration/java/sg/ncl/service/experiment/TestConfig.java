@@ -4,8 +4,6 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseBuilder;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseType;
 import org.springframework.test.context.ContextConfiguration;
-import org.springframework.transaction.PlatformTransactionManager;
-import org.springframework.transaction.jta.JtaTransactionManager;
 
 import javax.sql.DataSource;
 
@@ -18,11 +16,6 @@ public class TestConfig {
     @Bean
     DataSource dataSource() {
         return new EmbeddedDatabaseBuilder().setType(EmbeddedDatabaseType.H2).build();
-    }
-
-    @Bean
-    PlatformTransactionManager platformTransactionManager() {
-        return new JtaTransactionManager();
     }
 
 }
