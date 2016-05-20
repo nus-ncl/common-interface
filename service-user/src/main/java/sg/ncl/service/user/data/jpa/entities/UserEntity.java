@@ -78,7 +78,7 @@ public class UserEntity extends AbstractEntity implements User {
         return userDetails;
     }
 
-    void setUserDetails(final UserDetailsEntity userDetails) {
+    public void setUserDetails(final UserDetailsEntity userDetails) {
         this.userDetails = userDetails;
     }
 
@@ -105,7 +105,7 @@ public class UserEntity extends AbstractEntity implements User {
         return applicationDate;
     }
 
-    void setApplicationDate(final ZonedDateTime applicationDate) {
+    public void setApplicationDate(final ZonedDateTime applicationDate) {
         this.applicationDate = applicationDate;
     }
 
@@ -114,7 +114,7 @@ public class UserEntity extends AbstractEntity implements User {
         return processedDate;
     }
 
-    void setProcessedDate(final ZonedDateTime processedDate) {
+    public void setProcessedDate(final ZonedDateTime processedDate) {
         this.processedDate = processedDate;
     }
 
