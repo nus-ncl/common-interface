@@ -105,13 +105,13 @@ public class UserDetailsRepositoryTest extends AbstractTest {
     }
 
     public static UserDetailsEntity getUserDetailsEntity() {
-        final UserDetailsEntity userDetails = new UserDetailsEntity();
-        userDetails.setFirstName(RandomStringUtils.randomAlphanumeric(20));
-        userDetails.setLastName(RandomStringUtils.randomAlphanumeric(20));
-        userDetails.setAddress(AddressRepositoryTest.getAddressEntity());
-        userDetails.setEmail(RandomStringUtils.randomAlphanumeric(20));
-        userDetails.setPhone(RandomStringUtils.randomAlphanumeric(20));
-        return userDetails;
+        final UserDetailsEntity entity = new UserDetailsEntity();
+        entity.setFirstName(RandomStringUtils.randomAlphanumeric(20));
+        entity.setLastName(RandomStringUtils.randomAlphanumeric(20));
+        entity.setAddress(AddressRepositoryTest.getAddressEntity());
+        entity.setEmail(RandomStringUtils.randomAlphanumeric(20));
+        entity.setPhone(RandomStringUtils.randomAlphanumeric(20));
+        return entity;
     }
 
 }
