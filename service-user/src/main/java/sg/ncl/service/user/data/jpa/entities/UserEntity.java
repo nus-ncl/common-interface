@@ -2,6 +2,7 @@ package sg.ncl.service.user.data.jpa.entities;
 
 import org.hibernate.annotations.GenericGenerator;
 import org.hibernate.annotations.Type;
+import sg.ncl.common.jpa.AbstractEntity;
 import sg.ncl.service.user.domain.User;
 import sg.ncl.service.user.domain.UserStatus;
 

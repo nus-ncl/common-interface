@@ -1,5 +1,6 @@
 package sg.ncl.service.user.data.jpa.entities;
 
+import sg.ncl.common.jpa.AbstractEntity;
 import sg.ncl.service.user.domain.Address;
 
 import javax.persistence.Column;

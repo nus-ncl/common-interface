@@ -1,5 +1,6 @@
 package sg.ncl.service.user.data.jpa.entities;
 
+import sg.ncl.common.jpa.AbstractEntity;
 import sg.ncl.service.user.domain.UserCredentials;
 import sg.ncl.service.user.domain.UserCredentialsStatus;
 
