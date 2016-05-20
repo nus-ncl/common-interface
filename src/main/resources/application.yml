@@ -1,10 +1,15 @@
 # Spring Boot Configuration
 # For more information, please read http://docs.spring.io/spring-boot/docs/current/reference/html/index.html
+server:
+  port: 80
+---
 spring:
+  profiles: default
   datasource:
-    url: jdbc:mysql://${jdbc.mysql.host}:3306/${jdbc.mysql.schema} # please set your environment variable
-    username: ${jdbc.mysql.username} # please set your environment variable
-    password: ${jdbc.mysql.password} # please set your environment variable
+# please set values for the variables (${jdbc.mysql.*}) externally (e.g., environment variables)
+    url: jdbc:mysql://${jdbc.mysql.host}:${jdbc.mysql.port}/${jdbc.mysql.schema}
+    username: ${jdbc.mysql.username}
+    password: ${jdbc.mysql.password}
   jpa:
     hibernate:
       ddl-auto: create
@@ -12,3 +17,22 @@ spring:
     properties:
       hibernate:
         dialect: org.hibernate.dialect.MySQL5InnoDBDialect
+---
+spring:
+  profiles: development
+  jpa:
+    show-sql: false
+---
+spring:
+  profiles: staging
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    show-sql: false
+---
+spring:
+  profiles: production
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    show-sql: false
