@@ -1,4 +1,4 @@
-package sg.ncl.service.user;
+package sg.ncl.service.experiment;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseBuilder;

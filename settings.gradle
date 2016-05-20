@@ -1,2 +1,2 @@
 rootProject.name = 'common-interface'
-include 'service-user', 'service-team', 'service-version'
+include 'service-user', 'service-team', 'service-version', 'service-experiment', 'service-realization'
