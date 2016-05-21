@@ -2,15 +2,19 @@
 *.class
 
 # Gradle artifacts
-build
+build/
 .gradle/
 
 # Eclipse artifacts
-bin
+bin/
 .classpath
 .project
+.refactorings/
 .settings/
 
 # Idea artifacts
 .idea/
 *.iml
+
+# OSX artifacts
+.DS_Store/
