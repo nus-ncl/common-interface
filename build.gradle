@@ -24,10 +24,10 @@ allprojects {
 
     dependencyManagement {
         dependencies {
-            dependencySet(group: 'org.hibernate', version: '5.1.0.Final') {
-                entry 'hibernate-core'
-                entry 'hibernate-entitymanager'
-            }
+//            dependencySet(group: 'org.hibernate', version: '5.1.0.Final') {
+//                entry 'hibernate-core'
+//                entry 'hibernate-entitymanager'
+//            }
         }
 
         imports {
