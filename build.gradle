@@ -6,66 +6,93 @@ buildscript {
     }
 }
 
-apply plugin: 'java'
-apply plugin: 'spring-boot'
-apply plugin: 'io.spring.dependency-management'
-apply plugin: 'eclipse'
-apply plugin: 'idea'
+allprojects {
+    apply plugin: 'java'
+    apply plugin: 'eclipse'
+    apply plugin: 'idea'
+    apply plugin: 'io.spring.dependency-management'
 
-group = 'sg.ncl'
-version = '0.1'
+    group = 'sg.ncl'
+    version = '1.0-SNAPSHOT'
 
-sourceCompatibility = 1.8
-targetCompatibility = 1.8
+    sourceCompatibility = JavaVersion.VERSION_1_8
+    targetCompatibility = JavaVersion.VERSION_1_8
 
-sourceSets {
-    integrationTest {
-        java {
-            compileClasspath += main.output + test.output
-            runtimeClasspath += main.output + test.output
-            srcDir('src/test-integration/java')
+    repositories {
+        jcenter()
+    }
+
+    dependencyManagement {
+        dependencies {
+            dependencySet(group: 'org.hibernate', version: '5.1.0.Final') {
+                entry 'hibernate-core'
+                entry 'hibernate-entitymanager'
+            }
         }
-        resources {
-            srcDir('src/test-integration/resources')
+
+        imports {
+            mavenBom 'io.spring.platform:platform-bom:2.0.4.RELEASE'
         }
     }
 }
 
-configurations {
-    integrationTestCompile.extendsFrom testCompile
-    integrationTestRuntime.extendsFrom testRuntime
+configure([project(':service-authentication'),
+           project(':service-experiment'),
+           project(':service-realization'),
+           project(':service-team'),
+           project(':service-user'),
+           project(':service-version')]) {
+    apply plugin: 'spring-boot'
+
+    sourceSets {
+        integrationTest {
+            compileClasspath += main.output + test.output
+            runtimeClasspath += main.output + test.output
+
+            java { srcDir('src/test-integration/java') }
+
+            resources { srcDir('src/test-integration/resources') }
+        }
+    }
+
+    configurations {
+        integrationTestCompile { extendsFrom testCompile }
+        integrationTestRuntime { extendsFrom testRuntime }
+    }
+
+    idea {
+        module {
+            testSourceDirs += sourceSets.integrationTest.java.srcDirs
+            testSourceDirs += sourceSets.integrationTest.resources.srcDirs
+        }
+    }
+
+    task integrationTest(type: Test) {
+        check { dependsOn integrationTest }
+        integrationTest { mustRunAfter test }
+        testClassesDir = sourceSets.integrationTest.output.classesDir
+        classpath = sourceSets.integrationTest.runtimeClasspath
+    }
+
+    tasks.withType(Test) {
+        reports.html.destination = file("${reporting.baseDir}/${name}")
+    }
 }
 
-repositories {
-    jcenter()
-}
+apply plugin: 'spring-boot'
 
 dependencies {
-    compile project(':service-user')
+    compile project(':service-authentication')
+    compile project(':service-experiment')
+    compile project(':service-realization')
     compile project(':service-team')
+    compile project(':service-user')
     compile project(':service-version')
 
     runtime('mysql:mysql-connector-java')
-
-    testCompile project(':service-version')
-
-    integrationTestCompile project(':service-version')
-
-    integrationTestRuntime('com.h2database:h2')
-}
-
-task integrationTest(type: Test) {
-    check.dependsOn integrationTest
-    integrationTest.mustRunAfter test
-    testClassesDir = sourceSets.integrationTest.output.classesDir
-    classpath = sourceSets.integrationTest.runtimeClasspath
 }
 
 task wrapper(type: Wrapper) {
     gradleVersion = '2.13'
     distributionUrl = "https://services.gradle.org/distributions/gradle-${gradleVersion}-all.zip"
-}
-
-tasks.withType(Test) {
-    reports.html.destination = file("${reporting.baseDir}/${name}")
 }

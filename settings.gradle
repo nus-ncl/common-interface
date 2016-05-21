@@ -1,3 +1,10 @@
 rootProject.name = 'common-interface'
+
 include 'common-jpa'
-include 'service-authentication', 'service-user', 'service-team', 'service-version', 'service-experiment', 'service-realization'
+
+include 'service-authentication'
+include 'service-experiment'
+include 'service-realization'
+include 'service-team'
+include 'service-user'
+include 'service-version'
