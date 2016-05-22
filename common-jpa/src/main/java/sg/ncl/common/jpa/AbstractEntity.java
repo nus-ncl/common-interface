@@ -26,6 +26,14 @@ public abstract class AbstractEntity implements Serializable {
     @CreatedDate
     private ZonedDateTime createdDate;
 
+    public ZonedDateTime getCreatedDate() {
+        return createdDate;
+    }
+
+    public void setCreatedDate(final ZonedDateTime createdDate) {
+        this.createdDate = createdDate;
+    }
+
 //    @Column(name = "last_modified_by")
 //    @LastModifiedBy
 //    private String lastModifiedBy;
@@ -34,42 +42,33 @@ public abstract class AbstractEntity implements Serializable {
     @LastModifiedDate
     private ZonedDateTime lastModifiedDate;
 
-    @Version
-    @Column(name = "version", nullable = false)
-    private Long version = 0L;
-
-    public ZonedDateTime getCreatedDate() {
-        return createdDate;
-    }
-
-    void setCreatedDate(final ZonedDateTime createdDate) {
-        this.createdDate = createdDate;
-    }
-
     public ZonedDateTime getLastModifiedDate() {
         return lastModifiedDate;
     }
 
-    void setLastModifiedDate(final ZonedDateTime lastModifiedDate) {
+    public void setLastModifiedDate(final ZonedDateTime lastModifiedDate) {
         this.lastModifiedDate = lastModifiedDate;
     }
+
+    @Version
+    @Column(name = "version", nullable = false)
+    private Long version = 0L;
 
     public Long getVersion() {
         return version;
     }
 
-    void setVersion(final Long version) {
+    public void setVersion(final Long version) {
         this.version = version;
     }
 
     @Override
     public String toString() {
-        final StringBuilder sb = new StringBuilder("AbstractEntity{");
-        sb.append("createdDate=").append(createdDate);
-        sb.append(", lastModifiedDate=").append(lastModifiedDate);
-        sb.append(", version=").append(version);
-        sb.append('}');
-        return sb.toString();
+        return "AbstractEntity{" +
+                "createdDate=" + createdDate +
+                ", lastModifiedDate=" + lastModifiedDate +
+                ", version=" + version +
+                '}';
     }
 
 }

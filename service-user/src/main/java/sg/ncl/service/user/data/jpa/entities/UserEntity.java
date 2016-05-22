@@ -148,8 +148,8 @@ public class UserEntity extends AbstractEntity implements User {
 
     @Override
     public boolean equals(final Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (this == o) { return true; }
+        if (o == null || getClass() != o.getClass()) { return false; }
 
         final User that = (User) o;
 

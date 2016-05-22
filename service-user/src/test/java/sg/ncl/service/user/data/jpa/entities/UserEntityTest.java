@@ -1,7 +1,6 @@
 package sg.ncl.service.user.data.jpa.entities;
 
 import org.apache.commons.lang3.RandomStringUtils;
-import org.hamcrest.Matchers;
 import org.junit.Test;
 import sg.ncl.service.user.domain.UserStatus;
 
@@ -9,7 +8,7 @@ import java.time.ZonedDateTime;
 import java.util.List;
 
 import static org.hamcrest.Matchers.*;
-import static org.junit.Assert.assertThat;
+import static org.junit.Assert.*;
 
 /**
  * @author Christopher Zhong

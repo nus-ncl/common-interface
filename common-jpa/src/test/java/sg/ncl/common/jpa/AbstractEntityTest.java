@@ -6,7 +6,7 @@ import java.time.ZonedDateTime;
 import java.util.Random;
 
 import static org.hamcrest.Matchers.*;
-import static org.junit.Assert.assertThat;
+import static org.junit.Assert.*;
 
 /**
  * @author Christopher Zhong
@@ -15,16 +15,14 @@ public class AbstractEntityTest {
 
     @Test
     public void testGetCreatedDate() throws Exception {
-        final AbstractEntity abstractEntity = new AbstractEntity() {
-        };
+        final AbstractEntity abstractEntity = new AbstractEntity() {};
 
         assertThat(abstractEntity.getCreatedDate(), is(nullValue()));
     }
 
     @Test
     public void testSetCreatedDate() throws Exception {
-        final AbstractEntity abstractEntity = new AbstractEntity() {
-        };
+        final AbstractEntity abstractEntity = new AbstractEntity() {};
         final ZonedDateTime now = ZonedDateTime.now();
         abstractEntity.setCreatedDate(now);
 
@@ -33,16 +31,14 @@ public class AbstractEntityTest {
 
     @Test
     public void testGetLastModifiedDate() throws Exception {
-        final AbstractEntity abstractEntity = new AbstractEntity() {
-        };
+        final AbstractEntity abstractEntity = new AbstractEntity() {};
 
         assertThat(abstractEntity.getLastModifiedDate(), is(nullValue()));
     }
 
     @Test
     public void testSetLastModifiedDate() throws Exception {
-        final AbstractEntity abstractEntity = new AbstractEntity() {
-        };
+        final AbstractEntity abstractEntity = new AbstractEntity() {};
         final ZonedDateTime now = ZonedDateTime.now();
         abstractEntity.setLastModifiedDate(now);
 
@@ -51,16 +47,14 @@ public class AbstractEntityTest {
 
     @Test
     public void testGetVersion() throws Exception {
-        final AbstractEntity abstractEntity = new AbstractEntity() {
-        };
+        final AbstractEntity abstractEntity = new AbstractEntity() {};
 
         assertThat(abstractEntity.getVersion(), is(equalTo(0L)));
     }
 
     @Test
     public void testSetVersion() throws Exception {
-        final AbstractEntity abstractEntity = new AbstractEntity() {
-        };
+        final AbstractEntity abstractEntity = new AbstractEntity() {};
         final long version = new Random().nextLong();
         abstractEntity.setVersion(version);
 
@@ -69,8 +63,7 @@ public class AbstractEntityTest {
 
     @Test
     public void testToString() throws Exception {
-        final AbstractEntity abstractEntity = new AbstractEntity() {
-        };
+        final AbstractEntity abstractEntity = new AbstractEntity() {};
         final ZonedDateTime now = ZonedDateTime.now();
         final ZonedDateTime createdDate = now.minusYears(1);
         abstractEntity.setCreatedDate(createdDate);
