@@ -1,35 +1,4 @@
 # Spring Boot Configuration
 # For more information, please read http://docs.spring.io/spring-boot/docs/current/reference/html/index.html
 server:
-  port: 80
----
-spring:
-  profiles: default
-  datasource:
-# please set values for the variables (${jdbc.mysql.*}) externally (e.g., environment variables)
-    url: jdbc:mysql://${jdbc.mysql.host}:${jdbc.mysql.port}/${jdbc.mysql.schema}
-    username: ${jdbc.mysql.username}
-    password: ${jdbc.mysql.password}
-  jpa:
-    hibernate:
-      ddl-auto: create
-    show-sql: true
----
-spring:
-  profiles: development
-  jpa:
-    show-sql: false
----
-spring:
-  profiles: staging
-  jpa:
-    hibernate:
-      ddl-auto: validate
-    show-sql: false
----
-spring:
-  profiles: production
-  jpa:
-    hibernate:
-      ddl-auto: validate
-    show-sql: false
+  port: 9999

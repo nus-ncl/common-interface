@@ -1,16 +1,16 @@
 package sg.ncl.service.experiment;
 
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseBuilder;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseType;
-import org.springframework.test.context.ContextConfiguration;
 
 import javax.sql.DataSource;
 
 /**
  * @author Christopher Zhong
  */
-@ContextConfiguration(classes = App.class)
+@Configuration
 public class TestConfig {
 
     @Bean

@@ -16,7 +16,7 @@ import static org.junit.Assert.*;
  * @author Christopher Zhong
  */
 @RunWith(SpringJUnit4ClassRunner.class)
-@SpringApplicationConfiguration(classes = {App.class, TestConfig.class})
+@SpringApplicationConfiguration(classes = {App.class})
 @WebAppConfiguration
 public abstract class AbstractTest extends AbstractTransactionalJUnit4SpringContextTests {
 

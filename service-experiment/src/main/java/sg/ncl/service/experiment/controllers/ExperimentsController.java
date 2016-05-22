@@ -2,6 +2,7 @@ package sg.ncl.service.experiment.controllers;
 
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 import sg.ncl.service.experiment.data.jpa.repositories.ExperimentRepository;
 
@@ -20,5 +21,8 @@ public class ExperimentsController {
     protected ExperimentsController(final ExperimentRepository experimentRepository) {
         this.experimentRepository = experimentRepository;
     }
+
+    @RequestMapping(method = RequestMethod.GET)
+    public void get() { }
 
 }

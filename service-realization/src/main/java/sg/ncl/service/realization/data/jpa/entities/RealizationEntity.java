@@ -1,6 +1,5 @@
 package sg.ncl.service.realization.data.jpa.entities;
 
-import org.hibernate.annotations.GenericGenerator;
 import sg.ncl.common.jpa.AbstractEntity;
 import sg.ncl.service.realization.domain.Realization;
 
@@ -14,12 +13,11 @@ import javax.persistence.Table;
  * @author Christopher Zhong
  */
 @Entity
-@Table(name = "users")
+@Table(name = "realizations")
 public class RealizationEntity extends AbstractEntity implements Realization {
 
     @Id
-    @GeneratedValue(generator = "uuid2")
-    @GenericGenerator(name = "uuid2", strategy = "uuid2")
+    @GeneratedValue
     @Column(name = "id", nullable = false, unique = true, updatable = false)
     private Long id;
 

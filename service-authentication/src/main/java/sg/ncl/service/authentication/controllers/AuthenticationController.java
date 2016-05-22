@@ -4,7 +4,7 @@ import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
-import sg.ncl.service.authentication.data.jpa.repositories.CredentialsRepository;
+import sg.ncl.service.authentication.AuthenticationService;
 
 import javax.inject.Inject;
 
@@ -15,11 +15,11 @@ import javax.inject.Inject;
 @RequestMapping(path = "/authentication")
 public class AuthenticationController {
 
-    private final CredentialsRepository credentialsRepository;
+    private final AuthenticationService authenticationService;
 
     @Inject
-    protected AuthenticationController(final CredentialsRepository credentialsRepository) {
-        this.credentialsRepository = credentialsRepository;
+    protected AuthenticationController(final AuthenticationService authenticationService) {
+        this.authenticationService = authenticationService;
     }
 
     @RequestMapping(path = "/login", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)

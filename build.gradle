@@ -18,9 +18,7 @@ allprojects {
     sourceCompatibility = JavaVersion.VERSION_1_8
     targetCompatibility = JavaVersion.VERSION_1_8
 
-    repositories {
-        jcenter()
-    }
+    repositories { jcenter() }
 
     dependencyManagement {
         dependencies {
@@ -31,7 +29,7 @@ allprojects {
         }
 
         imports {
-            mavenBom 'io.spring.platform:platform-bom:2.0.4.RELEASE'
+            mavenBom 'io.spring.platform:platform-bom:2.0.5.RELEASE'
         }
     }
 }
