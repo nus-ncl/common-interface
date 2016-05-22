@@ -1,16 +1,13 @@
 package sg.ncl.service.user;
 
 import org.springframework.context.annotation.Configuration;
-import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
-import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
+import org.springframework.context.annotation.Import;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 
 /**
  * @author Christopher Zhong
  */
 @Configuration("sg.ncl.service.user.JpaConfig")
-@EnableJpaRepositories
-@EnableJpaAuditing
+@Import({sg.ncl.common.jpa.JpaConfig.class})
 @EnableTransactionManagement
-public class JpaConfig {
-}
+public class JpaConfig {}
