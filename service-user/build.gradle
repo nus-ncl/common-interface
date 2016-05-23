@@ -1,7 +1,8 @@
 dependencies {
     compile project(':common-jpa')
     compile('org.springframework.boot:spring-boot-starter-web')
-    compile('javax.inject:javax.inject:1')
+    compile('org.springframework.boot:spring-boot-starter-security')
+    compile('javax.inject:javax.inject')
 
     runtime('mysql:mysql-connector-java')
 
