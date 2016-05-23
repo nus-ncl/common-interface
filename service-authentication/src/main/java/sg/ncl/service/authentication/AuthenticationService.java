@@ -4,6 +4,7 @@ import org.springframework.stereotype.Service;
 import sg.ncl.service.authentication.data.jpa.repositories.CredentialsRepository;
 
 import javax.inject.Inject;
+import java.util.UUID;
 
 /**
  * @author Christopher Zhong
@@ -18,7 +19,9 @@ public class AuthenticationService {
         this.credentialsRepository = credentialsRepository;
     }
 
-    public void login() {}
+    public String login(final String username, String password) {
+        return UUID.randomUUID().toString();
+    }
 
     public void logout() {}
 
