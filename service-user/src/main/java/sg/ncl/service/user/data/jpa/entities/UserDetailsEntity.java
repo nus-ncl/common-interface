@@ -111,16 +111,23 @@ public class UserDetailsEntity extends AbstractEntity implements UserDetails {
 
     @Override
     public String toString() {
-        final StringBuilder sb = new StringBuilder("UserDetailsEntity{");
-        sb.append("id=").append(id);
-        sb.append(", firstName='").append(firstName).append('\'');
-        sb.append(", lastName='").append(lastName).append('\'');
-        sb.append(", address=").append(address);
-        sb.append(", email='").append(email).append('\'');
-        sb.append(", phone='").append(phone).append('\'');
-        sb.append(", super=").append(super.toString());
-        sb.append('}');
-        return sb.toString();
+        return "UserDetailsEntity{" +
+                "id=" + id +
+                ", firstName='" + firstName + '\'' +
+                ", lastName='" + lastName + '\'' +
+                ", address=" + address +
+                ", email='" + email + '\'' +
+                ", phone='" + phone + '\'' +
+                "} " + super.toString();
     }
 
+    public static UserDetailsEntity get(final UserDetails userDetails) {
+        final UserDetailsEntity entity = new UserDetailsEntity();
+        entity.setFirstName(userDetails.getFirstName());
+        entity.setLastName(userDetails.getLastName());
+        entity.setAddress(AddressEntity.get(userDetails.getAddress()));
+        entity.setEmail(userDetails.getEmail());
+        entity.setPhone(userDetails.getPhone());
+        return entity;
+    }
 }

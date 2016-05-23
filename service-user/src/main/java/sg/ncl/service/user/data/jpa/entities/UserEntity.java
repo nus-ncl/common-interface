@@ -163,17 +163,24 @@ public class UserEntity extends AbstractEntity implements User {
 
     @Override
     public String toString() {
-        final StringBuilder sb = new StringBuilder("UserEntity{");
-        sb.append("id='").append(id).append('\'');
-        sb.append(", userDetails=").append(userDetails);
-        sb.append(", emailVerified=").append(emailVerified);
-        sb.append(", status=").append(status);
-        sb.append(", applicationDate=").append(applicationDate);
-        sb.append(", processedDate=").append(processedDate);
-        sb.append(", loginActivities=").append(loginActivities);
-        sb.append(", super=").append(super.toString());
-        sb.append('}');
-        return sb.toString();
+        return "UserEntity{" +
+                "id='" + id + '\'' +
+                ", userDetails=" + userDetails +
+                ", emailVerified=" + emailVerified +
+                ", status=" + status +
+                ", applicationDate=" + applicationDate +
+                ", processedDate=" + processedDate +
+                ", loginActivities=" + loginActivities +
+                ", teams=" + teams +
+                ", teamIds=" + getTeamIds() +
+                "} " + super.toString();
+    }
+
+    public static UserEntity get(final User user) {
+        final UserEntity entity = new UserEntity();
+        entity.setUserDetails(UserDetailsEntity.get(user.getUserDetails()));
+        entity.setApplicationDate(ZonedDateTime.now());
+        return entity;
     }
 
 }

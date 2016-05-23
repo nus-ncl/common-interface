@@ -91,16 +91,24 @@ public class AddressEntity extends AbstractEntity implements Address {
 
     @Override
     public String toString() {
-        final StringBuilder sb = new StringBuilder("AddressEntity{");
-        sb.append("id=").append(id);
-        sb.append(", address1='").append(address1).append('\'');
-        sb.append(", address2='").append(address2).append('\'');
-        sb.append(", country='").append(country).append('\'');
-        sb.append(", region='").append(region).append('\'');
-        sb.append(", zipCode='").append(zipCode).append('\'');
-        sb.append(", super=").append(super.toString());
-        sb.append('}');
-        return sb.toString();
+        return "AddressEntity{" +
+                "id=" + id +
+                ", address1='" + address1 + '\'' +
+                ", address2='" + address2 + '\'' +
+                ", country='" + country + '\'' +
+                ", region='" + region + '\'' +
+                ", zipCode='" + zipCode + '\'' +
+                "} " + super.toString();
+    }
+
+    public static AddressEntity get(final Address address) {
+        final AddressEntity entity = new AddressEntity();
+        entity.setAddress1(address.getAddress1());
+        entity.setAddress2(address.getAddress2());
+        entity.setCountry(address.getCountry());
+        entity.setRegion(address.getRegion());
+        entity.setZipCode(address.getZipCode());
+        return entity;
     }
 
 }
