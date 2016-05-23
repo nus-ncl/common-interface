@@ -67,13 +67,6 @@ public class UserRepositoryTest extends AbstractTest {
         exception.expect(DataIntegrityViolationException.class);
     }
 
-    @Test
-    public void ttest() throws Exception {
-        final UserEntity entity = getUserEntity();
-
-        repository.save(entity);
-    }
-
     public static UserEntity getUserEntity() {
         final UserEntity entity = new UserEntity();
         entity.setUserDetails(UserDetailsRepositoryTest.getUserDetailsEntity());
