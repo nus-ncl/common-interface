@@ -18,4 +18,8 @@ public class AuthenticationService {
         this.credentialsRepository = credentialsRepository;
     }
 
+    public void login() {}
+
+    public void logout() {}
+
 }

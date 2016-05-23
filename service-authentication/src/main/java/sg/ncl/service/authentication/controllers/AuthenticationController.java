@@ -22,14 +22,14 @@ public class AuthenticationController {
         this.authenticationService = authenticationService;
     }
 
-    @RequestMapping(path = "/login", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+    @RequestMapping(method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
     public void login() {
-
+        authenticationService.login();
     }
 
-    @RequestMapping(path = "/logout", method = RequestMethod.GET)
+    @RequestMapping(method = RequestMethod.DELETE)
     public void logout() {
-
+        authenticationService.logout();
     }
 
 }
