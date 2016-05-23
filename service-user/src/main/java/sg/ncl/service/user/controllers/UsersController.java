@@ -1,16 +1,18 @@
 package sg.ncl.service.user.controllers;
 
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import sg.ncl.service.user.UserService;
 import sg.ncl.service.user.domain.User;
 
 import javax.inject.Inject;
-import javax.validation.Valid;
+import java.util.List;
 
 /**
  * @author Christopher Zhong
@@ -26,27 +28,22 @@ public class UsersController {
         this.userService = userService;
     }
 
-    @RequestMapping(path = "", method = RequestMethod.POST)
-    public void addUser(@RequestBody @Valid User user) {
-//        final UserEntity userEntity = new UserEntity();
-//        final UserDetailsEntity userDetailsEntity = new UserDetailsEntity();
-//        userDetailsEntity.setFirstName("");
-//        userDetailsEntity.setLastName("");
-//        userEntity.setUserDetails(userDetailsEntity);
-//        new UserCredentialsEntity();
-//        userService.save(userEntity);
-        return;
+    @RequestMapping(method = RequestMethod.GET)
+    @ResponseStatus(code = HttpStatus.OK)
+    public List<User> get() {
+        return userService.get();
     }
 
     @RequestMapping(path = "/{id}", method = RequestMethod.GET)
+    @ResponseStatus(code = HttpStatus.OK)
     public User getUser(@PathVariable String id) {
-//        final UserEntity user = userService.findOne(id);
-        return null;
+        return userService.find(id);
     }
 
     @RequestMapping(path = "/{id}", method = RequestMethod.PUT)
-    public void updateUser(@PathVariable String id) {
-
+    @ResponseStatus(code = HttpStatus.ACCEPTED)
+    public void updateUser(@PathVariable String id, @RequestBody User user) {
+        userService.update(id, user);
     }
 
 }
