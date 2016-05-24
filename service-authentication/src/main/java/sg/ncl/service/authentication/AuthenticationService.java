@@ -35,6 +35,4 @@ public class AuthenticationService {
         return UUID.randomUUID().toString();
     }
 
-    public void logout() {}
-
 }
