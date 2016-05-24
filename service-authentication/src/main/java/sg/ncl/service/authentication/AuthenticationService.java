@@ -28,9 +28,10 @@ public class AuthenticationService {
             throw new CredentialsNotFoundException();
         }
         // TODO compare password
-        // TODO remove any existing token
-        // TODO generate new token
-        // TODO return user id of the credential
+        // TODO remove existing JWT token
+        // TODO generate a new JWT token
+        // TODO sign JWT token
+        // TODO return JWT token
         return UUID.randomUUID().toString();
     }
 
