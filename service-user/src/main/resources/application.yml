@@ -2,7 +2,7 @@
 # For more information, please read http://docs.spring.io/spring-boot/docs/current/reference/html/index.html
 spring:
   profiles:
-    active: user
+    active: user-service
 server:
   port: 8080
 ---

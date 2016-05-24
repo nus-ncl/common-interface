@@ -10,7 +10,7 @@ import sg.ncl.common.jpa.UseJpa;
  */
 @SpringBootApplication
 @UseJpa
-@Profile("authentication")
+@Profile("authentication-service")
 public class App {
 
     public static void main(final String[] args) {
