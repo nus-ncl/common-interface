@@ -30,7 +30,7 @@ public class AuthenticationController {
         this.authenticationService = authenticationService;
     }
 
-    @RequestMapping(method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+    @RequestMapping(method = RequestMethod.POST)
     public String login(@RequestHeader(HttpHeaders.AUTHORIZATION) String authorization) {
         if (authorization.isEmpty()) {
             logger.warn("Empty authorization header");
@@ -50,11 +50,6 @@ public class AuthenticationController {
         }
         logger.warn("Unknown authorization scheme");
         throw new BadRequestException();
-    }
-
-    @RequestMapping(method = RequestMethod.DELETE)
-    public void logout() {
-        authenticationService.logout();
     }
 
 }
