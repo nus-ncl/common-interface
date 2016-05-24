@@ -1,5 +1,6 @@
 rootProject.name = 'common-interface'
 
+include 'common-exception'
 include 'common-jpa'
 
 include 'service-authentication'

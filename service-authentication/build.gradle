@@ -1,4 +1,5 @@
 dependencies {
+    compile project(':common-exception')
     compile project(':common-jpa')
     compile('org.springframework.boot:spring-boot-starter-web')
     compile('javax.inject:javax.inject')
