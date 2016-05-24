@@ -5,6 +5,7 @@ import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
+import sg.ncl.common.exceptions.BadRequestException;
 import sg.ncl.service.authentication.AuthenticationService;
 
 import javax.inject.Inject;
@@ -25,6 +26,9 @@ public class AuthenticationController {
 
     @RequestMapping(method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
     public String login(@RequestHeader("X-Username") String username, @RequestHeader("X-Password") String password) {
+        if (username.isEmpty() || password.isEmpty()) {
+            throw new BadRequestException();
+        }
         return authenticationService.login(username, password);
     }
 
