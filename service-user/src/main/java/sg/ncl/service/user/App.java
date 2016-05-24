@@ -2,17 +2,15 @@ package sg.ncl.service.user;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
-import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
-import org.springframework.transaction.annotation.EnableTransactionManagement;
+import org.springframework.context.annotation.Profile;
+import sg.ncl.common.jpa.UseJpa;
 
 /**
  * @author Christopher Zhong
  */
 @SpringBootApplication
-@EnableJpaRepositories
-@EnableJpaAuditing
-@EnableTransactionManagement
+@UseJpa
+@Profile("user")
 public class App {
 
     public static void main(final String[] args) {
