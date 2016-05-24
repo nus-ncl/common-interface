@@ -1,7 +1,9 @@
 package sg.ncl.service.authentication;
 
 import org.springframework.stereotype.Service;
+import sg.ncl.service.authentication.data.jpa.entities.CredentialsEntity;
 import sg.ncl.service.authentication.data.jpa.repositories.CredentialsRepository;
+import sg.ncl.service.authentication.exceptions.CredentialsNotFoundException;
 
 import javax.inject.Inject;
 import java.util.UUID;
@@ -20,6 +22,15 @@ public class AuthenticationService {
     }
 
     public String login(final String username, String password) {
+        // find the credentials first
+        final CredentialsEntity credentials = credentialsRepository.findByUsername(username);
+        if (credentials == null) {
+            throw new CredentialsNotFoundException();
+        }
+        // TODO compare password
+        // TODO remove any existing token
+        // TODO generate new token
+        // TODO return user id of the credential
         return UUID.randomUUID().toString();
     }
 
