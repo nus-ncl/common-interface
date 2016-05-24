@@ -12,4 +12,6 @@ dependencies {
 
     integrationTestCompile('org.springframework.boot:spring-boot-starter-test')
     integrationTestCompile('com.h2database:h2')
+
+    integrationTestRuntime('com.jayway.jsonpath:json-path')
 }
