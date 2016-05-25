@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import sg.ncl.service.user.UserService;
+import sg.ncl.service.user.data.jpa.entities.UserEntity;
 import sg.ncl.service.user.domain.User;
 import sg.ncl.service.user.dtos.UserInfo;
 
@@ -43,7 +44,7 @@ public class UsersController {
 
     @RequestMapping(path = "/{id}", method = RequestMethod.PUT)
     @ResponseStatus(code = HttpStatus.ACCEPTED)
-    public void updateUser(@PathVariable String id, @RequestBody UserInfo user) {
+    public void updateUser(@PathVariable String id, @RequestBody UserEntity user) {
         userService.update(id, user);
     }
 
