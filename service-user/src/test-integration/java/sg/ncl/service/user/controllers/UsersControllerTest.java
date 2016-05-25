@@ -1,10 +1,13 @@
 package sg.ncl.service.user.controllers;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.context.WebApplicationContext;
 import sg.ncl.service.user.AbstractTest;
 import sg.ncl.service.user.data.jpa.entities.AddressEntity;
@@ -17,11 +20,12 @@ import java.time.ZonedDateTime;
 
 import static org.hamcrest.core.Is.is;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 import static org.springframework.test.web.servlet.setup.MockMvcBuilders.webAppContextSetup;
 
 /**
- * Created by Desmond on 24-May-16.
+ * Created by Desmond
  */
 public class UsersControllerTest extends AbstractTest {
     @Inject
@@ -41,9 +45,9 @@ public class UsersControllerTest extends AbstractTest {
         MediaType contentType = new MediaType(MediaType.APPLICATION_JSON.getType(),
                 MediaType.APPLICATION_JSON.getSubtype());
 
-        Object[] objArray = addUser();
-        String idString = (String) objArray[0];
-        UserEntity originalEntity = (UserEntity) objArray[1];
+        final UserEntity[] userArray = addUser();
+        final String idString = userArray[0].getId();
+        final UserEntity originalEntity = userArray[1];
 
         mockMvc.perform(get("/users/" + idString))
                 .andExpect(status().isOk())
@@ -59,15 +63,46 @@ public class UsersControllerTest extends AbstractTest {
                 .andExpect(jsonPath("$.userDetails.address.zipCode", is(originalEntity.getUserDetails().getAddress().getZipCode())));
     }
 
-    private Object[] addUser() throws Exception {
-        final UserEntity userEntity = new UserEntity();
+    @Test
+    public void putUserTest() throws Exception {
+        MediaType contentType = new MediaType(MediaType.APPLICATION_JSON.getType(),
+                MediaType.APPLICATION_JSON.getSubtype());
 
+        final Object[] objArray = addUser();
+        final String idString = (String) objArray[0];
+        final UserEntity editedEntity = (UserEntity) objArray[1];
+
+        mockMvc.perform(get("/users/" + idString))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(contentType))
+                .andExpect(jsonPath("$.userDetails.firstName", is(editedEntity.getUserDetails().getFirstName())))
+                .andExpect(jsonPath("$.userDetails.lastName", is(editedEntity.getUserDetails().getLastName())));
+
+        String newFirstName = RandomStringUtils.randomAlphabetic(20);
+        editedEntity.getUserDetails().setFirstName(newFirstName);
+
+        ObjectMapper mapper = new ObjectMapper();
+        mapper.registerModule(new JavaTimeModule());
+        String jsonInString = mapper.writeValueAsString(editedEntity);
+
+        mockMvc.perform(put("/users/" + idString).contentType(contentType).content(jsonInString))
+                .andExpect(status().isAccepted());
+
+        mockMvc.perform(get("/users/" + idString))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(contentType))
+                .andExpect(jsonPath("$.userDetails.firstName", is(newFirstName)))
+                .andExpect(jsonPath("$.userDetails.lastName", is(editedEntity.getUserDetails().getLastName())));
+    }
+
+    @Transactional
+    private UserEntity[] addUser() throws Exception {
+        final UserEntity userEntity = new UserEntity();
         userEntity.setApplicationDate(ZonedDateTime.now());
 
         final UserDetailsEntity userDetailsEntity = new UserDetailsEntity();
         userDetailsEntity.setFirstName(RandomStringUtils.randomAlphabetic(20));
         userDetailsEntity.setLastName(RandomStringUtils.randomAlphabetic(20));
-
         userDetailsEntity.setEmail(RandomStringUtils.randomAlphabetic(20));
         userDetailsEntity.setPhone(RandomStringUtils.randomAlphabetic(20));
 
@@ -81,12 +116,12 @@ public class UsersControllerTest extends AbstractTest {
         userDetailsEntity.setAddress(address);
         userEntity.setUserDetails(userDetailsEntity);
 
-        UserEntity newUser = userRepository.save(userEntity);
+        UserEntity saveUser = userRepository.save(userEntity);
 
-        Object[] objArray = new Object[2];
-        objArray[0] = newUser.getId();
-        objArray[1] = userEntity;
+        final UserEntity[] userArray = new UserEntity[3];
+        userArray[0] = saveUser;
+        userArray[1] = userEntity;
 
-        return objArray;
+        return userArray;
     }
 }
