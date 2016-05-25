@@ -1,12 +1,16 @@
 package sg.ncl.service.user.controllers;
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import org.apache.commons.lang3.RandomStringUtils;
+import org.hamcrest.collection.IsIterableContainingInAnyOrder;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.context.WebApplicationContext;
 import sg.ncl.service.user.AbstractTest;
@@ -17,6 +21,7 @@ import sg.ncl.service.user.data.jpa.repositories.UserRepository;
 
 import javax.inject.Inject;
 import java.time.ZonedDateTime;
+import java.util.List;
 
 import static org.hamcrest.core.Is.is;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -38,6 +43,32 @@ public class UsersControllerTest extends AbstractTest {
     @Before
     public void setup() {
         mockMvc = webAppContextSetup(webApplicationContext).build();
+    }
+
+    @Test
+    public void getAllUserTest() throws Exception {
+        MediaType contentType = new MediaType(MediaType.APPLICATION_JSON.getType(),
+                MediaType.APPLICATION_JSON.getSubtype());
+
+        final UserEntity[] userEntityList = new UserEntity[3];
+
+        for (int i=0; i<3; i++) {
+            Object[] objArray = addUser();
+            userEntityList[i] = (UserEntity) objArray[0];
+        }
+
+        MvcResult result = mockMvc.perform(get("/users"))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(contentType))
+                .andReturn();
+
+        String allUserJsonString = result.getResponse().getContentAsString();
+
+        ObjectMapper mapper = new ObjectMapper();
+        mapper.registerModule(new JavaTimeModule());
+        List<UserEntity> userEntityList2 = mapper.readValue(allUserJsonString, new TypeReference<List<UserEntity>>(){});
+
+        Assert.assertThat(userEntityList2, IsIterableContainingInAnyOrder.containsInAnyOrder(userEntityList));
     }
 
     @Test
