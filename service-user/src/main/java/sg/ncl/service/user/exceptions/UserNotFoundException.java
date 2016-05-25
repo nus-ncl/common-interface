@@ -1,7 +1,12 @@
 package sg.ncl.service.user.exceptions;
 
+import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.ResponseStatus;
+import sg.ncl.common.exceptions.NotFoundException;
+
 /**
- * Created by dcslwpdj on 25-May-16.
+ * Created by Desmond
  */
-public class UserNotFoundException {
+@ResponseStatus(code = HttpStatus.NOT_FOUND, reason = "User is not found")
+public class UserNotFoundException extends NotFoundException {
 }
