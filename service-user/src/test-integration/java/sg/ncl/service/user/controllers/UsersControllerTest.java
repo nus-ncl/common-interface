@@ -59,7 +59,7 @@ public class UsersControllerTest extends AbstractTest {
 
         final UserEntity[] userEntityList = new UserEntity[3];
 
-        for (int i=0; i<3; i++) {
+        for (int i = 0; i < 3; i++) {
             Object[] objArray = addUser();
             userEntityList[i] = (UserEntity) objArray[0];
         }

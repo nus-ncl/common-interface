@@ -1,5 +1,6 @@
 package sg.ncl.service.user.dtos;
 
+import sg.ncl.service.user.data.jpa.entities.UserEntity;
 import sg.ncl.service.user.domain.LoginActivity;
 import sg.ncl.service.user.domain.User;
 import sg.ncl.service.user.domain.UserStatus;
@@ -30,6 +31,18 @@ public class UserInfo implements User {
         this.processedDate = processedDate;
         this.loginActivities = loginActivities;
         this.teamIds = teamIds;
+    }
+
+    public UserInfo(final UserEntity userEntity) {
+        this(userEntity.getId(),
+                new UserDetailsInfo(userEntity.getUserDetails()),
+                userEntity.isEmailVerified(),
+                userEntity.getStatus(),
+                userEntity.getApplicationDate(),
+                userEntity.getProcessedDate(),
+                userEntity.getLoginActivities(),
+                userEntity.getTeamIds()
+        );
     }
 
     @Override

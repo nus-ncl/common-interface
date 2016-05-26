@@ -1,5 +1,6 @@
 package sg.ncl.service.user.dtos;
 
+import sg.ncl.service.user.data.jpa.entities.AddressEntity;
 import sg.ncl.service.user.domain.Address;
 
 /**
@@ -19,6 +20,15 @@ public class AddressInfo implements Address {
         this.country = country;
         this.region = region;
         this.zipCode = zipCode;
+    }
+
+    public AddressInfo(AddressEntity addressEntity) {
+        this(addressEntity.getAddress1(),
+                addressEntity.getAddress2(),
+                addressEntity.getCountry(),
+                addressEntity.getRegion(),
+                addressEntity.getZipCode()
+        );
     }
 
     @Override

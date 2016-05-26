@@ -39,7 +39,7 @@ public class UsersController {
     @RequestMapping(path = "/{id}", method = RequestMethod.GET)
     @ResponseStatus(code = HttpStatus.OK)
     public User getUser(@PathVariable String id) {
-        return userService.find(id);
+        return new UserInfo(userService.find(id));
     }
 
     @RequestMapping(path = "/{id}", method = RequestMethod.PUT)

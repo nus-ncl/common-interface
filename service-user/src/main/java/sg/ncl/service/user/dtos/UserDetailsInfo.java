@@ -1,5 +1,6 @@
 package sg.ncl.service.user.dtos;
 
+import sg.ncl.service.user.data.jpa.entities.UserDetailsEntity;
 import sg.ncl.service.user.domain.UserDetails;
 
 /**
@@ -19,6 +20,15 @@ public class UserDetailsInfo implements UserDetails {
         this.address = address;
         this.email = email;
         this.phone = phone;
+    }
+
+    public UserDetailsInfo(UserDetailsEntity userDetailsEntity) {
+        this(userDetailsEntity.getFirstName(),
+                userDetailsEntity.getLastName(),
+                new AddressInfo(userDetailsEntity.getAddress()),
+                userDetailsEntity.getEmail(),
+                userDetailsEntity.getPhone()
+        );
     }
 
     @Override
@@ -45,4 +55,6 @@ public class UserDetailsInfo implements UserDetails {
     public String getPhone() {
         return phone;
     }
+
+
 }
