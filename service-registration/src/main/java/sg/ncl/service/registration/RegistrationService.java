@@ -1,7 +1,7 @@
 package sg.ncl.service.registration;
 
 import org.springframework.stereotype.Service;
-import sg.ncl.service.authentication.AuthenticationService;
+import sg.ncl.service.authentication.services.AuthenticationService;
 import sg.ncl.service.user.UserService;
 
 import javax.inject.Inject;
