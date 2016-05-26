@@ -48,4 +48,9 @@ public class UsersController {
         userService.update(id, user);
     }
 
+    @RequestMapping(path = "/seed", method = RequestMethod.POST)
+    public void seedData() {
+        userService.seedData();
+    }
+
 }

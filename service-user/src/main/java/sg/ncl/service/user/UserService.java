@@ -2,6 +2,7 @@ package sg.ncl.service.user;
 
 import org.springframework.stereotype.Service;
 import sg.ncl.service.user.data.jpa.entities.AddressEntity;
+import sg.ncl.service.user.data.jpa.entities.UserDetailsEntity;
 import sg.ncl.service.user.data.jpa.entities.UserEntity;
 import sg.ncl.service.user.data.jpa.repositories.UserRepository;
 import sg.ncl.service.user.domain.Address;
@@ -10,6 +11,7 @@ import sg.ncl.service.user.domain.UserDetails;
 import sg.ncl.service.user.dtos.UserInfo;
 
 import javax.inject.Inject;
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -93,4 +95,27 @@ public class UserService {
         userRepository.save(one);
     }
 
+    public void seedData() {
+
+        final UserEntity userEntity = new UserEntity();
+        userEntity.setApplicationDate(ZonedDateTime.now());
+
+        final UserDetailsEntity userDetailsEntity = new UserDetailsEntity();
+        userDetailsEntity.setFirstName("first");
+        userDetailsEntity.setLastName("last");
+        userDetailsEntity.setEmail("email");
+        userDetailsEntity.setPhone("phone");
+
+        final AddressEntity address = new AddressEntity();
+        address.setAddress1("address1");
+        address.setAddress2("address2");
+        address.setCountry("country");
+        address.setRegion("region");
+        address.setZipCode("zipcode");
+
+        userDetailsEntity.setAddress(address);
+        userEntity.setUserDetails(userDetailsEntity);
+
+        userRepository.save(userEntity);
+    }
 }
