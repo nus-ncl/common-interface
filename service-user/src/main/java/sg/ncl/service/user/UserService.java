@@ -9,6 +9,8 @@ import sg.ncl.service.user.domain.Address;
 import sg.ncl.service.user.domain.User;
 import sg.ncl.service.user.domain.UserDetails;
 import sg.ncl.service.user.dtos.UserInfo;
+import sg.ncl.service.user.exceptions.NoUsersFoundException;
+import sg.ncl.service.user.exceptions.UserNotFoundException;
 
 import javax.inject.Inject;
 import java.time.ZonedDateTime;
@@ -33,13 +35,18 @@ public class UserService {
         for (UserEntity user : userRepository.findAll()) {
             result.add(user);
         }
+
+        if (result.size() == 0) {
+            throw new NoUsersFoundException();
+        }
+
         return result;
     }
 
     public User find(final String id) {
         final UserEntity one = userRepository.findOne(id);
         if (one == null) {
-            // TODO throw exception
+            throw new UserNotFoundException();
         }
         return one;
     }
@@ -53,42 +60,42 @@ public class UserService {
         final UserDetails oneUserDetails = one.getUserDetails();
         final UserDetails userUserDetails = user.getUserDetails();
 
-        if (oneUserDetails.getFirstName() != userUserDetails.getFirstName()) {
+        if (oneUserDetails.getFirstName().equals(userUserDetails.getFirstName())) {
             one.getUserDetails().setFirstName(userUserDetails.getFirstName());
         }
 
-        if (oneUserDetails.getLastName() != userUserDetails.getLastName()) {
+        if (oneUserDetails.getLastName().equals(userUserDetails.getLastName())) {
             one.getUserDetails().setLastName(userUserDetails.getLastName());
         }
 
-        if (oneUserDetails.getEmail() != userUserDetails.getEmail()) {
+        if (oneUserDetails.getEmail().equals(userUserDetails.getEmail())) {
             one.getUserDetails().setEmail(userUserDetails.getEmail());
         }
 
-        if (oneUserDetails.getPhone() != userUserDetails.getPhone()) {
+        if (oneUserDetails.getPhone().equals(userUserDetails.getPhone())) {
             one.getUserDetails().setPhone(userUserDetails.getPhone());
         }
 
         final Address oneAddress = one.getUserDetails().getAddress();
         final Address userAddress = user.getUserDetails().getAddress();
 
-        if (oneAddress.getAddress1() != userAddress.getAddress1()) {
+        if (oneAddress.getAddress1().equals(userAddress.getAddress1())) {
             one.getUserDetails().getAddress().setAddress1(userAddress.getAddress1());
         }
 
-        if (oneAddress.getAddress2() != userAddress.getAddress2()) {
+        if (oneAddress.getAddress2().equals(userAddress.getAddress2())) {
             one.getUserDetails().getAddress().setAddress2(userAddress.getAddress2());
         }
 
-        if (oneAddress.getCountry() != userAddress.getCountry()) {
+        if (oneAddress.getCountry().equals(userAddress.getCountry())) {
             one.getUserDetails().getAddress().setCountry(userAddress.getCountry());
         }
 
-        if (oneAddress.getRegion() != userAddress.getRegion()) {
+        if (oneAddress.getRegion().equals(userAddress.getRegion())) {
             one.getUserDetails().getAddress().setRegion(userAddress.getRegion());
         }
 
-        if (oneAddress.getZipCode() != userAddress.getZipCode()) {
+        if (oneAddress.getZipCode().equals(userAddress.getZipCode())) {
             one.getUserDetails().getAddress().setZipCode((userAddress.getZipCode()));
         }
 
