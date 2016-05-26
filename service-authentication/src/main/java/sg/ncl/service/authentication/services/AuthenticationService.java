@@ -1,11 +1,13 @@
-package sg.ncl.service.authentication;
+package sg.ncl.service.authentication.services;
 
 import org.springframework.stereotype.Service;
 import sg.ncl.service.authentication.data.jpa.entities.CredentialsEntity;
 import sg.ncl.service.authentication.data.jpa.repositories.CredentialsRepository;
+import sg.ncl.service.authentication.domain.Credentials;
 import sg.ncl.service.authentication.exceptions.CredentialsNotFoundException;
 
 import javax.inject.Inject;
+import java.util.List;
 import java.util.UUID;
 
 /**
@@ -22,13 +24,13 @@ public class AuthenticationService {
     }
 
     public String login(final String username, String password) {
+        if (username.equals("johndoe@nus.edu.sg") && password.equals("password")) {
+            // FIXME not suppose to do this, but for dev purposes to bypass the credentials not found exception
+            return username;
+        }
         // find the credentials first
         final CredentialsEntity credentials = credentialsRepository.findByUsername(username);
-
-        if (username.equals("johndoe@nus.edu.sg") && password.equals("password")) {
-            // TODO not suppose to do this, but for dev purposes to bypass the credentials not found exception
-            return username;
-        } else if (credentials == null) {
+        if (credentials == null) {
             throw new CredentialsNotFoundException();
         }
         // TODO compare password
@@ -37,6 +39,10 @@ public class AuthenticationService {
         // TODO sign JWT token
         // TODO return JWT token
         return UUID.randomUUID().toString();
+    }
+
+    public List<? extends Credentials> getAll() {
+        return credentialsRepository.findAll();
     }
 
 }
