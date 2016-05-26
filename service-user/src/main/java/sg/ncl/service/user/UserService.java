@@ -100,14 +100,20 @@ public class UserService {
 
         final UserEntity userEntity = new UserEntity();
         userEntity.setApplicationDate(ZonedDateTime.now());
+        userEntity.setCreatedDate(ZonedDateTime.now());
+        userEntity.setLastModifiedDate(ZonedDateTime.now());
 
         final UserDetailsEntity userDetailsEntity = new UserDetailsEntity();
+        userDetailsEntity.setCreatedDate(ZonedDateTime.now());
+        userDetailsEntity.setLastModifiedDate(ZonedDateTime.now());
         userDetailsEntity.setFirstName("first");
         userDetailsEntity.setLastName("last");
         userDetailsEntity.setEmail("email");
         userDetailsEntity.setPhone("phone");
 
         final AddressEntity address = new AddressEntity();
+        address.setCreatedDate(ZonedDateTime.now());
+        address.setLastModifiedDate(ZonedDateTime.now());
         address.setAddress1("address1");
         address.setAddress2("address2");
         address.setCountry("country");
