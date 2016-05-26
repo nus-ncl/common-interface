@@ -50,6 +50,7 @@ public class UserService {
         if (one == null) {
             throw new UserNotFoundException();
         }
+        /*
 
         final UserDetails oneUserDetails = one.getUserDetails();
         final UserDetails userUserDetails = user.getUserDetails();
@@ -92,6 +93,7 @@ public class UserService {
         if (! oneAddress.getZipCode().equals(userAddress.getZipCode())) {
             one.getUserDetails().getAddress().setZipCode((userAddress.getZipCode()));
         }
+        */
 
         userRepository.save(one);
     }
@@ -106,19 +108,19 @@ public class UserService {
         final UserDetailsEntity userDetailsEntity = new UserDetailsEntity();
         userDetailsEntity.setCreatedDate(ZonedDateTime.now());
         userDetailsEntity.setLastModifiedDate(ZonedDateTime.now());
-        userDetailsEntity.setFirstName("first");
-        userDetailsEntity.setLastName("last");
-        userDetailsEntity.setEmail("email");
-        userDetailsEntity.setPhone("phone");
+        userDetailsEntity.setFirstName("john");
+        userDetailsEntity.setLastName("doe");
+        userDetailsEntity.setEmail("johndoe@nus.edu.sg");
+        userDetailsEntity.setPhone("12345678");
 
         final AddressEntity address = new AddressEntity();
         address.setCreatedDate(ZonedDateTime.now());
         address.setLastModifiedDate(ZonedDateTime.now());
-        address.setAddress1("address1");
-        address.setAddress2("address2");
-        address.setCountry("country");
-        address.setRegion("region");
-        address.setZipCode("zipcode");
+        address.setAddress1("computing drive 12");
+        address.setAddress2("another address 2");
+        address.setCountry("singapore");
+        address.setRegion("west");
+        address.setZipCode("123456");
 
         userDetailsEntity.setAddress(address);
         userEntity.setUserDetails(userDetailsEntity);
