@@ -37,6 +37,7 @@ allprojects {
 configure([project(':service-authentication'),
            project(':service-experiment'),
            project(':service-realization'),
+           project(':service-registration'),
            project(':service-team'),
            project(':service-user'),
            project(':service-version')]) {
@@ -83,6 +84,7 @@ dependencies {
     compile project(':service-authentication')
     compile project(':service-experiment')
     compile project(':service-realization')
+    compile project(':service-registration')
     compile project(':service-team')
     compile project(':service-user')
     compile project(':service-version')
