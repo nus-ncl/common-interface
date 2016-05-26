@@ -18,6 +18,7 @@ import sg.ncl.service.user.data.jpa.entities.AddressEntity;
 import sg.ncl.service.user.data.jpa.entities.UserDetailsEntity;
 import sg.ncl.service.user.data.jpa.entities.UserEntity;
 import sg.ncl.service.user.data.jpa.repositories.UserRepository;
+import sg.ncl.service.user.domain.User;
 
 import javax.inject.Inject;
 import java.time.ZonedDateTime;
@@ -46,6 +47,12 @@ public class UsersControllerTest extends AbstractTest {
     }
 
     @Test
+    public void getAllUserWithNoUserInDbTest() throws Exception {
+        MvcResult result = mockMvc.perform(get("/users")).andReturn();
+        Assert.assertTrue(result.getResponse().getContentLength() == 0);
+    }
+
+    @Test
     public void getAllUserTest() throws Exception {
         MediaType contentType = new MediaType(MediaType.APPLICATION_JSON.getType(),
                 MediaType.APPLICATION_JSON.getSubtype());
@@ -69,6 +76,13 @@ public class UsersControllerTest extends AbstractTest {
         List<UserEntity> userEntityList2 = mapper.readValue(allUserJsonString, new TypeReference<List<UserEntity>>(){});
 
         Assert.assertThat(userEntityList2, IsIterableContainingInAnyOrder.containsInAnyOrder(userEntityList));
+    }
+
+    @Test
+    public void getUserWithNoUserInDbTest() throws Exception {
+        mockMvc.perform(get("/users/" + RandomStringUtils.randomAlphabetic(20)))
+                .andExpect(status().isNotFound())
+                .andExpect(status().reason("User not found"));
     }
 
     @Test
@@ -99,9 +113,9 @@ public class UsersControllerTest extends AbstractTest {
         MediaType contentType = new MediaType(MediaType.APPLICATION_JSON.getType(),
                 MediaType.APPLICATION_JSON.getSubtype());
 
-        final Object[] objArray = addUser();
-        final String idString = (String) objArray[0];
-        final UserEntity editedEntity = (UserEntity) objArray[1];
+        final UserEntity[] userEntityArray = addUser();
+        final String idString = userEntityArray[0].getId();
+        final UserEntity editedEntity = userEntityArray[1];
 
         mockMvc.perform(get("/users/" + idString))
                 .andExpect(status().isOk())

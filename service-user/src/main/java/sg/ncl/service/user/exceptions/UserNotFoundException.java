@@ -7,6 +7,6 @@ import sg.ncl.common.exceptions.NotFoundException;
 /**
  * Created by Desmond
  */
-@ResponseStatus(code = HttpStatus.NOT_FOUND, reason = "User is not found")
+@ResponseStatus(code = HttpStatus.NOT_FOUND, reason = "User not found")
 public class UserNotFoundException extends NotFoundException {
 }

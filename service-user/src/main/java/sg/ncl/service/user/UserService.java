@@ -1,13 +1,11 @@
 package sg.ncl.service.user;
 
 import org.springframework.stereotype.Service;
-import sg.ncl.service.user.data.jpa.entities.AddressEntity;
 import sg.ncl.service.user.data.jpa.entities.UserEntity;
 import sg.ncl.service.user.data.jpa.repositories.UserRepository;
 import sg.ncl.service.user.domain.Address;
 import sg.ncl.service.user.domain.User;
 import sg.ncl.service.user.domain.UserDetails;
-import sg.ncl.service.user.dtos.UserInfo;
 import sg.ncl.service.user.exceptions.NoUsersFoundException;
 import sg.ncl.service.user.exceptions.UserNotFoundException;
 
@@ -34,10 +32,6 @@ public class UserService {
             result.add(user);
         }
 
-        if (result.size() == 0) {
-            throw new NoUsersFoundException();
-        }
-
         return result;
     }
 
@@ -52,48 +46,48 @@ public class UserService {
     public void update(final String id, final UserEntity user) {
         final UserEntity one = userRepository.findOne(id);
         if (one == null) {
-            return;
+            throw new UserNotFoundException();
         }
 
         final UserDetails oneUserDetails = one.getUserDetails();
         final UserDetails userUserDetails = user.getUserDetails();
 
-        if (oneUserDetails.getFirstName().equals(userUserDetails.getFirstName())) {
+        if (! oneUserDetails.getFirstName().equals(userUserDetails.getFirstName())) {
             one.getUserDetails().setFirstName(userUserDetails.getFirstName());
         }
 
-        if (oneUserDetails.getLastName().equals(userUserDetails.getLastName())) {
+        if (! oneUserDetails.getLastName().equals(userUserDetails.getLastName())) {
             one.getUserDetails().setLastName(userUserDetails.getLastName());
         }
 
-        if (oneUserDetails.getEmail().equals(userUserDetails.getEmail())) {
+        if (! oneUserDetails.getEmail().equals(userUserDetails.getEmail())) {
             one.getUserDetails().setEmail(userUserDetails.getEmail());
         }
 
-        if (oneUserDetails.getPhone().equals(userUserDetails.getPhone())) {
+        if (! oneUserDetails.getPhone().equals(userUserDetails.getPhone())) {
             one.getUserDetails().setPhone(userUserDetails.getPhone());
         }
 
         final Address oneAddress = one.getUserDetails().getAddress();
         final Address userAddress = user.getUserDetails().getAddress();
 
-        if (oneAddress.getAddress1().equals(userAddress.getAddress1())) {
+        if (! oneAddress.getAddress1().equals(userAddress.getAddress1())) {
             one.getUserDetails().getAddress().setAddress1(userAddress.getAddress1());
         }
 
-        if (oneAddress.getAddress2().equals(userAddress.getAddress2())) {
+        if (! oneAddress.getAddress2().equals(userAddress.getAddress2())) {
             one.getUserDetails().getAddress().setAddress2(userAddress.getAddress2());
         }
 
-        if (oneAddress.getCountry().equals(userAddress.getCountry())) {
+        if (! oneAddress.getCountry().equals(userAddress.getCountry())) {
             one.getUserDetails().getAddress().setCountry(userAddress.getCountry());
         }
 
-        if (oneAddress.getRegion().equals(userAddress.getRegion())) {
+        if (! oneAddress.getRegion().equals(userAddress.getRegion())) {
             one.getUserDetails().getAddress().setRegion(userAddress.getRegion());
         }
 
-        if (oneAddress.getZipCode().equals(userAddress.getZipCode())) {
+        if (! oneAddress.getZipCode().equals(userAddress.getZipCode())) {
             one.getUserDetails().getAddress().setZipCode((userAddress.getZipCode()));
         }
 

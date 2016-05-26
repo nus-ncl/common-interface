@@ -8,5 +8,4 @@ import sg.ncl.common.exceptions.NotFoundException;
  * Created by Desmond
  */
 @ResponseStatus(code = HttpStatus.NOT_FOUND, reason = "No users found")
-public class NoUsersFoundException extends NotFoundException {
-}
+public class NoUsersFoundException extends NotFoundException {}
