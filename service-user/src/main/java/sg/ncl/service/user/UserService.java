@@ -50,50 +50,51 @@ public class UserService {
         if (one == null) {
             throw new UserNotFoundException();
         }
-        /*
 
         final UserDetails oneUserDetails = one.getUserDetails();
         final UserDetails userUserDetails = user.getUserDetails();
 
-        if (oneUserDetails.getFirstName() != null) {
+        if (userUserDetails.getFirstName() != null) {
             one.getUserDetails().setFirstName(userUserDetails.getFirstName());
         }
 
-        if (oneUserDetails.getLastName() != null) {
+        if (userUserDetails.getLastName() != null) {
             one.getUserDetails().setLastName(userUserDetails.getLastName());
         }
 
-        if (oneUserDetails.getEmail() != null) {
+        if (userUserDetails.getEmail() != null) {
             one.getUserDetails().setEmail(userUserDetails.getEmail());
         }
 
-        if (oneUserDetails.getPhone() != null) {
+        if (userUserDetails.getPhone() != null) {
             one.getUserDetails().setPhone(userUserDetails.getPhone());
         }
 
         final Address oneAddress = one.getUserDetails().getAddress();
         final Address userAddress = user.getUserDetails().getAddress();
 
-        if (oneAddress.getAddress1() != null) {
-            one.getUserDetails().getAddress().setAddress1(userAddress.getAddress1());
-        }
+        if (userAddress != null) {
 
-        if (oneAddress.getAddress2() != null) {
-            one.getUserDetails().getAddress().setAddress2(userAddress.getAddress2());
-        }
+            if (userAddress.getAddress1() != null) {
+                one.getUserDetails().getAddress().setAddress1(userAddress.getAddress1());
+            }
 
-        if (oneAddress.getCountry() != null) {
-            one.getUserDetails().getAddress().setCountry(userAddress.getCountry());
-        }
+            if (userAddress.getAddress2() != null) {
+                one.getUserDetails().getAddress().setAddress2(userAddress.getAddress2());
+            }
 
-        if (oneAddress.getRegion() != null) {
-            one.getUserDetails().getAddress().setRegion(userAddress.getRegion());
-        }
+            if (userAddress.getCountry() != null) {
+                one.getUserDetails().getAddress().setCountry(userAddress.getCountry());
+            }
 
-        if (oneAddress.getZipCode() != null) {
-            one.getUserDetails().getAddress().setZipCode((userAddress.getZipCode()));
+            if (userAddress.getRegion() != null) {
+                one.getUserDetails().getAddress().setRegion(userAddress.getRegion());
+            }
+
+            if (userAddress.getZipCode() != null) {
+                one.getUserDetails().getAddress().setZipCode((userAddress.getZipCode()));
+            }
         }
-        */
 
         userRepository.save(one);
     }
