@@ -75,6 +75,27 @@ public class UserServiceTest extends AbstractTest {
         Assert.assertEquals(originalAddress.getZipCode(), fromDbAddress.getZipCode());
     }
 
+    @Test
+    public void putUserTest() throws Exception {
+        UserService userService = new UserService(userRepository);
+        final UserEntity[] userEntityArray = addUser();
+        final String idString = userEntityArray[0].getId();
+
+        // get user and store the original last name
+        UserEntity userEntity = userService.find(idString);
+        final String originalLastName = userEntity.getUserDetails().getLastName();
+
+        // change first name and put
+        String newFirstName = RandomStringUtils.randomAlphabetic(20);
+        userEntity.getUserDetails().setFirstName(newFirstName);
+
+        userService.update(idString, userEntity);
+
+        userEntity = userService.find(idString);
+        Assert.assertEquals(userEntity.getUserDetails().getFirstName(), newFirstName);
+        Assert.assertEquals(userEntity.getUserDetails().getLastName(), originalLastName);
+    }
+
     private UserEntity[] addUser() throws Exception {
         final UserEntity userEntity = new UserEntity();
         userEntity.setApplicationDate(ZonedDateTime.now());
