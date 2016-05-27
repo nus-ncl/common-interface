@@ -147,6 +147,47 @@ public class UsersControllerTest extends AbstractTest {
                 .andExpect(jsonPath("$.userDetails.lastName", is(originalLastName)));
     }
 
+    @Test
+    public void putUserNullFieldTest() throws Exception {
+        MediaType contentType = new MediaType(MediaType.APPLICATION_JSON.getType(),
+                MediaType.APPLICATION_JSON.getSubtype());
+
+        final UserEntity[] userEntityArray = addUser();
+        final String idString = userEntityArray[0].getId();
+
+        // get user
+        MvcResult result = mockMvc.perform(get("/users/" + idString))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(contentType))
+                .andReturn();
+
+        String jsonString = result.getResponse().getContentAsString();
+        ObjectMapper mapper = new ObjectMapper();
+        mapper.registerModule(new JavaTimeModule());
+
+        UserEntity userEntity = mapper.readValue(jsonString, UserEntity.class);
+        userEntity.getUserDetails().setFirstName(null);
+
+        String jsonInString = mapper.writeValueAsString(userEntity);
+
+        // put
+        mockMvc.perform(put("/users/" + idString).contentType(contentType).content(jsonInString))
+                .andExpect(status().isAccepted());
+    }
+
+    @Test
+    public void putUserWithWrongIdTest() throws Exception {
+        MediaType contentType = new MediaType(MediaType.APPLICATION_JSON.getType(),
+                MediaType.APPLICATION_JSON.getSubtype());
+
+        final String idString = "123456";
+
+        // put
+        mockMvc.perform(put("/users/" + idString).contentType(contentType).content("{}"))
+                .andExpect(status().isNotFound())
+                .andExpect(status().reason("User not found"));
+    }
+
     private UserEntity[] addUser() throws Exception {
         final UserEntity userEntity = new UserEntity();
         userEntity.setApplicationDate(ZonedDateTime.now());
