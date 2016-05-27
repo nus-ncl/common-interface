@@ -115,32 +115,38 @@ public class UsersControllerTest extends AbstractTest {
 
         final UserEntity[] userEntityArray = addUser();
         final String idString = userEntityArray[0].getId();
-        final UserEntity editedEntity = userEntityArray[1];
 
-        mockMvc.perform(get("/users/" + idString))
+        // get user
+        MvcResult result = mockMvc.perform(get("/users/" + idString))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(contentType))
-                .andExpect(jsonPath("$.userDetails.firstName", is(editedEntity.getUserDetails().getFirstName())))
-                .andExpect(jsonPath("$.userDetails.lastName", is(editedEntity.getUserDetails().getLastName())));
+                .andReturn();
 
-        String newFirstName = RandomStringUtils.randomAlphabetic(20);
-        editedEntity.getUserDetails().setFirstName(newFirstName);
-
+        String jsonString = result.getResponse().getContentAsString();
         ObjectMapper mapper = new ObjectMapper();
         mapper.registerModule(new JavaTimeModule());
-        String jsonInString = mapper.writeValueAsString(editedEntity);
 
+        UserEntity userEntity = mapper.readValue(jsonString, UserEntity.class);
+        String originalLastName = userEntity.getUserDetails().getLastName();
+
+        // change first name
+        String newFirstName = RandomStringUtils.randomAlphabetic(20);
+        userEntity.getUserDetails().setFirstName(newFirstName);
+
+        String jsonInString = mapper.writeValueAsString(userEntity);
+
+        // put
         mockMvc.perform(put("/users/" + idString).contentType(contentType).content(jsonInString))
                 .andExpect(status().isAccepted());
 
+        // check if first name is new first name and last name is the same
         mockMvc.perform(get("/users/" + idString))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(contentType))
                 .andExpect(jsonPath("$.userDetails.firstName", is(newFirstName)))
-                .andExpect(jsonPath("$.userDetails.lastName", is(editedEntity.getUserDetails().getLastName())));
+                .andExpect(jsonPath("$.userDetails.lastName", is(originalLastName)));
     }
 
-    @Transactional
     private UserEntity[] addUser() throws Exception {
         final UserEntity userEntity = new UserEntity();
         userEntity.setApplicationDate(ZonedDateTime.now());
