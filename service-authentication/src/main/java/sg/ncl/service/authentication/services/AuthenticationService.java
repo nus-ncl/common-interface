@@ -34,6 +34,7 @@ public class AuthenticationService {
             throw new CredentialsNotFoundException();
         }
         // TODO compare password
+        // TODO check email is verified or not
         // TODO remove existing JWT token
         // TODO generate a new JWT token
         // TODO sign JWT token
