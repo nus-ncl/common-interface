@@ -9,6 +9,7 @@ import sg.ncl.service.user.data.jpa.entities.UserDetailsEntity;
 import sg.ncl.service.user.data.jpa.entities.UserEntity;
 import sg.ncl.service.user.data.jpa.repositories.UserRepository;
 import sg.ncl.service.user.domain.User;
+import sg.ncl.service.user.exceptions.UserNotFoundException;
 
 import javax.inject.Inject;
 import java.time.ZonedDateTime;
@@ -41,6 +42,12 @@ public class UserServiceTest extends AbstractTest {
         List<User> userList2 = userService.get();
 
         Assert.assertThat(userList2, IsIterableContainingInAnyOrder.containsInAnyOrder(userArray));
+    }
+
+    @Test(expected=UserNotFoundException.class)
+    public void getUserWithNoUserInDbTest() throws Exception {
+        UserService userService = new UserService(userRepository);
+        userService.find(RandomStringUtils.randomAlphabetic(20));
     }
 
     private UserEntity[] addUser() throws Exception {
