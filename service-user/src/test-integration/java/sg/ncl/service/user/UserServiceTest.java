@@ -9,6 +9,7 @@ import sg.ncl.service.user.data.jpa.entities.UserDetailsEntity;
 import sg.ncl.service.user.data.jpa.entities.UserEntity;
 import sg.ncl.service.user.data.jpa.repositories.UserRepository;
 import sg.ncl.service.user.domain.User;
+import sg.ncl.service.user.exceptions.UserIdNullException;
 import sg.ncl.service.user.exceptions.UserNotFoundException;
 
 import javax.inject.Inject;
@@ -94,6 +95,28 @@ public class UserServiceTest extends AbstractTest {
         userEntity = userService.find(idString);
         Assert.assertEquals(userEntity.getUserDetails().getFirstName(), newFirstName);
         Assert.assertEquals(userEntity.getUserDetails().getLastName(), originalLastName);
+    }
+
+    @Test
+    public void updateUserNullFieldTest() throws Exception {
+        UserService userService = new UserService(userRepository);
+        final UserEntity[] userEntityArray = addUser();
+        final String idString = userEntityArray[0].getId();
+
+        // get user and store the original last name
+        UserEntity userEntity = userService.find(idString);
+
+        // change first name and put
+        userEntity.getUserDetails().setFirstName(null);
+
+        userService.update(idString, userEntity);
+    }
+
+    @Test(expected=UserIdNullException.class)
+    public  void updateUserNullIdTest() throws Exception {
+        UserService userService = new UserService(userRepository);
+        UserEntity userEntity = new UserEntity();
+        userService.update(null, userEntity);
     }
 
     private UserEntity[] addUser() throws Exception {

@@ -8,6 +8,7 @@ import sg.ncl.service.user.data.jpa.repositories.UserRepository;
 import sg.ncl.service.user.domain.Address;
 import sg.ncl.service.user.domain.User;
 import sg.ncl.service.user.domain.UserDetails;
+import sg.ncl.service.user.exceptions.UserIdNullException;
 import sg.ncl.service.user.exceptions.UserNotFoundException;
 
 import javax.inject.Inject;
@@ -45,6 +46,10 @@ public class UserService {
     }
 
     public void update(final String id, final UserEntity user) {
+        if (id == null || id.isEmpty()) {
+            throw new UserIdNullException();
+        }
+
         final UserEntity one = userRepository.findOne(id);
         if (one == null) {
             throw new UserNotFoundException();
