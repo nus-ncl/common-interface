@@ -50,6 +50,31 @@ public class UserServiceTest extends AbstractTest {
         userService.find(RandomStringUtils.randomAlphabetic(20));
     }
 
+    @Test
+    public void getUserTest() throws Exception {
+        UserService userService = new UserService(userRepository);
+        final UserEntity[] userArray = addUser();
+        final String idString = userArray[0].getId();
+        final UserEntity originalEntity = userArray[1];
+
+        UserEntity fromDbEntity = userService.find(idString);
+
+        UserDetailsEntity originalDetails = originalEntity.getUserDetails();
+        UserDetailsEntity fromDbDetails = fromDbEntity.getUserDetails();
+        Assert.assertEquals(originalDetails.getFirstName(), fromDbDetails.getFirstName());
+        Assert.assertEquals(originalDetails.getLastName(), fromDbDetails.getLastName());
+        Assert.assertEquals(originalDetails.getEmail(), fromDbDetails.getEmail());
+        Assert.assertEquals(originalDetails.getPhone(), fromDbDetails.getPhone());
+
+        AddressEntity originalAddress = originalDetails.getAddress();
+        AddressEntity fromDbAddress = fromDbDetails.getAddress();
+        Assert.assertEquals(originalAddress.getAddress1(), fromDbAddress.getAddress1());
+        Assert.assertEquals(originalAddress.getAddress2(), fromDbAddress.getAddress2());
+        Assert.assertEquals(originalAddress.getCountry(), fromDbAddress.getCountry());
+        Assert.assertEquals(originalAddress.getRegion(), fromDbAddress.getRegion());
+        Assert.assertEquals(originalAddress.getZipCode(), fromDbAddress.getZipCode());
+    }
+
     private UserEntity[] addUser() throws Exception {
         final UserEntity userEntity = new UserEntity();
         userEntity.setApplicationDate(ZonedDateTime.now());
