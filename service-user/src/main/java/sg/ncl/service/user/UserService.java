@@ -33,7 +33,6 @@ public class UserService {
         for (UserEntity user : userRepository.findAll()) {
             result.add(user);
         }
-
         return result;
     }
 
@@ -51,7 +50,6 @@ public class UserService {
             throw new UserNotFoundException();
         }
 
-        final UserDetails oneUserDetails = one.getUserDetails();
         final UserDetails userUserDetails = user.getUserDetails();
 
         if (userUserDetails.getFirstName() != null) {
@@ -70,7 +68,6 @@ public class UserService {
             one.getUserDetails().setPhone(userUserDetails.getPhone());
         }
 
-        final Address oneAddress = one.getUserDetails().getAddress();
         final Address userAddress = user.getUserDetails().getAddress();
 
         if (userAddress != null) {
