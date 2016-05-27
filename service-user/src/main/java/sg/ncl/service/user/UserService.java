@@ -38,6 +38,10 @@ public class UserService {
     }
 
     public UserEntity find(final String id) {
+        if (id == null || id.isEmpty()) {
+            throw new UserIdNullException();
+        }
+
         final UserEntity one = userRepository.findOne(id);
         if (one == null) {
             throw new UserNotFoundException();

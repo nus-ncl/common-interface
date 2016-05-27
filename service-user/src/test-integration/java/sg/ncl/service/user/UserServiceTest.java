@@ -45,7 +45,19 @@ public class UserServiceTest extends AbstractTest {
         Assert.assertThat(userList2, IsIterableContainingInAnyOrder.containsInAnyOrder(userArray));
     }
 
-    @Test(expected=UserNotFoundException.class)
+    @Test(expected = UserIdNullException.class)
+    public void getUserWithNullIdTest() throws Exception {
+        UserService userService = new UserService(userRepository);
+        userService.find(null);
+    }
+
+    @Test(expected = UserIdNullException.class)
+    public void getUserWithEmptyIdTest() throws Exception {
+        UserService userService = new UserService(userRepository);
+        userService.find("");
+    }
+
+    @Test(expected = UserNotFoundException.class)
     public void getUserWithNoUserInDbTest() throws Exception {
         UserService userService = new UserService(userRepository);
         userService.find(RandomStringUtils.randomAlphabetic(20));
@@ -112,11 +124,18 @@ public class UserServiceTest extends AbstractTest {
         userService.update(idString, userEntity);
     }
 
-    @Test(expected=UserIdNullException.class)
+    @Test(expected = UserIdNullException.class)
     public  void updateUserNullIdTest() throws Exception {
         UserService userService = new UserService(userRepository);
         UserEntity userEntity = new UserEntity();
         userService.update(null, userEntity);
+    }
+
+    @Test(expected = UserIdNullException.class)
+    public  void updateUserEmptyIdTest() throws Exception {
+        UserService userService = new UserService(userRepository);
+        UserEntity userEntity = new UserEntity();
+        userService.update("", userEntity);
     }
 
     private UserEntity[] addUser() throws Exception {
