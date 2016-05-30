@@ -58,13 +58,13 @@ public class UserServiceTest extends AbstractTest {
     }
 
     @Test(expected = UserNotFoundException.class)
-    public void getUserWithNoUserInDbTest() throws Exception {
+    public void findUserWithNoUserInDbTest() throws Exception {
         UserService userService = new UserService(userRepository);
         userService.find(RandomStringUtils.randomAlphabetic(20));
     }
 
     @Test
-    public void getUserTest() throws Exception {
+    public void findUserTest() throws Exception {
         UserService userService = new UserService(userRepository);
         final UserEntity[] userArray = addUser();
         final String idString = userArray[0].getId();

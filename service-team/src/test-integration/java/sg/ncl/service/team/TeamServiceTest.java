@@ -7,6 +7,8 @@ import org.junit.Test;
 import sg.ncl.service.team.data.jpa.entities.TeamEntity;
 import sg.ncl.service.team.data.jpa.repositories.TeamRepository;
 import sg.ncl.service.team.domain.Team;
+import sg.ncl.service.team.exceptions.TeamIdNullException;
+import sg.ncl.service.team.exceptions.TeamNotFoundException;
 
 import javax.inject.Inject;
 import java.time.ZonedDateTime;
@@ -30,6 +32,12 @@ public class TeamServiceTest extends AbstractTest {
         Assert.assertEquals(createdTeam.getApplicationDate(), saveTeam.getApplicationDate());
     }
 
+    @Test(expected = TeamNotFoundException.class)
+    public void findTeamWithNoTeamsInDbTest() throws Exception {
+        TeamService teamService = new TeamService(teamRepository);
+        teamService.find(RandomStringUtils.randomAlphabetic(20));
+    }
+
     @Test
     public void findTeamTest() {
         TeamService teamService = new TeamService(teamRepository);
@@ -41,6 +49,25 @@ public class TeamServiceTest extends AbstractTest {
         Assert.assertEquals(createdTeam.getName(), getTeam.getName());
         Assert.assertEquals(createdTeam.getDescription(), getTeam.getDescription());
         Assert.assertEquals(createdTeam.getApplicationDate(), getTeam.getApplicationDate());
+    }
+
+    @Test
+    public void getAllTeamsWithNoUserInDbTest() throws Exception {
+        TeamService teamService = new TeamService(teamRepository);
+        List<Team> list = teamService.get();
+        Assert.assertTrue(list.size() == 0);
+    }
+
+    @Test(expected = TeamIdNullException.class)
+    public void getUserWithNullIdTest() throws Exception {
+        TeamService teamService = new TeamService(teamRepository);
+        teamService.find(null);
+    }
+
+    @Test(expected = TeamIdNullException.class)
+    public void getUserWithEmptyIdTest() throws Exception {
+        TeamService teamService = new TeamService(teamRepository);
+        teamService.find("");
     }
 
     @Test
