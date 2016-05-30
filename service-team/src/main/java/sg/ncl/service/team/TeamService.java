@@ -58,4 +58,34 @@ public class TeamService {
         final TeamEntity one = this.find(id);
         return one.getStatus().toString();
     }
+
+    public void update(final String teamId, final Team inputTeam) {
+        if (teamId == null || teamId.isEmpty()) {
+            throw new TeamIdNullException();
+        }
+
+        final TeamEntity one = this.find(teamId);
+        if (one == null) {
+            throw new TeamNotFoundException();
+        }
+
+        if (inputTeam.getDescription() != null) {
+            one.setDescription(inputTeam.getDescription());
+        }
+
+        if (inputTeam.getPrivacy() != null) {
+            one.setPrivacy(inputTeam.getPrivacy());
+        }
+
+        if (inputTeam.getStatus() != null) {
+            one.setStatus(inputTeam.getStatus());
+        }
+
+        if (inputTeam.getVisibility() != null) {
+            one.setVisibility(inputTeam.getVisibility());
+        }
+
+        teamRepository.save(one);
+
+    }
 }

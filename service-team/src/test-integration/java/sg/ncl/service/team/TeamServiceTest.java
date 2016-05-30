@@ -96,6 +96,61 @@ public class TeamServiceTest extends AbstractTest {
         Assert.assertEquals(resultTeamStatus, TeamStatus.PENDING.toString());
     }
 
+    @Test
+    public void updateTeamInfoTest() throws Exception {
+        TeamService teamService = new TeamService(teamRepository);
+        Team team = createTeam();
+        team = teamService.save(team);
+        final String idString = team.getId();
+
+        // get team and store the original description from database
+        TeamEntity originalTeamEntity = teamService.find(idString);
+        final String originalDescription = originalTeamEntity.getDescription();
+
+        // change description and put
+        String modifiedDescription = RandomStringUtils.randomAlphabetic(20);
+        originalTeamEntity.setDescription(modifiedDescription);
+
+        teamService.update(idString, originalTeamEntity);
+
+        originalTeamEntity = teamService.find(idString);
+        Assert.assertEquals(originalTeamEntity.getId(), idString);
+        Assert.assertNotEquals(originalTeamEntity.getDescription(), originalDescription);
+        Assert.assertEquals(originalTeamEntity.getDescription(), modifiedDescription);
+    }
+
+    @Test(expected = TeamIdNullException.class)
+    public void updateTeamNullIdTest() throws Exception {
+        TeamService teamService = new TeamService(teamRepository);
+        TeamEntity teamEntity = new TeamEntity();
+        teamService.update(null, teamEntity);
+    }
+
+    @Test(expected = TeamIdNullException.class)
+    public void updateTeamEmptyIdTest() throws Exception {
+        TeamService teamService = new TeamService(teamRepository);
+        TeamEntity teamEntity = new TeamEntity();
+        teamService.update("", teamEntity);
+    }
+
+    @Test
+    public void updateTeamNullFieldTest() {
+        TeamService teamService = new TeamService(teamRepository);
+        Team team = createTeam();
+        team = teamService.save(team);
+        final String idString = team.getId();
+
+        // get team and store the original description from database
+        TeamEntity originalTeamEntity = teamService.find(idString);
+        final String originalDescription = originalTeamEntity.getDescription();
+
+        // change description and put
+        originalTeamEntity.setDescription(null);
+
+        // test should pass
+        teamService.update(idString, originalTeamEntity);
+    }
+
     private Team createTeam() {
         TeamEntity teamEntity = new TeamEntity();
 

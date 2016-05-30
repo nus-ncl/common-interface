@@ -96,7 +96,7 @@ public class TeamEntity extends AbstractEntity implements Team {
         return visibility;
     }
 
-    void setVisibility(final TeamVisibility visibility) {
+    public void setVisibility(final TeamVisibility visibility) {
         this.visibility = visibility;
     }
 
@@ -105,7 +105,7 @@ public class TeamEntity extends AbstractEntity implements Team {
         return privacy;
     }
 
-    void setPrivacy(final TeamPrivacy privacy) {
+    public void setPrivacy(final TeamPrivacy privacy) {
         this.privacy = privacy;
     }
 
@@ -114,7 +114,7 @@ public class TeamEntity extends AbstractEntity implements Team {
         return status;
     }
 
-    void setStatus(final TeamStatus status) {
+    public void setStatus(final TeamStatus status) {
         this.status = status;
     }
 
