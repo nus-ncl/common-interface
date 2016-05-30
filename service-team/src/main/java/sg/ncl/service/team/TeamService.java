@@ -53,4 +53,9 @@ public class TeamService {
         }
         return one;
     }
+
+    public String getTeamStatus(final String id) {
+        final TeamEntity one = this.find(id);
+        return one.getStatus().toString();
+    }
 }

@@ -7,6 +7,7 @@ import org.junit.Test;
 import sg.ncl.service.team.data.jpa.entities.TeamEntity;
 import sg.ncl.service.team.data.jpa.repositories.TeamRepository;
 import sg.ncl.service.team.domain.Team;
+import sg.ncl.service.team.domain.TeamStatus;
 import sg.ncl.service.team.exceptions.TeamIdNullException;
 import sg.ncl.service.team.exceptions.TeamNotFoundException;
 
@@ -83,6 +84,16 @@ public class TeamServiceTest extends AbstractTest {
         List<Team> teamList = teamService.get();
 
         Assert.assertThat(teamList, IsIterableContainingInAnyOrder.containsInAnyOrder(teamArray));
+    }
+
+    @Test
+    public void getValidTeamStatusTest() {
+        TeamService teamService = new TeamService(teamRepository);
+        Team createdTeam = new TeamEntity();
+        Team team = teamService.save(createdTeam);
+
+        String resultTeamStatus = teamService.getTeamStatus(team.getId());
+        Assert.assertEquals(resultTeamStatus, TeamStatus.PENDING.toString());
     }
 
     private Team createTeam() {
