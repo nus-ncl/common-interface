@@ -69,7 +69,7 @@ public class TeamEntity extends AbstractEntity implements Team {
         return id;
     }
 
-    void setId(final String id) {
+    public void setId(final String id) {
         this.id = id;
     }
 
@@ -78,7 +78,7 @@ public class TeamEntity extends AbstractEntity implements Team {
         return name;
     }
 
-    void setName(final String name) {
+    public void setName(final String name) {
         this.name = name;
     }
 
@@ -87,7 +87,7 @@ public class TeamEntity extends AbstractEntity implements Team {
         return description;
     }
 
-    void setDescription(final String description) {
+    public void setDescription(final String description) {
         this.description = description;
     }
 
@@ -123,7 +123,7 @@ public class TeamEntity extends AbstractEntity implements Team {
         return applicationDate;
     }
 
-    void setApplicationDate(ZonedDateTime applicationDate) {
+    public void setApplicationDate(ZonedDateTime applicationDate) {
         this.applicationDate = applicationDate;
     }
 

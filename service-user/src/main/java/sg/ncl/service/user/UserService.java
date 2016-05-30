@@ -134,4 +134,20 @@ public class UserService {
 
         userRepository.save(userEntity);
     }
+
+    public boolean addUserToTeam(final String userId, final String teamId) {
+        boolean noErrors = true;
+
+        try {
+            UserEntity userEntity = find(userId);
+            userEntity.addTeamId(teamId);
+            userRepository.save(userEntity);
+        }
+
+        catch (Exception e) {
+            noErrors = false;
+        }
+
+        return noErrors;
+    }
 }

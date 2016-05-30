@@ -5,6 +5,7 @@ import org.hibernate.annotations.Type;
 import sg.ncl.common.jpa.AbstractEntity;
 import sg.ncl.service.user.domain.User;
 import sg.ncl.service.user.domain.UserStatus;
+import sg.ncl.service.user.exceptions.UserAlreadyInTeam;
 
 import javax.persistence.CascadeType;
 import javax.persistence.CollectionTable;
@@ -133,9 +134,9 @@ public class UserEntity extends AbstractEntity implements User {
         return new ArrayList<>(teams);
     }
 
-    void addTeamId(final String teamId) {
+    public void addTeamId(final String teamId) {
         if (teams.contains(teamId)) {
-            return;
+            throw new UserAlreadyInTeam();
         }
         teams.add(teamId);
     }
