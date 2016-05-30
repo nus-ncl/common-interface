@@ -141,11 +141,11 @@ public class UserEntity extends AbstractEntity implements User {
         teams.add(teamId);
     }
 
-    void removeTeamId(final String teamId) {
-        if (teams.contains(teamId)) {
-            teams.remove(teamId);
-        }
-    }
+//    void removeTeamId(final String teamId) {
+//        if (teams.contains(teamId)) {
+//            teams.remove(teamId);
+//        }
+//    }
 
     @Override
     public boolean equals(final Object o) {

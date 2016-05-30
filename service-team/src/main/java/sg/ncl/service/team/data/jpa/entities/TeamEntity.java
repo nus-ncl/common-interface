@@ -17,6 +17,7 @@ import javax.persistence.Id;
 import javax.persistence.ManyToMany;
 import javax.persistence.MapKey;
 import javax.persistence.Table;
+import java.lang.reflect.Member;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -139,6 +140,18 @@ public class TeamEntity extends AbstractEntity implements Team {
     @Override
     public List<TeamMemberEntity> getMembers() {
         return new ArrayList<>(members.values());
+    }
+
+    public void addMember(final String userId) {
+        if (members.containsKey(userId)) {
+//            throw new UserAlreadyInTeam();
+        } else {
+            TeamMemberEntity teamMemberEntity = new TeamMemberEntity();
+            teamMemberEntity.setUserId(userId);
+            teamMemberEntity.setTeam(this);
+            teamMemberEntity.setJoinedDate(ZonedDateTime.now());
+            members.put(userId, teamMemberEntity);
+        }
     }
 
     @Override

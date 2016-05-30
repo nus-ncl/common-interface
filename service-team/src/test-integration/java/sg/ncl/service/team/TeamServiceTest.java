@@ -5,6 +5,7 @@ import org.hamcrest.collection.IsIterableContainingInAnyOrder;
 import org.junit.Assert;
 import org.junit.Test;
 import sg.ncl.service.team.data.jpa.entities.TeamEntity;
+import sg.ncl.service.team.data.jpa.entities.TeamMemberEntity;
 import sg.ncl.service.team.data.jpa.repositories.TeamRepository;
 import sg.ncl.service.team.domain.Team;
 import sg.ncl.service.team.domain.TeamStatus;
@@ -149,6 +150,22 @@ public class TeamServiceTest extends AbstractTest {
 
         // test should pass
         teamService.update(idString, originalTeamEntity);
+    }
+
+    @Test
+    public void addUserToTeamTest() throws  Exception {
+        TeamService teamService = new TeamService(teamRepository);
+        Team team = createTeam();
+        team = teamService.save(team);
+        String teamId = team.getId();
+        String userId = RandomStringUtils.randomAlphabetic(20);
+        TeamEntity teamEntity = teamService.find(teamId);
+        teamEntity.addMember(userId);
+        teamService.update(teamId, teamEntity);
+
+        TeamEntity teamEntityFromDb = teamService.find(teamId);
+        List<TeamMemberEntity> teamList = teamEntityFromDb.getMembers();
+        Assert.assertEquals(teamList.get(0).getUserId(), userId);
     }
 
     private Team createTeam() {

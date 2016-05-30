@@ -4,6 +4,10 @@ import org.apache.commons.lang3.RandomStringUtils;
 import org.hamcrest.collection.IsIterableContainingInAnyOrder;
 import org.junit.Assert;
 import org.junit.Test;
+import sg.ncl.service.team.TeamService;
+import sg.ncl.service.team.data.jpa.entities.TeamEntity;
+import sg.ncl.service.team.data.jpa.repositories.TeamRepository;
+import sg.ncl.service.team.domain.Team;
 import sg.ncl.service.user.data.jpa.entities.AddressEntity;
 import sg.ncl.service.user.data.jpa.entities.UserDetailsEntity;
 import sg.ncl.service.user.data.jpa.entities.UserEntity;
@@ -174,17 +178,18 @@ public class UserServiceTest extends AbstractTest {
         Assert.assertFalse(returnBoolean);
     }
 
-//    @Test
-//    public void addExistingUserToTeamTest() throws  Exception {
-//        UserService userService = new UserService(userRepository);
-//        UserEntity[] userEntity = addUser();
-//        String userId = userEntity[1].getId();
-//        userEntity[1].addTeamId("123");
-//        userRepository.save(userEntity[1]);
-//        boolean noErrors = userService.addUserToTeam(userId, "123");
-//        Assert.assertTrue(noErrors);
-//
-//        noErrors = userService.addUserToTeam(userId, "123");
-//        Assert.assertFalse(noErrors);
-//    }
+    @Test
+    public void addUserToTeamTest() throws  Exception {
+        UserService userService = new UserService(userRepository);
+        UserEntity[] userEntityArray = addUser();
+        UserEntity userEntity = userEntityArray[0];
+        String userId = userEntity.getId();
+        String teamId = RandomStringUtils.randomAlphabetic(20);
+        userEntity.addTeamId(teamId);
+        userService.update(userId, userEntity);
+
+        UserEntity userEntityFromDb = userService.find(userId);
+        List<String> teamList = userEntityFromDb.getTeamIds();
+        Assert.assertEquals(teamList.get(0), teamId);
+    }
 }

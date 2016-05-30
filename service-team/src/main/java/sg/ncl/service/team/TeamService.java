@@ -86,6 +86,21 @@ public class TeamService {
         }
 
         teamRepository.save(one);
+    }
 
+    public boolean addUserToTeam(final String userId, final String teamId) {
+        boolean noErrors = true;
+
+        try {
+            TeamEntity teamEntity = find(teamId);
+            teamEntity.addMember(userId);
+            teamRepository.save(teamEntity);
+        }
+
+        catch (Exception e) {
+            noErrors = false;
+        }
+
+        return noErrors;
     }
 }
