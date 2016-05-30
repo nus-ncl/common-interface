@@ -1,11 +1,28 @@
 package sg.ncl.service.authentication.exceptions;
 
-import org.springframework.http.HttpStatus;
-import org.springframework.web.bind.annotation.ResponseStatus;
 import sg.ncl.common.exceptions.NotFoundException;
 
 /**
  * @author Christopher Zhong
  */
-@ResponseStatus(code = HttpStatus.NOT_FOUND, reason = "Credentials not found")
-public class CredentialsNotFoundException extends NotFoundException {}
+public class CredentialsNotFoundException extends NotFoundException {
+
+    public CredentialsNotFoundException() {}
+
+    public CredentialsNotFoundException(final String message) {
+        super(message);
+    }
+
+    public CredentialsNotFoundException(final String message, final Throwable cause) {
+        super(message, cause);
+    }
+
+    public CredentialsNotFoundException(final Throwable cause) {
+        super(cause);
+    }
+
+    protected CredentialsNotFoundException(final String message, final Throwable cause, final boolean enableSuppression, final boolean writableStackTrace) {
+        super(message, cause, enableSuppression, writableStackTrace);
+    }
+
+}
