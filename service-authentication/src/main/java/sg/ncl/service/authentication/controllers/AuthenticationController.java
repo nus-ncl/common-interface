@@ -34,7 +34,7 @@ public class AuthenticationController {
     public String login(@RequestHeader(HttpHeaders.AUTHORIZATION) String authorization) {
         if (authorization.isEmpty()) {
             logger.warn("Empty authorization header");
-            throw new BadRequestException();
+            throw new BadRequestException("Empty authorization header");
         }
         if (authorization.startsWith("Basic ")) {
             final byte[] bytes = Base64Utils.decodeFromString(authorization.substring(6));
@@ -46,10 +46,10 @@ public class AuthenticationController {
                 return authenticationService.login(username, password);
             }
             logger.warn("Invalid basic authentication");
-            throw new BadRequestException();
+            throw new BadRequestException("Invalid basic authentication");
         }
         logger.warn("Unknown authorization scheme");
-        throw new BadRequestException();
+        throw new BadRequestException("Unknown authorization scheme");
     }
 
 }
