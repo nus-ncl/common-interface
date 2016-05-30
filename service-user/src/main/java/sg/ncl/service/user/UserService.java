@@ -8,6 +8,7 @@ import sg.ncl.service.user.data.jpa.repositories.UserRepository;
 import sg.ncl.service.user.domain.Address;
 import sg.ncl.service.user.domain.User;
 import sg.ncl.service.user.domain.UserDetails;
+import sg.ncl.service.user.exceptions.UserIdNullException;
 import sg.ncl.service.user.exceptions.UserNotFoundException;
 
 import javax.inject.Inject;
@@ -33,11 +34,14 @@ public class UserService {
         for (UserEntity user : userRepository.findAll()) {
             result.add(user);
         }
-
         return result;
     }
 
     public UserEntity find(final String id) {
+        if (id == null || id.isEmpty()) {
+            throw new UserIdNullException();
+        }
+
         final UserEntity one = userRepository.findOne(id);
         if (one == null) {
             throw new UserNotFoundException();
@@ -46,12 +50,15 @@ public class UserService {
     }
 
     public void update(final String id, final UserEntity user) {
+        if (id == null || id.isEmpty()) {
+            throw new UserIdNullException();
+        }
+
         final UserEntity one = userRepository.findOne(id);
         if (one == null) {
             throw new UserNotFoundException();
         }
 
-        final UserDetails oneUserDetails = one.getUserDetails();
         final UserDetails userUserDetails = user.getUserDetails();
 
         if (userUserDetails.getFirstName() != null) {
@@ -70,7 +77,6 @@ public class UserService {
             one.getUserDetails().setPhone(userUserDetails.getPhone());
         }
 
-        final Address oneAddress = one.getUserDetails().getAddress();
         final Address userAddress = user.getUserDetails().getAddress();
 
         if (userAddress != null) {
