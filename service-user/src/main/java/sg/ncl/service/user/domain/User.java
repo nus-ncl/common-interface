@@ -65,5 +65,4 @@ public interface User {
      * @return a list of teams for this {@link User}.
      */
     List<String> getTeamIds();
-
 }

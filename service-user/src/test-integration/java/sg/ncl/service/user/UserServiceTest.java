@@ -125,14 +125,14 @@ public class UserServiceTest extends AbstractTest {
     }
 
     @Test(expected = UserIdNullException.class)
-    public  void updateUserNullIdTest() throws Exception {
+    public void updateUserNullIdTest() throws Exception {
         UserService userService = new UserService(userRepository);
         UserEntity userEntity = new UserEntity();
         userService.update(null, userEntity);
     }
 
     @Test(expected = UserIdNullException.class)
-    public  void updateUserEmptyIdTest() throws Exception {
+    public void updateUserEmptyIdTest() throws Exception {
         UserService userService = new UserService(userRepository);
         UserEntity userEntity = new UserEntity();
         userService.update("", userEntity);
@@ -166,4 +166,25 @@ public class UserServiceTest extends AbstractTest {
 
         return userArray;
     }
+
+    @Test
+    public void addNoSuchUserToTeamTest() throws Exception {
+        UserService userService = new UserService(userRepository);
+        boolean returnBoolean = userService.addUserToTeam("123456", "123456");
+        Assert.assertFalse(returnBoolean);
+    }
+
+//    @Test
+//    public void addExistingUserToTeamTest() throws  Exception {
+//        UserService userService = new UserService(userRepository);
+//        UserEntity[] userEntity = addUser();
+//        String userId = userEntity[1].getId();
+//        userEntity[1].addTeamId("123");
+//        userRepository.save(userEntity[1]);
+//        boolean noErrors = userService.addUserToTeam(userId, "123");
+//        Assert.assertTrue(noErrors);
+//
+//        noErrors = userService.addUserToTeam(userId, "123");
+//        Assert.assertFalse(noErrors);
+//    }
 }
