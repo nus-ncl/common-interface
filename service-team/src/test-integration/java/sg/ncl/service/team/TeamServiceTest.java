@@ -9,11 +9,13 @@ import sg.ncl.service.team.data.jpa.entities.TeamMemberEntity;
 import sg.ncl.service.team.data.jpa.repositories.TeamRepository;
 import sg.ncl.service.team.domain.Team;
 import sg.ncl.service.team.domain.TeamStatus;
+import sg.ncl.service.team.dtos.TeamInfo;
 import sg.ncl.service.team.exceptions.TeamIdNullException;
 import sg.ncl.service.team.exceptions.TeamNotFoundException;
 
 import javax.inject.Inject;
 import java.time.ZonedDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -56,7 +58,7 @@ public class TeamServiceTest extends AbstractTest {
     @Test
     public void getAllTeamsWithNoUserInDbTest() throws Exception {
         TeamService teamService = new TeamService(teamRepository);
-        List<Team> list = teamService.get();
+        List<TeamInfo> list = teamService.get();
         Assert.assertTrue(list.size() == 0);
     }
 
@@ -76,15 +78,17 @@ public class TeamServiceTest extends AbstractTest {
     public void getAllTeamsTest() throws Exception {
         TeamService teamService = new TeamService(teamRepository);
 
-        Team[] teamArray = new Team[3];
+        List<TeamInfo> teamInfoList = new ArrayList<>();
 
         for (int i = 0; i < 3; i++) {
-            teamArray[i] = teamService.save(createTeam());
+            teamInfoList.add(new TeamInfo(teamService.save(createTeam())));
         }
 
-        List<Team> teamList = teamService.get();
+        List<TeamInfo> resultTeamList = teamService.get();
 
-        Assert.assertThat(teamList, IsIterableContainingInAnyOrder.containsInAnyOrder(teamArray));
+        Assert.assertTrue(isListEqual(resultTeamList, teamInfoList));
+
+//        Assert.assertThat(teamList, IsIterableContainingInAnyOrder.containsInAnyOrder(teamInfoArray));
     }
 
     @Test
@@ -105,7 +109,7 @@ public class TeamServiceTest extends AbstractTest {
         final String idString = team.getId();
 
         // get team and store the original description from database
-        TeamEntity originalTeamEntity = teamService.find(idString);
+        TeamEntity originalTeamEntity = teamService.findAndReturnTeamEntity(idString);
         final String originalDescription = originalTeamEntity.getDescription();
 
         // change description and put
@@ -114,10 +118,10 @@ public class TeamServiceTest extends AbstractTest {
 
         teamService.update(idString, originalTeamEntity);
 
-        originalTeamEntity = teamService.find(idString);
-        Assert.assertEquals(originalTeamEntity.getId(), idString);
-        Assert.assertNotEquals(originalTeamEntity.getDescription(), originalDescription);
-        Assert.assertEquals(originalTeamEntity.getDescription(), modifiedDescription);
+        TeamInfo originalTeamInfo = teamService.find(idString);
+        Assert.assertEquals(originalTeamInfo.getId(), idString);
+        Assert.assertNotEquals(originalTeamInfo.getDescription(), originalDescription);
+        Assert.assertEquals(originalTeamInfo.getDescription(), modifiedDescription);
     }
 
     @Test(expected = TeamIdNullException.class)
@@ -142,7 +146,7 @@ public class TeamServiceTest extends AbstractTest {
         final String idString = team.getId();
 
         // get team and store the original description from database
-        TeamEntity originalTeamEntity = teamService.find(idString);
+        TeamEntity originalTeamEntity = teamService.findAndReturnTeamEntity(idString);
         final String originalDescription = originalTeamEntity.getDescription();
 
         // change description and put
@@ -165,7 +169,7 @@ public class TeamServiceTest extends AbstractTest {
         teamService.addUserToTeam(userId, teamId);
 
         // find the team and check if user is in it
-        TeamEntity teamEntityFromDb = teamService.find(teamId);
+        TeamEntity teamEntityFromDb = teamService.findAndReturnTeamEntity(teamId);
         List<TeamMemberEntity> teamList = teamEntityFromDb.getMembers();
         Assert.assertEquals(teamList.get(0).getUserId(), userId);
     }
@@ -178,5 +182,19 @@ public class TeamServiceTest extends AbstractTest {
         teamEntity.setApplicationDate(ZonedDateTime.now());
 
         return teamEntity;
+    }
+
+    private boolean isListEqual(List<TeamInfo> one, List<TeamInfo> two) {
+        ArrayList<TeamInfo> cp = new ArrayList<>(one);
+        for (TeamInfo twoIterator : two) {
+            if (!cp.remove(twoIterator)) {
+                return false;
+            }
+        }
+        return cp.isEmpty();
+    }
+
+    private boolean isListEqual2(List<TeamInfo> one, List<TeamInfo> two) {
+        return ( one.size() == two.size() && one.containsAll(two) );
     }
 }
