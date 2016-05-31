@@ -1,6 +1,7 @@
 dependencies {
-    compile project(':common-jpa')
     compile project(':common-exception')
+    compile project(':common-jpa')
+    compile project(':common-jwt')
     compile('org.springframework.boot:spring-boot-starter-web')
     compile('javax.inject:javax.inject')
     compile('com.fasterxml.jackson.datatype:jackson-datatype-jsr310')
