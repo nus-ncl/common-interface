@@ -13,6 +13,7 @@ import javax.inject.Inject;
 
 import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.*;
+import static sg.ncl.service.authentication.data.jpa.entities.CredentialsEntityTest.getCredentialsEntity;
 
 /**
  * @author Christopher Zhong
@@ -126,14 +127,6 @@ public class CredentialsRepositoryTest extends AbstractTest {
         assertThat(entity.getId(), is(equalTo(id)));
         entity = repository.findOne(id);
         assertThat(entity.getUserId(), is(equalTo(userId)));
-    }
-
-    public static CredentialsEntity getCredentialsEntity() {
-        final CredentialsEntity entity = new CredentialsEntity();
-        entity.setUsername(RandomStringUtils.randomAlphanumeric(20));
-        entity.setPassword(RandomStringUtils.randomAlphanumeric(20));
-        entity.setUserId(RandomStringUtils.randomAlphanumeric(20));
-        return entity;
     }
 
 }
