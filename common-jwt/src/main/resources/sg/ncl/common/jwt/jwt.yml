@@ -1,0 +1,4 @@
+ncl:
+  jwt:
+# please set value for the variable (${jwt.apiKey}) externally (e.g., environment variables, properties file)
+    apiKey: ${jwt.apiKey}

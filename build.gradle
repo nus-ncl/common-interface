@@ -26,6 +26,7 @@ allprojects {
 //                entry 'hibernate-core'
 //                entry 'hibernate-entitymanager'
 //            }
+            dependency 'io.jsonwebtoken:jjwt:0.6.0'
         }
 
         imports {
