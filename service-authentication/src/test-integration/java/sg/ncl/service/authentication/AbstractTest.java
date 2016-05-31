@@ -8,7 +8,6 @@ import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.AbstractTransactionalJUnit4SpringContextTests;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-import org.springframework.test.context.web.WebAppConfiguration;
 
 import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.*;
@@ -17,8 +16,7 @@ import static org.junit.Assert.*;
  * @author Christopher Zhong
  */
 @RunWith(SpringJUnit4ClassRunner.class)
-@SpringApplicationConfiguration(classes = {App.class, TestConfig.class})
-@WebAppConfiguration
+@SpringApplicationConfiguration({App.class, TestConfig.class})
 @ActiveProfiles("authentication-service")
 public abstract class AbstractTest extends AbstractTransactionalJUnit4SpringContextTests {
 
