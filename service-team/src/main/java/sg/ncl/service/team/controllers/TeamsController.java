@@ -6,6 +6,7 @@ import org.springframework.web.bind.annotation.*;
 import sg.ncl.service.team.TeamService;
 import sg.ncl.service.team.data.jpa.entities.TeamEntity;
 import sg.ncl.service.team.domain.Team;
+import sg.ncl.service.team.dtos.TeamInfo;
 
 import javax.inject.Inject;
 import javax.validation.Valid;
@@ -33,14 +34,13 @@ public class TeamsController {
 
     @RequestMapping(method = RequestMethod.GET)
     @ResponseStatus(code = HttpStatus.OK)
-    public List<Team> get() {
+    public List<TeamInfo> get() {
         return teamService.get();
     }
 
     @RequestMapping(path = "/{id}", method = RequestMethod.GET)
     public Team getTeam(@PathVariable String id) {
-        final TeamEntity teamEntity = teamService.find(id);
-        return teamEntity;
+        return teamService.find(id);
     }
 
     @RequestMapping(path = "/{id}", method = RequestMethod.PUT)

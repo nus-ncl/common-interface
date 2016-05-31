@@ -25,6 +25,7 @@ import sg.ncl.service.team.data.jpa.entities.TeamEntity;
 import sg.ncl.service.team.data.jpa.repositories.TeamRepository;
 import sg.ncl.service.team.domain.Team;
 import sg.ncl.service.team.AbstractTest;
+import sg.ncl.service.team.dtos.TeamInfo;
 
 import javax.inject.Inject;
 import javax.swing.text.DateFormatter;
@@ -56,13 +57,16 @@ public class TeamsControllerTest extends AbstractTest {
 
     @Test
     public void postTeamTest() throws Exception {
-        TeamEntity teamEntity = createTeam();
+        // Note: must have TeamEntity to create the JSON
+        TeamEntity teamInfo = createTeam();
 
         Gson gson = Converters.registerAll(new GsonBuilder()).create();
-        String json = gson.toJson(teamEntity);
+        String json = gson.toJson(teamInfo);
 
         mockMvc.perform(post("/teams").contentType(MediaType.APPLICATION_JSON).content(json))
                 .andExpect(status().isCreated());
+
+        System.out.println("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA " + json);
 
         MediaType contentType = new MediaType(MediaType.APPLICATION_JSON.getType(),
                 MediaType.APPLICATION_JSON.getSubtype());
@@ -74,24 +78,12 @@ public class TeamsControllerTest extends AbstractTest {
 
         String list = mvcResult.getResponse().getContentAsString();
 
-        System.out.println("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA " + list);
+        JSONArray jsonArray =  new JSONArray(list);
+        JSONObject jsonObject = jsonArray.getJSONObject(0);
 
-//        ObjectMapper mapper = new ObjectMapper();
-//        mapper.registerModule(new JavaTimeModule());
-//        List<TeamEntity> teamEntityList = mapper.readValue(list, new TypeReference<List<TeamEntity>>(){});
-
-
-
-        JSONObject jsonObject = new JSONObject(list);
-        JSONArray jsonArray = jsonObject.getJSONArray("name");
-
-        String name = jsonArray.getString(0);
-
-
-//
-//                .andExpect(jsonPath("$.name", is(teamEntity.getName())))
-//                .andExpect(jsonPath("$.description", is(teamEntity.getDescription())))
-//                .andExpect(jsonPath("$.applicationDate", is(teamEntity.getApplicationDate())));
+        Assert.assertEquals(jsonObject.getString("name"), teamInfo.getName());
+        Assert.assertEquals(jsonObject.getString("description"), teamInfo.getDescription());
+        Assert.assertEquals(jsonObject.getString("status"), "PENDING");
     }
 
     private TeamEntity createTeam() {
