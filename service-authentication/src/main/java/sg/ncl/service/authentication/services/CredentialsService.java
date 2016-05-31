@@ -5,7 +5,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import sg.ncl.common.exceptions.BadRequestException;
 import sg.ncl.service.authentication.data.jpa.entities.CredentialsEntity;
 import sg.ncl.service.authentication.data.jpa.repositories.CredentialsRepository;
 import sg.ncl.service.authentication.domain.Credentials;
@@ -78,15 +77,23 @@ public class CredentialsService {
 
     @Transactional
     public void updatePassword(final Credentials credentials) {
-        if (credentials.getUsername() == null || credentials.getPassword() == null) {
-            throw new BadRequestException();
+        if (credentials.getUsername() == null) {
+            logger.warn("Username is null");
+            throw new NullUsernameException();
+        }
+        if (credentials.getPassword() == null) {
+            logger.warn("Password is null");
+            throw new NullPasswordException();
         }
         // check if the username exists
         final CredentialsEntity entity = credentialsRepository.findByUsername(credentials.getUsername());
         if (entity == null) {
-            throw new CredentialsNotFoundException();
+            logger.warn("Credentials for `{}` not found", credentials.getUsername());
+            throw new CredentialsNotFoundException(credentials.getUsername());
         }
         setPassword(entity, credentials.getPassword());
+        final CredentialsEntity savedEntity = credentialsRepository.save(entity);
+        logger.info("Credentials updated: {}", savedEntity);
     }
 
     private void setPassword(final CredentialsEntity entity, final String password) {

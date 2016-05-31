@@ -15,6 +15,7 @@ import sg.ncl.service.authentication.data.jpa.entities.CredentialsEntity;
 import sg.ncl.service.authentication.data.jpa.repositories.CredentialsRepository;
 import sg.ncl.service.authentication.domain.Credentials;
 import sg.ncl.service.authentication.dtos.CredentialsInfo;
+import sg.ncl.service.authentication.exceptions.CredentialsNotFoundException;
 import sg.ncl.service.authentication.exceptions.NullPasswordException;
 import sg.ncl.service.authentication.exceptions.NullUserIdException;
 import sg.ncl.service.authentication.exceptions.NullUsernameException;
@@ -132,6 +133,59 @@ public class CredentialsServiceTest extends AbstractTest {
         exception.expect(UserIdAlreadyExistsException.class);
 
         credentialsService.addCredentials(credentials);
+    }
+
+    @Test
+    public void testGoodUpdatePassword() {
+        final String username = RandomStringUtils.randomAlphanumeric(20);
+        final String password = RandomStringUtils.randomAlphanumeric(20);
+        final Credentials credentials = new CredentialsInfo(username, password, null, null);
+        final CredentialsEntity entity = new CredentialsEntity();
+        entity.setUsername(username);
+        entity.setPassword("password");
+
+        when(credentialsRepository.findByUsername(username)).thenAnswer(invocation -> entity);
+        when(passwordEncoder.encode(password)).thenAnswer(invocation -> invocation.getArgumentAt(0, String.class));
+        when(credentialsRepository.save(Mockito.any(CredentialsEntity.class))).thenAnswer(invocation -> invocation.getArgumentAt(0, CredentialsEntity.class));
+
+        credentialsService.updatePassword(credentials);
+
+        verify(credentialsRepository, times(1)).save(Mockito.any(CredentialsEntity.class));
+        assertThat(entity.getUsername(), is(equalTo(username)));
+        assertThat(entity.getPassword(), is(equalTo(password)));
+    }
+
+    @Test
+    public void testUpdatePasswordNullUsername() {
+        final String password = RandomStringUtils.randomAlphanumeric(20);
+        final Credentials credentials = new CredentialsInfo(null, password, null, null);
+
+        exception.expect(NullUsernameException.class);
+
+        credentialsService.updatePassword(credentials);
+    }
+
+    @Test
+    public void testUpdatePasswordNullPassword() {
+        final String username = RandomStringUtils.randomAlphanumeric(20);
+        final Credentials credentials = new CredentialsInfo(username, null, null, null);
+
+        exception.expect(NullPasswordException.class);
+
+        credentialsService.updatePassword(credentials);
+    }
+
+    @Test
+    public void testUpdatePasswordCredentialsNotFound() {
+        final String username = RandomStringUtils.randomAlphanumeric(20);
+        final String password = RandomStringUtils.randomAlphanumeric(20);
+        final Credentials credentials = new CredentialsInfo(username, password, null, null);
+
+        when(credentialsRepository.findByUsername(username)).thenReturn(null);
+
+        exception.expect(CredentialsNotFoundException.class);
+
+        credentialsService.updatePassword(credentials);
     }
 
 }
