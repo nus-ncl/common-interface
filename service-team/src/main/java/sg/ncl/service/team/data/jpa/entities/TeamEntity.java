@@ -17,6 +17,7 @@ import javax.persistence.Id;
 import javax.persistence.ManyToMany;
 import javax.persistence.MapKey;
 import javax.persistence.Table;
+import java.lang.reflect.Member;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -69,7 +70,7 @@ public class TeamEntity extends AbstractEntity implements Team {
         return id;
     }
 
-    void setId(final String id) {
+    public void setId(final String id) {
         this.id = id;
     }
 
@@ -78,7 +79,7 @@ public class TeamEntity extends AbstractEntity implements Team {
         return name;
     }
 
-    void setName(final String name) {
+    public void setName(final String name) {
         this.name = name;
     }
 
@@ -87,7 +88,7 @@ public class TeamEntity extends AbstractEntity implements Team {
         return description;
     }
 
-    void setDescription(final String description) {
+    public void setDescription(final String description) {
         this.description = description;
     }
 
@@ -96,7 +97,7 @@ public class TeamEntity extends AbstractEntity implements Team {
         return visibility;
     }
 
-    void setVisibility(final TeamVisibility visibility) {
+    public void setVisibility(final TeamVisibility visibility) {
         this.visibility = visibility;
     }
 
@@ -105,7 +106,7 @@ public class TeamEntity extends AbstractEntity implements Team {
         return privacy;
     }
 
-    void setPrivacy(final TeamPrivacy privacy) {
+    public void setPrivacy(final TeamPrivacy privacy) {
         this.privacy = privacy;
     }
 
@@ -114,7 +115,7 @@ public class TeamEntity extends AbstractEntity implements Team {
         return status;
     }
 
-    void setStatus(final TeamStatus status) {
+    public void setStatus(final TeamStatus status) {
         this.status = status;
     }
 
@@ -123,7 +124,7 @@ public class TeamEntity extends AbstractEntity implements Team {
         return applicationDate;
     }
 
-    void setApplicationDate(ZonedDateTime applicationDate) {
+    public void setApplicationDate(ZonedDateTime applicationDate) {
         this.applicationDate = applicationDate;
     }
 
@@ -139,6 +140,18 @@ public class TeamEntity extends AbstractEntity implements Team {
     @Override
     public List<TeamMemberEntity> getMembers() {
         return new ArrayList<>(members.values());
+    }
+
+    public void addMember(final String userId) {
+        if (members.containsKey(userId)) {
+//            throw new UserAlreadyInTeam();
+        } else {
+            TeamMemberEntity teamMemberEntity = new TeamMemberEntity();
+            teamMemberEntity.setUserId(userId);
+            teamMemberEntity.setTeam(this);
+            teamMemberEntity.setJoinedDate(ZonedDateTime.now());
+            members.put(userId, teamMemberEntity);
+        }
     }
 
     @Override

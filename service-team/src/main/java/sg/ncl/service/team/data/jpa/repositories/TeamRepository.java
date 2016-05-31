@@ -8,6 +8,6 @@ import sg.ncl.service.team.data.jpa.entities.TeamEntity;
  */
 public interface TeamRepository extends PagingAndSortingRepository<TeamEntity, String> {
 
-    TeamEntity findByName(String name);
+//    TeamEntity findByName(String name);
 
 }

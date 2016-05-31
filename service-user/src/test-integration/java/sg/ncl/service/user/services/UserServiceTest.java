@@ -1,10 +1,13 @@
-package sg.ncl.service.user.services;
+package sg.ncl.service.user;
 
 import org.apache.commons.lang3.RandomStringUtils;
 import org.hamcrest.collection.IsIterableContainingInAnyOrder;
 import org.junit.Assert;
 import org.junit.Test;
-import sg.ncl.service.user.AbstractTest;
+import sg.ncl.service.team.TeamService;
+import sg.ncl.service.team.data.jpa.entities.TeamEntity;
+import sg.ncl.service.team.data.jpa.repositories.TeamRepository;
+import sg.ncl.service.team.domain.Team;
 import sg.ncl.service.user.data.jpa.entities.AddressEntity;
 import sg.ncl.service.user.data.jpa.entities.UserDetailsEntity;
 import sg.ncl.service.user.data.jpa.entities.UserEntity;
@@ -59,13 +62,13 @@ public class UserServiceTest extends AbstractTest {
     }
 
     @Test(expected = UserNotFoundException.class)
-    public void getUserWithNoUserInDbTest() throws Exception {
+    public void findUserWithNoUserInDbTest() throws Exception {
         UserService userService = new UserService(userRepository);
         userService.find(RandomStringUtils.randomAlphabetic(20));
     }
 
     @Test
-    public void getUserTest() throws Exception {
+    public void findUserTest() throws Exception {
         UserService userService = new UserService(userRepository);
         final UserEntity[] userArray = addUser();
         final String idString = userArray[0].getId();
@@ -126,14 +129,14 @@ public class UserServiceTest extends AbstractTest {
     }
 
     @Test(expected = UserIdNullException.class)
-    public  void updateUserNullIdTest() throws Exception {
+    public void updateUserNullIdTest() throws Exception {
         UserService userService = new UserService(userRepository);
         UserEntity userEntity = new UserEntity();
         userService.update(null, userEntity);
     }
 
     @Test(expected = UserIdNullException.class)
-    public  void updateUserEmptyIdTest() throws Exception {
+    public void updateUserEmptyIdTest() throws Exception {
         UserService userService = new UserService(userRepository);
         UserEntity userEntity = new UserEntity();
         userService.update("", userEntity);
@@ -166,5 +169,27 @@ public class UserServiceTest extends AbstractTest {
         userArray[1] = userEntity;
 
         return userArray;
+    }
+
+    @Test
+    public void addNoSuchUserToTeamTest() throws Exception {
+        UserService userService = new UserService(userRepository);
+        boolean returnBoolean = userService.addUserToTeam("123456", "123456");
+        Assert.assertFalse(returnBoolean);
+    }
+
+    @Test
+    public void addUserToTeamTest() throws  Exception {
+        UserService userService = new UserService(userRepository);
+        UserEntity[] userEntityArray = addUser();
+        UserEntity userEntity = userEntityArray[0];
+        String userId = userEntity.getId();
+        String teamId = RandomStringUtils.randomAlphabetic(20);
+        userEntity.addTeamId(teamId);
+        userService.update(userId, userEntity);
+
+        UserEntity userEntityFromDb = userService.find(userId);
+        List<String> teamList = userEntityFromDb.getTeamIds();
+        Assert.assertEquals(teamList.get(0), teamId);
     }
 }

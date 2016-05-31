@@ -1,7 +1,9 @@
 dependencies {
     compile project(':common-jpa')
+    compile project(':common-exception')
     compile('org.springframework.boot:spring-boot-starter-web')
     compile('javax.inject:javax.inject')
+    compile('com.fasterxml.jackson.datatype:jackson-datatype-jsr310')
 
     runtime('mysql:mysql-connector-java')
 
@@ -10,6 +12,7 @@ dependencies {
     testCompile('org.apache.commons:commons-lang3:3.4')
 
     integrationTestCompile('org.springframework.boot:spring-boot-starter-test')
+    integrationTestCompile('com.h2database:h2')
 
-    integrationTestRuntime('com.h2database:h2')
+    integrationTestRuntime('com.jayway.jsonpath:json-path')
 }

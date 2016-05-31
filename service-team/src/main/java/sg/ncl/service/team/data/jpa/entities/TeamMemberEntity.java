@@ -66,7 +66,7 @@ public class TeamMemberEntity extends AbstractEntity implements TeamMember {
         return joinedDate;
     }
 
-    void setJoinedDate(final ZonedDateTime joinedDate) {
+    public void setJoinedDate(final ZonedDateTime joinedDate) {
         this.joinedDate = joinedDate;
     }
 
