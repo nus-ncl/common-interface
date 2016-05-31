@@ -18,7 +18,7 @@ import java.security.Key;
  * @author Christopher Zhong
  */
 @Configuration
-@PropertySource("classpath:/sg/ncl/common/jwt/jwt.yml")
+@PropertySource("classpath:/sg/ncl/common/jwt/jwt.properties")
 public class JwtConfig {
 
     private static final Logger logger = LoggerFactory.getLogger(JwtConfig.class);
@@ -31,7 +31,7 @@ public class JwtConfig {
     }
 
     @Bean
-    public SignatureAlgorithm signatureAlgorithm(@Value("${ncl.jwt.signing-algorithm:#{null}}") final String algorithm) {
+    public SignatureAlgorithm signatureAlgorithm(@Value("${ncl.jwt.signing-algorithm}") final String algorithm) {
         if (algorithm == null) {
             logger.warn("No signature algorithm specified; using default: {}", DEFAULT_SIGNATURE_ALGORITHM);
             return DEFAULT_SIGNATURE_ALGORITHM;
