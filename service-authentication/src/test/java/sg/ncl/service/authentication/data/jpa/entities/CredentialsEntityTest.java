@@ -156,4 +156,12 @@ public class CredentialsEntityTest {
         assertThat(toString, containsString(CredentialsStatus.ACTIVE.toString()));
     }
 
+    public static CredentialsEntity getCredentialsEntity() {
+        final CredentialsEntity entity = new CredentialsEntity();
+        entity.setUsername(RandomStringUtils.randomAlphanumeric(20));
+        entity.setPassword(RandomStringUtils.randomAlphanumeric(20));
+        entity.setUserId(RandomStringUtils.randomAlphanumeric(20));
+        return entity;
+    }
+
 }
