@@ -43,7 +43,7 @@ public class CredentialsService {
     }
 
     @Transactional
-    public void addCredentials(final Credentials credentials) {
+    public CredentialsEntity addCredentials(final Credentials credentials) {
         if (credentials.getUsername() == null) {
             logger.warn("Username is null");
             throw new NullUsernameException();
@@ -60,13 +60,14 @@ public class CredentialsService {
         if (credentialsRepository.findByUsername(credentials.getUsername()) == null) {
             // check if the user id already exists
             if (credentialsRepository.findByUserId(credentials.getUserId()) == null) {
-                CredentialsEntity entity = new CredentialsEntity();
+                final CredentialsEntity entity = new CredentialsEntity();
                 entity.setUsername(credentials.getUsername());
                 setPassword(entity, credentials.getPassword());
                 entity.setUserId(credentials.getUserId());
                 entity.setStatus(CredentialsStatus.ACTIVE);
-                entity = credentialsRepository.save(entity);
-                logger.info("New credentials `{}`", entity);
+                final CredentialsEntity savedEntity = credentialsRepository.save(entity);
+                logger.info("New credentials `{}`", savedEntity);
+                return savedEntity;
             }
             logger.warn("User ID `{}` is already associated with a credentials", credentials.getUserId());
             throw new UserIdAlreadyExistsException(credentials.getUserId());
