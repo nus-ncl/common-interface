@@ -7,6 +7,6 @@ import sg.ncl.common.jwt.JwtConfig;
 /**
  * @author Christopher Zhong
  */
-@Configuration
+@Configuration("sg.ncl.service.authentication.AppConfig")
 @Import({JwtConfig.class})
 public class AppConfig {}
