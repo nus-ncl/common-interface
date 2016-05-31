@@ -1,9 +1,10 @@
-package sg.ncl.service.user;
+package sg.ncl.service.user.services;
 
 import org.apache.commons.lang3.RandomStringUtils;
 import org.hamcrest.collection.IsIterableContainingInAnyOrder;
 import org.junit.Assert;
 import org.junit.Test;
+import sg.ncl.service.user.AbstractTest;
 import sg.ncl.service.user.data.jpa.entities.AddressEntity;
 import sg.ncl.service.user.data.jpa.entities.UserDetailsEntity;
 import sg.ncl.service.user.data.jpa.entities.UserEntity;

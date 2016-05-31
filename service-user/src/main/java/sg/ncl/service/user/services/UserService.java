@@ -1,4 +1,4 @@
-package sg.ncl.service.user;
+package sg.ncl.service.user.services;
 
 import org.springframework.stereotype.Service;
 import sg.ncl.service.user.data.jpa.entities.AddressEntity;
