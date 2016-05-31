@@ -157,12 +157,14 @@ public class TeamServiceTest extends AbstractTest {
         TeamService teamService = new TeamService(teamRepository);
         Team team = createTeam();
         team = teamService.save(team);
+
+        // get team id from newly saved team
         String teamId = team.getId();
         String userId = RandomStringUtils.randomAlphabetic(20);
-        TeamEntity teamEntity = teamService.find(teamId);
-        teamEntity.addMember(userId);
-        teamService.update(teamId, teamEntity);
 
+        teamService.addUserToTeam(userId, teamId);
+
+        // find the team and check if user is in it
         TeamEntity teamEntityFromDb = teamService.find(teamId);
         List<TeamMemberEntity> teamList = teamEntityFromDb.getMembers();
         Assert.assertEquals(teamList.get(0).getUserId(), userId);
