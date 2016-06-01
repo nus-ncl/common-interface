@@ -4,8 +4,9 @@ import org.apache.commons.lang3.RandomStringUtils;
 import org.junit.Test;
 import sg.ncl.service.authentication.domain.CredentialsStatus;
 
-import static org.hamcrest.Matchers.*;
-import static org.junit.Assert.*;
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.is;
+import static org.junit.Assert.assertThat;
 
 /**
  * @author Christopher Zhong
