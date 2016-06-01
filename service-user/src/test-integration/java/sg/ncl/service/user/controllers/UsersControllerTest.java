@@ -128,14 +128,14 @@ public class UsersControllerTest extends AbstractTest {
         ObjectMapper mapper = new ObjectMapper();
         mapper.registerModule(new JavaTimeModule());
 
-        UserEntity userEntity1 = mapper.readValue(jsonString, UserEntity.class);
-        String originalLastName = userEntity1.getUserDetails().getLastName();
+        UserEntity userEntityFromDb = mapper.readValue(jsonString, UserEntity.class);
+        String originalLastName = userEntityFromDb.getUserDetails().getLastName();
 
         // change first name
         String newFirstName = RandomStringUtils.randomAlphabetic(20);
-        userEntity.getUserDetails().setFirstName(newFirstName);
+        userEntityFromDb.getUserDetails().setFirstName(newFirstName);
 
-        String jsonInString = mapper.writeValueAsString(userEntity);
+        String jsonInString = mapper.writeValueAsString(userEntityFromDb);
 
         // put
         mockMvc.perform(put("/users/" + idString).contentType(contentType).content(jsonInString))
