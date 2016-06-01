@@ -1,7 +1,6 @@
 package sg.ncl.service.team;
 
 import org.apache.commons.lang3.RandomStringUtils;
-import org.hamcrest.collection.IsIterableContainingInAnyOrder;
 import org.junit.Assert;
 import org.junit.Test;
 import sg.ncl.service.team.data.jpa.entities.TeamEntity;
@@ -14,7 +13,6 @@ import sg.ncl.service.team.exceptions.TeamIdNullException;
 import sg.ncl.service.team.exceptions.TeamNotFoundException;
 
 import javax.inject.Inject;
-import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -28,7 +26,7 @@ public class TeamServiceTest extends AbstractTest {
     @Test
     public void saveTeamTest() {
         TeamService teamService = new TeamService(teamRepository);
-        Team createdTeam = createTeam();
+        Team createdTeam = TeamCommon.createTeam();
         Team saveTeam = teamService.save(createdTeam);
 
         Assert.assertEquals(createdTeam.getName(), saveTeam.getName());
@@ -81,7 +79,7 @@ public class TeamServiceTest extends AbstractTest {
         List<TeamInfo> teamInfoList = new ArrayList<>();
 
         for (int i = 0; i < 3; i++) {
-            teamInfoList.add(new TeamInfo(teamService.save(createTeam())));
+            teamInfoList.add(new TeamInfo(teamService.save(TeamCommon.createTeam())));
         }
 
         List<TeamInfo> resultTeamList = teamService.get();
@@ -104,7 +102,7 @@ public class TeamServiceTest extends AbstractTest {
     @Test
     public void updateTeamInfoTest() throws Exception {
         TeamService teamService = new TeamService(teamRepository);
-        Team team = createTeam();
+        Team team = TeamCommon.createTeam();
         team = teamService.save(team);
         final String idString = team.getId();
 
@@ -141,7 +139,7 @@ public class TeamServiceTest extends AbstractTest {
     @Test
     public void updateTeamNullFieldTest() {
         TeamService teamService = new TeamService(teamRepository);
-        Team team = createTeam();
+        Team team = TeamCommon.createTeam();
         team = teamService.save(team);
         final String idString = team.getId();
 
@@ -159,7 +157,7 @@ public class TeamServiceTest extends AbstractTest {
     @Test
     public void addUserToTeamTest() throws  Exception {
         TeamService teamService = new TeamService(teamRepository);
-        Team team = createTeam();
+        Team team = TeamCommon.createTeam();
         team = teamService.save(team);
 
         // get team id from newly saved team
@@ -172,16 +170,6 @@ public class TeamServiceTest extends AbstractTest {
         TeamEntity teamEntityFromDb = teamService.findAndReturnTeamEntity(teamId);
         List<TeamMemberEntity> teamList = teamEntityFromDb.getMembers();
         Assert.assertEquals(teamList.get(0).getUserId(), userId);
-    }
-
-    private Team createTeam() {
-        TeamEntity teamEntity = new TeamEntity();
-
-        teamEntity.setName(RandomStringUtils.randomAlphabetic(20));
-        teamEntity.setDescription(RandomStringUtils.randomAlphabetic(20));
-        teamEntity.setApplicationDate(ZonedDateTime.now());
-
-        return teamEntity;
     }
 
     private boolean isListEqual(List<TeamInfo> one, List<TeamInfo> two) {
