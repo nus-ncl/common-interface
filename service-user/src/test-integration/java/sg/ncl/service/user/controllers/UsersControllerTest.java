@@ -51,7 +51,7 @@ public class UsersControllerTest extends AbstractTest {
     }
 
     @Test
-    public void getAllUserTest() throws Exception {
+    public void getAllUsersTest() throws Exception {
         MediaType contentType = new MediaType(MediaType.APPLICATION_JSON.getType(),
                 MediaType.APPLICATION_JSON.getSubtype());
 
@@ -68,8 +68,6 @@ public class UsersControllerTest extends AbstractTest {
                 .andReturn();
 
         String allUserJsonString = result.getResponse().getContentAsString();
-
-        System.out.println("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA " + allUserJsonString);
 
         ObjectMapper mapper = new ObjectMapper();
         mapper.registerModule(new JavaTimeModule());
@@ -113,10 +111,13 @@ public class UsersControllerTest extends AbstractTest {
         MediaType contentType = new MediaType(MediaType.APPLICATION_JSON.getType(),
                 MediaType.APPLICATION_JSON.getSubtype());
 
+        UserEntity[] userArray = addUser();
+        UserEntity userEntity = userArray[0];
+
         final UserEntity[] userEntityArray = addUser();
         final String idString = userEntityArray[0].getId();
 
-        // get user
+         // get user
         MvcResult result = mockMvc.perform(get("/users/" + idString))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(contentType))
@@ -127,8 +128,8 @@ public class UsersControllerTest extends AbstractTest {
         ObjectMapper mapper = new ObjectMapper();
         mapper.registerModule(new JavaTimeModule());
 
-        UserEntity userEntity = mapper.readValue(jsonString, UserEntity.class);
-        String originalLastName = userEntity.getUserDetails().getLastName();
+        UserEntity userEntity1 = mapper.readValue(jsonString, UserEntity.class);
+        String originalLastName = userEntity1.getUserDetails().getLastName();
 
         // change first name
         String newFirstName = RandomStringUtils.randomAlphabetic(20);
