@@ -10,13 +10,13 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.web.context.WebApplicationContext;
+import sg.ncl.service.team.TeamCommon;
 import sg.ncl.service.team.data.jpa.entities.TeamEntity;
 import sg.ncl.service.team.data.jpa.repositories.TeamRepository;
 import sg.ncl.service.team.AbstractTest;
 import sg.ncl.service.team.domain.TeamStatus;
 import sg.ncl.service.team.serializers.DateTimeDeserializer;
 import sg.ncl.service.team.serializers.DateTimeSerializer;
-import sg.ncl.service.team.serializers.GsonDateTimeModule;
 
 import javax.inject.Inject;
 import java.lang.reflect.Type;
@@ -48,7 +48,7 @@ public class TeamsControllerTest extends AbstractTest {
     @Test
     public void postTeamTest() throws Exception {
         // Note: must have TeamEntity to create the JSON
-        TeamEntity teamInfo = createTeam();
+        TeamEntity teamInfo = TeamCommon.createTeam();
 
         GsonBuilder gsonBuilder = new GsonBuilder();
         gsonBuilder.registerTypeAdapter(ZonedDateTime.class, new DateTimeSerializer());
@@ -98,7 +98,7 @@ public class TeamsControllerTest extends AbstractTest {
         MediaType contentType = new MediaType(MediaType.APPLICATION_JSON.getType(),
                 MediaType.APPLICATION_JSON.getSubtype());
 
-        TeamEntity teamEntity = createTeam();
+        TeamEntity teamEntity = TeamCommon.createTeam();
         teamEntity = teamRepository.save(teamEntity);
 
         final String idString = teamEntity.getId();
@@ -115,7 +115,7 @@ public class TeamsControllerTest extends AbstractTest {
         MediaType contentType = new MediaType(MediaType.APPLICATION_JSON.getType(),
                 MediaType.APPLICATION_JSON.getSubtype());
 
-        TeamEntity origTeamEntity = createTeam();
+        TeamEntity origTeamEntity = TeamCommon.createTeam();
         TeamEntity teamEntity = teamRepository.save(origTeamEntity);
         final String idString = teamEntity.getId();
 
@@ -127,9 +127,8 @@ public class TeamsControllerTest extends AbstractTest {
 
         // create GSON
         GsonBuilder gsonBuilder = new GsonBuilder();
-//        gsonBuilder.registerTypeAdapter(ZonedDateTime.class, new DateTimeSerializer());
-//        gsonBuilder.registerTypeAdapter(ZonedDateTime.class, new DateTimeDeserializer());
-        gsonBuilder.registerTypeAdapter(ZonedDateTime.class, new GsonDateTimeModule());
+        gsonBuilder.registerTypeAdapter(ZonedDateTime.class, new DateTimeSerializer());
+        gsonBuilder.registerTypeAdapter(ZonedDateTime.class, new DateTimeDeserializer());
         Gson gson = gsonBuilder.create();
 
         // parse JSON into TeamEntity
@@ -170,16 +169,6 @@ public class TeamsControllerTest extends AbstractTest {
         mockMvc.perform(put("/teams/" + idString).contentType(contentType).content("{}"))
                 .andExpect(status().isNotFound())
                 .andExpect(status().reason("Team ID is empty"));
-    }
-
-    private TeamEntity createTeam() {
-        TeamEntity teamEntity = new TeamEntity();
-
-        teamEntity.setName(RandomStringUtils.randomAlphabetic(20));
-        teamEntity.setDescription(RandomStringUtils.randomAlphabetic(20));
-        teamEntity.setApplicationDate(ZonedDateTime.now());
-
-        return teamEntity;
     }
 
 }

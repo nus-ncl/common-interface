@@ -6,7 +6,6 @@ dependencies {
     compile('com.fasterxml.jackson.datatype:jackson-datatype-jsr310')
     compile('com.google.code.gson:gson')
     compile('org.json:json')
-    compile('com.fatboyindustrial.gson-javatime-serialisers:gson-javatime-serialisers:1.1.1')
 
     runtime('mysql:mysql-connector-java')
 
