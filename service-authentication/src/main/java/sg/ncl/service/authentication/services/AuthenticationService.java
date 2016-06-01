@@ -14,7 +14,9 @@ import sg.ncl.service.authentication.exceptions.CredentialsNotFoundException;
 import sg.ncl.service.authentication.exceptions.InvalidCredentialsException;
 
 import javax.inject.Inject;
+import javax.inject.Named;
 import java.security.Key;
+import java.time.Duration;
 import java.time.ZonedDateTime;
 import java.util.Date;
 import java.util.List;
@@ -31,37 +33,37 @@ public class AuthenticationService {
     private final PasswordEncoder passwordEncoder;
     private final SignatureAlgorithm signatureAlgorithm;
     private final Key key;
+    private final Duration duration;
 
     @Inject
-    protected AuthenticationService(final CredentialsRepository credentialsRepository, final PasswordEncoder passwordEncoder, final SignatureAlgorithm signatureAlgorithm, final Key key) {
+    protected AuthenticationService(final CredentialsRepository credentialsRepository, final PasswordEncoder passwordEncoder, final SignatureAlgorithm signatureAlgorithm, final Key key, @Named("ncl.jwt.expiry.duration") final Duration duration) {
         this.credentialsRepository = credentialsRepository;
         this.passwordEncoder = passwordEncoder;
         this.signatureAlgorithm = signatureAlgorithm;
         this.key = key;
+        this.duration = duration;
     }
 
     @Transactional
     public String login(final String username, String password) {
-        // FIXME not suppose to do this, but for dev purposes to bypass the credentials not found exception
-        if (username.equals("johndoe@nus.edu.sg") && password.equals("password")) {
-            return username;
-        }
         // find the credentials first
         final CredentialsEntity credentials = credentialsRepository.findByUsername(username);
         if (credentials == null) {
-            logger.warn("Credentials not found %1", username);
+            logger.warn("Credentials for `{}` not found", username);
             throw new CredentialsNotFoundException(username);
         }
         // compare the password
         if (passwordEncoder.matches(password, credentials.getPassword())) {
             // create and sign a JWT
             final ZonedDateTime now = ZonedDateTime.now();
+            final ZonedDateTime expiry = now.plus(duration);
             final String jwt = Jwts.builder()
                     .setSubject(credentials.getUserId())
                     .setIssuer(AuthenticationService.class.getName())
                     .setIssuedAt(Date.from(now.toInstant()))
                     // expiry is set for 1 day from issue date
-                    .setExpiration(Date.from(now.plusDays(1L).toInstant()))
+                    .setExpiration(Date.from(expiry.toInstant()))
+                    // TODO custom claims such as permissions
 //                    .claim()
                     // sign the JWT with the given algorithm and key
                     .signWith(signatureAlgorithm, key)

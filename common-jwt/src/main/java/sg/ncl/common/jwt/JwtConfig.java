@@ -13,6 +13,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 
 import javax.crypto.spec.SecretKeySpec;
 import java.security.Key;
+import java.time.Duration;
+import java.time.format.DateTimeParseException;
 
 /**
  * @author Christopher Zhong
@@ -24,6 +26,7 @@ public class JwtConfig {
     private static final Logger logger = LoggerFactory.getLogger(JwtConfig.class);
 
     private static final SignatureAlgorithm DEFAULT_SIGNATURE_ALGORITHM = SignatureAlgorithm.HS512;
+    private static final Duration DEFAULT_EXPIRY_DURATION = Duration.ofDays(1L);
 
     @Bean
     public PasswordEncoder passwordEncoder() {
@@ -36,9 +39,10 @@ public class JwtConfig {
             logger.warn("No signature algorithm specified; using default: {}", DEFAULT_SIGNATURE_ALGORITHM);
             return DEFAULT_SIGNATURE_ALGORITHM;
         }
-        logger.info("Looking up '{}' for signature algorithm", algorithm);
         try {
-            return SignatureAlgorithm.forName(algorithm);
+            final SignatureAlgorithm signatureAlgorithm = SignatureAlgorithm.forName(algorithm);
+            logger.info("Signature algorithm is '{}'", signatureAlgorithm);
+            return signatureAlgorithm;
         } catch (SignatureException e) {
             logger.warn("Unknown signature algorithm '{}'; using default: {}", algorithm, DEFAULT_SIGNATURE_ALGORITHM);
             return DEFAULT_SIGNATURE_ALGORITHM;
@@ -49,6 +53,18 @@ public class JwtConfig {
     public Key key(@Value("${ncl.jwt.apiKey}") final String apiKey, final SignatureAlgorithm signatureAlgorithm) {
         logger.info("Using '{}' as the api key and signing with {}", apiKey, signatureAlgorithm);
         return new SecretKeySpec(apiKey.getBytes(), signatureAlgorithm.getJcaName());
+    }
+
+    @Bean(name = "ncl.jwt.expiry.duration")
+    public Duration jwtExpiryDuration(@Value("${ncl.jwt.expiry.duration}") final String text) {
+        try {
+            final Duration duration = Duration.parse(text);
+            logger.info("JWT expiry duration is `{}`", duration);
+            return duration;
+        } catch (DateTimeParseException e) {
+            logger.warn("Invalid duration format `{}`; using default `{}`", text, DEFAULT_EXPIRY_DURATION);
+            return DEFAULT_EXPIRY_DURATION;
+        }
     }
 
 }
