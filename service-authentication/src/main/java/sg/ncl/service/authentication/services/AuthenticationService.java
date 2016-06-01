@@ -45,11 +45,11 @@ public class AuthenticationService {
     }
 
     @Transactional
-    public String login(final String username, String password) {
+    public String login(final String username, final String password) {
         // find the credentials first
         final CredentialsEntity credentials = credentialsRepository.findByUsername(username);
         if (credentials == null) {
-            logger.warn("Credentials for `{}` not found", username);
+            logger.warn("Credentials for '{}' not found", username);
             throw new CredentialsNotFoundException(username);
         }
         // compare the password
