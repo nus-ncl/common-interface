@@ -22,8 +22,11 @@ import sg.ncl.service.authentication.exceptions.NullUsernameException;
 import sg.ncl.service.authentication.exceptions.UserIdAlreadyExistsException;
 import sg.ncl.service.authentication.exceptions.UsernameAlreadyExistsException;
 
-import static org.hamcrest.Matchers.*;
-import static org.junit.Assert.*;
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.not;
+import static org.hamcrest.Matchers.nullValue;
+import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
