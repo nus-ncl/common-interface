@@ -51,7 +51,7 @@ public class JwtConfig {
 
     @Bean
     public Key key(@Value("${ncl.jwt.apiKey}") final String apiKey, final SignatureAlgorithm signatureAlgorithm) {
-        logger.info("Using '{}' as the api key and signing with {}", apiKey, signatureAlgorithm);
+        logger.info("Using '{}' as the api key and signing with '{}'", apiKey, signatureAlgorithm);
         return new SecretKeySpec(apiKey.getBytes(), signatureAlgorithm.getJcaName());
     }
 
@@ -59,10 +59,10 @@ public class JwtConfig {
     public Duration jwtExpiryDuration(@Value("${ncl.jwt.expiry.duration}") final String text) {
         try {
             final Duration duration = Duration.parse(text);
-            logger.info("JWT expiry duration is `{}`", duration);
+            logger.info("JWT expiry duration is '{}'", duration);
             return duration;
         } catch (DateTimeParseException e) {
-            logger.warn("Invalid duration format `{}`; using default `{}`", text, DEFAULT_EXPIRY_DURATION);
+            logger.warn("Invalid duration format '{}'; using default: {}", text, DEFAULT_EXPIRY_DURATION);
             return DEFAULT_EXPIRY_DURATION;
         }
     }
