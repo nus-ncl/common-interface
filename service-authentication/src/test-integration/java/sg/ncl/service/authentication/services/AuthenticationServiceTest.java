@@ -67,7 +67,7 @@ public class AuthenticationServiceTest extends AbstractTest {
         final String password = RandomStringUtils.randomAlphanumeric(20);
         final CredentialsEntity credentialsEntity = new CredentialsEntity();
 
-        credentialsEntity.setUserId(username);
+        credentialsEntity.setId(username);
         credentialsEntity.setUsername(username);
         credentialsEntity.setPassword(password);
 

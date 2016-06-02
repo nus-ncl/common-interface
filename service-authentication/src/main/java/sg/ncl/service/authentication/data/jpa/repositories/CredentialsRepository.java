@@ -9,11 +9,9 @@ import java.util.List;
 /**
  * @author Christopher Zhong
  */
-public interface CredentialsRepository extends JpaRepository<CredentialsEntity, Long> {
+public interface CredentialsRepository extends JpaRepository<CredentialsEntity, String> {
 
     CredentialsEntity findByUsername(String username);
-
-    CredentialsEntity findByUserId(String userId);
 
     List<CredentialsEntity> findByStatus(CredentialsStatus status);
 

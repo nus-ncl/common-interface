@@ -8,7 +8,6 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
-import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.Index;
 import javax.persistence.Table;
@@ -17,13 +16,12 @@ import javax.persistence.Table;
  * @author Christopher Zhong
  */
 @Entity
-@Table(name = "credentials", indexes = {@Index(columnList = "username"), @Index(columnList = "user_id")})
+@Table(name = "credentials", indexes = @Index(columnList = "username"))
 public class CredentialsEntity extends AbstractEntity implements Credentials {
 
     @Id
-    @GeneratedValue
     @Column(name = "id", nullable = false, unique = true, updatable = false)
-    private Long id;
+    private String id;
 
     @Column(name = "username", nullable = false, unique = true)
     private String username;
@@ -31,18 +29,16 @@ public class CredentialsEntity extends AbstractEntity implements Credentials {
     @Column(name = "password", nullable = false)
     private String password;
 
-    @Column(name = "user_id", nullable = false, unique = true, updatable = false)
-    private String userId;
-
     @Column(name = "status", nullable = false)
     @Enumerated(EnumType.STRING)
     private CredentialsStatus status = CredentialsStatus.ACTIVE;
 
-    public Long getId() {
+    @Override
+    public String getId() {
         return id;
     }
 
-    void setId(final Long id) {
+    public void setId(final String id) {
         this.id = id;
     }
 
@@ -65,15 +61,6 @@ public class CredentialsEntity extends AbstractEntity implements Credentials {
     }
 
     @Override
-    public String getUserId() {
-        return userId;
-    }
-
-    public void setUserId(final String userId) {
-        this.userId = userId;
-    }
-
-    @Override
     public CredentialsStatus getStatus() {
         return status;
     }
@@ -89,25 +76,22 @@ public class CredentialsEntity extends AbstractEntity implements Credentials {
 
         final Credentials that = (Credentials) o;
 
-        return getUsername() == null ? that.getUsername() == null : getUsername().equals(that.getUsername());
+        return getId() == null ? that.getId() == null : getId().equals(that.getId());
     }
 
     @Override
     public int hashCode() {
-        return getUsername() == null ? 0 : getUsername().hashCode();
+        return getId() == null ? 0 : getId().hashCode();
     }
 
     @Override
     public String toString() {
-        final StringBuilder sb = new StringBuilder("CredentialsEntity{");
-        sb.append("id=").append(id);
-        sb.append(", username='").append(username).append('\'');
-        sb.append(", password='").append(password).append('\'');
-        sb.append(", userId=").append(userId);
-        sb.append(", status=").append(status);
-        sb.append(", super=").append(super.toString());
-        sb.append('}');
-        return sb.toString();
+        return "CredentialsEntity{" +
+                "id='" + id + '\'' +
+                ", username='" + username + '\'' +
+                ", password='" + password + '\'' +
+                ", status=" + status +
+                "} " + super.toString();
     }
 
 }

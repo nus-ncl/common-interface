@@ -1,5 +1,7 @@
 package sg.ncl.service.authentication.dtos;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import sg.ncl.service.authentication.domain.Credentials;
 import sg.ncl.service.authentication.domain.CredentialsStatus;
 
@@ -8,16 +10,26 @@ import sg.ncl.service.authentication.domain.CredentialsStatus;
  */
 public class CredentialsInfo implements Credentials {
 
+    private final String id;
     private final String username;
     private final String password;
-    private final String userId;
     private final CredentialsStatus status;
 
-    public CredentialsInfo(final String username, final String password, final String userId, final CredentialsStatus status) {
+    @JsonCreator
+    public CredentialsInfo(@JsonProperty("id") final String id, @JsonProperty("username") final String username, @JsonProperty("password") final String password, @JsonProperty("status") final CredentialsStatus status) {
+        this.id = id;
         this.username = username;
         this.password = password;
-        this.userId = userId;
         this.status = status;
+    }
+
+    public CredentialsInfo(final Credentials credentials) {
+        this(credentials.getId(), credentials.getUsername(), null, credentials.getStatus());
+    }
+
+    @Override
+    public String getId() {
+        return id;
     }
 
     @Override
@@ -28,11 +40,6 @@ public class CredentialsInfo implements Credentials {
     @Override
     public String getPassword() {
         return password;
-    }
-
-    @Override
-    public String getUserId() {
-        return userId;
     }
 
     @Override
