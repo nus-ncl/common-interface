@@ -31,8 +31,8 @@ public class UserService {
         this.userRepository = userRepository;
     }
 
-    public List<UserEntity> get() {
-        final List<UserEntity> result = new ArrayList<>();
+    public List<User> get() {
+        final List<User> result = new ArrayList<>();
         for (UserEntity user : userRepository.findAll()) {
             result.add(user);
         }

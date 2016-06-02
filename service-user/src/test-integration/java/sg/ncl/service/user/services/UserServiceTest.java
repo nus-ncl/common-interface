@@ -168,12 +168,12 @@ public class UserServiceTest extends AbstractTest {
         return userArray;
     }
 
-    @Test
-    public void addNoSuchUserToTeamTest() throws Exception {
-        UserService userService = new UserService(userRepository);
-        boolean returnBoolean = userService.addUserToTeam("123456", "123456");
-        Assert.assertFalse(returnBoolean);
-    }
+//    @Test
+//    public void addNoSuchUserToTeamTest() throws Exception {
+//        UserService userService = new UserService(userRepository);
+//        boolean returnBoolean = userService.addUserToTeam("123456", "123456");
+//        Assert.assertFalse(returnBoolean);
+//    }
 
     @Test
     public void addUserToTeamTest() throws  Exception {
