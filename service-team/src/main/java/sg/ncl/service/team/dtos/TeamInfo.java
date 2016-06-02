@@ -20,7 +20,7 @@ public class TeamInfo implements Team {
     private final TeamStatus status;
     private final ZonedDateTime applicationDate;
     private final ZonedDateTime processedDate;
-    private final List<? extends TeamMember> members;
+    private final List<? extends TeamMemberInfo> members;
 
     public TeamInfo(final String id, final String name, final String description, final TeamVisibility visibility, final TeamPrivacy privacy, final TeamStatus status, final ZonedDateTime applicationDate, final ZonedDateTime processedDate, final List<? extends TeamMember> members) {
         this.id = id;
@@ -31,7 +31,7 @@ public class TeamInfo implements Team {
         this.status = status;
         this.applicationDate = applicationDate;
         this.processedDate = processedDate;
-        this.members = members;
+        this.members = new TeamMemberInfo(members);
     }
 
     public TeamInfo(final TeamEntity teamEntity) {
@@ -44,18 +44,6 @@ public class TeamInfo implements Team {
                 teamEntity.getApplicationDate(),
                 teamEntity.getProcessedDate(),
                 teamEntity.getMembers());
-    }
-
-    public TeamInfo(final Team team) {
-        this(team.getId(),
-                team.getName(),
-                team.getDescription(),
-                team.getVisibility(),
-                team.getPrivacy(),
-                team.getStatus(),
-                team.getApplicationDate(),
-                team.getProcessedDate(),
-                team.getMembers());
     }
 
     public String getId() {
