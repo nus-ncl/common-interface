@@ -1,10 +1,9 @@
 package sg.ncl.service.version;
 
-import org.springframework.test.context.ContextConfiguration;
+import org.springframework.context.annotation.Configuration;
 
 /**
  * @author Christopher Zhong
  */
-@ContextConfiguration(classes = {App.class, AppConfig.class})
-public class TestConfig {
-}
+@Configuration
+public class TestConfig {}
