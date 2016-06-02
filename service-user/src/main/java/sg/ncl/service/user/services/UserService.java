@@ -1,7 +1,6 @@
 package sg.ncl.service.user.services;
 
 import org.springframework.stereotype.Service;
-import sg.ncl.service.team.TeamService;
 import sg.ncl.service.user.data.jpa.entities.AddressEntity;
 import sg.ncl.service.user.data.jpa.entities.UserDetailsEntity;
 import sg.ncl.service.user.data.jpa.entities.UserEntity;
@@ -14,7 +13,6 @@ import sg.ncl.service.user.exceptions.UserNotFoundException;
 
 import javax.inject.Inject;
 import java.time.ZonedDateTime;
-import java.time.temporal.TemporalAmount;
 import java.util.ArrayList;
 import java.util.List;
 
