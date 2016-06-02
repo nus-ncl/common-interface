@@ -16,6 +16,7 @@ import sg.ncl.service.user.exceptions.UserNotFoundException;
 import javax.inject.Inject;
 import java.time.ZonedDateTime;
 import java.util.List;
+import java.util.concurrent.ExecutionException;
 
 /**
  * Created by Desmond
@@ -188,5 +189,35 @@ public class UserServiceTest extends AbstractTest {
         UserEntity userEntityFromDb = userService.find(userId);
         List<String> teamList = userEntityFromDb.getTeamIds();
         Assert.assertEquals(teamList.get(0), teamId);
+    }
+
+    @Test
+    public void addUserTest() throws Exception {
+        UserService userService = new UserService(userRepository);
+
+        // create test user
+        final UserEntity userEntity = new UserEntity();
+        userEntity.setApplicationDate(ZonedDateTime.now());
+
+        final UserDetailsEntity userDetailsEntity = new UserDetailsEntity();
+        userDetailsEntity.setFirstName(RandomStringUtils.randomAlphabetic(20));
+        userDetailsEntity.setLastName(RandomStringUtils.randomAlphabetic(20));
+        userDetailsEntity.setEmail(RandomStringUtils.randomAlphabetic(20));
+        userDetailsEntity.setPhone(RandomStringUtils.randomAlphabetic(20));
+
+        final AddressEntity address = new AddressEntity();
+        address.setAddress1(RandomStringUtils.randomAlphabetic(20));
+        address.setAddress2(RandomStringUtils.randomAlphabetic(20));
+        address.setCountry(RandomStringUtils.randomAlphabetic(20));
+        address.setRegion(RandomStringUtils.randomAlphabetic(20));
+        address.setZipCode(RandomStringUtils.randomAlphabetic(20));
+
+        userDetailsEntity.setAddress(address);
+        userEntity.setUserDetails(userDetailsEntity);
+
+        String userId = userService.addUser(userEntity);
+
+        UserEntity userEntityFromDb = userService.find(userId);
+        Assert.assertEquals(userEntity.getUserDetails(), userEntityFromDb.getUserDetails());
     }
 }

@@ -1,7 +1,6 @@
 package sg.ncl.service.user.services;
 
 import org.springframework.stereotype.Service;
-import sg.ncl.service.team.TeamService;
 import sg.ncl.service.user.data.jpa.entities.AddressEntity;
 import sg.ncl.service.user.data.jpa.entities.UserDetailsEntity;
 import sg.ncl.service.user.data.jpa.entities.UserEntity;
@@ -14,7 +13,6 @@ import sg.ncl.service.user.exceptions.UserNotFoundException;
 
 import javax.inject.Inject;
 import java.time.ZonedDateTime;
-import java.time.temporal.TemporalAmount;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -29,6 +27,16 @@ public class UserService {
     @Inject
     protected UserService(final UserRepository userRepository) {
         this.userRepository = userRepository;
+    }
+
+    public String addUser(User user) {
+        final UserEntity userEntity = new UserEntity();
+        userEntity.setApplicationDate(user.getApplicationDate());
+        userEntity.setProcessedDate(user.getProcessedDate());
+        userEntity.setUserDetails((UserDetailsEntity) user.getUserDetails());
+
+        UserEntity savedUserEntity = userRepository.save(userEntity);
+        return savedUserEntity.getId();
     }
 
     public List<User> get() {
@@ -52,7 +60,7 @@ public class UserService {
         return one;
     }
 
-    public void update(final String id, final UserEntity user) {
+    public void update(final String id, final User user) {
         if (id == null || id.isEmpty()) {
             throw new UserIdNullException();
         }
