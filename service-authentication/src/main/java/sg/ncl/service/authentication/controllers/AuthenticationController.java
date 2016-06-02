@@ -3,13 +3,17 @@ package sg.ncl.service.authentication.controllers;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.util.Base64Utils;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
-import sg.ncl.common.exceptions.BadRequestException;
+import sg.ncl.service.authentication.exceptions.EmptyAuthorizationHeaderException;
+import sg.ncl.service.authentication.exceptions.InvalidBasicAuthenticationException;
+import sg.ncl.service.authentication.exceptions.UnknownAuthorizationSchemeException;
 import sg.ncl.service.authentication.services.AuthenticationService;
 
 import javax.inject.Inject;
@@ -31,10 +35,11 @@ public class AuthenticationController {
     }
 
     @RequestMapping(method = RequestMethod.POST)
+    @ResponseStatus(HttpStatus.OK)
     public String login(@RequestHeader(HttpHeaders.AUTHORIZATION) String authorization) {
         if (authorization.isEmpty()) {
-            logger.warn("Empty authorization header");
-            throw new BadRequestException("Empty authorization header");
+            logger.warn("Authorization header is empty");
+            throw new EmptyAuthorizationHeaderException();
         }
         if (authorization.startsWith("Basic ")) {
             final byte[] bytes = Base64Utils.decodeFromString(authorization.substring(6));
@@ -45,11 +50,11 @@ public class AuthenticationController {
                 final String password = split[1];
                 return authenticationService.login(username, password);
             }
-            logger.warn("Invalid basic authentication");
-            throw new BadRequestException("Invalid basic authentication");
+            logger.warn("Invalid basic authentication: {}", authorization);
+            throw new InvalidBasicAuthenticationException(authorization);
         }
-        logger.warn("Unknown authorization scheme");
-        throw new BadRequestException("Unknown authorization scheme");
+        logger.warn("Unknown authorization scheme: {}", authorization);
+        throw new UnknownAuthorizationSchemeException(authorization);
     }
 
 }
