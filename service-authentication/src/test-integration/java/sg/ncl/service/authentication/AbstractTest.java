@@ -4,8 +4,8 @@ import org.h2.jdbc.JdbcSQLException;
 import org.hibernate.exception.ConstraintViolationException;
 import org.junit.runner.RunWith;
 import org.springframework.boot.test.SpringApplicationConfiguration;
+import org.springframework.boot.test.WebIntegrationTest;
 import org.springframework.dao.DataIntegrityViolationException;
-import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.AbstractTransactionalJUnit4SpringContextTests;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
@@ -21,7 +21,7 @@ import static org.junit.Assert.assertThat;
  */
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringApplicationConfiguration({App.class, TestConfig.class})
-@ActiveProfiles("authentication-service")
+@WebIntegrationTest
 public abstract class AbstractTest extends AbstractTransactionalJUnit4SpringContextTests {
 
     protected void checkException(final Exception e, final String message) {
