@@ -7,6 +7,7 @@ import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.springframework.dao.DataIntegrityViolationException;
 import sg.ncl.service.authentication.AbstractTest;
+import sg.ncl.service.authentication.Util;
 import sg.ncl.service.authentication.data.jpa.entities.CredentialsEntity;
 
 import javax.inject.Inject;
@@ -16,7 +17,6 @@ import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.not;
 import static org.hamcrest.Matchers.nullValue;
 import static org.junit.Assert.assertThat;
-import static sg.ncl.service.authentication.data.jpa.entities.CredentialsEntityTest.getCredentialsEntity;
 
 /**
  * @author Christopher Zhong
@@ -35,18 +35,18 @@ public class CredentialsRepositoryTest extends AbstractTest {
     }
 
     @Test
-    public void testGood() throws Exception {
-        final CredentialsEntity entity = getCredentialsEntity();
+    public void testGoodSave() throws Exception {
+        final CredentialsEntity entity = Util.getCredentialsEntity();
 
         final long count = repository.count();
         final CredentialsEntity savedEntity = repository.save(entity);
-        assertThat(savedEntity.getId(), is(not(nullValue(Long.class))));
         assertThat(repository.count(), is(equalTo(count + 1)));
+        assertThat(entity.getId(), is(equalTo(savedEntity.getId())));
     }
 
     @Test
-    public void testNullUsername() throws Exception {
-        final CredentialsEntity entity = getCredentialsEntity();
+    public void testSaveNullUsername() throws Exception {
+        final CredentialsEntity entity = Util.getCredentialsEntity();
         entity.setUsername(null);
 
         try {
@@ -59,7 +59,7 @@ public class CredentialsRepositoryTest extends AbstractTest {
 
     @Test
     public void testNullPassword() throws Exception {
-        final CredentialsEntity entity = getCredentialsEntity();
+        final CredentialsEntity entity = Util.getCredentialsEntity();
         entity.setPassword(null);
 
         try {
@@ -72,8 +72,8 @@ public class CredentialsRepositoryTest extends AbstractTest {
 
     @Test
     public void testNullUserId() throws Exception {
-        final CredentialsEntity entity = getCredentialsEntity();
-        entity.setUserId(null);
+        final CredentialsEntity entity = Util.getCredentialsEntity();
+        entity.setId(null);
 
         try {
             repository.save(entity);
@@ -85,8 +85,8 @@ public class CredentialsRepositoryTest extends AbstractTest {
 
     @Test
     public void testDuplicateUsername() throws Exception {
-        final CredentialsEntity entity1 = getCredentialsEntity();
-        final CredentialsEntity entity2 = getCredentialsEntity();
+        final CredentialsEntity entity1 = Util.getCredentialsEntity();
+        final CredentialsEntity entity2 = Util.getCredentialsEntity();
         entity2.setUsername(entity1.getUsername());
 
         assertThat(repository.findByUsername(entity1.getUsername()), is(nullValue(CredentialsEntity.class)));
@@ -101,11 +101,11 @@ public class CredentialsRepositoryTest extends AbstractTest {
 
     @Test
     public void testDuplicateUserId() throws Exception {
-        final CredentialsEntity entity1 = getCredentialsEntity();
-        final CredentialsEntity entity2 = getCredentialsEntity();
-        entity2.setUserId(entity1.getUserId());
+        final CredentialsEntity entity1 = Util.getCredentialsEntity();
+        final CredentialsEntity entity2 = Util.getCredentialsEntity();
+        entity2.setId(entity1.getId());
 
-        assertThat(repository.findByUserId(entity1.getUserId()), is(nullValue(CredentialsEntity.class)));
+        assertThat(repository.findOne(entity1.getId()), is(nullValue(CredentialsEntity.class)));
         repository.save(entity1);
         try {
             repository.save(entity2);
@@ -118,18 +118,18 @@ public class CredentialsRepositoryTest extends AbstractTest {
     @Test
     @Ignore("updatable = false is not working")
     public void testNonUpdatableUserId() throws Exception {
-        CredentialsEntity entity = getCredentialsEntity();
-        final String userId = entity.getUserId();
+        CredentialsEntity entity = Util.getCredentialsEntity();
+        final String userId = entity.getId();
 
         final long count = repository.count();
         entity = repository.save(entity);
-        final Long id = entity.getId();
-        entity.setUserId(RandomStringUtils.randomAlphanumeric(20));
+        final String id = entity.getId();
+        entity.setId(RandomStringUtils.randomAlphanumeric(20));
         entity = repository.save(entity);
         assertThat(repository.count(), is(equalTo(count + 1)));
         assertThat(entity.getId(), is(equalTo(id)));
         entity = repository.findOne(id);
-        assertThat(entity.getUserId(), is(equalTo(userId)));
+        assertThat(entity.getId(), is(equalTo(userId)));
     }
 
 }

@@ -16,7 +16,7 @@ public class CredentialsInfoTest {
     private final String username = RandomStringUtils.randomAlphanumeric(20);
     private final String password = RandomStringUtils.randomAlphanumeric(20);
     private final String userId = RandomStringUtils.randomAlphanumeric(20);
-    private final CredentialsInfo credentialsInfo = new CredentialsInfo(username, password, userId, CredentialsStatus.ACTIVE);
+    private final CredentialsInfo credentialsInfo = new CredentialsInfo(userId, username, password, CredentialsStatus.ACTIVE);
 
     @Test
     public void testGetUsername() throws Exception {
@@ -31,7 +31,7 @@ public class CredentialsInfoTest {
 
     @Test
     public void testGetUserId() throws Exception {
-        assertThat(credentialsInfo.getUserId(), is(equalTo(userId)));
+        assertThat(credentialsInfo.getId(), is(equalTo(userId)));
     }
 
     @Test

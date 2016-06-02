@@ -8,6 +8,13 @@ package sg.ncl.service.authentication.domain;
 public interface Credentials {
 
     /**
+     * Returns the user id associated with this credentials.
+     *
+     * @return the user id associated with this credentials.
+     */
+    String getId();
+
+    /**
      * Returns the username.
      *
      * @return the username.
@@ -20,13 +27,6 @@ public interface Credentials {
      * @return the password.
      */
     String getPassword();
-
-    /**
-     * Returns the user id associated with this credentials.
-     *
-     * @return the user id associated with this credentials.
-     */
-    String getUserId();
 
     /**
      * Returns the status of this credentials.

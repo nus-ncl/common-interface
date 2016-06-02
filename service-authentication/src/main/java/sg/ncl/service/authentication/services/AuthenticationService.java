@@ -58,7 +58,7 @@ public class AuthenticationService {
             final ZonedDateTime now = ZonedDateTime.now();
             final ZonedDateTime expiry = now.plus(duration);
             final String jwt = Jwts.builder()
-                    .setSubject(credentials.getUserId())
+                    .setSubject(credentials.getId())
                     .setIssuer(AuthenticationService.class.getName())
                     .setIssuedAt(Date.from(now.toInstant()))
                     // expiry is set for 1 day from issue date
