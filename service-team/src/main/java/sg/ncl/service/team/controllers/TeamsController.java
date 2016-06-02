@@ -48,4 +48,10 @@ public class TeamsController {
     public void updateTeam(@PathVariable String id, @RequestBody TeamEntity teamEntity) {
         teamService.update(id, teamEntity);
     }
+
+    @RequestMapping(path = "/seed", method = RequestMethod.POST)
+    @ResponseStatus(value = HttpStatus.CREATED)
+    public void seedData() {
+        teamService.seedData();
+    }
 }

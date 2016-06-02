@@ -9,6 +9,7 @@ import sg.ncl.service.team.exceptions.TeamIdNullException;
 import sg.ncl.service.team.exceptions.TeamNotFoundException;
 
 import javax.inject.Inject;
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -102,5 +103,14 @@ public class TeamService {
         }
 
         return noErrors;
+    }
+
+    public void seedData() {
+        TeamEntity teamEntity = new TeamEntity();
+
+        teamEntity.setName("Aries");
+        teamEntity.setDescription("This is a project description");
+        teamEntity.setApplicationDate(ZonedDateTime.now());
+        teamRepository.save(teamEntity);
     }
 }
