@@ -56,7 +56,7 @@ public class TeamServiceTest extends AbstractTest {
     @Test
     public void getAllTeamsWithNoUserInDbTest() throws Exception {
         TeamService teamService = new TeamService(teamRepository);
-        List<TeamInfo> list = teamService.get();
+        List<Team> list = teamService.get();
         Assert.assertTrue(list.size() == 0);
     }
 
@@ -76,13 +76,13 @@ public class TeamServiceTest extends AbstractTest {
     public void getAllTeamsTest() throws Exception {
         TeamService teamService = new TeamService(teamRepository);
 
-        List<TeamInfo> teamInfoList = new ArrayList<>();
+        List<Team> teamInfoList = new ArrayList<>();
 
         for (int i = 0; i < 3; i++) {
             teamInfoList.add(new TeamInfo(teamService.save(TeamCommon.createTeam())));
         }
 
-        List<TeamInfo> resultTeamList = teamService.get();
+        List<Team> resultTeamList = teamService.get();
 
         Assert.assertTrue(isListEqual(resultTeamList, teamInfoList));
 
@@ -172,9 +172,9 @@ public class TeamServiceTest extends AbstractTest {
         Assert.assertEquals(teamList.get(0).getUserId(), userId);
     }
 
-    private boolean isListEqual(List<TeamInfo> one, List<TeamInfo> two) {
-        ArrayList<TeamInfo> cp = new ArrayList<>(one);
-        for (TeamInfo twoIterator : two) {
+    private boolean isListEqual(List<Team> one, List<Team> two) {
+        ArrayList<Team> cp = new ArrayList<>(one);
+        for (Team twoIterator : two) {
             if (!cp.remove(twoIterator)) {
                 return false;
             }

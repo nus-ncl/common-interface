@@ -36,8 +36,8 @@ public class TeamService {
         return teamRepository.save(teamEntity);
     }
 
-    public List<TeamInfo> get() {
-        final List<TeamInfo> result = new ArrayList<>();
+    public List<Team> get() {
+        final List<Team> result = new ArrayList<>();
         for (TeamEntity team : teamRepository.findAll()) {
             TeamInfo teamInfo = new TeamInfo(team);
             result.add(teamInfo);
