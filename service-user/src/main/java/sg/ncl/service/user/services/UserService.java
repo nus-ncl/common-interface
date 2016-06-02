@@ -1,6 +1,7 @@
 package sg.ncl.service.user.services;
 
 import org.springframework.stereotype.Service;
+import sg.ncl.service.team.TeamService;
 import sg.ncl.service.user.data.jpa.entities.AddressEntity;
 import sg.ncl.service.user.data.jpa.entities.UserDetailsEntity;
 import sg.ncl.service.user.data.jpa.entities.UserEntity;
@@ -13,6 +14,7 @@ import sg.ncl.service.user.exceptions.UserNotFoundException;
 
 import javax.inject.Inject;
 import java.time.ZonedDateTime;
+import java.time.temporal.TemporalAmount;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -29,11 +31,12 @@ public class UserService {
         this.userRepository = userRepository;
     }
 
-    public List<User> get() {
-        final List<User> result = new ArrayList<>();
+    public List<UserEntity> get() {
+        final List<UserEntity> result = new ArrayList<>();
         for (UserEntity user : userRepository.findAll()) {
             result.add(user);
         }
+
         return result;
     }
 
@@ -135,19 +138,10 @@ public class UserService {
         userRepository.save(userEntity);
     }
 
-    public boolean addUserToTeam(final String userId, final String teamId) {
-        boolean noErrors = true;
+    public void addUserToTeam(final String userId, final String teamId) {
 
-        try {
-            UserEntity userEntity = find(userId);
-            userEntity.addTeamId(teamId);
-            userRepository.save(userEntity);
-        }
-
-        catch (Exception e) {
-            noErrors = false;
-        }
-
-        return noErrors;
+        UserEntity userEntity = find(userId);
+        userEntity.addTeamId(teamId);
+        userRepository.save(userEntity);
     }
 }
