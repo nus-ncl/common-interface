@@ -36,14 +36,23 @@ public class TeamService {
         return teamRepository.save(teamEntity);
     }
 
-    public List<TeamEntity> get() {
-        final List<TeamEntity> result = new ArrayList<>();
+//<<<<<<< HEAD
+//    public List<TeamEntity> get() {
+//        final List<TeamEntity> result = new ArrayList<>();
+////        for (TeamEntity team : teamRepository.findAll()) {
+////            TeamInfo teamInfo = new TeamInfo(team);
+////            result.add(teamInfo);
+////        }
+//=======
+//    public List<Team> get() {
+//        final List<Team> result = new ArrayList<>();
 //        for (TeamEntity team : teamRepository.findAll()) {
 //            TeamInfo teamInfo = new TeamInfo(team);
 //            result.add(teamInfo);
 //        }
-        return result;
-    }
+//>>>>>>> origin/master
+//        return result;
+//    }
 
     protected TeamEntity find(final String id) {
         if (id == null || id.isEmpty()) {

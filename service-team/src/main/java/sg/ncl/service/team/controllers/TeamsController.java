@@ -34,7 +34,7 @@ public class TeamsController {
 
     @RequestMapping(method = RequestMethod.GET)
     @ResponseStatus(code = HttpStatus.OK)
-    public List<TeamInfo> get() {
+    public List<Team> get() {
         return teamService.get();
     }
 
@@ -47,6 +47,19 @@ public class TeamsController {
     @ResponseStatus(code = HttpStatus.ACCEPTED)
     public void updateTeam(@PathVariable String id, @RequestBody TeamEntity teamEntity) {
         teamService.update(id, teamEntity);
+    }
+
+    @RequestMapping(path = "/addUserToTeam/{id}/{teamid}", method = RequestMethod.POST)
+    @ResponseStatus(value = HttpStatus.OK)
+    public void addUserToTeam(@PathVariable String id, @PathVariable String teamid) {
+        boolean noErrors = teamService.addUserToTeam(id, teamid);
+
+        if (noErrors == false) {
+            System.out.println("TEAM SIDE >>>>>>>>>>>>>>>>>>> There is an error with adding user to teams");
+        } else {
+            System.out.println("TEAM SIDE >>>>>>>>>>>>>>>>>>>  Add user to teams ok");
+        }
+
     }
 
     @RequestMapping(path = "/seed", method = RequestMethod.POST)
