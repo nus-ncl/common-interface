@@ -5,6 +5,7 @@ import sg.ncl.service.team.data.jpa.entities.TeamMemberEntity;
 import sg.ncl.service.team.domain.*;
 
 import java.time.ZonedDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -20,9 +21,9 @@ public class TeamInfo implements Team {
     private final TeamStatus status;
     private final ZonedDateTime applicationDate;
     private final ZonedDateTime processedDate;
-    private final List<? extends TeamMember> members;
+    private final List<TeamMemberInfo> members;
 
-    public TeamInfo(final String id, final String name, final String description, final TeamVisibility visibility, final TeamPrivacy privacy, final TeamStatus status, final ZonedDateTime applicationDate, final ZonedDateTime processedDate, final List<? extends TeamMember> members) {
+    public TeamInfo(final String id, final String name, final String description, final TeamVisibility visibility, final TeamPrivacy privacy, final TeamStatus status, final ZonedDateTime applicationDate, final ZonedDateTime processedDate, final List<TeamMemberEntity> members) {
         this.id = id;
         this.name = name;
         this.description = description;
@@ -31,7 +32,11 @@ public class TeamInfo implements Team {
         this.status = status;
         this.applicationDate = applicationDate;
         this.processedDate = processedDate;
-        this.members = members;
+        this.members = new ArrayList<>();
+
+        for (TeamMemberEntity teamMemberEntity : members) {
+            this.members.add(new TeamMemberInfo(teamMemberEntity));
+        }
     }
 
     public TeamInfo(final TeamEntity teamEntity) {
@@ -44,18 +49,6 @@ public class TeamInfo implements Team {
                 teamEntity.getApplicationDate(),
                 teamEntity.getProcessedDate(),
                 teamEntity.getMembers());
-    }
-
-    public TeamInfo(final Team team) {
-        this(team.getId(),
-                team.getName(),
-                team.getDescription(),
-                team.getVisibility(),
-                team.getPrivacy(),
-                team.getStatus(),
-                team.getApplicationDate(),
-                team.getProcessedDate(),
-                team.getMembers());
     }
 
     public String getId() {

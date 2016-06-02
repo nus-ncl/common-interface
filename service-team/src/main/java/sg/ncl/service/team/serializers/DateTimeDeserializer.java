@@ -12,7 +12,9 @@ import java.time.ZonedDateTime;
  * Created by Desmond / Te Ye
  */
 public class DateTimeDeserializer implements JsonDeserializer<ZonedDateTime> {
-    public ZonedDateTime deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
+    public ZonedDateTime deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context)
+            throws JsonParseException {
+
         String timeAsString = json.getAsJsonPrimitive().getAsString();
         String[] myStrArray = timeAsString.split("\\.");
         long milliSeconds = Long.parseLong(myStrArray[0]);

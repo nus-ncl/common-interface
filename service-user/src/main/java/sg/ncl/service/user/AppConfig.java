@@ -8,7 +8,7 @@ import sg.ncl.common.jwt.JwtConfig;
 /**
  * @author Christopher Zhong
  */
-//@Configuration("sg.ncl.service.user.AppConfig")
-//@Import({JpaConfig.class, JwtConfig.class})
-@Configuration
+@Configuration("sg.ncl.service.user.AppConfig")
+@Import({JpaConfig.class, JwtConfig.class})
+//@Configuration
 public class AppConfig {}
