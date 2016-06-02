@@ -2,6 +2,8 @@ package sg.ncl.service.authentication;
 
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
+import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import sg.ncl.common.jpa.JpaConfig;
 import sg.ncl.common.jwt.JwtConfig;
 
@@ -10,4 +12,15 @@ import sg.ncl.common.jwt.JwtConfig;
  */
 @Configuration("sg.ncl.service.authentication.AppConfig")
 @Import({JpaConfig.class, JwtConfig.class})
-public class AppConfig {}
+public class AppConfig extends WebSecurityConfigurerAdapter {
+
+    @Override
+    protected void configure(final HttpSecurity http) throws Exception {
+        http
+                .csrf().disable()
+                .formLogin().disable()
+                .authorizeRequests().antMatchers("/authentication").permitAll().and()
+                .authorizeRequests().anyRequest().permitAll();
+    }
+
+}
