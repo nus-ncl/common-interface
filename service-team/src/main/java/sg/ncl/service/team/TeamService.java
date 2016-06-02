@@ -9,6 +9,7 @@ import sg.ncl.service.team.exceptions.TeamIdNullException;
 import sg.ncl.service.team.exceptions.TeamNotFoundException;
 
 import javax.inject.Inject;
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -25,7 +26,7 @@ public class TeamService {
         this.teamRepository = teamRepository;
     }
 
-    public TeamEntity save(Team team) {
+    public TeamEntity save(TeamEntity team) {
         TeamEntity teamEntity = new TeamEntity();
 
         teamEntity.setName(team.getName());
@@ -35,16 +36,15 @@ public class TeamService {
         return teamRepository.save(teamEntity);
     }
 
-    public List<TeamInfo> get() {
-        final List<TeamInfo> result = new ArrayList<>();
+    public List<TeamEntity> get() {
+        final List<TeamEntity> result = new ArrayList<>();
         for (TeamEntity team : teamRepository.findAll()) {
-            TeamInfo teamInfo = new TeamInfo(team);
-            result.add(teamInfo);
+            result.add(team);
         }
         return result;
     }
 
-    protected TeamEntity findAndReturnTeamEntity(final String id) {
+    public TeamEntity find(final String id) {
         if (id == null || id.isEmpty()) {
             throw new TeamIdNullException();
         }
@@ -57,17 +57,13 @@ public class TeamService {
         return one;
     }
 
-    public TeamInfo find(final String id) {
-        return new TeamInfo(findAndReturnTeamEntity(id));
-    }
-
     public String getTeamStatus(final String id) {
-        final TeamInfo one = this.find(id);
+        final TeamEntity one = this.find(id);
         return one.getStatus().toString();
     }
 
-    public void update(final String teamId, final Team inputTeam) {
-        final TeamEntity one = findAndReturnTeamEntity(inputTeam.getId());
+    public void update(final Team inputTeam) {
+        final TeamEntity one = find(inputTeam.getId());
 
         if (inputTeam.getDescription() != null) {
             one.setDescription(inputTeam.getDescription());
@@ -88,19 +84,19 @@ public class TeamService {
         teamRepository.save(one);
     }
 
-    public boolean addUserToTeam(final String userId, final String teamId) {
-        boolean noErrors = true;
+    public void addUserToTeam(final String userId, final String teamId) {
 
-        try {
-            TeamEntity teamEntity = findAndReturnTeamEntity(teamId);
+            TeamEntity teamEntity = find(teamId);
             teamEntity.addMember(userId);
             teamRepository.save(teamEntity);
-        }
+    }
 
-        catch (Exception e) {
-            noErrors = false;
-        }
+    public void seedData() {
+        TeamEntity teamEntity = new TeamEntity();
 
-        return noErrors;
+        teamEntity.setName("Aries");
+        teamEntity.setDescription("This is a project description");
+        teamEntity.setApplicationDate(ZonedDateTime.now());
+        teamRepository.save(teamEntity);
     }
 }

@@ -29,11 +29,22 @@ public class UserService {
         this.userRepository = userRepository;
     }
 
+    public String addUser(User user) {
+        final UserEntity userEntity = new UserEntity();
+        userEntity.setApplicationDate(user.getApplicationDate());
+        userEntity.setProcessedDate(user.getProcessedDate());
+        userEntity.setUserDetails((UserDetailsEntity) user.getUserDetails());
+
+        UserEntity savedUserEntity = userRepository.save(userEntity);
+        return savedUserEntity.getId();
+    }
+
     public List<User> get() {
         final List<User> result = new ArrayList<>();
         for (UserEntity user : userRepository.findAll()) {
             result.add(user);
         }
+
         return result;
     }
 
@@ -49,7 +60,7 @@ public class UserService {
         return one;
     }
 
-    public void update(final String id, final UserEntity user) {
+    public void update(final String id, final User user) {
         if (id == null || id.isEmpty()) {
             throw new UserIdNullException();
         }
@@ -135,19 +146,10 @@ public class UserService {
         userRepository.save(userEntity);
     }
 
-    public boolean addUserToTeam(final String userId, final String teamId) {
-        boolean noErrors = true;
+    public void addUserToTeam(final String userId, final String teamId) {
 
-        try {
-            UserEntity userEntity = find(userId);
-            userEntity.addTeamId(teamId);
-            userRepository.save(userEntity);
-        }
-
-        catch (Exception e) {
-            noErrors = false;
-        }
-
-        return noErrors;
+        UserEntity userEntity = find(userId);
+        userEntity.addTeamId(teamId);
+        userRepository.save(userEntity);
     }
 }
