@@ -26,7 +26,7 @@ public class TeamService {
         this.teamRepository = teamRepository;
     }
 
-    public TeamEntity save(Team team) {
+    public TeamEntity save(TeamEntity team) {
         TeamEntity teamEntity = new TeamEntity();
 
         teamEntity.setName(team.getName());
@@ -36,25 +36,15 @@ public class TeamService {
         return teamRepository.save(teamEntity);
     }
 
-//<<<<<<< HEAD
-//    public List<TeamEntity> get() {
-//        final List<TeamEntity> result = new ArrayList<>();
-////        for (TeamEntity team : teamRepository.findAll()) {
-////            TeamInfo teamInfo = new TeamInfo(team);
-////            result.add(teamInfo);
-////        }
-//=======
-//    public List<Team> get() {
-//        final List<Team> result = new ArrayList<>();
-//        for (TeamEntity team : teamRepository.findAll()) {
-//            TeamInfo teamInfo = new TeamInfo(team);
-//            result.add(teamInfo);
-//        }
-//>>>>>>> origin/master
-//        return result;
-//    }
+    public List<TeamEntity> get() {
+        final List<TeamEntity> result = new ArrayList<>();
+        for (TeamEntity team : teamRepository.findAll()) {
+            result.add(team);
+        }
+        return result;
+    }
 
-    protected TeamEntity find(final String id) {
+    public TeamEntity find(final String id) {
         if (id == null || id.isEmpty()) {
             throw new TeamIdNullException();
         }
@@ -66,10 +56,6 @@ public class TeamService {
 
         return one;
     }
-
-//    public TeamInfo find(final String id) {
-//        return new TeamInfo(findAndReturnTeamEntity(id));
-//    }
 
     public String getTeamStatus(final String id) {
         final TeamEntity one = this.find(id);
