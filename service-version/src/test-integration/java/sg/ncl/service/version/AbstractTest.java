@@ -10,7 +10,6 @@ import org.springframework.test.context.web.WebAppConfiguration;
  * @author Christopher Zhong
  */
 @RunWith(SpringJUnit4ClassRunner.class)
-@SpringApplicationConfiguration(classes = App.class)
+@SpringApplicationConfiguration(classes = {App.class, TestConfig.class})
 @WebAppConfiguration
-public abstract class AbstractTest extends AbstractJUnit4SpringContextTests {
-}
+public abstract class AbstractTest extends AbstractJUnit4SpringContextTests {}
