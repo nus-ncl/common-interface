@@ -32,6 +32,8 @@ public class TeamInfo implements Team {
         this.status = status;
         this.applicationDate = applicationDate;
         this.processedDate = processedDate;
+//        this.members = members;
+
         this.members = new ArrayList<>();
 
         for (TeamMemberEntity teamMemberEntity : members) {
@@ -83,7 +85,7 @@ public class TeamInfo implements Team {
         return processedDate;
     }
 
-    public List<? extends TeamMember> getMembers() {
+    public List<TeamMemberInfo> getMembers() {
         return members;
     }
 
@@ -106,5 +108,21 @@ public class TeamInfo implements Team {
         result = 31 * result + getId().hashCode();
         result = 31 * result + getName().hashCode();
         return result;
+    }
+
+    @Override
+    public String toString() {
+        final StringBuilder sb = new StringBuilder("TeamEntity{");
+        sb.append("id='").append(id).append('\'');
+        sb.append(", name='").append(name).append('\'');
+        sb.append(", description='").append(description).append('\'');
+        sb.append(", visibility=").append(visibility);
+        sb.append(", status=").append(status);
+        sb.append(", applicationDate=").append(applicationDate);
+        sb.append(", processedDate=").append(processedDate);
+        sb.append(", members=").append(members);
+        sb.append(", super=").append(super.toString());
+        sb.append('}');
+        return sb.toString();
     }
 }
