@@ -11,8 +11,12 @@ import sg.ncl.service.user.data.jpa.entities.UserEntity;
 import javax.inject.Inject;
 import java.time.ZonedDateTime;
 
-import static org.hamcrest.Matchers.*;
-import static org.junit.Assert.*;
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.not;
+import static org.hamcrest.Matchers.nullValue;
+import static org.junit.Assert.assertThat;
+import static sg.ncl.common.test.Checks.checkException;
 
 /**
  * @author Christopher Zhong
