@@ -72,29 +72,20 @@ public class TeamServiceTest extends AbstractTest {
         teamService.find("");
     }
 
-//    @Test
-//    public void getAllTeamsTest() throws Exception {
-//        TeamService teamService = new TeamService(teamRepository);
-//
-//        List<Team> teamInfoList = new ArrayList<>();
-//
-//
-//
-//        for (int i = 0; i < 3; i++) {
-//            TeamEntity newTeamEntity = TeamCommon.createTeam();
-//            teamService.save(newTeamEntity);
-//            teamInfoList.add(newTeamEntity);
-//        }
-//
-//        List<TeamEntity> resultTeamList = teamService.get();
-//
-////        System.out.println("first : " + teamInfoList.size());
-////        System.out.println("second : " + resultTeamList.size());
-//
-//        Assert.assertTrue(isListEqual(resultTeamList, teamInfoList));
-//
-////        Assert.assertThat(teamList, IsIterableContainingInAnyOrder.containsInAnyOrder(teamInfoArray));
-//    }
+    @Test
+    public void getAllTeamsTest() throws Exception {
+        TeamService teamService = new TeamService(teamRepository);
+
+        List<TeamEntity> teamInfoList = new ArrayList<>();
+
+        for (int i = 0; i < 3; i++) {
+            teamInfoList.add(teamService.save(TeamCommon.createTeam()));
+        }
+
+        List<TeamEntity> resultTeamList = teamService.get();
+
+        Assert.assertTrue(isListEqual(resultTeamList, teamInfoList));
+    }
 
     @Test
     public void getValidTeamStatusTest() {
@@ -181,9 +172,9 @@ public class TeamServiceTest extends AbstractTest {
         Assert.assertEquals(teamList.get(0).getUserId(), userId);
     }
 
-    private boolean isListEqual(List<Team> one, List<Team> two) {
-        ArrayList<Team> cp = new ArrayList<>(one);
-        for (Team twoIterator : two) {
+    private boolean isListEqual(List<TeamEntity> one, List<TeamEntity> two) {
+        ArrayList<TeamEntity> cp = new ArrayList<>(one);
+        for (TeamEntity twoIterator : two) {
             if (!cp.remove(twoIterator)) {
                 return false;
             }
