@@ -30,11 +30,10 @@ public class AuthenticationControllerTest extends AbstractTest {
 
     @Inject
     private WebApplicationContext webApplicationContext;
-
-    private MockMvc mockMvc;
-
     @Inject
     private AuthenticationService authenticationService;
+
+    private MockMvc mockMvc;
 
     @Before
     public void before() {
