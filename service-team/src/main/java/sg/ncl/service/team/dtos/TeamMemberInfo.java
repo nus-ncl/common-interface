@@ -36,10 +36,12 @@ public class TeamMemberInfo implements TeamMember {
         return team;
     }
 
+    @Override
     public String getUserId() {
         return userId;
     }
 
+    @Override
     public ZonedDateTime getJoinedDate() {
         return joinedDate;
     }
