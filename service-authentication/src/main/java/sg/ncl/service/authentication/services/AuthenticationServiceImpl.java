@@ -6,7 +6,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 import sg.ncl.service.authentication.data.jpa.entities.CredentialsEntity;
 import sg.ncl.service.authentication.data.jpa.repositories.CredentialsRepository;
 import sg.ncl.service.authentication.exceptions.CredentialsNotFoundException;
@@ -14,6 +13,7 @@ import sg.ncl.service.authentication.exceptions.InvalidCredentialsException;
 
 import javax.inject.Inject;
 import javax.inject.Named;
+import javax.transaction.Transactional;
 import java.security.Key;
 import java.time.Duration;
 import java.time.ZonedDateTime;
