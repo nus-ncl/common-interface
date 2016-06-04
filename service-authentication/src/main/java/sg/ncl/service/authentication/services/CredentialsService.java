@@ -4,7 +4,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 import sg.ncl.service.authentication.data.jpa.entities.CredentialsEntity;
 import sg.ncl.service.authentication.data.jpa.repositories.CredentialsRepository;
 import sg.ncl.service.authentication.domain.Credentials;
@@ -18,6 +17,7 @@ import sg.ncl.service.authentication.exceptions.UserIdAlreadyExistsException;
 import sg.ncl.service.authentication.exceptions.UsernameAlreadyExistsException;
 
 import javax.inject.Inject;
+import javax.transaction.Transactional;
 import java.util.List;
 
 /**
@@ -37,7 +37,7 @@ public class CredentialsService {
         this.passwordEncoder = passwordEncoder;
     }
 
-    @Transactional(readOnly = true)
+    @Transactional
     public List<? extends Credentials> getAll() {
         return credentialsRepository.findAll();
     }
