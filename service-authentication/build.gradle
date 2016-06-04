@@ -2,7 +2,6 @@ dependencies {
     compile project(':common-exception')
     compile project(':common-jpa')
     compile project(':common-jwt')
-    compile('javax.inject:javax.inject')
 
     runtime('mysql:mysql-connector-java')
 

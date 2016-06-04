@@ -1,10 +1,10 @@
 package sg.ncl.service.realization;
 
-import org.springframework.context.annotation.Bean;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseBuilder;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseType;
 import org.springframework.test.context.ContextConfiguration;
 
+import javax.inject.Named;
 import javax.sql.DataSource;
 
 /**
@@ -13,7 +13,7 @@ import javax.sql.DataSource;
 @ContextConfiguration(classes = App.class)
 public class TestConfig {
 
-    @Bean
+    @Named
     DataSource dataSource() {
         return new EmbeddedDatabaseBuilder().setType(EmbeddedDatabaseType.H2).build();
     }
