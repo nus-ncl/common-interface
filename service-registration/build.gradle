@@ -2,7 +2,6 @@ dependencies {
     compile project(':service-authentication')
     compile project(':service-team')
     compile project(':service-user')
-    compile('javax.inject:javax.inject')
 
     runtime('mysql:mysql-connector-java')
 

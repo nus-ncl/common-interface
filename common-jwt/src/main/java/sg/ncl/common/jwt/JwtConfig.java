@@ -5,13 +5,13 @@ import io.jsonwebtoken.SignatureException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import javax.crypto.spec.SecretKeySpec;
+import javax.inject.Named;
 import java.security.Key;
 import java.time.Duration;
 import java.time.format.DateTimeParseException;
@@ -28,12 +28,12 @@ public class JwtConfig {
     private static final SignatureAlgorithm DEFAULT_SIGNATURE_ALGORITHM = SignatureAlgorithm.HS512;
     private static final Duration DEFAULT_EXPIRY_DURATION = Duration.ofDays(1L);
 
-    @Bean
+    @Named
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
 
-    @Bean
+    @Named
     public SignatureAlgorithm signatureAlgorithm(@Value("${ncl.jwt.signing-algorithm}") final String algorithm) {
         if (algorithm == null) {
             logger.warn("No signature algorithm specified; using default: {}", DEFAULT_SIGNATURE_ALGORITHM);
@@ -49,13 +49,13 @@ public class JwtConfig {
         }
     }
 
-    @Bean
+    @Named
     public Key key(@Value("${ncl.jwt.apiKey}") final String apiKey, final SignatureAlgorithm signatureAlgorithm) {
         logger.info("Using '{}' as the api key and signing with '{}'", apiKey, signatureAlgorithm);
         return new SecretKeySpec(apiKey.getBytes(), signatureAlgorithm.getJcaName());
     }
 
-    @Bean(name = "ncl.jwt.expiry.duration")
+    @Named("ncl.jwt.expiry.duration")
     public Duration jwtExpiryDuration(@Value("${ncl.jwt.expiry.duration}") final String text) {
         try {
             final Duration duration = Duration.parse(text);
