@@ -1,5 +1,4 @@
 dependencies {
     compile('org.springframework.boot:spring-boot-starter-security')
     compile('io.jsonwebtoken:jjwt')
-    compile('javax.inject:javax.inject')
 }
