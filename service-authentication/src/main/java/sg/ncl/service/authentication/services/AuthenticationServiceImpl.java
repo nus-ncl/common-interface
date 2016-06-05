@@ -12,7 +12,6 @@ import sg.ncl.service.authentication.exceptions.CredentialsNotFoundException;
 import sg.ncl.service.authentication.exceptions.InvalidCredentialsException;
 
 import javax.inject.Inject;
-import javax.inject.Named;
 import javax.transaction.Transactional;
 import java.security.Key;
 import java.time.Duration;
@@ -30,16 +29,16 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     private final CredentialsRepository credentialsRepository;
     private final PasswordEncoder passwordEncoder;
     private final SignatureAlgorithm signatureAlgorithm;
-    private final Key key;
-    private final Duration duration;
+    private final Key apiKey;
+    private final Duration expiryDuration;
 
     @Inject
-    protected AuthenticationServiceImpl(final CredentialsRepository credentialsRepository, final PasswordEncoder passwordEncoder, final SignatureAlgorithm signatureAlgorithm, final Key key, @Named("ncl.jwt.expiry.duration") final Duration duration) {
+    protected AuthenticationServiceImpl(final CredentialsRepository credentialsRepository, final PasswordEncoder passwordEncoder, final SignatureAlgorithm signatureAlgorithm, final Key apiKey, final Duration expiryDuration) {
         this.credentialsRepository = credentialsRepository;
         this.passwordEncoder = passwordEncoder;
         this.signatureAlgorithm = signatureAlgorithm;
-        this.key = key;
-        this.duration = duration;
+        this.apiKey = apiKey;
+        this.expiryDuration = expiryDuration;
     }
 
     @Transactional
@@ -54,7 +53,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         if (passwordEncoder.matches(password, credentials.getPassword())) {
             // create and sign a JWT
             final ZonedDateTime now = ZonedDateTime.now();
-            final ZonedDateTime expiry = now.plus(duration);
+            final ZonedDateTime expiry = now.plus(expiryDuration);
             final String jwt = Jwts.builder()
                     .setSubject(credentials.getId())
                     .setIssuer(AuthenticationService.class.getName())
@@ -63,8 +62,8 @@ public class AuthenticationServiceImpl implements AuthenticationService {
                     .setExpiration(Date.from(expiry.toInstant()))
                     // TODO custom claims such as permissions
 //                    .claim()
-                    // sign the JWT with the given algorithm and key
-                    .signWith(signatureAlgorithm, key)
+                    // sign the JWT with the given algorithm and apiKey
+                    .signWith(signatureAlgorithm, apiKey)
                     .compact();
             return jwt;
         }
