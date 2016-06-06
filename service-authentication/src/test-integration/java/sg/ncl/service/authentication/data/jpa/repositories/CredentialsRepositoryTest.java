@@ -10,6 +10,7 @@ import sg.ncl.service.authentication.Util;
 import sg.ncl.service.authentication.data.jpa.entities.CredentialsEntity;
 
 import javax.inject.Inject;
+import java.time.ZonedDateTime;
 
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
@@ -39,9 +40,12 @@ public class CredentialsRepositoryTest extends AbstractTest {
         final CredentialsEntity entity = Util.getCredentialsEntity();
 
         final long count = repository.count();
-        final CredentialsEntity savedEntity = repository.save(entity);
+        final CredentialsEntity savedEntity = repository.saveAndFlush(entity);
         assertThat(repository.count(), is(equalTo(count + 1)));
         assertThat(entity.getId(), is(equalTo(savedEntity.getId())));
+        assertThat(savedEntity.getCreatedDate(), is(not(nullValue(ZonedDateTime.class))));
+        assertThat(savedEntity.getLastModifiedDate(), is(not(nullValue(ZonedDateTime.class))));
+        assertThat(savedEntity.getVersion(), is(equalTo(0L)));
     }
 
     @Test
@@ -52,7 +56,7 @@ public class CredentialsRepositoryTest extends AbstractTest {
         exception.expect(JpaSystemException.class);
         exception.expectMessage(CredentialsEntity.class.getName());
 
-        repository.save(entity);
+        repository.saveAndFlush(entity);
     }
 
     @Test
@@ -61,7 +65,7 @@ public class CredentialsRepositoryTest extends AbstractTest {
         entity.setUsername(null);
 
         try {
-            repository.save(entity);
+            repository.saveAndFlush(entity);
             exception.expect(DataIntegrityViolationException.class);
         } catch (Exception e) {
             checkException(e, "NULL not allowed for column \"USERNAME\"");
@@ -74,7 +78,7 @@ public class CredentialsRepositoryTest extends AbstractTest {
         entity.setPassword(null);
 
         try {
-            repository.save(entity);
+            repository.saveAndFlush(entity);
             exception.expect(DataIntegrityViolationException.class);
         } catch (Exception e) {
             checkException(e, "NULL not allowed for column \"PASSWORD\"");
@@ -87,9 +91,9 @@ public class CredentialsRepositoryTest extends AbstractTest {
         final CredentialsEntity entity2 = Util.getCredentialsEntity();
         entity2.setUsername(entity1.getUsername());
 
-        repository.save(entity1);
+        repository.saveAndFlush(entity1);
         try {
-            repository.save(entity2);
+            repository.saveAndFlush(entity2);
             exception.expect(DataIntegrityViolationException.class);
         } catch (Exception e) {
             checkException(e, "PUBLIC.CREDENTIALS(USERNAME)");
