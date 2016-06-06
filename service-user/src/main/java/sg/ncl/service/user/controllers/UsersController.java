@@ -53,4 +53,10 @@ public class UsersController {
         userService.seedData();
     }
 
+    @RequestMapping(path = "/addUserToTeam/{id}/{teamId}", method = RequestMethod.POST)
+    @ResponseStatus(value = HttpStatus.OK)
+    public void addUserToTeam(@PathVariable String id, @PathVariable String teamId) {
+        userService.addUserToTeam(id, teamId);
+    }
+
 }
