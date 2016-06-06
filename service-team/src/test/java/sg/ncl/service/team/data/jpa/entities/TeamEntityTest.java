@@ -9,7 +9,6 @@ import sg.ncl.service.team.domain.TeamVisibility;
 
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
-import java.util.concurrent.ExecutionException;
 
 import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.*;
@@ -148,7 +147,7 @@ public class TeamEntityTest {
     public void testGetMembers() throws Exception {
         final TeamEntity entity = new TeamEntity();
 
-        assertEquals(entity.getMembers(), new ArrayList<TeamMemberEntity>());
+        assertThat(entity.getMembers(), is(new ArrayList<TeamMemberEntity>()));
     }
 
     @Test
