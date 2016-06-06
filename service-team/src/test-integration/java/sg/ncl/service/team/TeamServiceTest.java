@@ -24,7 +24,7 @@ public class TeamServiceTest extends AbstractTest {
     private TeamRepository teamRepository;
 
     @Test
-    public void saveTeamTest() {
+    public void testSaveTeam() {
         TeamService teamService = new TeamService(teamRepository);
         TeamEntity createdTeam = TeamCommon.createTeam();
         TeamEntity saveTeam = teamService.save(createdTeam);
@@ -35,13 +35,13 @@ public class TeamServiceTest extends AbstractTest {
     }
 
     @Test(expected = TeamNotFoundException.class)
-    public void findTeamWithNoTeamsInDbTest() throws Exception {
+    public void testFindTeamWithNoTeamsInDb() throws Exception {
         TeamService teamService = new TeamService(teamRepository);
         teamService.find(RandomStringUtils.randomAlphabetic(20));
     }
 
     @Test
-    public void findTeamTest() {
+    public void testFindTeam() {
         TeamService teamService = new TeamService(teamRepository);
         TeamEntity createdTeam = new TeamEntity();
         TeamEntity team = teamService.save(createdTeam);
@@ -54,26 +54,26 @@ public class TeamServiceTest extends AbstractTest {
     }
 
     @Test
-    public void getAllTeamsWithNoUserInDbTest() throws Exception {
+    public void testGetAllTeamsWithNoUserInDb() throws Exception {
         TeamService teamService = new TeamService(teamRepository);
         List<TeamEntity> list = teamService.get();
         Assert.assertTrue(list.size() == 0);
     }
 
     @Test(expected = TeamIdNullException.class)
-    public void getUserWithNullIdTest() throws Exception {
+    public void testGetUserWithNullId() throws Exception {
         TeamService teamService = new TeamService(teamRepository);
         teamService.find(null);
     }
 
     @Test(expected = TeamIdNullException.class)
-    public void getUserWithEmptyIdTest() throws Exception {
+    public void testGetUserWithEmptyId() throws Exception {
         TeamService teamService = new TeamService(teamRepository);
         teamService.find("");
     }
 
     @Test
-    public void getAllTeamsTest() throws Exception {
+    public void testGetAllTeams() throws Exception {
         TeamService teamService = new TeamService(teamRepository);
 
         List<TeamEntity> teamInfoList = new ArrayList<>();
@@ -88,7 +88,7 @@ public class TeamServiceTest extends AbstractTest {
     }
 
     @Test
-    public void getValidTeamStatusTest() {
+    public void testGetValidTeamStatus() {
         TeamService teamService = new TeamService(teamRepository);
         TeamEntity createdTeam = new TeamEntity();
         TeamEntity team = teamService.save(createdTeam);
@@ -98,7 +98,7 @@ public class TeamServiceTest extends AbstractTest {
     }
 
     @Test
-    public void updateTeamInfoTest() throws Exception {
+    public void testUpdateTeamInfo() throws Exception {
         TeamService teamService = new TeamService(teamRepository);
         TeamEntity team = TeamCommon.createTeam();
         team = teamService.save(team);
@@ -121,7 +121,7 @@ public class TeamServiceTest extends AbstractTest {
     }
 
     @Test(expected = TeamIdNullException.class)
-    public void updateTeamNullIdTest() throws Exception {
+    public void testUpdateTeamNullId() throws Exception {
         TeamService teamService = new TeamService(teamRepository);
         TeamEntity teamEntity = new TeamEntity();
         teamEntity.setName(null);
@@ -129,7 +129,7 @@ public class TeamServiceTest extends AbstractTest {
     }
 
     @Test(expected = TeamIdNullException.class)
-    public void updateTeamEmptyIdTest() throws Exception {
+    public void testUpdateTeamEmptyId() throws Exception {
         TeamService teamService = new TeamService(teamRepository);
         TeamEntity teamEntity = new TeamEntity();
         teamEntity.setName("");
@@ -137,7 +137,7 @@ public class TeamServiceTest extends AbstractTest {
     }
 
     @Test
-    public void updateTeamNullFieldTest() {
+    public void testUpdateTeamNullField() {
         TeamService teamService = new TeamService(teamRepository);
         TeamEntity team = TeamCommon.createTeam();
         team = teamService.save(team);
@@ -155,7 +155,7 @@ public class TeamServiceTest extends AbstractTest {
     }
 
     @Test
-    public void addUserToTeamTest() throws Exception {
+    public void testAddUserToTeam() throws Exception {
         TeamService teamService = new TeamService(teamRepository);
         TeamEntity team = TeamCommon.createTeam();
         team = teamService.save(team);

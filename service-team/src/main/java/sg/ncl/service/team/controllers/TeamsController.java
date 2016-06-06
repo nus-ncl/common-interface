@@ -6,6 +6,7 @@ import org.springframework.web.bind.annotation.*;
 import sg.ncl.service.team.TeamService;
 import sg.ncl.service.team.data.jpa.entities.TeamEntity;
 import sg.ncl.service.team.domain.Team;
+import sg.ncl.service.team.domain.TeamVisibility;
 import sg.ncl.service.team.dtos.TeamInfo;
 
 import javax.inject.Inject;
@@ -44,6 +45,24 @@ public class TeamsController {
         }
 
         return teamInfoList;
+    }
+
+    @RequestMapping(path = "/public", method = RequestMethod.GET)
+    @ResponseStatus(code = HttpStatus.OK)
+    public List<TeamInfo> getPublicTeams() {
+        List<TeamEntity> teamEntityList = teamService.getPublic();
+        List<TeamInfo> teamInfoList = new ArrayList<>();
+
+        for (TeamEntity teamEntity : teamEntityList) {
+            teamInfoList.add(new TeamInfo(teamEntity));
+        }
+        return teamInfoList;
+    }
+
+    @RequestMapping(path = "/name/{name}", method = RequestMethod.GET)
+    @ResponseStatus(code = HttpStatus.OK)
+    public TeamInfo getByName(@PathVariable String name) {
+        return new TeamInfo(teamService.getName(name));
     }
 
     @RequestMapping(path = "/{id}", method = RequestMethod.GET)

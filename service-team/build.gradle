@@ -6,12 +6,13 @@ dependencies {
     compile('com.fasterxml.jackson.datatype:jackson-datatype-jsr310')
     compile('com.google.code.gson:gson')
     compile('org.json:json')
+    compile('org.apache.commons:commons-lang3:3.4')
 
     runtime('mysql:mysql-connector-java')
 
     testCompile('junit:junit')
     testCompile('org.hamcrest:hamcrest-library')
-    testCompile('org.apache.commons:commons-lang3:3.4')
+//    testCompile('org.apache.commons:commons-lang3:3.4')
 
     integrationTestCompile project(':common-test')
 

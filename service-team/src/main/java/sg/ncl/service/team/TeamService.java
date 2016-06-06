@@ -4,6 +4,7 @@ import org.springframework.stereotype.Service;
 import sg.ncl.service.team.data.jpa.entities.TeamEntity;
 import sg.ncl.service.team.data.jpa.repositories.TeamRepository;
 import sg.ncl.service.team.domain.Team;
+import sg.ncl.service.team.domain.TeamVisibility;
 import sg.ncl.service.team.dtos.TeamInfo;
 import sg.ncl.service.team.exceptions.TeamIdNullException;
 import sg.ncl.service.team.exceptions.TeamNotFoundException;
@@ -44,6 +45,11 @@ public class TeamService {
         return result;
     }
 
+    public List<TeamEntity> getPublic() {
+        List<TeamEntity> result = teamRepository.findByVisibility(TeamVisibility.PUBLIC);
+        return result;
+    }
+
     public TeamEntity find(final String id) {
         if (id == null || id.isEmpty()) {
             throw new TeamIdNullException();
@@ -55,6 +61,10 @@ public class TeamService {
         }
 
         return one;
+    }
+
+    public TeamEntity getName(String name) {
+        return teamRepository.findByName(name);
     }
 
     public String getTeamStatus(final String id) {
