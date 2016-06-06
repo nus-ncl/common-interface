@@ -58,7 +58,7 @@ public class AuthenticationServiceTest extends AbstractTest {
 
     @Before
     public void before() {
-        authenticationService = new AuthenticationService(credentialsRepository, passwordEncoder, signatureAlgorithm, key, duration);
+        authenticationService = new AuthenticationServiceImpl(credentialsRepository, passwordEncoder, signatureAlgorithm, key, duration);
     }
 
     @Test
