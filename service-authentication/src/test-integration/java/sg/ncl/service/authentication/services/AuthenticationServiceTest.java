@@ -4,7 +4,6 @@ import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtParser;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
-import org.apache.commons.lang3.RandomStringUtils;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -31,6 +30,7 @@ import static org.junit.Assert.assertThat;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.when;
+import static sg.ncl.service.authentication.Util.getCredentialsEntity;
 
 /**
  * @author Christopher Zhong
@@ -50,35 +50,29 @@ public class AuthenticationServiceTest extends AbstractTest {
     @Inject
     private SignatureAlgorithm signatureAlgorithm;
     @Inject
-    private Key key;
+    private Key apiKey;
     @Inject
-    private Duration duration;
+    private Duration expiryDuration;
 
     private AuthenticationService authenticationService;
 
     @Before
     public void before() {
-        authenticationService = new AuthenticationServiceImpl(credentialsRepository, passwordEncoder, signatureAlgorithm, key, duration);
+        authenticationService = new AuthenticationServiceImpl(credentialsRepository, passwordEncoder, signatureAlgorithm, apiKey, expiryDuration);
     }
 
     @Test
     public void testLoginGood() {
-        final String username = RandomStringUtils.randomAlphanumeric(20);
-        final String password = RandomStringUtils.randomAlphanumeric(20);
-        final CredentialsEntity credentialsEntity = new CredentialsEntity();
+        final CredentialsEntity entity = getCredentialsEntity();
 
-        credentialsEntity.setId(username);
-        credentialsEntity.setUsername(username);
-        credentialsEntity.setPassword(password);
+        when(credentialsRepository.findByUsername(eq(entity.getUsername()))).thenReturn(entity);
+        when(passwordEncoder.matches(eq(entity.getPassword()), eq(entity.getPassword()))).thenReturn(true);
 
-        when(credentialsRepository.findByUsername(eq(username))).thenReturn(credentialsEntity);
-        when(passwordEncoder.matches(eq(password), eq(password))).thenReturn(true);
-
-        final String jwt = authenticationService.login(username, password);
+        final String jwt = authenticationService.login(entity.getUsername(), entity.getPassword());
 
         final JwtParser parser = Jwts.parser()
-                .setSigningKey(key)
-                .requireSubject(username)
+                .setSigningKey(apiKey)
+                .requireSubject(entity.getId())
                 .requireIssuer(AuthenticationService.class.getName());
         final Claims body = parser.parseClaimsJws(jwt).getBody();
         assertThat(body.getIssuedAt(), is(not(nullValue(Date.class))));
@@ -87,29 +81,27 @@ public class AuthenticationServiceTest extends AbstractTest {
 
     @Test
     public void testLoginCredentialsNotFound() {
-        final String username = RandomStringUtils.randomAlphanumeric(20);
-        final String password = RandomStringUtils.randomAlphanumeric(20);
+        final CredentialsEntity entity = getCredentialsEntity();
 
-        when(credentialsRepository.findByUsername(eq(username))).thenReturn(null);
+        when(credentialsRepository.findByUsername(eq(entity.getUsername()))).thenReturn(null);
 
         exception.expect(CredentialsNotFoundException.class);
-        exception.expectMessage(username);
+        exception.expectMessage(entity.getUsername());
 
-        authenticationService.login(username, password);
+        authenticationService.login(entity.getUsername(), entity.getPassword());
     }
 
     @Test
     public void testLoginInvalidCredentials() {
-        final String username = RandomStringUtils.randomAlphanumeric(20);
-        final String password = RandomStringUtils.randomAlphanumeric(20);
+        final CredentialsEntity entity = getCredentialsEntity();
 
-        when(credentialsRepository.findByUsername(eq(username))).thenReturn(new CredentialsEntity());
-        when(passwordEncoder.matches(eq(password), anyString())).thenReturn(false);
+        when(credentialsRepository.findByUsername(eq(entity.getUsername()))).thenReturn(entity);
+        when(passwordEncoder.matches(eq(entity.getPassword()), anyString())).thenReturn(false);
 
         exception.expect(InvalidCredentialsException.class);
-        exception.expectMessage(username);
+        exception.expectMessage(entity.getUsername());
 
-        authenticationService.login(username, password);
+        authenticationService.login(entity.getUsername(), entity.getPassword());
     }
 
 }
