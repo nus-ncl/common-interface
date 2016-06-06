@@ -13,6 +13,7 @@ import sg.ncl.service.authentication.exceptions.InvalidCredentialsException;
 
 import javax.inject.Inject;
 import javax.transaction.Transactional;
+import javax.validation.constraints.NotNull;
 import java.security.Key;
 import java.time.Duration;
 import java.time.ZonedDateTime;
@@ -24,7 +25,7 @@ import java.util.Date;
 @Service
 public class AuthenticationServiceImpl implements AuthenticationService {
 
-    private static final Logger logger = LoggerFactory.getLogger(AuthenticationServiceImpl.class);
+    private static final Logger logger = LoggerFactory.getLogger(AuthenticationService.class);
 
     private final CredentialsRepository credentialsRepository;
     private final PasswordEncoder passwordEncoder;
@@ -42,7 +43,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     }
 
     @Transactional
-    public String login(final String username, final String password) {
+    public String login(@NotNull final String username, @NotNull final String password) {
         // find the credentials first
         final CredentialsEntity credentials = credentialsRepository.findByUsername(username);
         if (credentials == null) {
