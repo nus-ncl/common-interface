@@ -47,7 +47,7 @@ public class TeamsControllerTest extends AbstractTest {
     }
 
     @Test
-    public void postTeamTest() throws Exception {
+    public void testPostTeam() throws Exception {
         // Note: must have TeamEntity to create the JSON
         TeamEntity teamEntity = TeamCommon.createTeam();
 
@@ -82,20 +82,20 @@ public class TeamsControllerTest extends AbstractTest {
     }
 
     @Test
-    public void getAllTeamsWithNoUserInDbTest() throws Exception {
+    public void testGetAllTeamsWithNoUserInDb() throws Exception {
         MvcResult result = mockMvc.perform(get("/teams")).andReturn();
         Assert.assertTrue(result.getResponse().getContentLength() == 0);
     }
 
     @Test
-    public void getTeamWithNoUserInDbTest() throws Exception {
+    public void testGetTeamWithNoUserInDb() throws Exception {
         mockMvc.perform(get("/teams/" + RandomStringUtils.randomAlphabetic(20)))
                 .andExpect(status().isNotFound())
                 .andExpect(status().reason("Team not found"));
     }
 
     @Test
-    public void getTeamTest() throws Exception {
+    public void testGetTeam() throws Exception {
         MediaType contentType = new MediaType(MediaType.APPLICATION_JSON.getType(),
                 MediaType.APPLICATION_JSON.getSubtype());
 
@@ -112,7 +112,7 @@ public class TeamsControllerTest extends AbstractTest {
     }
 
     @Test
-    public void getTeamAfterAddUsertoTeamTest() throws Exception {
+    public void testGetTeamAfterAddUsertoTeam() throws Exception {
         TeamEntity origTeamEntity = TeamCommon.createTeam();
         TeamEntity teamEntity = teamRepository.save(origTeamEntity);
         String teamId = teamEntity.getId();
@@ -131,7 +131,7 @@ public class TeamsControllerTest extends AbstractTest {
     }
 
     @Test
-    public void putTeamTest() throws Exception {
+    public void testPutTeam() throws Exception {
         MediaType contentType = new MediaType(MediaType.APPLICATION_JSON.getType(),
                 MediaType.APPLICATION_JSON.getSubtype());
 
@@ -179,7 +179,7 @@ public class TeamsControllerTest extends AbstractTest {
     }
 
     @Test
-    public void putTeamWithWrongIdTest() throws Exception {
+    public void testPutTeamWithWrongId() throws Exception {
         MediaType contentType = new MediaType(MediaType.APPLICATION_JSON.getType(),
                 MediaType.APPLICATION_JSON.getSubtype());
 
@@ -192,7 +192,7 @@ public class TeamsControllerTest extends AbstractTest {
     }
 
     @Test
-    public void getPublicTeams() throws Exception {
+    public void testGetPublicTeams() throws Exception {
         TeamEntity origTeamEntity = TeamCommon.createTeam();
 
         TeamEntity privateTeamEntity = TeamCommon.createTeam();
