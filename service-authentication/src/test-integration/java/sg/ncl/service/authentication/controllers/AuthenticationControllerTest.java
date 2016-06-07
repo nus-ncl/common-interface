@@ -14,7 +14,10 @@ import sg.ncl.service.authentication.services.AuthenticationService;
 
 import javax.inject.Inject;
 
+import static org.hamcrest.Matchers.is;
+import static org.junit.Assert.assertThat;
 import static org.mockito.Matchers.eq;
+import static org.mockito.Mockito.mockingDetails;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
@@ -37,6 +40,7 @@ public class AuthenticationControllerTest extends AbstractTest {
 
     @Before
     public void before() {
+        assertThat(mockingDetails(authenticationService).isMock(), is(true));
         mockMvc = MockMvcBuilders.webAppContextSetup(webApplicationContext).build();
     }
 
