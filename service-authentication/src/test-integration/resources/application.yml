@@ -1,6 +1,8 @@
 # Spring Boot Configuration
 # For more information, please read http://docs.spring.io/spring-boot/docs/current/reference/html/index.html
 spring:
+  main:
+    banner-mode: "off"
   datasource:
     url: jdbc:h2:mem:datajpa
     username: sa
