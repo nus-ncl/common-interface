@@ -3,4 +3,6 @@ dependencies {
     compile project(':common-jwt')
     compile('org.springframework.boot:spring-boot-starter-test')
     compile('com.h2database:h2')
+
+    runtime('com.jayway.jsonpath:json-path')
 }
