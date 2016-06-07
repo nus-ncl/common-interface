@@ -8,6 +8,7 @@ import org.springframework.context.annotation.Profile;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import sg.ncl.service.authentication.data.jpa.repositories.CredentialsRepository;
 import sg.ncl.service.authentication.services.AuthenticationService;
+import sg.ncl.service.authentication.services.CredentialsService;
 
 import static org.mockito.Mockito.mock;
 
@@ -24,6 +25,13 @@ public class TestConfig {
     public AuthenticationService authenticationService() {
         logger.info("Mocking: {}", AuthenticationService.class);
         return mock(AuthenticationService.class);
+    }
+
+    @Bean
+    @Profile("mock-credentials-service")
+    public CredentialsService credentialsService() {
+        logger.info("Mocking: {}", CredentialsService.class);
+        return mock(CredentialsService.class);
     }
 
     @Bean

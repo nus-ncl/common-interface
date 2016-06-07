@@ -24,7 +24,7 @@ public class CredentialsInfo implements Credentials {
     }
 
     public CredentialsInfo(final Credentials credentials) {
-        this(credentials.getId(), credentials.getUsername(), null, credentials.getStatus());
+        this(credentials.getId(), credentials.getUsername(), "*****", credentials.getStatus());
     }
 
     @Override

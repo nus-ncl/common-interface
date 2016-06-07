@@ -21,12 +21,16 @@ import javax.inject.Inject;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import static sg.ncl.service.authentication.controllers.CredentialsController.PATH;
+
 /**
  * @author Christopher Zhong
  */
 @RestController
-@RequestMapping(path = "/credentials", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+@RequestMapping(path = PATH, produces = MediaType.APPLICATION_JSON_VALUE)
 public class CredentialsController {
+
+    public static final String PATH = "/credentials";
 
     private static final Logger logger = LoggerFactory.getLogger(CredentialsController.class);
 
@@ -43,7 +47,7 @@ public class CredentialsController {
         return credentialsService.getAll().stream().map(CredentialsInfo::new).collect(Collectors.toList());
     }
 
-    @RequestMapping(method = RequestMethod.POST)
+    @RequestMapping(method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.ACCEPTED)
     public void addCredentials(@RequestBody final CredentialsInfo credentials) {
         if (credentials.getUsername() == null) {
@@ -58,7 +62,7 @@ public class CredentialsController {
         credentialsService.addCredentials(credentials);
     }
 
-    @RequestMapping(path = "/{id}", method = RequestMethod.PUT)
+    @RequestMapping(path = "/{id}", method = RequestMethod.PUT, consumes = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.ACCEPTED)
     public void updateCredentials(@PathVariable final String id, @RequestBody final CredentialsInfo credentials) {
         credentialsService.updateCredentials(id, credentials);

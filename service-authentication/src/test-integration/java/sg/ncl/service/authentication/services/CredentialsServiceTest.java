@@ -60,7 +60,7 @@ public class CredentialsServiceTest extends AbstractTest {
     public void before() {
         assertThat(mockingDetails(passwordEncoder).isMock(), is(true));
         assertThat(mockingDetails(credentialsRepository).isMock(), is(true));
-        credentialsService = new CredentialsService(credentialsRepository, passwordEncoder);
+        credentialsService = new CredentialsServiceImpl(credentialsRepository, passwordEncoder);
     }
 
     @Test
