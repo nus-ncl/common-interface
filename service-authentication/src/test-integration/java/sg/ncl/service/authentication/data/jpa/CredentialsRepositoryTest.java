@@ -1,4 +1,4 @@
-package sg.ncl.service.authentication.data.jpa.repositories;
+package sg.ncl.service.authentication.data.jpa;
 
 import org.junit.Rule;
 import org.junit.Test;
@@ -7,7 +7,6 @@ import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.orm.jpa.JpaSystemException;
 import sg.ncl.service.authentication.AbstractTest;
 import sg.ncl.service.authentication.Util;
-import sg.ncl.service.authentication.data.jpa.entities.CredentialsEntity;
 
 import javax.inject.Inject;
 import java.time.ZonedDateTime;

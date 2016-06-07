@@ -1,4 +1,4 @@
-package sg.ncl.service.authentication.dtos;
+package sg.ncl.service.authentication.web;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;

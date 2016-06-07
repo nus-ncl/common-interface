@@ -1,4 +1,4 @@
-package sg.ncl.service.authentication.dtos;
+package sg.ncl.service.authentication.web;
 
 import org.apache.commons.lang3.RandomStringUtils;
 import org.junit.Test;

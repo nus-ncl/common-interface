@@ -10,8 +10,8 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 import sg.ncl.common.exception.ExceptionProperties;
 import sg.ncl.service.authentication.AbstractTest;
-import sg.ncl.service.authentication.data.jpa.entities.CredentialsEntity;
-import sg.ncl.service.authentication.services.CredentialsService;
+import sg.ncl.service.authentication.data.jpa.CredentialsEntity;
+import sg.ncl.service.authentication.logic.CredentialsService;
 
 import javax.inject.Inject;
 import java.util.ArrayList;

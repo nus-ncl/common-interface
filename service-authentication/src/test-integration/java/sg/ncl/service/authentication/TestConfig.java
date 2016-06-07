@@ -6,9 +6,9 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import sg.ncl.service.authentication.data.jpa.repositories.CredentialsRepository;
-import sg.ncl.service.authentication.services.AuthenticationService;
-import sg.ncl.service.authentication.services.CredentialsService;
+import sg.ncl.service.authentication.data.jpa.CredentialsRepository;
+import sg.ncl.service.authentication.logic.AuthenticationService;
+import sg.ncl.service.authentication.logic.CredentialsService;
 
 import static org.mockito.Mockito.mock;
 

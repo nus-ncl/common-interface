@@ -1,6 +1,6 @@
-package sg.ncl.service.authentication.services;
+package sg.ncl.service.authentication.logic;
 
-import sg.ncl.service.authentication.data.jpa.entities.CredentialsEntity;
+import sg.ncl.service.authentication.data.jpa.CredentialsEntity;
 import sg.ncl.service.authentication.domain.Credentials;
 
 import java.util.List;

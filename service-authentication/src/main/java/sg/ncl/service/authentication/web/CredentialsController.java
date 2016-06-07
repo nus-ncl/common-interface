@@ -11,11 +11,10 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import sg.ncl.service.authentication.domain.Credentials;
-import sg.ncl.service.authentication.dtos.CredentialsInfo;
 import sg.ncl.service.authentication.exceptions.NullPasswordException;
 import sg.ncl.service.authentication.exceptions.NullUserIdException;
 import sg.ncl.service.authentication.exceptions.NullUsernameException;
-import sg.ncl.service.authentication.services.CredentialsService;
+import sg.ncl.service.authentication.logic.CredentialsService;
 
 import javax.inject.Inject;
 import java.util.List;

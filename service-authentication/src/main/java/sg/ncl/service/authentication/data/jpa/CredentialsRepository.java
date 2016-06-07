@@ -1,7 +1,6 @@
-package sg.ncl.service.authentication.data.jpa.repositories;
+package sg.ncl.service.authentication.data.jpa;
 
 import org.springframework.data.jpa.repository.JpaRepository;
-import sg.ncl.service.authentication.data.jpa.entities.CredentialsEntity;
 import sg.ncl.service.authentication.domain.CredentialsStatus;
 
 import java.util.List;

@@ -1,4 +1,4 @@
-package sg.ncl.service.authentication.data.jpa.entities;
+package sg.ncl.service.authentication.data.jpa;
 
 import sg.ncl.common.jpa.AbstractEntity;
 import sg.ncl.service.authentication.domain.Credentials;

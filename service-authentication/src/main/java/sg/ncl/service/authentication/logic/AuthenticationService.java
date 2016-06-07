@@ -1,4 +1,4 @@
-package sg.ncl.service.authentication.services;
+package sg.ncl.service.authentication.logic;
 
 /**
  * @author Christopher Zhong

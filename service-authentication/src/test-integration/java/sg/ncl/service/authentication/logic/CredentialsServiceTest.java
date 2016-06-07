@@ -1,4 +1,4 @@
-package sg.ncl.service.authentication.services;
+package sg.ncl.service.authentication.logic;
 
 import org.apache.commons.lang3.RandomStringUtils;
 import org.junit.Before;
@@ -12,10 +12,9 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.context.ActiveProfiles;
 import sg.ncl.service.authentication.AbstractTest;
 import sg.ncl.service.authentication.Util;
-import sg.ncl.service.authentication.data.jpa.entities.CredentialsEntity;
-import sg.ncl.service.authentication.data.jpa.repositories.CredentialsRepository;
+import sg.ncl.service.authentication.data.jpa.CredentialsEntity;
+import sg.ncl.service.authentication.data.jpa.CredentialsRepository;
 import sg.ncl.service.authentication.domain.Credentials;
-import sg.ncl.service.authentication.dtos.CredentialsInfo;
 import sg.ncl.service.authentication.exceptions.CredentialsNotFoundException;
 import sg.ncl.service.authentication.exceptions.NeitherUsernameNorPasswordModifiedException;
 import sg.ncl.service.authentication.exceptions.NullPasswordException;
@@ -23,6 +22,7 @@ import sg.ncl.service.authentication.exceptions.NullUserIdException;
 import sg.ncl.service.authentication.exceptions.NullUsernameException;
 import sg.ncl.service.authentication.exceptions.UserIdAlreadyExistsException;
 import sg.ncl.service.authentication.exceptions.UsernameAlreadyExistsException;
+import sg.ncl.service.authentication.web.CredentialsInfo;
 
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;

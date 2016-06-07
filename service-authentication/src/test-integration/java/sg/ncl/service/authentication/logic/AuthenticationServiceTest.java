@@ -1,4 +1,4 @@
-package sg.ncl.service.authentication.services;
+package sg.ncl.service.authentication.logic;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtParser;
@@ -14,8 +14,8 @@ import org.mockito.junit.MockitoRule;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.context.ActiveProfiles;
 import sg.ncl.service.authentication.AbstractTest;
-import sg.ncl.service.authentication.data.jpa.entities.CredentialsEntity;
-import sg.ncl.service.authentication.data.jpa.repositories.CredentialsRepository;
+import sg.ncl.service.authentication.data.jpa.CredentialsEntity;
+import sg.ncl.service.authentication.data.jpa.CredentialsRepository;
 import sg.ncl.service.authentication.exceptions.CredentialsNotFoundException;
 import sg.ncl.service.authentication.exceptions.InvalidCredentialsException;
 
