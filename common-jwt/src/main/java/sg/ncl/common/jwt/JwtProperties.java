@@ -6,10 +6,13 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 import java.time.Duration;
 import java.util.UUID;
 
+import static sg.ncl.common.jwt.JwtProperties.PREFIX;
+
 /**
  * @author Christopher Zhong
+ * @version 1.0
  */
-@ConfigurationProperties(prefix = JwtProperties.PREFIX)
+@ConfigurationProperties(prefix = PREFIX)
 public class JwtProperties {
 
     public static final String PREFIX = "ncl.jwt";

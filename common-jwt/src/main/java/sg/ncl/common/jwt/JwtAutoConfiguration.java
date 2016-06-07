@@ -20,6 +20,7 @@ import java.util.UUID;
 
 /**
  * @author Christopher Zhong
+ * @version 1.0
  */
 @Configuration
 @EnableConfigurationProperties(JwtProperties.class)
