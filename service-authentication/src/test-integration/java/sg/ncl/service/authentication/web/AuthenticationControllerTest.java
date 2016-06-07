@@ -1,4 +1,4 @@
-package sg.ncl.service.authentication.controllers;
+package sg.ncl.service.authentication.web;
 
 import org.junit.Before;
 import org.junit.Test;

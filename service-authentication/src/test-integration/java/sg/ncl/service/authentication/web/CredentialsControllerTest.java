@@ -1,4 +1,4 @@
-package sg.ncl.service.authentication.controllers;
+package sg.ncl.service.authentication.web;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -8,6 +8,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
+import sg.ncl.common.exception.ExceptionProperties;
 import sg.ncl.service.authentication.AbstractTest;
 import sg.ncl.service.authentication.data.jpa.entities.CredentialsEntity;
 import sg.ncl.service.authentication.services.CredentialsService;
@@ -25,6 +26,7 @@ import static org.mockito.Mockito.mockingDetails;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -45,6 +47,8 @@ public class CredentialsControllerTest extends AbstractTest {
     @Inject
     private CredentialsService credentialsService;
 
+    @Inject
+    private ExceptionProperties properties;
     private MockMvc mockMvc;
 
     @Before
@@ -89,7 +93,10 @@ public class CredentialsControllerTest extends AbstractTest {
 
     @Test
     public void testAddCredentials() throws Exception {
-
+        mockMvc.perform(post(CredentialsController.PATH).contentType(MediaType.APPLICATION_JSON).content("{}"))
+                .andDo(print())
+//                .andExpect(status().isAccepted())
+        ;
     }
 
 }

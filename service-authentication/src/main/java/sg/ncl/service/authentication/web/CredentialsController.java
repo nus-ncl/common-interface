@@ -1,4 +1,4 @@
-package sg.ncl.service.authentication.controllers;
+package sg.ncl.service.authentication.web;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -21,7 +21,7 @@ import javax.inject.Inject;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static sg.ncl.service.authentication.controllers.CredentialsController.PATH;
+import static sg.ncl.service.authentication.web.CredentialsController.PATH;
 
 /**
  * @author Christopher Zhong

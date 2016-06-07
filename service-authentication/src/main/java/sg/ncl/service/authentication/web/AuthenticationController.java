@@ -1,4 +1,4 @@
-package sg.ncl.service.authentication.controllers;
+package sg.ncl.service.authentication.web;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -36,7 +36,7 @@ public class AuthenticationController {
 
     @RequestMapping(method = RequestMethod.POST)
     @ResponseStatus(HttpStatus.OK)
-    public String login(@RequestHeader(HttpHeaders.AUTHORIZATION) String authorization) {
+    public String login(@RequestHeader(HttpHeaders.AUTHORIZATION) final String authorization) {
         if (authorization.isEmpty()) {
             logger.warn("Authorization header is empty");
             throw new EmptyAuthorizationHeaderException();
