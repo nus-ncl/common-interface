@@ -12,6 +12,7 @@ import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.test.context.ActiveProfiles;
 import sg.ncl.service.authentication.AbstractTest;
 import sg.ncl.service.authentication.data.jpa.entities.CredentialsEntity;
 import sg.ncl.service.authentication.data.jpa.repositories.CredentialsRepository;
@@ -29,12 +30,14 @@ import static org.hamcrest.Matchers.nullValue;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
+import static org.mockito.Mockito.mockingDetails;
 import static org.mockito.Mockito.when;
 import static sg.ncl.service.authentication.Util.getCredentialsEntity;
 
 /**
  * @author Christopher Zhong
  */
+@ActiveProfiles({"mock-password-encoder", "mock-credentials-repository"})
 public class AuthenticationServiceTest extends AbstractTest {
 
     @Rule
@@ -42,23 +45,31 @@ public class AuthenticationServiceTest extends AbstractTest {
     @Rule
     public ExpectedException exception = ExpectedException.none();
 
-    @Mock
-    private PasswordEncoder passwordEncoder;
+    //    @Inject
     @Mock
     private CredentialsRepository credentialsRepository;
-
+    //    @Inject
+    @Mock
+    private PasswordEncoder passwordEncoder;
     @Inject
     private SignatureAlgorithm signatureAlgorithm;
     @Inject
     private Key apiKey;
     @Inject
     private Duration expiryDuration;
-
+    //    @Inject
     private AuthenticationService authenticationService;
 
     @Before
     public void before() {
+        assertThat(mockingDetails(credentialsRepository).isMock(), is(true));
+        assertThat(mockingDetails(passwordEncoder).isMock(), is(true));
         authenticationService = new AuthenticationServiceImpl(credentialsRepository, passwordEncoder, signatureAlgorithm, apiKey, expiryDuration);
+    }
+
+    @Test
+    public void testAuthenticationServiceExists() {
+        assertThat(authenticationService, is(not(nullValue(AuthenticationService.class))));
     }
 
     @Test
