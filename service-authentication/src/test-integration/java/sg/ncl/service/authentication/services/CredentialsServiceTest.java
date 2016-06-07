@@ -1,14 +1,15 @@
 package sg.ncl.service.authentication.services;
 
 import org.apache.commons.lang3.RandomStringUtils;
+import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.test.context.ActiveProfiles;
 import sg.ncl.service.authentication.AbstractTest;
 import sg.ncl.service.authentication.Util;
 import sg.ncl.service.authentication.data.jpa.entities.CredentialsEntity;
@@ -16,19 +17,21 @@ import sg.ncl.service.authentication.data.jpa.repositories.CredentialsRepository
 import sg.ncl.service.authentication.domain.Credentials;
 import sg.ncl.service.authentication.dtos.CredentialsInfo;
 import sg.ncl.service.authentication.exceptions.CredentialsNotFoundException;
+import sg.ncl.service.authentication.exceptions.NeitherUsernameNorPasswordModifiedException;
 import sg.ncl.service.authentication.exceptions.NullPasswordException;
 import sg.ncl.service.authentication.exceptions.NullUserIdException;
 import sg.ncl.service.authentication.exceptions.NullUsernameException;
 import sg.ncl.service.authentication.exceptions.UserIdAlreadyExistsException;
 import sg.ncl.service.authentication.exceptions.UsernameAlreadyExistsException;
 
-import javax.inject.Inject;
-
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.not;
 import static org.hamcrest.Matchers.nullValue;
 import static org.junit.Assert.assertThat;
+import static org.mockito.Matchers.eq;
+import static org.mockito.Mockito.any;
+import static org.mockito.Mockito.mockingDetails;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -36,6 +39,7 @@ import static org.mockito.Mockito.when;
 /**
  * @author Christopher Zhong
  */
+@ActiveProfiles({"mock-password-encoder", "mock-credentials-repository"})
 public class CredentialsServiceTest extends AbstractTest {
 
     @Rule
@@ -43,18 +47,21 @@ public class CredentialsServiceTest extends AbstractTest {
     @Rule
     public ExpectedException exception = ExpectedException.none();
 
+    //    @Inject
     @Mock
     private PasswordEncoder passwordEncoder;
+    //    @Inject
     @Mock
     private CredentialsRepository credentialsRepository;
-
-    @Inject
+    //    @Inject
     private CredentialsService credentialsService;
 
-//    @Before
-//    public void before() {
-//        credentialsService = new CredentialsService(credentialsRepository, passwordEncoder);
-//    }
+    @Before
+    public void before() {
+        assertThat(mockingDetails(passwordEncoder).isMock(), is(true));
+        assertThat(mockingDetails(credentialsRepository).isMock(), is(true));
+        credentialsService = new CredentialsService(credentialsRepository, passwordEncoder);
+    }
 
     @Test
     public void testCredentialsServiceExists() {
@@ -69,11 +76,11 @@ public class CredentialsServiceTest extends AbstractTest {
         final Credentials credentials = new CredentialsInfo(userId, username, password, null);
 
         when(passwordEncoder.encode(password)).thenAnswer(invocation -> invocation.getArgumentAt(0, String.class));
-        when(credentialsRepository.save(Mockito.any(CredentialsEntity.class))).thenAnswer(invocation -> invocation.getArgumentAt(0, CredentialsEntity.class));
+        when(credentialsRepository.save(any(CredentialsEntity.class))).thenAnswer(invocation -> invocation.getArgumentAt(0, CredentialsEntity.class));
 
         final CredentialsEntity entity = credentialsService.addCredentials(credentials);
 
-        verify(credentialsRepository, times(1)).save(Mockito.any(CredentialsEntity.class));
+        verify(credentialsRepository, times(1)).save(any(CredentialsEntity.class));
         assertThat(entity.getUsername(), is(equalTo(username)));
         assertThat(entity.getPassword(), is(equalTo(password)));
         assertThat(entity.getId(), is(equalTo(userId)));
@@ -135,19 +142,89 @@ public class CredentialsServiceTest extends AbstractTest {
     }
 
     @Test
-    public void testGoodUpdateCredentials() {
+    public void testUpdateCredentialsGoodUsernameAndPassword() {
         final CredentialsEntity entity = Util.getCredentialsEntity();
         final String username = "username";
         final String password = "password";
-        final CredentialsInfo info = new CredentialsInfo(entity.getId(), username, password, null);
+        final CredentialsInfo info = new CredentialsInfo(null, username, password, null);
 
-        when(credentialsRepository.findByUsername(entity.getUsername())).thenAnswer(invocation -> entity);
-        when(passwordEncoder.encode(entity.getPassword())).thenAnswer(invocation -> invocation.getArgumentAt(0, String.class));
-        when(credentialsRepository.save(entity)).thenAnswer(invocation -> invocation.getArgumentAt(0, CredentialsEntity.class));
+        when(credentialsRepository.findOne(eq(entity.getId()))).thenReturn(entity);
+        when(passwordEncoder.encode(eq(password))).thenReturn(password);
+        when(credentialsRepository.save(entity)).thenReturn(entity);
 
         credentialsService.updateCredentials(entity.getId(), info);
 
-        verify(credentialsRepository, times(1)).save(Mockito.any(CredentialsEntity.class));
+        verify(credentialsRepository, times(1)).save(any(CredentialsEntity.class));
+        assertThat(entity.getUsername(), is(equalTo(username)));
+        assertThat(entity.getPassword(), is(equalTo(password)));
+    }
+
+    @Test
+    public void testUpdateCredentialsGoodUsernameAndNullPassword() {
+        final CredentialsEntity entity = Util.getCredentialsEntity();
+        final String username = "username";
+        final String password = entity.getPassword();
+        final CredentialsInfo info = new CredentialsInfo(null, username, null, null);
+
+        when(credentialsRepository.findOne(eq(entity.getId()))).thenReturn(entity);
+        when(credentialsRepository.save(entity)).thenReturn(entity);
+
+        credentialsService.updateCredentials(entity.getId(), info);
+
+        verify(credentialsRepository, times(1)).save(any(CredentialsEntity.class));
+        assertThat(entity.getUsername(), is(equalTo(username)));
+        assertThat(entity.getPassword(), is(equalTo(password)));
+    }
+
+    @Test
+    public void testUpdateCredentialsGoodUsernameAndEmptyPassword() {
+        final CredentialsEntity entity = Util.getCredentialsEntity();
+        final String username = "username";
+        final String password = entity.getPassword();
+        final CredentialsInfo info = new CredentialsInfo(null, username, "", null);
+
+        when(credentialsRepository.findOne(eq(entity.getId()))).thenReturn(entity);
+        when(credentialsRepository.save(entity)).thenReturn(entity);
+
+        credentialsService.updateCredentials(entity.getId(), info);
+
+        verify(credentialsRepository, times(1)).save(any(CredentialsEntity.class));
+        assertThat(entity.getUsername(), is(equalTo(username)));
+        assertThat(entity.getPassword(), is(equalTo(password)));
+    }
+
+    @Test
+    public void testUpdateCredentialsNullUsernameAndGoodPassword() {
+        final CredentialsEntity entity = Util.getCredentialsEntity();
+        final String username = entity.getUsername();
+        final String password = "password";
+        final CredentialsInfo info = new CredentialsInfo(null, null, password, null);
+
+        when(credentialsRepository.findOne(eq(entity.getId()))).thenReturn(entity);
+        when(passwordEncoder.encode(eq(password))).thenReturn(password);
+        when(credentialsRepository.save(entity)).thenReturn(entity);
+
+        credentialsService.updateCredentials(entity.getId(), info);
+
+        verify(credentialsRepository, times(1)).save(any(CredentialsEntity.class));
+        assertThat(entity.getUsername(), is(equalTo(username)));
+        assertThat(entity.getPassword(), is(equalTo(password)));
+    }
+
+    @Test
+    public void testUpdateCredentialsEmptyUsernameAndGoodPassword() {
+        final CredentialsEntity entity = Util.getCredentialsEntity();
+        final String username = entity.getUsername();
+        final String password = "password";
+        final CredentialsInfo info = new CredentialsInfo(null, "", password, null);
+
+        when(credentialsRepository.findOne(eq(entity.getId()))).thenReturn(entity);
+        when(passwordEncoder.encode(eq(password))).thenReturn(password);
+        when(credentialsRepository.save(entity)).thenReturn(entity);
+
+        credentialsService.updateCredentials(entity.getId(), info);
+
+        verify(credentialsRepository, times(1)).save(any(CredentialsEntity.class));
         assertThat(entity.getUsername(), is(equalTo(username)));
         assertThat(entity.getPassword(), is(equalTo(password)));
     }
@@ -156,7 +233,7 @@ public class CredentialsServiceTest extends AbstractTest {
     public void testUpdateCredentialsNullUsernameAndPassword() {
         final Credentials credentials = new CredentialsInfo(null, null, null, null);
 
-        exception.expect(NullUsernameException.class);
+        exception.expect(NeitherUsernameNorPasswordModifiedException.class);
 
         credentialsService.updateCredentials("id", credentials);
     }
@@ -165,7 +242,25 @@ public class CredentialsServiceTest extends AbstractTest {
     public void testUpdateCredentialsNullUsernameAndEmptyPassword() {
         final Credentials credentials = new CredentialsInfo(null, null, "", null);
 
-        exception.expect(NullPasswordException.class);
+        exception.expect(NeitherUsernameNorPasswordModifiedException.class);
+
+        credentialsService.updateCredentials("id", credentials);
+    }
+
+    @Test
+    public void testUpdateCredentialsEmptyUsernameAndNullPassword() {
+        final Credentials credentials = new CredentialsInfo(null, "", null, null);
+
+        exception.expect(NeitherUsernameNorPasswordModifiedException.class);
+
+        credentialsService.updateCredentials("id", credentials);
+    }
+
+    @Test
+    public void testUpdateCredentialsEmptyUsernameAndPassword() {
+        final Credentials credentials = new CredentialsInfo(null, "", "", null);
+
+        exception.expect(NeitherUsernameNorPasswordModifiedException.class);
 
         credentialsService.updateCredentials("id", credentials);
     }
