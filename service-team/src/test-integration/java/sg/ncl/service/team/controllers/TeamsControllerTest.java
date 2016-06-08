@@ -15,6 +15,7 @@ import sg.ncl.service.team.data.jpa.entities.TeamEntity;
 import sg.ncl.service.team.data.jpa.repositories.TeamRepository;
 import sg.ncl.service.team.AbstractTest;
 import sg.ncl.service.team.domain.TeamStatus;
+import sg.ncl.service.team.domain.TeamVisibility;
 import sg.ncl.service.team.serializers.DateTimeDeserializer;
 import sg.ncl.service.team.serializers.DateTimeSerializer;
 
@@ -46,7 +47,7 @@ public class TeamsControllerTest extends AbstractTest {
     }
 
     @Test
-    public void postTeamTest() throws Exception {
+    public void testPostTeam() throws Exception {
         // Note: must have TeamEntity to create the JSON
         TeamEntity teamEntity = TeamCommon.createTeam();
 
@@ -81,20 +82,20 @@ public class TeamsControllerTest extends AbstractTest {
     }
 
     @Test
-    public void getAllTeamsWithNoUserInDbTest() throws Exception {
+    public void testGetAllTeamsWithNoUserInDb() throws Exception {
         MvcResult result = mockMvc.perform(get("/teams")).andReturn();
         Assert.assertTrue(result.getResponse().getContentLength() == 0);
     }
 
     @Test
-    public void getTeamWithNoUserInDbTest() throws Exception {
+    public void testGetTeamWithNoUserInDb() throws Exception {
         mockMvc.perform(get("/teams/" + RandomStringUtils.randomAlphabetic(20)))
                 .andExpect(status().isNotFound())
                 .andExpect(status().reason("Team not found"));
     }
 
     @Test
-    public void getTeamTest() throws Exception {
+    public void testGetTeam() throws Exception {
         MediaType contentType = new MediaType(MediaType.APPLICATION_JSON.getType(),
                 MediaType.APPLICATION_JSON.getSubtype());
 
@@ -111,7 +112,26 @@ public class TeamsControllerTest extends AbstractTest {
     }
 
     @Test
-    public void putTeamTest() throws Exception {
+    public void testGetTeamAfterAddUsertoTeam() throws Exception {
+        TeamEntity origTeamEntity = TeamCommon.createTeam();
+        TeamEntity teamEntity = teamRepository.save(origTeamEntity);
+        String teamId = teamEntity.getId();
+
+        // get team before add user
+        mockMvc.perform(get("/teams/" + teamId))
+                .andExpect(status().isOk());
+
+        // add user to team
+        mockMvc.perform(post("/teams/addUserToTeam/123456/" + teamId))
+                .andExpect(status().isOk());
+
+        // get team after add user
+        mockMvc.perform(get("/teams/" + teamId))
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    public void testPutTeam() throws Exception {
         MediaType contentType = new MediaType(MediaType.APPLICATION_JSON.getType(),
                 MediaType.APPLICATION_JSON.getSubtype());
 
@@ -159,7 +179,7 @@ public class TeamsControllerTest extends AbstractTest {
     }
 
     @Test
-    public void putTeamWithWrongIdTest() throws Exception {
+    public void testPutTeamWithWrongId() throws Exception {
         MediaType contentType = new MediaType(MediaType.APPLICATION_JSON.getType(),
                 MediaType.APPLICATION_JSON.getSubtype());
 
@@ -171,6 +191,66 @@ public class TeamsControllerTest extends AbstractTest {
                 .andExpect(status().reason("Team ID is empty"));
     }
 
+    @Test
+    public void testGetPublicTeams() throws Exception {
+        TeamEntity origTeamEntity = TeamCommon.createTeam();
+
+        TeamEntity privateTeamEntity = TeamCommon.createTeam();
+        privateTeamEntity.setVisibility(TeamVisibility.PRIVATE);
+
+        teamRepository.save(origTeamEntity);
+        teamRepository.save(privateTeamEntity);
+
+        MediaType contentType = new MediaType(MediaType.APPLICATION_JSON.getType(),
+                MediaType.APPLICATION_JSON.getSubtype());
+
+        MvcResult mvcResult = mockMvc.perform(get("/teams/public"))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(contentType))
+                .andReturn();
+
+        // create GSON
+        GsonBuilder gsonBuilder = new GsonBuilder();
+        gsonBuilder.registerTypeAdapter(ZonedDateTime.class, new DateTimeSerializer());
+        gsonBuilder.registerTypeAdapter(ZonedDateTime.class, new DateTimeDeserializer());
+        Gson gson = gsonBuilder.create();
+
+        String list = mvcResult.getResponse().getContentAsString();
+
+        Type listType = new TypeToken<ArrayList<TeamEntity>>(){}.getType();
+        List<TeamEntity> teamEntityList = gson.fromJson(list, listType);
+
+        Assert.assertThat(teamEntityList.size(), is(1));
+        Assert.assertThat(teamEntityList.get(0).getVisibility(), is(TeamVisibility.PUBLIC));
+    }
+
+    @Test
+    public void testGetByName() throws Exception {
+        TeamEntity teamEntity = TeamCommon.createTeam();
+        String name = RandomStringUtils.randomAlphanumeric(20);
+        teamEntity.setName(name);
+
+        teamRepository.save(teamEntity);
+
+        MediaType contentType = new MediaType(MediaType.APPLICATION_JSON.getType(),
+                MediaType.APPLICATION_JSON.getSubtype());
+
+        MvcResult mvcResult = mockMvc.perform(get("/teams/name/" + name))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(contentType))
+                .andReturn();
+
+        // create GSON
+        GsonBuilder gsonBuilder = new GsonBuilder();
+        gsonBuilder.registerTypeAdapter(ZonedDateTime.class, new DateTimeSerializer());
+        gsonBuilder.registerTypeAdapter(ZonedDateTime.class, new DateTimeDeserializer());
+        Gson gson = gsonBuilder.create();
+
+        String list = mvcResult.getResponse().getContentAsString();
+        TeamEntity entity = gson.fromJson(list, TeamEntity.class);
+
+        Assert.assertThat(entity.getName(), is(name));
+    }
 }
 
 

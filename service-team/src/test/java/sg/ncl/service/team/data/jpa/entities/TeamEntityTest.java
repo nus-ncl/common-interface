@@ -9,7 +9,6 @@ import sg.ncl.service.team.domain.TeamVisibility;
 
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
-import java.util.concurrent.ExecutionException;
 
 import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.*;
@@ -23,7 +22,7 @@ public class TeamEntityTest {
     public void testGetId() throws Exception {
         final TeamEntity entity = new TeamEntity();
 
-        assertNull(entity.getId());
+        assertThat(entity.getId(), is(nullValue()));
     }
 
     @Test
@@ -32,14 +31,14 @@ public class TeamEntityTest {
         final String id = RandomStringUtils.randomAlphanumeric(20);
         entity.setId(id);
 
-        assertEquals(entity.getId(), id);
+        assertThat(entity.getId(), is(id));
     }
 
     @Test
     public void testGetName() throws Exception {
         final TeamEntity entity = new TeamEntity();
 
-        assertNull(entity.getName());
+        assertThat(entity.getName(), is(nullValue()));
     }
 
     @Test
@@ -48,14 +47,14 @@ public class TeamEntityTest {
         final String name = RandomStringUtils.randomAlphanumeric(20);
         entity.setName(name);
 
-        assertEquals(entity.getName(), name);
+        assertThat(entity.getName(), is(name));
     }
 
     @Test
     public void testGetDescription() throws Exception {
         final TeamEntity entity = new TeamEntity();
 
-        assertNull(entity.getDescription());
+        assertThat(entity.getDescription(), is(nullValue()));
     }
 
     @Test
@@ -64,14 +63,14 @@ public class TeamEntityTest {
         final String description = RandomStringUtils.randomAlphanumeric(20);
         entity.setDescription(description);
 
-        assertEquals(entity.getDescription(), description);
+        assertThat(entity.getDescription(), is(description));
     }
 
     @Test
     public void testGetVisibility() throws Exception {
         final TeamEntity entity = new TeamEntity();
 
-        assertEquals(entity.getVisibility(), TeamVisibility.PUBLIC);
+        assertThat(entity.getVisibility(), is(TeamVisibility.PUBLIC));
     }
 
     @Test
@@ -79,14 +78,14 @@ public class TeamEntityTest {
         final TeamEntity entity = new TeamEntity();
         entity.setVisibility(TeamVisibility.PRIVATE);
 
-        assertEquals(entity.getVisibility(), TeamVisibility.PRIVATE);
+        assertThat(entity.getVisibility(), is(TeamVisibility.PRIVATE));
     }
 
     @Test
     public void testGetPrivacy() throws Exception {
         final TeamEntity entity = new TeamEntity();
 
-        assertEquals(entity.getPrivacy(), TeamPrivacy.OPEN);
+        assertThat(entity.getPrivacy(), is(TeamPrivacy.OPEN));
     }
 
     @Test
@@ -94,14 +93,14 @@ public class TeamEntityTest {
         final TeamEntity entity = new TeamEntity();
         entity.setPrivacy(TeamPrivacy.INVITE);
 
-        assertEquals(entity.getPrivacy(), TeamPrivacy.INVITE);
+        assertThat(entity.getPrivacy(), is(TeamPrivacy.INVITE));
     }
 
     @Test
     public void testGetStatus() throws Exception {
         final TeamEntity entity = new TeamEntity();
 
-        assertEquals(entity.getStatus(), TeamStatus.PENDING);
+        assertThat(entity.getStatus(), is(TeamStatus.PENDING));
     }
 
     @Test
@@ -109,14 +108,14 @@ public class TeamEntityTest {
         final TeamEntity entity = new TeamEntity();
         entity.setStatus(TeamStatus.APPROVED);
 
-        assertEquals(entity.getStatus(), TeamStatus.APPROVED);
+        assertThat(entity.getStatus(), is(TeamStatus.APPROVED));
     }
 
     @Test
     public void testGetApplicationDate() throws Exception {
         final TeamEntity entity = new TeamEntity();
 
-        assertNull(entity.getApplicationDate());
+        assertThat(entity.getApplicationDate(), is(nullValue()));
     }
 
     @Test
@@ -125,14 +124,14 @@ public class TeamEntityTest {
         final ZonedDateTime zonedDateTime = ZonedDateTime.now();
         entity.setApplicationDate(zonedDateTime);
 
-        assertEquals(entity.getApplicationDate(), zonedDateTime);
+        assertThat(entity.getApplicationDate(), is(zonedDateTime));
     }
 
     @Test
     public void testGetProcessedDate() throws Exception {
         final TeamEntity entity = new TeamEntity();
 
-        assertNull(entity.getProcessedDate());
+        assertThat(entity.getProcessedDate(), is(nullValue()));
     }
 
     @Test
@@ -141,14 +140,14 @@ public class TeamEntityTest {
         final ZonedDateTime zonedDateTime = ZonedDateTime.now();
         entity.setProcessedDate(zonedDateTime);
 
-        assertEquals(entity.getProcessedDate(), zonedDateTime);
+        assertThat(entity.getProcessedDate(), is(zonedDateTime));
     }
 
     @Test
     public void testGetMembers() throws Exception {
         final TeamEntity entity = new TeamEntity();
 
-        assertEquals(entity.getMembers(), new ArrayList<TeamMemberEntity>());
+        assertThat(entity.getMembers(), is(new ArrayList<TeamMemberEntity>()));
     }
 
     @Test
@@ -157,7 +156,7 @@ public class TeamEntityTest {
         final String userId = RandomStringUtils.randomAlphanumeric(20);
         entity.addMember(userId);
 
-        assertEquals(entity.getMembers().get(0).getUserId(), userId);
+        assertThat(entity.getMembers().get(0).getUserId(), is(userId));
     }
 
     @Test
