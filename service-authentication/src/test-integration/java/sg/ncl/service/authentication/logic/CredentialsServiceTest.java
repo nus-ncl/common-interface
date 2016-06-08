@@ -17,11 +17,11 @@ import sg.ncl.service.authentication.data.jpa.CredentialsRepository;
 import sg.ncl.service.authentication.domain.Credentials;
 import sg.ncl.service.authentication.exceptions.CredentialsNotFoundException;
 import sg.ncl.service.authentication.exceptions.NeitherUsernameNorPasswordModifiedException;
-import sg.ncl.service.authentication.exceptions.NullPasswordException;
-import sg.ncl.service.authentication.exceptions.NullUserIdException;
-import sg.ncl.service.authentication.exceptions.NullUsernameException;
+import sg.ncl.service.authentication.exceptions.PasswordNullOrEmptyException;
 import sg.ncl.service.authentication.exceptions.UserIdAlreadyExistsException;
+import sg.ncl.service.authentication.exceptions.UserIdNullOrEmptyException;
 import sg.ncl.service.authentication.exceptions.UsernameAlreadyExistsException;
+import sg.ncl.service.authentication.exceptions.UsernameNullOrEmptyException;
 import sg.ncl.service.authentication.web.CredentialsInfo;
 
 import static org.hamcrest.Matchers.equalTo;
@@ -92,7 +92,7 @@ public class CredentialsServiceTest extends AbstractTest {
         final String userId = RandomStringUtils.randomAlphanumeric(20);
         final Credentials credentials = new CredentialsInfo(userId, null, password, null);
 
-        exception.expect(NullUsernameException.class);
+        exception.expect(UsernameNullOrEmptyException.class);
 
         credentialsService.addCredentials(credentials);
     }
@@ -103,7 +103,7 @@ public class CredentialsServiceTest extends AbstractTest {
         final String userId = RandomStringUtils.randomAlphanumeric(20);
         final Credentials credentials = new CredentialsInfo(userId, username, null, null);
 
-        exception.expect(NullPasswordException.class);
+        exception.expect(PasswordNullOrEmptyException.class);
 
         credentialsService.addCredentials(credentials);
     }
@@ -114,7 +114,7 @@ public class CredentialsServiceTest extends AbstractTest {
         final String password = RandomStringUtils.randomAlphanumeric(20);
         final Credentials credentials = new CredentialsInfo(null, username, password, null);
 
-        exception.expect(NullUserIdException.class);
+        exception.expect(UserIdNullOrEmptyException.class);
 
         credentialsService.addCredentials(credentials);
     }

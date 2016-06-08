@@ -11,15 +11,14 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import sg.ncl.service.authentication.domain.Credentials;
-import sg.ncl.service.authentication.exceptions.NullPasswordException;
-import sg.ncl.service.authentication.exceptions.NullUserIdException;
-import sg.ncl.service.authentication.exceptions.NullUsernameException;
 import sg.ncl.service.authentication.logic.CredentialsService;
 
 import javax.inject.Inject;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import static sg.ncl.service.authentication.validation.Validation.validateForCreation;
+import static sg.ncl.service.authentication.validation.Validation.validateForUpdate;
 import static sg.ncl.service.authentication.web.CredentialsController.PATH;
 
 /**
@@ -47,23 +46,16 @@ public class CredentialsController {
     }
 
     @RequestMapping(method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
-    @ResponseStatus(HttpStatus.ACCEPTED)
+    @ResponseStatus(HttpStatus.CREATED)
     public void addCredentials(@RequestBody final CredentialsInfo credentials) {
-        if (credentials.getUsername() == null) {
-            throw new NullUsernameException();
-        }
-        if (credentials.getPassword() == null) {
-            throw new NullPasswordException();
-        }
-        if (credentials.getId() == null) {
-            throw new NullUserIdException();
-        }
+        validateForCreation(credentials);
         credentialsService.addCredentials(credentials);
     }
 
     @RequestMapping(path = "/{id}", method = RequestMethod.PUT, consumes = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.ACCEPTED)
     public void updateCredentials(@PathVariable final String id, @RequestBody final CredentialsInfo credentials) {
+        validateForUpdate(credentials);
         credentialsService.updateCredentials(id, credentials);
     }
 

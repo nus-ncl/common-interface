@@ -9,16 +9,15 @@ import sg.ncl.service.authentication.data.jpa.CredentialsRepository;
 import sg.ncl.service.authentication.domain.Credentials;
 import sg.ncl.service.authentication.domain.CredentialsStatus;
 import sg.ncl.service.authentication.exceptions.CredentialsNotFoundException;
-import sg.ncl.service.authentication.exceptions.NeitherUsernameNorPasswordModifiedException;
-import sg.ncl.service.authentication.exceptions.NullPasswordException;
-import sg.ncl.service.authentication.exceptions.NullUserIdException;
-import sg.ncl.service.authentication.exceptions.NullUsernameException;
 import sg.ncl.service.authentication.exceptions.UserIdAlreadyExistsException;
 import sg.ncl.service.authentication.exceptions.UsernameAlreadyExistsException;
 
 import javax.inject.Inject;
 import javax.transaction.Transactional;
 import java.util.List;
+
+import static sg.ncl.service.authentication.validation.Validation.validateForCreation;
+import static sg.ncl.service.authentication.validation.Validation.validateForUpdate;
 
 /**
  * @author Christopher Zhong
@@ -44,43 +43,30 @@ public class CredentialsServiceImpl implements CredentialsService {
 
     @Transactional
     public CredentialsEntity addCredentials(final Credentials credentials) {
-        if (credentials.getUsername() == null) {
-            logger.warn("Username is null");
-            throw new NullUsernameException();
-        }
-        if (credentials.getPassword() == null) {
-            logger.warn("Password is null");
-            throw new NullPasswordException();
-        }
-        if (credentials.getId() == null) {
-            logger.warn("User ID is null");
-            throw new NullUserIdException();
-        }
-        // check if the username already exists
-        if (credentialsRepository.findByUsername(credentials.getUsername()) == null) {
-            // check if the user id already exists
-            if (credentialsRepository.findOne(credentials.getId()) == null) {
+        validateForCreation(credentials);
+        // check if the user id already exists
+        if (credentialsRepository.findOne(credentials.getId()) == null) {
+            // check if the username already exists
+            if (credentialsRepository.findByUsername(credentials.getUsername()) == null) {
                 final CredentialsEntity entity = new CredentialsEntity();
                 entity.setUsername(credentials.getUsername());
                 setPassword(entity, credentials.getPassword());
                 entity.setId(credentials.getId());
                 entity.setStatus(CredentialsStatus.ACTIVE);
                 final CredentialsEntity savedEntity = credentialsRepository.save(entity);
-                logger.info("New credentials '{}'", savedEntity);
+                logger.info("Credentials created: {}", savedEntity);
                 return savedEntity;
             }
-            logger.warn("User ID '{}' is already associated with a credentials", credentials.getId());
-            throw new UserIdAlreadyExistsException(credentials.getId());
+            logger.warn("Username '{}' is already associated with a credentials", credentials.getUsername());
+            throw new UsernameAlreadyExistsException(credentials.getUsername());
         }
-        logger.warn("Username '{}' is already associated with a credentials", credentials.getUsername());
-        throw new UsernameAlreadyExistsException(credentials.getUsername());
+        logger.warn("User ID '{}' is already associated with a credentials", credentials.getId());
+        throw new UserIdAlreadyExistsException(credentials.getId());
     }
 
     @Transactional
     public void updateCredentials(final String id, final Credentials credentials) {
-        if ((credentials.getUsername() == null || credentials.getUsername().isEmpty()) && (credentials.getPassword() == null || credentials.getPassword().isEmpty())) {
-            throw new NeitherUsernameNorPasswordModifiedException();
-        }
+        validateForUpdate(credentials);
         // check if the username exists
         final CredentialsEntity entity = credentialsRepository.findOne(id);
         if (entity == null) {

@@ -1,5 +1,6 @@
 package sg.ncl.service.authentication.web;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.http.MediaType;
@@ -46,9 +47,11 @@ public class CredentialsControllerTest extends AbstractTest {
     private WebApplicationContext webApplicationContext;
     @Inject
     private CredentialsService credentialsService;
-
     @Inject
     private ExceptionProperties properties;
+    @Inject
+    private ObjectMapper mapper;
+
     private MockMvc mockMvc;
 
     @Before
@@ -93,10 +96,96 @@ public class CredentialsControllerTest extends AbstractTest {
 
     @Test
     public void testAddCredentials() throws Exception {
-        mockMvc.perform(post(CredentialsController.PATH).contentType(MediaType.APPLICATION_JSON).content("{}"))
+        final CredentialsInfo credentialsInfo = new CredentialsInfo(null, null, null, null);
+
+        mockMvc.perform(post(CredentialsController.PATH).contentType(MediaType.APPLICATION_JSON).content("{\"username\": \"\"}"))
                 .andDo(print())
 //                .andExpect(status().isAccepted())
         ;
+    }
+
+    @Test
+    public void testAddCredentialsNullBody() throws Exception {
+        mockMvc.perform(post(CredentialsController.PATH).contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    public void testAddCredentialsEmptyBody() throws Exception {
+        mockMvc.perform(post(CredentialsController.PATH).contentType(MediaType.APPLICATION_JSON).content(""))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    public void testAddCredentialsNullIdAndUsernameAndPassword() throws Exception {
+        final CredentialsInfo credentialsInfo = new CredentialsInfo(null, null, null, null);
+        final byte[] content = mapper.writeValueAsBytes(credentialsInfo);
+
+        mockMvc.perform(post(CredentialsController.PATH).contentType(MediaType.APPLICATION_JSON).content(content))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    public void testAddCredentialsNullIdAndUsernameAndEmptyPassword() throws Exception {
+        final CredentialsInfo credentialsInfo = new CredentialsInfo(null, null, "", null);
+        final byte[] content = mapper.writeValueAsBytes(credentialsInfo);
+
+        mockMvc.perform(post(CredentialsController.PATH).contentType(MediaType.APPLICATION_JSON).content(content))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    public void testAddCredentialsNullIdAndEmptyUsernameAndNullPassword() throws Exception {
+        final CredentialsInfo credentialsInfo = new CredentialsInfo(null, "", null, null);
+        final byte[] content = mapper.writeValueAsBytes(credentialsInfo);
+
+        mockMvc.perform(post(CredentialsController.PATH).contentType(MediaType.APPLICATION_JSON).content(content))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    public void testAddCredentialsNullIdAndEmptyUsernameAndEmptyPassword() throws Exception {
+        final CredentialsInfo credentialsInfo = new CredentialsInfo(null, "", "", null);
+        final byte[] content = mapper.writeValueAsBytes(credentialsInfo);
+
+        mockMvc.perform(post(CredentialsController.PATH).contentType(MediaType.APPLICATION_JSON).content(content))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    public void testAddCredentialsEmptyIdAndNullUsernameAndNullPassword() throws Exception {
+        final CredentialsInfo credentialsInfo = new CredentialsInfo("", null, null, null);
+        final byte[] content = mapper.writeValueAsBytes(credentialsInfo);
+
+        mockMvc.perform(post(CredentialsController.PATH).contentType(MediaType.APPLICATION_JSON).content(content))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    public void testAddCredentialsEmptyIdAndNullUsernameAndEmptyPassword() throws Exception {
+        final CredentialsInfo credentialsInfo = new CredentialsInfo("", null, "", null);
+        final byte[] content = mapper.writeValueAsBytes(credentialsInfo);
+
+        mockMvc.perform(post(CredentialsController.PATH).contentType(MediaType.APPLICATION_JSON).content(content))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    public void testAddCredentialsEmptyIdAndEmptyUsernameAndNullPassword() throws Exception {
+        final CredentialsInfo credentialsInfo = new CredentialsInfo("", "", null, null);
+        final byte[] content = mapper.writeValueAsBytes(credentialsInfo);
+
+        mockMvc.perform(post(CredentialsController.PATH).contentType(MediaType.APPLICATION_JSON).content(content))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    public void testAddCredentialsEmptyIdAndEmptyUsernameAndEmptyPassword() throws Exception {
+        final CredentialsInfo credentialsInfo = new CredentialsInfo("", "", "", null);
+        final byte[] content = mapper.writeValueAsBytes(credentialsInfo);
+
+        mockMvc.perform(post(CredentialsController.PATH).contentType(MediaType.APPLICATION_JSON).content(content))
+                .andExpect(status().isBadRequest());
     }
 
 }
