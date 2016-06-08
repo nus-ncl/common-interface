@@ -1,6 +1,6 @@
 package sg.ncl.service.authentication.exceptions;
 
-import sg.ncl.common.exceptions.NotFoundException;
+import sg.ncl.common.exception.NotFoundException;
 
 /**
  * @author Christopher Zhong
