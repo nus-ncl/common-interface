@@ -1,6 +1,5 @@
 package sg.ncl.service.authentication.logic;
 
-import org.apache.commons.lang3.RandomStringUtils;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -26,9 +25,8 @@ import sg.ncl.service.authentication.web.CredentialsInfo;
 
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.not;
-import static org.hamcrest.Matchers.nullValue;
 import static org.junit.Assert.assertThat;
+import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.mockingDetails;
@@ -64,59 +62,145 @@ public class CredentialsServiceTest extends AbstractTest {
     }
 
     @Test
-    public void testCredentialsServiceExists() {
-        assertThat(credentialsService, is(not(nullValue(CredentialsService.class))));
-    }
+    public void testAddCredentialsGoodIdAndUsernameAndPassword() {
+        final Credentials credentialsInfo = new CredentialsInfo("id", "username", "password", null);
 
-    @Test
-    public void testGoodAddCredentials() {
-        final String username = RandomStringUtils.randomAlphanumeric(20);
-        final String password = RandomStringUtils.randomAlphanumeric(20);
-        final String userId = RandomStringUtils.randomAlphanumeric(20);
-        final Credentials credentials = new CredentialsInfo(userId, username, password, null);
+        when(passwordEncoder.encode(anyString())).thenReturn(credentialsInfo.getPassword());
+        when(credentialsRepository.save(any(CredentialsEntity.class))).thenAnswer(i -> i.getArgumentAt(0, CredentialsEntity.class));
 
-        when(passwordEncoder.encode(password)).thenAnswer(invocation -> invocation.getArgumentAt(0, String.class));
-        when(credentialsRepository.save(any(CredentialsEntity.class))).thenAnswer(invocation -> invocation.getArgumentAt(0, CredentialsEntity.class));
+        final CredentialsEntity credentialsEntity = credentialsService.addCredentials(credentialsInfo);
 
-        final CredentialsEntity entity = credentialsService.addCredentials(credentials);
-
+        verify(passwordEncoder, times(1)).encode(anyString());
         verify(credentialsRepository, times(1)).save(any(CredentialsEntity.class));
-        assertThat(entity.getUsername(), is(equalTo(username)));
-        assertThat(entity.getPassword(), is(equalTo(password)));
-        assertThat(entity.getId(), is(equalTo(userId)));
+        assertThat(credentialsEntity.getId(), is(equalTo(credentialsInfo.getId())));
+        assertThat(credentialsEntity.getUsername(), is(equalTo(credentialsInfo.getUsername())));
+        assertThat(credentialsEntity.getPassword(), is(equalTo(credentialsInfo.getPassword())));
     }
 
     @Test
-    public void testAddCredentialsNullUsername() {
-        final String password = RandomStringUtils.randomAlphanumeric(20);
-        final String userId = RandomStringUtils.randomAlphanumeric(20);
-        final Credentials credentials = new CredentialsInfo(userId, null, password, null);
-
-        exception.expect(UsernameNullOrEmptyException.class);
-
-        credentialsService.addCredentials(credentials);
-    }
-
-    @Test
-    public void testAddCredentialsNullPassword() {
-        final String username = RandomStringUtils.randomAlphanumeric(20);
-        final String userId = RandomStringUtils.randomAlphanumeric(20);
-        final Credentials credentials = new CredentialsInfo(userId, username, null, null);
+    public void testAddCredentialsGoodIdAndUsernameAndNullPassword() throws Exception {
+        final CredentialsInfo credentialsInfo = new CredentialsInfo("id", "username", null, null);
 
         exception.expect(PasswordNullOrEmptyException.class);
 
-        credentialsService.addCredentials(credentials);
+        credentialsService.addCredentials(credentialsInfo);
     }
 
     @Test
-    public void testAddCredentialsNullUserId() {
-        final String username = RandomStringUtils.randomAlphanumeric(20);
-        final String password = RandomStringUtils.randomAlphanumeric(20);
-        final Credentials credentials = new CredentialsInfo(null, username, password, null);
+    public void testAddCredentialsGoodIdAndUsernameAndEmptyPassword() throws Exception {
+        final CredentialsInfo credentialsInfo = new CredentialsInfo("id", "username", "", null);
+
+        exception.expect(PasswordNullOrEmptyException.class);
+
+        credentialsService.addCredentials(credentialsInfo);
+    }
+
+    @Test
+    public void testAddCredentialsGoodIdAndNullUsernameAndGoodPassword() throws Exception {
+        final CredentialsInfo credentialsInfo = new CredentialsInfo("id", null, "password", null);
+
+        exception.expect(UsernameNullOrEmptyException.class);
+
+        credentialsService.addCredentials(credentialsInfo);
+    }
+
+    @Test
+    public void testAddCredentialsGoodIdAndEmptyUsernameAndGoodPassword() throws Exception {
+        final CredentialsInfo credentialsInfo = new CredentialsInfo("id", "", "password", null);
+
+        exception.expect(UsernameNullOrEmptyException.class);
+
+        credentialsService.addCredentials(credentialsInfo);
+    }
+
+    @Test
+    public void testAddCredentialsNullIdAndGoodUsernameAndGoodPassword() throws Exception {
+        final CredentialsInfo credentialsInfo = new CredentialsInfo(null, "username", "password", null);
 
         exception.expect(UserIdNullOrEmptyException.class);
 
-        credentialsService.addCredentials(credentials);
+        credentialsService.addCredentials(credentialsInfo);
+    }
+
+    @Test
+    public void testAddCredentialsEmptyIdAndGoodUsernameAndGoodPassword() throws Exception {
+        final CredentialsInfo credentialsInfo = new CredentialsInfo("", "username", "password", null);
+
+        exception.expect(UserIdNullOrEmptyException.class);
+
+        credentialsService.addCredentials(credentialsInfo);
+    }
+
+    @Test
+    public void testAddCredentialsNullIdAndUsernameAndPassword() throws Exception {
+        final CredentialsInfo credentialsInfo = new CredentialsInfo(null, null, null, null);
+
+        exception.expect(UserIdNullOrEmptyException.class);
+
+        credentialsService.addCredentials(credentialsInfo);
+    }
+
+    @Test
+    public void testAddCredentialsNullIdAndUsernameAndEmptyPassword() throws Exception {
+        final CredentialsInfo credentialsInfo = new CredentialsInfo(null, null, "", null);
+
+        exception.expect(UserIdNullOrEmptyException.class);
+
+        credentialsService.addCredentials(credentialsInfo);
+    }
+
+    @Test
+    public void testAddCredentialsNullIdAndEmptyUsernameAndNullPassword() throws Exception {
+        final CredentialsInfo credentialsInfo = new CredentialsInfo(null, "", null, null);
+
+        exception.expect(UserIdNullOrEmptyException.class);
+
+        credentialsService.addCredentials(credentialsInfo);
+    }
+
+    @Test
+    public void testAddCredentialsNullIdAndEmptyUsernameAndEmptyPassword() throws Exception {
+        final CredentialsInfo credentialsInfo = new CredentialsInfo(null, "", "", null);
+
+        exception.expect(UserIdNullOrEmptyException.class);
+
+        credentialsService.addCredentials(credentialsInfo);
+    }
+
+    @Test
+    public void testAddCredentialsEmptyIdAndNullUsernameAndNullPassword() throws Exception {
+        final CredentialsInfo credentialsInfo = new CredentialsInfo("", null, null, null);
+
+        exception.expect(UserIdNullOrEmptyException.class);
+
+        credentialsService.addCredentials(credentialsInfo);
+    }
+
+    @Test
+    public void testAddCredentialsEmptyIdAndNullUsernameAndEmptyPassword() throws Exception {
+        final CredentialsInfo credentialsInfo = new CredentialsInfo("", null, "", null);
+
+        exception.expect(UserIdNullOrEmptyException.class);
+
+        credentialsService.addCredentials(credentialsInfo);
+    }
+
+    @Test
+    public void testAddCredentialsEmptyIdAndEmptyUsernameAndNullPassword() throws Exception {
+        final CredentialsInfo credentialsInfo = new CredentialsInfo("", "", null, null);
+
+        exception.expect(UserIdNullOrEmptyException.class);
+
+        credentialsService.addCredentials(credentialsInfo);
+    }
+
+    @Test
+    public void testAddCredentialsEmptyIdAndEmptyUsernameAndEmptyPassword() throws Exception {
+        final CredentialsInfo credentialsInfo = new CredentialsInfo("", "", "", null);
+
+        exception.expect(UserIdNullOrEmptyException.class);
+
+        credentialsService.addCredentials(credentialsInfo);
     }
 
     @Test
@@ -148,12 +232,13 @@ public class CredentialsServiceTest extends AbstractTest {
         final String password = "password";
         final CredentialsInfo info = new CredentialsInfo(null, username, password, null);
 
-        when(credentialsRepository.findOne(eq(entity.getId()))).thenReturn(entity);
-        when(passwordEncoder.encode(eq(password))).thenReturn(password);
-        when(credentialsRepository.save(entity)).thenReturn(entity);
+        when(credentialsRepository.findOne(anyString())).thenReturn(entity);
+        when(passwordEncoder.encode(anyString())).thenReturn(password);
+        when(credentialsRepository.save(any(CredentialsEntity.class))).thenReturn(entity);
 
         credentialsService.updateCredentials(entity.getId(), info);
 
+        verify(passwordEncoder, times(1)).encode(anyString());
         verify(credentialsRepository, times(1)).save(any(CredentialsEntity.class));
         assertThat(entity.getUsername(), is(equalTo(username)));
         assertThat(entity.getPassword(), is(equalTo(password)));
@@ -171,6 +256,7 @@ public class CredentialsServiceTest extends AbstractTest {
 
         credentialsService.updateCredentials(entity.getId(), info);
 
+        verify(passwordEncoder, times(0)).encode(anyString());
         verify(credentialsRepository, times(1)).save(any(CredentialsEntity.class));
         assertThat(entity.getUsername(), is(equalTo(username)));
         assertThat(entity.getPassword(), is(equalTo(password)));

@@ -14,6 +14,7 @@ import sg.ncl.service.authentication.exceptions.UsernameAlreadyExistsException;
 
 import javax.inject.Inject;
 import javax.transaction.Transactional;
+import javax.validation.constraints.NotNull;
 import java.util.List;
 
 import static sg.ncl.service.authentication.validation.Validation.validateForCreation;
@@ -42,7 +43,7 @@ public class CredentialsServiceImpl implements CredentialsService {
     }
 
     @Transactional
-    public CredentialsEntity addCredentials(final Credentials credentials) {
+    public CredentialsEntity addCredentials(@NotNull final Credentials credentials) {
         validateForCreation(credentials);
         // check if the user id already exists
         if (credentialsRepository.findOne(credentials.getId()) == null) {
@@ -60,12 +61,12 @@ public class CredentialsServiceImpl implements CredentialsService {
             logger.warn("Username '{}' is already associated with a credentials", credentials.getUsername());
             throw new UsernameAlreadyExistsException(credentials.getUsername());
         }
-        logger.warn("User ID '{}' is already associated with a credentials", credentials.getId());
+        logger.warn("User Id '{}' is already associated with a credentials", credentials.getId());
         throw new UserIdAlreadyExistsException(credentials.getId());
     }
 
     @Transactional
-    public void updateCredentials(final String id, final Credentials credentials) {
+    public void updateCredentials(@NotNull final String id, @NotNull final Credentials credentials) {
         validateForUpdate(credentials);
         // check if the username exists
         final CredentialsEntity entity = credentialsRepository.findOne(id);

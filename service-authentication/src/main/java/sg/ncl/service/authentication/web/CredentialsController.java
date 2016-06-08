@@ -47,9 +47,9 @@ public class CredentialsController {
 
     @RequestMapping(method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.CREATED)
-    public void addCredentials(@RequestBody final CredentialsInfo credentials) {
+    public Credentials addCredentials(@RequestBody final CredentialsInfo credentials) {
         validateForCreation(credentials);
-        credentialsService.addCredentials(credentials);
+        return new CredentialsInfo(credentialsService.addCredentials(credentials));
     }
 
     @RequestMapping(path = "/{id}", method = RequestMethod.PUT, consumes = MediaType.APPLICATION_JSON_VALUE)
