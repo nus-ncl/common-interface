@@ -4,7 +4,6 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.springframework.dao.DataIntegrityViolationException;
-import org.springframework.orm.jpa.JpaSystemException;
 import sg.ncl.service.team.AbstractTest;
 import sg.ncl.service.team.Util;
 import sg.ncl.service.team.data.jpa.entities.TeamEntity;
@@ -48,10 +47,10 @@ public class TeamRepositoryTest extends AbstractTest {
         entity.setName(null);
 
         try {
-            repository.save(entity);
+            repository.saveAndFlush(entity);
             exception.expect(DataIntegrityViolationException.class);
         } catch (Exception e) {
-            checkException(e, "NULL not allowed for column \"USERNAME\"");
+            checkException(e, "NULL not allowed for column \"NAME\"");
         }
     }
 }
