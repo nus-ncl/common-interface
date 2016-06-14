@@ -1,10 +1,12 @@
 package sg.ncl.service.authentication.logic;
 
+import sg.ncl.service.authentication.domain.Authorization;
+
 /**
  * @author Christopher Zhong
  */
 public interface AuthenticationService {
 
-    String login(String username, String password);
+    Authorization login(String username, String password);
 
 }

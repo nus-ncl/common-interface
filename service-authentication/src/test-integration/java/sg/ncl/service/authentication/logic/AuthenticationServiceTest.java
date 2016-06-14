@@ -16,6 +16,7 @@ import org.springframework.test.context.ActiveProfiles;
 import sg.ncl.service.authentication.AbstractTest;
 import sg.ncl.service.authentication.data.jpa.CredentialsEntity;
 import sg.ncl.service.authentication.data.jpa.CredentialsRepository;
+import sg.ncl.service.authentication.domain.Authorization;
 import sg.ncl.service.authentication.exceptions.CredentialsNotFoundException;
 import sg.ncl.service.authentication.exceptions.InvalidCredentialsException;
 
@@ -24,6 +25,7 @@ import java.security.Key;
 import java.time.Duration;
 import java.util.Date;
 
+import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.not;
 import static org.hamcrest.Matchers.nullValue;
@@ -79,13 +81,14 @@ public class AuthenticationServiceTest extends AbstractTest {
         when(credentialsRepository.findByUsername(eq(entity.getUsername()))).thenReturn(entity);
         when(passwordEncoder.matches(eq(entity.getPassword()), eq(entity.getPassword()))).thenReturn(true);
 
-        final String jwt = authenticationService.login(entity.getUsername(), entity.getPassword());
+        final Authorization authorization = authenticationService.login(entity.getUsername(), entity.getPassword());
 
+        assertThat(authorization.getId(), is(equalTo(entity.getId())));
         final JwtParser parser = Jwts.parser()
                 .setSigningKey(apiKey)
                 .requireSubject(entity.getId())
                 .requireIssuer(AuthenticationService.class.getName());
-        final Claims body = parser.parseClaimsJws(jwt).getBody();
+        final Claims body = parser.parseClaimsJws(authorization.getToken()).getBody();
         assertThat(body.getIssuedAt(), is(not(nullValue(Date.class))));
         assertThat(body.getExpiration(), is(not(nullValue(Date.class))));
     }
