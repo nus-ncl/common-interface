@@ -312,8 +312,7 @@ public class CredentialsControllerTest extends AbstractTest {
         doNothing().when(credentialsService).updateCredentials(anyString(), any(Credentials.class));
 
         mockMvc.perform(put(CredentialsController.PATH + "/id").contentType(MediaType.APPLICATION_JSON).content(content))
-                .andExpect(status().isAccepted())
-                .andDo(print());
+                .andExpect(status().isAccepted());
     }
 
     @Test

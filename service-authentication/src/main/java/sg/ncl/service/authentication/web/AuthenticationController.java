@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
+import sg.ncl.service.authentication.domain.Authorization;
 import sg.ncl.service.authentication.exceptions.EmptyAuthorizationHeaderException;
 import sg.ncl.service.authentication.exceptions.InvalidBasicAuthenticationException;
 import sg.ncl.service.authentication.exceptions.UnknownAuthorizationSchemeException;
@@ -36,7 +37,7 @@ public class AuthenticationController {
 
     @RequestMapping(method = RequestMethod.POST)
     @ResponseStatus(HttpStatus.OK)
-    public String login(@RequestHeader(HttpHeaders.AUTHORIZATION) final String authorization) {
+    public Authorization login(@RequestHeader(HttpHeaders.AUTHORIZATION) final String authorization) {
         if (authorization.isEmpty()) {
             logger.warn("Authorization header is empty");
             throw new EmptyAuthorizationHeaderException();

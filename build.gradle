@@ -106,7 +106,7 @@ dependencies {
 }
 
 task testReport(type: TestReport) {
-    destinationDir = file("$buildDir/reports")
+    destinationDir = file("$buildDir/reports/html")
     reportOn subprojects*.test
     reportOn subprojects.findAll({ it.name.startsWith("service-") }).integrationTest
 }
