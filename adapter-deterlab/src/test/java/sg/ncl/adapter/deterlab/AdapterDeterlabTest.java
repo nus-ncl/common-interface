@@ -3,6 +3,7 @@ package sg.ncl.adapter.deterlab;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.json.JSONObject;
 import org.junit.Assert;
+import org.junit.Ignore;
 import org.junit.Test;
 import sg.ncl.service.adapter.AdapterDeterlab;
 
@@ -19,6 +20,7 @@ import static org.junit.Assert.assertThat;
 public class AdapterDeterlabTest {
 
     @Test
+    @Ignore
     public void testAddUsersOnDeter() {
         // FIXME: must have python adapter running first for test to pass
         JSONObject userObject = new JSONObject();
