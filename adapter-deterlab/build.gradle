@@ -1,0 +1,17 @@
+dependencies {
+    compile "org.springframework.boot:spring-boot-configuration-processor"
+    compile project(':common-exception')
+    compile project(':common-jpa')
+    compile project(':common-jwt')
+    compile('javax.inject:javax.inject')
+
+    runtime('mysql:mysql-connector-java')
+
+    testCompile('junit:junit')
+    testCompile('org.hamcrest:hamcrest-library')
+    testCompile('org.apache.commons:commons-lang3:3.4')
+
+    integrationTestCompile project(':common-test')
+}
+
+compileJava.dependsOn(processResources)

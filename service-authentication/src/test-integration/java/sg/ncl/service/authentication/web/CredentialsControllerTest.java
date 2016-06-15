@@ -6,6 +6,7 @@ import org.junit.Test;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
@@ -113,13 +114,15 @@ public class CredentialsControllerTest extends AbstractTest {
 
         when(credentialsService.addCredentials(any(Credentials.class))).thenReturn(credentialsEntity);
 
-        mockMvc.perform(post(CredentialsController.PATH).contentType(MediaType.APPLICATION_JSON).content(content))
+        MvcResult mvcResult = mockMvc.perform(post(CredentialsController.PATH).contentType(MediaType.APPLICATION_JSON).content(content))
                 .andExpect(status().isCreated())
 
                 .andExpect(jsonPath("$.id", is(equalTo(credentialsInfo.getId()))))
                 .andExpect(jsonPath("$.username", is(equalTo(credentialsInfo.getUsername()))))
                 .andExpect(jsonPath("$.password", is(equalTo("*****"))))
-                .andExpect(jsonPath("$.status", is(equalTo(CredentialsStatus.ACTIVE.name()))));
+                .andExpect(jsonPath("$.status", is(equalTo(CredentialsStatus.ACTIVE.name())))).andReturn();
+
+        System.out.println(mvcResult.getResponse().getContentAsString());
     }
 
     @Test

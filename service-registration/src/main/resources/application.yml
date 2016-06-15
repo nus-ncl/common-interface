@@ -8,11 +8,11 @@ server:
 ---
 spring:
   profiles: default
-  datasource:
+  # datasource:
 # please set values for the variables (${jdbc.mysql.*}) externally (e.g., environment variables)
-    url: jdbc:mysql://${jdbc.mysql.host}:${jdbc.mysql.port}/${jdbc.mysql.schema}
-    username: ${jdbc.mysql.username}
-    password: ${jdbc.mysql.password}
+    # url: jdbc:mysql://${jdbc.mysql.host}:${jdbc.mysql.port}/${jdbc.mysql.schema}
+    # username: ${jdbc.mysql.username}
+    # password: ${jdbc.mysql.password}
   jpa:
     hibernate:
       ddl-auto: create

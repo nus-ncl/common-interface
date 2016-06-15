@@ -9,8 +9,6 @@ import sg.ncl.common.jpa.UseJpa;
  * @author Christopher Zhong
  */
 @SpringBootApplication
-@UseJpa
-@Profile("registration-service")
 public class App {
 
     public static void main(final String[] args) {

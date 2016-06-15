@@ -2,7 +2,7 @@ dependencies {
     compile project(':service-authentication')
     compile project(':service-team')
     compile project(':service-user')
-    compile('javax.inject:javax.inject')
+    compile project(':adapter-deterlab')
 
     runtime('mysql:mysql-connector-java')
 
@@ -10,6 +10,7 @@ dependencies {
     testCompile('org.hamcrest:hamcrest-library')
     testCompile('org.apache.commons:commons-lang3:3.4')
 
+    integrationTestCompile project(':common-test')
     integrationTestCompile('org.springframework.boot:spring-boot-starter-test')
     integrationTestCompile('com.h2database:h2')
 }

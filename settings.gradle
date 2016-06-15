@@ -12,3 +12,5 @@ include 'service-registration'
 include 'service-team'
 include 'service-user'
 include 'service-version'
+include 'adapter-deterlab'
+
