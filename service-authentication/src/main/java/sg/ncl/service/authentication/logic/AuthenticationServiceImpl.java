@@ -1,5 +1,6 @@
 package sg.ncl.service.authentication.logic;
 
+import io.jsonwebtoken.JwtBuilder;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import org.slf4j.Logger;
@@ -8,8 +9,10 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import sg.ncl.service.authentication.data.jpa.CredentialsEntity;
 import sg.ncl.service.authentication.data.jpa.CredentialsRepository;
+import sg.ncl.service.authentication.domain.Authorization;
 import sg.ncl.service.authentication.exceptions.CredentialsNotFoundException;
 import sg.ncl.service.authentication.exceptions.InvalidCredentialsException;
+import sg.ncl.service.authentication.web.AuthorizationInfo;
 
 import javax.inject.Inject;
 import javax.transaction.Transactional;
@@ -43,7 +46,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     }
 
     @Transactional
-    public String login(@NotNull final String username, @NotNull final String password) {
+    public Authorization login(@NotNull final String username, @NotNull final String password) {
         // find the credentials first
         final CredentialsEntity credentials = credentialsRepository.findByUsername(username);
         if (credentials == null) {
@@ -55,18 +58,19 @@ public class AuthenticationServiceImpl implements AuthenticationService {
             // create and sign a JWT
             final ZonedDateTime now = ZonedDateTime.now();
             final ZonedDateTime expiry = now.plus(expiryDuration);
+            final JwtBuilder builder = Jwts.builder();
             final String jwt = Jwts.builder()
                     .setSubject(credentials.getId())
                     .setIssuer(AuthenticationService.class.getName())
                     .setIssuedAt(Date.from(now.toInstant()))
-                    // expiry is set for 1 day from issue date
+                    // the expiry should be short; can be set through properties
                     .setExpiration(Date.from(expiry.toInstant()))
                     // TODO custom claims such as permissions
 //                    .claim()
                     // sign the JWT with the given algorithm and apiKey
                     .signWith(signatureAlgorithm, apiKey)
                     .compact();
-            return jwt;
+            return new AuthorizationInfo(credentials.getId(), jwt);
         }
         // TODO lockout behavior
         throw new InvalidCredentialsException(username);
