@@ -31,6 +31,7 @@ public class RegistrationServiceTest extends AbstractTest {
     private UserService userService;
 
     @Test
+    @Ignore
     public void registerTest() {
         // Need the adapter service to be up on BOSS first
         RegistrationService registrationService = new RegistrationService(authenticationService, credentialsService, teamService, userService);
