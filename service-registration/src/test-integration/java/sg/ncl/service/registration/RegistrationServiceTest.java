@@ -2,6 +2,7 @@ package sg.ncl.service.registration;
 
 import org.junit.Ignore;
 import org.junit.Test;
+import sg.ncl.service.authentication.data.jpa.CredentialsEntity;
 import sg.ncl.service.authentication.logic.AuthenticationService;
 import sg.ncl.service.authentication.logic.CredentialsService;
 import sg.ncl.service.team.TeamService;
@@ -30,15 +31,14 @@ public class RegistrationServiceTest extends AbstractTest {
     private UserService userService;
 
     @Test
-    @Ignore
     public void registerTest() {
         // Need the adapter service to be up on BOSS first
         RegistrationService registrationService = new RegistrationService(authenticationService, credentialsService, teamService, userService);
+        CredentialsEntity credentialsEntity = Util.getCredentialsEntity();
         User user = Util.getUserEntity();
         TeamEntity teamEntity = Util.getTeamEntity();
-        String password = "deterinavm";
 
-        registrationService.register(password, user, teamEntity);
+        registrationService.register(credentialsEntity, user, teamEntity);
     }
 
 }

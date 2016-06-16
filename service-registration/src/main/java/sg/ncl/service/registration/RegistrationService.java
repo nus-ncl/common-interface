@@ -43,18 +43,13 @@ public class RegistrationService {
         this.userService = userService;
     }
 
-    public void register(String password, User user, TeamEntity team) {
-        // FIXME parse in a Credentials object?
-        // FIXME parse in raw password to python script?
+    public void register(CredentialsEntity credentials, User user, TeamEntity team) {
         // accept user data from form
         String userId = userService.addUser(user);
 
         // create the credentials after creating the users
-        CredentialsEntity credentialsEntity = new CredentialsEntity();
-        credentialsEntity.setId(userId);
-        credentialsEntity.setUsername(user.getUserDetails().getEmail());
-        credentialsEntity.setPassword(password);
-        credentialsEntity = credentialsService.addCredentials(credentialsEntity);
+        credentials.setId(userId);
+        credentialsService.addCredentials(credentials);
 
         // accept the team data
         TeamEntity teamEntity = teamService.save(team);
@@ -71,7 +66,7 @@ public class RegistrationService {
         JSONObject userObject = new JSONObject();
         userObject.put("firstname", user.getUserDetails().getFirstName());
         userObject.put("lastname", user.getUserDetails().getLastName());
-        userObject.put("password", password);
+        userObject.put("password", credentials.getPassword()); // cannot get from credentialsEntity else will be hashed
         userObject.put("email", user.getUserDetails().getEmail());
 
         adapterDeterlab.addUsers(userObject.toString());

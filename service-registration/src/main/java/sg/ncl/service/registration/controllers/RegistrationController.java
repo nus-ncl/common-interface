@@ -4,14 +4,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 import sg.ncl.service.registration.RegistrationService;
-import sg.ncl.service.team.TeamService;
-import sg.ncl.service.team.data.jpa.entities.TeamEntity;
-import sg.ncl.service.team.dtos.TeamInfo;
+import sg.ncl.service.registration.dtos.RegistrationInfo;
 
 import javax.inject.Inject;
-import javax.validation.Valid;
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * @author Te Ye & Desmond
@@ -27,8 +22,13 @@ public class RegistrationController {
         this.registrationService = registrationService;
     }
 
-    @RequestMapping(method = RequestMethod.GET)
-    public void abc() {
-
+    @RequestMapping(method = RequestMethod.POST)
+    @ResponseStatus(HttpStatus.OK)
+    public void register(@RequestBody RegistrationInfo registrationInfo) {
+        // FIXME change password to CredentialsEntity
+        System.out.println(registrationInfo.getCredentials().getPassword());
+        System.out.println(registrationInfo.getUser());
+        System.out.println(registrationInfo.getTeam());
+        registrationService.register(registrationInfo.getCredentials(), registrationInfo.getUser(), registrationInfo.getTeam());
     }
 }
