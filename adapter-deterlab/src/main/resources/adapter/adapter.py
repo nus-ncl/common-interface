@@ -48,8 +48,8 @@ class add_users:
 
 		# join project (create user account in tbdb)
 		join_project(uid, password, email)
-		result = create_user(uid, password)
-		return result
+		resultJSON = create_user(uid, password)
+		return resultJSON
 
 def join_project(uid, password, email):
 	# need to parse in the form fields
@@ -78,6 +78,9 @@ def join_project(uid, password, email):
 	time.sleep(TIME_DELAY)
 
 def create_user(uid, password):
+
+	resultJSON = "{"
+
 	cmd = "mysql -e \"select verify_key from tbdb.users where uid='" + uid + "'" + "\""
 	# print cmd
 	q = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE)
@@ -89,7 +92,7 @@ def create_user(uid, password):
 	# mysql statement returns two parameters with a newline
 	print len(output_list)
 	if len(output_list) < 1:
-		return "no user created"
+		resultJSON = resultJSON + "\"msg\": \"no user created\""
 
 	verify_key = output_list[1]
 	if verify_key:
@@ -105,9 +108,14 @@ def create_user(uid, password):
 		q = subprocess.Popen(verify_url, shell=True, stdout=subprocess.PIPE)
 		time.sleep(TIME_DELAY)
 
-		return "user is created"
+		resultJSON = resultJSON + "\"msg\": \"user is created\""
 	else:
-		return "user not found"
+		resultJSON = resultJSON + "\"msg\": \"user not found\""
+
+	# append uid to json
+	# need comma
+	resultJSON = resultJSON + ",\"uid\": \"" + uid + "\"}"
+	return resultJSON
 
 if __name__ == "__main__":
 	app.run()

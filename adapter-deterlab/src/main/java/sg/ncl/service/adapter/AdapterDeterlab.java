@@ -20,10 +20,11 @@ public class AdapterDeterlab {
 
         ResponseEntity responseEntity = restTemplate.exchange(properties.getADD_USERS_URI(), HttpMethod.POST, request, String.class);
 
-        // Will return the following:
-        // no user created
-        // user is created
-        // user not found
+        // Will return the following JSON:
+        // msg: no user created, uid: xxx
+        // msg: user is created, uid: xxx
+        // msg: user not found, uid: xxx
+//        System.out.println(responseEntity.getBody().toString());
         return responseEntity.getBody().toString();
     }
 }

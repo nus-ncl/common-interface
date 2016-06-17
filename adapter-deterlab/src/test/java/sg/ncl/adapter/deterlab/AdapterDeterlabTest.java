@@ -20,18 +20,21 @@ import static org.junit.Assert.assertThat;
 public class AdapterDeterlabTest {
 
     @Test
-    @Ignore
     public void testAddUsersOnDeter() {
         // FIXME: must have python adapter running first for test to pass
         JSONObject userObject = new JSONObject();
-        userObject.put("firstname", RandomStringUtils.randomAlphanumeric(20));
+        userObject.put("firstname", RandomStringUtils.randomAlphabetic(20));
         userObject.put("lastname", RandomStringUtils.randomAlphanumeric(20));
         userObject.put("password", RandomStringUtils.randomAlphanumeric(20));
         userObject.put("email", RandomStringUtils.randomAlphanumeric(8) + "@nus.edu.sg");
 
         final AdapterDeterlab adapterDeterlab = new AdapterDeterlab();
         String result = adapterDeterlab.addUsers(userObject.toString());
-        Assert.assertThat(result,  is("user is created"));
+        JSONObject resultJSONObject = new JSONObject(result);
+        String msg = resultJSONObject.getString("msg");
+        String uid = resultJSONObject.getString("uid");
+        Assert.assertThat(msg, is("user is created"));
+        Assert.assertThat(uid, not(nullValue()));
     }
 
 }
