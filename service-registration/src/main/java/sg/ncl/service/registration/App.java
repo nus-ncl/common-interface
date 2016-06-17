@@ -9,6 +9,7 @@ import sg.ncl.common.jpa.UseJpa;
  * @author Christopher Zhong
  */
 @SpringBootApplication
+@UseJpa
 public class App {
 
     public static void main(final String[] args) {

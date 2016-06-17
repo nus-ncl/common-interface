@@ -5,6 +5,7 @@ import org.junit.Test;
 import sg.ncl.service.authentication.data.jpa.CredentialsEntity;
 import sg.ncl.service.authentication.logic.AuthenticationService;
 import sg.ncl.service.authentication.logic.CredentialsService;
+import sg.ncl.service.registration.data.jpa.repositories.RegistrationRepository;
 import sg.ncl.service.team.TeamService;
 import sg.ncl.service.team.data.jpa.entities.TeamEntity;
 import sg.ncl.service.user.domain.User;
@@ -30,11 +31,14 @@ public class RegistrationServiceTest extends AbstractTest {
     @Inject
     private UserService userService;
 
+    @Inject
+    private RegistrationRepository registrationRepository;
+
     @Test
     @Ignore
     public void registerTest() {
         // Need the adapter service to be up on BOSS first
-        RegistrationService registrationService = new RegistrationService(authenticationService, credentialsService, teamService, userService);
+        RegistrationService registrationService = new RegistrationService(authenticationService, credentialsService, teamService, userService, registrationRepository);
         CredentialsEntity credentialsEntity = Util.getCredentialsEntity();
         User user = Util.getUserEntity();
         TeamEntity teamEntity = Util.getTeamEntity();

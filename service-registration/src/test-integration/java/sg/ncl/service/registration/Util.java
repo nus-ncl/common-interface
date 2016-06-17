@@ -2,6 +2,7 @@ package sg.ncl.service.registration;
 
 import org.apache.commons.lang3.RandomStringUtils;
 import sg.ncl.service.authentication.data.jpa.CredentialsEntity;
+import sg.ncl.service.registration.data.jpa.entities.RegistrationEntity;
 import sg.ncl.service.team.data.jpa.entities.TeamEntity;
 import sg.ncl.service.user.data.jpa.entities.AddressEntity;
 import sg.ncl.service.user.data.jpa.entities.UserDetailsEntity;
@@ -52,5 +53,27 @@ public class Util {
         credentialsEntity.setUsername(RandomStringUtils.randomAlphabetic(8) + "@nus.edu.sg");
         credentialsEntity.setPassword("deterinavm");
         return credentialsEntity;
+    }
+
+    public static RegistrationEntity getRegistrationEntity() {
+        final RegistrationEntity registrationEntity = new RegistrationEntity();
+        registrationEntity.setPid(RandomStringUtils.randomAlphabetic(20));
+        registrationEntity.setUid(RandomStringUtils.randomAlphabetic(20));
+
+        registrationEntity.setUsrAddr(RandomStringUtils.randomAlphabetic(20));
+        registrationEntity.setUsrAddr2(RandomStringUtils.randomAlphabetic(20));
+        registrationEntity.setUsrAffil(RandomStringUtils.randomAlphabetic(20));
+        registrationEntity.setUsrAffilAbbrev(RandomStringUtils.randomAlphabetic(20));
+        registrationEntity.setUsrCity(RandomStringUtils.randomAlphabetic(20));
+        registrationEntity.setUsrCountry(RandomStringUtils.randomAlphabetic(20));
+        registrationEntity.setUsrState(RandomStringUtils.randomAlphabetic(20));
+        registrationEntity.setUsrEmail(RandomStringUtils.randomAlphabetic(20));
+
+        registrationEntity.setUsrName(RandomStringUtils.randomAlphabetic(20));
+        registrationEntity.setUsrPhone(RandomStringUtils.randomAlphabetic(20));
+        registrationEntity.setUsrTitle(RandomStringUtils.randomAlphabetic(20));
+        registrationEntity.setUsrZip(RandomStringUtils.randomAlphabetic(20));
+
+        return registrationEntity;
     }
 }

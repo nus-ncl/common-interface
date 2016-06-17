@@ -43,7 +43,7 @@ public class RegistrationEntity extends AbstractEntity implements Registration {
     @Column(name = "usr_addr", nullable = false)
     private String usrAddr;
 
-    @Column(name = "usr_addr2", nullable = false)
+    @Column(name = "usr_addr2")
     private String usrAddr2;
 
     @Column(name = "usr_city", nullable = false)
