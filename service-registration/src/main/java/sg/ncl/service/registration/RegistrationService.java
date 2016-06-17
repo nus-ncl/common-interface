@@ -125,7 +125,7 @@ public class RegistrationService {
         registrationEntity.setUsrCountry(user.getUserDetails().getAddress().getCountry());
         registrationEntity.setUsrEmail(user.getUserDetails().getEmail());
 
-        registrationEntity.setUsrName("QWE");
+        registrationEntity.setUsrName(user.getUserDetails().getLastName() + " " + user.getUserDetails().getFirstName());
         registrationEntity.setUsrPhone(user.getUserDetails().getPhone());
         registrationEntity.setUsrTitle("QWE");
         registrationEntity.setUsrZip(user.getUserDetails().getAddress().getZipCode());

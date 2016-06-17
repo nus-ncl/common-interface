@@ -25,6 +25,10 @@ public class RegistrationEntity extends AbstractEntity implements Registration {
     @Column(name = "uid", nullable = false, unique = true)
     private String uid;
 
+    // actual full name of the user
+    // Deterlab restrictions
+    // minimum 4 characters
+    // must have [firstname]<space>[lastname]
     @Column(name = "usr_name", nullable = false)
     private String usrName;
 
