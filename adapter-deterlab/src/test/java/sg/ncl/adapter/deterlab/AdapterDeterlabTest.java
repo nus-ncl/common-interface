@@ -20,6 +20,7 @@ import static org.junit.Assert.assertThat;
 public class AdapterDeterlabTest {
 
     @Test
+    @Ignore
     public void testAddUsersOnDeter() {
         // FIXME: must have python adapter running first for test to pass
         JSONObject userObject = new JSONObject();
