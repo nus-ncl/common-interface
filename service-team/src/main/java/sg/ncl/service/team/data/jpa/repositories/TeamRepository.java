@@ -9,7 +9,7 @@ import java.util.List;
 /**
  * @author Christopher Zhong
  */
-public interface TeamRepository  extends JpaRepository<TeamEntity, String> {
+public interface TeamRepository extends JpaRepository<TeamEntity, String> {
 
     TeamEntity findByName(String name);
     List<TeamEntity> findByVisibility(TeamVisibility visibility);
