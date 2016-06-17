@@ -9,6 +9,8 @@ import sg.ncl.service.authentication.data.jpa.CredentialsEntity;
 import sg.ncl.service.authentication.domain.Credentials;
 import sg.ncl.service.authentication.logic.AuthenticationService;
 import sg.ncl.service.authentication.logic.CredentialsService;
+import sg.ncl.service.registration.data.jpa.RegistrationRepository;
+import sg.ncl.service.registration.dtos.entities.RegistrationEntity;
 import sg.ncl.service.team.TeamService;
 import sg.ncl.service.team.data.jpa.entities.TeamEntity;
 import sg.ncl.service.user.data.jpa.entities.UserEntity;
@@ -34,13 +36,15 @@ public class RegistrationService {
     private final TeamService teamService;
     private final UserService userService;
     private final AdapterDeterlab adapterDeterlab = new AdapterDeterlab();
+    private final RegistrationRepository registrationRepository;
 
     @Inject
-    protected RegistrationService(final AuthenticationService authenticationService, final CredentialsService credentialsService, final TeamService teamService, final UserService userService) {
+    protected RegistrationService(final AuthenticationService authenticationService, final CredentialsService credentialsService, final TeamService teamService, final UserService userService, final RegistrationRepository registrationRepository) {
         this.authenticationService = authenticationService;
         this.credentialsService = credentialsService;
         this.teamService = teamService;
         this.userService = userService;
+        this.registrationRepository = registrationRepository;
     }
 
     public void register(CredentialsEntity credentials, User user, TeamEntity team) {
@@ -69,36 +73,64 @@ public class RegistrationService {
         userObject.put("password", credentials.getPassword()); // cannot get from credentialsEntity else will be hashed
         userObject.put("email", user.getUserDetails().getEmail());
 
-        adapterDeterlab.addUsers(userObject.toString());
+        String resultJSON = adapterDeterlab.addUsers(userObject.toString());
 
+        // store form fields into registration repository for recreation when required
+        addUserToRegistrationRepository(resultJSON, user, team);
     }
 
-    private void helloWorld() {
-        Process p = null;
-        try {
-            p = Runtime.getRuntime().exec("ssh ncl@172.18.178.10");
-            PrintStream out = new PrintStream(p.getOutputStream());
-            BufferedReader in = new BufferedReader(new InputStreamReader(p.getInputStream()));
-
-            out.println("ls -l");
-            while (in.ready()) {
-                String s = in.readLine();
-                System.out.println(s);
-            }
-            out.println("exit");
-
-            p.waitFor();
-        } catch (IOException e) {
-            e.printStackTrace();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-    }
+//    private void helloWorld() {
+//        Process p = null;
+//        try {
+//            p = Runtime.getRuntime().exec("ssh ncl@172.18.178.10");
+//            PrintStream out = new PrintStream(p.getOutputStream());
+//            BufferedReader in = new BufferedReader(new InputStreamReader(p.getInputStream()));
+//
+//            out.println("ls -l");
+//            while (in.ready()) {
+//                String s = in.readLine();
+//                System.out.println(s);
+//            }
+//            out.println("exit");
+//
+//            p.waitFor();
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        } catch (InterruptedException e) {
+//            e.printStackTrace();
+//        }
+//    }
 
     private List<String> getUserInfo(UserEntity userEntity) {
         List<String> ret = new ArrayList<>();
         ret.add(userEntity.getId());
         return ret;
+    }
+
+    private void addUserToRegistrationRepository(String resultJSON, User user, TeamEntity team) {
+
+        JSONObject jsonObjectFromAdapter = new JSONObject(resultJSON);
+        String uid = jsonObjectFromAdapter.getString("uid");
+
+        // FIXME ncl pid may be different from deter pid
+        RegistrationEntity registrationEntity = new RegistrationEntity();
+        registrationEntity.setPid(team.getId());
+        registrationEntity.setUid(uid);
+
+        registrationEntity.setUsrAddr(user.getUserDetails().getAddress().getAddress1());
+        registrationEntity.setUsrAddr2(user.getUserDetails().getAddress().getAddress2());
+        registrationEntity.setUsrAffil("QWE");
+        registrationEntity.setUsrAffilAbbrev("QWE");
+        registrationEntity.setUsrCity(user.getUserDetails().getAddress().getRegion());
+        registrationEntity.setUsrCountry(user.getUserDetails().getAddress().getCountry());
+        registrationEntity.setUsrEmail(user.getUserDetails().getEmail());
+
+        registrationEntity.setUsrName("QWE");
+        registrationEntity.setUsrPhone(user.getUserDetails().getPhone());
+        registrationEntity.setUsrTitle("QWE");
+        registrationEntity.setUsrZip(user.getUserDetails().getAddress().getZipCode());
+
+        registrationRepository.save(registrationEntity);
     }
 
 }
