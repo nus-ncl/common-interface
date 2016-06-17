@@ -1,4 +1,4 @@
-package sg.ncl.service.registration.dtos.entities;
+package sg.ncl.service.registration.data.jpa.entities;
 
 import org.hibernate.annotations.GenericGenerator;
 import sg.ncl.common.jpa.AbstractEntity;

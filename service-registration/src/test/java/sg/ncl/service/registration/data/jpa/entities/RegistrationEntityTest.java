@@ -2,7 +2,6 @@ package sg.ncl.service.registration.data.jpa.entities;
 
 import org.apache.commons.lang3.RandomStringUtils;
 import org.junit.Test;
-import sg.ncl.service.registration.dtos.entities.RegistrationEntity;
 
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.nullValue;
