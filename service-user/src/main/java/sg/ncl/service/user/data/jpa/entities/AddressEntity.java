@@ -33,6 +33,9 @@ public class AddressEntity extends AbstractEntity implements Address {
     @Column(name = "region")
     private String region;
 
+    @Column(name = "city")
+    private String city;
+
     @Column(name = "zip_code", nullable = false)
     private String zipCode;
 
@@ -81,6 +84,15 @@ public class AddressEntity extends AbstractEntity implements Address {
     }
 
     @Override
+    public String getCity() {
+        return city;
+    }
+
+    public void setCity(String city) {
+        this.city = city;
+    }
+
+    @Override
     public String getZipCode() {
         return zipCode;
     }
@@ -97,6 +109,7 @@ public class AddressEntity extends AbstractEntity implements Address {
                 ", address2='" + address2 + '\'' +
                 ", country='" + country + '\'' +
                 ", region='" + region + '\'' +
+                ", city='" + city + '\'' +
                 ", zipCode='" + zipCode + '\'' +
                 "} " + super.toString();
     }
@@ -107,8 +120,10 @@ public class AddressEntity extends AbstractEntity implements Address {
         entity.setAddress2(address.getAddress2());
         entity.setCountry(address.getCountry());
         entity.setRegion(address.getRegion());
+        entity.setCity(address.getCity());
         entity.setZipCode(address.getZipCode());
         return entity;
     }
+
 
 }

@@ -21,6 +21,8 @@ public interface UserDetails {
      */
     String getLastName();
 
+    String getJobTitle();
+
     /**
      * Returns the {@link Address} of the associated {@link User}.
      *
@@ -42,4 +44,7 @@ public interface UserDetails {
      */
     String getPhone();
 
+    String getInstitution();
+    String getInstitutionAbbreviation();
+    String getInstitutionWeb();
 }

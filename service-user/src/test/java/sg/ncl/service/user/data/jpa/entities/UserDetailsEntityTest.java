@@ -62,6 +62,22 @@ public class UserDetailsEntityTest {
     }
 
     @Test
+    public void testGetJobTitle() throws Exception {
+        final UserDetailsEntity userDetailsEntity = new UserDetailsEntity();
+
+        assertThat(userDetailsEntity.getJobTitle(), is(nullValue()));
+    }
+
+    @Test
+    public void testSetJobTitle() throws Exception {
+        final UserDetailsEntity userDetailsEntity = new UserDetailsEntity();
+        final String jobTitle = RandomStringUtils.randomAlphanumeric(20);
+        userDetailsEntity.setJobTitle(jobTitle);
+
+        assertThat(userDetailsEntity.getJobTitle(), is(equalTo(jobTitle)));
+    }
+
+    @Test
     public void testGetAddress() throws Exception {
         final UserDetailsEntity userDetailsEntity = new UserDetailsEntity();
 
@@ -107,6 +123,54 @@ public class UserDetailsEntityTest {
         userDetailsEntity.setPhone(phone);
 
         assertThat(userDetailsEntity.getPhone(), is(equalTo(phone)));
+    }
+
+    @Test
+    public void testGetInstitution() throws Exception {
+        final UserDetailsEntity userDetailsEntity = new UserDetailsEntity();
+
+        assertThat(userDetailsEntity.getInstitution(), is(nullValue()));
+    }
+
+    @Test
+    public void testSetInstitution() throws Exception {
+        final UserDetailsEntity userDetailsEntity = new UserDetailsEntity();
+        final String institution = RandomStringUtils.randomAlphanumeric(20);
+        userDetailsEntity.setInstitution(institution);
+
+        assertThat(userDetailsEntity.getInstitution(), is(equalTo(institution)));
+    }
+
+    @Test
+    public void testGetInstitutionAbbreviation() throws Exception {
+        final UserDetailsEntity userDetailsEntity = new UserDetailsEntity();
+
+        assertThat(userDetailsEntity.getInstitutionAbbreviation(), is(nullValue()));
+    }
+
+    @Test
+    public void testSetInstitutionAbbreviation() throws Exception {
+        final UserDetailsEntity userDetailsEntity = new UserDetailsEntity();
+        final String institutionAbbreviation = RandomStringUtils.randomAlphanumeric(20);
+        userDetailsEntity.setInstitutionAbbreviation(institutionAbbreviation);
+
+        assertThat(userDetailsEntity.getInstitutionAbbreviation(), is(equalTo(institutionAbbreviation)));
+    }
+
+    @Test
+    public void testGetInstitutionWeb() throws Exception {
+        final UserDetailsEntity userDetailsEntity = new UserDetailsEntity();
+
+        assertThat(userDetailsEntity.getInstitutionWeb(), is(nullValue()));
+    }
+
+    @Test
+    public void testSetInstitutionWeb() throws Exception {
+        final UserDetailsEntity userDetailsEntity = new UserDetailsEntity();
+        final String institutionWeb = RandomStringUtils.randomAlphanumeric(20);
+        userDetailsEntity.setInstitutionWeb(institutionWeb);
+
+        assertThat(userDetailsEntity.getInstitutionWeb(), is(equalTo(institutionWeb)));
     }
 
     @Test
@@ -163,18 +227,30 @@ public class UserDetailsEntityTest {
         userDetailsEntity.setFirstName(firstName);
         final String lastName = RandomStringUtils.randomAlphanumeric(20);
         userDetailsEntity.setLastName(lastName);
+        final String jobTitle = RandomStringUtils.randomAlphanumeric(20);
+        userDetailsEntity.setJobTitle(jobTitle);
         final String email = RandomStringUtils.randomAlphanumeric(20);
         userDetailsEntity.setEmail(email);
         final String phone = RandomStringUtils.randomAlphanumeric(20);
         userDetailsEntity.setPhone(phone);
+        final String institution = RandomStringUtils.randomAlphanumeric(20);
+        userDetailsEntity.setInstitution(institution);
+        final String institutionAbbreviation = RandomStringUtils.randomAlphanumeric(20);
+        userDetailsEntity.setInstitutionAbbreviation(institutionAbbreviation);
+        final String institutionWeb = RandomStringUtils.randomAlphanumeric(20);
+        userDetailsEntity.setInstitutionWeb(institutionWeb);
 
         final String toString = userDetailsEntity.toString();
 
         assertThat(toString, containsString(String.valueOf(id)));
         assertThat(toString, containsString(firstName));
         assertThat(toString, containsString(lastName));
+        assertThat(toString, containsString(jobTitle));
         assertThat(toString, containsString(email));
         assertThat(toString, containsString(phone));
+        assertThat(toString, containsString(institution));
+        assertThat(toString, containsString(institutionAbbreviation));
+        assertThat(toString, containsString(institutionWeb));
     }
 
 }

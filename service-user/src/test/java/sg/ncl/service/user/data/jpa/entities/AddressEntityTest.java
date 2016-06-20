@@ -94,6 +94,22 @@ public class AddressEntityTest {
     }
 
     @Test
+    public void testGetCity() throws Exception {
+        final AddressEntity addressEntity = new AddressEntity();
+
+        assertThat(addressEntity.getCity(), is(nullValue()));
+    }
+
+    @Test
+    public void testSetCity() throws Exception {
+        final AddressEntity addressEntity = new AddressEntity();
+        final String city = RandomStringUtils.randomAlphanumeric(20);
+        addressEntity.setCity(city);
+
+        assertThat(addressEntity.getCity(), is(equalTo(city)));
+    }
+
+    @Test
     public void testGetZipCode() throws Exception {
         final AddressEntity addressEntity = new AddressEntity();
 
@@ -122,6 +138,8 @@ public class AddressEntityTest {
         addressEntity.setCountry(country);
         final String region = RandomStringUtils.randomAlphanumeric(20);
         addressEntity.setRegion(region);
+        final String city = RandomStringUtils.randomAlphanumeric(20);
+        addressEntity.setCity(city);
         final String zipCode = RandomStringUtils.randomAlphanumeric(20);
         addressEntity.setZipCode(zipCode);
 
@@ -132,6 +150,7 @@ public class AddressEntityTest {
         assertThat(toString, containsString(address2));
         assertThat(toString, containsString(country));
         assertThat(toString, containsString(region));
+        assertThat(toString, containsString(city));
         assertThat(toString, containsString(zipCode));
     }
 

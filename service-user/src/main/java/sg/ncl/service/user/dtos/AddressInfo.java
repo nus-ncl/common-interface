@@ -12,13 +12,15 @@ public class AddressInfo implements Address {
     private final String address2;
     private final String country;
     private final String region;
+    private final String city;
     private final String zipCode;
 
-    public AddressInfo(final String address1, final String address2, final String country, final String region, final String zipCode) {
+    public AddressInfo(final String address1, final String address2, final String country, final String region, final String city, final String zipCode) {
         this.address1 = address1;
         this.address2 = address2;
         this.country = country;
         this.region = region;
+        this.city = city;
         this.zipCode = zipCode;
     }
 
@@ -27,6 +29,7 @@ public class AddressInfo implements Address {
                 addressEntity.getAddress2(),
                 addressEntity.getCountry(),
                 addressEntity.getRegion(),
+                addressEntity.getCity(),
                 addressEntity.getZipCode()
         );
     }
@@ -50,6 +53,9 @@ public class AddressInfo implements Address {
     public String getRegion() {
         return region;
     }
+
+    @Override
+    public String getCity() { return city; }
 
     @Override
     public String getZipCode() {

@@ -6,6 +6,7 @@ import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.springframework.dao.DataIntegrityViolationException;
 import sg.ncl.service.user.AbstractTest;
+import sg.ncl.service.user.Util;
 import sg.ncl.service.user.data.jpa.entities.AddressEntity;
 
 import javax.inject.Inject;
@@ -16,6 +17,7 @@ import static org.hamcrest.Matchers.not;
 import static org.hamcrest.Matchers.nullValue;
 import static org.junit.Assert.assertThat;
 import static sg.ncl.common.test.Checks.checkException;
+import static sg.ncl.service.user.Util.getAddressEntity;
 
 /**
  * @author Christopher Zhong
@@ -35,7 +37,7 @@ public class AddressRepositoryTest extends AbstractTest {
 
     @Test
     public void testGood() throws Exception {
-        final AddressEntity entity = getAddressEntity();
+        final AddressEntity entity = Util.getAddressEntity();
 
         final long count = repository.count();
         final AddressEntity persistedEntity = repository.save(entity);
@@ -45,7 +47,7 @@ public class AddressRepositoryTest extends AbstractTest {
 
     @Test
     public void testNullAddress1() throws Exception {
-        final AddressEntity entity = getAddressEntity();
+        final AddressEntity entity = Util.getAddressEntity();
         entity.setAddress1(null);
         try {
             repository.save(entity);
@@ -58,7 +60,7 @@ public class AddressRepositoryTest extends AbstractTest {
 
     @Test
     public void testNullCountry() throws Exception {
-        final AddressEntity entity = getAddressEntity();
+        final AddressEntity entity = Util.getAddressEntity();
         entity.setCountry(null);
         try {
             repository.save(entity);
@@ -71,7 +73,7 @@ public class AddressRepositoryTest extends AbstractTest {
 
     @Test
     public void testNullZipCode() throws Exception {
-        final AddressEntity entity = getAddressEntity();
+        final AddressEntity entity = Util.getAddressEntity();
         entity.setZipCode(null);
         try {
             repository.save(entity);
@@ -82,14 +84,5 @@ public class AddressRepositoryTest extends AbstractTest {
         exception.expect(DataIntegrityViolationException.class);
     }
 
-    public static AddressEntity getAddressEntity() {
-        final AddressEntity address = new AddressEntity();
-        address.setAddress1(RandomStringUtils.randomAlphanumeric(20));
-        address.setAddress2(RandomStringUtils.randomAlphanumeric(20));
-        address.setCountry(RandomStringUtils.randomAlphanumeric(20));
-        address.setRegion(RandomStringUtils.randomAlphanumeric(20));
-        address.setZipCode(RandomStringUtils.randomAlphanumeric(20));
-        return address;
-    }
 
 }

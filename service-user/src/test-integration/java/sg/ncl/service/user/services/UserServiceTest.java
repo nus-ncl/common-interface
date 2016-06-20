@@ -5,6 +5,7 @@ import org.hamcrest.collection.IsIterableContainingInAnyOrder;
 import org.junit.Assert;
 import org.junit.Test;
 import sg.ncl.service.user.AbstractTest;
+import sg.ncl.service.user.Util;
 import sg.ncl.service.user.data.jpa.entities.AddressEntity;
 import sg.ncl.service.user.data.jpa.entities.UserDetailsEntity;
 import sg.ncl.service.user.data.jpa.entities.UserEntity;
@@ -78,8 +79,12 @@ public class UserServiceTest extends AbstractTest {
         UserDetailsEntity fromDbDetails = fromDbEntity.getUserDetails();
         Assert.assertEquals(originalDetails.getFirstName(), fromDbDetails.getFirstName());
         Assert.assertEquals(originalDetails.getLastName(), fromDbDetails.getLastName());
+        Assert.assertEquals(originalDetails.getJobTitle(), fromDbDetails.getJobTitle());
         Assert.assertEquals(originalDetails.getEmail(), fromDbDetails.getEmail());
         Assert.assertEquals(originalDetails.getPhone(), fromDbDetails.getPhone());
+        Assert.assertEquals(originalDetails.getInstitution(), fromDbDetails.getInstitution());
+        Assert.assertEquals(originalDetails.getInstitutionAbbreviation(), fromDbDetails.getInstitutionAbbreviation());
+        Assert.assertEquals(originalDetails.getInstitutionWeb(), fromDbDetails.getInstitutionWeb());
 
         AddressEntity originalAddress = originalDetails.getAddress();
         AddressEntity fromDbAddress = fromDbDetails.getAddress();
@@ -87,6 +92,7 @@ public class UserServiceTest extends AbstractTest {
         Assert.assertEquals(originalAddress.getAddress2(), fromDbAddress.getAddress2());
         Assert.assertEquals(originalAddress.getCountry(), fromDbAddress.getCountry());
         Assert.assertEquals(originalAddress.getRegion(), fromDbAddress.getRegion());
+        Assert.assertEquals(originalAddress.getCity(), fromDbAddress.getCity());
         Assert.assertEquals(originalAddress.getZipCode(), fromDbAddress.getZipCode());
     }
 
@@ -141,25 +147,7 @@ public class UserServiceTest extends AbstractTest {
     }
 
     private UserEntity[] addUser() throws Exception {
-        final UserEntity userEntity = new UserEntity();
-        userEntity.setApplicationDate(ZonedDateTime.now());
-
-        final UserDetailsEntity userDetailsEntity = new UserDetailsEntity();
-        userDetailsEntity.setFirstName(RandomStringUtils.randomAlphabetic(20));
-        userDetailsEntity.setLastName(RandomStringUtils.randomAlphabetic(20));
-        userDetailsEntity.setEmail(RandomStringUtils.randomAlphabetic(20));
-        userDetailsEntity.setPhone(RandomStringUtils.randomAlphabetic(20));
-
-        final AddressEntity address = new AddressEntity();
-        address.setAddress1(RandomStringUtils.randomAlphabetic(20));
-        address.setAddress2(RandomStringUtils.randomAlphabetic(20));
-        address.setCountry(RandomStringUtils.randomAlphabetic(20));
-        address.setRegion(RandomStringUtils.randomAlphabetic(20));
-        address.setZipCode(RandomStringUtils.randomAlphabetic(20));
-
-        userDetailsEntity.setAddress(address);
-        userEntity.setUserDetails(userDetailsEntity);
-
+        UserEntity userEntity = Util.getUserEntity();
         UserEntity saveUser = userRepository.save(userEntity);
 
         final UserEntity[] userArray = new UserEntity[2];
@@ -194,27 +182,7 @@ public class UserServiceTest extends AbstractTest {
     @Test
     public void addUserTest() throws Exception {
         UserService userService = new UserService(userRepository);
-
-        // create test user
-        final UserEntity userEntity = new UserEntity();
-        userEntity.setApplicationDate(ZonedDateTime.now());
-
-        final UserDetailsEntity userDetailsEntity = new UserDetailsEntity();
-        userDetailsEntity.setFirstName(RandomStringUtils.randomAlphabetic(20));
-        userDetailsEntity.setLastName(RandomStringUtils.randomAlphabetic(20));
-        userDetailsEntity.setEmail(RandomStringUtils.randomAlphabetic(20));
-        userDetailsEntity.setPhone(RandomStringUtils.randomAlphabetic(20));
-
-        final AddressEntity address = new AddressEntity();
-        address.setAddress1(RandomStringUtils.randomAlphabetic(20));
-        address.setAddress2(RandomStringUtils.randomAlphabetic(20));
-        address.setCountry(RandomStringUtils.randomAlphabetic(20));
-        address.setRegion(RandomStringUtils.randomAlphabetic(20));
-        address.setZipCode(RandomStringUtils.randomAlphabetic(20));
-
-        userDetailsEntity.setAddress(address);
-        userEntity.setUserDetails(userDetailsEntity);
-
+        UserEntity userEntity = Util.getUserEntity();
         String userId = userService.addUser(userEntity);
 
         UserEntity userEntityFromDb = userService.find(userId);

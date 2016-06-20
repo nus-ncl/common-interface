@@ -6,6 +6,7 @@ import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.springframework.dao.DataIntegrityViolationException;
 import sg.ncl.service.user.AbstractTest;
+import sg.ncl.service.user.Util;
 import sg.ncl.service.user.data.jpa.entities.UserDetailsEntity;
 
 import javax.inject.Inject;
@@ -35,7 +36,7 @@ public class UserDetailsRepositoryTest extends AbstractTest {
 
     @Test
     public void testGood() throws Exception {
-        final UserDetailsEntity entity = getUserDetailsEntity();
+        final UserDetailsEntity entity = Util.getUserDetailsEntity();
 
         final long count = repository.count();
         final UserDetailsEntity persistedEntity = repository.save(entity);
@@ -45,7 +46,7 @@ public class UserDetailsRepositoryTest extends AbstractTest {
 
     @Test
     public void testNullFirstName() throws Exception {
-        final UserDetailsEntity entity = getUserDetailsEntity();
+        final UserDetailsEntity entity = Util.getUserDetailsEntity();
         entity.setFirstName(null);
         try {
             repository.save(entity);
@@ -58,7 +59,7 @@ public class UserDetailsRepositoryTest extends AbstractTest {
 
     @Test
     public void testNullLastName() throws Exception {
-        final UserDetailsEntity entity = getUserDetailsEntity();
+        final UserDetailsEntity entity = Util.getUserDetailsEntity();
         entity.setLastName(null);
         try {
             repository.save(entity);
@@ -70,8 +71,21 @@ public class UserDetailsRepositoryTest extends AbstractTest {
     }
 
     @Test
+    public void testNullJobTitle() throws Exception {
+        final UserDetailsEntity entity = Util.getUserDetailsEntity();
+        entity.setJobTitle(null);
+        try {
+            repository.save(entity);
+        } catch (Exception e) {
+            checkException(e, "NULL not allowed for column \"JOB_TITLE\"");
+            return;
+        }
+        exception.expect(DataIntegrityViolationException.class);
+    }
+
+    @Test
     public void testNullAddress() throws Exception {
-        final UserDetailsEntity entity = getUserDetailsEntity();
+        final UserDetailsEntity entity = Util.getUserDetailsEntity();
         entity.setAddress(null);
         try {
             repository.save(entity);
@@ -84,7 +98,7 @@ public class UserDetailsRepositoryTest extends AbstractTest {
 
     @Test
     public void testNullEmail() throws Exception {
-        final UserDetailsEntity entity = getUserDetailsEntity();
+        final UserDetailsEntity entity = Util.getUserDetailsEntity();
         entity.setEmail(null);
         try {
             repository.save(entity);
@@ -97,7 +111,7 @@ public class UserDetailsRepositoryTest extends AbstractTest {
 
     @Test
     public void testNullPhone() throws Exception {
-        final UserDetailsEntity entity = getUserDetailsEntity();
+        final UserDetailsEntity entity = Util.getUserDetailsEntity();
         entity.setPhone(null);
         try {
             repository.save(entity);
@@ -108,14 +122,43 @@ public class UserDetailsRepositoryTest extends AbstractTest {
         exception.expect(DataIntegrityViolationException.class);
     }
 
-    public static UserDetailsEntity getUserDetailsEntity() {
-        final UserDetailsEntity entity = new UserDetailsEntity();
-        entity.setFirstName(RandomStringUtils.randomAlphanumeric(20));
-        entity.setLastName(RandomStringUtils.randomAlphanumeric(20));
-        entity.setAddress(AddressRepositoryTest.getAddressEntity());
-        entity.setEmail(RandomStringUtils.randomAlphanumeric(20));
-        entity.setPhone(RandomStringUtils.randomAlphanumeric(20));
-        return entity;
+    @Test
+    public void testNullInstitution() throws Exception {
+        final UserDetailsEntity entity = Util.getUserDetailsEntity();
+        entity.setInstitution(null);
+        try {
+            repository.save(entity);
+        } catch (Exception e) {
+            checkException(e, "NULL not allowed for column \"INSTITUTION\"");
+            return;
+        }
+        exception.expect(DataIntegrityViolationException.class);
+    }
+
+    @Test
+    public void testNullInstitutionAbbreviation() throws Exception {
+        final UserDetailsEntity entity = Util.getUserDetailsEntity();
+        entity.setInstitutionAbbreviation(null);
+        try {
+            repository.save(entity);
+        } catch (Exception e) {
+            checkException(e, "NULL not allowed for column \"INSTITUTION_ABBREVIATION\"");
+            return;
+        }
+        exception.expect(DataIntegrityViolationException.class);
+    }
+
+    @Test
+    public void testNullInstitutionWeb() throws Exception {
+        final UserDetailsEntity entity = Util.getUserDetailsEntity();
+        entity.setInstitutionWeb(null);
+        try {
+            repository.save(entity);
+        } catch (Exception e) {
+            checkException(e, "NULL not allowed for column \"INSTITUTION_WEB\"");
+            return;
+        }
+        exception.expect(DataIntegrityViolationException.class);
     }
 
 }

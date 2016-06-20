@@ -6,6 +6,7 @@ import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.springframework.dao.DataIntegrityViolationException;
 import sg.ncl.service.user.AbstractTest;
+import sg.ncl.service.user.Util;
 import sg.ncl.service.user.data.jpa.entities.UserEntity;
 
 import javax.inject.Inject;
@@ -36,7 +37,7 @@ public class UserRepositoryTest extends AbstractTest {
 
     @Test
     public void testGood() throws Exception {
-        final UserEntity entity = getUserEntity();
+        final UserEntity entity = Util.getUserEntity();
 
         final long count = repository.count();
         final UserEntity persistedEntity = repository.save(entity);
@@ -47,7 +48,7 @@ public class UserRepositoryTest extends AbstractTest {
     @Test
     @Ignore("not null is not enforced")
     public void testNullUserDetails() throws Exception {
-        final UserEntity entity = getUserEntity();
+        final UserEntity entity = Util.getUserEntity();
         entity.setUserDetails(null);
 
         try {
@@ -62,7 +63,7 @@ public class UserRepositoryTest extends AbstractTest {
     @Test
     @Ignore("not null is not enforced")
     public void testNullApplicationDate() throws Exception {
-        final UserEntity entity = getUserEntity();
+        final UserEntity entity = Util.getUserEntity();
         entity.setApplicationDate(null);
 
         try {
@@ -72,16 +73,6 @@ public class UserRepositoryTest extends AbstractTest {
             return;
         }
         exception.expect(DataIntegrityViolationException.class);
-    }
-
-    public static UserEntity getUserEntity() {
-        final UserEntity entity = new UserEntity();
-        entity.setUserDetails(UserDetailsRepositoryTest.getUserDetailsEntity());
-        final ZonedDateTime applicationDate = ZonedDateTime.now();
-        entity.setApplicationDate(applicationDate);
-        final ZonedDateTime processedDate = applicationDate.plusDays(10);
-        entity.setProcessedDate(processedDate);
-        return entity;
     }
 
 }

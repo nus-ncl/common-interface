@@ -31,6 +31,9 @@ public class UserDetailsEntity extends AbstractEntity implements UserDetails {
     @Column(name = "last_name", nullable = false)
     private String lastName;
 
+    @Column(name = "job_title", nullable = false)
+    private String jobTitle;
+
     @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "address_id", nullable = false)
     private AddressEntity address;
@@ -40,6 +43,17 @@ public class UserDetailsEntity extends AbstractEntity implements UserDetails {
 
     @Column(name = "phone", nullable = false)
     private String phone;
+
+    @Column(name = "institution", nullable = false)
+    private String institution;
+
+    @Column(name = "institution_abbreviation", nullable = false)
+    private String institutionAbbreviation;
+
+    @Column(name = "institution_web", nullable = false)
+    private String institutionWeb;
+
+
 
     public Long getId() {
         return id;
@@ -65,6 +79,15 @@ public class UserDetailsEntity extends AbstractEntity implements UserDetails {
 
     public void setLastName(final String lastName) {
         this.lastName = lastName;
+    }
+
+    @Override
+    public String getJobTitle() {
+        return jobTitle;
+    }
+
+    public void setJobTitle(String jobTitle) {
+        this.jobTitle = jobTitle;
     }
 
     @Override
@@ -95,6 +118,33 @@ public class UserDetailsEntity extends AbstractEntity implements UserDetails {
     }
 
     @Override
+    public String getInstitution() {
+        return institution;
+    }
+
+    public void setInstitution(String institution) {
+        this.institution = institution;
+    }
+
+    @Override
+    public String getInstitutionAbbreviation() {
+        return institutionAbbreviation;
+    }
+
+    public void setInstitutionAbbreviation(String institutionAbbreviation) {
+        this.institutionAbbreviation = institutionAbbreviation;
+    }
+
+    @Override
+    public String getInstitutionWeb() {
+        return institutionWeb;
+    }
+
+    public void setInstitutionWeb(String institutionWeb) {
+        this.institutionWeb = institutionWeb;
+    }
+
+    @Override
     public boolean equals(Object o) {
         if (this == o) { return true; }
         if (o == null || getClass() != o.getClass()) { return false; }
@@ -115,9 +165,13 @@ public class UserDetailsEntity extends AbstractEntity implements UserDetails {
                 "id=" + id +
                 ", firstName='" + firstName + '\'' +
                 ", lastName='" + lastName + '\'' +
+                ", jobTitle='" + jobTitle + '\'' +
                 ", address=" + address +
                 ", email='" + email + '\'' +
                 ", phone='" + phone + '\'' +
+                ", institution='" + institution + '\'' +
+                ", institutionAbbreviation='" + institutionAbbreviation + '\'' +
+                ", institutionWeb='" + institutionWeb + '\'' +
                 "} " + super.toString();
     }
 
@@ -125,9 +179,13 @@ public class UserDetailsEntity extends AbstractEntity implements UserDetails {
         final UserDetailsEntity entity = new UserDetailsEntity();
         entity.setFirstName(userDetails.getFirstName());
         entity.setLastName(userDetails.getLastName());
+        entity.setJobTitle(userDetails.getJobTitle());
         entity.setAddress(AddressEntity.get(userDetails.getAddress()));
         entity.setEmail(userDetails.getEmail());
         entity.setPhone(userDetails.getPhone());
+        entity.setInstitution(userDetails.getInstitution());
+        entity.setInstitutionAbbreviation(userDetails.getInstitutionAbbreviation());
+        entity.setInstitutionWeb(userDetails.getInstitutionWeb());
         return entity;
     }
 }

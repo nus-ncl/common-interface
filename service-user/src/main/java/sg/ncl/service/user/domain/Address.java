@@ -35,6 +35,8 @@ public interface Address {
      */
     String getRegion();
 
+    String getCity();
+
     /**
      * Returns the zip code of this {@link Address}.
      *
