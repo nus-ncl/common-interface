@@ -86,6 +86,7 @@ def join_project(uid, my_dict):
 	 "&formfields[usr_affil_abbrev]=" + my_dict['institution_abbrev'] + \
 	 "&formfields[usr_email]=" + my_dict['email'] + \
 	 "&formfields[usr_addr]=" + my_dict['address1'] + \
+	 "&formfields[usr_addr2]" + my_dict['address2'] + \
 	 "&formfields[usr_city]=" + my_dict['city'] + \
 	 "&formfields[usr_state]=" + my_dict['region'] + \
 	 "&formfields[usr_zip]=" + my_dict['zip_code'] + \
