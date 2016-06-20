@@ -1,7 +1,6 @@
 package sg.ncl.service.registration;
 
 import org.apache.commons.lang3.RandomStringUtils;
-import org.apache.coyote.Adapter;
 import org.json.JSONObject;
 import org.springframework.stereotype.Service;
 import sg.ncl.service.adapter.AdapterDeterlab;
@@ -11,17 +10,20 @@ import sg.ncl.service.authentication.logic.AuthenticationService;
 import sg.ncl.service.authentication.logic.CredentialsService;
 import sg.ncl.service.registration.data.jpa.entities.RegistrationEntity;
 import sg.ncl.service.registration.data.jpa.repositories.RegistrationRepository;
+import sg.ncl.service.registration.dtos.RegistrationData;
 import sg.ncl.service.team.TeamService;
 import sg.ncl.service.team.data.jpa.entities.TeamEntity;
+import sg.ncl.service.team.domain.Team;
+import sg.ncl.service.user.data.jpa.entities.AddressEntity;
+import sg.ncl.service.user.data.jpa.entities.UserDetailsEntity;
 import sg.ncl.service.user.data.jpa.entities.UserEntity;
+import sg.ncl.service.user.domain.Address;
 import sg.ncl.service.user.domain.User;
+import sg.ncl.service.user.domain.UserDetails;
+import sg.ncl.service.user.dtos.UserInfo;
 import sg.ncl.service.user.services.UserService;
 
 import javax.inject.Inject;
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -35,7 +37,7 @@ public class RegistrationService {
     private final CredentialsService credentialsService;
     private final TeamService teamService;
     private final UserService userService;
-    private final AdapterDeterlab adapterDeterlab = new AdapterDeterlab();
+    private final AdapterDeterlab adapterDeterlab;
     private final RegistrationRepository registrationRepository;
 
     @Inject
@@ -45,9 +47,43 @@ public class RegistrationService {
         this.teamService = teamService;
         this.userService = userService;
         this.registrationRepository = registrationRepository;
+        this.adapterDeterlab = new AdapterDeterlab();
     }
 
-    public void register(CredentialsEntity credentials, User user, TeamEntity team) {
+    public void register2(RegistrationData registrationData) {
+        // create credentials object
+        // create user object
+        // create team object
+
+        UserEntity userEntity = new UserEntity();
+        UserDetailsEntity userDetails = new UserDetailsEntity();
+        AddressEntity addressEntity = new AddressEntity();
+        addressEntity.setAddress1(registrationData.getUsrAddr());
+        addressEntity.setAddress2(registrationData.getUsrAddr2());
+        addressEntity.setCountry(registrationData.getUsrCountry());
+        addressEntity.setRegion(registrationData.getUsrCity());
+        addressEntity.setZipCode(registrationData.getUsrZip());
+
+        // FIXME hardcoded first,last name until can find solution to merge with full name
+        userDetails.setFirstName("John");
+        userDetails.setLastName("Doe");
+        userDetails.setEmail(registrationData.getUsrEmail());
+        userDetails.setAddress(addressEntity);
+        userEntity.setUserDetails(userDetails);
+
+        String userId = userService.addUser(userEntity);
+
+        CredentialsEntity credentialsEntity = new CredentialsEntity();
+        credentialsEntity.setId(userId);
+        credentialsEntity.setUsername(registrationData.getUsrEmail());
+        credentialsEntity.setPassword(registrationData.getClearPassword());
+
+        credentialsService.addCredentials(credentialsEntity);
+
+        TeamEntity teamEntity = new TeamEntity();
+    }
+
+    public void register(CredentialsEntity credentials, User user, Team team) {
         // accept user data from form
         String userId = userService.addUser(user);
 
@@ -56,11 +92,11 @@ public class RegistrationService {
         credentialsService.addCredentials(credentials);
 
         // accept the team data
-        TeamEntity teamEntity = teamService.save(team);
+        TeamEntity teamEntity = teamService.find(team.getId());
 
         // add user to team and vice versa
-        userService.addUserToTeam(userId, teamEntity.getId());
-        teamService.addUserToTeam(userId, teamEntity.getId());
+        userService.addUserToTeam(userId, team.getId());
+        teamService.addUserToTeam(userId, team.getId());
 
         // get all user and team info
         List<String> userFormFieldsList = getUserInfo(userService.find(userId));
@@ -75,8 +111,19 @@ public class RegistrationService {
 
         String resultJSON = adapterDeterlab.addUsers(userObject.toString());
 
+        // TODO check if result json status is user created
         // store form fields into registration repository for recreation when required
-        addUserToRegistrationRepository(resultJSON, user, team);
+        addUserToRegistrationRepository(resultJSON, user, teamEntity);
+
+        // FIXME call deterlab adapter to store ncluid to deteruid mapping??
+        addNclUserIdMapping(resultJSON, userId);
+    }
+
+    // store ncluid to deteruid mapping
+    private void addNclUserIdMapping(String resultJSON, String nclUserId) {
+        JSONObject userObject = new JSONObject(resultJSON);
+        String deterUserId = userObject.getString("uid");
+        adapterDeterlab.saveDeterUserIdMapping(deterUserId, nclUserId);
     }
 
 //    private void helloWorld() {
@@ -123,8 +170,9 @@ public class RegistrationService {
         registrationEntity.setUsrAffilAbbrev("QWE");
         registrationEntity.setUsrCity(user.getUserDetails().getAddress().getRegion());
         registrationEntity.setUsrCountry(user.getUserDetails().getAddress().getCountry());
-        registrationEntity.setUsrEmail(user.getUserDetails().getEmail());
+        registrationEntity.setUsrState(user.getUserDetails().getAddress().getRegion());
 
+        registrationEntity.setUsrEmail(user.getUserDetails().getEmail());
         registrationEntity.setUsrName(user.getUserDetails().getLastName() + " " + user.getUserDetails().getFirstName());
         registrationEntity.setUsrPhone(user.getUserDetails().getPhone());
         registrationEntity.setUsrTitle("QWE");

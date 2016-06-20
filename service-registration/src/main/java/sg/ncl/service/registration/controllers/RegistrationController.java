@@ -4,6 +4,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 import sg.ncl.service.registration.RegistrationService;
+import sg.ncl.service.registration.dtos.RegistrationData;
 import sg.ncl.service.registration.dtos.RegistrationInfo;
 
 import javax.inject.Inject;
@@ -26,9 +27,11 @@ public class RegistrationController {
     @ResponseStatus(HttpStatus.OK)
     public void register(@RequestBody RegistrationInfo registrationInfo) {
         // FIXME change password to CredentialsEntity
-        System.out.println(registrationInfo.getCredentials().getPassword());
-        System.out.println(registrationInfo.getUser());
-        System.out.println(registrationInfo.getTeam());
+//        registrationService.register2(registrationdata);
+        System.out.println("Password: " + registrationInfo.getCredentials().getPassword());
+        System.out.println("User: " + registrationInfo.getUser());
+        System.out.println("Team: " + registrationInfo.getTeam());
+        System.out.println("Registration: " + registrationInfo.getRegistration());
         registrationService.register(registrationInfo.getCredentials(), registrationInfo.getUser(), registrationInfo.getTeam());
     }
 }

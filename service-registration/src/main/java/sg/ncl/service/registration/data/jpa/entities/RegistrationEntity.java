@@ -199,4 +199,31 @@ public class RegistrationEntity extends AbstractEntity implements Registration {
     public void setUsrPhone(String usrPhone) {
         this.usrPhone = usrPhone;
     }
+
+    /*
+    @Override
+    public boolean equals(final Object o) {
+        if (this == o) { return true; }
+        if (o == null || getClass() != o.getClass()) { return false; }
+
+        final Registration that = (Registration) o;
+
+        return getId() == null ? that.getId() == null : getId().equals(that.getId());
+    }
+
+    @Override
+    public int hashCode() {
+        return getId() == null ? 0 : getId().hashCode();
+    }
+
+    @Override
+    public String toString() {
+        return "RegistrationEntity{" +
+                "id='" + id + '\'' +
+                ", pid=" + pid +
+                ", uid=" + uid +
+                "} " + super.toString();
+    }
+    */
+
 }
