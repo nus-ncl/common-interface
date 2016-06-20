@@ -12,6 +12,7 @@ Later TODO:
 1. Remove users and projects
 2. Create experiment
 """
+from ConfigParser import SafeConfigParser
 import generateDeterUserId
 import json
 import web
@@ -20,6 +21,8 @@ import sys
 import os
 import subprocess
 
+CONFIG_FILE = "config.ini"
+CONFIG_DETER_URI_TITLE = "DETER_URI"
 # need time delay to allow subprocess to finish processing
 # in seconds
 TIME_DELAY = 1
@@ -66,6 +69,11 @@ class add_users:
 		return resultJSON
 
 def join_project(uid, my_dict):
+
+	parser = SafeConfigParser()
+	parser.read(CONFIG_FILE)
+	deter_uri = parser.get('DETER_URI', 'uri')
+
 	# need to parse in the form fields
 	# set pid as ncl for now
 	# uid, email address must be unique
@@ -85,7 +93,7 @@ def join_project(uid, my_dict):
 	 "&formfields[usr_phone]=" + my_dict['phone'] + \
 	 "&formfields[password1]=" + my_dict['password'] + \
 	 "&formfields[password2]=" + my_dict['password'] + "\" " + \
-	 "https://www.test.ncl.sg/joinproject.php > /dev/null"
+	 deter_uri + "joinproject.php > /dev/null"
 
 	# print cmd
 	p = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE)
