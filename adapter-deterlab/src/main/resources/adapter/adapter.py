@@ -38,39 +38,53 @@ class add_users:
 		parsed_json = json.loads(data)
 		
 		# json key must match that defined under RegistrationService.java
-		first_name = parsed_json['firstname']
-		last_name = parsed_json['lastname']
-		password = parsed_json['password']
-		email = parsed_json['email']
+		my_dict = {}
+		my_dict['first_name'] = parsed_json['firstName']
+		my_dict['last_name'] = parsed_json['lastName']
+		my_dict['job_title'] = parsed_json['jobTitle']
+		my_dict['password'] = parsed_json['password']
+		my_dict['email'] = parsed_json['email']
+		my_dict['phone'] = parsed_json['phone']
+		my_dict['institution'] = parsed_json['institution']
+		my_dict['institution_abbrev'] = parsed_json['institutionAbbreviation']
+		my_dict['institution_web'] = parsed_json['institutionWeb']
+		my_dict['address1'] = parsed_json['address1']
+		my_dict['address2'] = parsed_json['address2']
+		my_dict['country'] = parsed_json['country']
+		my_dict['region'] = parsed_json['region']
+		my_dict['city'] = parsed_json['city']
+		my_dict['zip_code'] = parsed_json['zipCode']
 
 		# call a python module to generate a unique deterlab userid
-		uid = generateDeterUserId.generate(first_name, last_name)
+		uid = generateDeterUserId.generate(my_dict['first_name'], my_dict['last_name'])
+
+		print uid
 
 		# join project (create user account in tbdb)
-		join_project(uid, password, email)
-		resultJSON = create_user(uid, password)
+		join_project(uid, my_dict)
+		resultJSON = create_user(uid, my_dict['password'])
 		return resultJSON
 
-def join_project(uid, password, email):
+def join_project(uid, my_dict):
 	# need to parse in the form fields
 	# set pid as ncl for now
 	# uid, email address must be unique
 	cmd = "curl --silent -k -d \"submit=Submit" + \
 	 "&formfields[pid]=ncl" + \
 	 "&formfields[uid]=" + uid + \
-	 "&formfields[usr_name]=Desmond Lim One" + \
-	 "&formfields[usr_title]=software engineer" + \
-	 "&formfields[usr_affil]=national university" + \
-	 "&formfields[usr_affil_abbrev]=nus" + \
-	 "&formfields[usr_email]=" + email + \
-	 "&formfields[usr_addr]=address1" + \
-	 "&formfields[usr_city]=sg" + \
-	 "&formfields[usr_state]=sg" + \
-	 "&formfields[usr_zip]=12345678" + \
-	 "&formfields[usr_country]=singapore" + \
-	 "&formfields[usr_phone]=65659898" + \
-	 "&formfields[password1]=" + password + \
-	 "&formfields[password2]=" + password + "\" " + \
+	 "&formfields[usr_name]=" + my_dict['last_name'] + " " + my_dict['first_name'] + \
+	 "&formfields[usr_title]=" + my_dict['job_title'] + \
+	 "&formfields[usr_affil]=" + my_dict['institution'] + \
+	 "&formfields[usr_affil_abbrev]=" + my_dict['institution_abbrev'] + \
+	 "&formfields[usr_email]=" + my_dict['email'] + \
+	 "&formfields[usr_addr]=" + my_dict['address1'] + \
+	 "&formfields[usr_city]=" + my_dict['city'] + \
+	 "&formfields[usr_state]=" + my_dict['region'] + \
+	 "&formfields[usr_zip]=" + my_dict['zip_code'] + \
+	 "&formfields[usr_country]=" + my_dict['country'] + \
+	 "&formfields[usr_phone]=" + my_dict['phone'] + \
+	 "&formfields[password1]=" + my_dict['password'] + \
+	 "&formfields[password2]=" + my_dict['password'] + "\" " + \
 	 "https://www.test.ncl.sg/joinproject.php > /dev/null"
 
 	# print cmd

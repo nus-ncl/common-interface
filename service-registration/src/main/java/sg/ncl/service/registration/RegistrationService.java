@@ -109,10 +109,22 @@ public class RegistrationService {
         // call python script (create a new user in deterlab)
         // parse in a the json string
         JSONObject userObject = new JSONObject();
-        userObject.put("firstname", user.getUserDetails().getFirstName());
-        userObject.put("lastname", user.getUserDetails().getLastName());
+        userObject.put("firstName", user.getUserDetails().getFirstName());
+        userObject.put("lastName", user.getUserDetails().getLastName());
+        userObject.put("jobTitle", user.getUserDetails().getJobTitle());
         userObject.put("password", credentials.getPassword()); // cannot get from credentialsEntity else will be hashed
         userObject.put("email", user.getUserDetails().getEmail());
+        userObject.put("phone", user.getUserDetails().getPhone());
+        userObject.put("institution", user.getUserDetails().getInstitution());
+        userObject.put("institutionAbbreviation", user.getUserDetails().getInstitutionAbbreviation());
+        userObject.put("institutionWeb", user.getUserDetails().getInstitutionWeb());
+
+        userObject.put("address1", user.getUserDetails().getAddress().getAddress1());
+        userObject.put("address2", user.getUserDetails().getAddress().getAddress2());
+        userObject.put("country", user.getUserDetails().getAddress().getCountry());
+        userObject.put("region", user.getUserDetails().getAddress().getRegion());
+        userObject.put("city", user.getUserDetails().getAddress().getCity());
+        userObject.put("zipCode", user.getUserDetails().getAddress().getZipCode());
 
         String resultJSON = adapterDeterlab.addUsers(userObject.toString());
 
