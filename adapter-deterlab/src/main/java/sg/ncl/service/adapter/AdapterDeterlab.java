@@ -1,7 +1,13 @@
 package sg.ncl.service.adapter;
 
+import org.json.JSONObject;
 import org.springframework.http.*;
 import org.springframework.web.client.RestTemplate;
+import sg.ncl.service.adapter.data.jpa.DeterlabUserRepository;
+import sg.ncl.service.adapter.domain.DeterlabUser;
+import sg.ncl.service.adapter.dtos.entities.DeterlabUserEntity;
+
+import javax.inject.Inject;
 
 
 /**
@@ -10,6 +16,7 @@ import org.springframework.web.client.RestTemplate;
  */
 public class AdapterDeterlab {
 
+    private DeterlabUserRepository deterlabUserRepository;
     private RestTemplate restTemplate = new RestTemplate();
     private ConnectionProperties properties = new ConnectionProperties();
 
@@ -26,5 +33,12 @@ public class AdapterDeterlab {
         // msg: user not found, uid: xxx
 //        System.out.println(responseEntity.getBody().toString());
         return responseEntity.getBody().toString();
+    }
+
+    public void saveDeterUserIdMapping(String deterUserId, String nclUserId) {
+        DeterlabUserEntity deterlabUserEntity = new DeterlabUserEntity();
+        deterlabUserEntity.setNclUserId(nclUserId);
+        deterlabUserEntity.setDeterUserId(deterUserId);
+        deterlabUserRepository.save(deterlabUserEntity);
     }
 }
