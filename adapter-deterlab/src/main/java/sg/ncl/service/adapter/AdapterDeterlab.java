@@ -20,6 +20,11 @@ public class AdapterDeterlab {
     private RestTemplate restTemplate = new RestTemplate();
     private ConnectionProperties properties = new ConnectionProperties();
 
+    @Inject
+    public AdapterDeterlab(DeterlabUserRepository repository) {
+        this.deterlabUserRepository = repository;
+    }
+
     public String addUsers(String jsonString) {
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);

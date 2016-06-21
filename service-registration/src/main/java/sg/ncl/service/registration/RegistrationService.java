@@ -4,6 +4,7 @@ import org.apache.commons.lang3.RandomStringUtils;
 import org.json.JSONObject;
 import org.springframework.stereotype.Service;
 import sg.ncl.service.adapter.AdapterDeterlab;
+import sg.ncl.service.adapter.data.jpa.DeterlabUserRepository;
 import sg.ncl.service.authentication.data.jpa.CredentialsEntity;
 import sg.ncl.service.authentication.domain.Credentials;
 import sg.ncl.service.authentication.logic.AuthenticationService;
@@ -39,17 +40,20 @@ public class RegistrationService {
     private final UserService userService;
     private final AdapterDeterlab adapterDeterlab;
     private final RegistrationRepository registrationRepository;
+    private final DeterlabUserRepository deterlabUserRepository;
 
     @Inject
-    protected RegistrationService(final AuthenticationService authenticationService, final CredentialsService credentialsService, final TeamService teamService, final UserService userService, final RegistrationRepository registrationRepository) {
+    protected RegistrationService(final AuthenticationService authenticationService, final CredentialsService credentialsService, final TeamService teamService, final UserService userService, final RegistrationRepository registrationRepository, final DeterlabUserRepository deterlabUserRepository) {
         this.authenticationService = authenticationService;
         this.credentialsService = credentialsService;
         this.teamService = teamService;
         this.userService = userService;
         this.registrationRepository = registrationRepository;
-        this.adapterDeterlab = new AdapterDeterlab();
+        this.deterlabUserRepository = deterlabUserRepository;
+        this.adapterDeterlab = new AdapterDeterlab(this.deterlabUserRepository);
     }
 
+    /*
     public void register2(RegistrationData registrationData) {
         // create credentials object
         // create user object
@@ -82,6 +86,7 @@ public class RegistrationService {
 
         TeamEntity teamEntity = new TeamEntity();
     }
+    */
 
     public void register(CredentialsEntity credentials, User user, Team team) {
         // accept user data from form
@@ -104,19 +109,41 @@ public class RegistrationService {
         // call python script (create a new user in deterlab)
         // parse in a the json string
         JSONObject userObject = new JSONObject();
-        userObject.put("firstname", user.getUserDetails().getFirstName());
-        userObject.put("lastname", user.getUserDetails().getLastName());
+        userObject.put("firstName", user.getUserDetails().getFirstName());
+        userObject.put("lastName", user.getUserDetails().getLastName());
+        userObject.put("jobTitle", user.getUserDetails().getJobTitle());
         userObject.put("password", credentials.getPassword()); // cannot get from credentialsEntity else will be hashed
         userObject.put("email", user.getUserDetails().getEmail());
+        userObject.put("phone", user.getUserDetails().getPhone());
+        userObject.put("institution", user.getUserDetails().getInstitution());
+        userObject.put("institutionAbbreviation", user.getUserDetails().getInstitutionAbbreviation());
+        userObject.put("institutionWeb", user.getUserDetails().getInstitutionWeb());
+
+        userObject.put("address1", user.getUserDetails().getAddress().getAddress1());
+        userObject.put("address2", user.getUserDetails().getAddress().getAddress2());
+        userObject.put("country", user.getUserDetails().getAddress().getCountry());
+        userObject.put("region", user.getUserDetails().getAddress().getRegion());
+        userObject.put("city", user.getUserDetails().getAddress().getCity());
+        userObject.put("zipCode", user.getUserDetails().getAddress().getZipCode());
 
         String resultJSON = adapterDeterlab.addUsers(userObject.toString());
 
-        // TODO check if result json status is user created
-        // store form fields into registration repository for recreation when required
-        addUserToRegistrationRepository(resultJSON, user, teamEntity);
+        if (getUserCreationStatus(resultJSON).equals("user is created")) {
+            // store form fields into registration repository for recreation when required
+            addUserToRegistrationRepository(resultJSON, user, teamEntity);
 
-        // FIXME call deterlab adapter to store ncluid to deteruid mapping??
-        addNclUserIdMapping(resultJSON, userId);
+            // call deterlab adapter to store ncluid to deteruid mapping
+            addNclUserIdMapping(resultJSON, userId);
+
+        } else {
+            // FIXME for debug purposes
+            System.out.println(resultJSON);
+        }
+    }
+
+    private String getUserCreationStatus(String resultJSON) {
+        JSONObject result = new JSONObject(resultJSON);
+        return result.getString("msg");
     }
 
     // store ncluid to deteruid mapping
@@ -166,16 +193,16 @@ public class RegistrationService {
 
         registrationEntity.setUsrAddr(user.getUserDetails().getAddress().getAddress1());
         registrationEntity.setUsrAddr2(user.getUserDetails().getAddress().getAddress2());
-        registrationEntity.setUsrAffil("QWE");
-        registrationEntity.setUsrAffilAbbrev("QWE");
-        registrationEntity.setUsrCity(user.getUserDetails().getAddress().getRegion());
+        registrationEntity.setUsrAffil(user.getUserDetails().getInstitution());
+        registrationEntity.setUsrAffilAbbrev(user.getUserDetails().getInstitutionAbbreviation());
+        registrationEntity.setUsrCity(user.getUserDetails().getAddress().getCity());
         registrationEntity.setUsrCountry(user.getUserDetails().getAddress().getCountry());
         registrationEntity.setUsrState(user.getUserDetails().getAddress().getRegion());
 
         registrationEntity.setUsrEmail(user.getUserDetails().getEmail());
         registrationEntity.setUsrName(user.getUserDetails().getLastName() + " " + user.getUserDetails().getFirstName());
         registrationEntity.setUsrPhone(user.getUserDetails().getPhone());
-        registrationEntity.setUsrTitle("QWE");
+        registrationEntity.setUsrTitle(user.getUserDetails().getJobTitle());
         registrationEntity.setUsrZip(user.getUserDetails().getAddress().getZipCode());
 
         registrationRepository.save(registrationEntity);
