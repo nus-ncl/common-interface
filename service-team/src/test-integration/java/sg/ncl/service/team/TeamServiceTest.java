@@ -10,6 +10,7 @@ import sg.ncl.service.team.domain.Team;
 import sg.ncl.service.team.domain.TeamStatus;
 import sg.ncl.service.team.dtos.TeamInfo;
 import sg.ncl.service.team.exceptions.TeamIdNullException;
+import sg.ncl.service.team.exceptions.TeamNameNullException;
 import sg.ncl.service.team.exceptions.TeamNotFoundException;
 
 import javax.inject.Inject;
@@ -61,15 +62,40 @@ public class TeamServiceTest extends AbstractTest {
     }
 
     @Test(expected = TeamIdNullException.class)
-    public void testGetUserWithNullId() throws Exception {
+    public void testGetTeamWithNullId() throws Exception {
         TeamService teamService = new TeamService(teamRepository);
         teamService.find(null);
     }
 
     @Test(expected = TeamIdNullException.class)
-    public void testGetUserWithEmptyId() throws Exception {
+    public void testGetTeamWithEmptyId() throws Exception {
         TeamService teamService = new TeamService(teamRepository);
         teamService.find("");
+    }
+
+    @Test(expected = TeamNameNullException.class)
+    public void testGetTeamWithNullName() throws Exception {
+        TeamService teamService = new TeamService(teamRepository);
+        teamService.getName(null);
+    }
+
+    @Test(expected = TeamNameNullException.class)
+    public void testGetTeamWithEmptyName() throws Exception {
+        TeamService teamService = new TeamService(teamRepository);
+        teamService.getName("");
+    }
+
+    @Test
+    public void testGetTeamWithValidName() throws Exception {
+        TeamService teamService = new TeamService(teamRepository);
+        TeamEntity createdTeam = Util.getTeamEntity();
+        TeamEntity team = teamService.save(createdTeam);
+
+        Team resultTeam = teamService.getName(team.getName());
+
+        Assert.assertEquals(createdTeam.getName(), resultTeam.getName());
+        Assert.assertEquals(createdTeam.getDescription(), resultTeam.getDescription());
+        Assert.assertEquals(createdTeam.getApplicationDate(), resultTeam.getApplicationDate());
     }
 
     @Test
