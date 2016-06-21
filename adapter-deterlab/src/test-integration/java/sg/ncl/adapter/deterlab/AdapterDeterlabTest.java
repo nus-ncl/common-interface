@@ -45,7 +45,7 @@ public class AdapterDeterlabTest extends AbstractTest {
 
         adapterDeterlab.saveDeterUserIdMapping(deterUserId, nclUserId);
         Assert.assertThat(deterlabUserRepository.findByDeterUserId(deterUserId), not(nullValue()));
-//        Assert.assertThat(deterUserId, is(deterlabUserRepository.findByDeterUserId(deterUserId)));
+        Assert.assertThat(deterUserId, is(deterlabUserRepository.findByDeterUserId(deterUserId).getDeterUserId()));
     }
 
 }

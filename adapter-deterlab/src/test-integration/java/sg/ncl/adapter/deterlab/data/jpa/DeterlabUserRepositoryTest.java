@@ -4,6 +4,7 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import sg.ncl.adapter.deterlab.AbstractTest;
+import sg.ncl.adapter.deterlab.Util;
 import sg.ncl.adapter.deterlab.dtos.entities.DeterlabUserEntity;
 
 
@@ -30,6 +31,12 @@ public class DeterlabUserRepositoryTest extends AbstractTest {
 
     @Test
     public void testGoodSave() throws Exception {
-        final DeterlabUserEntity entity = Util
+        final DeterlabUserEntity entity = Util.getDeterlabUserEntity();
+
+        final long count = repository.count();
+        final DeterlabUserEntity savedEntity = repository.save(entity);
+        assertThat(repository.count(), is(equalTo(count + 1)));
+        assertThat(entity.getNclUserId(), is(equalTo(savedEntity.getNclUserId())));
+        assertThat(entity.getDeterUserId(), is(equalTo(savedEntity.getDeterUserId())));
     }
 }
