@@ -29,9 +29,16 @@ TIME_DELAY = 1
 
 urls = (
 	'/addUsers', 'add_users',
+	'/applyProjectNewUsers', 'apply_project_new_users',
 )
 
 app = web.application(urls, globals())
+
+class apply_project_new_users:
+	def POST(self):
+		data = web.data()
+		print data
+		parsed_json = json.loads(data)
 
 class add_users:
 	def POST(self):
@@ -41,31 +48,16 @@ class add_users:
 		parsed_json = json.loads(data)
 		
 		# json key must match that defined under RegistrationService.java
-		my_dict = {}
-		my_dict['first_name'] = parsed_json['firstName']
-		my_dict['last_name'] = parsed_json['lastName']
-		my_dict['job_title'] = parsed_json['jobTitle']
-		my_dict['password'] = parsed_json['password']
-		my_dict['email'] = parsed_json['email']
-		my_dict['phone'] = parsed_json['phone']
-		my_dict['institution'] = parsed_json['institution']
-		my_dict['institution_abbrev'] = parsed_json['institutionAbbreviation']
-		my_dict['institution_web'] = parsed_json['institutionWeb']
-		my_dict['address1'] = parsed_json['address1']
-		my_dict['address2'] = parsed_json['address2']
-		my_dict['country'] = parsed_json['country']
-		my_dict['region'] = parsed_json['region']
-		my_dict['city'] = parsed_json['city']
-		my_dict['zip_code'] = parsed_json['zipCode']
+		user_info_dict = create_user_info_dict(parsed_json);
 
 		# call a python module to generate a unique deterlab userid
-		uid = generateDeterUserId.generate(my_dict['first_name'], my_dict['last_name'])
+		uid = generateDeterUserId.generate(user_info_dict['first_name'], user_info_dict['last_name'])
 
 		print uid
 
 		# join project (create user account in tbdb)
-		join_project(uid, my_dict)
-		resultJSON = create_user(uid, my_dict['password'])
+		join_project(uid, user_info_dict)
+		resultJSON = create_user(uid, user_info_dict['password'])
 		return resultJSON
 
 def join_project(uid, my_dict):
@@ -98,6 +90,25 @@ def join_project(uid, my_dict):
 
 	# print cmd
 	p = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE)
+	time.sleep(TIME_DELAY)
+
+def create_project(uid, password, pid):
+	# apply for new project
+	# no need to login beforehand
+
+	# create project
+	cmd = "curl --silent -k -d \"submit=Submit" + \
+	"&formfields[proj_name]=disney" + \
+	"&formfields[proj_why]=project goals" + \
+	"&formfields[pid]=" + pid + \
+	"&formfields[proj_URL]=http://www.nus.edu.sg" + \
+	"&formfields[proj_org]=Academic" + \
+	"&formfields[proj_research_type]=Other" + \
+	"&formfields[proj_funders]=Other" + \
+	"&formfields[proj_public]=Yes" + "\" " + \
+	deter_uri + "newproject.php > /dev/null"
+
+	q = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE)
 	time.sleep(TIME_DELAY)
 
 def create_user(uid, password):
@@ -139,6 +150,25 @@ def create_user(uid, password):
 	# need comma
 	resultJSON = resultJSON + ",\"uid\": \"" + uid + "\"}"
 	return resultJSON
+
+def create_user_info_dict(parsed_json):
+	my_dict = {}
+	my_dict['first_name'] = parsed_json['firstName']
+	my_dict['last_name'] = parsed_json['lastName']
+	my_dict['job_title'] = parsed_json['jobTitle']
+	my_dict['password'] = parsed_json['password']
+	my_dict['email'] = parsed_json['email']
+	my_dict['phone'] = parsed_json['phone']
+	my_dict['institution'] = parsed_json['institution']
+	my_dict['institution_abbrev'] = parsed_json['institutionAbbreviation']
+	my_dict['institution_web'] = parsed_json['institutionWeb']
+	my_dict['address1'] = parsed_json['address1']
+	my_dict['address2'] = parsed_json['address2']
+	my_dict['country'] = parsed_json['country']
+	my_dict['region'] = parsed_json['region']
+	my_dict['city'] = parsed_json['city']
+	my_dict['zip_code'] = parsed_json['zipCode']
+	return my_dict
 
 if __name__ == "__main__":
 	app.run()

@@ -5,10 +5,10 @@ import org.json.JSONObject;
 import org.junit.Assert;
 import org.junit.Ignore;
 import org.junit.Test;
-import sg.ncl.service.adapter.AdapterDeterlab;
+import sg.ncl.adapter.deterlab.data.jpa.DeterlabUserRepository;
 
-import static org.hamcrest.Matchers.containsString;
-import static org.hamcrest.Matchers.equalTo;
+import javax.inject.Inject;
+
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.not;
 import static org.hamcrest.Matchers.nullValue;
@@ -17,17 +17,16 @@ import static org.junit.Assert.assertThat;
 /**
  * Created by Te Ye on 15-Jun-16.
  */
-public class AdapterDeterlabTest {
+public class AdapterDeterlabTest extends AbstractTest {
+
+    @Inject
+    private DeterlabUserRepository deterlabUserRepository;
 
     @Test
     @Ignore
     public void testAddUsersOnDeter() {
         // FIXME: must have python adapter running first for test to pass
-        JSONObject userObject = new JSONObject();
-        userObject.put("firstname", RandomStringUtils.randomAlphabetic(20));
-        userObject.put("lastname", RandomStringUtils.randomAlphanumeric(20));
-        userObject.put("password", RandomStringUtils.randomAlphanumeric(20));
-        userObject.put("email", RandomStringUtils.randomAlphanumeric(8) + "@nus.edu.sg");
+        JSONObject userObject = Util.getUserAdapterJSONObject();
 
         final AdapterDeterlab adapterDeterlab = new AdapterDeterlab();
         String result = adapterDeterlab.addUsers(userObject.toString());
@@ -36,6 +35,17 @@ public class AdapterDeterlabTest {
         String uid = resultJSONObject.getString("uid");
         Assert.assertThat(msg, is("user is created"));
         Assert.assertThat(uid, not(nullValue()));
+    }
+
+    @Test
+    public void testSaveUserOnDeterUserRepository() {
+        String nclUserId = RandomStringUtils.randomAlphanumeric(20);
+        String deterUserId = RandomStringUtils.randomAlphanumeric(8);
+        AdapterDeterlab adapterDeterlab = new AdapterDeterlab(deterlabUserRepository);
+
+        adapterDeterlab.saveDeterUserIdMapping(deterUserId, nclUserId);
+        Assert.assertThat(deterlabUserRepository.findByDeterUserId(deterUserId), not(nullValue()));
+        Assert.assertThat(deterUserId, is(deterlabUserRepository.findByDeterUserId(deterUserId).getDeterUserId()));
     }
 
 }

@@ -1,32 +1,21 @@
 package sg.ncl.service.registration;
 
-import org.apache.commons.lang3.RandomStringUtils;
 import org.json.JSONObject;
 import org.springframework.stereotype.Service;
-import sg.ncl.service.adapter.AdapterDeterlab;
-import sg.ncl.service.adapter.data.jpa.DeterlabUserRepository;
+import sg.ncl.adapter.deterlab.AdapterDeterlab;
+import sg.ncl.adapter.deterlab.data.jpa.DeterlabUserRepository;
 import sg.ncl.service.authentication.data.jpa.CredentialsEntity;
-import sg.ncl.service.authentication.domain.Credentials;
 import sg.ncl.service.authentication.logic.AuthenticationService;
 import sg.ncl.service.authentication.logic.CredentialsService;
 import sg.ncl.service.registration.data.jpa.entities.RegistrationEntity;
 import sg.ncl.service.registration.data.jpa.repositories.RegistrationRepository;
-import sg.ncl.service.registration.dtos.RegistrationData;
 import sg.ncl.service.team.TeamService;
 import sg.ncl.service.team.data.jpa.entities.TeamEntity;
 import sg.ncl.service.team.domain.Team;
-import sg.ncl.service.user.data.jpa.entities.AddressEntity;
-import sg.ncl.service.user.data.jpa.entities.UserDetailsEntity;
-import sg.ncl.service.user.data.jpa.entities.UserEntity;
-import sg.ncl.service.user.domain.Address;
 import sg.ncl.service.user.domain.User;
-import sg.ncl.service.user.domain.UserDetails;
-import sg.ncl.service.user.dtos.UserInfo;
 import sg.ncl.service.user.services.UserService;
 
 import javax.inject.Inject;
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * @author Christopher Zhong
@@ -40,17 +29,19 @@ public class RegistrationService {
     private final UserService userService;
     private final AdapterDeterlab adapterDeterlab;
     private final RegistrationRepository registrationRepository;
-    private final DeterlabUserRepository deterlabUserRepository;
+//    private final DeterlabUserRepository deterlabUserRepository;
 
     @Inject
-    protected RegistrationService(final AuthenticationService authenticationService, final CredentialsService credentialsService, final TeamService teamService, final UserService userService, final RegistrationRepository registrationRepository, final DeterlabUserRepository deterlabUserRepository) {
+    protected RegistrationService(final AuthenticationService authenticationService, final CredentialsService credentialsService, final TeamService teamService, final UserService userService, final RegistrationRepository registrationRepository) {
         this.authenticationService = authenticationService;
         this.credentialsService = credentialsService;
         this.teamService = teamService;
         this.userService = userService;
         this.registrationRepository = registrationRepository;
-        this.deterlabUserRepository = deterlabUserRepository;
-        this.adapterDeterlab = new AdapterDeterlab(this.deterlabUserRepository);
+        this.adapterDeterlab = new AdapterDeterlab();
+//        this.deterlabUserRepository = deterlabUserRepository;
+//        this.adapterDeterlab = new AdapterDeterlab(deterlabUserRepository);
+//        this.adapterDeterlab = new AdapterDeterlab();
     }
 
     /*
@@ -102,9 +93,6 @@ public class RegistrationService {
         // add user to team and vice versa
         userService.addUserToTeam(userId, team.getId());
         teamService.addUserToTeam(userId, team.getId());
-
-        // get all user and team info
-        List<String> userFormFieldsList = getUserInfo(userService.find(userId));
 
         // call python script (create a new user in deterlab)
         // parse in a the json string
@@ -174,12 +162,6 @@ public class RegistrationService {
 //            e.printStackTrace();
 //        }
 //    }
-
-    private List<String> getUserInfo(UserEntity userEntity) {
-        List<String> ret = new ArrayList<>();
-        ret.add(userEntity.getId());
-        return ret;
-    }
 
     private void addUserToRegistrationRepository(String resultJSON, User user, TeamEntity team) {
 

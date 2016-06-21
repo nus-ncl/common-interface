@@ -7,6 +7,7 @@ import sg.ncl.service.team.domain.Team;
 import sg.ncl.service.team.domain.TeamVisibility;
 import sg.ncl.service.team.dtos.TeamInfo;
 import sg.ncl.service.team.exceptions.TeamIdNullException;
+import sg.ncl.service.team.exceptions.TeamNameNullException;
 import sg.ncl.service.team.exceptions.TeamNotFoundException;
 
 import javax.inject.Inject;
@@ -64,7 +65,15 @@ public class TeamService {
     }
 
     public TeamEntity getName(String name) {
-        return teamRepository.findByName(name);
+        if (name == null || name.isEmpty()) {
+            throw new TeamNameNullException();
+        }
+
+        final TeamEntity one = teamRepository.findByName(name);
+        if (one == null) {
+            throw new TeamNotFoundException();
+        }
+        return one;
     }
 
     public String getTeamStatus(final String id) {

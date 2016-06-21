@@ -33,9 +33,9 @@ public class Util {
         userDetailsEntity.setLastName(RandomStringUtils.randomAlphabetic(20));
         userDetailsEntity.setJobTitle(RandomStringUtils.randomAlphabetic(20));
         userDetailsEntity.setEmail(RandomStringUtils.randomAlphabetic(8) + "@nus.edu.sg");
-        userDetailsEntity.setPhone(RandomStringUtils.randomAlphabetic(20));
+        userDetailsEntity.setPhone(RandomStringUtils.randomNumeric(20));
         userDetailsEntity.setInstitution(RandomStringUtils.randomAlphabetic(20));
-        userDetailsEntity.setInstitutionAbbreviation(RandomStringUtils.randomAlphabetic(20));
+        userDetailsEntity.setInstitutionAbbreviation(RandomStringUtils.randomAlphabetic(15));
         userDetailsEntity.setInstitutionWeb(RandomStringUtils.randomAlphabetic(20));
 
         final AddressEntity address = new AddressEntity();
@@ -44,7 +44,7 @@ public class Util {
         address.setCountry(RandomStringUtils.randomAlphabetic(20));
         address.setRegion(RandomStringUtils.randomAlphabetic(20));
         address.setCity(RandomStringUtils.randomAlphabetic(20));
-        address.setZipCode(RandomStringUtils.randomAlphabetic(20));
+        address.setZipCode(RandomStringUtils.randomNumeric(20));
 
         userDetailsEntity.setAddress(address);
         userEntity.setUserDetails(userDetailsEntity);
@@ -68,7 +68,7 @@ public class Util {
         registrationEntity.setUsrAddr(RandomStringUtils.randomAlphabetic(20));
         registrationEntity.setUsrAddr2(RandomStringUtils.randomAlphabetic(20));
         registrationEntity.setUsrAffil(RandomStringUtils.randomAlphabetic(20));
-        registrationEntity.setUsrAffilAbbrev(RandomStringUtils.randomAlphabetic(20));
+        registrationEntity.setUsrAffilAbbrev(RandomStringUtils.randomAlphabetic(15));
         registrationEntity.setUsrCity(RandomStringUtils.randomAlphabetic(20));
         registrationEntity.setUsrCountry(RandomStringUtils.randomAlphabetic(20));
         registrationEntity.setUsrState(RandomStringUtils.randomAlphabetic(20));

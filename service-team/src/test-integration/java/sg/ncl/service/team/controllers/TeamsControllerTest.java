@@ -10,7 +10,7 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.web.context.WebApplicationContext;
-import sg.ncl.service.team.TeamCommon;
+import sg.ncl.service.team.Util;
 import sg.ncl.service.team.data.jpa.entities.TeamEntity;
 import sg.ncl.service.team.data.jpa.repositories.TeamRepository;
 import sg.ncl.service.team.AbstractTest;
@@ -49,7 +49,7 @@ public class TeamsControllerTest extends AbstractTest {
     @Test
     public void testPostTeam() throws Exception {
         // Note: must have TeamEntity to create the JSON
-        TeamEntity teamEntity = TeamCommon.createTeam();
+        TeamEntity teamEntity = Util.getTeamEntity();
 
         GsonBuilder gsonBuilder = new GsonBuilder();
         gsonBuilder.registerTypeAdapter(ZonedDateTime.class, new DateTimeSerializer());
@@ -99,7 +99,7 @@ public class TeamsControllerTest extends AbstractTest {
         MediaType contentType = new MediaType(MediaType.APPLICATION_JSON.getType(),
                 MediaType.APPLICATION_JSON.getSubtype());
 
-        TeamEntity teamEntity = TeamCommon.createTeam();
+        TeamEntity teamEntity = Util.getTeamEntity();
         teamEntity = teamRepository.save(teamEntity);
 
         final String idString = teamEntity.getId();
@@ -113,7 +113,7 @@ public class TeamsControllerTest extends AbstractTest {
 
     @Test
     public void testGetTeamAfterAddUsertoTeam() throws Exception {
-        TeamEntity origTeamEntity = TeamCommon.createTeam();
+        TeamEntity origTeamEntity = Util.getTeamEntity();
         TeamEntity teamEntity = teamRepository.save(origTeamEntity);
         String teamId = teamEntity.getId();
 
@@ -135,7 +135,7 @@ public class TeamsControllerTest extends AbstractTest {
         MediaType contentType = new MediaType(MediaType.APPLICATION_JSON.getType(),
                 MediaType.APPLICATION_JSON.getSubtype());
 
-        TeamEntity origTeamEntity = TeamCommon.createTeam();
+        TeamEntity origTeamEntity = Util.getTeamEntity();
         TeamEntity teamEntity = teamRepository.save(origTeamEntity);
         final String idString = teamEntity.getId();
 
@@ -193,9 +193,9 @@ public class TeamsControllerTest extends AbstractTest {
 
     @Test
     public void testGetPublicTeams() throws Exception {
-        TeamEntity origTeamEntity = TeamCommon.createTeam();
+        TeamEntity origTeamEntity = Util.getTeamEntity();
 
-        TeamEntity privateTeamEntity = TeamCommon.createTeam();
+        TeamEntity privateTeamEntity = Util.getTeamEntity();
         privateTeamEntity.setVisibility(TeamVisibility.PRIVATE);
 
         teamRepository.save(origTeamEntity);
@@ -226,7 +226,7 @@ public class TeamsControllerTest extends AbstractTest {
 
     @Test
     public void testGetByName() throws Exception {
-        TeamEntity teamEntity = TeamCommon.createTeam();
+        TeamEntity teamEntity = Util.getTeamEntity();
         String name = RandomStringUtils.randomAlphanumeric(20);
         teamEntity.setName(name);
 

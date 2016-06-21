@@ -1,4 +1,4 @@
-package sg.ncl.service.adapter;
+package sg.ncl.adapter.deterlab;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
 

@@ -1,4 +1,4 @@
-package sg.ncl.service.adapter.domain;
+package sg.ncl.adapter.deterlab.domain;
 
 /**
  * Created by dcsyeoty on 16-Jun-16.
