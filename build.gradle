@@ -38,38 +38,17 @@ allprojects {
         }
     }
 
-    tasks.withType(Test) {
-        group 'verification'
-        reports {
-            html {
-                destination = file("${reporting.baseDir}/${task.name}/html")
-            }
-        }
-    }
-
-    tasks.withType(TestReport) {
-        group 'reporting'
-    }
-
-    tasks.withType(JacocoReport) {
-        group 'reporting'
-    }
-}
-
-configure(subprojects.findAll({ it.name.startsWith('service-') })) {
-    apply plugin: 'spring-boot'
-
     sourceSets {
         integrationTest {
             compileClasspath += main.output + test.output
             runtimeClasspath += main.output + test.output
 
             java {
-                srcDir('src/test-integration/java')
+                srcDir 'src/test-integration/java'
             }
 
             resources {
-                srcDir('src/test-integration/resources')
+                srcDir 'src/test-integration/resources'
             }
         }
     }
@@ -95,25 +74,37 @@ configure(subprojects.findAll({ it.name.startsWith('service-') })) {
         check {
             dependsOn integrationTest
         }
-        testClassesDir = sourceSets.integrationTest.output.classesDir
+        testClassesDir sourceSets.integrationTest.output.classesDir
         classpath = sourceSets.integrationTest.runtimeClasspath
     }
 
-//    jacocoTestReport {
-//        dependsOn check
-//        executionData test, integrationTest
-//    }
-
     task testReport(type: TestReport) {
         group 'reporting'
-        dependsOn test, integrationTest
-        destinationDir = file("${reporting.baseDir}/unified/html")
+        dependsOn check
+        destinationDir file("${reporting.baseDir}/unified/html")
         reportOn test, integrationTest
     }
 
-    tasks.withType(JacocoReport) {
-        executionData test, integrationTest
+    tasks.withType(Test) {
+        group 'verification'
+        reports {
+            html {
+                destination file("${reporting.baseDir}/${task.name}/html")
+            }
+        }
     }
+
+    tasks.withType(JacocoReport) {
+        group 'reporting'
+        executionData test, integrationTest
+        // temporary hack to fix a bug requiring that there be at least one test case in each source set for coverage data to be generated;
+        // it should be if there is at least one test case in any of the source sets
+        executionData = files(executionData.findAll({ it.exists() }))
+    }
+}
+
+configure(subprojects.findAll({ it.name.startsWith('service-') })) {
+    apply plugin: 'spring-boot'
 }
 
 apply plugin: 'spring-boot'
@@ -126,25 +117,26 @@ dependencies {
     compile subprojects.findAll({ it.name.startsWith('service-') })
     // the runtime dependencies should be a union of all runtime dependencies needed by all subprojects
     runtime 'mysql:mysql-connector-java'
+
+    testCompile 'junit:junit'
+}
+
+testReport {
+    dependsOn check, subprojects.testReport
+    reportOn test, subprojects.test, subprojects.integrationTest
 }
 
 jacocoTestReport {
-    dependsOn subprojects.jacocoTestReport
-    executionData test,
-            subprojects.test,
-            subprojects.findAll({ it.name.startsWith('service-') }).integrationTest
-}
-
-task testReport(type: TestReport) {
-    dependsOn test,
-            subprojects.test,
-            subprojects.findAll({ it.name.startsWith('service-') }).testReport
-    destinationDir = file("${reporting.baseDir}/unified/html")
-    reportOn subprojects.test,
-            subprojects.findAll({ it.name.startsWith('service-') }).integrationTest
+    dependsOn check, subprojects.jacocoTestReport
+    executionData subprojects.jacocoTestReport.executionData
+    // temporary hack to fix a bug requiring that there be at least one test case in each source set for coverage data to be generated;
+    // it should be if there is at least one test case in any of the source sets
+    executionData = files(executionData.findAll({ it.exists() }))
+    println '>>>>>:'
+    executionData.each { println " - " + it + ":" + it.exists() }
 }
 
 task wrapper(type: Wrapper) {
-    gradleVersion = '2.14'
-    distributionUrl = "https://services.gradle.org/distributions/gradle-${gradleVersion}-all.zip"
+    gradleVersion '2.14'
+    distributionUrl "https://services.gradle.org/distributions/gradle-${gradleVersion}-all.zip"
 }
