@@ -128,8 +128,12 @@ public class UserService {
         userDetailsEntity.setLastModifiedDate(ZonedDateTime.now());
         userDetailsEntity.setFirstName("john");
         userDetailsEntity.setLastName("doe");
+        userDetailsEntity.setJobTitle("research assistant");
         userDetailsEntity.setEmail("johndoe@nus.edu.sg");
         userDetailsEntity.setPhone("12345678");
+        userDetailsEntity.setInstitution("national university of singapore");
+        userDetailsEntity.setInstitutionAbbreviation("NUS");
+        userDetailsEntity.setInstitutionWeb("http://www.nus.edu.sg");
 
         final AddressEntity address = new AddressEntity();
         address.setCreatedDate(ZonedDateTime.now());
@@ -137,6 +141,7 @@ public class UserService {
         address.setAddress1("computing drive 12");
         address.setAddress2("another address 2");
         address.setCountry("singapore");
+        address.setCity("singapore");
         address.setRegion("west");
         address.setZipCode("123456");
 
