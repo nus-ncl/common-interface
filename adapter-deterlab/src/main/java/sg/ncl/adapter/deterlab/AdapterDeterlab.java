@@ -1,6 +1,10 @@
 package sg.ncl.adapter.deterlab;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.http.*;
+import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 import sg.ncl.adapter.deterlab.data.jpa.DeterlabUserRepository;
 import sg.ncl.adapter.deterlab.dtos.entities.DeterlabUserEntity;
@@ -12,6 +16,7 @@ import javax.inject.Inject;
  * This is to invoke python scripts on the BOSS
  * Created by Te Ye on 15-Jun-16.
  */
+@Component
 public class AdapterDeterlab {
 
     private DeterlabUserRepository deterlabUserRepository;
@@ -22,7 +27,7 @@ public class AdapterDeterlab {
 
     }
 
-    @Inject
+    @Autowired
     public AdapterDeterlab(DeterlabUserRepository repository) {
         this.deterlabUserRepository = repository;
     }

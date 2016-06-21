@@ -2,6 +2,8 @@ package sg.ncl.service.registration;
 
 import org.junit.Ignore;
 import org.junit.Test;
+import sg.ncl.adapter.deterlab.AdapterDeterlab;
+import sg.ncl.adapter.deterlab.data.jpa.DeterlabUserRepository;
 import sg.ncl.service.authentication.data.jpa.CredentialsEntity;
 import sg.ncl.service.authentication.logic.AuthenticationService;
 import sg.ncl.service.authentication.logic.CredentialsService;
@@ -10,7 +12,6 @@ import sg.ncl.service.team.TeamService;
 import sg.ncl.service.team.data.jpa.entities.TeamEntity;
 import sg.ncl.service.user.domain.User;
 import sg.ncl.service.user.services.UserService;
-import sg.ncl.service.registration.Util;
 
 import javax.inject.Inject;
 
@@ -33,6 +34,12 @@ public class RegistrationServiceTest extends AbstractTest {
 
     @Inject
     private RegistrationRepository registrationRepository;
+
+    @Inject
+    private DeterlabUserRepository deterlabUserRepository;
+
+    @Inject
+    private AdapterDeterlab adapterDeterlab;
 
     @Test
     @Ignore

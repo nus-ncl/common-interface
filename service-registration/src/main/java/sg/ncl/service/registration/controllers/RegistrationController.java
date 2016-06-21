@@ -26,12 +26,9 @@ public class RegistrationController {
     @RequestMapping(method = RequestMethod.POST)
     @ResponseStatus(HttpStatus.OK)
     public void register(@RequestBody RegistrationInfo registrationInfo) {
-        // FIXME change password to CredentialsEntity
-//        registrationService.register2(registrationdata);
-        System.out.println("Password: " + registrationInfo.getCredentials().getPassword());
-        System.out.println("User: " + registrationInfo.getUser());
-        System.out.println("Team: " + registrationInfo.getTeam());
-        System.out.println("Registration: " + registrationInfo.getRegistration());
+//        System.out.println("User: " + registrationInfo.getUser());
+//        System.out.println("Team: " + registrationInfo.getTeam());
+//        System.out.println("Registration: " + registrationInfo.getRegistration());
         registrationService.register(registrationInfo.getCredentials(), registrationInfo.getUser(), registrationInfo.getTeam());
     }
 }
