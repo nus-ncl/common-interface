@@ -1,7 +1,7 @@
-package sg.ncl.service.adapter.data.jpa;
+package sg.ncl.adapter.deterlab.data.jpa;
 
 import org.springframework.data.jpa.repository.JpaRepository;
-import sg.ncl.service.adapter.dtos.entities.DeterlabProjectEntity;
+import sg.ncl.adapter.deterlab.dtos.entities.DeterlabProjectEntity;
 
 /**
  * @author Yeo Te Ye

@@ -1,8 +1,8 @@
-package sg.ncl.service.adapter.dtos.entities;
+package sg.ncl.adapter.deterlab.dtos.entities;
 
 import org.hibernate.annotations.GenericGenerator;
+import sg.ncl.adapter.deterlab.domain.DeterlabUser;
 import sg.ncl.common.jpa.AbstractEntity;
-import sg.ncl.service.adapter.domain.DeterlabUser;
 
 import javax.persistence.*;
 

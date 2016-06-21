@@ -1,11 +1,9 @@
-package sg.ncl.service.adapter;
+package sg.ncl.adapter.deterlab;
 
-import org.json.JSONObject;
 import org.springframework.http.*;
 import org.springframework.web.client.RestTemplate;
-import sg.ncl.service.adapter.data.jpa.DeterlabUserRepository;
-import sg.ncl.service.adapter.domain.DeterlabUser;
-import sg.ncl.service.adapter.dtos.entities.DeterlabUserEntity;
+import sg.ncl.adapter.deterlab.data.jpa.DeterlabUserRepository;
+import sg.ncl.adapter.deterlab.dtos.entities.DeterlabUserEntity;
 
 import javax.inject.Inject;
 
@@ -19,6 +17,10 @@ public class AdapterDeterlab {
     private DeterlabUserRepository deterlabUserRepository;
     private RestTemplate restTemplate = new RestTemplate();
     private ConnectionProperties properties = new ConnectionProperties();
+
+    public AdapterDeterlab() {
+
+    }
 
     @Inject
     public AdapterDeterlab(DeterlabUserRepository repository) {

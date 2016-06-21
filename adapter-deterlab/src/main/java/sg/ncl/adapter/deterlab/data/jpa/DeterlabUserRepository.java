@@ -1,11 +1,13 @@
-package sg.ncl.service.adapter.data.jpa;
+package sg.ncl.adapter.deterlab.data.jpa;
 
 import org.springframework.data.jpa.repository.JpaRepository;
-import sg.ncl.service.adapter.dtos.entities.DeterlabUserEntity;
+import sg.ncl.adapter.deterlab.dtos.entities.DeterlabUserEntity;
 
 /**
  * @author Yeo Te Ye
  */
 public interface DeterlabUserRepository extends JpaRepository<DeterlabUserEntity, String> {
+
+    String findByDeterUserId(String deterUserId);
 
 }
