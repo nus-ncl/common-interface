@@ -27,7 +27,7 @@ public class TeamServiceTest extends AbstractTest {
     @Test
     public void testSaveTeam() {
         TeamService teamService = new TeamService(teamRepository);
-        TeamEntity createdTeam = TeamCommon.createTeam();
+        TeamEntity createdTeam = Util.getTeamEntity();
         TeamEntity saveTeam = teamService.save(createdTeam);
 
         Assert.assertEquals(createdTeam.getName(), saveTeam.getName());
@@ -105,7 +105,7 @@ public class TeamServiceTest extends AbstractTest {
         List<TeamEntity> teamInfoList = new ArrayList<>();
 
         for (int i = 0; i < 3; i++) {
-            teamInfoList.add(teamService.save(TeamCommon.createTeam()));
+            teamInfoList.add(teamService.save(Util.getTeamEntity()));
         }
 
         List<TeamEntity> resultTeamList = teamService.get();
@@ -126,7 +126,7 @@ public class TeamServiceTest extends AbstractTest {
     @Test
     public void testUpdateTeamInfo() throws Exception {
         TeamService teamService = new TeamService(teamRepository);
-        TeamEntity team = TeamCommon.createTeam();
+        TeamEntity team = Util.getTeamEntity();
         team = teamService.save(team);
         final String idString = team.getId();
 
@@ -165,7 +165,7 @@ public class TeamServiceTest extends AbstractTest {
     @Test
     public void testUpdateTeamNullField() {
         TeamService teamService = new TeamService(teamRepository);
-        TeamEntity team = TeamCommon.createTeam();
+        TeamEntity team = Util.getTeamEntity();
         team = teamService.save(team);
         final String idString = team.getId();
 
@@ -183,7 +183,7 @@ public class TeamServiceTest extends AbstractTest {
     @Test
     public void testAddUserToTeam() throws Exception {
         TeamService teamService = new TeamService(teamRepository);
-        TeamEntity team = TeamCommon.createTeam();
+        TeamEntity team = Util.getTeamEntity();
         team = teamService.save(team);
 
         // get team id from newly saved team
