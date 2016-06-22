@@ -1,8 +1,10 @@
 package sg.ncl.service.registration;
 
 import org.json.JSONObject;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import sg.ncl.adapter.deterlab.AdapterDeterlab;
+import sg.ncl.adapter.deterlab.ConnectionProperties;
 import sg.ncl.adapter.deterlab.data.jpa.DeterlabUserRepository;
 import sg.ncl.service.authentication.data.jpa.CredentialsEntity;
 import sg.ncl.service.authentication.logic.AuthenticationService;
@@ -23,25 +25,21 @@ import javax.inject.Inject;
 @Service
 public class RegistrationService {
 
-    private final AuthenticationService authenticationService;
     private final CredentialsService credentialsService;
     private final TeamService teamService;
     private final UserService userService;
-    private final AdapterDeterlab adapterDeterlab;
     private final RegistrationRepository registrationRepository;
-//    private final DeterlabUserRepository deterlabUserRepository;
+
+    @Autowired
+    private final AdapterDeterlab adapterDeterlab;
 
     @Inject
-    protected RegistrationService(final AuthenticationService authenticationService, final CredentialsService credentialsService, final TeamService teamService, final UserService userService, final RegistrationRepository registrationRepository) {
-        this.authenticationService = authenticationService;
+    protected RegistrationService(final CredentialsService credentialsService, final TeamService teamService, final UserService userService, final RegistrationRepository registrationRepository, final DeterlabUserRepository deterlabUserRepository, final ConnectionProperties connectionProperties) {
         this.credentialsService = credentialsService;
         this.teamService = teamService;
         this.userService = userService;
         this.registrationRepository = registrationRepository;
-        this.adapterDeterlab = new AdapterDeterlab();
-//        this.deterlabUserRepository = deterlabUserRepository;
-//        this.adapterDeterlab = new AdapterDeterlab(deterlabUserRepository);
-//        this.adapterDeterlab = new AdapterDeterlab();
+        this.adapterDeterlab = new AdapterDeterlab(deterlabUserRepository, connectionProperties);
     }
 
     /*
