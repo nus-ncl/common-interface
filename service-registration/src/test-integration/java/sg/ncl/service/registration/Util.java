@@ -24,6 +24,15 @@ public class Util {
         return entity;
     }
 
+    public static TeamEntity getInvalidTeamEntity() {
+        final TeamEntity entity = new TeamEntity();
+        entity.setId(null);
+        entity.setName(RandomStringUtils.randomAlphanumeric(20));
+        entity.setDescription(RandomStringUtils.randomAlphanumeric(20));
+        entity.setApplicationDate(ZonedDateTime.now());
+        return entity;
+    }
+
     public static UserEntity getUserEntity() {
         final UserEntity userEntity = new UserEntity();
         userEntity.setApplicationDate(ZonedDateTime.now());
@@ -52,11 +61,46 @@ public class Util {
         return userEntity;
     }
 
+    public static UserEntity getInvalidUserEntity() {
+        final UserEntity userEntity = new UserEntity();
+        userEntity.setApplicationDate(ZonedDateTime.now());
+
+        final UserDetailsEntity userDetailsEntity = new UserDetailsEntity();
+        // purposely set null
+        userDetailsEntity.setFirstName(null);
+        userDetailsEntity.setLastName(RandomStringUtils.randomAlphabetic(20));
+        userDetailsEntity.setJobTitle(RandomStringUtils.randomAlphabetic(20));
+        userDetailsEntity.setEmail(RandomStringUtils.randomAlphabetic(8) + "@nus.edu.sg");
+        userDetailsEntity.setPhone(RandomStringUtils.randomNumeric(20));
+        userDetailsEntity.setInstitution(RandomStringUtils.randomAlphabetic(20));
+        userDetailsEntity.setInstitutionAbbreviation(RandomStringUtils.randomAlphabetic(15));
+        userDetailsEntity.setInstitutionWeb(RandomStringUtils.randomAlphabetic(20));
+
+        final AddressEntity address = new AddressEntity();
+        address.setAddress1(RandomStringUtils.randomAlphabetic(20));
+        address.setAddress2(RandomStringUtils.randomAlphabetic(20));
+        address.setCountry(RandomStringUtils.randomAlphabetic(20));
+        address.setRegion(RandomStringUtils.randomAlphabetic(20));
+        address.setCity(RandomStringUtils.randomAlphabetic(20));
+        address.setZipCode(RandomStringUtils.randomNumeric(20));
+
+        userDetailsEntity.setAddress(address);
+        userEntity.setUserDetails(userDetailsEntity);
+
+        return userEntity;
+    }
+
     public static CredentialsEntity getCredentialsEntity() {
         final CredentialsEntity credentialsEntity = new CredentialsEntity();
-//        credentialsEntity.setId(RandomStringUtils.randomAlphabetic(20));
         credentialsEntity.setUsername(RandomStringUtils.randomAlphabetic(8) + "@nus.edu.sg");
         credentialsEntity.setPassword("deterinavm");
+        return credentialsEntity;
+    }
+
+    public static CredentialsEntity getInvalidCredentialsEntity() {
+        final CredentialsEntity credentialsEntity = new CredentialsEntity();
+        credentialsEntity.setUsername(RandomStringUtils.randomAlphabetic(8) + "@nus.edu.sg");
+        credentialsEntity.setPassword(null);
         return credentialsEntity;
     }
 

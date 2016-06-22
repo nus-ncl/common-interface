@@ -1,16 +1,18 @@
 package sg.ncl.service.registration;
 
 import org.json.JSONObject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import sg.ncl.adapter.deterlab.AdapterDeterlab;
 import sg.ncl.adapter.deterlab.ConnectionProperties;
 import sg.ncl.adapter.deterlab.data.jpa.DeterlabUserRepository;
 import sg.ncl.service.authentication.data.jpa.CredentialsEntity;
-import sg.ncl.service.authentication.logic.AuthenticationService;
 import sg.ncl.service.authentication.logic.CredentialsService;
 import sg.ncl.service.registration.data.jpa.entities.RegistrationEntity;
 import sg.ncl.service.registration.data.jpa.repositories.RegistrationRepository;
+import sg.ncl.service.registration.exceptions.UserFormException;
 import sg.ncl.service.team.TeamService;
 import sg.ncl.service.team.data.jpa.entities.TeamEntity;
 import sg.ncl.service.team.domain.Team;
@@ -24,6 +26,8 @@ import javax.inject.Inject;
  */
 @Service
 public class RegistrationService {
+
+    private static final Logger logger = LoggerFactory.getLogger(RegistrationService.class);
 
     private final CredentialsService credentialsService;
     private final TeamService teamService;
@@ -78,15 +82,31 @@ public class RegistrationService {
     */
 
     public void register(CredentialsEntity credentials, User user, Team team) {
+
+        if (userFormFieldsHasErrors(user)) {
+            logger.warn("User form fields has errors {}", user);
+            throw new UserFormException();
+        }
+
+        if (credentials.getPassword() == null || credentials.getPassword().isEmpty()) {
+            logger.warn("Credentials password is empty");
+            throw new UserFormException();
+        }
+
+        if (team.getId() == null || team.getId().isEmpty()) {
+            logger.warn("Team id from join existing team is empty");
+            throw new UserFormException();
+        }
+
+        // accept the team data
+        TeamEntity teamEntity = teamService.find(team.getId());
+
         // accept user data from form
         String userId = userService.addUser(user);
 
         // create the credentials after creating the users
         credentials.setId(userId);
         credentialsService.addCredentials(credentials);
-
-        // accept the team data
-        TeamEntity teamEntity = teamService.find(team.getId());
 
         // add user to team and vice versa
         userService.addUserToTeam(userId, team.getId());
@@ -125,6 +145,68 @@ public class RegistrationService {
             // FIXME for debug purposes
             System.out.println(resultJSON);
         }
+    }
+
+    private boolean userFormFieldsHasErrors(User user) {
+        boolean errorsFound = false;
+
+        if (user == null) {
+            errorsFound = true;
+        }
+
+        if (errorsFound == false && (user.getUserDetails().getFirstName() == null || user.getUserDetails().getFirstName().isEmpty())) {
+            errorsFound = true;
+        }
+
+        if (errorsFound == false && (user.getUserDetails().getLastName() == null || user.getUserDetails().getLastName().isEmpty())) {
+            errorsFound = true;
+        }
+
+        if (errorsFound == false && (user.getUserDetails().getJobTitle() == null || user.getUserDetails().getJobTitle().isEmpty())) {
+            errorsFound = true;
+        }
+
+        if (errorsFound == false && (user.getUserDetails().getEmail() == null || user.getUserDetails().getEmail().isEmpty())) {
+            errorsFound = true;
+        }
+
+        if (errorsFound == false && (user.getUserDetails().getPhone() == null || user.getUserDetails().getPhone().isEmpty())) {
+            errorsFound = true;
+        }
+
+        if (errorsFound == false && (user.getUserDetails().getInstitution() == null || user.getUserDetails().getInstitution().isEmpty())) {
+            errorsFound = true;
+        }
+
+        if (errorsFound == false && (user.getUserDetails().getInstitutionAbbreviation() == null || user.getUserDetails().getInstitutionAbbreviation().isEmpty())) {
+            errorsFound = true;
+        }
+
+        if (errorsFound == false && (user.getUserDetails().getInstitutionWeb() == null || user.getUserDetails().getInstitutionWeb().isEmpty())) {
+            errorsFound = true;
+        }
+
+        if (errorsFound == false && (user.getUserDetails().getAddress().getAddress1() == null || user.getUserDetails().getAddress().getAddress1().isEmpty())) {
+            errorsFound = true;
+        }
+
+        if (errorsFound == false && (user.getUserDetails().getAddress().getCountry() == null || user.getUserDetails().getAddress().getCountry().isEmpty())) {
+            errorsFound = true;
+        }
+
+        if (errorsFound == false && (user.getUserDetails().getAddress().getRegion() == null || user.getUserDetails().getAddress().getRegion().isEmpty())) {
+            errorsFound = true;
+        }
+
+        if (errorsFound == false && (user.getUserDetails().getAddress().getCity() == null || user.getUserDetails().getAddress().getCity().isEmpty())) {
+            errorsFound = true;
+        }
+
+        if (errorsFound == false && (user.getUserDetails().getAddress().getZipCode() == null || user.getUserDetails().getAddress().getZipCode().isEmpty())) {
+            errorsFound = true;
+        }
+
+        return errorsFound;
     }
 
     private String getUserCreationStatus(String resultJSON) {
