@@ -114,9 +114,10 @@ public class TeamService {
 
     public void seedData() {
         TeamEntity teamEntity = new TeamEntity();
-
-        teamEntity.setName("Aries");
+        teamEntity.setName("NCL");
         teamEntity.setDescription("This is a project description");
+        teamEntity.setOrganisationType("Academic");
+        teamEntity.setWebsite("http://www.com");
         teamEntity.setApplicationDate(ZonedDateTime.now());
         teamRepository.save(teamEntity);
     }
