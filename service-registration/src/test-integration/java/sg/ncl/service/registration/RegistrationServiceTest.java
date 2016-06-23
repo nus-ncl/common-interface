@@ -12,10 +12,10 @@ import org.springframework.web.client.RestOperations;
 import org.springframework.web.client.RestTemplate;
 import sg.ncl.adapter.deterlab.ConnectionProperties;
 import sg.ncl.service.authentication.data.jpa.CredentialsEntity;
+import sg.ncl.service.registration.exceptions.RegisterTeamNameDuplicateException;
 import sg.ncl.service.registration.exceptions.UserFormException;
 import sg.ncl.service.team.TeamService;
 import sg.ncl.service.team.data.jpa.entities.TeamEntity;
-import sg.ncl.service.user.data.jpa.entities.UserEntity;
 import sg.ncl.service.user.domain.User;
 
 import javax.inject.Inject;
@@ -89,6 +89,21 @@ public class RegistrationServiceTest extends AbstractTest {
                 .andExpect(method(HttpMethod.POST))
                 .andRespond(withSuccess(predefinedResultJson.toString(), MediaType.APPLICATION_JSON));
 
+        registrationService.register(credentialsEntity, user, teamEntity, isJoinTeam);
+    }
+
+    @Test(expected = RegisterTeamNameDuplicateException.class)
+    public void registerTestApplyDuplicateTeamName() throws Exception {
+        CredentialsEntity credentialsEntity = Util.getCredentialsEntity();
+        User user = Util.getUserEntity();
+        isJoinTeam = false;
+
+        TeamEntity teamEntity = Util.getTeamEntity();
+        String teamName = teamEntity.getName();
+        teamService.save(teamEntity);
+
+        // purposely register for an already saved team
+        // don't have to mock server since will throw exception
         registrationService.register(credentialsEntity, user, teamEntity, isJoinTeam);
     }
 

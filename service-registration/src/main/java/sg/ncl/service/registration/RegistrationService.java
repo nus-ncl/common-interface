@@ -12,10 +12,12 @@ import sg.ncl.service.authentication.data.jpa.CredentialsEntity;
 import sg.ncl.service.authentication.logic.CredentialsService;
 import sg.ncl.service.registration.data.jpa.entities.RegistrationEntity;
 import sg.ncl.service.registration.data.jpa.repositories.RegistrationRepository;
+import sg.ncl.service.registration.exceptions.RegisterTeamNameDuplicateException;
 import sg.ncl.service.registration.exceptions.UserFormException;
 import sg.ncl.service.team.TeamService;
 import sg.ncl.service.team.data.jpa.entities.TeamEntity;
 import sg.ncl.service.team.domain.Team;
+import sg.ncl.service.team.exceptions.TeamNotFoundException;
 import sg.ncl.service.user.domain.User;
 import sg.ncl.service.user.services.UserService;
 
@@ -63,6 +65,21 @@ public class RegistrationService {
         if (isJoinTeam == true && (team.getId() == null || team.getId().isEmpty())) {
             logger.warn("Team id from join existing team is empty");
             throw new UserFormException();
+        }
+
+        if (isJoinTeam == false && (team.getName() != null || !team.getName().isEmpty())) {
+            TeamEntity teamEntity = new TeamEntity();
+            try {
+                teamEntity = teamService.getName(team.getName());
+            } catch (TeamNotFoundException e) {
+                logger.info("This is good, this implies team name is unique");
+            }
+            if (teamEntity.getId() != null) {
+                if (! teamEntity.getId().isEmpty()) {
+                    logger.warn("Team name duplicate entry found");
+                    throw new RegisterTeamNameDuplicateException();
+                }
+            }
         }
 
         String resultJSON;
