@@ -53,4 +53,30 @@ public class TeamRepositoryTest extends AbstractTest {
             checkException(e, "NULL not allowed for column \"NAME\"");
         }
     }
+
+    @Test
+    public void testSaveNullWebsite() throws Exception {
+        final TeamEntity entity = Util.getTeamEntity();
+        entity.setWebsite(null);
+
+        try {
+            repository.saveAndFlush(entity);
+            exception.expect(DataIntegrityViolationException.class);
+        } catch (Exception e) {
+            checkException(e, "NULL not allowed for column \"WEBSITE\"");
+        }
+    }
+
+    @Test
+    public void testSaveNullOrganisationType() throws Exception {
+        final TeamEntity entity = Util.getTeamEntity();
+        entity.setOrganisationType(null);
+
+        try {
+            repository.saveAndFlush(entity);
+            exception.expect(DataIntegrityViolationException.class);
+        } catch (Exception e) {
+            checkException(e, "NULL not allowed for column \"ORGANISATION_TYPE\"");
+        }
+    }
 }

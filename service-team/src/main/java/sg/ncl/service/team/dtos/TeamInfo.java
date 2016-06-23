@@ -16,6 +16,8 @@ public class TeamInfo implements Team {
     private final String id;
     private final String name;
     private final String description;
+    private final String website;
+    private final String organisationType;
     private final TeamVisibility visibility;
     private final TeamPrivacy privacy;
     private final TeamStatus status;
@@ -23,16 +25,17 @@ public class TeamInfo implements Team {
     private final ZonedDateTime processedDate;
     private final List<TeamMemberInfo> members;
 
-    public TeamInfo(final String id, final String name, final String description, final TeamVisibility visibility, final TeamPrivacy privacy, final TeamStatus status, final ZonedDateTime applicationDate, final ZonedDateTime processedDate, final List<TeamMemberEntity> members) {
+    public TeamInfo(final String id, final String name, final String description, final String website, final String organisationType, final TeamVisibility visibility, final TeamPrivacy privacy, final TeamStatus status, final ZonedDateTime applicationDate, final ZonedDateTime processedDate, final List<TeamMemberEntity> members) {
         this.id = id;
         this.name = name;
         this.description = description;
+        this.website = website;
+        this.organisationType = organisationType;
         this.visibility = visibility;
         this.privacy = privacy;
         this.status = status;
         this.applicationDate = applicationDate;
         this.processedDate = processedDate;
-//        this.members = members;
 
         this.members = new ArrayList<>();
 
@@ -45,6 +48,8 @@ public class TeamInfo implements Team {
         this(teamEntity.getId(),
                 teamEntity.getName(),
                 teamEntity.getDescription(),
+                teamEntity.getWebsite(),
+                teamEntity.getOrganisationType(),
                 teamEntity.getVisibility(),
                 teamEntity.getPrivacy(),
                 teamEntity.getStatus(),
@@ -63,6 +68,14 @@ public class TeamInfo implements Team {
 
     public String getDescription() {
         return description;
+    }
+
+    public String getWebsite() {
+        return website;
+    }
+
+    public String getOrganisationType() {
+        return organisationType;
     }
 
     public TeamVisibility getVisibility() {
@@ -116,6 +129,8 @@ public class TeamInfo implements Team {
         sb.append("id='").append(id).append('\'');
         sb.append(", name='").append(name).append('\'');
         sb.append(", description='").append(description).append('\'');
+        sb.append(", website='").append(website).append('\'');
+        sb.append(", organisationType='").append(organisationType).append('\'');
         sb.append(", visibility=").append(visibility);
         sb.append(", status=").append(status);
         sb.append(", applicationDate=").append(applicationDate);
