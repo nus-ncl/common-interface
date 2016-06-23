@@ -1,21 +1,28 @@
 package sg.ncl.service.registration;
 
 import org.json.JSONObject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import sg.ncl.adapter.deterlab.AdapterDeterlab;
+import sg.ncl.adapter.deterlab.ConnectionProperties;
 import sg.ncl.adapter.deterlab.data.jpa.DeterlabUserRepository;
 import sg.ncl.service.authentication.data.jpa.CredentialsEntity;
-import sg.ncl.service.authentication.logic.AuthenticationService;
 import sg.ncl.service.authentication.logic.CredentialsService;
 import sg.ncl.service.registration.data.jpa.entities.RegistrationEntity;
 import sg.ncl.service.registration.data.jpa.repositories.RegistrationRepository;
+import sg.ncl.service.registration.exceptions.RegisterTeamNameDuplicateException;
+import sg.ncl.service.registration.exceptions.UserFormException;
 import sg.ncl.service.team.TeamService;
 import sg.ncl.service.team.data.jpa.entities.TeamEntity;
 import sg.ncl.service.team.domain.Team;
+import sg.ncl.service.team.exceptions.TeamNotFoundException;
 import sg.ncl.service.user.domain.User;
 import sg.ncl.service.user.services.UserService;
 
 import javax.inject.Inject;
+import java.time.ZonedDateTime;
 
 /**
  * @author Christopher Zhong
@@ -23,63 +30,81 @@ import javax.inject.Inject;
 @Service
 public class RegistrationService {
 
-    private final AuthenticationService authenticationService;
+    private static final Logger logger = LoggerFactory.getLogger(RegistrationService.class);
+
     private final CredentialsService credentialsService;
     private final TeamService teamService;
     private final UserService userService;
-    private final AdapterDeterlab adapterDeterlab;
     private final RegistrationRepository registrationRepository;
-//    private final DeterlabUserRepository deterlabUserRepository;
+
+    @Autowired
+    private final AdapterDeterlab adapterDeterlab;
 
     @Inject
-    protected RegistrationService(final AuthenticationService authenticationService, final CredentialsService credentialsService, final TeamService teamService, final UserService userService, final RegistrationRepository registrationRepository) {
-        this.authenticationService = authenticationService;
+    protected RegistrationService(final CredentialsService credentialsService, final TeamService teamService, final UserService userService, final RegistrationRepository registrationRepository, final DeterlabUserRepository deterlabUserRepository, final ConnectionProperties connectionProperties) {
         this.credentialsService = credentialsService;
         this.teamService = teamService;
         this.userService = userService;
         this.registrationRepository = registrationRepository;
-        this.adapterDeterlab = new AdapterDeterlab();
-//        this.deterlabUserRepository = deterlabUserRepository;
-//        this.adapterDeterlab = new AdapterDeterlab(deterlabUserRepository);
-//        this.adapterDeterlab = new AdapterDeterlab();
+        this.adapterDeterlab = new AdapterDeterlab(deterlabUserRepository, connectionProperties);
     }
 
-    /*
-    public void register2(RegistrationData registrationData) {
-        // create credentials object
-        // create user object
-        // create team object
+    public void register(CredentialsEntity credentials, User user, Team team, boolean isJoinTeam) {
 
-        UserEntity userEntity = new UserEntity();
-        UserDetailsEntity userDetails = new UserDetailsEntity();
-        AddressEntity addressEntity = new AddressEntity();
-        addressEntity.setAddress1(registrationData.getUsrAddr());
-        addressEntity.setAddress2(registrationData.getUsrAddr2());
-        addressEntity.setCountry(registrationData.getUsrCountry());
-        addressEntity.setRegion(registrationData.getUsrCity());
-        addressEntity.setZipCode(registrationData.getUsrZip());
+        if (userFormFieldsHasErrors(user)) {
+            logger.warn("User form fields has errors {}", user);
+            throw new UserFormException();
+        }
 
-        // FIXME hardcoded first,last name until can find solution to merge with full name
-        userDetails.setFirstName("John");
-        userDetails.setLastName("Doe");
-        userDetails.setEmail(registrationData.getUsrEmail());
-        userDetails.setAddress(addressEntity);
-        userEntity.setUserDetails(userDetails);
+        if (credentials.getPassword() == null || credentials.getPassword().isEmpty()) {
+            logger.warn("Credentials password is empty");
+            throw new UserFormException();
+        }
 
-        String userId = userService.addUser(userEntity);
 
-        CredentialsEntity credentialsEntity = new CredentialsEntity();
-        credentialsEntity.setId(userId);
-        credentialsEntity.setUsername(registrationData.getUsrEmail());
-        credentialsEntity.setPassword(registrationData.getClearPassword());
+        if (isJoinTeam == true && (team.getId() == null || team.getId().isEmpty())) {
+            logger.warn("Team id from join existing team is empty");
+            throw new UserFormException();
+        }
 
-        credentialsService.addCredentials(credentialsEntity);
+        if (isJoinTeam == false && (team.getName() != null || !team.getName().isEmpty())) {
+            TeamEntity teamEntity = new TeamEntity();
+            try {
+                teamEntity = teamService.getName(team.getName());
+            } catch (TeamNotFoundException e) {
+                logger.info("This is good, this implies team name is unique");
+            }
+            if (teamEntity.getId() != null) {
+                if (! teamEntity.getId().isEmpty()) {
+                    logger.warn("Team name duplicate entry found");
+                    throw new RegisterTeamNameDuplicateException();
+                }
+            }
+        }
 
-        TeamEntity teamEntity = new TeamEntity();
-    }
-    */
+        String resultJSON;
+        String teamId;
+        TeamEntity teamEntity;
 
-    public void register(CredentialsEntity credentials, User user, Team team) {
+        if (isJoinTeam == true) {
+            // accept the team data
+            teamEntity = teamService.find(team.getId());
+            teamId = team.getId();
+        } else {
+            // apply for new team
+            // check if team already exists
+            teamEntity = new TeamEntity();
+            teamEntity.setName(team.getName());
+            teamEntity.setVisibility(team.getVisibility());
+            teamEntity.setApplicationDate(ZonedDateTime.now());
+            teamEntity.setDescription(team.getDescription());
+            teamEntity.setWebsite(team.getWebsite());
+            teamEntity.setOrganisationType(team.getOrganisationType());
+            teamEntity.setPrivacy(team.getPrivacy());
+            teamEntity = teamService.save(teamEntity);
+            teamId = teamEntity.getId();
+        }
+
         // accept user data from form
         String userId = userService.addUser(user);
 
@@ -87,15 +112,10 @@ public class RegistrationService {
         credentials.setId(userId);
         credentialsService.addCredentials(credentials);
 
-        // accept the team data
-        TeamEntity teamEntity = teamService.find(team.getId());
-
         // add user to team and vice versa
-        userService.addUserToTeam(userId, team.getId());
-        teamService.addUserToTeam(userId, team.getId());
+        userService.addUserToTeam(userId, teamId);
+        teamService.addUserToTeam(userId, teamId);
 
-        // call python script (create a new user in deterlab)
-        // parse in a the json string
         JSONObject userObject = new JSONObject();
         userObject.put("firstName", user.getUserDetails().getFirstName());
         userObject.put("lastName", user.getUserDetails().getLastName());
@@ -114,7 +134,22 @@ public class RegistrationService {
         userObject.put("city", user.getUserDetails().getAddress().getCity());
         userObject.put("zipCode", user.getUserDetails().getAddress().getZipCode());
 
-        String resultJSON = adapterDeterlab.addUsers(userObject.toString());
+        if (isJoinTeam == true) {
+
+            // call python script (create a new user in deterlab)
+            // parse in a the json string
+            resultJSON = adapterDeterlab.addUsers(userObject.toString());
+
+        } else {
+            // call python script to apply for new project
+            userObject.put("projName", teamEntity.getName());
+            userObject.put("projGoals", teamEntity.getDescription());
+            userObject.put("pid", teamEntity.getName());
+            userObject.put("projWeb", "http://www.nus.edu.sg");
+            userObject.put("projOrg", "Academic");
+            userObject.put("projPublic", teamEntity.getVisibility());
+            resultJSON = adapterDeterlab.applyProjectNewUsers(userObject.toString());
+        }
 
         if (getUserCreationStatus(resultJSON).equals("user is created")) {
             // store form fields into registration repository for recreation when required
@@ -127,6 +162,68 @@ public class RegistrationService {
             // FIXME for debug purposes
             System.out.println(resultJSON);
         }
+    }
+
+    private boolean userFormFieldsHasErrors(User user) {
+        boolean errorsFound = false;
+
+        if (user == null) {
+            errorsFound = true;
+        }
+
+        if (errorsFound == false && (user.getUserDetails().getFirstName() == null || user.getUserDetails().getFirstName().isEmpty())) {
+            errorsFound = true;
+        }
+
+        if (errorsFound == false && (user.getUserDetails().getLastName() == null || user.getUserDetails().getLastName().isEmpty())) {
+            errorsFound = true;
+        }
+
+        if (errorsFound == false && (user.getUserDetails().getJobTitle() == null || user.getUserDetails().getJobTitle().isEmpty())) {
+            errorsFound = true;
+        }
+
+        if (errorsFound == false && (user.getUserDetails().getEmail() == null || user.getUserDetails().getEmail().isEmpty())) {
+            errorsFound = true;
+        }
+
+        if (errorsFound == false && (user.getUserDetails().getPhone() == null || user.getUserDetails().getPhone().isEmpty())) {
+            errorsFound = true;
+        }
+
+        if (errorsFound == false && (user.getUserDetails().getInstitution() == null || user.getUserDetails().getInstitution().isEmpty())) {
+            errorsFound = true;
+        }
+
+        if (errorsFound == false && (user.getUserDetails().getInstitutionAbbreviation() == null || user.getUserDetails().getInstitutionAbbreviation().isEmpty())) {
+            errorsFound = true;
+        }
+
+        if (errorsFound == false && (user.getUserDetails().getInstitutionWeb() == null || user.getUserDetails().getInstitutionWeb().isEmpty())) {
+            errorsFound = true;
+        }
+
+        if (errorsFound == false && (user.getUserDetails().getAddress().getAddress1() == null || user.getUserDetails().getAddress().getAddress1().isEmpty())) {
+            errorsFound = true;
+        }
+
+        if (errorsFound == false && (user.getUserDetails().getAddress().getCountry() == null || user.getUserDetails().getAddress().getCountry().isEmpty())) {
+            errorsFound = true;
+        }
+
+        if (errorsFound == false && (user.getUserDetails().getAddress().getRegion() == null || user.getUserDetails().getAddress().getRegion().isEmpty())) {
+            errorsFound = true;
+        }
+
+        if (errorsFound == false && (user.getUserDetails().getAddress().getCity() == null || user.getUserDetails().getAddress().getCity().isEmpty())) {
+            errorsFound = true;
+        }
+
+        if (errorsFound == false && (user.getUserDetails().getAddress().getZipCode() == null || user.getUserDetails().getAddress().getZipCode().isEmpty())) {
+            errorsFound = true;
+        }
+
+        return errorsFound;
     }
 
     private String getUserCreationStatus(String resultJSON) {

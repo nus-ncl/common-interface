@@ -14,6 +14,7 @@ public class RegistrationInfo {
     private CredentialsEntity credentials;
     private UserEntity user;
     private TeamEntity team;
+    private boolean isJoinTeam;
 
     public CredentialsEntity getCredentials() {
         return credentials;
@@ -39,4 +40,11 @@ public class RegistrationInfo {
         this.team = team;
     }
 
+    public boolean getIsJoinTeam() {
+        return isJoinTeam;
+    }
+
+    public void setJoinTeam(boolean joinTeam) {
+        isJoinTeam = joinTeam;
+    }
 }

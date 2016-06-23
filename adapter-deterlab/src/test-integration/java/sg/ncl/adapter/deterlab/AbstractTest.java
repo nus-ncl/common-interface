@@ -1,6 +1,7 @@
 package sg.ncl.adapter.deterlab;
 
 import org.springframework.boot.test.SpringApplicationConfiguration;
+import sg.ncl.adapter.deterlab.data.jpa.App;
 
 /**
  * @author Christopher Zhong

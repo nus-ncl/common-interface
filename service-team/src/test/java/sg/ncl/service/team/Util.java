@@ -15,6 +15,8 @@ public class Util {
         entity.setId(RandomStringUtils.randomAlphanumeric(20));
         entity.setName(RandomStringUtils.randomAlphanumeric(20));
         entity.setDescription(RandomStringUtils.randomAlphanumeric(20));
+        entity.setWebsite("http://" + RandomStringUtils.randomAlphanumeric(20) + ".com");
+        entity.setOrganisationType(RandomStringUtils.randomAlphanumeric(20));
         entity.setApplicationDate(ZonedDateTime.now());
         return entity;
     }

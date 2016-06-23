@@ -2,24 +2,45 @@ package sg.ncl.adapter.deterlab;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
+import static sg.ncl.adapter.deterlab.ConnectionProperties.PREFIX;
+
 /**
  * Created by Te Ye
  */
-@ConfigurationProperties(prefix = ConnectionProperties.PREFIX)
+@ConfigurationProperties(prefix = PREFIX)
 public class ConnectionProperties {
 
-    public static final String PREFIX = "connection.properties";
+    public static final String PREFIX = "ncl.deterlab.adapter";
 
-    private String ADAPTER_IP = "172.18.178.10";
-    private String ADAPTER_PORT = "8080";
-    private String ADD_USERS_URI = "http://" + ADAPTER_IP + ":" + ADAPTER_PORT + "/addUsers";
+    private String ip;
+    private String port;
 
-    public String getADD_USERS_URI() {
-        return ADD_USERS_URI;
+    public String getIp() {
+        return ip;
     }
 
-    public void setADD_USERS_URI(String ADD_USERS_URI) {
-        this.ADD_USERS_URI = ADD_USERS_URI;
+    public void setIp(String ip) {
+        this.ip = ip;
     }
+
+    public String getPort() {
+        return port;
+    }
+
+    public void setPort(String port) {
+        this.port = port;
+    }
+
+    public String getAddUsersUri() {
+        return "http://" + ip + ":" + port + "/addUsers";
+    }
+
+    public String getApplyProjectNewUsers() {
+        return "http://" + ip + ":" + port + "/applyProjectNewUsers";
+    }
+
+//    public void setAddUsersUri(String addUsersUri) {
+//         not implemented
+//    }
 }
 

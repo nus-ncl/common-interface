@@ -46,13 +46,12 @@ public class UserRepositoryTest extends AbstractTest {
     }
 
     @Test
-    @Ignore("not null is not enforced")
     public void testNullUserDetails() throws Exception {
         final UserEntity entity = Util.getUserEntity();
         entity.setUserDetails(null);
 
         try {
-            repository.save(entity);
+            repository.saveAndFlush(entity);
         } catch (Exception e) {
             checkException(e, "NULL not allowed for column \"USER_DETAILS_ID\"");
             return;
@@ -61,13 +60,12 @@ public class UserRepositoryTest extends AbstractTest {
     }
 
     @Test
-    @Ignore("not null is not enforced")
     public void testNullApplicationDate() throws Exception {
         final UserEntity entity = Util.getUserEntity();
         entity.setApplicationDate(null);
 
         try {
-            repository.save(entity);
+            repository.saveAndFlush(entity);
         } catch (Exception e) {
             checkException(e, "NULL not allowed for column \"APPLICATION_DATE\"");
             return;

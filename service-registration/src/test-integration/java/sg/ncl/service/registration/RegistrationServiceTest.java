@@ -1,56 +1,147 @@
 package sg.ncl.service.registration;
 
-import org.junit.Ignore;
+import org.apache.commons.lang3.RandomStringUtils;
+import org.json.JSONObject;
+import org.junit.Before;
 import org.junit.Test;
-import sg.ncl.adapter.deterlab.AdapterDeterlab;
-import sg.ncl.adapter.deterlab.data.jpa.DeterlabUserRepository;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.MediaType;
+import org.springframework.test.web.client.MockRestServiceServer;
+import org.springframework.web.client.RestOperations;
+import org.springframework.web.client.RestTemplate;
+import sg.ncl.adapter.deterlab.ConnectionProperties;
 import sg.ncl.service.authentication.data.jpa.CredentialsEntity;
-import sg.ncl.service.authentication.logic.AuthenticationService;
-import sg.ncl.service.authentication.logic.CredentialsService;
-import sg.ncl.service.registration.data.jpa.repositories.RegistrationRepository;
+import sg.ncl.service.registration.exceptions.RegisterTeamNameDuplicateException;
+import sg.ncl.service.registration.exceptions.UserFormException;
 import sg.ncl.service.team.TeamService;
 import sg.ncl.service.team.data.jpa.entities.TeamEntity;
 import sg.ncl.service.user.domain.User;
-import sg.ncl.service.user.services.UserService;
 
 import javax.inject.Inject;
 
+import static org.springframework.test.web.client.match.MockRestRequestMatchers.method;
+import static org.springframework.test.web.client.match.MockRestRequestMatchers.requestTo;
+import static org.springframework.test.web.client.response.MockRestResponseCreators.withSuccess;
+
 /**
- * Created by Te Ye on 13-Jun-16.
+ * @author Te Ye
  */
 public class RegistrationServiceTest extends AbstractTest {
-
-    @Inject
-    private CredentialsService credentialsService;
-
-    @Inject
-    private AuthenticationService authenticationService;
 
     @Inject
     private TeamService teamService;
 
     @Inject
-    private UserService userService;
+    private ConnectionProperties properties;
 
     @Inject
-    private RegistrationRepository registrationRepository;
+    private RegistrationService registrationService;
 
-    @Inject
-    private DeterlabUserRepository deterlabUserRepository;
+    @Autowired
+    private RestOperations restOperations;
 
-    @Inject
-    private AdapterDeterlab adapterDeterlab;
+    private MockRestServiceServer mockServer;
+
+    private boolean isJoinTeam = true;
+
+    @Before
+    public void setUp() throws Exception {
+        mockServer = MockRestServiceServer.createServer((RestTemplate) restOperations);
+    }
 
     @Test
-    @Ignore
     public void registerTest() {
-        // Need the adapter service to be up on BOSS first
-        RegistrationService registrationService = new RegistrationService(authenticationService, credentialsService, teamService, userService, registrationRepository);
         CredentialsEntity credentialsEntity = Util.getCredentialsEntity();
         User user = Util.getUserEntity();
-        TeamEntity teamEntity = Util.getTeamEntity();
 
-        registrationService.register(credentialsEntity, user, teamEntity);
+        // apply to join team but since no teams exists yet
+        // create stub team
+        TeamEntity teamEntity = teamService.save(Util.getTeamEntity());
+
+        String stubUid = RandomStringUtils.randomAlphanumeric(8);
+        JSONObject predefinedResultJson = new JSONObject();
+        predefinedResultJson.put("msg", "user is created");
+        predefinedResultJson.put("uid", stubUid);
+
+        mockServer.expect(requestTo(properties.getAddUsersUri()))
+                .andExpect(method(HttpMethod.POST))
+                .andRespond(withSuccess(predefinedResultJson.toString(), MediaType.APPLICATION_JSON));
+
+        registrationService.register(credentialsEntity, user, teamEntity, isJoinTeam);
+    }
+
+    @Test
+    public void registerTestApplyNewProject() {
+        CredentialsEntity credentialsEntity = Util.getCredentialsEntity();
+        User user = Util.getUserEntity();
+
+        // apply to join team but since no teams exists yet
+        // create stub team
+        TeamEntity teamEntity = Util.getTeamEntity();
+        isJoinTeam = false;
+        String stubUid = RandomStringUtils.randomAlphanumeric(8);
+        JSONObject predefinedResultJson = new JSONObject();
+        predefinedResultJson.put("msg", "user is created");
+        predefinedResultJson.put("uid", stubUid);
+
+        mockServer.expect(requestTo(properties.getApplyProjectNewUsers()))
+                .andExpect(method(HttpMethod.POST))
+                .andRespond(withSuccess(predefinedResultJson.toString(), MediaType.APPLICATION_JSON));
+
+        registrationService.register(credentialsEntity, user, teamEntity, isJoinTeam);
+    }
+
+    @Test(expected = RegisterTeamNameDuplicateException.class)
+    public void registerTestApplyDuplicateTeamName() throws Exception {
+        CredentialsEntity credentialsEntity = Util.getCredentialsEntity();
+        User user = Util.getUserEntity();
+        isJoinTeam = false;
+
+        TeamEntity teamEntity = Util.getTeamEntity();
+        String teamName = teamEntity.getName();
+        teamService.save(teamEntity);
+
+        // purposely register for an already saved team
+        // don't have to mock server since will throw exception
+        registrationService.register(credentialsEntity, user, teamEntity, isJoinTeam);
+    }
+
+    @Test(expected = UserFormException.class)
+    public void registerTestUserFieldsError() throws Exception {
+        CredentialsEntity credentialsEntity = Util.getCredentialsEntity();
+        User user = Util.getInvalidUserEntity();
+
+        // apply to join team but since no teams exists yet
+        // create stub team
+        TeamEntity teamEntity = teamService.save(Util.getTeamEntity());
+
+        // don't have to mock server since will throw exception
+        registrationService.register(credentialsEntity, user, teamEntity, isJoinTeam);
+    }
+
+    @Test(expected = UserFormException.class)
+    public void registerTestCredentialsError() throws Exception {
+        CredentialsEntity credentialsEntity = Util.getInvalidCredentialsEntity();
+        User user = Util.getUserEntity();
+
+        // apply to join team but since no teams exists yet
+        // create stub team
+        TeamEntity teamEntity = teamService.save(Util.getTeamEntity());
+
+        // don't have to mock server since will throw exception
+        registrationService.register(credentialsEntity, user, teamEntity, isJoinTeam);
+    }
+
+    @Test(expected = UserFormException.class)
+    public void registerTestNoSuchTeamError() throws Exception {
+        CredentialsEntity credentialsEntity = Util.getCredentialsEntity();
+        User user = Util.getUserEntity();
+
+        TeamEntity teamEntity = Util.getInvalidTeamEntity();
+
+        // don't have to mock server since will throw exception
+        registrationService.register(credentialsEntity, user, teamEntity, isJoinTeam);
     }
 
 }

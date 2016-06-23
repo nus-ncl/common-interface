@@ -67,6 +67,38 @@ public class TeamEntityTest {
     }
 
     @Test
+    public void testGetWebsite() throws Exception {
+        final TeamEntity entity = new TeamEntity();
+
+        assertThat(entity.getWebsite(), is(nullValue()));
+    }
+
+    @Test
+    public void testSetWebsite() throws Exception {
+        final TeamEntity entity = new TeamEntity();
+        final String website = RandomStringUtils.randomAlphanumeric(20);
+        entity.setWebsite(website);
+
+        assertThat(entity.getWebsite(), is(website));
+    }
+
+    @Test
+    public void testGetOrganisationType() throws Exception {
+        final TeamEntity entity = new TeamEntity();
+
+        assertThat(entity.getOrganisationType(), is(nullValue()));
+    }
+
+    @Test
+    public void testSetOrganisationType() throws Exception {
+        final TeamEntity entity = new TeamEntity();
+        final String organisationType = RandomStringUtils.randomAlphanumeric(20);
+        entity.setOrganisationType(organisationType);
+
+        assertThat(entity.getOrganisationType(), is(organisationType));
+    }
+
+    @Test
     public void testGetVisibility() throws Exception {
         final TeamEntity entity = new TeamEntity();
 

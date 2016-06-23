@@ -5,6 +5,7 @@ dependencies {
     compile project(':service-team')
     compile project(':service-user')
     compile project(':adapter-deterlab')
+    compile project(':common-exception')
 
     runtime('mysql:mysql-connector-java')
 
