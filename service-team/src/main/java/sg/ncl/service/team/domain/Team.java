@@ -32,6 +32,20 @@ public interface Team {
     String getDescription();
 
     /**
+     * Returns the website of this {@link Team}.
+     *
+     * @return the website of this {@link Team}.
+     */
+    String getWebsite();
+
+    /**
+     * Returns the organisation type of this {@link Team}.
+     *
+     * @return the organisation type of this {@link Team}.
+     */
+    String getOrganisationType();
+
+    /**
      * Returns the {@link TeamVisibility} of this {@link Team}.
      *
      * @return the {@link TeamVisibility} of this {@link Team}.

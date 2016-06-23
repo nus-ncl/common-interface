@@ -43,6 +43,12 @@ public class TeamEntity extends AbstractEntity implements Team {
     @Column(name = "description")
     private String description;
 
+    @Column(name = "website", nullable = false)
+    private String website;
+
+    @Column(name = "organisation_type", nullable = false)
+    private String organisationType;
+
     @Column(name = "visibility", nullable = false)
     @Enumerated(EnumType.STRING)
     private TeamVisibility visibility = TeamVisibility.PUBLIC;
@@ -90,6 +96,24 @@ public class TeamEntity extends AbstractEntity implements Team {
 
     public void setDescription(final String description) {
         this.description = description;
+    }
+
+    @Override
+    public String getWebsite() {
+        return website;
+    }
+
+    public void setWebsite(String website) {
+        this.website = website;
+    }
+
+    @Override
+    public String getOrganisationType() {
+        return organisationType;
+    }
+
+    public void setOrganisationType(String organisationType) {
+        this.organisationType = organisationType;
     }
 
     @Override
@@ -184,5 +208,4 @@ public class TeamEntity extends AbstractEntity implements Team {
         sb.append('}');
         return sb.toString();
     }
-
 }

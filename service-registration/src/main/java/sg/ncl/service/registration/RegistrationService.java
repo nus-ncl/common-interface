@@ -81,6 +81,8 @@ public class RegistrationService {
             teamEntity.setVisibility(team.getVisibility());
             teamEntity.setApplicationDate(ZonedDateTime.now());
             teamEntity.setDescription(team.getDescription());
+            teamEntity.setWebsite(team.getWebsite());
+            teamEntity.setOrganisationType(team.getOrganisationType());
             teamEntity.setPrivacy(team.getPrivacy());
             teamEntity = teamService.save(teamEntity);
             teamId = teamEntity.getId();

@@ -33,6 +33,8 @@ public class TeamService {
 
         teamEntity.setName(team.getName());
         teamEntity.setDescription(team.getDescription());
+        teamEntity.setWebsite(team.getWebsite());
+        teamEntity.setOrganisationType(team.getOrganisationType());
         teamEntity.setApplicationDate(team.getApplicationDate());
 
         return teamRepository.save(teamEntity);
