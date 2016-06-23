@@ -43,6 +43,8 @@ public class RegistrationServiceTest extends AbstractTest {
 
     private MockRestServiceServer mockServer;
 
+    private boolean isJoinTeam = true;
+
     @Before
     public void setUp() throws Exception {
         mockServer = MockRestServiceServer.createServer((RestTemplate) restOperations);
@@ -66,7 +68,28 @@ public class RegistrationServiceTest extends AbstractTest {
                 .andExpect(method(HttpMethod.POST))
                 .andRespond(withSuccess(predefinedResultJson.toString(), MediaType.APPLICATION_JSON));
 
-        registrationService.register(credentialsEntity, user, teamEntity);
+        registrationService.register(credentialsEntity, user, teamEntity, isJoinTeam);
+    }
+
+    @Test
+    public void registerTestApplyNewProject() {
+        CredentialsEntity credentialsEntity = Util.getCredentialsEntity();
+        User user = Util.getUserEntity();
+
+        // apply to join team but since no teams exists yet
+        // create stub team
+        TeamEntity teamEntity = Util.getTeamEntity();
+        isJoinTeam = false;
+        String stubUid = RandomStringUtils.randomAlphanumeric(8);
+        JSONObject predefinedResultJson = new JSONObject();
+        predefinedResultJson.put("msg", "user is created");
+        predefinedResultJson.put("uid", stubUid);
+
+        mockServer.expect(requestTo(properties.getApplyProjectNewUsers()))
+                .andExpect(method(HttpMethod.POST))
+                .andRespond(withSuccess(predefinedResultJson.toString(), MediaType.APPLICATION_JSON));
+
+        registrationService.register(credentialsEntity, user, teamEntity, isJoinTeam);
     }
 
     @Test(expected = UserFormException.class)
@@ -79,7 +102,7 @@ public class RegistrationServiceTest extends AbstractTest {
         TeamEntity teamEntity = teamService.save(Util.getTeamEntity());
 
         // don't have to mock server since will throw exception
-        registrationService.register(credentialsEntity, user, teamEntity);
+        registrationService.register(credentialsEntity, user, teamEntity, isJoinTeam);
     }
 
     @Test(expected = UserFormException.class)
@@ -92,7 +115,7 @@ public class RegistrationServiceTest extends AbstractTest {
         TeamEntity teamEntity = teamService.save(Util.getTeamEntity());
 
         // don't have to mock server since will throw exception
-        registrationService.register(credentialsEntity, user, teamEntity);
+        registrationService.register(credentialsEntity, user, teamEntity, isJoinTeam);
     }
 
     @Test(expected = UserFormException.class)
@@ -103,7 +126,7 @@ public class RegistrationServiceTest extends AbstractTest {
         TeamEntity teamEntity = Util.getInvalidTeamEntity();
 
         // don't have to mock server since will throw exception
-        registrationService.register(credentialsEntity, user, teamEntity);
+        registrationService.register(credentialsEntity, user, teamEntity, isJoinTeam);
     }
 
 }

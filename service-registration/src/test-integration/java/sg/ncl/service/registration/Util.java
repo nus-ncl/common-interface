@@ -18,7 +18,7 @@ public class Util {
     public static TeamEntity getTeamEntity() {
         final TeamEntity entity = new TeamEntity();
         entity.setId(RandomStringUtils.randomAlphanumeric(20));
-        entity.setName(RandomStringUtils.randomAlphanumeric(20));
+        entity.setName(RandomStringUtils.randomAlphanumeric(6));
         entity.setDescription(RandomStringUtils.randomAlphanumeric(20));
         entity.setApplicationDate(ZonedDateTime.now());
         return entity;
@@ -42,10 +42,10 @@ public class Util {
         userDetailsEntity.setLastName(RandomStringUtils.randomAlphabetic(20));
         userDetailsEntity.setJobTitle(RandomStringUtils.randomAlphabetic(20));
         userDetailsEntity.setEmail(RandomStringUtils.randomAlphabetic(8) + "@nus.edu.sg");
-        userDetailsEntity.setPhone(RandomStringUtils.randomNumeric(20));
+        userDetailsEntity.setPhone(RandomStringUtils.randomNumeric(8));
         userDetailsEntity.setInstitution(RandomStringUtils.randomAlphabetic(20));
         userDetailsEntity.setInstitutionAbbreviation(RandomStringUtils.randomAlphabetic(15));
-        userDetailsEntity.setInstitutionWeb(RandomStringUtils.randomAlphabetic(20));
+        userDetailsEntity.setInstitutionWeb("http://" + RandomStringUtils.randomAlphabetic(8) + ".com");
 
         final AddressEntity address = new AddressEntity();
         address.setAddress1(RandomStringUtils.randomAlphabetic(20));
@@ -53,7 +53,7 @@ public class Util {
         address.setCountry(RandomStringUtils.randomAlphabetic(20));
         address.setRegion(RandomStringUtils.randomAlphabetic(20));
         address.setCity(RandomStringUtils.randomAlphabetic(20));
-        address.setZipCode(RandomStringUtils.randomNumeric(20));
+        address.setZipCode(RandomStringUtils.randomNumeric(8));
 
         userDetailsEntity.setAddress(address);
         userEntity.setUserDetails(userDetailsEntity);

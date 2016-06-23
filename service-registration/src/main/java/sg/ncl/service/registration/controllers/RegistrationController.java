@@ -29,6 +29,6 @@ public class RegistrationController {
 //        System.out.println("User: " + registrationInfo.getUser());
 //        System.out.println("Team: " + registrationInfo.getTeam());
 //        System.out.println("Registration: " + registrationInfo.getRegistration());
-        registrationService.register(registrationInfo.getCredentials(), registrationInfo.getUser(), registrationInfo.getTeam());
+        registrationService.register(registrationInfo.getCredentials(), registrationInfo.getUser(), registrationInfo.getTeam(), registrationInfo.getIsJoinTeam());
     }
 }

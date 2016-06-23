@@ -20,6 +20,7 @@ import sg.ncl.service.user.domain.User;
 import sg.ncl.service.user.services.UserService;
 
 import javax.inject.Inject;
+import java.time.ZonedDateTime;
 
 /**
  * @author Christopher Zhong
@@ -46,42 +47,7 @@ public class RegistrationService {
         this.adapterDeterlab = new AdapterDeterlab(deterlabUserRepository, connectionProperties);
     }
 
-    /*
-    public void register2(RegistrationData registrationData) {
-        // create credentials object
-        // create user object
-        // create team object
-
-        UserEntity userEntity = new UserEntity();
-        UserDetailsEntity userDetails = new UserDetailsEntity();
-        AddressEntity addressEntity = new AddressEntity();
-        addressEntity.setAddress1(registrationData.getUsrAddr());
-        addressEntity.setAddress2(registrationData.getUsrAddr2());
-        addressEntity.setCountry(registrationData.getUsrCountry());
-        addressEntity.setRegion(registrationData.getUsrCity());
-        addressEntity.setZipCode(registrationData.getUsrZip());
-
-        // FIXME hardcoded first,last name until can find solution to merge with full name
-        userDetails.setFirstName("John");
-        userDetails.setLastName("Doe");
-        userDetails.setEmail(registrationData.getUsrEmail());
-        userDetails.setAddress(addressEntity);
-        userEntity.setUserDetails(userDetails);
-
-        String userId = userService.addUser(userEntity);
-
-        CredentialsEntity credentialsEntity = new CredentialsEntity();
-        credentialsEntity.setId(userId);
-        credentialsEntity.setUsername(registrationData.getUsrEmail());
-        credentialsEntity.setPassword(registrationData.getClearPassword());
-
-        credentialsService.addCredentials(credentialsEntity);
-
-        TeamEntity teamEntity = new TeamEntity();
-    }
-    */
-
-    public void register(CredentialsEntity credentials, User user, Team team) {
+    public void register(CredentialsEntity credentials, User user, Team team, boolean isJoinTeam) {
 
         if (userFormFieldsHasErrors(user)) {
             logger.warn("User form fields has errors {}", user);
@@ -93,13 +59,32 @@ public class RegistrationService {
             throw new UserFormException();
         }
 
-        if (team.getId() == null || team.getId().isEmpty()) {
+
+        if (isJoinTeam == true && (team.getId() == null || team.getId().isEmpty())) {
             logger.warn("Team id from join existing team is empty");
             throw new UserFormException();
         }
 
-        // accept the team data
-        TeamEntity teamEntity = teamService.find(team.getId());
+        String resultJSON;
+        String teamId;
+        TeamEntity teamEntity;
+
+        if (isJoinTeam == true) {
+            // accept the team data
+            teamEntity = teamService.find(team.getId());
+            teamId = team.getId();
+        } else {
+            // apply for new team
+            // check if team already exists
+            teamEntity = new TeamEntity();
+            teamEntity.setName(team.getName());
+            teamEntity.setVisibility(team.getVisibility());
+            teamEntity.setApplicationDate(ZonedDateTime.now());
+            teamEntity.setDescription(team.getDescription());
+            teamEntity.setPrivacy(team.getPrivacy());
+            teamEntity = teamService.save(teamEntity);
+            teamId = teamEntity.getId();
+        }
 
         // accept user data from form
         String userId = userService.addUser(user);
@@ -109,11 +94,9 @@ public class RegistrationService {
         credentialsService.addCredentials(credentials);
 
         // add user to team and vice versa
-        userService.addUserToTeam(userId, team.getId());
-        teamService.addUserToTeam(userId, team.getId());
+        userService.addUserToTeam(userId, teamId);
+        teamService.addUserToTeam(userId, teamId);
 
-        // call python script (create a new user in deterlab)
-        // parse in a the json string
         JSONObject userObject = new JSONObject();
         userObject.put("firstName", user.getUserDetails().getFirstName());
         userObject.put("lastName", user.getUserDetails().getLastName());
@@ -132,7 +115,22 @@ public class RegistrationService {
         userObject.put("city", user.getUserDetails().getAddress().getCity());
         userObject.put("zipCode", user.getUserDetails().getAddress().getZipCode());
 
-        String resultJSON = adapterDeterlab.addUsers(userObject.toString());
+        if (isJoinTeam == true) {
+
+            // call python script (create a new user in deterlab)
+            // parse in a the json string
+            resultJSON = adapterDeterlab.addUsers(userObject.toString());
+
+        } else {
+            // call python script to apply for new project
+            userObject.put("projName", teamEntity.getName());
+            userObject.put("projGoals", teamEntity.getDescription());
+            userObject.put("pid", teamEntity.getName());
+            userObject.put("projWeb", "http://www.nus.edu.sg");
+            userObject.put("projOrg", "Academic");
+            userObject.put("projPublic", teamEntity.getVisibility());
+            resultJSON = adapterDeterlab.applyProjectNewUsers(userObject.toString());
+        }
 
         if (getUserCreationStatus(resultJSON).equals("user is created")) {
             // store form fields into registration repository for recreation when required

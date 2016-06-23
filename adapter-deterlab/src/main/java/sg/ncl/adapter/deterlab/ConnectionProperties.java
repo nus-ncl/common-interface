@@ -35,6 +35,10 @@ public class ConnectionProperties {
         return "http://" + ip + ":" + port + "/addUsers";
     }
 
+    public String getApplyProjectNewUsers() {
+        return "http://" + ip + ":" + port + "/applyProjectNewUsers";
+    }
+
 //    public void setAddUsersUri(String addUsersUri) {
 //         not implemented
 //    }

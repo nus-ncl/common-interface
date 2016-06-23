@@ -63,7 +63,7 @@ public class RegistrationControllerTest extends AbstractTest {
     }
 
     @Test
-    public void registerNewUserTest() throws Exception {
+    public void registerNewUserJoinExistingTeamTest() throws Exception {
         CredentialsEntity credentialsEntity = Util.getCredentialsEntity();
         UserEntity userEntity = Util.getUserEntity();
 
@@ -87,6 +87,7 @@ public class RegistrationControllerTest extends AbstractTest {
         mainJSON.put("credentials", credentialsFields);
         mainJSON.put("user", userFields);
         mainJSON.put("team", teamFields);
+        mainJSON.put("isJoinTeam", "true");
 
         String stubUid = RandomStringUtils.randomAlphanumeric(8);
         JSONObject predefinedResultJson = new JSONObject();
