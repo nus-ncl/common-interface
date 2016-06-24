@@ -16,6 +16,9 @@ public class RegistrationInfo {
     private TeamEntity team;
     private boolean isJoinTeam;
 
+    // for joining and apply teams after logged on
+    private String uid;
+
     public CredentialsEntity getCredentials() {
         return credentials;
     }
@@ -46,5 +49,13 @@ public class RegistrationInfo {
 
     public void setJoinTeam(boolean joinTeam) {
         isJoinTeam = joinTeam;
+    }
+
+    public String getUid() {
+        return uid;
+    }
+
+    public void setUid(String uid) {
+        this.uid = uid;
     }
 }

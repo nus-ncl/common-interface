@@ -13,6 +13,8 @@ import sg.ncl.service.authentication.logic.CredentialsService;
 import sg.ncl.service.registration.data.jpa.entities.RegistrationEntity;
 import sg.ncl.service.registration.data.jpa.repositories.RegistrationRepository;
 import sg.ncl.service.registration.exceptions.RegisterTeamNameDuplicateException;
+import sg.ncl.service.registration.exceptions.RegisterTeamNameEmptyException;
+import sg.ncl.service.registration.exceptions.RegisterUidNullException;
 import sg.ncl.service.registration.exceptions.UserFormException;
 import sg.ncl.service.team.TeamService;
 import sg.ncl.service.team.data.jpa.entities.TeamEntity;
@@ -47,6 +49,26 @@ public class RegistrationService {
         this.userService = userService;
         this.registrationRepository = registrationRepository;
         this.adapterDeterlab = new AdapterDeterlab(deterlabUserRepository, connectionProperties);
+    }
+
+    public void registerRequestToJoinTeam(String uid, Team team) {
+        if (team.getName() == null || team.getName().isEmpty()) {
+            throw new RegisterTeamNameEmptyException();
+        }
+
+        if (uid == null || uid.isEmpty()) {
+            throw new RegisterUidNullException();
+        }
+
+        TeamEntity teamEntity = teamService.find(team.getId());
+        String teamId = team.getId();
+
+        JSONObject userObject = new JSONObject();
+        userObject.put("pid", teamEntity.getName());
+        String resultJSON = adapterDeterlab.joinProject(userObject.toString());
+
+        // TODO add user to team?
+        // TODO add team to user?
     }
 
     public void register(CredentialsEntity credentials, User user, Team team, boolean isJoinTeam) {
@@ -139,7 +161,7 @@ public class RegistrationService {
             // call python script (create a new user in deterlab)
             // parse in a the json string
             userObject.put("pid", teamEntity.getName());
-            resultJSON = adapterDeterlab.addUsers(userObject.toString());
+            resultJSON = adapterDeterlab.joinProjectNewUsers(userObject.toString());
 
         } else {
             // call python script to apply for new project
