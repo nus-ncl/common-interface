@@ -1,6 +1,8 @@
 dependencies {
     compile project(':common-jpa')
-    compile('org.springframework.boot:spring-boot-starter-web')
+    compile project(':common-jpa')
+    compile project(':common-jwt')
+
     compile('javax.inject:javax.inject')
 
     runtime('mysql:mysql-connector-java')
@@ -10,6 +12,7 @@ dependencies {
     testCompile('org.apache.commons:commons-lang3:3.4')
 
     integrationTestCompile('org.springframework.boot:spring-boot-starter-test')
+    integrationTestCompile project(':common-test')
 
     integrationTestRuntime('com.h2database:h2')
 }

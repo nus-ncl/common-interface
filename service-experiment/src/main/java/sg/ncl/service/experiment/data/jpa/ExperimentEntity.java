@@ -1,4 +1,4 @@
-package sg.ncl.service.experiment.data.jpa.entities;
+package sg.ncl.service.experiment.data.jpa;
 
 import sg.ncl.common.jpa.AbstractEntity;
 import sg.ncl.service.experiment.domain.Experiment;
@@ -10,7 +10,7 @@ import javax.persistence.Id;
 import javax.persistence.Table;
 
 /**
- * @author Christopher Zhong
+ * Created by Desmond
  */
 @Entity
 @Table(name = "experiments")
@@ -44,11 +44,9 @@ public class ExperimentEntity extends AbstractEntity implements Experiment {
         return id;
     }
 
-    void setId(final Long id) {
+    public void setId(final Long id) {
         this.id = id;
     }
-
-
 
     @Override
     public String getTeamId() {

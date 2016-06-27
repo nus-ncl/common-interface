@@ -3,7 +3,7 @@ package sg.ncl.service.experiment.domain;
 /**
  * The {@link Experiment} interface represents a realization.
  *
- * @author Christopher Zhong
+ * Created by Desmond
  */
 public interface Experiment {
 
@@ -20,3 +20,4 @@ public interface Experiment {
     Integer getIdleSwap();
     Integer getMaxDuration();
 }
+
