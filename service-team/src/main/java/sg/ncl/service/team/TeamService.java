@@ -6,6 +6,7 @@ import sg.ncl.service.team.data.jpa.repositories.TeamRepository;
 import sg.ncl.service.team.domain.Team;
 import sg.ncl.service.team.domain.TeamVisibility;
 import sg.ncl.service.team.dtos.TeamInfo;
+import sg.ncl.service.team.dtos.TeamMemberInfo;
 import sg.ncl.service.team.exceptions.TeamIdNullException;
 import sg.ncl.service.team.exceptions.TeamNameNullException;
 import sg.ncl.service.team.exceptions.TeamNotFoundException;
@@ -105,10 +106,9 @@ public class TeamService {
         teamRepository.save(one);
     }
 
-    public void addUserToTeam(final String userId, final String teamId) {
-
+    public void addUserToTeam(final String teamId, TeamMemberInfo teamMemberInfo) {
             TeamEntity teamEntity = find(teamId);
-            teamEntity.addMember(userId);
+            teamEntity.addMember(teamMemberInfo);
             teamRepository.save(teamEntity);
     }
 
@@ -118,6 +118,8 @@ public class TeamService {
         teamEntity.setName("Aries");
         teamEntity.setDescription("This is a project description");
         teamEntity.setApplicationDate(ZonedDateTime.now());
+        teamEntity.setOrganisationType("Academic");
+        teamEntity.setWebsite("http://www.nus.edu.sg");
         teamRepository.save(teamEntity);
     }
 }
