@@ -10,6 +10,7 @@ import sg.ncl.service.experiment.Util;
 import sg.ncl.service.experiment.data.jpa.ExperimentEntity;
 import sg.ncl.service.experiment.data.jpa.ExperimentRepository;
 
+
 import javax.inject.Inject;
 
 import java.time.ZonedDateTime;
@@ -41,21 +42,9 @@ public class ExperimentRepositoryTest extends AbstractTest {
         final long count = repository.count();
         final ExperimentEntity savedEntity = repository.saveAndFlush(entity);
         assertThat(repository.count(), is(equalTo(count + 1)));
-        assertThat(entity.getId(), is(equalTo(savedEntity.getId())));
         assertThat(savedEntity.getCreatedDate(), is(not(nullValue(ZonedDateTime.class))));
         assertThat(savedEntity.getLastModifiedDate(), is(not(nullValue(ZonedDateTime.class))));
         assertThat(savedEntity.getVersion(), is(equalTo(0L)));
-    }
-
-    @Test
-    public void testSaveNullId() throws Exception {
-        final ExperimentEntity entity = Util.getExperimentsEntity();
-        entity.setId(null);
-
-        exception.expect(JpaSystemException.class);
-        exception.expectMessage(ExperimentEntity.class.getName());
-
-        repository.saveAndFlush(entity);
     }
 
     @Test
@@ -100,7 +89,7 @@ public class ExperimentRepositoryTest extends AbstractTest {
     @Test
     public void testSaveNullNsFile() throws Exception {
         final ExperimentEntity entity = Util.getExperimentsEntity();
-        entity.setName(null);
+        entity.setNsFile(null);
 
         try {
             repository.saveAndFlush(entity);
@@ -113,7 +102,7 @@ public class ExperimentRepositoryTest extends AbstractTest {
     @Test
     public void testSaveNullIdleSwap() throws Exception {
         final ExperimentEntity entity = Util.getExperimentsEntity();
-        entity.setName(null);
+        entity.setIdleSwap(null);
 
         try {
             repository.saveAndFlush(entity);
@@ -126,7 +115,7 @@ public class ExperimentRepositoryTest extends AbstractTest {
     @Test
     public void testSaveNullMaxDuration() throws Exception {
         final ExperimentEntity entity = Util.getExperimentsEntity();
-        entity.setName(null);
+        entity.setMaxDuration(null);
 
         try {
             repository.saveAndFlush(entity);
