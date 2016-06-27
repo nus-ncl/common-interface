@@ -48,6 +48,19 @@ public class ExperimentRepositoryTest extends AbstractTest {
     }
 
     @Test
+    public void testSaveNullUserId() throws Exception {
+        final ExperimentEntity entity = Util.getExperimentsEntity();
+        entity.setUserId(null);
+
+        try {
+            repository.saveAndFlush(entity);
+            exception.expect(DataIntegrityViolationException.class);
+        } catch (Exception e) {
+            checkException(e, "NULL not allowed for column \"USER_ID\"");
+        }
+    }
+
+    @Test
     public void testSaveNullTeamId() throws Exception {
         final ExperimentEntity entity = Util.getExperimentsEntity();
         entity.setTeamId(null);

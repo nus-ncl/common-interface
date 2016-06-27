@@ -12,6 +12,7 @@ public class Util {
     public static ExperimentEntity getExperimentsEntity() {
         final ExperimentEntity entity = new ExperimentEntity();
         entity.setId(RandomUtils.nextLong(100000000, 999999999));
+        entity.setUserId(RandomStringUtils.randomAlphanumeric(20));
         entity.setTeamId(RandomStringUtils.randomAlphanumeric(20));
         entity.setName(RandomStringUtils.randomAlphanumeric(20));
         entity.setDescription(RandomStringUtils.randomAlphanumeric(20));
