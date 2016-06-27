@@ -99,7 +99,7 @@ allprojects {
         executionData test, integrationTest
         // temporary hack to fix a bug requiring that there be at least one test case in each source set for coverage data to be generated;
         // it should be if there is at least one test case in any of the source sets
-        executionData = files(executionData.findAll({ it.exists() }))
+//        executionData = files(executionData.findAll({ it.exists() }))
     }
 }
 
@@ -123,17 +123,24 @@ dependencies {
 
 testReport {
     dependsOn check, subprojects.testReport
-    reportOn test, subprojects.test, subprojects.integrationTest
+    reportOn test, integrationTest, subprojects.test, subprojects.integrationTest
 }
 
-jacocoTestReport {
-    dependsOn check, subprojects.jacocoTestReport
-    executionData subprojects.jacocoTestReport.executionData
+task jacocoMerge(type: JacocoMerge) {
+    executionData test, integrationTest, subprojects.test, subprojects.integrationTest
     // temporary hack to fix a bug requiring that there be at least one test case in each source set for coverage data to be generated;
     // it should be if there is at least one test case in any of the source sets
     executionData = files(executionData.findAll({ it.exists() }))
-    println '>>>>>:'
-    executionData.each { println " - " + it + ":" + it.exists() }
+}
+
+task mergeJacocoTestReport(type: JacocoReport) {
+    dependsOn check, subprojects.jacocoTestReport, jacocoMerge
+    executionData jacocoMerge.destinationFile
+    // temporary hack to fix a bug requiring that there be at least one test case in each source set for coverage data to be generated;
+    // it should be if there is at least one test case in any of the source sets
+    executionData = files(executionData.findAll({ it.exists() }))
+    sourceDirectories = files(sourceSets.main.java.srcDirs, subprojects.sourceSets.main.java.srcDirs)
+    classDirectories = files(sourceSets.main.output.classesDir, subprojects.sourceSets.main.output.classesDir)
 }
 
 task wrapper(type: Wrapper) {
