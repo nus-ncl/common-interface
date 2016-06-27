@@ -2,10 +2,8 @@ package sg.ncl.service.team.data.jpa.entities;
 
 import org.hibernate.annotations.GenericGenerator;
 import sg.ncl.common.jpa.AbstractEntity;
-import sg.ncl.service.team.domain.Team;
-import sg.ncl.service.team.domain.TeamPrivacy;
-import sg.ncl.service.team.domain.TeamStatus;
-import sg.ncl.service.team.domain.TeamVisibility;
+import sg.ncl.service.team.domain.*;
+import sg.ncl.service.team.dtos.TeamMemberInfo;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -166,7 +164,8 @@ public class TeamEntity extends AbstractEntity implements Team {
         return new ArrayList<>(members.values());
     }
 
-    public void addMember(final String userId) {
+    public void addMember(final TeamMemberInfo teamMemberInfo) {
+        String userId = teamMemberInfo.getUserId();
         if (members.containsKey(userId)) {
 //            throw new UserAlreadyInTeam();
         } else {
@@ -174,6 +173,7 @@ public class TeamEntity extends AbstractEntity implements Team {
             teamMemberEntity.setUserId(userId);
             teamMemberEntity.setTeam(this);
             teamMemberEntity.setJoinedDate(ZonedDateTime.now());
+            teamMemberEntity.setTeamMemberType(teamMemberInfo.getTeamMemberType());
             members.put(userId, teamMemberEntity);
         }
     }
