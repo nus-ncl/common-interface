@@ -13,5 +13,10 @@ public interface Experiment {
      * @return the unique identifier of this {@link Experiment}.
      */
     Long getId();
-
+    String getTeamId();
+    String getName();
+    String getDescription();
+    String getNsFile();
+    Integer getIdleSwap();
+    Integer getMaxDuration();
 }

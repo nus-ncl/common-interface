@@ -21,6 +21,24 @@ public class ExperimentEntity extends AbstractEntity implements Experiment {
     @Column(name = "id", nullable = false, unique = true, updatable = false)
     private Long id;
 
+    @Column(name = "team_id", nullable = false, updatable = false)
+    private String teamId;
+
+    @Column(name = "name", nullable = false)
+    private String name;
+
+    @Column(name = "description", nullable = false)
+    private String description;
+
+    @Column(name = "ns_file", nullable = false)
+    private String nsFile;
+
+    @Column(name = "idle_swap", nullable = false)
+    private Integer idleSwap;
+
+    @Column(name = "max_duration", nullable = false)
+    private Integer maxDuration;
+
     @Override
     public Long getId() {
         return id;
@@ -54,4 +72,57 @@ public class ExperimentEntity extends AbstractEntity implements Experiment {
         return sb.toString();
     }
 
+    @Override
+    public String getTeamId() {
+        return teamId;
+    }
+
+    public void setTeamId(String teamId) {
+        this.teamId = teamId;
+    }
+
+    @Override
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    @Override
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    @Override
+    public String getNsFile() {
+        return nsFile;
+    }
+
+    public void setNsFile(String nsFile) {
+        this.nsFile = nsFile;
+    }
+
+    @Override
+    public Integer getIdleSwap() {
+        return idleSwap;
+    }
+
+    public void setIdleSwap(Integer idleSwap) {
+        this.idleSwap = idleSwap;
+    }
+
+    @Override
+    public Integer getMaxDuration() {
+        return maxDuration;
+    }
+
+    public void setMaxDuration(Integer maxDuration) {
+        this.maxDuration = maxDuration;
+    }
 }
