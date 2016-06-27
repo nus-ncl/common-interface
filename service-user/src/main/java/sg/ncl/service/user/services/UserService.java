@@ -80,12 +80,28 @@ public class UserService {
             one.getUserDetails().setLastName(userUserDetails.getLastName());
         }
 
+        if (userUserDetails.getJobTitle() != null) {
+            one.getUserDetails().setJobTitle(userUserDetails.getJobTitle());
+        }
+
         if (userUserDetails.getEmail() != null) {
             one.getUserDetails().setEmail(userUserDetails.getEmail());
         }
 
         if (userUserDetails.getPhone() != null) {
             one.getUserDetails().setPhone(userUserDetails.getPhone());
+        }
+
+        if (userUserDetails.getInstitution() != null) {
+            one.getUserDetails().setInstitution(userUserDetails.getInstitution());
+        }
+
+        if (userUserDetails.getInstitutionAbbreviation() != null) {
+            one.getUserDetails().setInstitutionAbbreviation(userUserDetails.getInstitutionAbbreviation());
+        }
+
+        if (userUserDetails.getInstitutionWeb() != null) {
+            one.getUserDetails().setInstitutionWeb(userUserDetails.getInstitutionWeb());
         }
 
         final Address userAddress = user.getUserDetails().getAddress();
@@ -102,6 +118,10 @@ public class UserService {
 
             if (userAddress.getCountry() != null) {
                 one.getUserDetails().getAddress().setCountry(userAddress.getCountry());
+            }
+
+            if (userAddress.getCity() != null) {
+                one.getUserDetails().getAddress().setCity(userAddress.getCity());
             }
 
             if (userAddress.getRegion() != null) {
