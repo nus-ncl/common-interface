@@ -21,6 +21,9 @@ public class ExperimentEntity extends AbstractEntity implements Experiment {
     @Column(name = "id", nullable = false, unique = true, updatable = false)
     private Long id;
 
+    @Column(name = "user_id", nullable = false, updatable = false)
+    private String userId;
+
     @Column(name = "team_id", nullable = false, updatable = false)
     private String teamId;
 
@@ -46,6 +49,15 @@ public class ExperimentEntity extends AbstractEntity implements Experiment {
 
     public void setId(final Long id) {
         this.id = id;
+    }
+
+    @Override
+    public String getUserId() {
+        return userId;
+    }
+
+    public void setUserId(String userId) {
+        this.userId = userId;
     }
 
     @Override

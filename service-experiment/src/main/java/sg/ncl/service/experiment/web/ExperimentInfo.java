@@ -8,6 +8,7 @@ import sg.ncl.service.experiment.domain.Experiment;
 public class ExperimentInfo implements Experiment {
 
     private Long id;
+    private String userId;
     private String teamId;
     private String name;
     private String description;
@@ -18,6 +19,11 @@ public class ExperimentInfo implements Experiment {
     @Override
     public Long getId() {
         return id;
+    }
+
+    @Override
+    public String getUserId() {
+        return userId;
     }
 
     @Override
@@ -49,4 +55,6 @@ public class ExperimentInfo implements Experiment {
     public Integer getMaxDuration() {
         return maxDuration;
     }
+
+
 }
