@@ -13,9 +13,9 @@ import javax.sql.DataSource;
 @Configuration
 public class TestConfig {
 
-    @Bean
-    DataSource dataSource() {
-        return new EmbeddedDatabaseBuilder().setType(EmbeddedDatabaseType.H2).build();
-    }
+//    @Bean
+//    DataSource dataSource() {
+//        return new EmbeddedDatabaseBuilder().setType(EmbeddedDatabaseType.H2).build();
+//    }
 
 }

@@ -1,10 +1,10 @@
-package sg.ncl.service.experiment.controllers;
+package sg.ncl.service.experiment.web;
 
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
-import sg.ncl.service.experiment.data.jpa.repositories.ExperimentRepository;
+import sg.ncl.service.experiment.data.jpa.ExperimentRepository;
 
 import javax.inject.Inject;
 
