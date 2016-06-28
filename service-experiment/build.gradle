@@ -1,6 +1,7 @@
 dependencies {
     compile project(':common-jpa')
-    compile('org.springframework.boot:spring-boot-starter-web')
+    compile project(':common-exception')
+
     compile('javax.inject:javax.inject')
 
     runtime('mysql:mysql-connector-java')
@@ -9,7 +10,9 @@ dependencies {
     testCompile('org.hamcrest:hamcrest-library')
     testCompile('org.apache.commons:commons-lang3:3.4')
 
+    integrationTestCompile project(':common-test')
     integrationTestCompile('org.springframework.boot:spring-boot-starter-test')
+    integrationTestCompile('com.h2database:h2')
 
     integrationTestRuntime('com.h2database:h2')
 }

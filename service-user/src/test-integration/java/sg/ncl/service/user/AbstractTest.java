@@ -5,5 +5,5 @@ import org.springframework.boot.test.SpringApplicationConfiguration;
 /**
  * @author Christopher Zhong
  */
-@SpringApplicationConfiguration(App.class)
+@SpringApplicationConfiguration(UserApplication.class)
 public abstract class AbstractTest extends sg.ncl.common.test.AbstractTest {}
