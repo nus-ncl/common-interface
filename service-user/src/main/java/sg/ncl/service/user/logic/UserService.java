@@ -50,16 +50,8 @@ public class UserService {
     }
 
     @Transactional
-    public UserEntity findUser(final String id) {
-        if (id == null || id.isEmpty()) {
-            throw new UserIdNullException();
-        }
-
-        final UserEntity one = userRepository.findOne(id);
-        if (one == null) {
-            throw new UserNotFoundException();
-        }
-        return one;
+    public User findUser(final String id) {
+        return findUserEntity(id);
     }
 
     @Transactional
@@ -146,6 +138,12 @@ public class UserService {
     }
 
     private UserEntity findAndAddTeam(final String userId, final String teamId) {
+        UserEntity one = findUserEntity(userId);
+        one.addTeamId(teamId);
+        return one;
+    }
+
+    private UserEntity findUserEntity(final String userId) {
         if (userId == null || userId.isEmpty()) {
             throw new UserIdNullException();
         }
@@ -154,8 +152,6 @@ public class UserService {
         if (one == null) {
             throw new UserNotFoundException();
         }
-
-        one.addTeamId(teamId);
         return one;
     }
 }

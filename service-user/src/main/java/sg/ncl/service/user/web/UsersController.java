@@ -37,7 +37,7 @@ public class UsersController {
     @RequestMapping(path = "/{id}", method = RequestMethod.GET)
     @ResponseStatus(code = HttpStatus.OK)
     public User getUser(@PathVariable String id) {
-        return new UserInfo(userService.findUser(id));
+        return userService.findUser(id);
     }
 
     @RequestMapping(path = "/{id}", method = RequestMethod.PUT)
