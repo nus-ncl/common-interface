@@ -42,7 +42,7 @@ public class UserService {
     }
 
     @Transactional
-    public List<User> get() {
+    public List<User> getAll() {
         final List<User> result = new ArrayList<>();
         for (UserEntity user : userRepository.findAll()) {
             result.add(user);

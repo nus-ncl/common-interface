@@ -27,7 +27,7 @@ public class UserServiceTest extends AbstractTest {
     @Test
     public void getAllUserWithNoUserInDbTest() throws Exception {
         UserService userService = new UserService(userRepository);
-        List<User> list = userService.get();
+        List<User> list = userService.getAll();
         Assert.assertTrue(list.size() == 0);
     }
 
@@ -41,7 +41,7 @@ public class UserServiceTest extends AbstractTest {
             userArray[i] = userEntityArray[0];
         }
 
-        List<User> userList2 = userService.get();
+        List<User> userList2 = userService.getAll();
 
         Assert.assertThat(userList2, IsIterableContainingInAnyOrder.containsInAnyOrder(userArray));
     }

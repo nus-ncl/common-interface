@@ -8,9 +8,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
-import sg.ncl.service.user.data.jpa.UserEntity;
 import sg.ncl.service.user.domain.User;
-import sg.ncl.service.user.domain.UserDetails;
 import sg.ncl.service.user.logic.UserService;
 
 import javax.inject.Inject;
@@ -33,7 +31,7 @@ public class UsersController {
     @RequestMapping(method = RequestMethod.GET)
     @ResponseStatus(code = HttpStatus.OK)
     public List<User> get() {
-        return userService.get();
+        return userService.getAll();
     }
 
     @RequestMapping(path = "/{id}", method = RequestMethod.GET)
