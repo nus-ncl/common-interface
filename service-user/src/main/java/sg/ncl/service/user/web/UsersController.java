@@ -1,4 +1,4 @@
-package sg.ncl.service.user.controllers;
+package sg.ncl.service.user.web;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
