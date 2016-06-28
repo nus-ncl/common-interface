@@ -49,19 +49,19 @@ public class UserServiceTest extends AbstractTest {
     @Test(expected = UserIdNullException.class)
     public void getUserWithNullIdTest() throws Exception {
         UserService userService = new UserService(userRepository);
-        userService.find(null);
+        userService.findUser(null);
     }
 
     @Test(expected = UserIdNullException.class)
     public void getUserWithEmptyIdTest() throws Exception {
         UserService userService = new UserService(userRepository);
-        userService.find("");
+        userService.findUser("");
     }
 
     @Test(expected = UserNotFoundException.class)
     public void findUserWithNoUserInDbTest() throws Exception {
         UserService userService = new UserService(userRepository);
-        userService.find(RandomStringUtils.randomAlphabetic(20));
+        userService.findUser(RandomStringUtils.randomAlphabetic(20));
     }
 
     @Test
@@ -71,7 +71,7 @@ public class UserServiceTest extends AbstractTest {
         final String idString = userArray[0].getId();
         final UserEntity originalEntity = userArray[1];
 
-        UserEntity fromDbEntity = userService.find(idString);
+        UserEntity fromDbEntity = userService.findUser(idString);
 
         UserDetailsEntity originalDetails = originalEntity.getUserDetails();
         UserDetailsEntity fromDbDetails = fromDbEntity.getUserDetails();
@@ -101,7 +101,7 @@ public class UserServiceTest extends AbstractTest {
         final String idString = userEntityArray[0].getId();
 
         // get user and store the original last name
-        UserEntity userEntity = userService.find(idString);
+        UserEntity userEntity = userService.findUser(idString);
         final String originalLastName = userEntity.getUserDetails().getLastName();
 
         // change first name and put
@@ -110,7 +110,7 @@ public class UserServiceTest extends AbstractTest {
 
         userService.update(idString, userEntity.getUserDetails());
 
-        userEntity = userService.find(idString);
+        userEntity = userService.findUser(idString);
         Assert.assertEquals(userEntity.getUserDetails().getFirstName(), newFirstName);
         Assert.assertEquals(userEntity.getUserDetails().getLastName(), originalLastName);
     }
@@ -122,7 +122,7 @@ public class UserServiceTest extends AbstractTest {
         final String idString = userEntityArray[0].getId();
 
         // get user and store the original last name
-        UserEntity userEntity = userService.find(idString);
+        UserEntity userEntity = userService.findUser(idString);
 
         // change first name and put
         userEntity.getUserDetails().setFirstName(null);
@@ -172,7 +172,7 @@ public class UserServiceTest extends AbstractTest {
         userEntity.addTeamId(teamId);
         userService.update(userId, userEntity.getUserDetails());
 
-        UserEntity userEntityFromDb = userService.find(userId);
+        UserEntity userEntityFromDb = userService.findUser(userId);
         List<String> teamList = userEntityFromDb.getTeamIds();
         Assert.assertEquals(teamList.get(0), teamId);
     }
@@ -183,7 +183,7 @@ public class UserServiceTest extends AbstractTest {
         UserEntity userEntity = Util.getUserEntity();
         User user = userService.createUser(userEntity);
 
-        UserEntity userEntityFromDb = userService.find(user.getId());
+        UserEntity userEntityFromDb = userService.findUser(user.getId());
         Assert.assertEquals(userEntity.getUserDetails(), userEntityFromDb.getUserDetails());
     }
 }
