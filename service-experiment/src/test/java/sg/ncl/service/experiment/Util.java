@@ -4,6 +4,9 @@ import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.commons.lang3.RandomUtils;
 import sg.ncl.service.experiment.data.jpa.ExperimentEntity;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * Created by Desmond.
  */
@@ -20,5 +23,15 @@ public class Util {
         entity.setIdleSwap(RandomUtils.nextInt(100000000, 999999999));
         entity.setMaxDuration(RandomUtils.nextInt(100000000, 999999999));
         return entity;
+    }
+
+    public static boolean isListEqual(List<ExperimentEntity> one, List<ExperimentEntity> two) {
+        ArrayList<ExperimentEntity> cp = new ArrayList<>(one);
+        for (ExperimentEntity twoIterator : two) {
+            if (!cp.remove(twoIterator)) {
+                return false;
+            }
+        }
+        return cp.isEmpty();
     }
 }

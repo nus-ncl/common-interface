@@ -44,7 +44,7 @@ public class ExperimentServiceTest extends AbstractTest {
     }
 
     @Test
-    public void testGetExperiment() {
+    public void testGetExperiment() throws Exception {
         ExperimentService experimentService = new ExperimentService(experimentRepository);
 
         List<ExperimentEntity> list = new ArrayList<>();
@@ -54,22 +54,21 @@ public class ExperimentServiceTest extends AbstractTest {
         }
 
         List<ExperimentEntity> listFromDb = experimentService.get();
-
-        Assert.assertTrue(isListEqual(list, listFromDb));
+        Assert.assertTrue(Util.isListEqual(list, listFromDb));
     }
 
-    private boolean isListEqual(List<ExperimentEntity> one, List<ExperimentEntity> two) {
-        ArrayList<ExperimentEntity> cp = new ArrayList<>(one);
-        for (ExperimentEntity twoIterator : two) {
-            if (!cp.remove(twoIterator)) {
-                return false;
-            }
-        }
-        return cp.isEmpty();
-    }
+//    private boolean isListEqual(List<ExperimentEntity> one, List<ExperimentEntity> two) {
+//        ArrayList<ExperimentEntity> cp = new ArrayList<>(one);
+//        for (ExperimentEntity twoIterator : two) {
+//            if (!cp.remove(twoIterator)) {
+//                return false;
+//            }
+//        }
+//        return cp.isEmpty();
+//    }
 
     @Test
-    public void testGetExperimentsByUser() {
+    public void testGetExperimentsByUser() throws Exception {
         ExperimentService experimentService = new ExperimentService(experimentRepository);
 
         final String userId = RandomStringUtils.randomAlphanumeric(20);
@@ -88,7 +87,7 @@ public class ExperimentServiceTest extends AbstractTest {
     }
 
     @Test
-    public void testGetExperimentsUserHasNoExperiments() {
+    public void testGetExperimentsUserHasNoExperiments() throws Exception {
         ExperimentService experimentService = new ExperimentService(experimentRepository);
 
         final String userId = RandomStringUtils.randomAlphanumeric(20);
