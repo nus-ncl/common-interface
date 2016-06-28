@@ -1,4 +1,4 @@
-package sg.ncl.service.user.dtos;
+package sg.ncl.service.user.web;
 
 import sg.ncl.service.user.data.jpa.entities.AddressEntity;
 import sg.ncl.service.user.domain.Address;
