@@ -12,6 +12,7 @@ import sg.ncl.service.user.exceptions.UserIdNullException;
 import sg.ncl.service.user.exceptions.UserNotFoundException;
 
 import javax.inject.Inject;
+import javax.transaction.Transactional;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -29,6 +30,7 @@ public class UserService {
         this.userRepository = userRepository;
     }
 
+    @Transactional
     public String addUser(User user) {
         final UserEntity userEntity = new UserEntity();
         userEntity.setApplicationDate(user.getApplicationDate());
@@ -39,6 +41,7 @@ public class UserService {
         return savedUserEntity.getId();
     }
 
+    @Transactional
     public List<User> get() {
         final List<User> result = new ArrayList<>();
         for (UserEntity user : userRepository.findAll()) {
@@ -48,6 +51,7 @@ public class UserService {
         return result;
     }
 
+    @Transactional
     public UserEntity find(final String id) {
         if (id == null || id.isEmpty()) {
             throw new UserIdNullException();
@@ -60,6 +64,7 @@ public class UserService {
         return one;
     }
 
+    @Transactional
     public void update(final String id, final User user) {
         if (id == null || id.isEmpty()) {
             throw new UserIdNullException();
@@ -171,6 +176,7 @@ public class UserService {
         userRepository.save(userEntity);
     }
 
+    @Transactional
     public void addUserToTeam(final String userId, final String teamId) {
 
         UserEntity userEntity = find(userId);
