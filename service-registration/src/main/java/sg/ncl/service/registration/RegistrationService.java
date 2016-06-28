@@ -19,7 +19,7 @@ import sg.ncl.service.team.data.jpa.entities.TeamEntity;
 import sg.ncl.service.team.domain.Team;
 import sg.ncl.service.team.exceptions.TeamNotFoundException;
 import sg.ncl.service.user.domain.User;
-import sg.ncl.service.user.services.UserService;
+import sg.ncl.service.user.logic.UserService;
 
 import javax.inject.Inject;
 import java.time.ZonedDateTime;

@@ -1,4 +1,4 @@
-package sg.ncl.service.user.services;
+package sg.ncl.service.user.logic;
 
 import org.apache.commons.lang3.RandomStringUtils;
 import org.hamcrest.collection.IsIterableContainingInAnyOrder;
@@ -15,9 +15,7 @@ import sg.ncl.service.user.exceptions.UserIdNullException;
 import sg.ncl.service.user.exceptions.UserNotFoundException;
 
 import javax.inject.Inject;
-import java.time.ZonedDateTime;
 import java.util.List;
-import java.util.concurrent.ExecutionException;
 
 /**
  * Created by Desmond

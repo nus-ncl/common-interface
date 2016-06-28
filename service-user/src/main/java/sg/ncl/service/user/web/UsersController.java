@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.RestController;
 import sg.ncl.service.user.data.jpa.entities.UserEntity;
 import sg.ncl.service.user.domain.User;
 import sg.ncl.service.user.dtos.UserInfo;
-import sg.ncl.service.user.services.UserService;
+import sg.ncl.service.user.logic.UserService;
 
 import javax.inject.Inject;
 import java.util.List;
