@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import sg.ncl.service.user.data.jpa.UserEntity;
 import sg.ncl.service.user.domain.User;
+import sg.ncl.service.user.domain.UserDetails;
 import sg.ncl.service.user.logic.UserService;
 
 import javax.inject.Inject;
@@ -43,7 +44,7 @@ public class UsersController {
 
     @RequestMapping(path = "/{id}", method = RequestMethod.PUT)
     @ResponseStatus(code = HttpStatus.ACCEPTED)
-    public void updateUser(@PathVariable String id, @RequestBody UserEntity user) {
+    public void updateUser(@PathVariable String id, @RequestBody UserDetailsInfo user) {
         userService.update(id, user);
     }
 

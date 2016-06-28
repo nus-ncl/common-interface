@@ -1,5 +1,7 @@
 package sg.ncl.service.user.web;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import sg.ncl.service.user.data.jpa.UserDetailsEntity;
 import sg.ncl.service.user.domain.UserDetails;
 
@@ -18,7 +20,8 @@ public class UserDetailsInfo implements UserDetails {
     private final String institutionAbbreviation;
     private final String institutionWeb;
 
-    public UserDetailsInfo(final String firstName, final String lastName, final String jobTitle, final AddressInfo address, final String email, final String phone, final String institution, final String institutionAbbreviation, final String institutionWeb) {
+    @JsonCreator
+    public UserDetailsInfo(@JsonProperty("firstName") final String firstName, @JsonProperty("lastName") final String lastName, @JsonProperty("jobTitle") final String jobTitle, @JsonProperty("address") final AddressInfo address, @JsonProperty("email") final String email, @JsonProperty("phone") final String phone, @JsonProperty("institution") final String institution, @JsonProperty("institutionAbbreviation") final String institutionAbbreviation, @JsonProperty("institutionWeb") final String institutionWeb) {
         this.firstName = firstName;
         this.lastName = lastName;
         this.jobTitle = jobTitle;

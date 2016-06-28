@@ -65,7 +65,7 @@ public class UserService {
     }
 
     @Transactional
-    public void update(final String id, final User user) {
+    public void update(final String id, final UserDetails user) {
         if (id == null || id.isEmpty()) {
             throw new UserIdNullException();
         }
@@ -75,41 +75,41 @@ public class UserService {
             throw new UserNotFoundException();
         }
 
-        final UserDetails userUserDetails = user.getUserDetails();
+//        final UserDetails user = user.getUserDetails();
 
-        if (userUserDetails.getFirstName() != null) {
-            one.getUserDetails().setFirstName(userUserDetails.getFirstName());
+        if (user.getFirstName() != null) {
+            one.getUserDetails().setFirstName(user.getFirstName());
         }
 
-        if (userUserDetails.getLastName() != null) {
-            one.getUserDetails().setLastName(userUserDetails.getLastName());
+        if (user.getLastName() != null) {
+            one.getUserDetails().setLastName(user.getLastName());
         }
 
-        if (userUserDetails.getJobTitle() != null) {
-            one.getUserDetails().setJobTitle(userUserDetails.getJobTitle());
+        if (user.getJobTitle() != null) {
+            one.getUserDetails().setJobTitle(user.getJobTitle());
         }
 
-        if (userUserDetails.getEmail() != null) {
-            one.getUserDetails().setEmail(userUserDetails.getEmail());
+        if (user.getEmail() != null) {
+            one.getUserDetails().setEmail(user.getEmail());
         }
 
-        if (userUserDetails.getPhone() != null) {
-            one.getUserDetails().setPhone(userUserDetails.getPhone());
+        if (user.getPhone() != null) {
+            one.getUserDetails().setPhone(user.getPhone());
         }
 
-        if (userUserDetails.getInstitution() != null) {
-            one.getUserDetails().setInstitution(userUserDetails.getInstitution());
+        if (user.getInstitution() != null) {
+            one.getUserDetails().setInstitution(user.getInstitution());
         }
 
-        if (userUserDetails.getInstitutionAbbreviation() != null) {
-            one.getUserDetails().setInstitutionAbbreviation(userUserDetails.getInstitutionAbbreviation());
+        if (user.getInstitutionAbbreviation() != null) {
+            one.getUserDetails().setInstitutionAbbreviation(user.getInstitutionAbbreviation());
         }
 
-        if (userUserDetails.getInstitutionWeb() != null) {
-            one.getUserDetails().setInstitutionWeb(userUserDetails.getInstitutionWeb());
+        if (user.getInstitutionWeb() != null) {
+            one.getUserDetails().setInstitutionWeb(user.getInstitutionWeb());
         }
 
-        final Address userAddress = user.getUserDetails().getAddress();
+        final Address userAddress = user.getAddress();
 
         if (userAddress != null) {
 

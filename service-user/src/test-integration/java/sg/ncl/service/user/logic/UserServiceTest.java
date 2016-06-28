@@ -108,7 +108,7 @@ public class UserServiceTest extends AbstractTest {
         String newFirstName = RandomStringUtils.randomAlphabetic(20);
         userEntity.getUserDetails().setFirstName(newFirstName);
 
-        userService.update(idString, userEntity);
+        userService.update(idString, userEntity.getUserDetails());
 
         userEntity = userService.find(idString);
         Assert.assertEquals(userEntity.getUserDetails().getFirstName(), newFirstName);
@@ -127,21 +127,21 @@ public class UserServiceTest extends AbstractTest {
         // change first name and put
         userEntity.getUserDetails().setFirstName(null);
 
-        userService.update(idString, userEntity);
+        userService.update(idString, userEntity.getUserDetails());
     }
 
     @Test(expected = UserIdNullException.class)
     public void updateUserNullIdTest() throws Exception {
         UserService userService = new UserService(userRepository);
         UserEntity userEntity = new UserEntity();
-        userService.update(null, userEntity);
+        userService.update(null, userEntity.getUserDetails());
     }
 
     @Test(expected = UserIdNullException.class)
     public void updateUserEmptyIdTest() throws Exception {
         UserService userService = new UserService(userRepository);
         UserEntity userEntity = new UserEntity();
-        userService.update("", userEntity);
+        userService.update("", userEntity.getUserDetails());
     }
 
     private UserEntity[] addUser() throws Exception {
@@ -170,7 +170,7 @@ public class UserServiceTest extends AbstractTest {
         String userId = userEntity.getId();
         String teamId = RandomStringUtils.randomAlphabetic(20);
         userEntity.addTeamId(teamId);
-        userService.update(userId, userEntity);
+        userService.update(userId, userEntity.getUserDetails());
 
         UserEntity userEntityFromDb = userService.find(userId);
         List<String> teamList = userEntityFromDb.getTeamIds();

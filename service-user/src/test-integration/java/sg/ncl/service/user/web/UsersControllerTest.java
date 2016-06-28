@@ -138,7 +138,7 @@ public class UsersControllerTest extends AbstractTest {
         String newFirstName = RandomStringUtils.randomAlphabetic(20);
         userEntityFromDb.getUserDetails().setFirstName(newFirstName);
 
-        String jsonInString = mapper.writeValueAsString(userEntityFromDb);
+        String jsonInString = mapper.writeValueAsString(userEntityFromDb.getUserDetails());
 
         // put
         mockMvc.perform(put("/users/" + idString).contentType(contentType).content(jsonInString))
