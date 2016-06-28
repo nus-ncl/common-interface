@@ -3,10 +3,7 @@ package sg.ncl.service.experiment.web;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
-import com.google.gson.reflect.TypeToken;
-import net.minidev.json.JSONObject;
 import org.apache.commons.lang3.RandomStringUtils;
-import org.hamcrest.collection.IsIterableContainingInAnyOrder;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -51,6 +48,7 @@ public class ExperimentsControllerTest extends AbstractTest {
 
     @Test
     public void testGetAllExperimentsWithNothingInDb() throws Exception {
+        
         MvcResult result = mockMvc.perform(get("/experiments/experiments")
                 .contentType(contentType))
                 .andReturn();
@@ -59,6 +57,7 @@ public class ExperimentsControllerTest extends AbstractTest {
 
     @Test
     public void testPostExperiment() throws Exception {
+
         ExperimentEntity experimentsEntity = Util.getExperimentsEntity();
         ObjectMapper mapper = new ObjectMapper();
         mapper.registerModule(new JavaTimeModule());
@@ -82,6 +81,7 @@ public class ExperimentsControllerTest extends AbstractTest {
 
     @Test
     public void testGetAllExperiments() throws Exception {
+
         // add 3 entries to database
         List<ExperimentEntity> experimentEntityList = new ArrayList<>();
 
@@ -108,9 +108,11 @@ public class ExperimentsControllerTest extends AbstractTest {
 
     @Test
     public void testGetExperimentsByUserId() throws Exception {
-        String userId = RandomStringUtils.randomAlphanumeric(20);
 
-        for (int i = 0; i < 6; i++) {
+        String userId = RandomStringUtils.randomAlphanumeric(20);
+        int numEntries = 6;
+
+        for (int i = 0; i < numEntries; i++) {
             ExperimentEntity experimentEntity = Util.getExperimentsEntity();
 
             if (i % 2 == 0) {
@@ -136,5 +138,8 @@ public class ExperimentsControllerTest extends AbstractTest {
         for (ExperimentEntity forEntity : experimentEntityList) {
             Assert.assertEquals(forEntity.getUserId(), userId);
         }
+
+        List<ExperimentEntity> allExperiments = experimentRepository.findAll();
+        Assert.assertEquals(allExperiments.size(), numEntries);
     }
 }
