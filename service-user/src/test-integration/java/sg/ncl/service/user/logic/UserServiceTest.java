@@ -181,9 +181,9 @@ public class UserServiceTest extends AbstractTest {
     public void addUserTest() throws Exception {
         UserService userService = new UserService(userRepository);
         UserEntity userEntity = Util.getUserEntity();
-        String userId = userService.addUser(userEntity);
+        User user = userService.createUser(userEntity);
 
-        UserEntity userEntityFromDb = userService.find(userId);
+        UserEntity userEntityFromDb = userService.find(user.getId());
         Assert.assertEquals(userEntity.getUserDetails(), userEntityFromDb.getUserDetails());
     }
 }

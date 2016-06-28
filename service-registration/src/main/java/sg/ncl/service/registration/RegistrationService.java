@@ -106,7 +106,7 @@ public class RegistrationService {
         }
 
         // accept user data from form
-        String userId = userService.addUser(user);
+        String userId = userService.createUser(user).getId();
 
         // create the credentials after creating the users
         credentials.setId(userId);

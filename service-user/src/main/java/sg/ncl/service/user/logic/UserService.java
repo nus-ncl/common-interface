@@ -31,14 +31,14 @@ public class UserService {
     }
 
     @Transactional
-    public String addUser(User user) {
+    public User createUser(User user) {
         final UserEntity userEntity = new UserEntity();
         userEntity.setApplicationDate(user.getApplicationDate());
         userEntity.setProcessedDate(user.getProcessedDate());
         userEntity.setUserDetails((UserDetailsEntity) user.getUserDetails());
 
         UserEntity savedUserEntity = userRepository.save(userEntity);
-        return savedUserEntity.getId();
+        return savedUserEntity;
     }
 
     @Transactional
