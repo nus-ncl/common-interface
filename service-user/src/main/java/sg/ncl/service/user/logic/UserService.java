@@ -1,7 +1,6 @@
 package sg.ncl.service.user.logic;
 
 import org.springframework.stereotype.Service;
-import sg.ncl.service.user.data.jpa.AddressEntity;
 import sg.ncl.service.user.data.jpa.UserDetailsEntity;
 import sg.ncl.service.user.data.jpa.UserEntity;
 import sg.ncl.service.user.data.jpa.UserRepository;
@@ -13,7 +12,6 @@ import sg.ncl.service.user.exceptions.UserNotFoundException;
 
 import javax.inject.Inject;
 import javax.transaction.Transactional;
-import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -52,7 +50,7 @@ public class UserService {
     }
 
     @Transactional
-    public UserEntity find(final String id) {
+    public UserEntity findUser(final String id) {
         if (id == null || id.isEmpty()) {
             throw new UserIdNullException();
         }
@@ -143,9 +141,21 @@ public class UserService {
 
     @Transactional
     public void addUserToTeam(final String userId, final String teamId) {
-
-        UserEntity userEntity = find(userId);
-        userEntity.addTeamId(teamId);
+        UserEntity userEntity = findAndAddTeam(userId, teamId);
         userRepository.save(userEntity);
+    }
+
+    private UserEntity findAndAddTeam(final String userId, final String teamId) {
+        if (userId == null || userId.isEmpty()) {
+            throw new UserIdNullException();
+        }
+
+        final UserEntity one = userRepository.findOne(userId);
+        if (one == null) {
+            throw new UserNotFoundException();
+        }
+
+        one.addTeamId(teamId);
+        return one;
     }
 }
