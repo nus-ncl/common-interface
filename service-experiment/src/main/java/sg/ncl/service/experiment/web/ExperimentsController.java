@@ -27,7 +27,7 @@ public class ExperimentsController {
         this.experimentService = experimentService;
     }
 
-    @RequestMapping(path = "/teams", method = RequestMethod.GET)
+    @RequestMapping(path = "/experiments", method = RequestMethod.GET)
     @ResponseStatus(code = HttpStatus.OK)
     public List<ExperimentEntity> get() {
         return experimentService.get();
