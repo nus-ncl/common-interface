@@ -1,0 +1,7 @@
+# Spring Boot Configuration
+# For more information, please read http://docs.spring.io/spring-boot/docs/current/reference/html/index.html
+ncl:
+  jwt:
+    api-key: 123
+    signing-algorithm: HS256
+    expiry-duration: PT1H

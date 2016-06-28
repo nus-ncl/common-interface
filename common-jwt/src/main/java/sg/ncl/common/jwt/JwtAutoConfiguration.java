@@ -46,7 +46,7 @@ public class JwtAutoConfiguration {
     @Bean
     @ConditionalOnMissingBean(SignatureAlgorithm.class)
     public SignatureAlgorithm signatureAlgorithm() {
-        final String value = properties.getSignatureAlgorithm();
+        final String value = properties.getSigningAlgorithm();
         if (value == null || value.isEmpty()) {
             logger.warn("No signature algorithm was specified; using default: {}", DEFAULT_SIGNATURE_ALGORITHM);
             return DEFAULT_SIGNATURE_ALGORITHM;
