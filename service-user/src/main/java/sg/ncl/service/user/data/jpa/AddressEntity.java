@@ -33,7 +33,7 @@ public class AddressEntity extends AbstractEntity implements Address {
     @Column(name = "region")
     private String region;
 
-    @Column(name = "city")
+    @Column(name = "city", nullable = false)
     private String city;
 
     @Column(name = "zip_code", nullable = false)

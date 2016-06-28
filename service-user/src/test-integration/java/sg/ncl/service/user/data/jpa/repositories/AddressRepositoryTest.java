@@ -71,6 +71,19 @@ public class AddressRepositoryTest extends AbstractTest {
     }
 
     @Test
+    public void testNullCity() throws Exception {
+        final AddressEntity entity = Util.getAddressEntity();
+        entity.setCity(null);
+        try {
+            repository.save(entity);
+        } catch (Exception e) {
+            checkException(e, "NULL not allowed for column \"CITY\"");
+            return;
+        }
+        exception.expect(DataIntegrityViolationException.class);
+    }
+
+    @Test
     public void testNullZipCode() throws Exception {
         final AddressEntity entity = Util.getAddressEntity();
         entity.setZipCode(null);
