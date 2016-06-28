@@ -1,4 +1,4 @@
-package sg.ncl.service.user.data.jpa.entities;
+package sg.ncl.service.user.data.jpa;
 
 import org.hibernate.annotations.GenericGenerator;
 import org.hibernate.annotations.Type;

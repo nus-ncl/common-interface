@@ -1,16 +1,15 @@
 package sg.ncl.service.user.data.jpa.repositories;
 
-import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.springframework.dao.DataIntegrityViolationException;
 import sg.ncl.service.user.AbstractTest;
 import sg.ncl.service.user.Util;
-import sg.ncl.service.user.data.jpa.entities.UserEntity;
+import sg.ncl.service.user.data.jpa.UserRepository;
+import sg.ncl.service.user.data.jpa.UserEntity;
 
 import javax.inject.Inject;
-import java.time.ZonedDateTime;
 
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;

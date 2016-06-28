@@ -1,4 +1,4 @@
-package sg.ncl.service.user.data.jpa.entities;
+package sg.ncl.service.user.data.jpa;
 
 import sg.ncl.common.jpa.AbstractEntity;
 import sg.ncl.service.user.domain.Address;

@@ -1,10 +1,10 @@
-package sg.ncl.service.user.services;
+package sg.ncl.service.user.logic;
 
 import org.springframework.stereotype.Service;
-import sg.ncl.service.user.data.jpa.entities.AddressEntity;
-import sg.ncl.service.user.data.jpa.entities.UserDetailsEntity;
-import sg.ncl.service.user.data.jpa.entities.UserEntity;
-import sg.ncl.service.user.data.jpa.repositories.UserRepository;
+import sg.ncl.service.user.data.jpa.AddressEntity;
+import sg.ncl.service.user.data.jpa.UserDetailsEntity;
+import sg.ncl.service.user.data.jpa.UserEntity;
+import sg.ncl.service.user.data.jpa.UserRepository;
 import sg.ncl.service.user.domain.Address;
 import sg.ncl.service.user.domain.User;
 import sg.ncl.service.user.domain.UserDetails;
@@ -12,6 +12,7 @@ import sg.ncl.service.user.exceptions.UserIdNullException;
 import sg.ncl.service.user.exceptions.UserNotFoundException;
 
 import javax.inject.Inject;
+import javax.transaction.Transactional;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -29,6 +30,7 @@ public class UserService {
         this.userRepository = userRepository;
     }
 
+    @Transactional
     public String addUser(User user) {
         final UserEntity userEntity = new UserEntity();
         userEntity.setApplicationDate(user.getApplicationDate());
@@ -39,6 +41,7 @@ public class UserService {
         return savedUserEntity.getId();
     }
 
+    @Transactional
     public List<User> get() {
         final List<User> result = new ArrayList<>();
         for (UserEntity user : userRepository.findAll()) {
@@ -48,6 +51,7 @@ public class UserService {
         return result;
     }
 
+    @Transactional
     public UserEntity find(final String id) {
         if (id == null || id.isEmpty()) {
             throw new UserIdNullException();
@@ -60,7 +64,8 @@ public class UserService {
         return one;
     }
 
-    public void update(final String id, final User user) {
+    @Transactional
+    public void update(final String id, final UserDetails user) {
         if (id == null || id.isEmpty()) {
             throw new UserIdNullException();
         }
@@ -70,41 +75,41 @@ public class UserService {
             throw new UserNotFoundException();
         }
 
-        final UserDetails userUserDetails = user.getUserDetails();
+//        final UserDetails user = user.getUserDetails();
 
-        if (userUserDetails.getFirstName() != null) {
-            one.getUserDetails().setFirstName(userUserDetails.getFirstName());
+        if (user.getFirstName() != null) {
+            one.getUserDetails().setFirstName(user.getFirstName());
         }
 
-        if (userUserDetails.getLastName() != null) {
-            one.getUserDetails().setLastName(userUserDetails.getLastName());
+        if (user.getLastName() != null) {
+            one.getUserDetails().setLastName(user.getLastName());
         }
 
-        if (userUserDetails.getJobTitle() != null) {
-            one.getUserDetails().setJobTitle(userUserDetails.getJobTitle());
+        if (user.getJobTitle() != null) {
+            one.getUserDetails().setJobTitle(user.getJobTitle());
         }
 
-        if (userUserDetails.getEmail() != null) {
-            one.getUserDetails().setEmail(userUserDetails.getEmail());
+        if (user.getEmail() != null) {
+            one.getUserDetails().setEmail(user.getEmail());
         }
 
-        if (userUserDetails.getPhone() != null) {
-            one.getUserDetails().setPhone(userUserDetails.getPhone());
+        if (user.getPhone() != null) {
+            one.getUserDetails().setPhone(user.getPhone());
         }
 
-        if (userUserDetails.getInstitution() != null) {
-            one.getUserDetails().setInstitution(userUserDetails.getInstitution());
+        if (user.getInstitution() != null) {
+            one.getUserDetails().setInstitution(user.getInstitution());
         }
 
-        if (userUserDetails.getInstitutionAbbreviation() != null) {
-            one.getUserDetails().setInstitutionAbbreviation(userUserDetails.getInstitutionAbbreviation());
+        if (user.getInstitutionAbbreviation() != null) {
+            one.getUserDetails().setInstitutionAbbreviation(user.getInstitutionAbbreviation());
         }
 
-        if (userUserDetails.getInstitutionWeb() != null) {
-            one.getUserDetails().setInstitutionWeb(userUserDetails.getInstitutionWeb());
+        if (user.getInstitutionWeb() != null) {
+            one.getUserDetails().setInstitutionWeb(user.getInstitutionWeb());
         }
 
-        final Address userAddress = user.getUserDetails().getAddress();
+        final Address userAddress = user.getAddress();
 
         if (userAddress != null) {
 
@@ -136,41 +141,7 @@ public class UserService {
         userRepository.save(one);
     }
 
-    public void seedData() {
-
-        final UserEntity userEntity = new UserEntity();
-        userEntity.setApplicationDate(ZonedDateTime.now());
-        userEntity.setCreatedDate(ZonedDateTime.now());
-        userEntity.setLastModifiedDate(ZonedDateTime.now());
-
-        final UserDetailsEntity userDetailsEntity = new UserDetailsEntity();
-        userDetailsEntity.setCreatedDate(ZonedDateTime.now());
-        userDetailsEntity.setLastModifiedDate(ZonedDateTime.now());
-        userDetailsEntity.setFirstName("john");
-        userDetailsEntity.setLastName("doe");
-        userDetailsEntity.setJobTitle("research assistant");
-        userDetailsEntity.setEmail("johndoe@nus.edu.sg");
-        userDetailsEntity.setPhone("12345678");
-        userDetailsEntity.setInstitution("national university of singapore");
-        userDetailsEntity.setInstitutionAbbreviation("NUS");
-        userDetailsEntity.setInstitutionWeb("http://www.nus.edu.sg");
-
-        final AddressEntity address = new AddressEntity();
-        address.setCreatedDate(ZonedDateTime.now());
-        address.setLastModifiedDate(ZonedDateTime.now());
-        address.setAddress1("computing drive 12");
-        address.setAddress2("another address 2");
-        address.setCountry("singapore");
-        address.setCity("singapore");
-        address.setRegion("west");
-        address.setZipCode("123456");
-
-        userDetailsEntity.setAddress(address);
-        userEntity.setUserDetails(userDetailsEntity);
-
-        userRepository.save(userEntity);
-    }
-
+    @Transactional
     public void addUserToTeam(final String userId, final String teamId) {
 
         UserEntity userEntity = find(userId);

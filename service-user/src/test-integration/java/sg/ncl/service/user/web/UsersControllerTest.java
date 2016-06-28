@@ -1,4 +1,4 @@
-package sg.ncl.service.user.controllers;
+package sg.ncl.service.user.web;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -14,13 +14,10 @@ import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.web.context.WebApplicationContext;
 import sg.ncl.service.user.AbstractTest;
 import sg.ncl.service.user.Util;
-import sg.ncl.service.user.data.jpa.entities.AddressEntity;
-import sg.ncl.service.user.data.jpa.entities.UserDetailsEntity;
-import sg.ncl.service.user.data.jpa.entities.UserEntity;
-import sg.ncl.service.user.data.jpa.repositories.UserRepository;
+import sg.ncl.service.user.data.jpa.UserEntity;
+import sg.ncl.service.user.data.jpa.UserRepository;
 
 import javax.inject.Inject;
-import java.time.ZonedDateTime;
 import java.util.List;
 
 import static org.hamcrest.core.Is.is;
@@ -141,7 +138,7 @@ public class UsersControllerTest extends AbstractTest {
         String newFirstName = RandomStringUtils.randomAlphabetic(20);
         userEntityFromDb.getUserDetails().setFirstName(newFirstName);
 
-        String jsonInString = mapper.writeValueAsString(userEntityFromDb);
+        String jsonInString = mapper.writeValueAsString(userEntityFromDb.getUserDetails());
 
         // put
         mockMvc.perform(put("/users/" + idString).contentType(contentType).content(jsonInString))

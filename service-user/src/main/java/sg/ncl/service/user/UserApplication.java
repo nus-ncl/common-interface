@@ -9,10 +9,10 @@ import sg.ncl.common.jpa.UseJpa;
  */
 @SpringBootApplication
 @UseJpa
-public class App {
+public class UserApplication {
 
     public static void main(final String[] args) {
-        SpringApplication.run(App.class, args);
+        SpringApplication.run(UserApplication.class, args);
     }
 
 }
