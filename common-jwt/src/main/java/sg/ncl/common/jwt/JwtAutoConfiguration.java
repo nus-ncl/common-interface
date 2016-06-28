@@ -4,6 +4,7 @@ import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.SignatureException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
@@ -23,6 +24,7 @@ import java.util.UUID;
  * @version 1.0
  */
 @Configuration
+@ConditionalOnClass({BCryptPasswordEncoder.class, SignatureAlgorithm.class, Key.class, Duration.class})
 @EnableConfigurationProperties(JwtProperties.class)
 public class JwtAutoConfiguration {
 
