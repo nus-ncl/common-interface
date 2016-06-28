@@ -6,6 +6,6 @@ import org.springframework.test.context.web.WebAppConfiguration;
 /**
  * @author Christopher Zhong
  */
-@SpringApplicationConfiguration(AuthenticationApp.class)
+@SpringApplicationConfiguration(AuthenticationApplication.class)
 @WebAppConfiguration
 public abstract class AbstractTest extends sg.ncl.common.test.AbstractTest {}

@@ -2,11 +2,6 @@ package sg.ncl.service.registration;
 
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
-import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
-import sg.ncl.common.exception.ExceptionAutoConfiguration;
-import sg.ncl.common.jpa.JpaConfig;
-import sg.ncl.common.jwt.JwtAutoConfiguration;
 
 /**
  * @author Christopher Zhong

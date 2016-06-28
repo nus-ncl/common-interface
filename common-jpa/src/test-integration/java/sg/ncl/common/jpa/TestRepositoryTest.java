@@ -2,7 +2,7 @@ package sg.ncl.common.jpa;
 
 import org.junit.Test;
 import org.springframework.boot.test.SpringApplicationConfiguration;
-import org.springframework.test.context.junit4.AbstractTransactionalJUnit4SpringContextTests;
+import sg.ncl.common.test.AbstractTest;
 
 import javax.inject.Inject;
 import java.time.ZonedDateTime;
@@ -17,7 +17,7 @@ import static org.junit.Assert.assertThat;
  * @version 1.0
  */
 @SpringApplicationConfiguration(TestApp.class)
-public class TestRepositoryTest extends AbstractTransactionalJUnit4SpringContextTests {
+public class TestRepositoryTest extends AbstractTest {
 
     @Inject
     private TestRepository testRepository;
