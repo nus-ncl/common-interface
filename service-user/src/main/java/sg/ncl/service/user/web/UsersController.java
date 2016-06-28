@@ -48,11 +48,6 @@ public class UsersController {
         userService.update(id, user);
     }
 
-    @RequestMapping(path = "/seed", method = RequestMethod.POST)
-    public void seedData() {
-        userService.seedData();
-    }
-
     @RequestMapping(path = "/addUserToTeam/{id}/{teamId}", method = RequestMethod.POST)
     @ResponseStatus(value = HttpStatus.OK)
     public void addUserToTeam(@PathVariable String id, @PathVariable String teamId) {
