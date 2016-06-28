@@ -9,6 +9,7 @@ import sg.ncl.service.experiment.domain.Experiment;
 import sg.ncl.service.experiment.logic.ExperimentService;
 
 import javax.inject.Inject;
+import javax.validation.Valid;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -26,13 +27,13 @@ public class ExperimentsController {
         this.experimentService = experimentService;
     }
 
-    @RequestMapping(method = RequestMethod.GET)
+    @RequestMapping(path = "/teams", method = RequestMethod.GET)
     @ResponseStatus(code = HttpStatus.OK)
     public List<ExperimentEntity> get() {
         return experimentService.get();
     }
 
-    @RequestMapping(path = "/user/{id}", method = RequestMethod.GET)
+    @RequestMapping(path = "/users/{id}", method = RequestMethod.GET)
     @ResponseStatus(code = HttpStatus.OK)
     public List<ExperimentInfo> getByUser(@PathVariable String id) {
         List<ExperimentInfo> infoList = new ArrayList<>();
@@ -43,5 +44,11 @@ public class ExperimentsController {
         }
 
         return infoList;
+    }
+
+    @RequestMapping(path = "", method = RequestMethod.POST)
+    @ResponseStatus(value = HttpStatus.CREATED)
+    public void addExperiment(@RequestBody @Valid ExperimentEntity experimentEntity) {
+        experimentService.save(experimentEntity);
     }
 }
