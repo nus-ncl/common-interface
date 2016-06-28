@@ -1,12 +1,12 @@
 package sg.ncl.service.user.data.jpa.repositories;
 
-import org.apache.commons.lang3.RandomStringUtils;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.springframework.dao.DataIntegrityViolationException;
 import sg.ncl.service.user.AbstractTest;
 import sg.ncl.service.user.Util;
+import sg.ncl.service.user.data.jpa.UserDetailsRepository;
 import sg.ncl.service.user.data.jpa.entities.UserDetailsEntity;
 
 import javax.inject.Inject;

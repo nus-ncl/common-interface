@@ -15,7 +15,7 @@ import org.springframework.web.context.WebApplicationContext;
 import sg.ncl.service.user.AbstractTest;
 import sg.ncl.service.user.Util;
 import sg.ncl.service.user.data.jpa.entities.UserEntity;
-import sg.ncl.service.user.data.jpa.repositories.UserRepository;
+import sg.ncl.service.user.data.jpa.UserRepository;
 
 import javax.inject.Inject;
 import java.util.List;
