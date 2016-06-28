@@ -3,6 +3,7 @@ package sg.ncl.service.experiment;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.commons.lang3.RandomUtils;
 import sg.ncl.service.experiment.data.jpa.ExperimentEntity;
+import sg.ncl.service.experiment.data.jpa.ExperimentRepository;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -33,5 +34,17 @@ public class Util {
             }
         }
         return cp.isEmpty();
+    }
+
+    public static void addExperiments(int numEntries, String userId, ExperimentRepository experimentRepository) {
+        for (int i = 0; i < numEntries; i++) {
+            ExperimentEntity experimentEntity = Util.getExperimentsEntity();
+
+            if (i % 2 == 0) {
+                experimentEntity.setUserId(userId);
+            }
+
+            experimentRepository.save(experimentEntity);
+        }
     }
 }

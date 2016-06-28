@@ -22,6 +22,7 @@ public class ExperimentServiceTest extends AbstractTest {
 
     @Test
     public void testSaveTeam() throws Exception {
+
         ExperimentService experimentService = new ExperimentService(experimentRepository);
         ExperimentEntity createdExperiment = Util.getExperimentsEntity();
         ExperimentEntity saveExperiment = experimentService.save(createdExperiment);
@@ -37,6 +38,7 @@ public class ExperimentServiceTest extends AbstractTest {
 
     @Test
     public void testGetExperimentIfNotExperimentInDb() throws Exception {
+
         ExperimentService experimentService = new ExperimentService(experimentRepository);
         List<ExperimentEntity> experimentEntityList = experimentService.get();
 
@@ -45,6 +47,7 @@ public class ExperimentServiceTest extends AbstractTest {
 
     @Test
     public void testGetExperiment() throws Exception {
+
         ExperimentService experimentService = new ExperimentService(experimentRepository);
 
         List<ExperimentEntity> list = new ArrayList<>();
@@ -57,37 +60,29 @@ public class ExperimentServiceTest extends AbstractTest {
         Assert.assertTrue(Util.isListEqual(list, listFromDb));
     }
 
-//    private boolean isListEqual(List<ExperimentEntity> one, List<ExperimentEntity> two) {
-//        ArrayList<ExperimentEntity> cp = new ArrayList<>(one);
-//        for (ExperimentEntity twoIterator : two) {
-//            if (!cp.remove(twoIterator)) {
-//                return false;
-//            }
-//        }
-//        return cp.isEmpty();
-//    }
-
     @Test
     public void testGetExperimentsByUser() throws Exception {
+
+        int numEntries = 6;
         ExperimentService experimentService = new ExperimentService(experimentRepository);
 
         final String userId = RandomStringUtils.randomAlphanumeric(20);
-        for (int i = 0; i < 3; i++) {
-            ExperimentEntity experimentEntity = Util.getExperimentsEntity();
-
-            if (i > 0) {
-                experimentEntity.setUserId(userId);
-            }
-
-            experimentService.save(experimentEntity);
-        }
+        Util.addExperiments(numEntries, userId, experimentRepository);
 
         List<ExperimentEntity> list = experimentService.findByUser(userId);
-        Assert.assertEquals(list.size(), 2);
+        Assert.assertEquals(list.size(), numEntries / 2);
+
+        for (ExperimentEntity forEntity : list) {
+            Assert.assertEquals(forEntity.getUserId(), userId);
+        }
+
+        List<ExperimentEntity> allExperiments = experimentService.get();
+        Assert.assertEquals(allExperiments.size(), numEntries);
     }
 
     @Test
     public void testGetExperimentsUserHasNoExperiments() throws Exception {
+
         ExperimentService experimentService = new ExperimentService(experimentRepository);
 
         final String userId = RandomStringUtils.randomAlphanumeric(20);

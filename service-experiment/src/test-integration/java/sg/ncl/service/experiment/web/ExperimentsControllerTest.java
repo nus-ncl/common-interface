@@ -112,15 +112,7 @@ public class ExperimentsControllerTest extends AbstractTest {
         String userId = RandomStringUtils.randomAlphanumeric(20);
         int numEntries = 6;
 
-        for (int i = 0; i < numEntries; i++) {
-            ExperimentEntity experimentEntity = Util.getExperimentsEntity();
-
-            if (i % 2 == 0) {
-                experimentEntity.setUserId(userId);
-            }
-
-            experimentRepository.save(experimentEntity);
-        }
+        Util.addExperiments(numEntries, userId, experimentRepository);
 
         MvcResult result = mockMvc.perform(get("/experiments/users/" + userId))
                 .andExpect(status().isOk())
@@ -133,7 +125,7 @@ public class ExperimentsControllerTest extends AbstractTest {
         mapper.registerModule(new JavaTimeModule());
         List<ExperimentEntity> experimentEntityList = mapper.readValue(allUserJsonString, new TypeReference<List<ExperimentEntity>>(){});
 
-        Assert.assertEquals(experimentEntityList.size(), 3);
+        Assert.assertEquals(experimentEntityList.size(), numEntries / 2);
 
         for (ExperimentEntity forEntity : experimentEntityList) {
             Assert.assertEquals(forEntity.getUserId(), userId);
