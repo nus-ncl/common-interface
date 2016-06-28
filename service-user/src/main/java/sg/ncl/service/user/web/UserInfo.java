@@ -1,6 +1,6 @@
 package sg.ncl.service.user.web;
 
-import sg.ncl.service.user.data.jpa.entities.UserEntity;
+import sg.ncl.service.user.data.jpa.UserEntity;
 import sg.ncl.service.user.domain.LoginActivity;
 import sg.ncl.service.user.domain.User;
 import sg.ncl.service.user.domain.UserStatus;

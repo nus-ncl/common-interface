@@ -1,6 +1,6 @@
 package sg.ncl.service.user.web;
 
-import sg.ncl.service.user.data.jpa.entities.UserDetailsEntity;
+import sg.ncl.service.user.data.jpa.UserDetailsEntity;
 import sg.ncl.service.user.domain.UserDetails;
 
 /**

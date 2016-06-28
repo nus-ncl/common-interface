@@ -7,7 +7,7 @@ import org.springframework.dao.DataIntegrityViolationException;
 import sg.ncl.service.user.AbstractTest;
 import sg.ncl.service.user.Util;
 import sg.ncl.service.user.data.jpa.AddressRepository;
-import sg.ncl.service.user.data.jpa.entities.AddressEntity;
+import sg.ncl.service.user.data.jpa.AddressEntity;
 
 import javax.inject.Inject;
 

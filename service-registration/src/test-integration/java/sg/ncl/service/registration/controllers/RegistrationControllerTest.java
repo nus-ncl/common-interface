@@ -21,7 +21,7 @@ import sg.ncl.service.team.TeamService;
 import sg.ncl.service.team.data.jpa.entities.TeamEntity;
 import sg.ncl.service.team.serializers.DateTimeDeserializer;
 import sg.ncl.service.team.serializers.DateTimeSerializer;
-import sg.ncl.service.user.data.jpa.entities.UserEntity;
+import sg.ncl.service.user.data.jpa.UserEntity;
 import sg.ncl.adapter.deterlab.ConnectionProperties;
 
 import javax.inject.Inject;

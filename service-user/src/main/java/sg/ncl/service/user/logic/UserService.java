@@ -1,9 +1,9 @@
 package sg.ncl.service.user.logic;
 
 import org.springframework.stereotype.Service;
-import sg.ncl.service.user.data.jpa.entities.AddressEntity;
-import sg.ncl.service.user.data.jpa.entities.UserDetailsEntity;
-import sg.ncl.service.user.data.jpa.entities.UserEntity;
+import sg.ncl.service.user.data.jpa.AddressEntity;
+import sg.ncl.service.user.data.jpa.UserDetailsEntity;
+import sg.ncl.service.user.data.jpa.UserEntity;
 import sg.ncl.service.user.data.jpa.UserRepository;
 import sg.ncl.service.user.domain.Address;
 import sg.ncl.service.user.domain.User;
