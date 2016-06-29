@@ -3,6 +3,7 @@ package sg.ncl.service.team.web;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
+import sg.ncl.service.team.domain.Team;
 import sg.ncl.service.team.logic.TeamService;
 import sg.ncl.service.team.data.jpa.TeamEntity;
 
@@ -27,8 +28,8 @@ public class TeamsController {
 
     @RequestMapping(path = "", method = RequestMethod.POST)
     @ResponseStatus(value = HttpStatus.CREATED)
-    public void addTeam(@RequestBody @Valid TeamEntity team) {
-        teamService.save(team);
+    public Team createTeam(@RequestBody @Valid TeamEntity team) {
+        return teamService.createTeam(team);
     }
 
     @RequestMapping(method = RequestMethod.GET)

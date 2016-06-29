@@ -12,7 +12,6 @@ import sg.ncl.service.team.exceptions.TeamNameNullException;
 import sg.ncl.service.team.exceptions.TeamNotFoundException;
 
 import javax.inject.Inject;
-import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -30,7 +29,7 @@ public class TeamService {
     }
 
     @Transactional
-    public TeamEntity save(TeamEntity team) {
+    public TeamEntity createTeam(TeamEntity team) {
         TeamEntity teamEntity = new TeamEntity();
 
         teamEntity.setName(team.getName());
