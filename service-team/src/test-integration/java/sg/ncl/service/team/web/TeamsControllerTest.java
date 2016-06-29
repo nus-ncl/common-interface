@@ -16,7 +16,6 @@ import sg.ncl.service.team.data.jpa.TeamRepository;
 import sg.ncl.service.team.AbstractTest;
 import sg.ncl.service.team.domain.TeamStatus;
 import sg.ncl.service.team.domain.TeamVisibility;
-import sg.ncl.service.team.dtos.TeamMemberInfo;
 import sg.ncl.service.team.serializers.DateTimeDeserializer;
 import sg.ncl.service.team.serializers.DateTimeSerializer;
 

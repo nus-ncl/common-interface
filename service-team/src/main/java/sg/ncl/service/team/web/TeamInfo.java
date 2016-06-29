@@ -1,4 +1,4 @@
-package sg.ncl.service.team.dtos;
+package sg.ncl.service.team.web;
 
 import sg.ncl.service.team.data.jpa.TeamEntity;
 import sg.ncl.service.team.data.jpa.TeamMemberEntity;

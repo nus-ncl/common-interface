@@ -1,4 +1,4 @@
-package sg.ncl.service.team.dtos;
+package sg.ncl.service.team.web;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;

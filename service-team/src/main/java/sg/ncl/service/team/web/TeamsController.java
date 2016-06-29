@@ -5,8 +5,6 @@ import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 import sg.ncl.service.team.TeamService;
 import sg.ncl.service.team.data.jpa.TeamEntity;
-import sg.ncl.service.team.dtos.TeamInfo;
-import sg.ncl.service.team.dtos.TeamMemberInfo;
 
 import javax.inject.Inject;
 import javax.validation.Valid;

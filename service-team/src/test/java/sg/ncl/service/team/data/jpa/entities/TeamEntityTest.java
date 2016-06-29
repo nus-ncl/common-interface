@@ -8,7 +8,7 @@ import sg.ncl.service.team.data.jpa.TeamMemberEntity;
 import sg.ncl.service.team.domain.TeamPrivacy;
 import sg.ncl.service.team.domain.TeamStatus;
 import sg.ncl.service.team.domain.TeamVisibility;
-import sg.ncl.service.team.dtos.TeamMemberInfo;
+import sg.ncl.service.team.web.TeamMemberInfo;
 
 import java.time.ZonedDateTime;
 import java.util.ArrayList;

@@ -19,7 +19,7 @@ import sg.ncl.service.team.data.jpa.TeamEntity;
 import sg.ncl.service.team.data.jpa.TeamMemberEntity;
 import sg.ncl.service.team.domain.Team;
 import sg.ncl.service.team.domain.TeamMemberType;
-import sg.ncl.service.team.dtos.TeamMemberInfo;
+import sg.ncl.service.team.web.TeamMemberInfo;
 import sg.ncl.service.team.exceptions.TeamNotFoundException;
 import sg.ncl.service.user.domain.User;
 import sg.ncl.service.user.services.UserService;
