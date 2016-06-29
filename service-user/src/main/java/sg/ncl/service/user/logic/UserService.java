@@ -132,7 +132,7 @@ public class UserService {
     }
 
     @Transactional
-    public void addUserToTeam(final String userId, final String teamId) {
+    public void addTeam(final String userId, final String teamId) {
         UserEntity userEntity = findAndAddTeam(userId, teamId);
         userRepository.save(userEntity);
     }

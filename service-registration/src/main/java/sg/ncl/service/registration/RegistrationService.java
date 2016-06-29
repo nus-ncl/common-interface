@@ -113,7 +113,7 @@ public class RegistrationService {
         credentialsService.addCredentials(credentials);
 
         // add user to team and vice versa
-        userService.addUserToTeam(userId, teamId);
+        userService.addTeam(userId, teamId);
         teamService.addUserToTeam(userId, teamId);
 
         JSONObject userObject = new JSONObject();
