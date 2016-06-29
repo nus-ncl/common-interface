@@ -1,6 +1,7 @@
 package sg.ncl.service.team.logic;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import sg.ncl.service.team.data.jpa.TeamEntity;
 import sg.ncl.service.team.data.jpa.TeamRepository;
 import sg.ncl.service.team.domain.Team;
@@ -28,6 +29,7 @@ public class TeamService {
         this.teamRepository = teamRepository;
     }
 
+    @Transactional
     public TeamEntity save(TeamEntity team) {
         TeamEntity teamEntity = new TeamEntity();
 
@@ -40,6 +42,7 @@ public class TeamService {
         return teamRepository.save(teamEntity);
     }
 
+    @Transactional
     public List<TeamEntity> get() {
         final List<TeamEntity> result = new ArrayList<>();
         for (TeamEntity team : teamRepository.findAll()) {
@@ -48,11 +51,13 @@ public class TeamService {
         return result;
     }
 
+    @Transactional
     public List<TeamEntity> getPublic() {
         List<TeamEntity> result = teamRepository.findByVisibility(TeamVisibility.PUBLIC);
         return result;
     }
 
+    @Transactional
     public TeamEntity find(final String id) {
         if (id == null || id.isEmpty()) {
             throw new TeamIdNullException();
@@ -66,6 +71,7 @@ public class TeamService {
         return one;
     }
 
+    @Transactional
     public TeamEntity getName(String name) {
         if (name == null || name.isEmpty()) {
             throw new TeamNameNullException();
@@ -78,11 +84,13 @@ public class TeamService {
         return one;
     }
 
+    @Transactional
     public String getTeamStatus(final String id) {
         final TeamEntity one = this.find(id);
         return one.getStatus().toString();
     }
 
+    @Transactional
     public void update(final Team inputTeam) {
         final TeamEntity one = find(inputTeam.getId());
 
@@ -105,6 +113,7 @@ public class TeamService {
         teamRepository.save(one);
     }
 
+    @Transactional
     public void addUserToTeam(final String teamId, TeamMemberInfo teamMemberInfo) {
             TeamEntity teamEntity = find(teamId);
             teamEntity.addMember(teamMemberInfo);
