@@ -38,6 +38,7 @@ public class TeamsControllerTest extends AbstractTest {
     private TeamRepository teamRepository;
 
     private MockMvc mockMvc;
+
     @Inject
     private WebApplicationContext webApplicationContext;
 
@@ -131,6 +132,9 @@ public class TeamsControllerTest extends AbstractTest {
         mockMvc.perform(post("/teams/addUserToTeam/" + teamId).contentType(MediaType.APPLICATION_JSON).content(jsonInString))
                 .andExpect(status().isOk());
 
+        TeamEntity teamEntity2 = teamRepository.findOne(teamId);
+        System.out.println(teamEntity2);
+
         // get team after add user
         mockMvc.perform(get("/teams/" + teamId))
                 .andExpect(status().isOk());
@@ -180,7 +184,7 @@ public class TeamsControllerTest extends AbstractTest {
         // put
         mockMvc.perform(put("/teams/" + idString).contentType(contentType).content("{}"))
                 .andExpect(status().isNotFound())
-                .andExpect(status().reason("Team ID is empty"));
+                .andExpect(status().reason("Team not found"));
     }
 
     @Test

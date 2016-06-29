@@ -58,7 +58,8 @@ public class TeamService {
 
     @Transactional
     public Team findTeam(final String id) {
-        return findTeamEntity(id);
+        Team team = findTeamEntity(id);
+        return team;
     }
 
     @Transactional
