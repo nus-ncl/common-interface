@@ -14,7 +14,7 @@ import sg.ncl.adapter.deterlab.ConnectionProperties;
 import sg.ncl.service.authentication.data.jpa.CredentialsEntity;
 import sg.ncl.service.registration.exceptions.RegisterTeamNameDuplicateException;
 import sg.ncl.service.registration.exceptions.UserFormException;
-import sg.ncl.service.team.TeamService;
+import sg.ncl.service.team.logic.TeamService;
 import sg.ncl.service.team.data.jpa.TeamEntity;
 import sg.ncl.service.user.domain.User;
 

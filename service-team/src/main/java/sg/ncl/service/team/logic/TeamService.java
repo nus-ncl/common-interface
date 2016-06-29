@@ -1,4 +1,4 @@
-package sg.ncl.service.team;
+package sg.ncl.service.team.logic;
 
 import org.springframework.stereotype.Service;
 import sg.ncl.service.team.data.jpa.TeamEntity;
