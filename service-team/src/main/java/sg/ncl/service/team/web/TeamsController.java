@@ -79,10 +79,4 @@ public class TeamsController {
         // id is the team id
         teamService.addUserToTeam(id, teamMember);
     }
-
-    @RequestMapping(path = "/seed", method = RequestMethod.POST)
-    @ResponseStatus(value = HttpStatus.CREATED)
-    public void seedData() {
-        teamService.seedData();
-    }
 }

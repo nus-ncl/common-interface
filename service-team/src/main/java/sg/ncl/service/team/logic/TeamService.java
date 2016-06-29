@@ -119,15 +119,4 @@ public class TeamService {
             teamEntity.addMember(teamMemberInfo);
             teamRepository.save(teamEntity);
     }
-
-    public void seedData() {
-        TeamEntity teamEntity = new TeamEntity();
-
-        teamEntity.setName("Aries");
-        teamEntity.setDescription("This is a project description");
-        teamEntity.setApplicationDate(ZonedDateTime.now());
-        teamEntity.setOrganisationType("Academic");
-        teamEntity.setWebsite("http://www.nus.edu.sg");
-        teamRepository.save(teamEntity);
-    }
 }
