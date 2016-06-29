@@ -46,10 +46,10 @@ public class UsersController {
         userService.updateUser(id, user);
     }
 
-    @RequestMapping(path = "/addUserToTeam/{id}/{teamId}", method = RequestMethod.POST)
+    @RequestMapping(path = "/addUserToTeam/{id}/teams", method = RequestMethod.POST)
     @ResponseStatus(value = HttpStatus.OK)
-    public void addUserToTeam(@PathVariable String id, @PathVariable String teamId) {
-        userService.addTeam(id, teamId);
+    public void addTeam(@PathVariable String id, @RequestBody User user) {
+        userService.addTeam(id, user.getTeams().get(0));
     }
 
 }
