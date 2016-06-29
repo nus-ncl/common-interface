@@ -1,6 +1,8 @@
-package sg.ncl.service.user.dtos;
+package sg.ncl.service.user.web;
 
-import sg.ncl.service.user.data.jpa.entities.UserEntity;
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import sg.ncl.service.user.data.jpa.UserEntity;
 import sg.ncl.service.user.domain.LoginActivity;
 import sg.ncl.service.user.domain.User;
 import sg.ncl.service.user.domain.UserStatus;
@@ -20,9 +22,10 @@ public class UserInfo implements User {
     private final ZonedDateTime applicationDate;
     private final ZonedDateTime processedDate;
     private final List<? extends LoginActivity> loginActivities;
-    private final List<String> teamIds;
+    private final List<String> teams;
 
-    public UserInfo(final String id, final UserDetailsInfo userDetails, final Boolean emailVerified, final UserStatus status, final ZonedDateTime applicationDate, final ZonedDateTime processedDate, final List<? extends LoginActivity> loginActivities, final List<String> teamIds) {
+    @JsonCreator
+    public UserInfo(@JsonProperty("id") final String id, @JsonProperty("userDetails") final UserDetailsInfo userDetails, @JsonProperty("emailVerified") final Boolean emailVerified, @JsonProperty("status") final UserStatus status, @JsonProperty("applicationDate") final ZonedDateTime applicationDate, @JsonProperty("processedDate") final ZonedDateTime processedDate, @JsonProperty("loginActivities") final List<? extends LoginActivity> loginActivities, @JsonProperty("teams") final List<String> teams) {
         this.id = id;
         this.userDetails = userDetails;
         this.emailVerified = emailVerified;
@@ -30,7 +33,7 @@ public class UserInfo implements User {
         this.applicationDate = applicationDate;
         this.processedDate = processedDate;
         this.loginActivities = loginActivities;
-        this.teamIds = teamIds;
+        this.teams = teams;
     }
 
     public UserInfo(final UserEntity userEntity) {
@@ -41,7 +44,7 @@ public class UserInfo implements User {
                 userEntity.getApplicationDate(),
                 userEntity.getProcessedDate(),
                 userEntity.getLoginActivities(),
-                userEntity.getTeamIds()
+                userEntity.getTeams()
         );
     }
 
@@ -81,8 +84,8 @@ public class UserInfo implements User {
     }
 
     @Override
-    public List<String> getTeamIds() {
-        return teamIds;
+    public List<String> getTeams() {
+        return teams;
     }
 
 }

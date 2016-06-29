@@ -1,8 +1,9 @@
-package sg.ncl.service.user.controllers;
+package sg.ncl.service.user.web;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import net.minidev.json.JSONObject;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.hamcrest.collection.IsIterableContainingInAnyOrder;
 import org.junit.Assert;
@@ -14,13 +15,10 @@ import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.web.context.WebApplicationContext;
 import sg.ncl.service.user.AbstractTest;
 import sg.ncl.service.user.Util;
-import sg.ncl.service.user.data.jpa.entities.AddressEntity;
-import sg.ncl.service.user.data.jpa.entities.UserDetailsEntity;
-import sg.ncl.service.user.data.jpa.entities.UserEntity;
-import sg.ncl.service.user.data.jpa.repositories.UserRepository;
+import sg.ncl.service.user.data.jpa.UserEntity;
+import sg.ncl.service.user.data.jpa.UserRepository;
 
 import javax.inject.Inject;
-import java.time.ZonedDateTime;
 import java.util.List;
 
 import static org.hamcrest.core.Is.is;
@@ -190,8 +188,11 @@ public class UsersControllerTest extends AbstractTest {
 
         final String idString = "123456";
 
+        JSONObject object = new JSONObject();
+        object.put("id", idString);
+
         // put
-        mockMvc.perform(put("/users/" + idString).contentType(contentType).content("{}"))
+        mockMvc.perform(put("/users/" + idString).contentType(contentType).content(object.toString()))
                 .andExpect(status().isNotFound())
                 .andExpect(status().reason("User not found"));
     }

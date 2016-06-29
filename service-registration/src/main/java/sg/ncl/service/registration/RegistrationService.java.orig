@@ -118,6 +118,11 @@ public class RegistrationService {
         credentials.setId(userId);
         credentialsService.addCredentials(credentials);
 
+<<<<<<< HEAD
+        // add user to team and vice versa
+        userService.addTeam(userId, teamId);
+        teamService.addUserToTeam(userId, teamId);
+=======
         if (isJoinTeam == true) {
             // indicate member type based on button click
             memberType = TeamMemberType.MEMBER;
@@ -131,8 +136,9 @@ public class RegistrationService {
         teamMemberEntity.setTeamMemberType(memberType);
         teamMemberInfo = new TeamMemberInfo(teamMemberEntity);
 
-        userService.addTeam(userId, teamId);
+        userService.addUserToTeam(userId, teamId);
         teamService.addUserToTeam(teamId, teamMemberInfo);
+>>>>>>> refs/remotes/origin/master
 
         JSONObject userObject = new JSONObject();
         userObject.put("firstName", user.getUserDetails().getFirstName());

@@ -17,6 +17,7 @@ import sg.ncl.service.registration.exceptions.UserFormException;
 import sg.ncl.service.team.TeamService;
 import sg.ncl.service.team.data.jpa.entities.TeamEntity;
 import sg.ncl.service.user.domain.User;
+import sg.ncl.service.user.logic.UserService;
 
 import javax.inject.Inject;
 
@@ -28,6 +29,9 @@ import static org.springframework.test.web.client.response.MockRestResponseCreat
  * @author Te Ye
  */
 public class RegistrationServiceTest extends AbstractTest {
+
+    @Inject
+    private UserService userService;
 
     @Inject
     private TeamService teamService;
