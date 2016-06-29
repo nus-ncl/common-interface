@@ -59,7 +59,7 @@ public class TeamsController {
 
     @RequestMapping(path = "/name/{name}", method = RequestMethod.GET)
     @ResponseStatus(code = HttpStatus.OK)
-    public TeamInfo getByName(@PathVariable String name) {
+    public Team getByName(@PathVariable String name) {
         return new TeamInfo(teamService.getName(name));
     }
 
