@@ -15,7 +15,7 @@ public class Util {
 
     public static TeamEntity getTeamEntity() {
         final TeamEntity entity = new TeamEntity();
-        entity.setId(RandomStringUtils.randomAlphanumeric(20));
+//        entity.setId(RandomStringUtils.randomAlphanumeric(20));
         entity.setName(RandomStringUtils.randomAlphanumeric(20));
         entity.setDescription(RandomStringUtils.randomAlphanumeric(20));
         entity.setWebsite("http://" + RandomStringUtils.randomAlphanumeric(20) + ".com");
