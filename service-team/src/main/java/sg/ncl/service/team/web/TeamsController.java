@@ -28,33 +28,20 @@ public class TeamsController {
 
     @RequestMapping(path = "", method = RequestMethod.POST)
     @ResponseStatus(value = HttpStatus.CREATED)
-    public void createTeam(@RequestBody @Valid TeamEntity team) {
+    public void createTeam(@RequestBody @Valid Team team) {
         teamService.createTeam(team);
     }
 
     @RequestMapping(method = RequestMethod.GET)
     @ResponseStatus(code = HttpStatus.OK)
     public List<Team> getAll() {
-        List<TeamEntity> teamEntityList = teamService.get();
-        List<Team> teamList = new ArrayList<>();
-
-        for (TeamEntity teamEntity : teamEntityList) {
-            teamList.add(new TeamInfo(teamEntity));
-        }
-
-        return teamList;
+        return teamService.getAll();
     }
 
     @RequestMapping(path = "/public", method = RequestMethod.GET)
     @ResponseStatus(code = HttpStatus.OK)
     public List<Team> getPublicTeams() {
-        List<TeamEntity> teamEntityList = teamService.getPublic();
-        List<Team> teamList = new ArrayList<>();
-
-        for (TeamEntity teamEntity : teamEntityList) {
-            teamList.add(new TeamInfo(teamEntity));
-        }
-        return teamList;
+        return teamService.getPublic();
     }
 
     @RequestMapping(path = "/name/{name}", method = RequestMethod.GET)

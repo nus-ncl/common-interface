@@ -6,6 +6,7 @@ import sg.ncl.service.team.data.jpa.TeamEntity;
 import sg.ncl.service.team.data.jpa.TeamRepository;
 import sg.ncl.service.team.domain.Team;
 import sg.ncl.service.team.domain.TeamVisibility;
+import sg.ncl.service.team.web.TeamInfo;
 import sg.ncl.service.team.web.TeamMemberInfo;
 import sg.ncl.service.team.exceptions.TeamIdNullException;
 import sg.ncl.service.team.exceptions.TeamNameNullException;
@@ -29,7 +30,7 @@ public class TeamService {
     }
 
     @Transactional
-    public TeamEntity createTeam(TeamEntity team) {
+    public Team createTeam(Team team) {
         TeamEntity teamEntity = new TeamEntity();
 
         teamEntity.setName(team.getName());
@@ -38,22 +39,27 @@ public class TeamService {
         teamEntity.setOrganisationType(team.getOrganisationType());
         teamEntity.setApplicationDate(team.getApplicationDate());
 
-        return teamRepository.save(teamEntity);
+        return new TeamInfo(teamRepository.save(teamEntity));
     }
 
     @Transactional
-    public List<TeamEntity> get() {
-        final List<TeamEntity> result = new ArrayList<>();
+    public List<Team> getAll() {
+        final List<Team> result = new ArrayList<>();
         for (TeamEntity team : teamRepository.findAll()) {
-            result.add(team);
+            result.add(new TeamInfo(team));
         }
         return result;
     }
 
     @Transactional
-    public List<TeamEntity> getPublic() {
+    public List<Team> getPublic() {
         List<TeamEntity> result = teamRepository.findByVisibility(TeamVisibility.PUBLIC);
-        return result;
+        List<Team> teamList = new ArrayList<>();
+
+        for (TeamEntity teamEntity : result) {
+            teamList.add(new TeamInfo(teamEntity));
+        }
+        return teamList;
     }
 
     @Transactional
@@ -72,7 +78,7 @@ public class TeamService {
         if (one == null) {
             throw new TeamNotFoundException();
         }
-        return one;
+        return new TeamInfo(one);
     }
 
     @Transactional
@@ -83,6 +89,8 @@ public class TeamService {
 
     @Transactional
     public void updateTeam(final String id, final Team team) {
+
+        // Note: team name should be unchangeable
 
         if (id == null || id.isEmpty()) {
             throw new TeamIdNullException();
