@@ -57,7 +57,7 @@ public class RegistrationServiceTest extends AbstractTest {
 
         // apply to join team but since no teams exists yet
         // create stub team
-        TeamEntity teamEntity = teamService.save(Util.getTeamEntity());
+        TeamEntity teamEntity = teamService.createTeam(Util.getTeamEntity());
 
         String stubUid = RandomStringUtils.randomAlphanumeric(8);
         JSONObject predefinedResultJson = new JSONObject();
@@ -100,7 +100,7 @@ public class RegistrationServiceTest extends AbstractTest {
 
         TeamEntity teamEntity = Util.getTeamEntity();
         String teamName = teamEntity.getName();
-        teamService.save(teamEntity);
+        teamService.createTeam(teamEntity);
 
         // purposely register for an already saved team
         // don't have to mock server since will throw exception
@@ -114,7 +114,7 @@ public class RegistrationServiceTest extends AbstractTest {
 
         // apply to join team but since no teams exists yet
         // create stub team
-        TeamEntity teamEntity = teamService.save(Util.getTeamEntity());
+        TeamEntity teamEntity = teamService.createTeam(Util.getTeamEntity());
 
         // don't have to mock server since will throw exception
         registrationService.register(credentialsEntity, user, teamEntity, isJoinTeam);
@@ -127,7 +127,7 @@ public class RegistrationServiceTest extends AbstractTest {
 
         // apply to join team but since no teams exists yet
         // create stub team
-        TeamEntity teamEntity = teamService.save(Util.getTeamEntity());
+        TeamEntity teamEntity = teamService.createTeam(Util.getTeamEntity());
 
         // don't have to mock server since will throw exception
         registrationService.register(credentialsEntity, user, teamEntity, isJoinTeam);

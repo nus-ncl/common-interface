@@ -106,7 +106,7 @@ public class RegistrationService {
             teamEntity.setWebsite(team.getWebsite());
             teamEntity.setOrganisationType(team.getOrganisationType());
             teamEntity.setPrivacy(team.getPrivacy());
-            teamEntity = teamService.save(teamEntity);
+            teamEntity = teamService.createTeam(teamEntity);
             teamId = teamEntity.getId();
         }
 
