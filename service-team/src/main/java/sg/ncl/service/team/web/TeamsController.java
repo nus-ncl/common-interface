@@ -4,6 +4,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 import sg.ncl.service.team.domain.Team;
+import sg.ncl.service.team.domain.TeamMember;
 import sg.ncl.service.team.logic.TeamService;
 import sg.ncl.service.team.data.jpa.TeamEntity;
 
@@ -63,7 +64,7 @@ public class TeamsController {
 
     @RequestMapping(path = "/addUserToTeam/{id}", method = RequestMethod.POST)
     @ResponseStatus(value = HttpStatus.OK)
-    public void addUserToTeam(@PathVariable String id, @RequestBody TeamMemberInfo teamMember) {
+    public void addUserToTeam(@PathVariable String id, @RequestBody TeamMember teamMember) {
         // id is the team id
         teamService.addUserToTeam(id, teamMember);
     }

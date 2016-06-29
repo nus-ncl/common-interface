@@ -196,8 +196,8 @@ public class TeamEntityTest {
 
     @Test
     public void testEqual() throws Exception {
-        final TeamEntity entity1 = Util.getTeamEntity();
-        final TeamEntity entity2 = Util.getTeamEntity();
+        final TeamEntity entity1 = Util.getTeamEntityWithId();
+        final TeamEntity entity2 = Util.getTeamEntityWithId();
 
         assertThat(entity1, not(entity2));
     }
@@ -230,7 +230,6 @@ public class TeamEntityTest {
 
         final String toString = entity.toString();
 
-        assertThat(toString, containsString(entity.getId()));
         assertThat(toString, containsString(entity.getName()));
         assertThat(toString, containsString(entity.getDescription()));
         assertThat(toString, containsString(TeamVisibility.PUBLIC.toString()));

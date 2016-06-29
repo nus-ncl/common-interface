@@ -163,7 +163,7 @@ public class TeamEntity extends AbstractEntity implements Team {
         return new ArrayList<>(members.values());
     }
 
-    public void addMember(final TeamMemberInfo teamMemberInfo) {
+    public void addMember(final TeamMember teamMemberInfo) {
         String userId = teamMemberInfo.getUserId();
         if (members.containsKey(userId)) {
 //            throw new UserAlreadyInTeam();

@@ -71,7 +71,7 @@ public class RegistrationService {
         }
 
         if (isJoinTeam == false && (team.getName() != null || !team.getName().isEmpty())) {
-            TeamEntity teamEntity = new TeamEntity();
+            Team teamEntity = new TeamEntity();
             try {
                 teamEntity = teamService.getName(team.getName());
             } catch (TeamNotFoundException e) {

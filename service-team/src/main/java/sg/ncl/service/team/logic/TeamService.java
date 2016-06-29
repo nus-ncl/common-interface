@@ -5,6 +5,7 @@ import org.springframework.transaction.annotation.Transactional;
 import sg.ncl.service.team.data.jpa.TeamEntity;
 import sg.ncl.service.team.data.jpa.TeamRepository;
 import sg.ncl.service.team.domain.Team;
+import sg.ncl.service.team.domain.TeamMember;
 import sg.ncl.service.team.domain.TeamVisibility;
 import sg.ncl.service.team.web.TeamInfo;
 import sg.ncl.service.team.web.TeamMemberInfo;
@@ -45,8 +46,8 @@ public class TeamService {
     @Transactional
     public List<Team> getAll() {
         final List<Team> result = new ArrayList<>();
-        for (TeamEntity team : teamRepository.findAll()) {
-            result.add(new TeamInfo(team));
+        for (TeamEntity teamEntity : teamRepository.findAll()) {
+            result.add(new TeamInfo(teamEntity));
         }
         return result;
     }
@@ -122,7 +123,7 @@ public class TeamService {
     }
 
     @Transactional
-    public void addUserToTeam(final String teamId, TeamMemberInfo teamMemberInfo) {
+    public void addUserToTeam(final String teamId, TeamMember teamMemberInfo) {
             TeamEntity teamEntity = findTeamEntity(teamId);
             teamEntity.addMember(teamMemberInfo);
             teamRepository.save(teamEntity);
