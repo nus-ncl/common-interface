@@ -47,14 +47,14 @@ public class TeamsController {
 
     @RequestMapping(path = "/public", method = RequestMethod.GET)
     @ResponseStatus(code = HttpStatus.OK)
-    public List<TeamInfo> getPublicTeams() {
+    public List<Team> getPublicTeams() {
         List<TeamEntity> teamEntityList = teamService.getPublic();
-        List<TeamInfo> teamInfoList = new ArrayList<>();
+        List<Team> teamList = new ArrayList<>();
 
         for (TeamEntity teamEntity : teamEntityList) {
-            teamInfoList.add(new TeamInfo(teamEntity));
+            teamList.add(new TeamInfo(teamEntity));
         }
-        return teamInfoList;
+        return teamList;
     }
 
     @RequestMapping(path = "/name/{name}", method = RequestMethod.GET)
