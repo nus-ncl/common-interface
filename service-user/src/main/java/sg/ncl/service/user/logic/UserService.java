@@ -55,7 +55,7 @@ public class UserService {
     }
 
     @Transactional
-    public void update(final String id, final UserDetails user) {
+    public void updateUser(final String id, final UserDetails user) {
         if (id == null || id.isEmpty()) {
             throw new UserIdNullException();
         }

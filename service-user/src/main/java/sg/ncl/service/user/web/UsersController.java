@@ -43,7 +43,7 @@ public class UsersController {
     @RequestMapping(path = "/{id}", method = RequestMethod.PUT)
     @ResponseStatus(code = HttpStatus.ACCEPTED)
     public void updateUser(@PathVariable String id, @RequestBody UserDetailsInfo user) {
-        userService.update(id, user);
+        userService.updateUser(id, user);
     }
 
     @RequestMapping(path = "/addUserToTeam/{id}/{teamId}", method = RequestMethod.POST)

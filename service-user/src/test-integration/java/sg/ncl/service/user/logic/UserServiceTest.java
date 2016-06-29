@@ -112,7 +112,7 @@ public class UserServiceTest extends AbstractTest {
         String newFirstName = RandomStringUtils.randomAlphabetic(20);
         userEntityArray[0].getUserDetails().setFirstName(newFirstName);
 
-        userService.update(idString, userEntityArray[0].getUserDetails());
+        userService.updateUser(idString, userEntityArray[0].getUserDetails());
 
         user = userService.findUser(idString);
         Assert.assertEquals(user.getUserDetails().getFirstName(), newFirstName);
@@ -128,21 +128,21 @@ public class UserServiceTest extends AbstractTest {
 
         savedUserEntity.getUserDetails().setFirstName(null);
 
-        userService.update(savedUserEntity.getId(), savedUserEntity.getUserDetails());
+        userService.updateUser(savedUserEntity.getId(), savedUserEntity.getUserDetails());
     }
 
     @Test(expected = UserIdNullException.class)
     public void updateUserNullIdTest() throws Exception {
         UserService userService = new UserService(userRepository);
         UserEntity userEntity = new UserEntity();
-        userService.update(null, userEntity.getUserDetails());
+        userService.updateUser(null, userEntity.getUserDetails());
     }
 
     @Test(expected = UserIdNullException.class)
     public void updateUserEmptyIdTest() throws Exception {
         UserService userService = new UserService(userRepository);
         UserEntity userEntity = new UserEntity();
-        userService.update("", userEntity.getUserDetails());
+        userService.updateUser("", userEntity.getUserDetails());
     }
 
     private UserEntity[] addUser() throws Exception {
@@ -171,7 +171,7 @@ public class UserServiceTest extends AbstractTest {
         String userId = userEntity.getId();
         String teamId = RandomStringUtils.randomAlphabetic(20);
         userEntity.addTeamId(teamId);
-        userService.update(userId, userEntity.getUserDetails());
+        userService.updateUser(userId, userEntity.getUserDetails());
 
         User userFromDb = userService.findUser(userId);
         List<String> teamList = userFromDb.getTeamIds();
