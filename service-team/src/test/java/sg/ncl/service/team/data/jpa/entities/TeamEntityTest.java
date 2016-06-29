@@ -6,6 +6,7 @@ import sg.ncl.service.team.Util;
 import sg.ncl.service.team.domain.TeamPrivacy;
 import sg.ncl.service.team.domain.TeamStatus;
 import sg.ncl.service.team.domain.TeamVisibility;
+import sg.ncl.service.team.dtos.TeamMemberInfo;
 
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
@@ -185,10 +186,10 @@ public class TeamEntityTest {
     @Test
     public void testAddMember() throws Exception {
         final TeamEntity entity = new TeamEntity();
-        final String userId = RandomStringUtils.randomAlphanumeric(20);
-        entity.addMember(userId);
+        final TeamMemberInfo teamMemberInfo = Util.getTeamMemberInfo();
+        entity.addMember(teamMemberInfo);
 
-        assertThat(entity.getMembers().get(0).getUserId(), is(userId));
+        assertThat(entity.getMembers().get(0).getUserId(), is(teamMemberInfo.getUserId()));
     }
 
     @Test

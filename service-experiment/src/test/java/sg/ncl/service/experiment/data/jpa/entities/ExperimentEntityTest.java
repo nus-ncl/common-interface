@@ -31,6 +31,22 @@ public class ExperimentEntityTest {
     }
 
     @Test
+    public void testGetUserId() throws Exception {
+        final ExperimentEntity entity = new ExperimentEntity();
+
+        assertThat(entity.getUserId(), is(nullValue()));
+    }
+
+    @Test
+    public void testSetUserId() throws Exception {
+        final ExperimentEntity entity = new ExperimentEntity();
+        final String userId = RandomStringUtils.randomAlphanumeric(20);
+        entity.setUserId(userId);
+
+        assertThat(entity.getUserId(), is(userId));
+    }
+
+    @Test
     public void testGetTeamId() throws Exception {
         final ExperimentEntity entity = new ExperimentEntity();
 
