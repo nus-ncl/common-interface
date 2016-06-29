@@ -112,7 +112,7 @@ public class UserServiceTest extends AbstractTest {
         String newFirstName = RandomStringUtils.randomAlphabetic(20);
         userEntityArray[0].getUserDetails().setFirstName(newFirstName);
 
-        userService.updateUser(idString, userEntityArray[0].getUserDetails());
+        userService.updateUser(idString, userEntityArray[0]);
 
         user = userService.findUser(idString);
         Assert.assertEquals(user.getUserDetails().getFirstName(), newFirstName);
@@ -128,21 +128,21 @@ public class UserServiceTest extends AbstractTest {
 
         savedUserEntity.getUserDetails().setFirstName(null);
 
-        userService.updateUser(savedUserEntity.getId(), savedUserEntity.getUserDetails());
+        userService.updateUser(savedUserEntity.getId(), savedUserEntity);
     }
 
     @Test(expected = UserIdNullException.class)
     public void updateUserNullIdTest() throws Exception {
         UserService userService = new UserService(userRepository);
         UserEntity userEntity = new UserEntity();
-        userService.updateUser(null, userEntity.getUserDetails());
+        userService.updateUser(null, userEntity);
     }
 
     @Test(expected = UserIdNullException.class)
     public void updateUserEmptyIdTest() throws Exception {
         UserService userService = new UserService(userRepository);
         UserEntity userEntity = new UserEntity();
-        userService.updateUser("", userEntity.getUserDetails());
+        userService.updateUser("", userEntity);
     }
 
     private UserEntity[] addUser() throws Exception {
@@ -171,10 +171,10 @@ public class UserServiceTest extends AbstractTest {
         String userId = userEntity.getId();
         String teamId = RandomStringUtils.randomAlphabetic(20);
         userEntity.addTeamId(teamId);
-        userService.updateUser(userId, userEntity.getUserDetails());
+        userService.updateUser(userId, userEntity);
 
         User userFromDb = userService.findUser(userId);
-        List<String> teamList = userFromDb.getTeamIds();
+        List<String> teamList = userFromDb.getTeams();
         Assert.assertEquals(teamList.get(0), teamId);
     }
 

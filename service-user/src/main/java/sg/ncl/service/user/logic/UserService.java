@@ -55,7 +55,7 @@ public class UserService {
     }
 
     @Transactional
-    public void updateUser(final String id, final UserDetails user) {
+    public void updateUser(final String id, final User user) {
         if (id == null || id.isEmpty()) {
             throw new UserIdNullException();
         }
@@ -65,41 +65,45 @@ public class UserService {
             throw new UserNotFoundException();
         }
 
-//        final UserDetails user = user.getUserDetails();
+        System.out.println("@@@@@@@@@@@@@@@@@@ " + user);
 
-        if (user.getFirstName() != null) {
-            one.getUserDetails().setFirstName(user.getFirstName());
+        final UserDetails user2 = user.getUserDetails();
+
+        System.out.println(user2);
+
+        if (user.getUserDetails().getFirstName() != null) {
+            one.getUserDetails().setFirstName(user.getUserDetails().getFirstName());
         }
 
-        if (user.getLastName() != null) {
-            one.getUserDetails().setLastName(user.getLastName());
+        if (user.getUserDetails().getLastName() != null) {
+            one.getUserDetails().setLastName(user.getUserDetails().getLastName());
         }
 
-        if (user.getJobTitle() != null) {
-            one.getUserDetails().setJobTitle(user.getJobTitle());
+        if (user.getUserDetails().getJobTitle() != null) {
+            one.getUserDetails().setJobTitle(user.getUserDetails().getJobTitle());
         }
 
-        if (user.getEmail() != null) {
-            one.getUserDetails().setEmail(user.getEmail());
+        if (user.getUserDetails().getEmail() != null) {
+            one.getUserDetails().setEmail(user.getUserDetails().getEmail());
         }
 
-        if (user.getPhone() != null) {
-            one.getUserDetails().setPhone(user.getPhone());
+        if (user.getUserDetails().getPhone() != null) {
+            one.getUserDetails().setPhone(user.getUserDetails().getPhone());
         }
 
-        if (user.getInstitution() != null) {
-            one.getUserDetails().setInstitution(user.getInstitution());
+        if (user.getUserDetails().getInstitution() != null) {
+            one.getUserDetails().setInstitution(user.getUserDetails().getInstitution());
         }
 
-        if (user.getInstitutionAbbreviation() != null) {
-            one.getUserDetails().setInstitutionAbbreviation(user.getInstitutionAbbreviation());
+        if (user.getUserDetails().getInstitutionAbbreviation() != null) {
+            one.getUserDetails().setInstitutionAbbreviation(user.getUserDetails().getInstitutionAbbreviation());
         }
 
-        if (user.getInstitutionWeb() != null) {
-            one.getUserDetails().setInstitutionWeb(user.getInstitutionWeb());
+        if (user.getUserDetails().getInstitutionWeb() != null) {
+            one.getUserDetails().setInstitutionWeb(user.getUserDetails().getInstitutionWeb());
         }
 
-        final Address userAddress = user.getAddress();
+        final Address userAddress = user.getUserDetails().getAddress();
 
         if (userAddress != null) {
 
