@@ -65,7 +65,7 @@ public class TeamsController {
 
     @RequestMapping(path = "/{id}", method = RequestMethod.GET)
     public TeamInfo getTeam(@PathVariable String id) {
-        return new TeamInfo(teamService.find(id));
+        return new TeamInfo(teamService.findTeam(id));
     }
 
     @RequestMapping(path = "/{id}", method = RequestMethod.PUT)

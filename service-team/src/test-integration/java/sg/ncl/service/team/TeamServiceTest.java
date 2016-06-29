@@ -38,7 +38,7 @@ public class TeamServiceTest extends AbstractTest {
 
     @Test(expected = TeamNotFoundException.class)
     public void testFindTeamWithNoTeamsInDb() throws Exception {
-        teamService.find(RandomStringUtils.randomAlphabetic(20));
+        teamService.findTeam(RandomStringUtils.randomAlphabetic(20));
     }
 
     @Test
@@ -46,7 +46,7 @@ public class TeamServiceTest extends AbstractTest {
         TeamEntity createdTeam = new TeamEntity();
         TeamEntity team = teamService.createTeam(createdTeam);
 
-        Team getTeam = teamService.find(team.getId());
+        Team getTeam = teamService.findTeam(team.getId());
 
         Assert.assertEquals(createdTeam.getName(), getTeam.getName());
         Assert.assertEquals(createdTeam.getDescription(), getTeam.getDescription());
@@ -61,12 +61,12 @@ public class TeamServiceTest extends AbstractTest {
 
     @Test(expected = TeamIdNullException.class)
     public void testGetTeamWithNullId() throws Exception {
-        teamService.find(null);
+        teamService.findTeam(null);
     }
 
     @Test(expected = TeamIdNullException.class)
     public void testGetTeamWithEmptyId() throws Exception {
-        teamService.find("");
+        teamService.findTeam("");
     }
 
     @Test(expected = TeamNameNullException.class)
@@ -120,7 +120,7 @@ public class TeamServiceTest extends AbstractTest {
         final String idString = team.getId();
 
         // get team and store the original description from database
-        TeamEntity originalTeamEntity = teamService.find(idString);
+        TeamEntity originalTeamEntity = teamService.findTeam(idString);
         final String originalDescription = originalTeamEntity.getDescription();
 
         // change description and put
@@ -129,7 +129,7 @@ public class TeamServiceTest extends AbstractTest {
 
         teamService.update(originalTeamEntity);
 
-        TeamEntity teamEntityFromDb = teamService.find(idString);
+        TeamEntity teamEntityFromDb = teamService.findTeam(idString);
         Assert.assertEquals(teamEntityFromDb.getId(), idString);
         Assert.assertNotEquals(teamEntityFromDb.getDescription(), originalDescription);
         Assert.assertEquals(teamEntityFromDb.getDescription(), modifiedDescription);
@@ -156,7 +156,7 @@ public class TeamServiceTest extends AbstractTest {
         final String idString = team.getId();
 
         // get team and store the original description from database
-        TeamEntity originalTeamEntity = teamService.find(idString);
+        TeamEntity originalTeamEntity = teamService.findTeam(idString);
         final String originalDescription = originalTeamEntity.getDescription();
 
         // change description and put
@@ -178,7 +178,7 @@ public class TeamServiceTest extends AbstractTest {
         teamService.addUserToTeam(teamId, teamMemberInfo);
 
         // find the team and check if user is in it
-        TeamEntity teamEntityFromDb = teamService.find(teamId);
+        TeamEntity teamEntityFromDb = teamService.findTeam(teamId);
         List<TeamMemberEntity> teamList = teamEntityFromDb.getMembers();
         Assert.assertEquals(teamList.get(0).getUserId(), teamMemberInfo.getUserId());
     }

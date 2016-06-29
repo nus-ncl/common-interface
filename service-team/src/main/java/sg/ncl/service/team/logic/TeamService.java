@@ -57,7 +57,7 @@ public class TeamService {
     }
 
     @Transactional
-    public TeamEntity find(final String id) {
+    public TeamEntity findTeam(final String id) {
         if (id == null || id.isEmpty()) {
             throw new TeamIdNullException();
         }
@@ -85,13 +85,13 @@ public class TeamService {
 
     @Transactional
     public String getTeamStatus(final String id) {
-        final TeamEntity one = this.find(id);
+        final TeamEntity one = findTeam(id);
         return one.getStatus().toString();
     }
 
     @Transactional
     public void update(final Team inputTeam) {
-        final TeamEntity one = find(inputTeam.getId());
+        final TeamEntity one = findTeam(inputTeam.getId());
 
         if (inputTeam.getDescription() != null) {
             one.setDescription(inputTeam.getDescription());
@@ -114,7 +114,7 @@ public class TeamService {
 
     @Transactional
     public void addUserToTeam(final String teamId, TeamMemberInfo teamMemberInfo) {
-            TeamEntity teamEntity = find(teamId);
+            TeamEntity teamEntity = findTeam(teamId);
             teamEntity.addMember(teamMemberInfo);
             teamRepository.save(teamEntity);
     }
