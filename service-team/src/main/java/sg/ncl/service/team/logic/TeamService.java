@@ -63,7 +63,7 @@ public class TeamService {
     }
 
     @Transactional
-    public TeamEntity getName(String name) {
+    public Team getName(String name) {
         if (name == null || name.isEmpty()) {
             throw new TeamNameNullException();
         }
