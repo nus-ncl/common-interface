@@ -8,7 +8,6 @@ import org.springframework.boot.autoconfigure.jdbc.DataSourceProperties;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.PropertySource;
 
 import javax.inject.Inject;
 import javax.sql.DataSource;
@@ -19,7 +18,6 @@ import javax.sql.DataSource;
 @Configuration
 @ConditionalOnClass(DataSource.class)
 @EnableConfigurationProperties(DataSourceProperties.class)
-@PropertySource("classpath:/sg/ncl/common/jpa/jpa.properties")
 public class JpaAutoConfiguration {
 
     private static final Logger logger = LoggerFactory.getLogger(JpaAutoConfiguration.class);
@@ -29,7 +27,7 @@ public class JpaAutoConfiguration {
 
     @Bean
     public DataSource dataSource() {
-        logger.info("Connecting to `{}` as `{}`", dataSourceProperties.getUrl(), dataSourceProperties.getUsername());
+        logger.info("Connecting to '{}' as '{}'", dataSourceProperties.getUrl(), dataSourceProperties.getUsername());
         return DataSourceBuilder.create().url(dataSourceProperties.getUrl()).username(dataSourceProperties.getUsername()).password(dataSourceProperties.getPassword()).build();
     }
 
