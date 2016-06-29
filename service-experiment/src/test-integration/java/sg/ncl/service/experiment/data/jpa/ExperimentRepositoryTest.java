@@ -1,4 +1,4 @@
-package sg.ncl.service.experiment.data.jpa.repositories;
+package sg.ncl.service.experiment.data.jpa;
 
 import org.junit.Rule;
 import org.junit.Test;
@@ -45,6 +45,19 @@ public class ExperimentRepositoryTest extends AbstractTest {
         assertThat(savedEntity.getCreatedDate(), is(not(nullValue(ZonedDateTime.class))));
         assertThat(savedEntity.getLastModifiedDate(), is(not(nullValue(ZonedDateTime.class))));
         assertThat(savedEntity.getVersion(), is(equalTo(0L)));
+    }
+
+    @Test
+    public void testSaveNullUserId() throws Exception {
+        final ExperimentEntity entity = Util.getExperimentsEntity();
+        entity.setUserId(null);
+
+        try {
+            repository.saveAndFlush(entity);
+            exception.expect(DataIntegrityViolationException.class);
+        } catch (Exception e) {
+            checkException(e, "NULL not allowed for column \"USER_ID\"");
+        }
     }
 
     @Test
