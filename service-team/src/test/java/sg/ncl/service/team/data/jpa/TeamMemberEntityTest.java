@@ -1,4 +1,4 @@
-package sg.ncl.service.team.data.jpa.entities;
+package sg.ncl.service.team.data.jpa;
 
 import org.apache.commons.lang3.RandomStringUtils;
 import org.junit.Test;
