@@ -2,10 +2,12 @@ package sg.ncl.service.team.data.jpa.entities;
 
 import org.apache.commons.lang3.RandomStringUtils;
 import org.junit.Test;
+import sg.ncl.service.team.domain.TeamMemberType;
 
 import java.time.ZonedDateTime;
 
 import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.Matchers.nullValue;
 import static org.junit.Assert.assertThat;
 
@@ -78,5 +80,18 @@ public class TeamMemberEntityTest {
         entity.setJoinedDate(joinedDate);
 
         assertThat(entity.getJoinedDate(), is(joinedDate));
+    }
+
+    @Test
+    public void testSetMemberType() throws Exception {
+        final TeamMemberEntity entity = new TeamMemberEntity();
+        entity.setTeamMemberType(TeamMemberType.OWNER);
+        assertThat(entity.getTeamMemberType(), is(TeamMemberType.OWNER));
+    }
+
+    @Test
+    public void testGetMemberType() throws Exception {
+        final TeamMemberEntity entity = new TeamMemberEntity();
+        assertThat(entity.getTeamMemberType(), is(notNullValue()));
     }
 }

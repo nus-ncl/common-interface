@@ -1,13 +1,17 @@
 package sg.ncl.service.team.controllers;
 
+import org.json.JSONObject;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 import sg.ncl.service.team.TeamService;
 import sg.ncl.service.team.data.jpa.entities.TeamEntity;
 import sg.ncl.service.team.domain.Team;
+import sg.ncl.service.team.domain.TeamMember;
+import sg.ncl.service.team.domain.TeamMemberType;
 import sg.ncl.service.team.domain.TeamVisibility;
 import sg.ncl.service.team.dtos.TeamInfo;
+import sg.ncl.service.team.dtos.TeamMemberInfo;
 
 import javax.inject.Inject;
 import javax.validation.Valid;
@@ -76,10 +80,11 @@ public class TeamsController {
         teamService.update(teamEntity);
     }
 
-    @RequestMapping(path = "/addUserToTeam/{id}/{teamId}", method = RequestMethod.POST)
+    @RequestMapping(path = "/addUserToTeam/{id}", method = RequestMethod.POST)
     @ResponseStatus(value = HttpStatus.OK)
-    public void addUserToTeam(@PathVariable String id, @PathVariable String teamId) {
-        teamService.addUserToTeam(id, teamId);
+    public void addUserToTeam(@PathVariable String id, @RequestBody TeamMemberInfo teamMember) {
+        // id is the team id
+        teamService.addUserToTeam(id, teamMember);
     }
 
     @RequestMapping(path = "/seed", method = RequestMethod.POST)

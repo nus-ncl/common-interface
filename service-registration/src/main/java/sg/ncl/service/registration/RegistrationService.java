@@ -16,7 +16,11 @@ import sg.ncl.service.registration.exceptions.RegisterTeamNameDuplicateException
 import sg.ncl.service.registration.exceptions.UserFormException;
 import sg.ncl.service.team.TeamService;
 import sg.ncl.service.team.data.jpa.entities.TeamEntity;
+import sg.ncl.service.team.data.jpa.entities.TeamMemberEntity;
 import sg.ncl.service.team.domain.Team;
+import sg.ncl.service.team.domain.TeamMember;
+import sg.ncl.service.team.domain.TeamMemberType;
+import sg.ncl.service.team.dtos.TeamMemberInfo;
 import sg.ncl.service.team.exceptions.TeamNotFoundException;
 import sg.ncl.service.user.domain.User;
 import sg.ncl.service.user.logic.UserService;
@@ -82,9 +86,11 @@ public class RegistrationService {
             }
         }
 
+        TeamMemberType memberType;
         String resultJSON;
         String teamId;
         TeamEntity teamEntity;
+        TeamMemberInfo teamMemberInfo;
 
         if (isJoinTeam == true) {
             // accept the team data
@@ -112,9 +118,21 @@ public class RegistrationService {
         credentials.setId(userId);
         credentialsService.addCredentials(credentials);
 
-        // add user to team and vice versa
+        if (isJoinTeam == true) {
+            // indicate member type based on button click
+            memberType = TeamMemberType.MEMBER;
+        } else {
+            memberType = TeamMemberType.OWNER;
+        }
+
+        TeamMemberEntity teamMemberEntity = new TeamMemberEntity();
+        teamMemberEntity.setUserId(userId);
+        teamMemberEntity.setJoinedDate(ZonedDateTime.now());
+        teamMemberEntity.setTeamMemberType(memberType);
+        teamMemberInfo = new TeamMemberInfo(teamMemberEntity);
+
         userService.addUserToTeam(userId, teamId);
-        teamService.addUserToTeam(userId, teamId);
+        teamService.addUserToTeam(teamId, teamMemberInfo);
 
         JSONObject userObject = new JSONObject();
         userObject.put("firstName", user.getUserDetails().getFirstName());

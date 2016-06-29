@@ -18,6 +18,7 @@ import sg.ncl.service.team.data.jpa.entities.TeamEntity;
 import sg.ncl.service.team.data.jpa.repositories.TeamRepository;
 import sg.ncl.service.team.domain.TeamStatus;
 import sg.ncl.service.team.domain.TeamVisibility;
+import sg.ncl.service.team.dtos.TeamMemberInfo;
 import sg.ncl.service.team.serializers.DateTimeDeserializer;
 import sg.ncl.service.team.serializers.DateTimeSerializer;
 
@@ -124,12 +125,19 @@ public class TeamsControllerTest extends AbstractTest {
         TeamEntity teamEntity = teamRepository.save(origTeamEntity);
         String teamId = teamEntity.getId();
 
+        TeamMemberInfo teamMemberInfo = Util.getTeamMemberInfo();
+        GsonBuilder gsonBuilder = new GsonBuilder();
+        gsonBuilder.registerTypeAdapter(ZonedDateTime.class, new DateTimeSerializer());
+        gsonBuilder.registerTypeAdapter(ZonedDateTime.class, new DateTimeDeserializer());
+        Gson gson = gsonBuilder.create();
+        String jsonInString = gson.toJson(teamMemberInfo);
+
         // get team before add user
         mockMvc.perform(get("/teams/" + teamId))
                 .andExpect(status().isOk());
 
         // add user to team
-        mockMvc.perform(post("/teams/addUserToTeam/123456/" + teamId))
+        mockMvc.perform(post("/teams/addUserToTeam/" + teamId).contentType(MediaType.APPLICATION_JSON).content(jsonInString))
                 .andExpect(status().isOk());
 
         // get team after add user
