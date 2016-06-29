@@ -131,7 +131,7 @@ public class RegistrationService {
         teamMemberEntity.setTeamMemberType(memberType);
         teamMemberInfo = new TeamMemberInfo(teamMemberEntity);
 
-        userService.addUserToTeam(userId, teamId);
+        userService.addTeam(userId, teamId);
         teamService.addUserToTeam(teamId, teamMemberInfo);
 
         JSONObject userObject = new JSONObject();
