@@ -1,15 +1,10 @@
-package sg.ncl.service.team.controllers;
+package sg.ncl.service.team.web;
 
-import org.json.JSONObject;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 import sg.ncl.service.team.TeamService;
 import sg.ncl.service.team.data.jpa.entities.TeamEntity;
-import sg.ncl.service.team.domain.Team;
-import sg.ncl.service.team.domain.TeamMember;
-import sg.ncl.service.team.domain.TeamMemberType;
-import sg.ncl.service.team.domain.TeamVisibility;
 import sg.ncl.service.team.dtos.TeamInfo;
 import sg.ncl.service.team.dtos.TeamMemberInfo;
 

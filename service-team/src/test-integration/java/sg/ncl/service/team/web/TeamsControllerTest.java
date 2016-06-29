@@ -1,4 +1,4 @@
-package sg.ncl.service.team.controllers;
+package sg.ncl.service.team.web;
 
 import com.google.gson.*;
 import com.google.gson.reflect.TypeToken;
