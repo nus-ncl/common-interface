@@ -2,7 +2,7 @@ package sg.ncl.service.team.dtos;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import sg.ncl.service.team.data.jpa.entities.TeamMemberEntity;
+import sg.ncl.service.team.data.jpa.TeamMemberEntity;
 import sg.ncl.service.team.domain.TeamMember;
 import sg.ncl.service.team.domain.TeamMemberType;
 

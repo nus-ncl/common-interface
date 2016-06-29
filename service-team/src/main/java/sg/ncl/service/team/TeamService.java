@@ -1,11 +1,10 @@
 package sg.ncl.service.team;
 
 import org.springframework.stereotype.Service;
-import sg.ncl.service.team.data.jpa.entities.TeamEntity;
-import sg.ncl.service.team.data.jpa.repositories.TeamRepository;
+import sg.ncl.service.team.data.jpa.TeamEntity;
+import sg.ncl.service.team.data.jpa.TeamRepository;
 import sg.ncl.service.team.domain.Team;
 import sg.ncl.service.team.domain.TeamVisibility;
-import sg.ncl.service.team.dtos.TeamInfo;
 import sg.ncl.service.team.dtos.TeamMemberInfo;
 import sg.ncl.service.team.exceptions.TeamIdNullException;
 import sg.ncl.service.team.exceptions.TeamNameNullException;

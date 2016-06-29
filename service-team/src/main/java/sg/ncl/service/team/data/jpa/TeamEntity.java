@@ -1,4 +1,4 @@
-package sg.ncl.service.team.data.jpa.entities;
+package sg.ncl.service.team.data.jpa;
 
 import org.hibernate.annotations.GenericGenerator;
 import sg.ncl.common.jpa.AbstractEntity;
@@ -15,7 +15,6 @@ import javax.persistence.Id;
 import javax.persistence.ManyToMany;
 import javax.persistence.MapKey;
 import javax.persistence.Table;
-import java.lang.reflect.Member;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;

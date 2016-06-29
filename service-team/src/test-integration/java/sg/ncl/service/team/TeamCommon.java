@@ -1,7 +1,7 @@
 package sg.ncl.service.team;
 
 import org.apache.commons.lang3.RandomStringUtils;
-import sg.ncl.service.team.data.jpa.entities.TeamEntity;
+import sg.ncl.service.team.data.jpa.TeamEntity;
 
 import java.time.ZonedDateTime;
 

@@ -1,7 +1,7 @@
 package sg.ncl.service.team.dtos;
 
-import sg.ncl.service.team.data.jpa.entities.TeamEntity;
-import sg.ncl.service.team.data.jpa.entities.TeamMemberEntity;
+import sg.ncl.service.team.data.jpa.TeamEntity;
+import sg.ncl.service.team.data.jpa.TeamMemberEntity;
 import sg.ncl.service.team.domain.*;
 
 import java.time.ZonedDateTime;

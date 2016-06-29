@@ -1,4 +1,4 @@
-package sg.ncl.service.team.data.jpa.repositories;
+package sg.ncl.service.team.data.jpa;
 
 import org.junit.Rule;
 import org.junit.Test;
@@ -6,7 +6,8 @@ import org.junit.rules.ExpectedException;
 import org.springframework.dao.DataIntegrityViolationException;
 import sg.ncl.service.team.AbstractTest;
 import sg.ncl.service.team.Util;
-import sg.ncl.service.team.data.jpa.entities.TeamEntity;
+import sg.ncl.service.team.data.jpa.TeamRepository;
+import sg.ncl.service.team.data.jpa.TeamEntity;
 
 import javax.inject.Inject;
 

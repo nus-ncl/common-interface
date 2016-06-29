@@ -1,4 +1,4 @@
-package sg.ncl.service.team.data.jpa.entities;
+package sg.ncl.service.team.data.jpa;
 
 import sg.ncl.common.jpa.AbstractEntity;
 import sg.ncl.service.team.domain.TeamMember;
