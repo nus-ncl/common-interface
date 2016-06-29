@@ -23,4 +23,11 @@ public interface TeamMember {
      */
     ZonedDateTime getJoinedDate();
 
+    /**
+     * Returns the associated team membership.
+     *
+     * @return the associated team membership.
+     */
+    TeamMemberType getTeamMemberType();
+
 }

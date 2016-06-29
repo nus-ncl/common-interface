@@ -2,16 +2,9 @@ package sg.ncl.service.team.data.jpa.entities;
 
 import sg.ncl.common.jpa.AbstractEntity;
 import sg.ncl.service.team.domain.TeamMember;
+import sg.ncl.service.team.domain.TeamMemberType;
 
-import javax.persistence.CascadeType;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
-import javax.persistence.Table;
-import javax.persistence.UniqueConstraint;
+import javax.persistence.*;
 import java.time.ZonedDateTime;
 
 /**
@@ -36,6 +29,10 @@ public class TeamMemberEntity extends AbstractEntity implements TeamMember {
     @Column(name = "joined_date", nullable = false)
     private ZonedDateTime joinedDate;
 
+    @Column(name = "member_type", nullable = false)
+    @Enumerated(EnumType.STRING)
+    private TeamMemberType teamMemberType = TeamMemberType.MEMBER;
+
     public Long getId() {
         return id;
     }
@@ -57,7 +54,7 @@ public class TeamMemberEntity extends AbstractEntity implements TeamMember {
         return userId;
     }
 
-    void setUserId(final String userId) {
+    public void setUserId(final String userId) {
         this.userId = userId;
     }
 
@@ -70,4 +67,12 @@ public class TeamMemberEntity extends AbstractEntity implements TeamMember {
         this.joinedDate = joinedDate;
     }
 
+    @Override
+    public TeamMemberType getTeamMemberType() {
+        return teamMemberType;
+    }
+
+    public void setTeamMemberType(TeamMemberType teamMemberType) {
+        this.teamMemberType = teamMemberType;
+    }
 }
