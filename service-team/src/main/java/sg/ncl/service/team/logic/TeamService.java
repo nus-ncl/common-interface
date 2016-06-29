@@ -57,17 +57,8 @@ public class TeamService {
     }
 
     @Transactional
-    public TeamEntity findTeam(final String id) {
-        if (id == null || id.isEmpty()) {
-            throw new TeamIdNullException();
-        }
-
-        final TeamEntity one = teamRepository.findOne(id);
-        if (one == null) {
-            throw new TeamNotFoundException();
-        }
-
-        return one;
+    public Team findTeam(final String id) {
+        return findTeamEntity(id);
     }
 
     @Transactional
@@ -85,28 +76,37 @@ public class TeamService {
 
     @Transactional
     public String getTeamStatus(final String id) {
-        final TeamEntity one = findTeam(id);
+        final Team one = findTeam(id);
         return one.getStatus().toString();
     }
 
     @Transactional
-    public void update(final Team inputTeam) {
-        final TeamEntity one = findTeam(inputTeam.getId());
+    public void updateTeam(final String id, final Team team) {
 
-        if (inputTeam.getDescription() != null) {
-            one.setDescription(inputTeam.getDescription());
+        if (id == null || id.isEmpty()) {
+            throw new TeamIdNullException();
         }
 
-        if (inputTeam.getPrivacy() != null) {
-            one.setPrivacy(inputTeam.getPrivacy());
+        final TeamEntity one = teamRepository.findOne(id);
+
+        if (one == null) {
+            throw new TeamNotFoundException();
         }
 
-        if (inputTeam.getStatus() != null) {
-            one.setStatus(inputTeam.getStatus());
+        if (team.getDescription() != null) {
+            one.setDescription(team.getDescription());
         }
 
-        if (inputTeam.getVisibility() != null) {
-            one.setVisibility(inputTeam.getVisibility());
+        if (team.getPrivacy() != null) {
+            one.setPrivacy(team.getPrivacy());
+        }
+
+        if (team.getStatus() != null) {
+            one.setStatus(team.getStatus());
+        }
+
+        if (team.getVisibility() != null) {
+            one.setVisibility(team.getVisibility());
         }
 
         teamRepository.save(one);
@@ -114,8 +114,20 @@ public class TeamService {
 
     @Transactional
     public void addUserToTeam(final String teamId, TeamMemberInfo teamMemberInfo) {
-            TeamEntity teamEntity = findTeam(teamId);
+            TeamEntity teamEntity = findTeamEntity(teamId);
             teamEntity.addMember(teamMemberInfo);
             teamRepository.save(teamEntity);
+    }
+
+    private TeamEntity findTeamEntity(final String id) {
+        if (id == null || id.isEmpty()) {
+            throw new TeamIdNullException();
+        }
+
+        final TeamEntity one = teamRepository.findOne(id);
+        if (one == null) {
+            throw new TeamNotFoundException();
+        }
+        return one;
     }
 }
