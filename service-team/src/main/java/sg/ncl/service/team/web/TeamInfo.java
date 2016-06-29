@@ -1,5 +1,7 @@
 package sg.ncl.service.team.web;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import sg.ncl.service.team.data.jpa.TeamEntity;
 import sg.ncl.service.team.data.jpa.TeamMemberEntity;
 import sg.ncl.service.team.domain.*;
@@ -25,7 +27,8 @@ public class TeamInfo implements Team {
     private final ZonedDateTime processedDate;
     private final List<TeamMemberInfo> members;
 
-    public TeamInfo(final String id, final String name, final String description, final String website, final String organisationType, final TeamVisibility visibility, final TeamPrivacy privacy, final TeamStatus status, final ZonedDateTime applicationDate, final ZonedDateTime processedDate, final List<TeamMemberEntity> members) {
+    @JsonCreator
+    public TeamInfo(@JsonProperty("id") final String id, @JsonProperty("name") final String name, @JsonProperty("description") final String description, @JsonProperty("website") final String website, @JsonProperty("organisationType") final String organisationType, @JsonProperty("visibility") final TeamVisibility visibility, @JsonProperty("privacy") final TeamPrivacy privacy, @JsonProperty("status") final TeamStatus status, @JsonProperty("applicationDate") final ZonedDateTime applicationDate, @JsonProperty("processedDate") final ZonedDateTime processedDate, @JsonProperty("members") final List<TeamMemberEntity> members) {
         this.id = id;
         this.name = name;
         this.description = description;

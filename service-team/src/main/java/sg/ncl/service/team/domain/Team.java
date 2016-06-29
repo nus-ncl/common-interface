@@ -1,5 +1,8 @@
 package sg.ncl.service.team.domain;
 
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import sg.ncl.service.team.data.jpa.TeamEntity;
+
 import java.time.ZonedDateTime;
 import java.util.List;
 
@@ -8,6 +11,7 @@ import java.util.List;
  *
  * @author Christopher Zhong
  */
+@JsonDeserialize(as = TeamEntity.class)
 public interface Team {
 
     /**
