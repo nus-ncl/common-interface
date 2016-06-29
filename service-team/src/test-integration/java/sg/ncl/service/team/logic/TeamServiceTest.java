@@ -1,8 +1,10 @@
-package sg.ncl.service.team;
+package sg.ncl.service.team.logic;
 
 import org.apache.commons.lang3.RandomStringUtils;
 import org.junit.Assert;
 import org.junit.Test;
+import sg.ncl.service.team.AbstractTest;
+import sg.ncl.service.team.Util;
 import sg.ncl.service.team.data.jpa.TeamEntity;
 import sg.ncl.service.team.data.jpa.TeamMemberEntity;
 import sg.ncl.service.team.data.jpa.TeamRepository;
@@ -120,14 +122,14 @@ public class TeamServiceTest extends AbstractTest {
         final String idString = team.getId();
 
         // get team and store the original description from database
-        TeamEntity originalTeamEntity = teamService.findTeam(idString);
-        final String originalDescription = originalTeamEntity.getDescription();
+        Team originalTeam = teamService.findTeam(idString);
+        final String originalDescription = originalTeam.getDescription();
 
         // change description and put
         String modifiedDescription = RandomStringUtils.randomAlphabetic(20);
         originalTeamEntity.setDescription(modifiedDescription);
 
-        teamService.update(originalTeamEntity);
+        teamService.updateTeam(originalTeam);
 
         TeamEntity teamEntityFromDb = teamService.findTeam(idString);
         Assert.assertEquals(teamEntityFromDb.getId(), idString);
@@ -139,14 +141,14 @@ public class TeamServiceTest extends AbstractTest {
     public void testUpdateTeamNullId() throws Exception {
         TeamEntity teamEntity = new TeamEntity();
         teamEntity.setName(null);
-        teamService.update(teamEntity);
+        teamService.updateTeam(teamEntity);
     }
 
     @Test(expected = TeamIdNullException.class)
     public void testUpdateTeamEmptyId() throws Exception {
         TeamEntity teamEntity = new TeamEntity();
         teamEntity.setName("");
-        teamService.update(teamEntity);
+        teamService.updateTeam(teamEntity);
     }
 
     @Test
@@ -163,7 +165,7 @@ public class TeamServiceTest extends AbstractTest {
         originalTeamEntity.setDescription(null);
 
         // test should pass
-        teamService.update(originalTeamEntity);
+        teamService.updateTeam(originalTeamEntity);
     }
 
     @Test
