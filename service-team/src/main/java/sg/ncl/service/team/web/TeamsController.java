@@ -28,8 +28,8 @@ public class TeamsController {
 
     @RequestMapping(path = "", method = RequestMethod.POST)
     @ResponseStatus(value = HttpStatus.CREATED)
-    public Team createTeam(@RequestBody @Valid TeamEntity team) {
-        return teamService.createTeam(team);
+    public void createTeam(@RequestBody @Valid TeamEntity team) {
+        teamService.createTeam(team);
     }
 
     @RequestMapping(method = RequestMethod.GET)
