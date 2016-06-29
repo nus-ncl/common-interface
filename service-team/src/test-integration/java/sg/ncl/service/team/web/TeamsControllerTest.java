@@ -78,7 +78,6 @@ public class TeamsControllerTest extends AbstractTest {
         Assert.assertEquals(teamEntity.getName(), grabTeamEntity.getName());
         Assert.assertEquals(teamEntity.getDescription(), grabTeamEntity.getDescription());
         Assert.assertEquals(teamEntity.getStatus(), TeamStatus.PENDING);
-//        Assert.assertEquals(teamEntity.getApplicationDate(), grabTeamEntity.getApplicationDate());
     }
 
     @Test
@@ -139,18 +138,17 @@ public class TeamsControllerTest extends AbstractTest {
 
     @Test
     public void testPutTeam() throws Exception {
-        MediaType contentType = new MediaType(MediaType.APPLICATION_JSON.getType(),
-                MediaType.APPLICATION_JSON.getSubtype());
-
         TeamEntity origTeamEntity = Util.getTeamEntity();
-        TeamEntity teamEntity = teamRepository.save(origTeamEntity);
-        final String idString = teamEntity.getId();
+        TeamEntity savedTeamEntity = teamRepository.save(origTeamEntity);
+        final String id = savedTeamEntity.getId();
 
-        // get user
-        MvcResult result = mockMvc.perform(get("/teams/" + idString))
-                .andExpect(status().isOk())
-                .andExpect(content().contentType(contentType))
-                .andReturn();
+        TeamEntity teamEntityFromDb = teamRepository.findOne(id);
+
+        // change name
+        String editedName = RandomStringUtils.randomAlphanumeric(20);
+        String editedDescription = RandomStringUtils.randomAlphanumeric(20);
+        teamEntityFromDb.setName(editedName);
+        teamEntityFromDb.setDescription(editedDescription);
 
         // create GSON
         GsonBuilder gsonBuilder = new GsonBuilder();
@@ -158,31 +156,18 @@ public class TeamsControllerTest extends AbstractTest {
         gsonBuilder.registerTypeAdapter(ZonedDateTime.class, new DateTimeDeserializer());
         Gson gson = gsonBuilder.create();
 
-        // parse JSON into TeamEntity
-        TeamEntity teamEntityFromDb = gson.fromJson(result.getResponse().getContentAsString(), TeamEntity.class);
-
-        Assert.assertEquals(origTeamEntity.getName(), teamEntityFromDb.getName());
-        Assert.assertEquals(origTeamEntity.getDescription(), teamEntityFromDb.getDescription());
-
-        String name = teamEntityFromDb.getName();
-        String description = teamEntityFromDb.getDescription();
-
-        // change name
-        String newDescription = RandomStringUtils.randomAlphabetic(20);
-        teamEntityFromDb.setDescription(newDescription);
-
-        String jsonString = gson.toJson(teamEntityFromDb);
-
         // put
-        mockMvc.perform(put("/teams/" + idString).contentType(contentType).content(jsonString))
+        String jsonString = gson.toJson(teamEntityFromDb);
+        System.out.println(jsonString);
+        mockMvc.perform(put("/teams/" + id).contentType(MediaType.APPLICATION_JSON).content(jsonString))
                 .andExpect(status().isAccepted());
 
         // check if name is new name and description is the same
-        mockMvc.perform(get("/teams/" + idString))
+        mockMvc.perform(get("/teams/" + id))
                 .andExpect(status().isOk())
-                .andExpect(content().contentType(contentType))
-                .andExpect(jsonPath("$.name", is(name)))
-                .andExpect(jsonPath("$.description", is(newDescription)));
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$.name", is(editedName)))
+                .andExpect(jsonPath("$.description", is(editedDescription)));
     }
 
     @Test
