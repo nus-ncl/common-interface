@@ -17,8 +17,8 @@ import javax.transaction.Transactional;
 import javax.validation.constraints.NotNull;
 import java.util.List;
 
-import static sg.ncl.service.authentication.validation.Validation.validateForCreation;
-import static sg.ncl.service.authentication.validation.Validation.validateForUpdate;
+import static sg.ncl.service.authentication.validation.Validator.validateForCreation;
+import static sg.ncl.service.authentication.validation.Validator.validateForUpdate;
 
 /**
  * @author Christopher Zhong

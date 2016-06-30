@@ -12,9 +12,9 @@ import sg.ncl.service.authentication.exceptions.UsernameNullOrEmptyException;
  * @author Christopher Zhong
  * @version 1.0
  */
-public class Validation {
+public class Validator {
 
-    private static final Logger logger = LoggerFactory.getLogger(Validation.class);
+    private static final Logger logger = LoggerFactory.getLogger(Validator.class);
 
     public static void validateForCreation(final Credentials credentials) {
         if (isIdNullOrEmpty(credentials)) {
