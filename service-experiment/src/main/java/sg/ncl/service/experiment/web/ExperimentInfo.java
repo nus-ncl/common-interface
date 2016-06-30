@@ -28,6 +28,17 @@ public class ExperimentInfo implements Experiment {
         this.maxDuration = maxDuration;
     }
 
+    public ExperimentInfo(final Experiment experiment) {
+        this(experiment.getId(),
+                experiment.getUserId(),
+                experiment.getTeamId(),
+                experiment.getName(),
+                experiment.getDescription(),
+                experiment.getNsFile(),
+                experiment.getIdleSwap(),
+                experiment.getMaxDuration());
+    }
+
     public ExperimentInfo(final ExperimentEntity experimentEntity) {
         this(experimentEntity.getId(),
                 experimentEntity.getUserId(),
