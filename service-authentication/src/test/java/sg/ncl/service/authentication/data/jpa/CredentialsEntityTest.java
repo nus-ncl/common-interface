@@ -2,8 +2,8 @@ package sg.ncl.service.authentication.data.jpa;
 
 import org.apache.commons.lang3.RandomStringUtils;
 import org.junit.Test;
-import sg.ncl.service.authentication.Util;
 import sg.ncl.service.authentication.domain.CredentialsStatus;
+import sg.ncl.service.authentication.util.TestUtil;
 
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.equalTo;
@@ -126,7 +126,7 @@ public class CredentialsEntityTest {
 
     @Test
     public void testToString() throws Exception {
-        final CredentialsEntity entity = Util.getCredentialsEntity();
+        final CredentialsEntity entity = TestUtil.getCredentialsEntity();
 
         final String toString = entity.toString();
 
