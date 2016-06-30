@@ -19,6 +19,7 @@ import sg.ncl.service.user.AbstractTest;
 import sg.ncl.service.user.Util;
 import sg.ncl.service.user.data.jpa.UserEntity;
 import sg.ncl.service.user.data.jpa.UserRepository;
+import sg.ncl.service.user.exceptions.UserAddTeamBadRequestException;
 
 import javax.inject.Inject;
 import java.util.List;
@@ -34,9 +35,6 @@ import static org.springframework.test.web.servlet.setup.MockMvcBuilders.webAppC
  * Created by Desmond
  */
 public class UsersControllerTest extends AbstractTest {
-
-    @Rule
-    public final ExpectedException exception = ExpectedException.none();
 
     @Inject
     private UserRepository userRepository;
@@ -214,12 +212,9 @@ public class UsersControllerTest extends AbstractTest {
 
         String jsonInString = mapper.writeValueAsString(userEntityArray[0]);
 
-        try {
             mockMvc.perform(post("/users/" + id + "/teams").contentType(MediaType.APPLICATION_JSON).content(jsonInString.toString()))
-                    .andExpect(status().isOk());
-            exception.expect(NullPointerException.class);
-        } catch (Exception e) {
-        }
+                    .andExpect(status().isBadRequest())
+                    .andExpect(status().reason("Bad request when adding user to team"));
     }
 
     private UserEntity[] addUser() throws Exception {
