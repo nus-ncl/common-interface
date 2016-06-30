@@ -9,6 +9,7 @@ import sg.ncl.service.user.domain.User;
 import sg.ncl.service.user.domain.UserDetails;
 import sg.ncl.service.user.exceptions.UserIdNullException;
 import sg.ncl.service.user.exceptions.UserNotFoundException;
+import sg.ncl.service.user.web.UserInfo;
 
 import javax.inject.Inject;
 import javax.transaction.Transactional;
@@ -51,7 +52,7 @@ public class UserService {
 
     @Transactional
     public User findUser(final String id) {
-        return findUserEntity(id);
+        return new UserInfo(findUserEntity(id));
     }
 
     @Transactional
