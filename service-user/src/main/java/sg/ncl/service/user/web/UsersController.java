@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import sg.ncl.service.user.domain.User;
+import sg.ncl.service.user.exceptions.UserAddTeamBadRequestException;
 import sg.ncl.service.user.logic.UserService;
 
 import javax.inject.Inject;
@@ -37,18 +38,23 @@ public class UsersController {
     @RequestMapping(path = "/{id}", method = RequestMethod.GET)
     @ResponseStatus(code = HttpStatus.OK)
     public User getUser(@PathVariable String id) {
-        return userService.findUser(id);
+        return new UserInfo(userService.findUser(id));
     }
 
     @RequestMapping(path = "/{id}", method = RequestMethod.PUT)
     @ResponseStatus(code = HttpStatus.ACCEPTED)
-    public void updateUser(@PathVariable String id, @RequestBody User user) {
+    public void updateUser(@PathVariable String id, @RequestBody UserInfo user) {
         userService.updateUser(id, user);
     }
 
-    @RequestMapping(path = "/addUserToTeam/{id}/teams", method = RequestMethod.POST)
+    @RequestMapping(path = "/{id}/teams", method = RequestMethod.POST)
     @ResponseStatus(value = HttpStatus.OK)
-    public void addTeam(@PathVariable String id, @RequestBody User user) {
+    public void addTeam(@PathVariable String id, @RequestBody UserInfo user) {
+        if (user.getTeams() == null || user.getTeams().isEmpty()) {
+            System.out.println("@@@@@@@@@@@@@@@" + user.getTeams());
+            throw new UserAddTeamBadRequestException();
+        }
+        // keep it simple for RegistrationService when parsing add user to team
         userService.addTeam(id, user.getTeams().get(0));
     }
 

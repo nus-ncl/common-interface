@@ -164,7 +164,7 @@ public class RegistrationControllerTest extends AbstractTest {
         teamArray.put(team.getId());
         userObject.put("teams", teamArray);
 
-        mockMvc.perform(post("/users/addUserToTeam/" + user.getId() + "/teams").contentType(MediaType.APPLICATION_JSON).content(userObject.toString()))
+        mockMvc.perform(post("/users/" + user.getId() + "/teams").contentType(MediaType.APPLICATION_JSON).content(userObject.toString()))
                 .andExpect(status().isOk());
 
         // after add user complete, retrieve the user from database

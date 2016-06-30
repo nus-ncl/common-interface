@@ -24,6 +24,7 @@ import java.util.List;
 
 import static org.hamcrest.core.Is.is;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -35,6 +36,7 @@ import static org.springframework.test.web.servlet.setup.MockMvcBuilders.webAppC
  */
 @WebAppConfiguration
 public class UsersControllerTest extends AbstractTest {
+
     @Inject
     private UserRepository userRepository;
 
@@ -199,6 +201,21 @@ public class UsersControllerTest extends AbstractTest {
         mockMvc.perform(put("/users/" + idString).contentType(contentType).content(object.toString()))
                 .andExpect(status().isNotFound())
                 .andExpect(status().reason("User not found"));
+    }
+
+    @Test
+    public void addUserToTeam() throws Exception {
+        final UserEntity[] userEntityArray = addUser();
+        final String id = userEntityArray[0].getId();
+
+        ObjectMapper mapper = new ObjectMapper();
+        mapper.registerModule(new JavaTimeModule());
+
+        String jsonInString = mapper.writeValueAsString(userEntityArray[0]);
+
+            mockMvc.perform(post("/users/" + id + "/teams").contentType(MediaType.APPLICATION_JSON).content(jsonInString.toString()))
+                    .andExpect(status().isBadRequest())
+                    .andExpect(status().reason("Bad request when adding user to team"));
     }
 
     private UserEntity[] addUser() throws Exception {
