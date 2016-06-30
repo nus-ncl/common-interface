@@ -2,7 +2,6 @@ package sg.ncl.service.user.web;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import sg.ncl.service.user.data.jpa.AddressEntity;
 import sg.ncl.service.user.domain.Address;
 
 /**
@@ -27,13 +26,13 @@ public class AddressInfo implements Address {
         this.zipCode = zipCode;
     }
 
-    public AddressInfo(AddressEntity addressEntity) {
-        this(addressEntity.getAddress1(),
-                addressEntity.getAddress2(),
-                addressEntity.getCountry(),
-                addressEntity.getRegion(),
-                addressEntity.getCity(),
-                addressEntity.getZipCode()
+    public AddressInfo(Address address) {
+        this(address.getAddress1(),
+                address.getAddress2(),
+                address.getCountry(),
+                address.getRegion(),
+                address.getCity(),
+                address.getZipCode()
         );
     }
 
