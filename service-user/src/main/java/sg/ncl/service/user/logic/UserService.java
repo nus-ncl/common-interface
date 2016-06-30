@@ -6,7 +6,6 @@ import sg.ncl.service.user.data.jpa.UserEntity;
 import sg.ncl.service.user.data.jpa.UserRepository;
 import sg.ncl.service.user.domain.Address;
 import sg.ncl.service.user.domain.User;
-import sg.ncl.service.user.domain.UserDetails;
 import sg.ncl.service.user.exceptions.UserIdNullException;
 import sg.ncl.service.user.exceptions.UserNotFoundException;
 
@@ -56,20 +55,7 @@ public class UserService {
 
     @Transactional
     public void updateUser(final String id, final User user) {
-        if (id == null || id.isEmpty()) {
-            throw new UserIdNullException();
-        }
-
-        final UserEntity one = userRepository.findOne(id);
-        if (one == null) {
-            throw new UserNotFoundException();
-        }
-
-        System.out.println("@@@@@@@@@@@@@@@@@@ " + user);
-
-        final UserDetails user2 = user.getUserDetails();
-
-        System.out.println(user2);
+        final UserEntity one = findUserEntity(id);
 
         if (user.getUserDetails().getFirstName() != null) {
             one.getUserDetails().setFirstName(user.getUserDetails().getFirstName());
@@ -137,14 +123,9 @@ public class UserService {
 
     @Transactional
     public void addTeam(final String userId, final String teamId) {
-        UserEntity userEntity = findAndAddTeam(userId, teamId);
-        userRepository.save(userEntity);
-    }
-
-    private UserEntity findAndAddTeam(final String userId, final String teamId) {
         UserEntity one = findUserEntity(userId);
         one.addTeamId(teamId);
-        return one;
+        userRepository.save(one);
     }
 
     private UserEntity findUserEntity(final String userId) {
