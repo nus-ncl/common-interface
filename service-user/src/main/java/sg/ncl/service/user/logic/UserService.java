@@ -126,14 +126,9 @@ public class UserService {
 
     @Transactional
     public void addTeam(final String userId, final String teamId) {
-        UserEntity userEntity = findAndAddTeam(userId, teamId);
-        userRepository.save(userEntity);
-    }
-
-    private UserEntity findAndAddTeam(final String userId, final String teamId) {
         UserEntity one = findUserEntity(userId);
         one.addTeamId(teamId);
-        return one;
+        userRepository.save(one);
     }
 
     private UserEntity findUserEntity(final String userId) {
