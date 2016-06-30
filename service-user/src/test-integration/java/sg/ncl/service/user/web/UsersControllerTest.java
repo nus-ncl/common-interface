@@ -8,9 +8,7 @@ import org.apache.commons.lang3.RandomStringUtils;
 import org.hamcrest.collection.IsIterableContainingInAnyOrder;
 import org.junit.Assert;
 import org.junit.Before;
-import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.ExpectedException;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
@@ -19,7 +17,6 @@ import sg.ncl.service.user.AbstractTest;
 import sg.ncl.service.user.Util;
 import sg.ncl.service.user.data.jpa.UserEntity;
 import sg.ncl.service.user.data.jpa.UserRepository;
-import sg.ncl.service.user.exceptions.UserAddTeamBadRequestException;
 
 import javax.inject.Inject;
 import java.util.List;
