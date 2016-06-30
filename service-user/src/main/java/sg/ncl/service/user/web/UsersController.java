@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import sg.ncl.service.user.domain.User;
+import sg.ncl.service.user.exceptions.UserAddTeamBadRequestException;
 import sg.ncl.service.user.logic.UserService;
 
 import javax.inject.Inject;
@@ -50,7 +51,8 @@ public class UsersController {
     @ResponseStatus(value = HttpStatus.OK)
     public void addTeam(@PathVariable String id, @RequestBody UserInfo user) {
         if (user.getTeams() == null || user.getTeams().isEmpty()) {
-            throw new NullPointerException();
+            System.out.println("@@@@@@@@@@@@@@@" + user.getTeams());
+            throw new UserAddTeamBadRequestException();
         }
         // keep it simple for RegistrationService when parsing add user to team
         userService.addTeam(id, user.getTeams().get(0));
