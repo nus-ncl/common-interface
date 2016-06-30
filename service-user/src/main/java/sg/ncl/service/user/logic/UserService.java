@@ -56,14 +56,7 @@ public class UserService {
 
     @Transactional
     public void updateUser(final String id, final User user) {
-        if (id == null || id.isEmpty()) {
-            throw new UserIdNullException();
-        }
-
-        final UserEntity one = userRepository.findOne(id);
-        if (one == null) {
-            throw new UserNotFoundException();
-        }
+        final UserEntity one = findUserEntity(id);
 
         final UserDetails user2 = user.getUserDetails();
 
