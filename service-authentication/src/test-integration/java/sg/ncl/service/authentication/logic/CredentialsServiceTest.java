@@ -68,13 +68,13 @@ public class CredentialsServiceTest extends AbstractTest {
         when(passwordEncoder.encode(anyString())).thenReturn(credentialsInfo.getPassword());
         when(credentialsRepository.save(any(CredentialsEntity.class))).thenAnswer(i -> i.getArgumentAt(0, CredentialsEntity.class));
 
-        final CredentialsEntity credentialsEntity = credentialsService.addCredentials(credentialsInfo);
+        final Credentials credentials = credentialsService.addCredentials(credentialsInfo);
 
         verify(passwordEncoder, times(1)).encode(anyString());
         verify(credentialsRepository, times(1)).save(any(CredentialsEntity.class));
-        assertThat(credentialsEntity.getId(), is(equalTo(credentialsInfo.getId())));
-        assertThat(credentialsEntity.getUsername(), is(equalTo(credentialsInfo.getUsername())));
-        assertThat(credentialsEntity.getPassword(), is(equalTo(credentialsInfo.getPassword())));
+        assertThat(credentials.getId(), is(equalTo(credentialsInfo.getId())));
+        assertThat(credentials.getUsername(), is(equalTo(credentialsInfo.getUsername())));
+        assertThat(credentials.getPassword(), is(equalTo(credentialsInfo.getPassword())));
     }
 
     @Test
