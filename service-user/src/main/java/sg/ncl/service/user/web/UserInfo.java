@@ -2,7 +2,6 @@ package sg.ncl.service.user.web;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import sg.ncl.service.user.data.jpa.UserEntity;
 import sg.ncl.service.user.domain.LoginActivity;
 import sg.ncl.service.user.domain.User;
 import sg.ncl.service.user.domain.UserStatus;
@@ -36,15 +35,15 @@ public class UserInfo implements User {
         this.teams = teams;
     }
 
-    public UserInfo(final UserEntity userEntity) {
-        this(userEntity.getId(),
-                new UserDetailsInfo(userEntity.getUserDetails()),
-                userEntity.isEmailVerified(),
-                userEntity.getStatus(),
-                userEntity.getApplicationDate(),
-                userEntity.getProcessedDate(),
-                userEntity.getLoginActivities(),
-                userEntity.getTeams()
+    public UserInfo(final User user) {
+        this(user.getId(),
+                new UserDetailsInfo(user.getUserDetails()),
+                user.isEmailVerified(),
+                user.getStatus(),
+                user.getApplicationDate(),
+                user.getProcessedDate(),
+                user.getLoginActivities(),
+                user.getTeams()
         );
     }
 

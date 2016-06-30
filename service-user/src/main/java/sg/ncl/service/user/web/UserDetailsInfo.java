@@ -2,7 +2,6 @@ package sg.ncl.service.user.web;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import sg.ncl.service.user.data.jpa.UserDetailsEntity;
 import sg.ncl.service.user.domain.UserDetails;
 
 /**
@@ -33,16 +32,16 @@ public class UserDetailsInfo implements UserDetails {
         this.institutionWeb = institutionWeb;
     }
 
-    public UserDetailsInfo(UserDetailsEntity userDetailsEntity) {
-        this(userDetailsEntity.getFirstName(),
-                userDetailsEntity.getLastName(),
-                userDetailsEntity.getJobTitle(),
-                new AddressInfo(userDetailsEntity.getAddress()),
-                userDetailsEntity.getEmail(),
-                userDetailsEntity.getPhone(),
-                userDetailsEntity.getInstitution(),
-                userDetailsEntity.getInstitutionAbbreviation(),
-                userDetailsEntity.getInstitutionWeb()
+    public UserDetailsInfo(UserDetails userDetails) {
+        this(userDetails.getFirstName(),
+                userDetails.getLastName(),
+                userDetails.getJobTitle(),
+                new AddressInfo(userDetails.getAddress()),
+                userDetails.getEmail(),
+                userDetails.getPhone(),
+                userDetails.getInstitution(),
+                userDetails.getInstitutionAbbreviation(),
+                userDetails.getInstitutionWeb()
         );
     }
 
