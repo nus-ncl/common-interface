@@ -65,11 +65,7 @@ public class UserService {
             throw new UserNotFoundException();
         }
 
-        System.out.println("@@@@@@@@@@@@@@@@@@ " + user);
-
         final UserDetails user2 = user.getUserDetails();
-
-        System.out.println(user2);
 
         if (user.getUserDetails().getFirstName() != null) {
             one.getUserDetails().setFirstName(user.getUserDetails().getFirstName());
