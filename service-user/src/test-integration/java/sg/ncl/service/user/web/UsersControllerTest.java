@@ -215,7 +215,7 @@ public class UsersControllerTest extends AbstractTest {
         String jsonInString = mapper.writeValueAsString(userEntityArray[0]);
 
         try {
-            mockMvc.perform(post("/users/addUserToTeam/" + id + "/teams").contentType(MediaType.APPLICATION_JSON).content(jsonInString.toString()))
+            mockMvc.perform(post("/users/" + id + "/teams").contentType(MediaType.APPLICATION_JSON).content(jsonInString.toString()))
                     .andExpect(status().isOk());
             exception.expect(NullPointerException.class);
         } catch (Exception e) {
