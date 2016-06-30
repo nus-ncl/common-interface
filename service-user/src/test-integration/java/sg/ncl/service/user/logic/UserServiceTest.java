@@ -185,6 +185,6 @@ public class UserServiceTest extends AbstractTest {
         User user = userService.createUser(userEntity);
 
         User userFromDb = userService.findUser(user.getId());
-        Assert.assertEquals(userEntity.getUserDetails(), userFromDb.getUserDetails());
+        Assert.assertEquals(userEntity.getUserDetails().getFirstName(), userFromDb.getUserDetails().getFirstName());
     }
 }
