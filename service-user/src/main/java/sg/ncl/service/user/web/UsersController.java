@@ -48,7 +48,11 @@ public class UsersController {
 
     @RequestMapping(path = "/addUserToTeam/{id}/teams", method = RequestMethod.POST)
     @ResponseStatus(value = HttpStatus.OK)
-    public void addTeam(@PathVariable String id, @RequestBody User user) {
+    public void addTeam(@PathVariable String id, @RequestBody UserInfo user) {
+        if (user.getTeams() == null || user.getTeams().isEmpty()) {
+            throw new NullPointerException();
+        }
+        // keep it simple for RegistrationService when parsing add user to team
         userService.addTeam(id, user.getTeams().get(0));
     }
 
