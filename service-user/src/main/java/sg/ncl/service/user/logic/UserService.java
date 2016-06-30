@@ -6,10 +6,8 @@ import sg.ncl.service.user.data.jpa.UserEntity;
 import sg.ncl.service.user.data.jpa.UserRepository;
 import sg.ncl.service.user.domain.Address;
 import sg.ncl.service.user.domain.User;
-import sg.ncl.service.user.domain.UserDetails;
 import sg.ncl.service.user.exceptions.UserIdNullException;
 import sg.ncl.service.user.exceptions.UserNotFoundException;
-import sg.ncl.service.user.web.UserInfo;
 
 import javax.inject.Inject;
 import javax.transaction.Transactional;
@@ -52,7 +50,7 @@ public class UserService {
 
     @Transactional
     public User findUser(final String id) {
-        return new UserInfo(findUserEntity(id));
+        return findUserEntity(id);
     }
 
     @Transactional
