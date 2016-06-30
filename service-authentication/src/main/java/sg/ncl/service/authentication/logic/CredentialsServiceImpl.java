@@ -17,8 +17,8 @@ import javax.transaction.Transactional;
 import javax.validation.constraints.NotNull;
 import java.util.List;
 
-import static sg.ncl.service.authentication.validation.Validation.validateForCreation;
-import static sg.ncl.service.authentication.validation.Validation.validateForUpdate;
+import static sg.ncl.service.authentication.validation.Validator.validateForCreation;
+import static sg.ncl.service.authentication.validation.Validator.validateForUpdate;
 
 /**
  * @author Christopher Zhong
@@ -51,7 +51,7 @@ public class CredentialsServiceImpl implements CredentialsService {
             if (credentialsRepository.findByUsername(credentials.getUsername()) == null) {
                 final CredentialsEntity entity = new CredentialsEntity();
                 entity.setUsername(credentials.getUsername());
-                setPassword(entity, credentials.getPassword());
+                hashPassword(entity, credentials.getPassword());
                 entity.setId(credentials.getId());
                 entity.setStatus(CredentialsStatus.ACTIVE);
                 final CredentialsEntity savedEntity = credentialsRepository.save(entity);
@@ -78,13 +78,13 @@ public class CredentialsServiceImpl implements CredentialsService {
             entity.setUsername(credentials.getUsername());
         }
         if (credentials.getPassword() != null && !credentials.getPassword().isEmpty()) {
-            setPassword(entity, credentials.getPassword());
+            hashPassword(entity, credentials.getPassword());
         }
         final CredentialsEntity savedEntity = credentialsRepository.save(entity);
         logger.info("Credentials updated: {}", savedEntity);
     }
 
-    private void setPassword(final CredentialsEntity entity, final String password) {
+    private void hashPassword(final CredentialsEntity entity, final String password) {
         entity.setPassword(passwordEncoder.encode(password));
     }
 

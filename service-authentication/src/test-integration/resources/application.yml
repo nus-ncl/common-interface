@@ -16,6 +16,8 @@ spring:
         dialect: org.hibernate.dialect.H2Dialect
         format-sql: true
 ncl:
+  authentication:
+    url: "/authentication"
   jwt:
     api-key: 123
     signing-algorithm: HS256

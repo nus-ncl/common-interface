@@ -1,17 +1,24 @@
 # Spring Boot Configuration
 # For more information, please read http://docs.spring.io/spring-boot/docs/current/reference/html/index.html
-spring:
-  profiles:
-    active: authentication-service
 server:
   port: 8080
----
 spring:
-  profiles: default
+  datasource:
+    url: ${jdbc.url}
+    username: ${jdbc.username}
+    password: ${jdbc.password}
   jpa:
     hibernate:
-      ddl-auto: create
-    show-sql: true
+      ddl-auto: validate
+    show-sql: false
     properties:
       hibernate:
         dialect: org.hibernate.dialect.MySQL5InnoDBDialect
+        format-sql: true
+ncl:
+  authentication:
+    url: "/authentication"
+  jwt:
+    api-key: ${jwt.key}
+    signing-algorithm: HS512
+    expiry-duration: PT1H

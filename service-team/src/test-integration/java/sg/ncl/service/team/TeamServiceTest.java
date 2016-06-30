@@ -9,6 +9,7 @@ import sg.ncl.service.team.data.jpa.repositories.TeamRepository;
 import sg.ncl.service.team.domain.Team;
 import sg.ncl.service.team.domain.TeamStatus;
 import sg.ncl.service.team.dtos.TeamInfo;
+import sg.ncl.service.team.dtos.TeamMemberInfo;
 import sg.ncl.service.team.exceptions.TeamIdNullException;
 import sg.ncl.service.team.exceptions.TeamNameNullException;
 import sg.ncl.service.team.exceptions.TeamNotFoundException;
@@ -184,18 +185,18 @@ public class TeamServiceTest extends AbstractTest {
     public void testAddUserToTeam() throws Exception {
         TeamService teamService = new TeamService(teamRepository);
         TeamEntity team = Util.getTeamEntity();
+        TeamMemberInfo teamMemberInfo = Util.getTeamMemberInfo();
         team = teamService.save(team);
 
         // get team id from newly saved team
         String teamId = team.getId();
-        String userId = RandomStringUtils.randomAlphabetic(20);
 
-        teamService.addUserToTeam(userId, teamId);
+        teamService.addUserToTeam(teamId, teamMemberInfo);
 
         // find the team and check if user is in it
         TeamEntity teamEntityFromDb = teamService.find(teamId);
         List<TeamMemberEntity> teamList = teamEntityFromDb.getMembers();
-        Assert.assertEquals(teamList.get(0).getUserId(), userId);
+        Assert.assertEquals(teamList.get(0).getUserId(), teamMemberInfo.getUserId());
     }
 
     private boolean isListEqual(List<TeamEntity> one, List<TeamEntity> two) {

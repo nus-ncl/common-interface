@@ -6,7 +6,6 @@ import org.junit.rules.ExpectedException;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.orm.jpa.JpaSystemException;
 import sg.ncl.service.authentication.AbstractTest;
-import sg.ncl.service.authentication.Util;
 
 import javax.inject.Inject;
 import java.time.ZonedDateTime;
@@ -17,6 +16,7 @@ import static org.hamcrest.Matchers.not;
 import static org.hamcrest.Matchers.nullValue;
 import static org.junit.Assert.assertThat;
 import static sg.ncl.common.test.Checks.checkException;
+import static sg.ncl.service.authentication.util.TestUtil.getCredentialsEntity;
 
 /**
  * @author Christopher Zhong
@@ -36,7 +36,7 @@ public class CredentialsRepositoryTest extends AbstractTest {
 
     @Test
     public void testGoodSave() throws Exception {
-        final CredentialsEntity entity = Util.getCredentialsEntity();
+        final CredentialsEntity entity = getCredentialsEntity();
 
         final long count = repository.count();
         final CredentialsEntity savedEntity = repository.saveAndFlush(entity);
@@ -49,7 +49,7 @@ public class CredentialsRepositoryTest extends AbstractTest {
 
     @Test
     public void testSaveNullId() throws Exception {
-        final CredentialsEntity entity = Util.getCredentialsEntity();
+        final CredentialsEntity entity = getCredentialsEntity();
         entity.setId(null);
 
         exception.expect(JpaSystemException.class);
@@ -60,7 +60,7 @@ public class CredentialsRepositoryTest extends AbstractTest {
 
     @Test
     public void testSaveNullUsername() throws Exception {
-        final CredentialsEntity entity = Util.getCredentialsEntity();
+        final CredentialsEntity entity = getCredentialsEntity();
         entity.setUsername(null);
 
         try {
@@ -73,7 +73,7 @@ public class CredentialsRepositoryTest extends AbstractTest {
 
     @Test
     public void testSaveNullPassword() throws Exception {
-        final CredentialsEntity entity = Util.getCredentialsEntity();
+        final CredentialsEntity entity = getCredentialsEntity();
         entity.setPassword(null);
 
         try {
@@ -86,8 +86,8 @@ public class CredentialsRepositoryTest extends AbstractTest {
 
     @Test
     public void testSaveDuplicateUsername() throws Exception {
-        final CredentialsEntity entity1 = Util.getCredentialsEntity();
-        final CredentialsEntity entity2 = Util.getCredentialsEntity();
+        final CredentialsEntity entity1 = getCredentialsEntity();
+        final CredentialsEntity entity2 = getCredentialsEntity();
         entity2.setUsername(entity1.getUsername());
 
         repository.saveAndFlush(entity1);

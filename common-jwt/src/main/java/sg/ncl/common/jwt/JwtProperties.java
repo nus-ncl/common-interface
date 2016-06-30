@@ -6,19 +6,17 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 import java.time.Duration;
 import java.util.UUID;
 
-import static sg.ncl.common.jwt.JwtProperties.PREFIX;
-
 /**
  * @author Christopher Zhong
  * @version 1.0
  */
-@ConfigurationProperties(prefix = PREFIX)
+@ConfigurationProperties(prefix = JwtProperties.PREFIX)
 public class JwtProperties {
 
     public static final String PREFIX = "ncl.jwt";
 
     private String apiKey = UUID.randomUUID().toString();
-    private String signatureAlgorithm = SignatureAlgorithm.HS512.name();
+    private String signingAlgorithm = SignatureAlgorithm.HS512.name();
     private String expiryDuration = Duration.ofHours(24L).toString();
 
     public String getApiKey() {
@@ -29,12 +27,12 @@ public class JwtProperties {
         this.apiKey = apiKey;
     }
 
-    public String getSignatureAlgorithm() {
-        return signatureAlgorithm;
+    public String getSigningAlgorithm() {
+        return signingAlgorithm;
     }
 
-    public void setSignatureAlgorithm(final String signatureAlgorithm) {
-        this.signatureAlgorithm = signatureAlgorithm;
+    public void setSigningAlgorithm(final String signingAlgorithm) {
+        this.signingAlgorithm = signingAlgorithm;
     }
 
     public String getExpiryDuration() {

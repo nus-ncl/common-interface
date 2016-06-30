@@ -3,7 +3,7 @@ package sg.ncl.service.experiment.domain;
 /**
  * The {@link Experiment} interface represents a realization.
  *
- * @author Christopher Zhong
+ * Created by Desmond
  */
 public interface Experiment {
 
@@ -12,6 +12,13 @@ public interface Experiment {
      *
      * @return the unique identifier of this {@link Experiment}.
      */
-    Long getId();
-
+    long getId();
+    String getUserId();
+    String getTeamId();
+    String getName();
+    String getDescription();
+    String getNsFile();
+    int getIdleSwap();
+    int getMaxDuration();
 }
+

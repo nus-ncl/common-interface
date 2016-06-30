@@ -1,13 +1,13 @@
 package sg.ncl.service.user.data.jpa.repositories;
 
-import org.apache.commons.lang3.RandomStringUtils;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.springframework.dao.DataIntegrityViolationException;
 import sg.ncl.service.user.AbstractTest;
 import sg.ncl.service.user.Util;
-import sg.ncl.service.user.data.jpa.entities.AddressEntity;
+import sg.ncl.service.user.data.jpa.AddressRepository;
+import sg.ncl.service.user.data.jpa.AddressEntity;
 
 import javax.inject.Inject;
 
@@ -17,7 +17,6 @@ import static org.hamcrest.Matchers.not;
 import static org.hamcrest.Matchers.nullValue;
 import static org.junit.Assert.assertThat;
 import static sg.ncl.common.test.Checks.checkException;
-import static sg.ncl.service.user.Util.getAddressEntity;
 
 /**
  * @author Christopher Zhong
@@ -66,6 +65,19 @@ public class AddressRepositoryTest extends AbstractTest {
             repository.save(entity);
         } catch (Exception e) {
             checkException(e, "NULL not allowed for column \"COUNTRY\"");
+            return;
+        }
+        exception.expect(DataIntegrityViolationException.class);
+    }
+
+    @Test
+    public void testNullCity() throws Exception {
+        final AddressEntity entity = Util.getAddressEntity();
+        entity.setCity(null);
+        try {
+            repository.save(entity);
+        } catch (Exception e) {
+            checkException(e, "NULL not allowed for column \"CITY\"");
             return;
         }
         exception.expect(DataIntegrityViolationException.class);

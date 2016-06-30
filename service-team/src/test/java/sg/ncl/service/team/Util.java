@@ -2,6 +2,10 @@ package sg.ncl.service.team;
 
 import org.apache.commons.lang3.RandomStringUtils;
 import sg.ncl.service.team.data.jpa.entities.TeamEntity;
+import sg.ncl.service.team.data.jpa.entities.TeamMemberEntity;
+import sg.ncl.service.team.domain.TeamMember;
+import sg.ncl.service.team.domain.TeamMemberType;
+import sg.ncl.service.team.dtos.TeamMemberInfo;
 
 import java.time.ZonedDateTime;
 
@@ -19,5 +23,13 @@ public class Util {
         entity.setOrganisationType(RandomStringUtils.randomAlphanumeric(20));
         entity.setApplicationDate(ZonedDateTime.now());
         return entity;
+    }
+
+    public static TeamMemberInfo getTeamMemberInfo() {
+        final TeamMemberEntity teamMemberEntity = new TeamMemberEntity();
+        teamMemberEntity.setUserId(RandomStringUtils.randomAlphanumeric(20));
+        teamMemberEntity.setJoinedDate(ZonedDateTime.now());
+        teamMemberEntity.setTeamMemberType(TeamMemberType.MEMBER);
+        return new TeamMemberInfo(teamMemberEntity);
     }
 }
