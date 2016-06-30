@@ -19,7 +19,7 @@ public class ExperimentEntity extends AbstractEntity implements Experiment {
     @Id
     @GeneratedValue
     @Column(name = "id", nullable = false, unique = true, updatable = false)
-    private Long id;
+    private long id;
 
     @Column(name = "user_id", nullable = false, updatable = false)
     private String userId;
@@ -37,17 +37,17 @@ public class ExperimentEntity extends AbstractEntity implements Experiment {
     private String nsFile;
 
     @Column(name = "idle_swap", nullable = false)
-    private Integer idleSwap;
+    private int idleSwap;
 
     @Column(name = "max_duration", nullable = false)
-    private Integer maxDuration;
+    private int maxDuration;
 
     @Override
-    public Long getId() {
+    public long getId() {
         return id;
     }
 
-    public void setId(final Long id) {
+    public void setId(final long id) {
         this.id = id;
     }
 
@@ -97,7 +97,7 @@ public class ExperimentEntity extends AbstractEntity implements Experiment {
     }
 
     @Override
-    public Integer getIdleSwap() {
+    public int getIdleSwap() {
         return idleSwap;
     }
 
@@ -106,7 +106,7 @@ public class ExperimentEntity extends AbstractEntity implements Experiment {
     }
 
     @Override
-    public Integer getMaxDuration() {
+    public int getMaxDuration() {
         return maxDuration;
     }
 
@@ -121,12 +121,7 @@ public class ExperimentEntity extends AbstractEntity implements Experiment {
 
         final Experiment that = (Experiment) o;
 
-        return getId() == null ? that.getId() == null : getId().equals(that.getId());
-    }
-
-    @Override
-    public int hashCode() {
-        return getId() == null ? 0 : getId().hashCode();
+        return getId() == 0L ? that.getId() == 0L : getId() == that.getId();
     }
 
     @Override

@@ -18,7 +18,7 @@ public class ExperimentEntityTest {
     public void testGetId() throws Exception {
         final ExperimentEntity entity = new ExperimentEntity();
 
-        assertThat(entity.getId(), is(nullValue()));
+        assertThat(entity.getId(), is(0L));
     }
 
     @Test
@@ -114,7 +114,7 @@ public class ExperimentEntityTest {
     public void testGetIdleSwap() throws Exception {
         final ExperimentEntity entity = new ExperimentEntity();
 
-        assertThat(entity.getIdleSwap(), is(nullValue()));
+        assertThat(entity.getIdleSwap(), is(0));
     }
 
     @Test
@@ -130,7 +130,7 @@ public class ExperimentEntityTest {
     public void testGetMaxDuration() throws Exception {
         final ExperimentEntity entity = new ExperimentEntity();
 
-        assertThat(entity.getMaxDuration(), is(nullValue()));
+        assertThat(entity.getMaxDuration(), is(0));
     }
 
     @Test

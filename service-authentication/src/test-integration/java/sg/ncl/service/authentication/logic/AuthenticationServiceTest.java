@@ -34,7 +34,7 @@ import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mockingDetails;
 import static org.mockito.Mockito.when;
-import static sg.ncl.service.authentication.Util.getCredentialsEntity;
+import static sg.ncl.service.authentication.util.TestUtil.getCredentialsEntity;
 
 /**
  * @author Christopher Zhong
