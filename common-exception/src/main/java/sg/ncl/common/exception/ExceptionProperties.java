@@ -6,13 +6,11 @@ import org.springframework.http.HttpStatus;
 import java.util.HashMap;
 import java.util.Map;
 
-import static sg.ncl.common.exception.ExceptionProperties.PREFIX;
-
 /**
  * @author Christopher Zhong
  * @version 1.0
  */
-@ConfigurationProperties(prefix = PREFIX)
+@ConfigurationProperties(prefix = ExceptionProperties.PREFIX)
 public class ExceptionProperties {
 
     public static final String PREFIX = "ncl.exception";

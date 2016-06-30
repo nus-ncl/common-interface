@@ -1,6 +1,9 @@
 dependencies {
-    compile('org.springframework.boot:spring-boot-starter-data-jpa')
-    compile('javax.inject:javax.inject')
+    compile 'org.springframework.boot:spring-boot-starter-data-jpa'
+    compile 'javax.inject:javax.inject'
 
-    testCompile('org.springframework.boot:spring-boot-starter-test')
+    testCompile 'junit:junit'
+    testCompile 'org.hamcrest:hamcrest-library'
+
+    integrationTestCompile project(':common-test')
 }
