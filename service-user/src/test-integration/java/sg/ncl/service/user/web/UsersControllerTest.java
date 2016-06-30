@@ -1,30 +1,31 @@
-package sg.ncl.service.user.controllers;
+package sg.ncl.service.user.web;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import net.minidev.json.JSONObject;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.hamcrest.collection.IsIterableContainingInAnyOrder;
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.web.context.WebApplicationContext;
 import sg.ncl.service.user.AbstractTest;
 import sg.ncl.service.user.Util;
-import sg.ncl.service.user.data.jpa.entities.AddressEntity;
-import sg.ncl.service.user.data.jpa.entities.UserDetailsEntity;
-import sg.ncl.service.user.data.jpa.entities.UserEntity;
-import sg.ncl.service.user.data.jpa.repositories.UserRepository;
+import sg.ncl.service.user.data.jpa.UserEntity;
+import sg.ncl.service.user.data.jpa.UserRepository;
 
 import javax.inject.Inject;
-import java.time.ZonedDateTime;
 import java.util.List;
 
 import static org.hamcrest.core.Is.is;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 import static org.springframework.test.web.servlet.setup.MockMvcBuilders.webAppContextSetup;
@@ -33,6 +34,10 @@ import static org.springframework.test.web.servlet.setup.MockMvcBuilders.webAppC
  * Created by Desmond
  */
 public class UsersControllerTest extends AbstractTest {
+
+    @Rule
+    public final ExpectedException exception = ExpectedException.none();
+
     @Inject
     private UserRepository userRepository;
 
@@ -190,10 +195,31 @@ public class UsersControllerTest extends AbstractTest {
 
         final String idString = "123456";
 
+        JSONObject object = new JSONObject();
+        object.put("id", idString);
+
         // put
-        mockMvc.perform(put("/users/" + idString).contentType(contentType).content("{}"))
+        mockMvc.perform(put("/users/" + idString).contentType(contentType).content(object.toString()))
                 .andExpect(status().isNotFound())
                 .andExpect(status().reason("User not found"));
+    }
+
+    @Test
+    public void addUserToTeam() throws Exception {
+        final UserEntity[] userEntityArray = addUser();
+        final String id = userEntityArray[0].getId();
+
+        ObjectMapper mapper = new ObjectMapper();
+        mapper.registerModule(new JavaTimeModule());
+
+        String jsonInString = mapper.writeValueAsString(userEntityArray[0]);
+
+        try {
+            mockMvc.perform(post("/users/addUserToTeam/" + id + "/teams").contentType(MediaType.APPLICATION_JSON).content(jsonInString.toString()))
+                    .andExpect(status().isOk());
+            exception.expect(NullPointerException.class);
+        } catch (Exception e) {
+        }
     }
 
     private UserEntity[] addUser() throws Exception {

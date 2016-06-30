@@ -1,6 +1,7 @@
-package sg.ncl.service.user.dtos;
+package sg.ncl.service.user.web;
 
-import sg.ncl.service.user.data.jpa.entities.UserDetailsEntity;
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import sg.ncl.service.user.domain.UserDetails;
 
 /**
@@ -18,7 +19,8 @@ public class UserDetailsInfo implements UserDetails {
     private final String institutionAbbreviation;
     private final String institutionWeb;
 
-    public UserDetailsInfo(final String firstName, final String lastName, final String jobTitle, final AddressInfo address, final String email, final String phone, final String institution, final String institutionAbbreviation, final String institutionWeb) {
+    @JsonCreator
+    public UserDetailsInfo(@JsonProperty("firstName") final String firstName, @JsonProperty("lastName") final String lastName, @JsonProperty("jobTitle") final String jobTitle, @JsonProperty("address") final AddressInfo address, @JsonProperty("email") final String email, @JsonProperty("phone") final String phone, @JsonProperty("institution") final String institution, @JsonProperty("institutionAbbreviation") final String institutionAbbreviation, @JsonProperty("institutionWeb") final String institutionWeb) {
         this.firstName = firstName;
         this.lastName = lastName;
         this.jobTitle = jobTitle;
@@ -30,16 +32,16 @@ public class UserDetailsInfo implements UserDetails {
         this.institutionWeb = institutionWeb;
     }
 
-    public UserDetailsInfo(UserDetailsEntity userDetailsEntity) {
-        this(userDetailsEntity.getFirstName(),
-                userDetailsEntity.getLastName(),
-                userDetailsEntity.getJobTitle(),
-                new AddressInfo(userDetailsEntity.getAddress()),
-                userDetailsEntity.getEmail(),
-                userDetailsEntity.getPhone(),
-                userDetailsEntity.getInstitution(),
-                userDetailsEntity.getInstitutionAbbreviation(),
-                userDetailsEntity.getInstitutionWeb()
+    public UserDetailsInfo(UserDetails userDetails) {
+        this(userDetails.getFirstName(),
+                userDetails.getLastName(),
+                userDetails.getJobTitle(),
+                new AddressInfo(userDetails.getAddress()),
+                userDetails.getEmail(),
+                userDetails.getPhone(),
+                userDetails.getInstitution(),
+                userDetails.getInstitutionAbbreviation(),
+                userDetails.getInstitutionWeb()
         );
     }
 

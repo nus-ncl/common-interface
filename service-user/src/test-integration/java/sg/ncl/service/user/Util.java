@@ -1,9 +1,9 @@
 package sg.ncl.service.user;
 
 import org.apache.commons.lang3.RandomStringUtils;
-import sg.ncl.service.user.data.jpa.entities.AddressEntity;
-import sg.ncl.service.user.data.jpa.entities.UserDetailsEntity;
-import sg.ncl.service.user.data.jpa.entities.UserEntity;
+import sg.ncl.service.user.data.jpa.AddressEntity;
+import sg.ncl.service.user.data.jpa.UserDetailsEntity;
+import sg.ncl.service.user.data.jpa.UserEntity;
 
 import java.time.ZonedDateTime;
 

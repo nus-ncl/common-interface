@@ -1,4 +1,4 @@
-package sg.ncl.service.user.data.jpa.entities;
+package sg.ncl.service.user.data.jpa;
 
 import org.hibernate.annotations.GenericGenerator;
 import org.hibernate.annotations.Type;
@@ -130,7 +130,7 @@ public class UserEntity extends AbstractEntity implements User {
     }
 
     @Override
-    public List<String> getTeamIds() {
+    public List<String> getTeams() {
         return new ArrayList<>(teams);
     }
 
@@ -173,15 +173,7 @@ public class UserEntity extends AbstractEntity implements User {
                 ", processedDate=" + processedDate +
                 ", loginActivities=" + loginActivities +
                 ", teams=" + teams +
-                ", teamIds=" + getTeamIds() +
                 "} " + super.toString();
-    }
-
-    public static UserEntity get(final User user) {
-        final UserEntity entity = new UserEntity();
-        entity.setUserDetails(UserDetailsEntity.get(user.getUserDetails()));
-        entity.setApplicationDate(ZonedDateTime.now());
-        return entity;
     }
 
 }
