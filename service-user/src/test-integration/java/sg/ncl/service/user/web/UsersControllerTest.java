@@ -3,6 +3,7 @@ package sg.ncl.service.user.web;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import net.minidev.json.JSONObject;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.hamcrest.collection.IsIterableContainingInAnyOrder;
 import org.junit.Assert;
@@ -142,7 +143,7 @@ public class UsersControllerTest extends AbstractTest {
         String newFirstName = RandomStringUtils.randomAlphabetic(20);
         userEntityFromDb.getUserDetails().setFirstName(newFirstName);
 
-        String jsonInString = mapper.writeValueAsString(userEntityFromDb.getUserDetails());
+        String jsonInString = mapper.writeValueAsString(userEntityFromDb);
 
         // put
         mockMvc.perform(put("/users/" + idString).contentType(contentType).content(jsonInString))
@@ -191,8 +192,11 @@ public class UsersControllerTest extends AbstractTest {
 
         final String idString = "123456";
 
+        JSONObject object = new JSONObject();
+        object.put("id", idString);
+
         // put
-        mockMvc.perform(put("/users/" + idString).contentType(contentType).content("{}"))
+        mockMvc.perform(put("/users/" + idString).contentType(contentType).content(object.toString()))
                 .andExpect(status().isNotFound())
                 .andExpect(status().reason("User not found"));
     }

@@ -1,7 +1,6 @@
 package sg.ncl.service.user.logic;
 
 import org.springframework.stereotype.Service;
-import sg.ncl.service.user.data.jpa.AddressEntity;
 import sg.ncl.service.user.data.jpa.UserDetailsEntity;
 import sg.ncl.service.user.data.jpa.UserEntity;
 import sg.ncl.service.user.data.jpa.UserRepository;
@@ -13,7 +12,6 @@ import sg.ncl.service.user.exceptions.UserNotFoundException;
 
 import javax.inject.Inject;
 import javax.transaction.Transactional;
-import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -42,7 +40,7 @@ public class UserService {
     }
 
     @Transactional
-    public List<User> get() {
+    public List<User> getAll() {
         final List<User> result = new ArrayList<>();
         for (UserEntity user : userRepository.findAll()) {
             result.add(user);
@@ -52,20 +50,12 @@ public class UserService {
     }
 
     @Transactional
-    public UserEntity find(final String id) {
-        if (id == null || id.isEmpty()) {
-            throw new UserIdNullException();
-        }
-
-        final UserEntity one = userRepository.findOne(id);
-        if (one == null) {
-            throw new UserNotFoundException();
-        }
-        return one;
+    public User findUser(final String id) {
+        return findUserEntity(id);
     }
 
     @Transactional
-    public void update(final String id, final UserDetails user) {
+    public void updateUser(final String id, final User user) {
         if (id == null || id.isEmpty()) {
             throw new UserIdNullException();
         }
@@ -75,41 +65,45 @@ public class UserService {
             throw new UserNotFoundException();
         }
 
-//        final UserDetails user = user.getUserDetails();
+        System.out.println("@@@@@@@@@@@@@@@@@@ " + user);
 
-        if (user.getFirstName() != null) {
-            one.getUserDetails().setFirstName(user.getFirstName());
+        final UserDetails user2 = user.getUserDetails();
+
+        System.out.println(user2);
+
+        if (user.getUserDetails().getFirstName() != null) {
+            one.getUserDetails().setFirstName(user.getUserDetails().getFirstName());
         }
 
-        if (user.getLastName() != null) {
-            one.getUserDetails().setLastName(user.getLastName());
+        if (user.getUserDetails().getLastName() != null) {
+            one.getUserDetails().setLastName(user.getUserDetails().getLastName());
         }
 
-        if (user.getJobTitle() != null) {
-            one.getUserDetails().setJobTitle(user.getJobTitle());
+        if (user.getUserDetails().getJobTitle() != null) {
+            one.getUserDetails().setJobTitle(user.getUserDetails().getJobTitle());
         }
 
-        if (user.getEmail() != null) {
-            one.getUserDetails().setEmail(user.getEmail());
+        if (user.getUserDetails().getEmail() != null) {
+            one.getUserDetails().setEmail(user.getUserDetails().getEmail());
         }
 
-        if (user.getPhone() != null) {
-            one.getUserDetails().setPhone(user.getPhone());
+        if (user.getUserDetails().getPhone() != null) {
+            one.getUserDetails().setPhone(user.getUserDetails().getPhone());
         }
 
-        if (user.getInstitution() != null) {
-            one.getUserDetails().setInstitution(user.getInstitution());
+        if (user.getUserDetails().getInstitution() != null) {
+            one.getUserDetails().setInstitution(user.getUserDetails().getInstitution());
         }
 
-        if (user.getInstitutionAbbreviation() != null) {
-            one.getUserDetails().setInstitutionAbbreviation(user.getInstitutionAbbreviation());
+        if (user.getUserDetails().getInstitutionAbbreviation() != null) {
+            one.getUserDetails().setInstitutionAbbreviation(user.getUserDetails().getInstitutionAbbreviation());
         }
 
-        if (user.getInstitutionWeb() != null) {
-            one.getUserDetails().setInstitutionWeb(user.getInstitutionWeb());
+        if (user.getUserDetails().getInstitutionWeb() != null) {
+            one.getUserDetails().setInstitutionWeb(user.getUserDetails().getInstitutionWeb());
         }
 
-        final Address userAddress = user.getAddress();
+        final Address userAddress = user.getUserDetails().getAddress();
 
         if (userAddress != null) {
 
@@ -142,10 +136,26 @@ public class UserService {
     }
 
     @Transactional
-    public void addUserToTeam(final String userId, final String teamId) {
-
-        UserEntity userEntity = find(userId);
-        userEntity.addTeamId(teamId);
+    public void addTeam(final String userId, final String teamId) {
+        UserEntity userEntity = findAndAddTeam(userId, teamId);
         userRepository.save(userEntity);
+    }
+
+    private UserEntity findAndAddTeam(final String userId, final String teamId) {
+        UserEntity one = findUserEntity(userId);
+        one.addTeamId(teamId);
+        return one;
+    }
+
+    private UserEntity findUserEntity(final String userId) {
+        if (userId == null || userId.isEmpty()) {
+            throw new UserIdNullException();
+        }
+
+        final UserEntity one = userRepository.findOne(userId);
+        if (one == null) {
+            throw new UserNotFoundException();
+        }
+        return one;
     }
 }
