@@ -7,6 +7,5 @@ import sg.ncl.common.exception.BadRequestException;
 /**
  * Created by Desmond
  */
-@ResponseStatus(code = HttpStatus.BAD_REQUEST, reason = "Bad request when adding user to team")
-public class UserAddTeamBadRequestException extends BadRequestException {
+public class TeamsNullOrEmptyException extends BadRequestException {
 }
