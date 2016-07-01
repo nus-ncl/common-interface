@@ -65,8 +65,7 @@ public class TeamService {
 
     @Transactional
     public Team findTeam(final String id) {
-        Team team = findTeamEntity(id);
-        return team;
+        return findTeamEntity(id);
     }
 
     @Transactional
@@ -92,16 +91,7 @@ public class TeamService {
     public void updateTeam(final String id, final Team team) {
 
         // Note: team name should be unchangeable
-
-        if (id == null || id.isEmpty()) {
-            throw new TeamIdNullException();
-        }
-
-        final TeamEntity one = teamRepository.findOne(id);
-
-        if (one == null) {
-            throw new TeamNotFoundException();
-        }
+        final TeamEntity one = findTeamEntity(id);
 
         if (team.getDescription() != null) {
             one.setDescription(team.getDescription());

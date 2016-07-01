@@ -58,13 +58,13 @@ public class TeamsController {
 
     @RequestMapping(path = "/{id}", method = RequestMethod.PUT)
     @ResponseStatus(code = HttpStatus.ACCEPTED)
-    public void updateTeam(@PathVariable String id, @RequestBody Team team) {
+    public void updateTeam(@PathVariable String id, @RequestBody TeamInfo team) {
         teamService.updateTeam(id, team);
     }
 
     @RequestMapping(path = "/addUserToTeam/{id}", method = RequestMethod.POST)
     @ResponseStatus(value = HttpStatus.OK)
-    public void addUserToTeam(@PathVariable String id, @RequestBody TeamMember teamMember) {
+    public void addUserToTeam(@PathVariable String id, @RequestBody TeamMemberInfo teamMember) {
         // id is the team id
         teamService.addUserToTeam(id, teamMember);
     }
