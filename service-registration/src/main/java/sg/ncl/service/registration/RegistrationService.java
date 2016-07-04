@@ -22,7 +22,7 @@ import sg.ncl.service.team.domain.TeamMemberType;
 import sg.ncl.service.team.web.TeamMemberInfo;
 import sg.ncl.service.team.exceptions.TeamNotFoundException;
 import sg.ncl.service.user.domain.User;
-import sg.ncl.service.user.services.UserService;
+import sg.ncl.service.user.logic.UserService;
 
 import javax.inject.Inject;
 import java.time.ZonedDateTime;
@@ -111,7 +111,7 @@ public class RegistrationService {
         }
 
         // accept user data from form
-        String userId = userService.addUser(user);
+        String userId = userService.createUser(user).getId();
 
         // create the credentials after creating the users
         credentials.setId(userId);
@@ -130,7 +130,7 @@ public class RegistrationService {
         teamMemberEntity.setTeamMemberType(memberType);
         teamMemberInfo = new TeamMemberInfo(teamMemberEntity);
 
-        userService.addUserToTeam(userId, teamId);
+        userService.addTeam(userId, teamId);
         teamService.addUserToTeam(teamId, teamMemberInfo);
 
         JSONObject userObject = new JSONObject();

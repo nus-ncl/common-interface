@@ -112,29 +112,29 @@ public class ExperimentRepositoryTest extends AbstractTest {
         }
     }
 
-    @Test
-    public void testSaveNullIdleSwap() throws Exception {
-        final ExperimentEntity entity = Util.getExperimentsEntity();
-        entity.setIdleSwap(null);
-
-        try {
-            repository.saveAndFlush(entity);
-            exception.expect(DataIntegrityViolationException.class);
-        } catch (Exception e) {
-            checkException(e, "NULL not allowed for column \"IDLE_SWAP\"");
-        }
-    }
-
-    @Test
-    public void testSaveNullMaxDuration() throws Exception {
-        final ExperimentEntity entity = Util.getExperimentsEntity();
-        entity.setMaxDuration(null);
-
-        try {
-            repository.saveAndFlush(entity);
-            exception.expect(DataIntegrityViolationException.class);
-        } catch (Exception e) {
-            checkException(e, "NULL not allowed for column \"MAX_DURATION\"");
-        }
-    }
+//    @Test
+//    public void testSaveNullIdleSwap() throws Exception {
+//        final ExperimentEntity entity = Util.getExperimentsEntity();
+//        entity.setIdleSwap(null);
+//
+//        try {
+//            repository.saveAndFlush(entity);
+//            exception.expect(DataIntegrityViolationException.class);
+//        } catch (Exception e) {
+//            checkException(e, "NULL not allowed for column \"IDLE_SWAP\"");
+//        }
+//    }
+//
+//    @Test
+//    public void testSaveNullMaxDuration() throws Exception {
+//        final ExperimentEntity entity = Util.getExperimentsEntity();
+//        entity.setMaxDuration(null);
+//
+//        try {
+//            repository.saveAndFlush(entity);
+//            exception.expect(DataIntegrityViolationException.class);
+//        } catch (Exception e) {
+//            checkException(e, "NULL not allowed for column \"MAX_DURATION\"");
+//        }
+//    }
 }

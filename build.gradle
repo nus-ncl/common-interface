@@ -7,15 +7,15 @@ buildscript {
         classpath("org.springframework.boot:spring-boot-gradle-plugin:1.3.5.RELEASE")
     }
 }
-
+// settings for all projects
 allprojects {
     apply plugin: 'java'
     apply plugin: 'eclipse'
     apply plugin: 'idea'
     apply plugin: 'io.spring.dependency-management'
+    apply plugin: 'jacoco'
 
-    group = 'sg.ncl'
-    version = '1.0-SNAPSHOT'
+    group 'sg.ncl'
 
     sourceCompatibility = JavaVersion.VERSION_1_8
     targetCompatibility = JavaVersion.VERSION_1_8
@@ -38,32 +38,28 @@ allprojects {
         }
     }
 
-}
-
-configure([project(':adapter-deterlab'),
-           project(':service-authentication'),
-           project(':service-experiment'),
-           project(':service-realization'),
-           project(':service-registration'),
-           project(':service-team'),
-           project(':service-user'),
-           project(':service-version')]) {
-    apply plugin: 'spring-boot'
-
     sourceSets {
         integrationTest {
             compileClasspath += main.output + test.output
             runtimeClasspath += main.output + test.output
 
-            java { srcDir('src/test-integration/java') }
+            java {
+                srcDir 'src/test-integration/java'
+            }
 
-            resources { srcDir('src/test-integration/resources') }
+            resources {
+                srcDir 'src/test-integration/resources'
+            }
         }
     }
 
     configurations {
-        integrationTestCompile { extendsFrom testCompile }
-        integrationTestRuntime { extendsFrom testRuntime }
+        integrationTestCompile {
+            extendsFrom testCompile
+        }
+        integrationTestRuntime {
+            extendsFrom testRuntime
+        }
     }
 
     idea {
@@ -72,48 +68,73 @@ configure([project(':adapter-deterlab'),
             testSourceDirs += sourceSets.integrationTest.resources.srcDirs
         }
     }
+
     task integrationTest(type: Test) {
+        group 'verification'
         check {
             dependsOn integrationTest
         }
-        integrationTest {
-            mustRunAfter test
-        }
-        testClassesDir = sourceSets.integrationTest.output.classesDir
+        testClassesDir sourceSets.integrationTest.output.classesDir
         classpath = sourceSets.integrationTest.runtimeClasspath
     }
 
+    task testReport(type: TestReport) {
+        group 'reporting'
+        dependsOn check
+        destinationDir file("${reporting.baseDir}/unified/html")
+        reportOn test, integrationTest
+    }
+
     tasks.withType(Test) {
+        group 'verification'
         reports {
             html {
-                destination = file("${reporting.baseDir}/${name}")
+                destination file("${reporting.baseDir}/${task.name}/html")
             }
         }
     }
+
+    tasks.withType(JacocoReport) {
+        group 'reporting'
+        dependsOn check
+        executionData test, integrationTest
+        // HACK Jacoco's requirement that every test set has to have at least one test case for generating a report;
+        // workaround removes test sets that does not have any test cases
+        executionData = files(executionData.findAll({ it.exists() }))
+    }
+}
+
+configure(subprojects.findAll({ it.name.startsWith('service-') })) {
+    apply plugin: 'spring-boot'
 }
 
 apply plugin: 'spring-boot'
 
-dependencies {
-    compile project(':adapter-deterlab')
-    compile project(':service-authentication')
-    compile project(':service-experiment')
-    compile project(':service-realization')
-    compile project(':service-registration')
-    compile project(':service-team')
-    compile project(':service-user')
-    compile project(':service-version')
+version '1.0-SNAPSHOT'
 
-    runtime('mysql:mysql-connector-java')
+dependencies {
+    // the only compile dependencies needed here are the services projects;
+    // there should be no other compile dependencies
+    compile subprojects.findAll({ it.name.startsWith('service-') })
+    // the runtime dependencies should be a union of all runtime dependencies needed by all subprojects
+    runtime 'mysql:mysql-connector-java'
+
+    testCompile 'junit:junit'
 }
 
-task testReport(type: TestReport) {
-    destinationDir = file("$buildDir/reports/html")
-    reportOn subprojects*.test
-    reportOn subprojects.findAll({ it.name.startsWith("service-") }).integrationTest
+testReport {
+    dependsOn check, subprojects.testReport
+    reportOn test, integrationTest, subprojects.test, subprojects.integrationTest
+}
+
+jacocoTestReport {
+    dependsOn check, subprojects.jacocoTestReport
+    executionData = fileTree(project.rootDir.absolutePath).include('**/build/jacoco/*.exec')
+    sourceDirectories = files(sourceSets.main.java.srcDirs, subprojects.sourceSets.main.java.srcDirs)
+    classDirectories = files(sourceSets.main.output.classesDir, subprojects.sourceSets.main.output.classesDir)
 }
 
 task wrapper(type: Wrapper) {
-    gradleVersion = '2.13'
-    distributionUrl = "https://services.gradle.org/distributions/gradle-${gradleVersion}-all.zip"
+    gradleVersion '2.14'
+    distributionUrl "https://services.gradle.org/distributions/gradle-${gradleVersion}-all.zip"
 }

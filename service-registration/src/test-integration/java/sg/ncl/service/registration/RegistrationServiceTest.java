@@ -18,6 +18,7 @@ import sg.ncl.service.team.domain.Team;
 import sg.ncl.service.team.logic.TeamService;
 import sg.ncl.service.team.data.jpa.TeamEntity;
 import sg.ncl.service.user.domain.User;
+import sg.ncl.service.user.logic.UserService;
 
 import javax.inject.Inject;
 
@@ -29,6 +30,9 @@ import static org.springframework.test.web.client.response.MockRestResponseCreat
  * @author Te Ye
  */
 public class RegistrationServiceTest extends AbstractTest {
+
+    @Inject
+    private UserService userService;
 
     @Inject
     private TeamService teamService;

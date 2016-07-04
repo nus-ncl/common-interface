@@ -17,8 +17,8 @@ import javax.inject.Inject;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static sg.ncl.service.authentication.validation.Validation.validateForCreation;
-import static sg.ncl.service.authentication.validation.Validation.validateForUpdate;
+import static sg.ncl.service.authentication.validation.Validator.validateForCreation;
+import static sg.ncl.service.authentication.validation.Validator.validateForUpdate;
 import static sg.ncl.service.authentication.web.CredentialsController.PATH;
 
 /**

@@ -9,7 +9,6 @@ import org.springframework.test.context.support.DirtiesContextBeforeModesTestExe
 import org.springframework.test.context.support.DirtiesContextTestExecutionListener;
 import org.springframework.test.context.transaction.TransactionalTestExecutionListener;
 import org.springframework.test.context.web.ServletTestExecutionListener;
-import org.springframework.test.context.web.WebAppConfiguration;
 
 import javax.transaction.Transactional;
 
@@ -17,7 +16,13 @@ import javax.transaction.Transactional;
  * @author Christopher Zhong
  */
 @RunWith(SpringJUnit4ClassRunner.class)
-@WebAppConfiguration
-@TestExecutionListeners({ServletTestExecutionListener.class, DirtiesContextBeforeModesTestExecutionListener.class, DependencyInjectionTestExecutionListener.class, DirtiesContextTestExecutionListener.class, TransactionalTestExecutionListener.class, SqlScriptsTestExecutionListener.class})
+@TestExecutionListeners({
+        ServletTestExecutionListener.class,
+        DirtiesContextBeforeModesTestExecutionListener.class,
+        DependencyInjectionTestExecutionListener.class,
+        DirtiesContextTestExecutionListener.class,
+        TransactionalTestExecutionListener.class,
+        SqlScriptsTestExecutionListener.class
+})
 @Transactional
 public abstract class AbstractTest {}

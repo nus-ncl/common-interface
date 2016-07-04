@@ -3,7 +3,9 @@ package sg.ncl.service.registration.controllers;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import org.apache.commons.lang3.RandomStringUtils;
+import org.json.JSONArray;
 import org.json.JSONObject;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -12,6 +14,7 @@ import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.client.MockRestServiceServer;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.web.client.RestOperations;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.context.WebApplicationContext;
@@ -23,17 +26,22 @@ import sg.ncl.service.team.logic.TeamService;
 import sg.ncl.service.team.data.jpa.TeamEntity;
 import sg.ncl.service.team.serializers.DateTimeDeserializer;
 import sg.ncl.service.team.serializers.DateTimeSerializer;
-import sg.ncl.service.user.data.jpa.entities.UserEntity;
+import sg.ncl.service.user.data.jpa.UserEntity;
 import sg.ncl.adapter.deterlab.ConnectionProperties;
+import sg.ncl.service.user.domain.User;
+import sg.ncl.service.user.logic.UserService;
 
 import javax.inject.Inject;
 
 import java.time.ZonedDateTime;
 
+import static org.hamcrest.core.Is.is;
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.method;
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.requestTo;
 import static org.springframework.test.web.client.response.MockRestResponseCreators.withSuccess;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.springframework.test.web.servlet.setup.MockMvcBuilders.webAppContextSetup;
 
@@ -52,6 +60,9 @@ public class RegistrationControllerTest extends AbstractTest {
 
     @Inject
     private TeamService teamService;
+
+    @Inject
+    private UserService userService;
 
     @Autowired
     private RestOperations restOperations;
@@ -140,5 +151,32 @@ public class RegistrationControllerTest extends AbstractTest {
 
         mockMvc.perform(post("/registrations").contentType(MediaType.APPLICATION_JSON).content(mainJSON.toString()))
                 .andExpect(status().isOk());
+    }
+
+    @Test
+    public void addTeamUserControllerTest() throws Exception {
+        // UserController addUserToTeam test can only be tested here because it requires an existing team in the database
+        User user = userService.createUser(Util.getUserEntity());
+        Team team = teamService.save(Util.getTeamEntity());
+
+        // craft the RequestBody to add user to team
+        JSONObject userObject = new JSONObject();
+        JSONArray teamArray = new JSONArray();
+        teamArray.put(team.getId());
+        userObject.put("teams", teamArray);
+
+        mockMvc.perform(post("/users/" + user.getId() + "/teams").contentType(MediaType.APPLICATION_JSON).content(userObject.toString()))
+                .andExpect(status().isOk());
+
+        // after add user complete, retrieve the user from database
+        // assert that the team ids are identical
+        MvcResult result = mockMvc.perform(get("/users/" + user.getId()))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andReturn();
+
+        JSONObject resultObject = new JSONObject(result.getResponse().getContentAsString());
+        JSONArray resulTeamArray = resultObject.getJSONArray("teams");
+        Assert.assertThat(team.getId(), is(resulTeamArray.get(0).toString()));
     }
 }
