@@ -14,6 +14,7 @@ public class ConnectionProperties {
 
     private String ip;
     private String port;
+    private String userIp;
 
     public String getIp() {
         return ip;
@@ -31,12 +32,24 @@ public class ConnectionProperties {
         this.port = port;
     }
 
+    public String getUserIp() {
+        return userIp;
+    }
+
+    public void setUserIp(String userIp) {
+        this.userIp = userIp;
+    }
+
     public String getAddUsersUri() {
         return "http://" + ip + ":" + port + "/addUsers";
     }
 
     public String getApplyProjectNewUsers() {
         return "http://" + ip + ":" + port + "/applyProjectNewUsers";
+    }
+
+    public String getCreateExperimentUri() {
+        return "http://" + userIp + ":" + port + "/createExperiment";
     }
 
 //    public void setAddUsersUri(String addUsersUri) {

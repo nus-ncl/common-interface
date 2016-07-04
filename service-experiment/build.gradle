@@ -1,6 +1,7 @@
 dependencies {
     compile project(':common-jpa')
     compile project(':common-exception')
+    compile project(':adapter-deterlab')
 
     compile('com.fasterxml.jackson.datatype:jackson-datatype-jsr310')
     compile('javax.inject:javax.inject')

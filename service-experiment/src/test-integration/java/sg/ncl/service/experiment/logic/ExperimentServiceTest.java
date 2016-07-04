@@ -1,16 +1,33 @@
 package sg.ncl.service.experiment.logic;
 
 import org.apache.commons.lang3.RandomStringUtils;
+import org.json.JSONObject;
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.MediaType;
+import org.springframework.test.web.client.MockRestServiceServer;
+import org.springframework.web.client.RestOperations;
+import org.springframework.web.client.RestTemplate;
+import sg.ncl.adapter.deterlab.ConnectionProperties;
+import sg.ncl.adapter.deterlab.data.jpa.DeterlabUserRepository;
 import sg.ncl.service.experiment.AbstractTest;
 import sg.ncl.service.experiment.Util;
 import sg.ncl.service.experiment.data.jpa.ExperimentEntity;
 import sg.ncl.service.experiment.data.jpa.ExperimentRepository;
+import sg.ncl.service.experiment.domain.Experiment;
 
 import javax.inject.Inject;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
+
+import static org.springframework.test.web.client.match.MockRestRequestMatchers.method;
+import static org.springframework.test.web.client.match.MockRestRequestMatchers.requestTo;
+import static org.springframework.test.web.client.response.MockRestResponseCreators.withSuccess;
 
 /**
  * Created by Desmond.
@@ -20,26 +37,54 @@ public class ExperimentServiceTest extends AbstractTest {
     @Inject
     private ExperimentRepository experimentRepository;
 
-    @Test
-    public void testSaveTeam() throws Exception {
+    @Inject
+    private ExperimentService experimentService;
 
-        ExperimentService experimentService = new ExperimentService(experimentRepository);
-        ExperimentEntity createdExperiment = Util.getExperimentsEntity();
-        ExperimentEntity saveExperiment = experimentService.save(createdExperiment);
+    @Inject
+    private ConnectionProperties properties;
 
-        Assert.assertEquals(createdExperiment.getUserId(), saveExperiment.getUserId());
-        Assert.assertEquals(createdExperiment.getTeamId(), saveExperiment.getTeamId());
-        Assert.assertEquals(createdExperiment.getName(), saveExperiment.getName());
-        Assert.assertEquals(createdExperiment.getDescription(), saveExperiment.getDescription());
-        Assert.assertEquals(createdExperiment.getNsFile(), saveExperiment.getNsFile());
-        Assert.assertEquals(createdExperiment.getIdleSwap(), saveExperiment.getIdleSwap());
-        Assert.assertEquals(createdExperiment.getMaxDuration(), saveExperiment.getMaxDuration());
+    @Autowired
+    private RestOperations restOperations;
+
+    private MockRestServiceServer mockServer;
+
+    @Before
+    public void setUp() throws Exception {
+        mockServer = MockRestServiceServer.createServer((RestTemplate) restOperations);
     }
 
     @Test
-    public void testGetExperimentIfNotExperimentInDb() throws Exception {
+    public void testSaveExperiment() throws Exception {
+        // craft the adapter-deter service reply
+        String stubUid = RandomStringUtils.randomAlphanumeric(8);
+        JSONObject predefinedResultJson = new JSONObject();
+        predefinedResultJson.put("msg", "experiment is created");
+        predefinedResultJson.put("uid", stubUid);
 
-        ExperimentService experimentService = new ExperimentService(experimentRepository);
+        // mock the adapter-deter service
+        mockServer.expect(requestTo(properties.getCreateExperimentUri()))
+                .andExpect(method(HttpMethod.POST))
+                .andRespond(withSuccess(predefinedResultJson.toString(), MediaType.APPLICATION_JSON));
+
+        ExperimentEntity createdExperiment = Util.getExperimentsEntity();
+        ExperimentEntity savedExperiment = experimentService.save(createdExperiment);
+
+        Assert.assertEquals(createdExperiment.getUserId(), savedExperiment.getUserId());
+        Assert.assertEquals(createdExperiment.getTeamId(), savedExperiment.getTeamId());
+        Assert.assertEquals(createdExperiment.getName(), savedExperiment.getName());
+        Assert.assertEquals(createdExperiment.getDescription(), savedExperiment.getDescription());
+        Assert.assertEquals(createdExperiment.getIdleSwap(), savedExperiment.getIdleSwap());
+        Assert.assertEquals(createdExperiment.getMaxDuration(), savedExperiment.getMaxDuration());
+
+        // check new nsFile name
+        String craftDate = new SimpleDateFormat("yyyyMMdd").format(new Date());
+        String fileName = createdExperiment.getUserId() + "_" + createdExperiment.getTeamId() + "_" + craftDate + "_" + createdExperiment.getNsFile();
+        Assert.assertEquals(fileName, savedExperiment.getNsFile());
+    }
+
+    @Test
+    public void testGetExperimentIfNoExperimentInDb() throws Exception {
+
         List<ExperimentEntity> experimentEntityList = experimentService.get();
 
         Assert.assertEquals(experimentEntityList.size(), 0);
@@ -47,8 +92,6 @@ public class ExperimentServiceTest extends AbstractTest {
 
     @Test
     public void testGetExperiment() throws Exception {
-
-        ExperimentService experimentService = new ExperimentService(experimentRepository);
 
         List<ExperimentEntity> list = new ArrayList<>();
 
@@ -64,7 +107,6 @@ public class ExperimentServiceTest extends AbstractTest {
     public void testGetExperimentsByUser() throws Exception {
 
         int numEntries = 6;
-        ExperimentService experimentService = new ExperimentService(experimentRepository);
 
         final String userId = RandomStringUtils.randomAlphanumeric(20);
         Util.addExperiments(numEntries, userId, experimentRepository);
@@ -82,8 +124,6 @@ public class ExperimentServiceTest extends AbstractTest {
 
     @Test
     public void testGetExperimentsUserHasNoExperiments() throws Exception {
-
-        ExperimentService experimentService = new ExperimentService(experimentRepository);
 
         final String userId = RandomStringUtils.randomAlphanumeric(20);
         for (int i = 0; i < 3; i++) {

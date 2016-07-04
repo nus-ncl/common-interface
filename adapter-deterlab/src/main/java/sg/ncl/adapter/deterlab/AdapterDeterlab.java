@@ -69,4 +69,17 @@ public class AdapterDeterlab {
         deterlabUserEntity.setDeterUserId(deterUserId);
         deterlabUserRepository.save(deterlabUserEntity);
     }
+
+    public String createExperiment(String jsonString) {
+
+        logger.info("Sending message to {} at {}: {}", properties.getUserIp(), properties.getPort(), jsonString);
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        HttpEntity<String> request = new HttpEntity<String>(jsonString, headers);
+
+        ResponseEntity responseEntity = restTemplate.exchange(properties.getCreateExperimentUri(), HttpMethod.POST, request, String.class);
+
+        return responseEntity.getBody().toString();
+    }
 }

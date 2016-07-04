@@ -79,4 +79,21 @@ public class AdapterDeterlabTest extends AbstractTest {
         Assert.assertThat(deterUserId, is(deterlabUserRepository.findByDeterUserId(deterUserId).getDeterUserId()));
     }
 
+    @Test
+    public void testCreateExperimentOnDeter() {
+        JSONObject userObject = Util.getUserAdapterJSONObject();
+
+        String stubUid = RandomStringUtils.randomAlphanumeric(8);
+        JSONObject predefinedResultJson = new JSONObject();
+        predefinedResultJson.put("msg", "experiment is created");
+
+
+
+        mockServer.expect(requestTo(properties.getAddUsersUri()))
+                .andExpect(method(HttpMethod.POST))
+                .andRespond(withSuccess(predefinedResultJson.toString(), MediaType.APPLICATION_JSON));
+
+        String result = adapterDeterlab.addUsers(userObject.toString());
+        JSONObject resultJSONObject = new JSONObject(result);
+    }
 }
