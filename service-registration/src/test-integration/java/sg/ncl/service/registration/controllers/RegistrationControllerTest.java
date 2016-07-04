@@ -157,7 +157,7 @@ public class RegistrationControllerTest extends AbstractTest {
     public void addTeamUserControllerTest() throws Exception {
         // UserController addUserToTeam test can only be tested here because it requires an existing team in the database
         User user = userService.createUser(Util.getUserEntity());
-        Team team = teamService.save(Util.getTeamEntity());
+        Team team = teamService.createTeam(Util.getTeamEntity());
 
         // craft the RequestBody to add user to team
         JSONObject userObject = new JSONObject();
