@@ -8,6 +8,7 @@ import sg.ncl.service.team.logic.TeamService;
 
 import javax.inject.Inject;
 import javax.validation.Valid;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -33,19 +34,27 @@ public class TeamsController {
     @RequestMapping(method = RequestMethod.GET)
     @ResponseStatus(code = HttpStatus.OK)
     public List<Team> getAll() {
-        return teamService.getAll();
+        List<Team> result = new ArrayList<>();
+        for (Team team: teamService.getAll()) {
+            result.add(new TeamInfo(team));
+        }
+        return result;
     }
 
     @RequestMapping(path = "/public", method = RequestMethod.GET)
     @ResponseStatus(code = HttpStatus.OK)
     public List<Team> getPublicTeams() {
-        return teamService.getPublic();
+        List<Team> result = new ArrayList<>();
+        for (Team team: teamService.getPublic()) {
+            result.add(new TeamInfo(team));
+        }
+        return result;
     }
 
     @RequestMapping(path = "/name/{name}", method = RequestMethod.GET)
     @ResponseStatus(code = HttpStatus.OK)
     public Team getByName(@PathVariable String name) {
-        return teamService.getName(name);
+        return new TeamInfo(teamService.getName(name));
     }
 
     @RequestMapping(path = "/{id}", method = RequestMethod.GET)
