@@ -226,11 +226,11 @@ public class TeamsControllerTest extends AbstractTest {
 
         String list = mvcResult.getResponse().getContentAsString();
 
-        Type listType = new TypeToken<ArrayList<TeamEntity>>(){}.getType();
-        List<TeamEntity> teamEntityList = gson.fromJson(list, listType);
+        Type listType = new TypeToken<ArrayList<TeamInfo>>(){}.getType();
+        List<Team> teamList = gson.fromJson(list, listType);
 
-        Assert.assertThat(teamEntityList.size(), is(1));
-        Assert.assertThat(teamEntityList.get(0).getVisibility(), is(TeamVisibility.PUBLIC));
+        Assert.assertThat(teamList.size(), is(1));
+        Assert.assertThat(teamList.get(0).getVisibility(), is(TeamVisibility.PUBLIC));
     }
 
     @Test
@@ -256,7 +256,7 @@ public class TeamsControllerTest extends AbstractTest {
         Gson gson = gsonBuilder.create();
 
         String list = mvcResult.getResponse().getContentAsString();
-        TeamEntity entity = gson.fromJson(list, TeamEntity.class);
+        Team entity = gson.fromJson(list, TeamInfo.class);
 
         Assert.assertThat(entity.getName(), is(name));
     }
