@@ -2,8 +2,6 @@ package sg.ncl.service.team.web;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import sg.ncl.service.team.data.jpa.TeamEntity;
-import sg.ncl.service.team.data.jpa.TeamMemberEntity;
 import sg.ncl.service.team.domain.*;
 
 import java.time.ZonedDateTime;
@@ -25,10 +23,22 @@ public class TeamInfo implements Team {
     private final TeamStatus status;
     private final ZonedDateTime applicationDate;
     private final ZonedDateTime processedDate;
+
     private final List<TeamMemberInfo> members;
 
     @JsonCreator
-    public TeamInfo(@JsonProperty("id") final String id, @JsonProperty("name") final String name, @JsonProperty("description") final String description, @JsonProperty("website") final String website, @JsonProperty("organisationType") final String organisationType, @JsonProperty("visibility") final TeamVisibility visibility, @JsonProperty("privacy") final TeamPrivacy privacy, @JsonProperty("status") final TeamStatus status, @JsonProperty("applicationDate") final ZonedDateTime applicationDate, @JsonProperty("processedDate") final ZonedDateTime processedDate, @JsonProperty("members") final List<TeamMemberEntity> members) {
+    public TeamInfo(
+            @JsonProperty("id") final String id,
+            @JsonProperty("name") final String name,
+            @JsonProperty("description") final String description,
+            @JsonProperty("website") final String website,
+            @JsonProperty("organisationType") final String organisationType,
+            @JsonProperty("visibility") final TeamVisibility visibility,
+            @JsonProperty("privacy") final TeamPrivacy privacy,
+            @JsonProperty("status") final TeamStatus status,
+            @JsonProperty("applicationDate") final ZonedDateTime applicationDate,
+            @JsonProperty("processedDate") final ZonedDateTime processedDate,
+            @JsonProperty("members") final List<? extends TeamMember> members) {
         this.id = id;
         this.name = name;
         this.description = description;
@@ -40,14 +50,16 @@ public class TeamInfo implements Team {
         this.applicationDate = applicationDate;
         this.processedDate = processedDate;
 
+//        this.members = members;
+
         this.members = new ArrayList<>();
 
-        for (TeamMemberEntity teamMemberEntity : members) {
+        for (TeamMember teamMemberEntity : members) {
             this.members.add(new TeamMemberInfo(teamMemberEntity));
         }
     }
 
-    public TeamInfo(final TeamEntity teamEntity) {
+    public TeamInfo(final Team teamEntity) {
         this(teamEntity.getId(),
                 teamEntity.getName(),
                 teamEntity.getDescription(),
@@ -101,7 +113,7 @@ public class TeamInfo implements Team {
         return processedDate;
     }
 
-    public List<TeamMemberInfo> getMembers() {
+    public List<? extends TeamMember> getMembers() {
         return members;
     }
 

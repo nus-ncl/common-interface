@@ -3,7 +3,6 @@ package sg.ncl.service.team.data.jpa;
 import org.hibernate.annotations.GenericGenerator;
 import sg.ncl.common.jpa.AbstractEntity;
 import sg.ncl.service.team.domain.*;
-import sg.ncl.service.team.web.TeamMemberInfo;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -171,7 +170,7 @@ public class TeamEntity extends AbstractEntity implements Team {
             TeamMemberEntity teamMemberEntity = new TeamMemberEntity();
             teamMemberEntity.setUserId(userId);
             teamMemberEntity.setTeam(this);
-            teamMemberEntity.setJoinedDate(ZonedDateTime.now());
+            teamMemberEntity.setJoinedDate(teamMemberInfo.getJoinedDate());
             teamMemberEntity.setTeamMemberType(teamMemberInfo.getTeamMemberType());
             members.put(userId, teamMemberEntity);
         }

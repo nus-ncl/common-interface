@@ -7,8 +7,6 @@ import sg.ncl.service.team.data.jpa.TeamRepository;
 import sg.ncl.service.team.domain.Team;
 import sg.ncl.service.team.domain.TeamMember;
 import sg.ncl.service.team.domain.TeamVisibility;
-import sg.ncl.service.team.web.TeamInfo;
-import sg.ncl.service.team.web.TeamMemberInfo;
 import sg.ncl.service.team.exceptions.TeamIdNullException;
 import sg.ncl.service.team.exceptions.TeamNameNullException;
 import sg.ncl.service.team.exceptions.TeamNotFoundException;
@@ -40,14 +38,14 @@ public class TeamService {
         teamEntity.setOrganisationType(team.getOrganisationType());
         teamEntity.setApplicationDate(team.getApplicationDate());
 
-        return new TeamInfo(teamRepository.save(teamEntity));
+        return teamRepository.save(teamEntity);
     }
 
     @Transactional
     public List<Team> getAll() {
         final List<Team> result = new ArrayList<>();
         for (TeamEntity teamEntity : teamRepository.findAll()) {
-            result.add(new TeamInfo(teamEntity));
+            result.add(teamEntity);
         }
         return result;
     }
@@ -58,7 +56,7 @@ public class TeamService {
         List<Team> teamList = new ArrayList<>();
 
         for (TeamEntity teamEntity : result) {
-            teamList.add(new TeamInfo(teamEntity));
+            teamList.add(teamEntity);
         }
         return teamList;
     }
@@ -78,7 +76,7 @@ public class TeamService {
         if (one == null) {
             throw new TeamNotFoundException();
         }
-        return new TeamInfo(one);
+        return one;
     }
 
     @Transactional

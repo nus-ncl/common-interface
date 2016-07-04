@@ -4,13 +4,10 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 import sg.ncl.service.team.domain.Team;
-import sg.ncl.service.team.domain.TeamMember;
 import sg.ncl.service.team.logic.TeamService;
-import sg.ncl.service.team.data.jpa.TeamEntity;
 
 import javax.inject.Inject;
 import javax.validation.Valid;
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -29,7 +26,7 @@ public class TeamsController {
 
     @RequestMapping(path = "", method = RequestMethod.POST)
     @ResponseStatus(value = HttpStatus.CREATED)
-    public void createTeam(@RequestBody @Valid Team team) {
+    public void createTeam(@RequestBody @Valid TeamInfo team) {
         teamService.createTeam(team);
     }
 
@@ -53,7 +50,7 @@ public class TeamsController {
 
     @RequestMapping(path = "/{id}", method = RequestMethod.GET)
     public Team getTeam(@PathVariable String id) {
-        return teamService.findTeam(id);
+        return new TeamInfo(teamService.findTeam(id));
     }
 
     @RequestMapping(path = "/{id}", method = RequestMethod.PUT)

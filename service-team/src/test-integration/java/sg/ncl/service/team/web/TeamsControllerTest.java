@@ -5,7 +5,6 @@ import com.google.gson.reflect.TypeToken;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.junit.Assert;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
@@ -15,6 +14,7 @@ import sg.ncl.service.team.Util;
 import sg.ncl.service.team.data.jpa.TeamEntity;
 import sg.ncl.service.team.data.jpa.TeamRepository;
 import sg.ncl.service.team.AbstractTest;
+import sg.ncl.service.team.domain.Team;
 import sg.ncl.service.team.domain.TeamStatus;
 import sg.ncl.service.team.domain.TeamVisibility;
 import sg.ncl.service.team.serializers.DateTimeDeserializer;
@@ -57,7 +57,7 @@ public class TeamsControllerTest extends AbstractTest {
         gsonBuilder.registerTypeAdapter(ZonedDateTime.class, new DateTimeSerializer());
         gsonBuilder.registerTypeAdapter(ZonedDateTime.class, new DateTimeDeserializer());
         Gson gson = gsonBuilder.create();
-        String jsonInString = gson.toJson(teamEntity);
+        String jsonInString = gson.toJson(new TeamInfo(teamEntity));
 
         mockMvc.perform(post("/teams").contentType(MediaType.APPLICATION_JSON).content(jsonInString))
                 .andExpect(status().isCreated());
@@ -133,12 +133,19 @@ public class TeamsControllerTest extends AbstractTest {
         mockMvc.perform(post("/teams/addUserToTeam/" + teamId).contentType(MediaType.APPLICATION_JSON).content(jsonInString))
                 .andExpect(status().isOk());
 
-        TeamEntity teamEntity2 = teamRepository.findOne(teamId);
-        System.out.println(teamEntity2);
-
+        // assert that team has a member
         // get team after add user
-        mockMvc.perform(get("/teams/" + teamId))
-                .andExpect(status().isOk());
+        MvcResult mvcResult = mockMvc.perform(get("/teams/" + teamId))
+                                                .andExpect(status().isOk())
+                                                .andReturn();
+
+        String response = mvcResult.getResponse().getContentAsString();
+        Team resultTeam = gson.fromJson(response, TeamInfo.class);
+
+        Assert.assertThat(teamId, is(resultTeam.getId()));
+        Assert.assertThat(teamMemberInfo.getUserId(), is(resultTeam.getMembers().get(0).getUserId()));
+        Assert.assertThat(teamMemberInfo.getJoinedDate(), is(resultTeam.getMembers().get(0).getJoinedDate()));
+        Assert.assertThat(teamMemberInfo.getTeamMemberType(), is(resultTeam.getMembers().get(0).getTeamMemberType()));
     }
 
     @Test
@@ -161,9 +168,10 @@ public class TeamsControllerTest extends AbstractTest {
         gsonBuilder.registerTypeAdapter(ZonedDateTime.class, new DateTimeDeserializer());
         Gson gson = gsonBuilder.create();
 
+        // convert to TeamInfo
         // put
-        String jsonString = gson.toJson(teamEntityFromDb);
-        System.out.println(jsonString);
+        String jsonString = gson.toJson(new TeamInfo(teamEntityFromDb));
+
         mockMvc.perform(put("/teams/" + id).contentType(MediaType.APPLICATION_JSON).content(jsonString))
                 .andExpect(status().isAccepted());
 
@@ -177,13 +185,17 @@ public class TeamsControllerTest extends AbstractTest {
 
     @Test
     public void testPutTeamWithWrongId() throws Exception {
-        MediaType contentType = new MediaType(MediaType.APPLICATION_JSON.getType(),
-                MediaType.APPLICATION_JSON.getSubtype());
-
+        TeamEntity teamEntity = Util.getTeamEntity();
         final String idString = "123456";
 
+        // create GSON
+        GsonBuilder gsonBuilder = new GsonBuilder();
+        gsonBuilder.registerTypeAdapter(ZonedDateTime.class, new DateTimeSerializer());
+        gsonBuilder.registerTypeAdapter(ZonedDateTime.class, new DateTimeDeserializer());
+        Gson gson = gsonBuilder.create();
+
         // put
-        mockMvc.perform(put("/teams/" + idString).contentType(contentType).content("{}"))
+        mockMvc.perform(put("/teams/" + idString).contentType(MediaType.APPLICATION_JSON).content(gson.toJson(new TeamInfo(teamEntity))))
                 .andExpect(status().isNotFound())
                 .andExpect(status().reason("Team not found"));
     }

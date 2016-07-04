@@ -37,6 +37,7 @@ public class Util {
 
     public static TeamMemberInfo getTeamMemberInfo() {
         final TeamMemberEntity teamMemberEntity = new TeamMemberEntity();
+        teamMemberEntity.setId(RandomStringUtils.randomAlphanumeric(20));
         teamMemberEntity.setUserId(RandomStringUtils.randomAlphanumeric(20));
         teamMemberEntity.setJoinedDate(ZonedDateTime.now());
         teamMemberEntity.setTeamMemberType(TeamMemberType.MEMBER);
