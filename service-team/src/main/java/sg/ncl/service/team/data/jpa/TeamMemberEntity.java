@@ -1,4 +1,4 @@
-package sg.ncl.service.team.data.jpa.entities;
+package sg.ncl.service.team.data.jpa;
 
 import sg.ncl.common.jpa.AbstractEntity;
 import sg.ncl.service.team.domain.TeamMember;
@@ -17,7 +17,7 @@ public class TeamMemberEntity extends AbstractEntity implements TeamMember {
     @Id
     @GeneratedValue
     @Column(name = "id", nullable = false, unique = true, updatable = false)
-    private Long id;
+    private String id;
 
     @ManyToOne(cascade = CascadeType.ALL, optional = false)
     @JoinColumn(name = "team_id", nullable = false, updatable = false)
@@ -33,11 +33,11 @@ public class TeamMemberEntity extends AbstractEntity implements TeamMember {
     @Enumerated(EnumType.STRING)
     private TeamMemberType teamMemberType = TeamMemberType.MEMBER;
 
-    public Long getId() {
+    public String getId() {
         return id;
     }
 
-    void setId(final Long id) {
+    public void setId(final String id) {
         this.id = id;
     }
 

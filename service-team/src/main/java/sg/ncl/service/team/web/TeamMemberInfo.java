@@ -1,8 +1,7 @@
-package sg.ncl.service.team.dtos;
+package sg.ncl.service.team.web;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import sg.ncl.service.team.data.jpa.entities.TeamMemberEntity;
 import sg.ncl.service.team.domain.TeamMember;
 import sg.ncl.service.team.domain.TeamMemberType;
 
@@ -12,27 +11,31 @@ import java.time.ZonedDateTime;
  * Created by Desmond
  */
 public class TeamMemberInfo implements TeamMember {
-    private final Long id;
+    private final String id;
     private final String userId;
     private final ZonedDateTime joinedDate;
     private final TeamMemberType teamMemberType;
 
     @JsonCreator
-    public TeamMemberInfo(@JsonProperty("id") final Long id, @JsonProperty("userId") final String userId, @JsonProperty("joinedDate") final ZonedDateTime joinedDate, @JsonProperty("teamMemberType") final TeamMemberType teamMemberType) {
+    public TeamMemberInfo(
+            @JsonProperty("id") final String id,
+            @JsonProperty("userId") final String userId,
+            @JsonProperty("joinedDate") final ZonedDateTime joinedDate,
+            @JsonProperty("teamMemberType") final TeamMemberType teamMemberType) {
         this.id = id;
         this.userId = userId;
         this.joinedDate = joinedDate;
         this.teamMemberType = teamMemberType;
     }
 
-    public TeamMemberInfo(final TeamMemberEntity teamMemberEntity) {
+    public TeamMemberInfo(final TeamMember teamMemberEntity) {
         this(teamMemberEntity.getId(),
                 teamMemberEntity.getUserId(),
                 teamMemberEntity.getJoinedDate(),
                 teamMemberEntity.getTeamMemberType());
     }
 
-    public Long getId() {
+    public String getId() {
         return id;
     }
 

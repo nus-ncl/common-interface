@@ -14,13 +14,12 @@ import sg.ncl.service.registration.data.jpa.entities.RegistrationEntity;
 import sg.ncl.service.registration.data.jpa.repositories.RegistrationRepository;
 import sg.ncl.service.registration.exceptions.RegisterTeamNameDuplicateException;
 import sg.ncl.service.registration.exceptions.UserFormException;
-import sg.ncl.service.team.TeamService;
-import sg.ncl.service.team.data.jpa.entities.TeamEntity;
-import sg.ncl.service.team.data.jpa.entities.TeamMemberEntity;
+import sg.ncl.service.team.logic.TeamService;
+import sg.ncl.service.team.data.jpa.TeamEntity;
+import sg.ncl.service.team.data.jpa.TeamMemberEntity;
 import sg.ncl.service.team.domain.Team;
-import sg.ncl.service.team.domain.TeamMember;
 import sg.ncl.service.team.domain.TeamMemberType;
-import sg.ncl.service.team.dtos.TeamMemberInfo;
+import sg.ncl.service.team.web.TeamMemberInfo;
 import sg.ncl.service.team.exceptions.TeamNotFoundException;
 import sg.ncl.service.user.domain.User;
 import sg.ncl.service.user.logic.UserService;
@@ -72,7 +71,7 @@ public class RegistrationService {
         }
 
         if (isJoinTeam == false && (team.getName() != null || !team.getName().isEmpty())) {
-            TeamEntity teamEntity = new TeamEntity();
+            Team teamEntity = new TeamEntity();
             try {
                 teamEntity = teamService.getName(team.getName());
             } catch (TeamNotFoundException e) {
@@ -89,17 +88,17 @@ public class RegistrationService {
         TeamMemberType memberType;
         String resultJSON;
         String teamId;
-        TeamEntity teamEntity;
+        Team createdTeam;
         TeamMemberInfo teamMemberInfo;
 
         if (isJoinTeam == true) {
             // accept the team data
-            teamEntity = teamService.find(team.getId());
+            createdTeam = teamService.findTeam(team.getId());
             teamId = team.getId();
         } else {
             // apply for new team
             // check if team already exists
-            teamEntity = new TeamEntity();
+            TeamEntity teamEntity = new TeamEntity();
             teamEntity.setName(team.getName());
             teamEntity.setVisibility(team.getVisibility());
             teamEntity.setApplicationDate(ZonedDateTime.now());
@@ -107,8 +106,8 @@ public class RegistrationService {
             teamEntity.setWebsite(team.getWebsite());
             teamEntity.setOrganisationType(team.getOrganisationType());
             teamEntity.setPrivacy(team.getPrivacy());
-            teamEntity = teamService.save(teamEntity);
-            teamId = teamEntity.getId();
+            createdTeam = teamService.createTeam(teamEntity);
+            teamId = createdTeam.getId();
         }
 
         // accept user data from form
@@ -160,18 +159,18 @@ public class RegistrationService {
 
         } else {
             // call python script to apply for new project
-            userObject.put("projName", teamEntity.getName());
-            userObject.put("projGoals", teamEntity.getDescription());
-            userObject.put("pid", teamEntity.getName());
+            userObject.put("projName", createdTeam.getName());
+            userObject.put("projGoals", createdTeam.getDescription());
+            userObject.put("pid", createdTeam.getName());
             userObject.put("projWeb", "http://www.nus.edu.sg");
             userObject.put("projOrg", "Academic");
-            userObject.put("projPublic", teamEntity.getVisibility());
+            userObject.put("projPublic", createdTeam.getVisibility());
             resultJSON = adapterDeterlab.applyProjectNewUsers(userObject.toString());
         }
 
         if (getUserCreationStatus(resultJSON).equals("user is created")) {
             // store form fields into registration repository for recreation when required
-            addUserToRegistrationRepository(resultJSON, user, teamEntity);
+            addUserToRegistrationRepository(resultJSON, user, createdTeam);
 
             // call deterlab adapter to store ncluid to deteruid mapping
             addNclUserIdMapping(resultJSON, userId);
@@ -278,7 +277,7 @@ public class RegistrationService {
 //        }
 //    }
 
-    private void addUserToRegistrationRepository(String resultJSON, User user, TeamEntity team) {
+    private void addUserToRegistrationRepository(String resultJSON, User user, Team team) {
 
         JSONObject jsonObjectFromAdapter = new JSONObject(resultJSON);
         String uid = jsonObjectFromAdapter.getString("uid");

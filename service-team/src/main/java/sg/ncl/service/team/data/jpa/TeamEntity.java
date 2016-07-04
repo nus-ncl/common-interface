@@ -1,9 +1,8 @@
-package sg.ncl.service.team.data.jpa.entities;
+package sg.ncl.service.team.data.jpa;
 
 import org.hibernate.annotations.GenericGenerator;
 import sg.ncl.common.jpa.AbstractEntity;
 import sg.ncl.service.team.domain.*;
-import sg.ncl.service.team.dtos.TeamMemberInfo;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -15,7 +14,6 @@ import javax.persistence.Id;
 import javax.persistence.ManyToMany;
 import javax.persistence.MapKey;
 import javax.persistence.Table;
-import java.lang.reflect.Member;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -164,7 +162,7 @@ public class TeamEntity extends AbstractEntity implements Team {
         return new ArrayList<>(members.values());
     }
 
-    public void addMember(final TeamMemberInfo teamMemberInfo) {
+    public void addMember(final TeamMember teamMemberInfo) {
         String userId = teamMemberInfo.getUserId();
         if (members.containsKey(userId)) {
 //            throw new UserAlreadyInTeam();
@@ -172,7 +170,7 @@ public class TeamEntity extends AbstractEntity implements Team {
             TeamMemberEntity teamMemberEntity = new TeamMemberEntity();
             teamMemberEntity.setUserId(userId);
             teamMemberEntity.setTeam(this);
-            teamMemberEntity.setJoinedDate(ZonedDateTime.now());
+            teamMemberEntity.setJoinedDate(teamMemberInfo.getJoinedDate());
             teamMemberEntity.setTeamMemberType(teamMemberInfo.getTeamMemberType());
             members.put(userId, teamMemberEntity);
         }

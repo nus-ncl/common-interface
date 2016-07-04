@@ -14,8 +14,9 @@ import sg.ncl.adapter.deterlab.ConnectionProperties;
 import sg.ncl.service.authentication.data.jpa.CredentialsEntity;
 import sg.ncl.service.registration.exceptions.RegisterTeamNameDuplicateException;
 import sg.ncl.service.registration.exceptions.UserFormException;
-import sg.ncl.service.team.TeamService;
-import sg.ncl.service.team.data.jpa.entities.TeamEntity;
+import sg.ncl.service.team.domain.Team;
+import sg.ncl.service.team.logic.TeamService;
+import sg.ncl.service.team.data.jpa.TeamEntity;
 import sg.ncl.service.user.domain.User;
 import sg.ncl.service.user.logic.UserService;
 
@@ -61,7 +62,7 @@ public class RegistrationServiceTest extends AbstractTest {
 
         // apply to join team but since no teams exists yet
         // create stub team
-        TeamEntity teamEntity = teamService.save(Util.getTeamEntity());
+        Team team = teamService.createTeam(Util.getTeamEntity());
 
         String stubUid = RandomStringUtils.randomAlphanumeric(8);
         JSONObject predefinedResultJson = new JSONObject();
@@ -72,7 +73,7 @@ public class RegistrationServiceTest extends AbstractTest {
                 .andExpect(method(HttpMethod.POST))
                 .andRespond(withSuccess(predefinedResultJson.toString(), MediaType.APPLICATION_JSON));
 
-        registrationService.register(credentialsEntity, user, teamEntity, isJoinTeam);
+        registrationService.register(credentialsEntity, user, team, isJoinTeam);
     }
 
     @Test
@@ -104,7 +105,7 @@ public class RegistrationServiceTest extends AbstractTest {
 
         TeamEntity teamEntity = Util.getTeamEntity();
         String teamName = teamEntity.getName();
-        teamService.save(teamEntity);
+        teamService.createTeam(teamEntity);
 
         // purposely register for an already saved team
         // don't have to mock server since will throw exception
@@ -118,10 +119,10 @@ public class RegistrationServiceTest extends AbstractTest {
 
         // apply to join team but since no teams exists yet
         // create stub team
-        TeamEntity teamEntity = teamService.save(Util.getTeamEntity());
+        Team team = teamService.createTeam(Util.getTeamEntity());
 
         // don't have to mock server since will throw exception
-        registrationService.register(credentialsEntity, user, teamEntity, isJoinTeam);
+        registrationService.register(credentialsEntity, user, team, isJoinTeam);
     }
 
     @Test(expected = UserFormException.class)
@@ -131,10 +132,10 @@ public class RegistrationServiceTest extends AbstractTest {
 
         // apply to join team but since no teams exists yet
         // create stub team
-        TeamEntity teamEntity = teamService.save(Util.getTeamEntity());
+        Team team = teamService.createTeam(Util.getTeamEntity());
 
         // don't have to mock server since will throw exception
-        registrationService.register(credentialsEntity, user, teamEntity, isJoinTeam);
+        registrationService.register(credentialsEntity, user, team, isJoinTeam);
     }
 
     @Test(expected = UserFormException.class)

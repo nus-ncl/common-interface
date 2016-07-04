@@ -1,17 +1,10 @@
-package sg.ncl.service.team.controllers;
+package sg.ncl.service.team.web;
 
-import org.json.JSONObject;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
-import sg.ncl.service.team.TeamService;
-import sg.ncl.service.team.data.jpa.entities.TeamEntity;
 import sg.ncl.service.team.domain.Team;
-import sg.ncl.service.team.domain.TeamMember;
-import sg.ncl.service.team.domain.TeamMemberType;
-import sg.ncl.service.team.domain.TeamVisibility;
-import sg.ncl.service.team.dtos.TeamInfo;
-import sg.ncl.service.team.dtos.TeamMemberInfo;
+import sg.ncl.service.team.logic.TeamService;
 
 import javax.inject.Inject;
 import javax.validation.Valid;
@@ -34,50 +27,45 @@ public class TeamsController {
 
     @RequestMapping(path = "", method = RequestMethod.POST)
     @ResponseStatus(value = HttpStatus.CREATED)
-    public void addTeam(@RequestBody @Valid TeamEntity team) {
-        teamService.save(team);
+    public void createTeam(@RequestBody @Valid TeamInfo team) {
+        teamService.createTeam(team);
     }
 
     @RequestMapping(method = RequestMethod.GET)
     @ResponseStatus(code = HttpStatus.OK)
-    public List<TeamInfo> get() {
-        List<TeamEntity> teamEntityList = teamService.get();
-        List<TeamInfo> teamInfoList = new ArrayList<>();
-
-        for (TeamEntity teamEntity : teamEntityList) {
-            teamInfoList.add(new TeamInfo(teamEntity));
+    public List<Team> getAll() {
+        List<Team> result = new ArrayList<>();
+        for (Team team: teamService.getAll()) {
+            result.add(new TeamInfo(team));
         }
-
-        return teamInfoList;
+        return result;
     }
 
     @RequestMapping(path = "/public", method = RequestMethod.GET)
     @ResponseStatus(code = HttpStatus.OK)
-    public List<TeamInfo> getPublicTeams() {
-        List<TeamEntity> teamEntityList = teamService.getPublic();
-        List<TeamInfo> teamInfoList = new ArrayList<>();
-
-        for (TeamEntity teamEntity : teamEntityList) {
-            teamInfoList.add(new TeamInfo(teamEntity));
+    public List<Team> getPublicTeams() {
+        List<Team> result = new ArrayList<>();
+        for (Team team: teamService.getPublic()) {
+            result.add(new TeamInfo(team));
         }
-        return teamInfoList;
+        return result;
     }
 
     @RequestMapping(path = "/name/{name}", method = RequestMethod.GET)
     @ResponseStatus(code = HttpStatus.OK)
-    public TeamInfo getByName(@PathVariable String name) {
+    public Team getByName(@PathVariable String name) {
         return new TeamInfo(teamService.getName(name));
     }
 
     @RequestMapping(path = "/{id}", method = RequestMethod.GET)
-    public TeamInfo getTeam(@PathVariable String id) {
-        return new TeamInfo(teamService.find(id));
+    public Team getTeam(@PathVariable String id) {
+        return new TeamInfo(teamService.findTeam(id));
     }
 
     @RequestMapping(path = "/{id}", method = RequestMethod.PUT)
     @ResponseStatus(code = HttpStatus.ACCEPTED)
-    public void updateTeam(@PathVariable String id, @RequestBody TeamEntity teamEntity) {
-        teamService.update(teamEntity);
+    public void updateTeam(@PathVariable String id, @RequestBody TeamInfo team) {
+        teamService.updateTeam(id, team);
     }
 
     @RequestMapping(path = "/addUserToTeam/{id}", method = RequestMethod.POST)
@@ -85,11 +73,5 @@ public class TeamsController {
     public void addUserToTeam(@PathVariable String id, @RequestBody TeamMemberInfo teamMember) {
         // id is the team id
         teamService.addUserToTeam(id, teamMember);
-    }
-
-    @RequestMapping(path = "/seed", method = RequestMethod.POST)
-    @ResponseStatus(value = HttpStatus.CREATED)
-    public void seedData() {
-        teamService.seedData();
     }
 }

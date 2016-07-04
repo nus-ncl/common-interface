@@ -21,9 +21,15 @@ import org.springframework.web.context.WebApplicationContext;
 import sg.ncl.service.authentication.data.jpa.CredentialsEntity;
 import sg.ncl.service.registration.AbstractTest;
 import sg.ncl.service.registration.Util;
+<<<<<<< HEAD
 import sg.ncl.service.team.domain.Team;
 import sg.ncl.service.team.logic.TeamService;
 import sg.ncl.service.team.data.jpa.TeamEntity;
+=======
+import sg.ncl.service.team.TeamService;
+import sg.ncl.service.team.data.jpa.entities.TeamEntity;
+import sg.ncl.service.team.domain.Team;
+>>>>>>> refs/remotes/origin/master
 import sg.ncl.service.team.serializers.DateTimeDeserializer;
 import sg.ncl.service.team.serializers.DateTimeSerializer;
 import sg.ncl.service.user.data.jpa.UserEntity;
@@ -157,7 +163,7 @@ public class RegistrationControllerTest extends AbstractTest {
     public void addTeamUserControllerTest() throws Exception {
         // UserController addUserToTeam test can only be tested here because it requires an existing team in the database
         User user = userService.createUser(Util.getUserEntity());
-        Team team = teamService.createTeam(Util.getTeamEntity());
+        Team team = teamService.save(Util.getTeamEntity());
 
         // craft the RequestBody to add user to team
         JSONObject userObject = new JSONObject();
