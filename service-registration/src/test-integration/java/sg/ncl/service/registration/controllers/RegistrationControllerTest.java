@@ -65,7 +65,6 @@ public class RegistrationControllerTest extends AbstractTest {
     }
 
     @Test
-    @Ignore
     public void registerNewUserJoinExistingTeamTest() throws Exception {
         CredentialsEntity credentialsEntity = Util.getCredentialsEntity();
         UserEntity userEntity = Util.getUserEntity();
