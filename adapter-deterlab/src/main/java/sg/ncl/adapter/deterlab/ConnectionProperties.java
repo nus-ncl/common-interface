@@ -39,6 +39,14 @@ public class ConnectionProperties {
         return "http://" + ip + ":" + port + "/applyProjectNewUsers";
     }
 
+    public String getJoinProject() {
+        return "http://" + ip + ":" + port + "/joinProject";
+    }
+
+    public String getLogin() {
+        return "http://" + ip + ":" + port + "/login";
+    }
+
 //    public void setAddUsersUri(String addUsersUri) {
 //         not implemented
 //    }

@@ -13,6 +13,8 @@ import org.springframework.web.client.RestTemplate;
 import sg.ncl.adapter.deterlab.ConnectionProperties;
 import sg.ncl.service.authentication.data.jpa.CredentialsEntity;
 import sg.ncl.service.registration.exceptions.RegisterTeamNameDuplicateException;
+import sg.ncl.service.registration.exceptions.RegisterTeamNameEmptyException;
+import sg.ncl.service.registration.exceptions.RegisterUidNullException;
 import sg.ncl.service.registration.exceptions.UserFormException;
 import sg.ncl.service.team.TeamService;
 import sg.ncl.service.team.data.jpa.entities.TeamEntity;
@@ -146,6 +148,23 @@ public class RegistrationServiceTest extends AbstractTest {
 
         // don't have to mock server since will throw exception
         registrationService.register(credentialsEntity, user, teamEntity, isJoinTeam);
+    }
+
+    @Test(expected = RegisterTeamNameEmptyException.class)
+    public void registerJoinTeamOldUserEmptyTeam() throws Exception {
+        String uid = RandomStringUtils.randomAlphabetic(8);
+        TeamEntity teamEntity = Util.getTeamEntity();
+        teamEntity.setName(null);
+        // don't have to mock server since will throw exception
+        registrationService.registerRequestToJoinTeam(uid, teamEntity);
+    }
+
+    @Test(expected = RegisterUidNullException.class)
+    public void registerJoinTeamOldUserEmptyUser() throws Exception {
+        String uid = null;
+        TeamEntity teamEntity = Util.getTeamEntity();
+        // don't have to mock server since will throw exception
+        registrationService.registerRequestToJoinTeam(uid, teamEntity);
     }
 
 }
