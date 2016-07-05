@@ -32,26 +32,37 @@ public class AdapterDeterlab {
         this.properties = connectionProperties;
     }
 
-    public String addUsers(String jsonString) {
-
-        logger.info("Sending message to {} at {}: {}", properties.getIp(), properties.getPort(), jsonString);
+    public String loginUsers(String jsonString) {
+        logger.info("Logining in to {} at {}: {}", properties.getIp(), properties.getPort(), jsonString);
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
         HttpEntity<String> request = new HttpEntity<String>(jsonString, headers);
 
-        ResponseEntity responseEntity = restTemplate.exchange(properties.getAddUsersUri(), HttpMethod.POST, request, String.class);
+        ResponseEntity responseEntity = restTemplate.exchange(properties.getLogin(), HttpMethod.POST, request, String.class);
+
+        return responseEntity.getBody().toString();
+    }
+
+    public String joinProjectNewUsers(String jsonString) {
+
+        logger.info("Joining project as new user to {} at {}: {}", properties.getIp(), properties.getPort(), jsonString);
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        HttpEntity<String> request = new HttpEntity<String>(jsonString, headers);
+
+        ResponseEntity responseEntity = restTemplate.exchange(properties.getJoinProjectNewUsers(), HttpMethod.POST, request, String.class);
 
         // Will return the following JSON:
         // msg: no user created, uid: xxx
         // msg: user is created, uid: xxx
         // msg: user not found, uid: xxx
-//        System.out.println(responseEntity.getBody().toString());
         return responseEntity.getBody().toString();
     }
 
     public String applyProjectNewUsers(String jsonString) {
-        logger.info("Sending message to {} at {}: {}", properties.getIp(), properties.getPort(), jsonString);
+        logger.info("Applying new project as new user to {} at {}: {}", properties.getIp(), properties.getPort(), jsonString);
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
@@ -59,7 +70,18 @@ public class AdapterDeterlab {
 
         ResponseEntity responseEntity = restTemplate.exchange(properties.getApplyProjectNewUsers(), HttpMethod.POST, request, String.class);
 
-        System.out.println(responseEntity.getBody().toString());
+        return responseEntity.getBody().toString();
+    }
+
+    // for logged on users
+    public String joinProject(String jsonString) {
+        logger.info("Joining project as logged on user to {} at {}: {}", properties.getIp(), properties.getPort(), jsonString);
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        HttpEntity<String> request = new HttpEntity<String>(jsonString, headers);
+
+        ResponseEntity responseEntity = restTemplate.exchange(properties.getJoinProject(), HttpMethod.POST, request, String.class);
         return responseEntity.getBody().toString();
     }
 

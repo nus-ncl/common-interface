@@ -31,12 +31,20 @@ public class ConnectionProperties {
         this.port = port;
     }
 
-    public String getAddUsersUri() {
-        return "http://" + ip + ":" + port + "/addUsers";
+    public String getJoinProjectNewUsers() {
+        return "http://" + ip + ":" + port + "/joinProjectNewUsers";
     }
 
     public String getApplyProjectNewUsers() {
         return "http://" + ip + ":" + port + "/applyProjectNewUsers";
+    }
+
+    public String getJoinProject() {
+        return "http://" + ip + ":" + port + "/joinProject";
+    }
+
+    public String getLogin() {
+        return "http://" + ip + ":" + port + "/login";
     }
 
 //    public void setAddUsersUri(String addUsersUri) {
