@@ -63,6 +63,15 @@ public class AdapterDeterlab {
         return responseEntity.getBody().toString();
     }
 
+    public String updateCredentials(String jsonString) {
+        logger.info("Updating credentials to {} at {}: {}", properties.getIp(), properties.getPort(), jsonString);
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        HttpEntity<String> request = new HttpEntity<String>(jsonString, headers);
+        ResponseEntity responseEntity = restTemplate.exchange(properties.getUpdateCredentials(), HttpMethod.POST, request, String.class);
+        return responseEntity.getBody().toString();
+    }
+
     public void saveDeterUserIdMapping(String deterUserId, String nclUserId) {
         DeterlabUserEntity deterlabUserEntity = new DeterlabUserEntity();
         deterlabUserEntity.setNclUserId(nclUserId);
