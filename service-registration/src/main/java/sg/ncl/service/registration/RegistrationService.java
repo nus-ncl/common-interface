@@ -156,6 +156,7 @@ public class RegistrationService {
 
             // call python script (create a new user in deterlab)
             // parse in a the json string
+            userObject.put("pid", teamEntity.getName());
             resultJSON = adapterDeterlab.addUsers(userObject.toString());
 
         } else {
