@@ -31,8 +31,8 @@ public class ConnectionProperties {
         this.port = port;
     }
 
-    public String getAddUsersUri() {
-        return "http://" + ip + ":" + port + "/addUsers";
+    public String getJoinProjectNewUsers() {
+        return "http://" + ip + ":" + port + "/joinProjectNewUsers";
     }
 
     public String getApplyProjectNewUsers() {

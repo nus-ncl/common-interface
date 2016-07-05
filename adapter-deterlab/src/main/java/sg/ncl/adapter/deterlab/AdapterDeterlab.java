@@ -34,13 +34,13 @@ public class AdapterDeterlab {
 
     public String addUsers(String jsonString) {
 
-        logger.info("Sending message to {} at {}: {}", properties.getIp(), properties.getPort(), jsonString);
+        logger.info("Join team for newly registered users to {} at {}: {}", properties.getIp(), properties.getPort(), jsonString);
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
         HttpEntity<String> request = new HttpEntity<String>(jsonString, headers);
 
-        ResponseEntity responseEntity = restTemplate.exchange(properties.getAddUsersUri(), HttpMethod.POST, request, String.class);
+        ResponseEntity responseEntity = restTemplate.exchange(properties.getJoinProjectNewUsers(), HttpMethod.POST, request, String.class);
 
         // Will return the following JSON:
         // msg: no user created, uid: xxx
