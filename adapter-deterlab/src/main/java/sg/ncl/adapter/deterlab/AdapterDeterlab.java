@@ -58,7 +58,6 @@ public class AdapterDeterlab {
         // msg: no user created, uid: xxx
         // msg: user is created, uid: xxx
         // msg: user not found, uid: xxx
-//        System.out.println(responseEntity.getBody().toString());
         return responseEntity.getBody().toString();
     }
 
@@ -71,7 +70,6 @@ public class AdapterDeterlab {
 
         ResponseEntity responseEntity = restTemplate.exchange(properties.getApplyProjectNewUsers(), HttpMethod.POST, request, String.class);
 
-//        System.out.println(responseEntity.getBody().toString());
         return responseEntity.getBody().toString();
     }
 
@@ -84,12 +82,8 @@ public class AdapterDeterlab {
         HttpEntity<String> request = new HttpEntity<String>(jsonString, headers);
 
         ResponseEntity responseEntity = restTemplate.exchange(properties.getJoinProject(), HttpMethod.POST, request, String.class);
-
-//        System.out.println(responseEntity.getBody().toString());
         return responseEntity.getBody().toString();
     }
-
-
 
     public void saveDeterUserIdMapping(String deterUserId, String nclUserId) {
         DeterlabUserEntity deterlabUserEntity = new DeterlabUserEntity();
