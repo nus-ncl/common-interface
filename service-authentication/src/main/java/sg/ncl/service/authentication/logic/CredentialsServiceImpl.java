@@ -87,11 +87,9 @@ public class CredentialsServiceImpl implements CredentialsService {
         if (credentials.getPassword() != null && !credentials.getPassword().isEmpty()) {
             hashPassword(entity, credentials.getPassword());
         }
+        changePassword(credentials.getPassword());
         final CredentialsEntity savedEntity = credentialsRepository.save(entity);
         logger.info("Credentials updated: {}", savedEntity);
-
-        changePassword(credentials.getPassword());
-
     }
 
     private void hashPassword(final CredentialsEntity entity, final String password) {
