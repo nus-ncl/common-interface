@@ -15,7 +15,7 @@ public interface TeamMember {
      *
      * @return a {@link String} that represents the unique identifier of this {@link Team}.
      */
-    String getId();
+    Long getId();
 
     /**
      * Returns the associated user ID.

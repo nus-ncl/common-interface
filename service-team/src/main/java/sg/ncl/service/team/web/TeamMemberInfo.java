@@ -11,14 +11,14 @@ import java.time.ZonedDateTime;
  * Created by Desmond
  */
 public class TeamMemberInfo implements TeamMember {
-    private final String id;
+    private final Long id;
     private final String userId;
     private final ZonedDateTime joinedDate;
     private final TeamMemberType teamMemberType;
 
     @JsonCreator
     public TeamMemberInfo(
-            @JsonProperty("id") final String id,
+            @JsonProperty("id") final Long id,
             @JsonProperty("userId") final String userId,
             @JsonProperty("joinedDate") final ZonedDateTime joinedDate,
             @JsonProperty("teamMemberType") final TeamMemberType teamMemberType) {
@@ -35,7 +35,7 @@ public class TeamMemberInfo implements TeamMember {
                 teamMemberEntity.getTeamMemberType());
     }
 
-    public String getId() {
+    public Long getId() {
         return id;
     }
 
