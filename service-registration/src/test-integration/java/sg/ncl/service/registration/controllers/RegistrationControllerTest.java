@@ -106,7 +106,7 @@ public class RegistrationControllerTest extends AbstractTest {
         predefinedResultJson.put("msg", "user is created");
         predefinedResultJson.put("uid", stubUid);
 
-        mockServer.expect(requestTo(properties.getAddUsersUri()))
+        mockServer.expect(requestTo(properties.getJoinProjectNewUsers()))
                 .andExpect(method(HttpMethod.POST))
                 .andRespond(withSuccess(predefinedResultJson.toString(), MediaType.APPLICATION_JSON));
 
