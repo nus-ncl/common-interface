@@ -1,9 +1,12 @@
 package sg.ncl.service.authentication.logic;
 
+import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import sg.ncl.adapter.deterlab.AdapterDeterlab;
 import sg.ncl.service.authentication.data.jpa.CredentialsEntity;
 import sg.ncl.service.authentication.data.jpa.CredentialsRepository;
 import sg.ncl.service.authentication.domain.Credentials;
@@ -31,10 +34,14 @@ public class CredentialsServiceImpl implements CredentialsService {
     private final CredentialsRepository credentialsRepository;
     private final PasswordEncoder passwordEncoder;
 
+    @Autowired
+    private final AdapterDeterlab adapterDeterlab;
+
     @Inject
-    protected CredentialsServiceImpl(final CredentialsRepository credentialsRepository, final PasswordEncoder passwordEncoder) {
+    protected CredentialsServiceImpl(final CredentialsRepository credentialsRepository, final PasswordEncoder passwordEncoder, final AdapterDeterlab adapterDeterlab) {
         this.credentialsRepository = credentialsRepository;
         this.passwordEncoder = passwordEncoder;
+        this.adapterDeterlab = adapterDeterlab;
     }
 
     @Transactional
@@ -80,12 +87,22 @@ public class CredentialsServiceImpl implements CredentialsService {
         if (credentials.getPassword() != null && !credentials.getPassword().isEmpty()) {
             hashPassword(entity, credentials.getPassword());
         }
+        changePassword(credentials.getPassword());
         final CredentialsEntity savedEntity = credentialsRepository.save(entity);
         logger.info("Credentials updated: {}", savedEntity);
     }
 
     private void hashPassword(final CredentialsEntity entity, final String password) {
         entity.setPassword(passwordEncoder.encode(password));
+    }
+
+    private void changePassword(String password) {
+        JSONObject adapterObject = new JSONObject();
+        adapterObject.put("deterUID", "1234567");
+        adapterObject.put("password1", password);
+        adapterObject.put("password2", password);
+        logger.info("Credentials to be updated on Deter: {}", adapterObject.toString());
+        adapterDeterlab.updateCredentials(adapterObject.toString());
     }
 
 }
