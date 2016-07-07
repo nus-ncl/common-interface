@@ -1,10 +1,10 @@
-package sg.ncl.service.realization.controllers;
+package sg.ncl.service.realization.web;
 
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
-import sg.ncl.service.realization.data.jpa.repositories.RealizationRepository;
+import sg.ncl.service.realization.data.jpa.RealizationRepository;
 
 import javax.inject.Inject;
 
