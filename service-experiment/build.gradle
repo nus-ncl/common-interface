@@ -1,3 +1,5 @@
+version '1.0-SNAPSHOT'
+
 dependencies {
     compile project(':common-jpa')
     compile project(':common-exception')

@@ -56,10 +56,8 @@ public class ExperimentServiceTest extends AbstractTest {
     @Test
     public void testSaveExperiment() throws Exception {
         // craft the adapter-deter service reply
-        String stubUid = RandomStringUtils.randomAlphanumeric(8);
         JSONObject predefinedResultJson = new JSONObject();
         predefinedResultJson.put("msg", "experiment is created");
-        predefinedResultJson.put("uid", stubUid);
 
         // mock the adapter-deter service
         mockServer.expect(requestTo(properties.getCreateExperimentUri()))
@@ -92,11 +90,10 @@ public class ExperimentServiceTest extends AbstractTest {
 
     @Test
     public void testGetExperiment() throws Exception {
-
         List<ExperimentEntity> list = new ArrayList<>();
 
         for (int i = 0; i < 3; i++) {
-            list.add(experimentService.save(Util.getExperimentsEntity()));
+            list.add(experimentRepository.save(Util.getExperimentsEntity()));
         }
 
         List<ExperimentEntity> listFromDb = experimentService.get();
@@ -124,10 +121,9 @@ public class ExperimentServiceTest extends AbstractTest {
 
     @Test
     public void testGetExperimentsUserHasNoExperiments() throws Exception {
-
         final String userId = RandomStringUtils.randomAlphanumeric(20);
         for (int i = 0; i < 3; i++) {
-            experimentService.save(Util.getExperimentsEntity());
+            experimentRepository.save(Util.getExperimentsEntity());
         }
 
         List<ExperimentEntity> list = experimentService.findByUser(userId);

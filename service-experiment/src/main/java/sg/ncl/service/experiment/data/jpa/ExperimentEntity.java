@@ -19,7 +19,7 @@ public class ExperimentEntity extends AbstractEntity implements Experiment {
     @Id
     @GeneratedValue
     @Column(name = "id", nullable = false, unique = true, updatable = false)
-    private long id;
+    private Long id;
 
     @Column(name = "user_id", nullable = false, updatable = false)
     private String userId;
@@ -43,11 +43,11 @@ public class ExperimentEntity extends AbstractEntity implements Experiment {
     private int maxDuration;
 
     @Override
-    public long getId() {
+    public Long getId() {
         return id;
     }
 
-    public void setId(final long id) {
+    public void setId(final Long id) {
         this.id = id;
     }
 
@@ -121,13 +121,14 @@ public class ExperimentEntity extends AbstractEntity implements Experiment {
 
         final Experiment that = (Experiment) o;
 
-        return getId() == 0L ? that.getId() == 0L : getId() == that.getId();
+        return getId() == null ? that.getId() == null : getId().equals(that.getId());
     }
 
     @Override
     public String toString() {
         final StringBuilder sb = new StringBuilder("ExperimentEntity{");
         sb.append("id='").append(id).append('\'');
+        sb.append(", userId=").append(userId);
         sb.append(", teamId=").append(teamId);
         sb.append(", name=").append(name);
         sb.append(", description=").append(description);

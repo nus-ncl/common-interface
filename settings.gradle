@@ -1,5 +1,7 @@
 rootProject.name = 'services-in-one'
 
+include 'adapter-deterlab'
+
 include 'common-exception'
 include 'common-jpa'
 include 'common-jwt'
@@ -12,5 +14,5 @@ include 'service-registration'
 include 'service-team'
 include 'service-user'
 include 'service-version'
-include 'adapter-deterlab'
+
 

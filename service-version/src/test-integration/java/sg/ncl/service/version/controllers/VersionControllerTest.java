@@ -3,6 +3,7 @@ package sg.ncl.service.version.controllers;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.http.MediaType;
+import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
@@ -17,6 +18,7 @@ import static org.springframework.test.web.servlet.setup.MockMvcBuilders.webAppC
 /**
  * @author Christopher Zhong
  */
+@WebAppConfiguration
 public class VersionControllerTest extends AbstractTest {
 
     private MockMvc mockMvc;

@@ -9,8 +9,8 @@ import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.context.ActiveProfiles;
+import sg.ncl.adapter.deterlab.AdapterDeterlab;
 import sg.ncl.service.authentication.AbstractTest;
-import sg.ncl.service.authentication.Util;
 import sg.ncl.service.authentication.data.jpa.CredentialsEntity;
 import sg.ncl.service.authentication.data.jpa.CredentialsRepository;
 import sg.ncl.service.authentication.domain.Credentials;
@@ -33,6 +33,7 @@ import static org.mockito.Mockito.mockingDetails;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static sg.ncl.service.authentication.util.TestUtil.getCredentialsEntity;
 
 /**
  * @author Christopher Zhong
@@ -54,11 +55,14 @@ public class CredentialsServiceTest extends AbstractTest {
     //    @Inject
     private CredentialsService credentialsService;
 
+    @Mock
+    private AdapterDeterlab adapterDeterlab;
+
     @Before
     public void before() {
         assertThat(mockingDetails(passwordEncoder).isMock(), is(true));
         assertThat(mockingDetails(credentialsRepository).isMock(), is(true));
-        credentialsService = new CredentialsServiceImpl(credentialsRepository, passwordEncoder);
+        credentialsService = new CredentialsServiceImpl(credentialsRepository, passwordEncoder, adapterDeterlab);
     }
 
     @Test
@@ -68,13 +72,13 @@ public class CredentialsServiceTest extends AbstractTest {
         when(passwordEncoder.encode(anyString())).thenReturn(credentialsInfo.getPassword());
         when(credentialsRepository.save(any(CredentialsEntity.class))).thenAnswer(i -> i.getArgumentAt(0, CredentialsEntity.class));
 
-        final CredentialsEntity credentialsEntity = credentialsService.addCredentials(credentialsInfo);
+        final Credentials credentials = credentialsService.addCredentials(credentialsInfo);
 
         verify(passwordEncoder, times(1)).encode(anyString());
         verify(credentialsRepository, times(1)).save(any(CredentialsEntity.class));
-        assertThat(credentialsEntity.getId(), is(equalTo(credentialsInfo.getId())));
-        assertThat(credentialsEntity.getUsername(), is(equalTo(credentialsInfo.getUsername())));
-        assertThat(credentialsEntity.getPassword(), is(equalTo(credentialsInfo.getPassword())));
+        assertThat(credentials.getId(), is(equalTo(credentialsInfo.getId())));
+        assertThat(credentials.getUsername(), is(equalTo(credentialsInfo.getUsername())));
+        assertThat(credentials.getPassword(), is(equalTo(credentialsInfo.getPassword())));
     }
 
     @Test
@@ -205,7 +209,7 @@ public class CredentialsServiceTest extends AbstractTest {
 
     @Test
     public void testAddCredentialsDuplicateUsername() {
-        final CredentialsEntity credentials = Util.getCredentialsEntity();
+        final CredentialsEntity credentials = getCredentialsEntity();
 
         when(credentialsRepository.findByUsername(credentials.getUsername())).thenReturn(credentials);
 
@@ -216,7 +220,7 @@ public class CredentialsServiceTest extends AbstractTest {
 
     @Test
     public void testAddCredentialsDuplicateUserId() {
-        final CredentialsEntity credentials = Util.getCredentialsEntity();
+        final CredentialsEntity credentials = getCredentialsEntity();
 
         when(credentialsRepository.findOne(credentials.getId())).thenReturn(credentials);
 
@@ -227,7 +231,7 @@ public class CredentialsServiceTest extends AbstractTest {
 
     @Test
     public void testUpdateCredentialsGoodUsernameAndPassword() {
-        final CredentialsEntity entity = Util.getCredentialsEntity();
+        final CredentialsEntity entity = getCredentialsEntity();
         final String username = "username";
         final String password = "password";
         final CredentialsInfo info = new CredentialsInfo(null, username, password, null);
@@ -246,7 +250,7 @@ public class CredentialsServiceTest extends AbstractTest {
 
     @Test
     public void testUpdateCredentialsGoodUsernameAndNullPassword() {
-        final CredentialsEntity entity = Util.getCredentialsEntity();
+        final CredentialsEntity entity = getCredentialsEntity();
         final String username = "username";
         final String password = entity.getPassword();
         final CredentialsInfo info = new CredentialsInfo(null, username, null, null);
@@ -264,7 +268,7 @@ public class CredentialsServiceTest extends AbstractTest {
 
     @Test
     public void testUpdateCredentialsGoodUsernameAndEmptyPassword() {
-        final CredentialsEntity entity = Util.getCredentialsEntity();
+        final CredentialsEntity entity = getCredentialsEntity();
         final String username = "username";
         final String password = entity.getPassword();
         final CredentialsInfo info = new CredentialsInfo(null, username, "", null);
@@ -281,7 +285,7 @@ public class CredentialsServiceTest extends AbstractTest {
 
     @Test
     public void testUpdateCredentialsNullUsernameAndGoodPassword() {
-        final CredentialsEntity entity = Util.getCredentialsEntity();
+        final CredentialsEntity entity = getCredentialsEntity();
         final String username = entity.getUsername();
         final String password = "password";
         final CredentialsInfo info = new CredentialsInfo(null, null, password, null);
@@ -299,7 +303,7 @@ public class CredentialsServiceTest extends AbstractTest {
 
     @Test
     public void testUpdateCredentialsEmptyUsernameAndGoodPassword() {
-        final CredentialsEntity entity = Util.getCredentialsEntity();
+        final CredentialsEntity entity = getCredentialsEntity();
         final String username = entity.getUsername();
         final String password = "password";
         final CredentialsInfo info = new CredentialsInfo(null, "", password, null);

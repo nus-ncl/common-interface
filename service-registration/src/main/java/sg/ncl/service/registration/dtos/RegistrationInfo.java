@@ -2,7 +2,7 @@ package sg.ncl.service.registration.dtos;
 
 import sg.ncl.service.authentication.data.jpa.CredentialsEntity;
 import sg.ncl.service.team.data.jpa.entities.TeamEntity;
-import sg.ncl.service.user.data.jpa.entities.UserEntity;
+import sg.ncl.service.user.data.jpa.UserEntity;
 
 /**
  * @author Christopher Zhong

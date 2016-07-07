@@ -45,16 +45,14 @@ public class ExperimentService {
         String fileName = craftFileName(experiment);
 
         // check experiment name is unique
-        long countByUserId = experimentRepository.countByUserId(experiment.getName());
+        long countByUserId = experimentRepository.countByTeamId(experiment.getName());
         if (countByUserId > 0) {
-            return null;
+            return new ExperimentEntity();
         }
 
         ExperimentEntity experimentEntity = experimentRepository.save(setupEntity(experiment, fileName));
         String parametersJson = writeJsonString(experimentEntity);
-        String resultJson = adapterDeterlab.createExperiment(parametersJson);
-
-        System.out.println("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@: " + resultJson);
+        adapterDeterlab.createExperiment(parametersJson);
 
         return experimentEntity;
     }
