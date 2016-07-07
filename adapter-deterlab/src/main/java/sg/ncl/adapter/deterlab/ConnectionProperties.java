@@ -49,7 +49,7 @@ public class ConnectionProperties {
     }
 
     public String getCreateExperimentUri() {
-        return "http://" + userIp + ":" + port + "/createExperiment";
+        return "http://" + ip + ":" + port + "/createExperiment";
     }
 
 //    public void setAddUsersUri(String addUsersUri) {

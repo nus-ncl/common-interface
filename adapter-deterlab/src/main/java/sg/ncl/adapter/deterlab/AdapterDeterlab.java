@@ -72,7 +72,7 @@ public class AdapterDeterlab {
 
     public String createExperiment(String jsonString) {
 
-        logger.info("Sending message to {} at {}: {}", properties.getUserIp(), properties.getPort(), jsonString);
+        logger.info("Sending message to {} at {}: {}", properties.getIp(), properties.getPort(), jsonString);
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
@@ -80,6 +80,7 @@ public class AdapterDeterlab {
 
         ResponseEntity responseEntity = restTemplate.exchange(properties.getCreateExperimentUri(), HttpMethod.POST, request, String.class);
 
+        System.out.println(responseEntity.getBody().toString());
         return responseEntity.getBody().toString();
     }
 }
