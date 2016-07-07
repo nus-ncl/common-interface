@@ -63,13 +63,9 @@ public class ExperimentsControllerTest extends AbstractTest {
     private RestOperations restOperations;
 
     @Before
-    public void setup() {
-        mockMvc = webAppContextSetup(webApplicationContext).build();
-    }
-
-    @Before
     public void setUp() throws Exception {
         mockServer = MockRestServiceServer.createServer((RestTemplate) restOperations);
+        mockMvc = webAppContextSetup(webApplicationContext).build();
     }
 
     @Test
