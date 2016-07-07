@@ -128,6 +128,7 @@ public class ExperimentEntity extends AbstractEntity implements Experiment {
     public String toString() {
         final StringBuilder sb = new StringBuilder("ExperimentEntity{");
         sb.append("id='").append(id).append('\'');
+        sb.append(", userId=").append(userId);
         sb.append(", teamId=").append(teamId);
         sb.append(", name=").append(name);
         sb.append(", description=").append(description);

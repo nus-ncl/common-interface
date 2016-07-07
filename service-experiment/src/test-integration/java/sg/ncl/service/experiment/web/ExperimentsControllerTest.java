@@ -4,13 +4,20 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import org.apache.commons.lang3.RandomStringUtils;
+import org.json.JSONObject;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
+import org.springframework.test.web.client.MockRestServiceServer;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
+import org.springframework.web.client.RestOperations;
+import org.springframework.web.client.RestTemplate;
 import org.springframework.web.context.WebApplicationContext;
+import sg.ncl.adapter.deterlab.ConnectionProperties;
 import sg.ncl.service.experiment.AbstractTest;
 import sg.ncl.service.experiment.Util;
 import sg.ncl.service.experiment.data.jpa.ExperimentEntity;
@@ -18,9 +25,14 @@ import sg.ncl.service.experiment.data.jpa.ExperimentRepository;
 
 import javax.inject.Inject;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
+import static org.springframework.test.web.client.match.MockRestRequestMatchers.method;
+import static org.springframework.test.web.client.match.MockRestRequestMatchers.requestTo;
+import static org.springframework.test.web.client.response.MockRestResponseCreators.withSuccess;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
@@ -35,15 +47,29 @@ public class ExperimentsControllerTest extends AbstractTest {
     private MediaType contentType = new MediaType(MediaType.APPLICATION_JSON.getType(), MediaType.APPLICATION_JSON.getSubtype());
     private MockMvc mockMvc;
 
+    // to mock the adapter server
+    private MockRestServiceServer mockServer;
+
     @Inject
     private ExperimentRepository experimentRepository;
 
     @Inject
     private WebApplicationContext webApplicationContext;
 
+    @Inject
+    private ConnectionProperties properties;
+
+    @Autowired
+    private RestOperations restOperations;
+
     @Before
     public void setup() {
         mockMvc = webAppContextSetup(webApplicationContext).build();
+    }
+
+    @Before
+    public void setUp() throws Exception {
+        mockServer = MockRestServiceServer.createServer((RestTemplate) restOperations);
     }
 
     @Test
@@ -57,6 +83,15 @@ public class ExperimentsControllerTest extends AbstractTest {
 
     @Test
     public void testPostExperiment() throws Exception {
+
+        // craft the adapter-deter service reply
+        JSONObject predefinedResultJson = new JSONObject();
+        predefinedResultJson.put("msg", "experiment is created");
+
+        // mock the adapter-deter service
+        mockServer.expect(requestTo(properties.getCreateExperimentUri()))
+                .andExpect(method(HttpMethod.POST))
+                .andRespond(withSuccess(predefinedResultJson.toString(), MediaType.APPLICATION_JSON));
 
         ExperimentEntity experimentsEntity = Util.getExperimentsEntity();
         ObjectMapper mapper = new ObjectMapper();
@@ -74,9 +109,13 @@ public class ExperimentsControllerTest extends AbstractTest {
         Assert.assertEquals(experimentsEntity.getTeamId(), firstExperimentEntity.getTeamId());
         Assert.assertEquals(experimentsEntity.getName(), firstExperimentEntity.getName());
         Assert.assertEquals(experimentsEntity.getDescription(), firstExperimentEntity.getDescription());
-        Assert.assertEquals(experimentsEntity.getNsFile(), firstExperimentEntity.getNsFile());
         Assert.assertEquals(experimentsEntity.getIdleSwap(), firstExperimentEntity.getIdleSwap());
         Assert.assertEquals(experimentsEntity.getMaxDuration(), firstExperimentEntity.getMaxDuration());
+
+        // check new nsFile name
+        String craftDate = new SimpleDateFormat("yyyyMMdd").format(new Date());
+        String fileName = experimentsEntity.getUserId() + "_" + experimentsEntity.getTeamId() + "_" + craftDate + "_" + experimentsEntity.getNsFile();
+        Assert.assertEquals(fileName, firstExperimentEntity.getNsFile());
     }
 
     @Test
