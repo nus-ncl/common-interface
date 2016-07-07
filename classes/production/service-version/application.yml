@@ -1,0 +1,7 @@
+# Spring Boot Configuration
+# For more information, please read http://docs.spring.io/spring-boot/docs/current/reference/html/index.html
+spring:
+  profiles:
+    active: version
+server:
+  port: 8080

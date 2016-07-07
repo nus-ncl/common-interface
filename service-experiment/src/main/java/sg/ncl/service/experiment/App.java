@@ -10,10 +10,6 @@ import sg.ncl.common.jpa.UseJpa;
 /**
  * @author Christopher Zhong
  */
-//@SpringBootApplication
-//@EnableJpaRepositories
-//@EnableJpaAuditing
-//@EnableTransactionManagement
 @SpringBootApplication
 @UseJpa
 public class App {
