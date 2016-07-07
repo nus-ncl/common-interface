@@ -52,6 +52,10 @@ public class ConnectionProperties {
         return "http://" + ip + ":" + port + "/createExperiment";
     }
 
+    public String getUpdateCredentials() {
+        return "http://" + ip + ":" + port + "/changePassword";
+    }
+
 //    public void setAddUsersUri(String addUsersUri) {
 //         not implemented
 //    }
