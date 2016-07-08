@@ -7,17 +7,17 @@ import java.util.List;
  */
 public interface TeamService {
 
-    Team createTeam(Team team);
+    Team addTeam(Team team);
 
     List<? extends Team> getTeams();
 
-    List<? extends Team> getTeamsByVisibility(final TeamVisibility visibility);
+    List<? extends Team> getTeamsByVisibility(TeamVisibility visibility);
 
-    Team getTeamById(final String id);
+    Team getTeamById(String id);
 
-    Team getTeamByName(final String name);
+    Team getTeamByName(String name);
 
-    Team updateTeam(final String id, final Team team);
+    Team updateTeam(String id, Team team);
 
-    Team addTeamMember(final String id, final TeamMember teamMember);
+    Team addTeamMember(String id, TeamMember teamMember);
 }

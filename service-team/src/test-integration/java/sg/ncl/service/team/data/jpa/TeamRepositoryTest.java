@@ -6,13 +6,10 @@ import org.junit.rules.ExpectedException;
 import org.springframework.dao.DataIntegrityViolationException;
 import sg.ncl.service.team.AbstractTest;
 import sg.ncl.service.team.Util;
-import sg.ncl.service.team.data.jpa.TeamRepository;
-import sg.ncl.service.team.data.jpa.TeamEntity;
 
 import javax.inject.Inject;
 
 import static org.hamcrest.Matchers.*;
-import static org.hamcrest.Matchers.equalTo;
 import static org.junit.Assert.assertThat;
 import static sg.ncl.common.test.Checks.checkException;
 

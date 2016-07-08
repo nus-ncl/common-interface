@@ -7,7 +7,6 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 import org.junit.Assert;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpMethod;
@@ -81,7 +80,7 @@ public class RegistrationControllerTest extends AbstractTest {
 
         // apply to join team but since no teams exists yet
         // create stub team
-        Team team = teamService.createTeam(Util.getTeamEntity());
+        Team team = teamService.addTeam(Util.getTeamEntity());
 
         GsonBuilder gsonBuilder = new GsonBuilder();
         gsonBuilder.registerTypeAdapter(ZonedDateTime.class, new DateTimeSerializer());
@@ -186,7 +185,7 @@ public class RegistrationControllerTest extends AbstractTest {
     public void addTeamUserControllerTest() throws Exception {
         // UserController addTeamMember test can only be tested here because it requires an existing team in the database
         User user = userService.createUser(Util.getUserEntity());
-        Team team = teamService.createTeam(Util.getTeamEntity());
+        Team team = teamService.addTeam(Util.getTeamEntity());
 
         // craft the RequestBody to add user to team
         JSONObject userObject = new JSONObject();

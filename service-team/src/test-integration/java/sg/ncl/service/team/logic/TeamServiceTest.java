@@ -29,7 +29,7 @@ public class TeamServiceTest extends AbstractTest {
     @Test
     public void testSaveTeam() {
         TeamEntity createdTeam = Util.getTeamEntity();
-        Team saveTeam = teamService.createTeam(createdTeam);
+        Team saveTeam = teamService.addTeam(createdTeam);
 
         Assert.assertEquals(createdTeam.getName(), saveTeam.getName());
         Assert.assertEquals(createdTeam.getDescription(), saveTeam.getDescription());
@@ -44,7 +44,7 @@ public class TeamServiceTest extends AbstractTest {
     @Test
     public void testFindTeam() {
         TeamEntity createdTeam = new TeamEntity();
-        Team team = teamService.createTeam(createdTeam);
+        Team team = teamService.addTeam(createdTeam);
 
         Team getTeam = teamService.getTeamById(team.getId());
 
@@ -82,7 +82,7 @@ public class TeamServiceTest extends AbstractTest {
     @Test
     public void testGetTeamWithValidName() throws Exception {
         TeamEntity createdTeam = Util.getTeamEntity();
-        Team team = teamService.createTeam(createdTeam);
+        Team team = teamService.addTeam(createdTeam);
 
         Team resultTeam = teamService.getTeamByName(team.getName());
 
@@ -96,7 +96,7 @@ public class TeamServiceTest extends AbstractTest {
         List<Team> teamInfoList = new ArrayList<>();
 
         for (int i = 0; i < 3; i++) {
-            teamInfoList.add(teamService.createTeam(Util.getTeamEntity()));
+            teamInfoList.add(teamService.addTeam(Util.getTeamEntity()));
         }
 
         List<? extends Team> resultTeamList = teamService.getTeams();
@@ -107,7 +107,7 @@ public class TeamServiceTest extends AbstractTest {
     @Test
     public void testUpdateTeamInfo() throws Exception {
         TeamEntity teamEntity = Util.getTeamEntity();
-        Team createdTeam = teamService.createTeam(teamEntity);
+        Team createdTeam = teamService.addTeam(teamEntity);
         final String id = createdTeam.getId();
 
         String description = RandomStringUtils.randomAlphanumeric(20);
@@ -133,14 +133,14 @@ public class TeamServiceTest extends AbstractTest {
     public void testUpdateTeamEmptyId() throws Exception {
         TeamEntity teamEntity = Util.getTeamEntity();
         teamEntity.setName(RandomStringUtils.randomAlphanumeric(20));
-        Team team = teamService.createTeam(teamEntity);
+        Team team = teamService.addTeam(teamEntity);
         teamService.updateTeam("", team);
     }
 
     @Test
     public void testUpdateTeamNullField() {
         TeamEntity team = Util.getTeamEntity();
-        Team createdTeam = teamService.createTeam(team);
+        Team createdTeam = teamService.addTeam(team);
         final String id = createdTeam.getId();
 
         team.setDescription(null);
@@ -153,7 +153,7 @@ public class TeamServiceTest extends AbstractTest {
     public void testAddUserToTeam() throws Exception {
         TeamEntity team = Util.getTeamEntity();
         TeamMemberInfo teamMemberInfo = Util.getTeamMemberInfo();
-        Team createdTeam = teamService.createTeam(team);
+        Team createdTeam = teamService.addTeam(team);
 
         // get team id from newly saved team
         String id = createdTeam.getId();

@@ -35,7 +35,7 @@ public class TeamsController {
     @ResponseStatus(HttpStatus.CREATED)
     public Team createTeam(@RequestBody @Valid final TeamInfo team) {
         logger.info("Creating a team: {}", team);
-        return new TeamInfo(teamService.createTeam(team));
+        return new TeamInfo(teamService.addTeam(team));
     }
 
     @RequestMapping(method = RequestMethod.GET)

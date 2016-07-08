@@ -29,7 +29,7 @@ public class TeamServiceImpl implements TeamService {
     }
 
     @Transactional
-    public Team createTeam(final Team team) {
+    public Team addTeam(final Team team) {
         TeamEntity entity = new TeamEntity();
 
         entity.setName(team.getName());

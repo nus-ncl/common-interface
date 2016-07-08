@@ -63,7 +63,7 @@ public class RegistrationService {
             throw new RegisterUidNullException();
         }
 
-        TeamEntity teamEntity = teamService.find(team.getId());
+        Team teamEntity = teamService.getTeamById(team.getId());
         String teamId = team.getId();
 
         JSONObject userObject = new JSONObject();
@@ -110,26 +110,26 @@ public class RegistrationService {
         TeamMemberType memberType;
         String resultJSON;
         String teamId;
-        Team createdTeam;
+        Team teamEntity;
         TeamMemberInfo teamMemberInfo;
 
         if (isJoinTeam == true) {
             // accept the team data
-            createdTeam = teamService.getTeamById(team.getId());
+            teamEntity = teamService.getTeamById(team.getId());
             teamId = team.getId();
         } else {
             // apply for new team
             // check if team already exists
-            TeamEntity teamEntity = new TeamEntity();
-            teamEntity.setName(team.getName());
-            teamEntity.setVisibility(team.getVisibility());
-            teamEntity.setApplicationDate(ZonedDateTime.now());
-            teamEntity.setDescription(team.getDescription());
-            teamEntity.setWebsite(team.getWebsite());
-            teamEntity.setOrganisationType(team.getOrganisationType());
-            teamEntity.setPrivacy(team.getPrivacy());
-            createdTeam = teamService.createTeam(teamEntity);
-            teamId = createdTeam.getId();
+            TeamEntity teamEntity1 = new TeamEntity();
+            teamEntity1.setName(team.getName());
+            teamEntity1.setVisibility(team.getVisibility());
+            teamEntity1.setApplicationDate(ZonedDateTime.now());
+            teamEntity1.setDescription(team.getDescription());
+            teamEntity1.setWebsite(team.getWebsite());
+            teamEntity1.setOrganisationType(team.getOrganisationType());
+            teamEntity1.setPrivacy(team.getPrivacy());
+            teamEntity = teamService.addTeam(teamEntity1);
+            teamId = teamEntity.getId();
         }
 
         // accept user data from form
@@ -182,18 +182,18 @@ public class RegistrationService {
 
         } else {
             // call python script to apply for new project
-            userObject.put("projName", createdTeam.getName());
-            userObject.put("projGoals", createdTeam.getDescription());
-            userObject.put("pid", createdTeam.getName());
+            userObject.put("projName", teamEntity.getName());
+            userObject.put("projGoals", teamEntity.getDescription());
+            userObject.put("pid", teamEntity.getName());
             userObject.put("projWeb", "http://www.nus.edu.sg");
             userObject.put("projOrg", "Academic");
-            userObject.put("projPublic", createdTeam.getVisibility());
+            userObject.put("projPublic", teamEntity.getVisibility());
             resultJSON = adapterDeterlab.applyProjectNewUsers(userObject.toString());
         }
 
         if (getUserCreationStatus(resultJSON).equals("user is created")) {
             // store form fields into registration repository for recreation when required
-            addUserToRegistrationRepository(resultJSON, user, createdTeam);
+            addUserToRegistrationRepository(resultJSON, user, teamEntity);
 
             // call deterlab adapter to store ncluid to deteruid mapping
             addNclUserIdMapping(resultJSON, userId);
