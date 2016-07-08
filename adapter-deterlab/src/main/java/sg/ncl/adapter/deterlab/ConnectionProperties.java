@@ -14,7 +14,6 @@ public class ConnectionProperties {
 
     private String ip;
     private String port;
-    private String userIp;
 
     public String getIp() {
         return ip;
@@ -36,18 +35,9 @@ public class ConnectionProperties {
         return "http://" + ip + ":" + port + "/joinProjectNewUsers";
     }
 
-    public void setUserIp(String userIp) {
-        this.userIp = userIp;
-    }
-
     public String getJoinProject() {
         return "http://" + ip + ":" + port + "/joinProject";
     }
-
-    public String getLogin() {
-        return "http://" + ip + ":" + port + "/login";
-    }
-    
 
     public String getApplyProjectNewUsers() {
         return "http://" + ip + ":" + port + "/applyProjectNewUsers";
