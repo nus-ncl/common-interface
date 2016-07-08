@@ -9,6 +9,7 @@ import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.context.ActiveProfiles;
+import sg.ncl.adapter.deterlab.AdapterDeterlab;
 import sg.ncl.service.authentication.AbstractTest;
 import sg.ncl.service.authentication.data.jpa.CredentialsEntity;
 import sg.ncl.service.authentication.data.jpa.CredentialsRepository;
@@ -54,11 +55,14 @@ public class CredentialsServiceTest extends AbstractTest {
     //    @Inject
     private CredentialsService credentialsService;
 
+    @Mock
+    private AdapterDeterlab adapterDeterlab;
+
     @Before
     public void before() {
         assertThat(mockingDetails(passwordEncoder).isMock(), is(true));
         assertThat(mockingDetails(credentialsRepository).isMock(), is(true));
-        credentialsService = new CredentialsServiceImpl(credentialsRepository, passwordEncoder);
+        credentialsService = new CredentialsServiceImpl(credentialsRepository, passwordEncoder, adapterDeterlab);
     }
 
     @Test

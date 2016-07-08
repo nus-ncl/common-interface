@@ -12,7 +12,7 @@ public interface Experiment {
      *
      * @return the unique identifier of this {@link Experiment}.
      */
-    long getId();
+    Long getId();
     String getUserId();
     String getTeamId();
     String getName();

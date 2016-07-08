@@ -8,7 +8,7 @@ import sg.ncl.service.experiment.domain.Experiment;
  */
 public class ExperimentInfo implements Experiment {
 
-    private long id;
+    private Long id;
     private String userId;
     private String teamId;
     private String name;
@@ -17,7 +17,7 @@ public class ExperimentInfo implements Experiment {
     private int idleSwap;
     private int maxDuration;
 
-    public ExperimentInfo(final long id, final String userId, final String teamId, final String name, final String description, final String nsFile, final int idleSwap, final int maxDuration) {
+    public ExperimentInfo(final Long id, final String userId, final String teamId, final String name, final String description, final String nsFile, final int idleSwap, final int maxDuration) {
         this.id = id;
         this.userId = userId;
         this.teamId = teamId;
@@ -26,6 +26,17 @@ public class ExperimentInfo implements Experiment {
         this.nsFile = nsFile;
         this.idleSwap = idleSwap;
         this.maxDuration = maxDuration;
+    }
+
+    public ExperimentInfo(final Experiment experiment) {
+        this(experiment.getId(),
+                experiment.getUserId(),
+                experiment.getTeamId(),
+                experiment.getName(),
+                experiment.getDescription(),
+                experiment.getNsFile(),
+                experiment.getIdleSwap(),
+                experiment.getMaxDuration());
     }
 
     public ExperimentInfo(final ExperimentEntity experimentEntity) {
@@ -40,7 +51,7 @@ public class ExperimentInfo implements Experiment {
     }
 
     @Override
-    public long getId() {
+    public Long getId() {
         return id;
     }
 
@@ -78,6 +89,4 @@ public class ExperimentInfo implements Experiment {
     public int getMaxDuration() {
         return maxDuration;
     }
-
-
 }
