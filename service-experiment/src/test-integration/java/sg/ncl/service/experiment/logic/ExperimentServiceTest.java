@@ -43,7 +43,7 @@ public class ExperimentServiceTest extends AbstractTest {
     @Inject
     private ConnectionProperties properties;
 
-    @Autowired
+    @Inject
     private RestOperations restOperations;
 
     private MockRestServiceServer mockServer;
