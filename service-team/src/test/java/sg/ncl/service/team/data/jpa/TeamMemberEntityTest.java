@@ -28,7 +28,7 @@ public class TeamMemberEntityTest {
     @Test
     public void testSetId() throws Exception {
         final TeamMemberEntity entity = new TeamMemberEntity();
-        final String id = RandomStringUtils.randomNumeric(10);
+        final Long id = Long.parseLong(RandomStringUtils.randomNumeric(10));
         entity.setId(id);
 
         assertThat(entity.getId(), is(id));

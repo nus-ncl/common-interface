@@ -51,8 +51,8 @@ public class TeamService {
     }
 
     @Transactional
-    public List<Team> getPublic() {
-        List<TeamEntity> result = teamRepository.findByVisibility(TeamVisibility.PUBLIC);
+    public List<Team> getByVisibility(TeamVisibility visibility) {
+        List<TeamEntity> result = teamRepository.findByVisibility(visibility);
         List<Team> teamList = new ArrayList<>();
 
         for (TeamEntity teamEntity : result) {
@@ -62,12 +62,12 @@ public class TeamService {
     }
 
     @Transactional
-    public Team findTeam(final String id) {
+    public Team getById(final String id) {
         return findTeamEntity(id);
     }
 
     @Transactional
-    public Team getName(String name) {
+    public Team getByName(String name) {
         if (name == null || name.isEmpty()) {
             throw new TeamNameNullException();
         }
@@ -81,7 +81,7 @@ public class TeamService {
 
     @Transactional
     public String getTeamStatus(final String id) {
-        final Team one = findTeam(id);
+        final Team one = getById(id);
         return one.getStatus().toString();
     }
 

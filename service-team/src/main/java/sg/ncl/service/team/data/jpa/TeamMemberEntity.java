@@ -17,7 +17,7 @@ public class TeamMemberEntity extends AbstractEntity implements TeamMember {
     @Id
     @GeneratedValue
     @Column(name = "id", nullable = false, unique = true, updatable = false)
-    private String id;
+    private Long id;
 
     @ManyToOne(cascade = CascadeType.ALL, optional = false)
     @JoinColumn(name = "team_id", nullable = false, updatable = false)
@@ -33,11 +33,11 @@ public class TeamMemberEntity extends AbstractEntity implements TeamMember {
     @Enumerated(EnumType.STRING)
     private TeamMemberType teamMemberType = TeamMemberType.MEMBER;
 
-    public String getId() {
+    public Long getId() {
         return id;
     }
 
-    public void setId(final String id) {
+    public void setId(final Long id) {
         this.id = id;
     }
 
