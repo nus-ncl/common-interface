@@ -23,13 +23,20 @@ public class RegistrationController {
         this.registrationService = registrationService;
     }
 
+    // new user + join team
     @RequestMapping(method = RequestMethod.POST)
     @ResponseStatus(HttpStatus.OK)
     public void register(@RequestBody RegistrationInfo registrationInfo) {
 //        System.out.println("User: " + registrationInfo.getUser());
 //        System.out.println("Team: " + registrationInfo.getTeam());
 //        System.out.println("Registration: " + registrationInfo.getRegistration());
-        if (registrationInfo.getIsJoinTeam())
         registrationService.register(registrationInfo.getCredentials(), registrationInfo.getUser(), registrationInfo.getTeam(), registrationInfo.getIsJoinTeam());
+    }
+
+    // old user + join team
+    @RequestMapping(path = "/joinApplications", method = RequestMethod.POST)
+    @ResponseStatus(HttpStatus.OK)
+    public void registerRequestToJoinTeam(@RequestBody RegistrationInfo registrationInfo) {
+        registrationService.registerRequestToJoinTeam(registrationInfo.getUid(), registrationInfo.getTeam());
     }
 }

@@ -32,6 +32,20 @@ public class Util {
         return userObject;
     }
 
+    public static JSONObject getLoginAdapterJSONObject() {
+        JSONObject myObject = new JSONObject();
+        myObject.put("uid", RandomStringUtils.randomAlphabetic(8));
+        myObject.put("password", RandomStringUtils.randomAlphabetic(8));
+        return myObject;
+    }
+
+    public static JSONObject getTeamAdapterJSONObject() {
+        JSONObject teamObject = new JSONObject();
+        teamObject.put("uid", RandomStringUtils.randomAlphabetic(8));
+        teamObject.put("pid", RandomStringUtils.randomAlphabetic(8));
+        return teamObject;
+    }
+
     public static DeterlabUserEntity getDeterlabUserEntity() {
         final DeterlabUserEntity deterlabUserEntity = new DeterlabUserEntity();
         deterlabUserEntity.setNclUserId(RandomStringUtils.randomAlphabetic(20));
