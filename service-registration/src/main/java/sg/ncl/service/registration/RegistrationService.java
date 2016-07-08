@@ -93,7 +93,7 @@ public class RegistrationService {
 
         if (isJoinTeam == true) {
             // accept the team data
-            createdTeam = teamService.findTeam(team.getId());
+            createdTeam = teamService.getById(team.getId());
             teamId = team.getId();
         } else {
             // apply for new team
