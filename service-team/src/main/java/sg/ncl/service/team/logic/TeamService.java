@@ -51,8 +51,8 @@ public class TeamService {
     }
 
     @Transactional
-    public List<Team> getPublic() {
-        List<TeamEntity> result = teamRepository.findByVisibility(TeamVisibility.PUBLIC);
+    public List<Team> getByVisibility(TeamVisibility visibility) {
+        List<TeamEntity> result = teamRepository.findByVisibility(visibility);
         List<Team> teamList = new ArrayList<>();
 
         for (TeamEntity teamEntity : result) {

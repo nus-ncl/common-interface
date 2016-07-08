@@ -4,6 +4,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 import sg.ncl.service.team.domain.Team;
+import sg.ncl.service.team.domain.TeamVisibility;
 import sg.ncl.service.team.logic.TeamService;
 
 import javax.inject.Inject;
@@ -45,7 +46,7 @@ public class TeamsController {
     @ResponseStatus(code = HttpStatus.OK)
     public List<Team> getPublicTeams() {
         List<Team> result = new ArrayList<>();
-        for (Team team: teamService.getPublic()) {
+        for (Team team: teamService.getByVisibility(TeamVisibility.PUBLIC)) {
             result.add(new TeamInfo(team));
         }
         return result;
