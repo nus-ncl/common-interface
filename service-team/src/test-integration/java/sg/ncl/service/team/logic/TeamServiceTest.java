@@ -38,7 +38,7 @@ public class TeamServiceTest extends AbstractTest {
 
     @Test(expected = TeamNotFoundException.class)
     public void testFindTeamWithNoTeamsInDb() throws Exception {
-        teamService.findTeam(RandomStringUtils.randomAlphabetic(20));
+        teamService.getById(RandomStringUtils.randomAlphabetic(20));
     }
 
     @Test
@@ -46,7 +46,7 @@ public class TeamServiceTest extends AbstractTest {
         TeamEntity createdTeam = new TeamEntity();
         Team team = teamService.createTeam(createdTeam);
 
-        Team getTeam = teamService.findTeam(team.getId());
+        Team getTeam = teamService.getById(team.getId());
 
         Assert.assertEquals(createdTeam.getName(), getTeam.getName());
         Assert.assertEquals(createdTeam.getDescription(), getTeam.getDescription());
@@ -61,12 +61,12 @@ public class TeamServiceTest extends AbstractTest {
 
     @Test(expected = TeamIdNullException.class)
     public void testGetTeamWithNullId() throws Exception {
-        teamService.findTeam(null);
+        teamService.getById(null);
     }
 
     @Test(expected = TeamIdNullException.class)
     public void testGetTeamWithEmptyId() throws Exception {
-        teamService.findTeam("");
+        teamService.getById("");
     }
 
     @Test(expected = TeamNameNullException.class)
@@ -125,7 +125,7 @@ public class TeamServiceTest extends AbstractTest {
 
         teamService.updateTeam(id, teamEntity);
 
-        Team teamFromDb = teamService.findTeam(id);
+        Team teamFromDb = teamService.getById(id);
         Assert.assertEquals(teamFromDb.getId(), id);
         Assert.assertEquals(teamFromDb.getDescription(), description);
         Assert.assertEquals(teamFromDb.getVisibility(), TeamVisibility.PRIVATE);
@@ -170,7 +170,7 @@ public class TeamServiceTest extends AbstractTest {
         teamService.addUserToTeam(id, teamMemberInfo);
 
         // find the team and check if user is in it
-        Team teamFromDb = teamService.findTeam(id);
+        Team teamFromDb = teamService.getById(id);
         Assert.assertEquals(teamFromDb.getMembers().get(0).getUserId(), teamMemberInfo.getUserId());
     }
 
