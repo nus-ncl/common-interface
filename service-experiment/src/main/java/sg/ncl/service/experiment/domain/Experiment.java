@@ -18,7 +18,7 @@ public interface Experiment {
     String getName();
     String getDescription();
     String getNsFile();
-    int getIdleSwap();
-    int getMaxDuration();
+    Integer getIdleSwap();
+    Integer getMaxDuration();
 }
 

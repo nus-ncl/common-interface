@@ -81,7 +81,7 @@ public class RealizationEntityTest {
     public void testGetNumberOfNodes() throws Exception {
         final RealizationEntity entity = new RealizationEntity();
 
-        assertThat(entity.getNumberOfNodes(), is(0));
+        assertThat(entity.getNumberOfNodes(), is(nullValue()));
     }
 
     @Test
@@ -97,7 +97,7 @@ public class RealizationEntityTest {
     public void testGetIdleMinutes() throws Exception {
         final RealizationEntity entity = new RealizationEntity();
 
-        assertThat(entity.getIdleMinutes(), is(0L));
+        assertThat(entity.getIdleMinutes(), is(nullValue()));
     }
 
     @Test
@@ -113,7 +113,7 @@ public class RealizationEntityTest {
     public void testGetRunningMinutes() throws Exception {
         final RealizationEntity entity = new RealizationEntity();
 
-        assertThat(entity.getRunningMinutes(), is(0L));
+        assertThat(entity.getRunningMinutes(), is(nullValue()));
     }
 
     @Test
