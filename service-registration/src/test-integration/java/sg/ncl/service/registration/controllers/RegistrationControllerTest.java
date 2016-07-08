@@ -7,6 +7,7 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpMethod;
@@ -106,7 +107,7 @@ public class RegistrationControllerTest extends AbstractTest {
         predefinedResultJson.put("msg", "user is created");
         predefinedResultJson.put("uid", stubUid);
 
-        mockServer.expect(requestTo(properties.getAddUsersUri()))
+        mockServer.expect(requestTo(properties.getJoinProjectNewUsers()))
                 .andExpect(method(HttpMethod.POST))
                 .andRespond(withSuccess(predefinedResultJson.toString(), MediaType.APPLICATION_JSON));
 
@@ -149,6 +150,36 @@ public class RegistrationControllerTest extends AbstractTest {
                 .andRespond(withSuccess(predefinedResultJson.toString(), MediaType.APPLICATION_JSON));
 
         mockMvc.perform(post("/registrations").contentType(MediaType.APPLICATION_JSON).content(mainJSON.toString()))
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    public void registerOldUserJoinTeamTest() throws Exception {
+
+        // apply to join team but since no teams exists yet
+        // create stub team
+        TeamEntity teamEntity = teamService.save(Util.getTeamEntity());
+
+        GsonBuilder gsonBuilder = new GsonBuilder();
+        gsonBuilder.registerTypeAdapter(ZonedDateTime.class, new DateTimeSerializer());
+        gsonBuilder.registerTypeAdapter(ZonedDateTime.class, new DateTimeDeserializer());
+        Gson gson = gsonBuilder.create();
+        String teamJSON = gson.toJson(teamEntity);
+
+        JSONObject mainJSON = new JSONObject();
+        JSONObject teamFields = new JSONObject(teamJSON);
+
+        mainJSON.put("uid", RandomStringUtils.randomAlphanumeric(8));
+        mainJSON.put("team", teamFields);
+
+        JSONObject predefinedResultJson = new JSONObject();
+        predefinedResultJson.put("msg", "user has logged in and joined a project");
+
+        mockServer.expect(requestTo(properties.getJoinProject()))
+                .andExpect(method(HttpMethod.POST))
+                .andRespond(withSuccess(predefinedResultJson.toString(), MediaType.APPLICATION_JSON));
+
+        mockMvc.perform(post("/registrations/joinApplications").contentType(MediaType.APPLICATION_JSON).content(mainJSON.toString()))
                 .andExpect(status().isOk());
     }
 
