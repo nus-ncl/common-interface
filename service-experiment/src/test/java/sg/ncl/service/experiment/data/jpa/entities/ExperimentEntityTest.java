@@ -3,6 +3,7 @@ package sg.ncl.service.experiment.data.jpa.entities;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.commons.lang3.RandomUtils;
 import org.junit.Test;
+import org.springframework.cache.support.NullValue;
 import sg.ncl.service.experiment.data.jpa.ExperimentEntity;
 
 import static org.hamcrest.Matchers.is;
@@ -18,7 +19,7 @@ public class ExperimentEntityTest {
     public void testGetId() throws Exception {
         final ExperimentEntity entity = new ExperimentEntity();
 
-        assertThat(entity.getId(), is(0L));
+        assertThat(entity.getId(), is(nullValue()));
     }
 
     @Test
@@ -114,7 +115,7 @@ public class ExperimentEntityTest {
     public void testGetIdleSwap() throws Exception {
         final ExperimentEntity entity = new ExperimentEntity();
 
-        assertThat(entity.getIdleSwap(), is(0));
+        assertThat(entity.getIdleSwap(), is(nullValue()));
     }
 
     @Test
@@ -130,7 +131,7 @@ public class ExperimentEntityTest {
     public void testGetMaxDuration() throws Exception {
         final ExperimentEntity entity = new ExperimentEntity();
 
-        assertThat(entity.getMaxDuration(), is(0));
+        assertThat(entity.getMaxDuration(), is(nullValue()));
     }
 
     @Test

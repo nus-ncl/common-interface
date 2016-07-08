@@ -105,7 +105,7 @@ public class RegistrationServiceTest extends AbstractTest {
         isJoinTeam = false;
 
         TeamEntity teamEntity = Util.getTeamEntity();
-        String teamName = teamEntity.getName();
+//        String teamName = teamEntity.getName();
         teamService.save(teamEntity);
 
         // purposely register for an already saved team

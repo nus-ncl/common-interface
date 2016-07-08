@@ -13,5 +13,10 @@ public interface Realization {
      * @return the unique identifier of this {@link Realization}.
      */
     Long getId();
-
+    Long getExperimentId();
+    String getUserId();
+    String getTeamId();
+    Integer getNumberOfNodes();
+    Long getIdleMinutes();
+    Long getRunningMinutes();
 }

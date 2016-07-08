@@ -53,4 +53,17 @@ public class Util {
         return deterlabUserEntity;
     }
 
+    public static JSONObject getExperimentAdapterJsonObject() {
+        JSONObject experimentObject = new JSONObject();
+        experimentObject.put("id", RandomStringUtils.randomAlphanumeric(20));
+        experimentObject.put("userId", "ncl");
+        experimentObject.put("teamId", "testbed");
+        experimentObject.put("name", RandomStringUtils.randomAlphanumeric(19));
+        experimentObject.put("description", RandomStringUtils.randomAlphanumeric(20));
+        experimentObject.put("nsFile", "test.ns");
+        experimentObject.put("idleSwap", "240");
+        experimentObject.put("maxDuration", "960");
+
+        return experimentObject;
+    }
 }
