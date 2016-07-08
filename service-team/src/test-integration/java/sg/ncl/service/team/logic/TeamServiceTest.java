@@ -71,12 +71,12 @@ public class TeamServiceTest extends AbstractTest {
 
     @Test(expected = TeamNameNullException.class)
     public void testGetTeamWithNullName() throws Exception {
-        teamService.getName(null);
+        teamService.getByName(null);
     }
 
     @Test(expected = TeamNameNullException.class)
     public void testGetTeamWithEmptyName() throws Exception {
-        teamService.getName("");
+        teamService.getByName("");
     }
 
     @Test
@@ -84,7 +84,7 @@ public class TeamServiceTest extends AbstractTest {
         TeamEntity createdTeam = Util.getTeamEntity();
         Team team = teamService.createTeam(createdTeam);
 
-        Team resultTeam = teamService.getName(team.getName());
+        Team resultTeam = teamService.getByName(team.getName());
 
         Assert.assertEquals(createdTeam.getName(), resultTeam.getName());
         Assert.assertEquals(createdTeam.getDescription(), resultTeam.getDescription());
