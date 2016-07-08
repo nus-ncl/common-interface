@@ -84,4 +84,43 @@ public class RealizationRepositoryTest extends AbstractTest {
             checkException(e, "NULL not allowed for column \"TEAM_ID\"");
         }
     }
+
+    @Test
+    public void testSaveNullNumberOfNodes() throws Exception {
+        final RealizationEntity entity = Util.getRealizationEntity();
+        entity.setNumberOfNodes(null);
+
+        try {
+            repository.saveAndFlush(entity);
+            exception.expect(DataIntegrityViolationException.class);
+        } catch (Exception e) {
+            checkException(e, "NULL not allowed for column \"NUM_NODES\"");
+        }
+    }
+
+    @Test
+    public void testSaveNullIdleMinutes() throws Exception {
+        final RealizationEntity entity = Util.getRealizationEntity();
+        entity.setIdleMinutes(null);
+
+        try {
+            repository.saveAndFlush(entity);
+            exception.expect(DataIntegrityViolationException.class);
+        } catch (Exception e) {
+            checkException(e, "NULL not allowed for column \"IDLE_MINUTES\"");
+        }
+    }
+
+    @Test
+    public void testSaveNullRunningMinutes() throws Exception {
+        final RealizationEntity entity = Util.getRealizationEntity();
+        entity.setRunningMinutes(null);
+
+        try {
+            repository.saveAndFlush(entity);
+            exception.expect(DataIntegrityViolationException.class);
+        } catch (Exception e) {
+            checkException(e, "NULL not allowed for column \"RUNNING_MINUTES\"");
+        }
+    }
 }

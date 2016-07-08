@@ -12,13 +12,13 @@ public class RealizationInfo implements Realization {
     private Long experimentId;
     private String userId;
     private String teamId;
-    private int numberOfNodes;
-    private long idleMinutes;
-    private long runningMinutes;
+    private Integer numberOfNodes;
+    private Long idleMinutes;
+    private Long runningMinutes;
 
     public RealizationInfo(final Long id, final Long experimentId, final String userId,
-                            final String teamId, final int numberOfNodes, final long idleMinutes,
-                            final long runningMinutes) {
+                            final String teamId, final Integer numberOfNodes, final Long idleMinutes,
+                            final Long runningMinutes) {
 
         this.id = id;
         this.experimentId = experimentId;
@@ -70,17 +70,17 @@ public class RealizationInfo implements Realization {
     }
 
     @Override
-    public int getNumberOfNodes() {
+    public Integer getNumberOfNodes() {
         return numberOfNodes;
     }
 
     @Override
-    public long getIdleMinutes() {
+    public Long getIdleMinutes() {
         return idleMinutes;
     }
 
     @Override
-    public long getRunningMinutes() {
+    public Long getRunningMinutes() {
         return runningMinutes;
     }
 }

@@ -37,10 +37,10 @@ public class ExperimentEntity extends AbstractEntity implements Experiment {
     private String nsFile;
 
     @Column(name = "idle_swap", nullable = false)
-    private int idleSwap;
+    private Integer idleSwap;
 
     @Column(name = "max_duration", nullable = false)
-    private int maxDuration;
+    private Integer maxDuration;
 
     @Override
     public Long getId() {
@@ -97,7 +97,7 @@ public class ExperimentEntity extends AbstractEntity implements Experiment {
     }
 
     @Override
-    public int getIdleSwap() {
+    public Integer getIdleSwap() {
         return idleSwap;
     }
 
@@ -106,7 +106,7 @@ public class ExperimentEntity extends AbstractEntity implements Experiment {
     }
 
     @Override
-    public int getMaxDuration() {
+    public Integer getMaxDuration() {
         return maxDuration;
     }
 

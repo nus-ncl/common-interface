@@ -31,13 +31,13 @@ public class RealizationEntity extends AbstractEntity implements Realization {
     private String teamId;
 
     @Column(name = "num_nodes", nullable = false, updatable = false)
-    private int numberOfNodes;
+    private Integer numberOfNodes;
 
     @Column(name = "idle_minutes", nullable = false, updatable = false)
-    private long idleMinutes;
+    private Long idleMinutes;
 
     @Column(name = "running_minutes", nullable = false, updatable = false)
-    private long runningMinutes;
+    private Long runningMinutes;
 
     @Override
     public Long getId() {
@@ -76,29 +76,29 @@ public class RealizationEntity extends AbstractEntity implements Realization {
     }
 
     @Override
-    public int getNumberOfNodes() {
+    public Integer getNumberOfNodes() {
         return numberOfNodes;
     }
 
-    public void setNumberOfNodes(int numberOfNodes) {
+    public void setNumberOfNodes(Integer numberOfNodes) {
         this.numberOfNodes = numberOfNodes;
     }
 
     @Override
-    public long getIdleMinutes() {
+    public Long getIdleMinutes() {
         return idleMinutes;
     }
 
-    public void setIdleMinutes(long idleMinutes) {
+    public void setIdleMinutes(Long idleMinutes) {
         this.idleMinutes = idleMinutes;
     }
 
     @Override
-    public long getRunningMinutes() {
+    public Long getRunningMinutes() {
         return runningMinutes;
     }
 
-    public void setRunningMinutes(long runningMinutes) {
+    public void setRunningMinutes(Long runningMinutes) {
         this.runningMinutes = runningMinutes;
     }
 
