@@ -62,7 +62,7 @@ public class TeamService {
     }
 
     @Transactional
-    public Team findTeam(final String id) {
+    public Team getById(final String id) {
         return findTeamEntity(id);
     }
 
@@ -81,7 +81,7 @@ public class TeamService {
 
     @Transactional
     public String getTeamStatus(final String id) {
-        final Team one = findTeam(id);
+        final Team one = getById(id);
         return one.getStatus().toString();
     }
 
