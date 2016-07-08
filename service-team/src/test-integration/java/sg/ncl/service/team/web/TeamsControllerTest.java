@@ -210,7 +210,7 @@ public class TeamsControllerTest extends AbstractTest {
         MediaType contentType = new MediaType(MediaType.APPLICATION_JSON.getType(),
                 MediaType.APPLICATION_JSON.getSubtype());
 
-        MvcResult mvcResult = mockMvc.perform(get("/teams/public"))
+        MvcResult mvcResult = mockMvc.perform(get("/teams/?visibility=PUBLIC"))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(contentType))
                 .andReturn();
