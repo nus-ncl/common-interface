@@ -32,17 +32,17 @@ public class AdapterDeterlab {
         this.properties = connectionProperties;
     }
 
-    public String loginUsers(String jsonString) {
-        logger.info("Logining in to {} at {}: {}", properties.getIp(), properties.getPort(), jsonString);
-
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_JSON);
-        HttpEntity<String> request = new HttpEntity<String>(jsonString, headers);
-
-        ResponseEntity responseEntity = restTemplate.exchange(properties.getLogin(), HttpMethod.POST, request, String.class);
-
-        return responseEntity.getBody().toString();
-    }
+//    public String loginUsers(String jsonString) {
+//        logger.info("Logining in to {} at {}: {}", properties.getIp(), properties.getPort(), jsonString);
+//
+//        HttpHeaders headers = new HttpHeaders();
+//        headers.setContentType(MediaType.APPLICATION_JSON);
+//        HttpEntity<String> request = new HttpEntity<String>(jsonString, headers);
+//
+//        ResponseEntity responseEntity = restTemplate.exchange(properties.getLogin(), HttpMethod.POST, request, String.class);
+//
+//        return responseEntity.getBody().toString();
+//    }
 
     public String joinProjectNewUsers(String jsonString) {
 

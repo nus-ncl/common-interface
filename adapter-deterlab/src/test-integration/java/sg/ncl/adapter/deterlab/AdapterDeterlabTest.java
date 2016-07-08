@@ -75,7 +75,7 @@ public class AdapterDeterlabTest extends AbstractTest {
         JSONObject teamObject = Util.getTeamAdapterJSONObject();
     }
 
-    @Test
+/*    @Test
     public void testLoginOnDeter() {
         JSONObject userLoginObject = Util.getLoginAdapterJSONObject();
         JSONObject predefinedResultJson = new JSONObject();
@@ -89,7 +89,7 @@ public class AdapterDeterlabTest extends AbstractTest {
         JSONObject loginResultJSONObject = new JSONObject(loginResultJSON);
         String loginMsg = loginResultJSONObject.getString("msg");
         Assert.assertThat(loginMsg, is("user is logged in"));
-    }
+    }*/
 
     @Test
     public void testJoinProjectOnDeter() {
