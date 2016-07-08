@@ -5,8 +5,8 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import sg.ncl.service.team.domain.*;
 
 import java.time.ZonedDateTime;
-import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * Created by Te Ye
@@ -49,28 +49,21 @@ public class TeamInfo implements Team {
         this.status = status;
         this.applicationDate = applicationDate;
         this.processedDate = processedDate;
-
-//        this.members = members;
-
-        this.members = new ArrayList<>();
-
-        for (TeamMember teamMemberEntity : members) {
-            this.members.add(new TeamMemberInfo(teamMemberEntity));
-        }
+        this.members = members.stream().map(TeamMemberInfo::new).collect(Collectors.toList());
     }
 
-    public TeamInfo(final Team teamEntity) {
-        this(teamEntity.getId(),
-                teamEntity.getName(),
-                teamEntity.getDescription(),
-                teamEntity.getWebsite(),
-                teamEntity.getOrganisationType(),
-                teamEntity.getVisibility(),
-                teamEntity.getPrivacy(),
-                teamEntity.getStatus(),
-                teamEntity.getApplicationDate(),
-                teamEntity.getProcessedDate(),
-                teamEntity.getMembers());
+    public TeamInfo(final Team team) {
+        this(team.getId(),
+                team.getName(),
+                team.getDescription(),
+                team.getWebsite(),
+                team.getOrganisationType(),
+                team.getVisibility(),
+                team.getPrivacy(),
+                team.getStatus(),
+                team.getApplicationDate(),
+                team.getProcessedDate(),
+                team.getMembers());
     }
 
     public String getId() {
@@ -118,41 +111,19 @@ public class TeamInfo implements Team {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) { return true; }
-        if (o == null || getClass() != o.getClass()) { return false; }
-
-        TeamInfo that = (TeamInfo) o;
-
-        if (!getId().equals(that.getId())) { return false; }
-        if (!getName().equals(that.getName())) { return false; }
-        if (!getDescription().equals(that.getDescription())) { return false; }
-        return getApplicationDate().equals(that.getApplicationDate());
-    }
-
-    @Override
-    public int hashCode() {
-        int result = 37;
-        result = 31 * result + getId().hashCode();
-        result = 31 * result + getName().hashCode();
-        return result;
-    }
-
-    @Override
     public String toString() {
-        final StringBuilder sb = new StringBuilder("TeamEntity{");
-        sb.append("id='").append(id).append('\'');
-        sb.append(", name='").append(name).append('\'');
-        sb.append(", description='").append(description).append('\'');
-        sb.append(", website='").append(website).append('\'');
-        sb.append(", organisationType='").append(organisationType).append('\'');
-        sb.append(", visibility=").append(visibility);
-        sb.append(", status=").append(status);
-        sb.append(", applicationDate=").append(applicationDate);
-        sb.append(", processedDate=").append(processedDate);
-        sb.append(", members=").append(members);
-        sb.append(", super=").append(super.toString());
-        sb.append('}');
-        return sb.toString();
+        return "TeamInfo{" +
+                "id='" + id + '\'' +
+                ", name='" + name + '\'' +
+                ", description='" + description + '\'' +
+                ", website='" + website + '\'' +
+                ", organisationType='" + organisationType + '\'' +
+                ", visibility=" + visibility +
+                ", privacy=" + privacy +
+                ", status=" + status +
+                ", applicationDate=" + applicationDate +
+                ", processedDate=" + processedDate +
+                ", members=" + members +
+                '}';
     }
 }

@@ -2,15 +2,11 @@ package sg.ncl.service.team.data.jpa;
 
 import org.apache.commons.lang3.RandomStringUtils;
 import org.junit.Test;
-import sg.ncl.service.team.data.jpa.TeamEntity;
-import sg.ncl.service.team.data.jpa.TeamMemberEntity;
 import sg.ncl.service.team.domain.TeamMemberType;
 
 import java.time.ZonedDateTime;
 
-import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.notNullValue;
-import static org.hamcrest.Matchers.nullValue;
+import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.assertThat;
 
 /**
@@ -87,13 +83,13 @@ public class TeamMemberEntityTest {
     @Test
     public void testSetMemberType() throws Exception {
         final TeamMemberEntity entity = new TeamMemberEntity();
-        entity.setTeamMemberType(TeamMemberType.OWNER);
-        assertThat(entity.getTeamMemberType(), is(TeamMemberType.OWNER));
+        entity.setMemberType(TeamMemberType.OWNER);
+        assertThat(entity.getMemberType(), is(TeamMemberType.OWNER));
     }
 
     @Test
     public void testGetMemberType() throws Exception {
         final TeamMemberEntity entity = new TeamMemberEntity();
-        assertThat(entity.getTeamMemberType(), is(notNullValue()));
+        assertThat(entity.getMemberType(), is(notNullValue()));
     }
 }

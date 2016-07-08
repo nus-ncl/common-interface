@@ -7,12 +7,12 @@ import sg.ncl.service.team.AbstractTest;
 import sg.ncl.service.team.Util;
 import sg.ncl.service.team.data.jpa.TeamEntity;
 import sg.ncl.service.team.domain.Team;
-import sg.ncl.service.team.domain.TeamStatus;
+import sg.ncl.service.team.domain.TeamService;
 import sg.ncl.service.team.domain.TeamVisibility;
-import sg.ncl.service.team.web.TeamMemberInfo;
 import sg.ncl.service.team.exceptions.TeamIdNullException;
 import sg.ncl.service.team.exceptions.TeamNameNullException;
 import sg.ncl.service.team.exceptions.TeamNotFoundException;
+import sg.ncl.service.team.web.TeamMemberInfo;
 
 import javax.inject.Inject;
 import java.util.ArrayList;
@@ -38,7 +38,7 @@ public class TeamServiceTest extends AbstractTest {
 
     @Test(expected = TeamNotFoundException.class)
     public void testFindTeamWithNoTeamsInDb() throws Exception {
-        teamService.getById(RandomStringUtils.randomAlphabetic(20));
+        teamService.getTeamById(RandomStringUtils.randomAlphabetic(20));
     }
 
     @Test
@@ -46,7 +46,7 @@ public class TeamServiceTest extends AbstractTest {
         TeamEntity createdTeam = new TeamEntity();
         Team team = teamService.createTeam(createdTeam);
 
-        Team getTeam = teamService.getById(team.getId());
+        Team getTeam = teamService.getTeamById(team.getId());
 
         Assert.assertEquals(createdTeam.getName(), getTeam.getName());
         Assert.assertEquals(createdTeam.getDescription(), getTeam.getDescription());
@@ -55,28 +55,28 @@ public class TeamServiceTest extends AbstractTest {
 
     @Test
     public void testGetAllTeamsWithNoUserInDb() throws Exception {
-        List<Team> list = teamService.getAll();
+        List<? extends Team> list = teamService.getTeams();
         Assert.assertTrue(list.size() == 0);
     }
 
     @Test(expected = TeamIdNullException.class)
     public void testGetTeamWithNullId() throws Exception {
-        teamService.getById(null);
+        teamService.getTeamById(null);
     }
 
     @Test(expected = TeamIdNullException.class)
     public void testGetTeamWithEmptyId() throws Exception {
-        teamService.getById("");
+        teamService.getTeamById("");
     }
 
     @Test(expected = TeamNameNullException.class)
     public void testGetTeamWithNullName() throws Exception {
-        teamService.getByName(null);
+        teamService.getTeamByName(null);
     }
 
     @Test(expected = TeamNameNullException.class)
     public void testGetTeamWithEmptyName() throws Exception {
-        teamService.getByName("");
+        teamService.getTeamByName("");
     }
 
     @Test
@@ -84,7 +84,7 @@ public class TeamServiceTest extends AbstractTest {
         TeamEntity createdTeam = Util.getTeamEntity();
         Team team = teamService.createTeam(createdTeam);
 
-        Team resultTeam = teamService.getByName(team.getName());
+        Team resultTeam = teamService.getTeamByName(team.getName());
 
         Assert.assertEquals(createdTeam.getName(), resultTeam.getName());
         Assert.assertEquals(createdTeam.getDescription(), resultTeam.getDescription());
@@ -99,18 +99,9 @@ public class TeamServiceTest extends AbstractTest {
             teamInfoList.add(teamService.createTeam(Util.getTeamEntity()));
         }
 
-        List<Team> resultTeamList = teamService.getAll();
+        List<? extends Team> resultTeamList = teamService.getTeams();
 
         Assert.assertTrue(isListTeamEqual(resultTeamList, teamInfoList));
-    }
-
-    @Test
-    public void testGetValidTeamStatus() {
-        TeamEntity createdTeam = new TeamEntity();
-        Team team = teamService.createTeam(createdTeam);
-
-        String resultTeamStatus = teamService.getTeamStatus(team.getId());
-        Assert.assertEquals(resultTeamStatus, TeamStatus.PENDING.toString());
     }
 
     @Test
@@ -125,7 +116,7 @@ public class TeamServiceTest extends AbstractTest {
 
         teamService.updateTeam(id, teamEntity);
 
-        Team teamFromDb = teamService.getById(id);
+        Team teamFromDb = teamService.getTeamById(id);
         Assert.assertEquals(teamFromDb.getId(), id);
         Assert.assertEquals(teamFromDb.getDescription(), description);
         Assert.assertEquals(teamFromDb.getVisibility(), TeamVisibility.PRIVATE);
@@ -167,10 +158,10 @@ public class TeamServiceTest extends AbstractTest {
         // get team id from newly saved team
         String id = createdTeam.getId();
 
-        teamService.addUserToTeam(id, teamMemberInfo);
+        teamService.addTeamMember(id, teamMemberInfo);
 
         // find the team and check if user is in it
-        Team teamFromDb = teamService.getById(id);
+        Team teamFromDb = teamService.getTeamById(id);
         Assert.assertEquals(teamFromDb.getMembers().get(0).getUserId(), teamMemberInfo.getUserId());
     }
 
@@ -184,7 +175,7 @@ public class TeamServiceTest extends AbstractTest {
         return cp.isEmpty();
     }
 
-    private boolean isListTeamEqual(List<Team> one, List<Team> two) {
+    private boolean isListTeamEqual(List<? extends Team> one, List<Team> two) {
         ArrayList<Team> cp = new ArrayList<>(one);
         for (Team twoIterator : two) {
             if (!cp.remove(twoIterator)) {

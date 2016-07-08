@@ -36,6 +36,6 @@ public interface TeamMember {
      *
      * @return the associated team membership.
      */
-    TeamMemberType getTeamMemberType();
+    TeamMemberType getMemberType();
 
 }

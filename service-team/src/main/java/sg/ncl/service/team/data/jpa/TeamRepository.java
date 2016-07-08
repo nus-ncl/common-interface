@@ -11,6 +11,7 @@ import java.util.List;
 public interface TeamRepository extends JpaRepository<TeamEntity, String> {
 
     TeamEntity findByName(String name);
+
     List<TeamEntity> findByVisibility(TeamVisibility visibility);
 
 }

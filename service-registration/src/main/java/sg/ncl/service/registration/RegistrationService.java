@@ -14,13 +14,13 @@ import sg.ncl.service.registration.data.jpa.entities.RegistrationEntity;
 import sg.ncl.service.registration.data.jpa.repositories.RegistrationRepository;
 import sg.ncl.service.registration.exceptions.RegisterTeamNameDuplicateException;
 import sg.ncl.service.registration.exceptions.UserFormException;
-import sg.ncl.service.team.logic.TeamService;
 import sg.ncl.service.team.data.jpa.TeamEntity;
 import sg.ncl.service.team.data.jpa.TeamMemberEntity;
 import sg.ncl.service.team.domain.Team;
 import sg.ncl.service.team.domain.TeamMemberType;
-import sg.ncl.service.team.web.TeamMemberInfo;
+import sg.ncl.service.team.domain.TeamService;
 import sg.ncl.service.team.exceptions.TeamNotFoundException;
+import sg.ncl.service.team.web.TeamMemberInfo;
 import sg.ncl.service.user.domain.User;
 import sg.ncl.service.user.logic.UserService;
 
@@ -73,7 +73,7 @@ public class RegistrationService {
         if (isJoinTeam == false && (team.getName() != null || !team.getName().isEmpty())) {
             Team teamEntity = new TeamEntity();
             try {
-                teamEntity = teamService.getByName(team.getName());
+                teamEntity = teamService.getTeamByName(team.getName());
             } catch (TeamNotFoundException e) {
                 logger.info("This is good, this implies team name is unique");
             }
@@ -93,7 +93,7 @@ public class RegistrationService {
 
         if (isJoinTeam == true) {
             // accept the team data
-            createdTeam = teamService.getById(team.getId());
+            createdTeam = teamService.getTeamById(team.getId());
             teamId = team.getId();
         } else {
             // apply for new team
@@ -127,11 +127,11 @@ public class RegistrationService {
         TeamMemberEntity teamMemberEntity = new TeamMemberEntity();
         teamMemberEntity.setUserId(userId);
         teamMemberEntity.setJoinedDate(ZonedDateTime.now());
-        teamMemberEntity.setTeamMemberType(memberType);
+        teamMemberEntity.setMemberType(memberType);
         teamMemberInfo = new TeamMemberInfo(teamMemberEntity);
 
         userService.addTeam(userId, teamId);
-        teamService.addUserToTeam(teamId, teamMemberInfo);
+        teamService.addTeamMember(teamId, teamMemberInfo);
 
         JSONObject userObject = new JSONObject();
         userObject.put("firstName", user.getUserDetails().getFirstName());

@@ -31,7 +31,7 @@ public class TeamMemberEntity extends AbstractEntity implements TeamMember {
 
     @Column(name = "member_type", nullable = false)
     @Enumerated(EnumType.STRING)
-    private TeamMemberType teamMemberType = TeamMemberType.MEMBER;
+    private TeamMemberType memberType = TeamMemberType.MEMBER;
 
     public Long getId() {
         return id;
@@ -68,11 +68,11 @@ public class TeamMemberEntity extends AbstractEntity implements TeamMember {
     }
 
     @Override
-    public TeamMemberType getTeamMemberType() {
-        return teamMemberType;
+    public TeamMemberType getMemberType() {
+        return memberType;
     }
 
-    public void setTeamMemberType(TeamMemberType teamMemberType) {
-        this.teamMemberType = teamMemberType;
+    public void setMemberType(TeamMemberType memberType) {
+        this.memberType = memberType;
     }
 }

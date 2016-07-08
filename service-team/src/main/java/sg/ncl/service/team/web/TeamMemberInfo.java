@@ -14,25 +14,25 @@ public class TeamMemberInfo implements TeamMember {
     private final Long id;
     private final String userId;
     private final ZonedDateTime joinedDate;
-    private final TeamMemberType teamMemberType;
+    private final TeamMemberType memberType;
 
     @JsonCreator
     public TeamMemberInfo(
             @JsonProperty("id") final Long id,
             @JsonProperty("userId") final String userId,
             @JsonProperty("joinedDate") final ZonedDateTime joinedDate,
-            @JsonProperty("teamMemberType") final TeamMemberType teamMemberType) {
+            @JsonProperty("memberType") final TeamMemberType memberType) {
         this.id = id;
         this.userId = userId;
         this.joinedDate = joinedDate;
-        this.teamMemberType = teamMemberType;
+        this.memberType = memberType;
     }
 
-    public TeamMemberInfo(final TeamMember teamMemberEntity) {
-        this(teamMemberEntity.getId(),
-                teamMemberEntity.getUserId(),
-                teamMemberEntity.getJoinedDate(),
-                teamMemberEntity.getTeamMemberType());
+    public TeamMemberInfo(final TeamMember teamMember) {
+        this(teamMember.getId(),
+                teamMember.getUserId(),
+                teamMember.getJoinedDate(),
+                teamMember.getMemberType());
     }
 
     public Long getId() {
@@ -50,7 +50,7 @@ public class TeamMemberInfo implements TeamMember {
     }
 
     @Override
-    public TeamMemberType getTeamMemberType() {
-        return teamMemberType;
+    public TeamMemberType getMemberType() {
+        return memberType;
     }
 }
