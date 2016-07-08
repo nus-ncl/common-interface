@@ -67,7 +67,7 @@ public class TeamService {
     }
 
     @Transactional
-    public Team getName(String name) {
+    public Team getByName(String name) {
         if (name == null || name.isEmpty()) {
             throw new TeamNameNullException();
         }

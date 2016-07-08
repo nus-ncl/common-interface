@@ -55,7 +55,7 @@ public class TeamsController {
     @RequestMapping(path = "/name/{name}", method = RequestMethod.GET)
     @ResponseStatus(code = HttpStatus.OK)
     public Team getByName(@PathVariable String name) {
-        return new TeamInfo(teamService.getName(name));
+        return new TeamInfo(teamService.getByName(name));
     }
 
     @RequestMapping(path = "/{id}", method = RequestMethod.GET)
