@@ -42,9 +42,9 @@ public class TeamsController {
         return result;
     }
 
-    @RequestMapping(path = "/public", method = RequestMethod.GET)
+    @RequestMapping(path = "/", method = RequestMethod.GET)
     @ResponseStatus(code = HttpStatus.OK)
-    public List<Team> getPublicTeams() {
+    public List<Team> getByVisibility(@RequestParam("visibility") TeamVisibility visibility) {
         List<Team> result = new ArrayList<>();
         for (Team team: teamService.getByVisibility(TeamVisibility.PUBLIC)) {
             result.add(new TeamInfo(team));
