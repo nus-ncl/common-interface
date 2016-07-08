@@ -4,6 +4,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 import sg.ncl.service.registration.RegistrationService;
+import sg.ncl.service.registration.dtos.RegistrationData;
 import sg.ncl.service.registration.dtos.RegistrationInfo;
 
 import javax.inject.Inject;
@@ -25,6 +26,10 @@ public class RegistrationController {
     @RequestMapping(method = RequestMethod.POST)
     @ResponseStatus(HttpStatus.OK)
     public void register(@RequestBody RegistrationInfo registrationInfo) {
+//        System.out.println("User: " + registrationInfo.getUser());
+//        System.out.println("Team: " + registrationInfo.getTeam());
+//        System.out.println("Registration: " + registrationInfo.getRegistration());
+        if (registrationInfo.getIsJoinTeam())
         registrationService.register(registrationInfo.getCredentials(), registrationInfo.getUser(), registrationInfo.getTeam(), registrationInfo.getIsJoinTeam());
     }
 }
