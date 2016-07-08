@@ -67,26 +67,15 @@ public class TeamsControllerTest extends AbstractTest {
         Gson gson = gsonBuilder.create();
         String jsonInString = gson.toJson(new TeamInfo(teamEntity));
 
-        mockMvc.perform(post("/teams").contentType(MediaType.APPLICATION_JSON).content(jsonInString))
-                .andExpect(status().isCreated());
-
-        MediaType contentType = new MediaType(MediaType.APPLICATION_JSON.getType(),
-                MediaType.APPLICATION_JSON.getSubtype());
-
-        MvcResult mvcResult = mockMvc.perform(get("/teams"))
-                .andExpect(status().isOk())
-                .andExpect(content().contentType(contentType))
+        MvcResult createdTeamResult = mockMvc.perform(post("/teams").contentType(MediaType.APPLICATION_JSON).content(jsonInString))
+                .andExpect(status().isCreated())
                 .andReturn();
 
-        String list = mvcResult.getResponse().getContentAsString();
+        String response = createdTeamResult.getResponse().getContentAsString();
+        Team createdTeam = gson.fromJson(response, TeamInfo.class);
 
-        Type listType = new TypeToken<ArrayList<TeamEntity>>(){}.getType();
-        List<TeamEntity> teamEntityList2 = gson.fromJson(list, listType);
-
-        TeamEntity grabTeamEntity = teamEntityList2.get(0);
-
-        Assert.assertEquals(teamEntity.getName(), grabTeamEntity.getName());
-        Assert.assertEquals(teamEntity.getDescription(), grabTeamEntity.getDescription());
+        Assert.assertEquals(teamEntity.getName(), createdTeam.getName());
+        Assert.assertEquals(teamEntity.getDescription(), createdTeam.getDescription());
         Assert.assertEquals(teamEntity.getStatus(), TeamStatus.PENDING);
     }
 
