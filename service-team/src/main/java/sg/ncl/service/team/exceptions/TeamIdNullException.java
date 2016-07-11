@@ -8,4 +8,5 @@ import sg.ncl.common.exception.NotFoundException;
  * Created by Desmond / Te Ye
  */
 @ResponseStatus(code = HttpStatus.NOT_FOUND, reason = "Team ID is empty")
-public class TeamIdNullException extends NotFoundException {}
+public class TeamIdNullException extends NotFoundException {
+}

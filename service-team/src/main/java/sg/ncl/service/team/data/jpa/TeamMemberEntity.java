@@ -1,4 +1,4 @@
-package sg.ncl.service.team.data.jpa.entities;
+package sg.ncl.service.team.data.jpa;
 
 import sg.ncl.common.jpa.AbstractEntity;
 import sg.ncl.service.team.domain.TeamMember;
@@ -31,13 +31,13 @@ public class TeamMemberEntity extends AbstractEntity implements TeamMember {
 
     @Column(name = "member_type", nullable = false)
     @Enumerated(EnumType.STRING)
-    private TeamMemberType teamMemberType = TeamMemberType.MEMBER;
+    private TeamMemberType memberType = TeamMemberType.MEMBER;
 
     public Long getId() {
         return id;
     }
 
-    void setId(final Long id) {
+    public void setId(final Long id) {
         this.id = id;
     }
 
@@ -68,11 +68,11 @@ public class TeamMemberEntity extends AbstractEntity implements TeamMember {
     }
 
     @Override
-    public TeamMemberType getTeamMemberType() {
-        return teamMemberType;
+    public TeamMemberType getMemberType() {
+        return memberType;
     }
 
-    public void setTeamMemberType(TeamMemberType teamMemberType) {
-        this.teamMemberType = teamMemberType;
+    public void setMemberType(TeamMemberType memberType) {
+        this.memberType = memberType;
     }
 }
