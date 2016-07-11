@@ -125,9 +125,17 @@ dependencies {
     testCompile 'junit:junit'
 }
 
+task copyJunitXml(type: Copy) {
+    from(subprojects.test.reports.junitXml.destination) {
+        include '*.xml'
+    }
+    into test.reports.junitXml.destination
+}
+
 testReport {
     dependsOn allprojects.check
     reportOn allprojects.test, allprojects.integrationTest
+    finalizedBy copyJunitXml
 }
 
 jacocoTestReport {
