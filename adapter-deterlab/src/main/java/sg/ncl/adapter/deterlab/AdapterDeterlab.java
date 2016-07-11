@@ -7,7 +7,9 @@ import org.springframework.http.*;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 import sg.ncl.adapter.deterlab.data.jpa.DeterlabUserRepository;
+import sg.ncl.adapter.deterlab.domain.DeterlabUser;
 import sg.ncl.adapter.deterlab.dtos.entities.DeterlabUserEntity;
+import sg.ncl.adapter.deterlab.exceptions.UserNotFoundException;
 
 import javax.inject.Inject;
 
@@ -99,6 +101,14 @@ public class AdapterDeterlab {
         deterlabUserEntity.setNclUserId(nclUserId);
         deterlabUserEntity.setDeterUserId(deterUserId);
         deterlabUserRepository.save(deterlabUserEntity);
+    }
+
+    public String getDeterUserIdByNclUserId(String nclUserId) {
+        DeterlabUserEntity deterlabUserEntity = deterlabUserRepository.findByNclUserId(nclUserId);
+        if (deterlabUserEntity == null) {
+            throw new UserNotFoundException();
+        }
+        return deterlabUserEntity.getDeterUserId();
     }
 
     public String createExperiment(String jsonString) {
