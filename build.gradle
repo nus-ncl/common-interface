@@ -123,12 +123,12 @@ dependencies {
 }
 
 testReport {
-    dependsOn check, subprojects.testReport
-    reportOn test, integrationTest, subprojects.test, subprojects.integrationTest
+    dependsOn allprojects.check
+    reportOn allprojects.test, allprojects.integrationTest
 }
 
 jacocoTestReport {
-    dependsOn check, subprojects.jacocoTestReport
+    dependsOn allprojects.check
     executionData = fileTree(project.rootDir.absolutePath).include('**/build/jacoco/*.exec')
     sourceDirectories = files(sourceSets.main.java.srcDirs, subprojects.sourceSets.main.java.srcDirs)
     classDirectories = files(sourceSets.main.output.classesDir, subprojects.sourceSets.main.output.classesDir)
