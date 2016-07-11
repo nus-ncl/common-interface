@@ -21,11 +21,11 @@ import sg.ncl.adapter.deterlab.ConnectionProperties;
 import sg.ncl.service.authentication.data.jpa.CredentialsEntity;
 import sg.ncl.service.registration.AbstractTest;
 import sg.ncl.service.registration.Util;
+import sg.ncl.service.registration.serializers.DateTimeDeserializer;
+import sg.ncl.service.registration.serializers.DateTimeSerializer;
 import sg.ncl.service.team.data.jpa.TeamEntity;
 import sg.ncl.service.team.domain.Team;
 import sg.ncl.service.team.domain.TeamService;
-import sg.ncl.service.team.serializers.DateTimeDeserializer;
-import sg.ncl.service.team.serializers.DateTimeSerializer;
 import sg.ncl.service.user.data.jpa.UserEntity;
 import sg.ncl.service.user.domain.User;
 import sg.ncl.service.user.logic.UserService;
@@ -156,7 +156,7 @@ public class RegistrationControllerTest extends AbstractTest {
 
         // apply to join team but since no teams exists yet
         // create stub team
-        TeamEntity teamEntity = teamService.save(Util.getTeamEntity());
+        Team teamEntity = teamService.addTeam(Util.getTeamEntity());
 
         GsonBuilder gsonBuilder = new GsonBuilder();
         gsonBuilder.registerTypeAdapter(ZonedDateTime.class, new DateTimeSerializer());
