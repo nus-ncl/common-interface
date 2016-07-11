@@ -87,6 +87,7 @@ allprojects {
 
     tasks.withType(Test) {
         group 'verification'
+        ignoreFailures true
         reports {
             html {
                 destination file("${reporting.baseDir}/${task.name}/html")
