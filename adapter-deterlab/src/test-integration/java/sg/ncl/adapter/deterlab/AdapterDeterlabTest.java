@@ -14,6 +14,8 @@ import org.springframework.test.web.client.MockRestServiceServer;
 import org.springframework.web.client.RestOperations;
 import org.springframework.web.client.RestTemplate;
 import sg.ncl.adapter.deterlab.data.jpa.DeterlabUserRepository;
+import sg.ncl.adapter.deterlab.dtos.entities.DeterlabUserEntity;
+import sg.ncl.adapter.deterlab.exceptions.UserNotFoundException;
 
 import javax.inject.Inject;
 
@@ -146,4 +148,18 @@ public class AdapterDeterlabTest extends AbstractTest {
         String msg = resultJSONObject.getString("msg");
         Assert.assertThat(msg, is("experiment is created"));
     }
+
+    @Test(expected = UserNotFoundException.class)
+    public void testGetDeterUserIdBad() {
+        adapterDeterlab.getDeterUserIdByNclUserId(RandomStringUtils.randomAlphanumeric(20));
+    }
+
+    @Test
+    public void testGetDeterUserIdGood() {
+        DeterlabUserEntity deterlabUserEntity = Util.getDeterlabUserEntity();
+        deterlabUserRepository.saveAndFlush(deterlabUserEntity);
+        String expectedDeterUserId = adapterDeterlab.getDeterUserIdByNclUserId(deterlabUserEntity.getNclUserId());
+        Assert.assertThat(deterlabUserEntity.getDeterUserId(), is(expectedDeterUserId));
+    }
+
 }

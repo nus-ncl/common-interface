@@ -87,7 +87,7 @@ public class CredentialsServiceImpl implements CredentialsService {
         if (credentials.getPassword() != null && !credentials.getPassword().isEmpty()) {
             hashPassword(entity, credentials.getPassword());
         }
-        changePassword(credentials.getPassword());
+        changePassword(id, credentials.getPassword());
         final CredentialsEntity savedEntity = credentialsRepository.save(entity);
         logger.info("Credentials updated: {}", savedEntity);
     }
@@ -96,9 +96,9 @@ public class CredentialsServiceImpl implements CredentialsService {
         entity.setPassword(passwordEncoder.encode(password));
     }
 
-    private void changePassword(String password) {
+    private void changePassword(String nclUserId, String password) {
         JSONObject adapterObject = new JSONObject();
-        adapterObject.put("deterUID", "1234567");
+        adapterObject.put("uid", adapterDeterlab.getDeterUserIdByNclUserId(nclUserId));
         adapterObject.put("password1", password);
         adapterObject.put("password2", password);
         logger.info("Credentials to be updated on Deter: {}", adapterObject.toString());
