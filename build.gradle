@@ -118,6 +118,8 @@ dependencies {
     compile subprojects.findAll({ it.name.startsWith('service-') })
     // the runtime dependencies should be a union of all runtime dependencies needed by all subprojects
     runtime 'mysql:mysql-connector-java'
+    runtime 'com.h2database:h2'
+    runtime 'org.postgresql:postgresql'
 
     testCompile 'junit:junit'
 }
