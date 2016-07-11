@@ -156,15 +156,14 @@ public class TeamEntity extends AbstractEntity implements Team {
     public void addMember(final TeamMember member) {
         final String userId = member.getUserId();
         if (members.containsKey(userId)) {
-//            throw new UserAlreadyInTeam();
-        } else {
-            TeamMemberEntity entity = new TeamMemberEntity();
-            entity.setUserId(userId);
-            entity.setTeam(this);
-            entity.setJoinedDate(ZonedDateTime.now());
-            entity.setMemberType(member.getMemberType());
-            members.put(userId, entity);
+            return;
         }
+        TeamMemberEntity entity = new TeamMemberEntity();
+        entity.setUserId(userId);
+        entity.setTeam(this);
+        entity.setJoinedDate(ZonedDateTime.now());
+        entity.setMemberType(member.getMemberType());
+        members.put(userId, entity);
     }
 
     @Override
