@@ -157,6 +157,7 @@ public class RegistrationControllerTest extends AbstractTest {
         // apply to join team but since no teams exists yet
         // create stub team
         Team teamEntity = teamService.addTeam(Util.getTeamEntity());
+        User user = userService.createUser(Util.getUserEntity());
 
         GsonBuilder gsonBuilder = new GsonBuilder();
         gsonBuilder.registerTypeAdapter(ZonedDateTime.class, new DateTimeSerializer());
@@ -167,7 +168,7 @@ public class RegistrationControllerTest extends AbstractTest {
         JSONObject mainJSON = new JSONObject();
         JSONObject teamFields = new JSONObject(teamJSON);
 
-        mainJSON.put("uid", RandomStringUtils.randomAlphanumeric(8));
+        mainJSON.put("uid", user.getId());
         mainJSON.put("team", teamFields);
 
         JSONObject predefinedResultJson = new JSONObject();
