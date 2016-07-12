@@ -6,7 +6,9 @@ import com.google.gson.reflect.TypeToken;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
@@ -19,6 +21,7 @@ import sg.ncl.service.team.data.jpa.TeamRepository;
 import sg.ncl.service.team.domain.Team;
 import sg.ncl.service.team.domain.TeamStatus;
 import sg.ncl.service.team.domain.TeamVisibility;
+import sg.ncl.service.team.exceptions.TeamNotFoundException;
 import sg.ncl.service.team.serializers.DateTimeDeserializer;
 import sg.ncl.service.team.serializers.DateTimeSerializer;
 
@@ -32,12 +35,17 @@ import static org.hamcrest.core.Is.is;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 import static org.springframework.test.web.servlet.setup.MockMvcBuilders.webAppContextSetup;
+import static sg.ncl.service.team.Checks.checkException;
 
 /**
  * Created by Desmond / Te Ye
  */
 @WebAppConfiguration
 public class TeamsControllerTest extends AbstractTest {
+
+    @Rule
+    public final ExpectedException exception = ExpectedException.none();
+
     @Inject
     private TeamRepository teamRepository;
 
@@ -82,9 +90,15 @@ public class TeamsControllerTest extends AbstractTest {
 
     @Test
     public void testGetTeamWithNoUserInDb() throws Exception {
-        mockMvc.perform(get("/teams/" + RandomStringUtils.randomAlphabetic(20)))
-                .andExpect(status().isNotFound())
-                .andExpect(status().reason("Team not found"));
+        try {
+            mockMvc.perform(get("/teams/" + RandomStringUtils.randomAlphabetic(20)))
+                    .andExpect(status().isNotFound())
+                    .andExpect(status().reason("Team not found"));
+        } catch (Exception e) {
+            checkException(e, "");
+            return;
+        }
+        exception.expect(TeamNotFoundException.class);
     }
 
     @Test
@@ -187,9 +201,15 @@ public class TeamsControllerTest extends AbstractTest {
         Gson gson = gsonBuilder.create();
 
         // put
-        mockMvc.perform(put("/teams/" + idString).contentType(MediaType.APPLICATION_JSON).content(gson.toJson(new TeamInfo(teamEntity))))
-                .andExpect(status().isNotFound())
-                .andExpect(status().reason("Team not found"));
+        try {
+            mockMvc.perform(put("/teams/" + idString).contentType(MediaType.APPLICATION_JSON).content(gson.toJson(new TeamInfo(teamEntity))))
+                    .andExpect(status().isNotFound())
+                    .andExpect(status().reason("Team not found"));
+        } catch (Exception e) {
+            checkException(e, idString);
+            return;
+        }
+        exception.expect(TeamNotFoundException.class);
     }
 
     @Test
