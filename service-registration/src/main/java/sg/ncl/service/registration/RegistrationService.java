@@ -21,7 +21,7 @@ import sg.ncl.service.team.data.jpa.TeamMemberEntity;
 import sg.ncl.service.team.domain.Team;
 import sg.ncl.service.team.domain.TeamMemberType;
 import sg.ncl.service.team.domain.TeamService;
-import sg.ncl.service.team.exceptions.TeamNotFoundException;
+import sg.ncl.service.team.exceptions.TeamNameNullException;
 import sg.ncl.service.team.web.TeamMemberInfo;
 import sg.ncl.service.user.domain.User;
 import sg.ncl.service.user.logic.UserService;
@@ -68,10 +68,17 @@ public class RegistrationService {
 
         JSONObject userObject = new JSONObject();
         userObject.put("pid", teamEntity.getName());
-        String resultJSON = adapterDeterlab.joinProject(userObject.toString());
 
-        // TODO add user to team?
-        // TODO add team to user?
+        TeamMemberEntity teamMemberEntity = new TeamMemberEntity();
+        teamMemberEntity.setUserId(uid);
+        teamMemberEntity.setJoinedDate(ZonedDateTime.now());
+        teamMemberEntity.setMemberType(TeamMemberType.MEMBER);
+        TeamMemberInfo teamMemberInfo = new TeamMemberInfo(teamMemberEntity);
+
+        userService.addTeam(uid, teamId);
+        teamService.addTeamMember(teamId, teamMemberInfo);
+
+        String resultJSON = adapterDeterlab.joinProject(userObject.toString());
     }
 
     public void register(CredentialsEntity credentials, User user, Team team, boolean isJoinTeam) {
@@ -95,11 +102,12 @@ public class RegistrationService {
         if (isJoinTeam == false && (team.getName() != null || !team.getName().isEmpty())) {
             Team teamEntity = new TeamEntity();
             try {
+                logger.info("New team name is {}", team.getName());
                 teamEntity = teamService.getTeamByName(team.getName());
-            } catch (TeamNotFoundException e) {
+            } catch (NullPointerException e) {
                 logger.info("This is good, this implies team name is unique");
             }
-            if (teamEntity.getId() != null) {
+            if (teamEntity != null && teamEntity.getId() != null) {
                 if (! teamEntity.getId().isEmpty()) {
                     logger.warn("Team name duplicate entry found");
                     throw new RegisterTeamNameDuplicateException();
