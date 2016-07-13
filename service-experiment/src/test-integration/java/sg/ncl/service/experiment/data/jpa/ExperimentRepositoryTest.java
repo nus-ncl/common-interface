@@ -113,7 +113,20 @@ public class ExperimentRepositoryTest extends AbstractTest {
     }
 
     @Test
-    public void testSaveIdleSwap() throws Exception {
+    public void testSaveNullNsFileContent() throws Exception {
+        final ExperimentEntity entity = Util.getExperimentsEntity();
+        entity.setNsFileContent(null);
+
+        try {
+            repository.saveAndFlush(entity);
+            exception.expect(DataIntegrityViolationException.class);
+        } catch (Exception e) {
+            checkException(e, "NULL not allowed for column \"NS_FILE_CONTENT\"");
+        }
+    }
+
+    @Test
+    public void testSaveNullIdleSwap() throws Exception {
         final ExperimentEntity entity = Util.getExperimentsEntity();
         entity.setIdleSwap(null);
 
@@ -126,7 +139,7 @@ public class ExperimentRepositoryTest extends AbstractTest {
     }
 
     @Test
-    public void testSaveMaxDuration() throws Exception {
+    public void testSaveNullMaxDuration() throws Exception {
         final ExperimentEntity entity = Util.getExperimentsEntity();
         entity.setMaxDuration(null);
 

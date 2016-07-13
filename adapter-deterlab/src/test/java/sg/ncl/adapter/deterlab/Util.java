@@ -60,10 +60,25 @@ public class Util {
         experimentObject.put("teamId", "testbed");
         experimentObject.put("name", RandomStringUtils.randomAlphanumeric(19));
         experimentObject.put("description", RandomStringUtils.randomAlphanumeric(20));
-        experimentObject.put("nsFile", "test.ns");
+        experimentObject.put("nsFile", nsFileString());
         experimentObject.put("idleSwap", "240");
         experimentObject.put("maxDuration", "960");
 
         return experimentObject;
+    }
+
+    private static String nsFileString() {
+        StringBuilder sb = new StringBuilder();
+
+        sb.append("set ns [new Simulator]\n");
+        sb.append("source tb_compat.tcl\n");
+        sb.append("set n0 [$ns node]\n");
+        sb.append("\n");
+        sb.append("$ns rtproto Static\n");
+        sb.append("$ns run\n");
+
+        System.out.println(sb.toString());
+
+        return sb.toString();
     }
 }

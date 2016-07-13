@@ -19,6 +19,11 @@ import sg.ncl.adapter.deterlab.exceptions.UserNotFoundException;
 
 import javax.inject.Inject;
 
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.InputStream;
+
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.not;
 import static org.hamcrest.Matchers.nullValue;
@@ -161,5 +166,4 @@ public class AdapterDeterlabTest extends AbstractTest {
         String expectedDeterUserId = adapterDeterlab.getDeterUserIdByNclUserId(deterlabUserEntity.getNclUserId());
         Assert.assertThat(deterlabUserEntity.getDeterUserId(), is(expectedDeterUserId));
     }
-
 }

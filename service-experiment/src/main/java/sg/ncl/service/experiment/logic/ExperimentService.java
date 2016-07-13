@@ -1,24 +1,15 @@
 package sg.ncl.service.experiment.logic;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
-import org.json.JSONObject;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
-import sg.ncl.adapter.deterlab.AdapterDeterlab;
-import sg.ncl.adapter.deterlab.ConnectionProperties;
-import sg.ncl.adapter.deterlab.data.jpa.DeterlabUserRepository;
 import sg.ncl.service.experiment.data.jpa.ExperimentEntity;
 import sg.ncl.service.experiment.data.jpa.ExperimentRepository;
 import sg.ncl.service.experiment.domain.Experiment;
 import sg.ncl.service.experiment.exceptions.UserIdNotFound;
 
 import javax.inject.Inject;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.OutputStream;
-import java.net.URL;
-import java.net.URLConnection;
+import java.io.*;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -30,31 +21,38 @@ import java.util.List;
 @Service
 public class ExperimentService {
 
+    private static final Logger logger = LoggerFactory.getLogger(ExperimentService.class);
     private final ExperimentRepository experimentRepository;
 
-    @Autowired
-    private final AdapterDeterlab adapterDeterlab;
-
     @Inject
-    protected ExperimentService(final ExperimentRepository experimentRepository, final DeterlabUserRepository deterlabUserRepository, final ConnectionProperties connectionProperties) {
+    protected ExperimentService(final ExperimentRepository experimentRepository) {
         this.experimentRepository = experimentRepository;
-        this.adapterDeterlab = new AdapterDeterlab(deterlabUserRepository, connectionProperties);
     }
 
     public ExperimentEntity save(Experiment experiment) {
+        logger.info("Save experiment");
         String fileName = craftFileName(experiment);
 
         // check experiment name is unique
-        long countByUserId = experimentRepository.countByTeamId(experiment.getName());
-        if (countByUserId > 0) {
-            return new ExperimentEntity();
+        long countName = experimentRepository.countByName(experiment.getName());
+        if (countName > 0) {
+            logger.warn("Experiment name is in use");
+            return null;
         }
 
-        ExperimentEntity experimentEntity = experimentRepository.save(setupEntity(experiment, fileName));
-        String parametersJson = writeJsonString(experimentEntity);
-        adapterDeterlab.createExperiment(parametersJson);
+        createNsFile(fileName, experiment.getNsFileContent());
 
-        return experimentEntity;
+        ExperimentEntity savedExperimentEntity = experimentRepository.save(setupEntity(experiment, fileName));
+        logger.info("Experiment saved");
+
+        String returnResult = this.createExperimentInDeter(savedExperimentEntity);
+        if (returnResult == "done") {
+            return savedExperimentEntity;
+        }
+
+        else {
+            return null;
+        }
     }
 
     private String craftDate() {
@@ -63,7 +61,7 @@ public class ExperimentService {
     }
 
     private String craftFileName(Experiment experiment) {
-        String fileName = experiment.getNsFile();
+        String fileName = experiment.getNsFile() + ".ns";
         return experiment.getUserId() + "_" + experiment.getTeamId() + "_" + craftDate() + "_" + fileName;
     }
 
@@ -75,28 +73,31 @@ public class ExperimentService {
         experimentEntity.setName(experiment.getName());
         experimentEntity.setDescription(experiment.getDescription());
         experimentEntity.setNsFile(fileName);
+        experimentEntity.setNsFileContent(experiment.getNsFileContent());
         experimentEntity.setIdleSwap(experiment.getIdleSwap());
         experimentEntity.setMaxDuration(experiment.getMaxDuration());
         return experimentEntity;
     }
 
-    private String writeJsonString(ExperimentEntity experimentEntity) {
-        String jsonString = "";
-
-        try {
-            ObjectMapper mapper = new ObjectMapper();
-            mapper.registerModule(new JavaTimeModule());
-            jsonString = mapper.writeValueAsString(experimentEntity);
-
-        } catch (Exception e) {
-//            throw e;
-
-        } finally {
-            return jsonString;
-        }
-    }
+//    private String writeJsonString(ExperimentEntity experimentEntity) {
+//        String jsonString = "";
+//
+//        try {
+//            ObjectMapper mapper = new ObjectMapper();
+//            mapper.registerModule(new JavaTimeModule());
+//            jsonString = mapper.writeValueAsString(experimentEntity);
+//
+//        } catch (Exception e) {
+////            throw e;
+//
+//        } finally {
+//            return jsonString;
+//        }
+//    }
 
     public List<ExperimentEntity> get() {
+        logger.info("Get all experiments");
+
         final List<ExperimentEntity> result = new ArrayList<>();
         for (ExperimentEntity experimentEntity : experimentRepository.findAll()) {
             result.add(experimentEntity);
@@ -105,6 +106,7 @@ public class ExperimentService {
     }
 
     public List<ExperimentEntity> findByUser(String userId) {
+        logger.info("Find user by user id");
         if (userId == null || userId.isEmpty()) {
             throw new UserIdNotFound();
         }
@@ -113,53 +115,84 @@ public class ExperimentService {
         return result;
     }
 
-    public String createExperimentInDeter(ExperimentEntity experimentEntity) {
-        // call python script to apply for new project
-        JSONObject jsonObject = new JSONObject();
-        jsonObject.put("id", experimentEntity.getId());
-        jsonObject.put("userId", experimentEntity.getUserId());
-        jsonObject.put("teamId", experimentEntity.getTeamId());
-        jsonObject.put("name", experimentEntity.getName());
-        jsonObject.put("description", experimentEntity.getDescription());
-        jsonObject.put("nsFile", experimentEntity.getNsFile());
-        jsonObject.put("idleSwap", experimentEntity.getIdleSwap());
-        jsonObject.put("maxDuration", experimentEntity.getMaxDuration());
+    public String createNsFile(String filename, String contents) {
+        logger.info("Create NS file");
 
-        String resultJson = adapterDeterlab.createExperiment(jsonObject.toString());
-
-        return resultJson;
-    }
-
-    private void uploadNsFile(String fileName) {
-        String ftpUrl = "ftp://%s:%s@%s/%s;type=i";
-        String host = "173.18.178.11";
-        String user = "ncl";
-        String pass = "deterinavm";
-        String filePath = "/nsfile/" + fileName;
-        String uploadPath = "/nsfile/ + fileName";
-
-        ftpUrl = String.format(ftpUrl, user, pass, host, uploadPath);
-        System.out.println("Upload URL: " + ftpUrl);
+        File file;
+        FileOutputStream fileOutputStream = null;
 
         try {
-            URL url = new URL(ftpUrl);
-            URLConnection conn = url.openConnection();
-            OutputStream outputStream = conn.getOutputStream();
-            FileInputStream inputStream = new FileInputStream(filePath);
+            file = new File(filename);
+            fileOutputStream = new FileOutputStream(file);
 
-            byte[] buffer = new byte[4096];
-            int bytesRead = -1;
-            while ((bytesRead = inputStream.read(buffer)) != -1) {
-                outputStream.write(buffer, 0, bytesRead);
+            // if file doesn't exist, create it
+            if (!file.exists()) {
+                file.createNewFile();
             }
 
-            inputStream.close();
-            outputStream.close();
+            // get contents in bytes
+            byte[] contentInBytes = contents.getBytes();
 
-            System.out.println("File uploaded");
-
-        } catch (IOException ex) {
-            ex.printStackTrace();
+            fileOutputStream.write(contentInBytes);
+            fileOutputStream.flush();
+            fileOutputStream.close();
         }
+
+        catch (IOException e) {
+            logger.error("File cannot be created.\n" + e.getMessage());
+            filename = "error";
+        }
+
+        finally {
+            try {
+                if (fileOutputStream != null) {
+                    fileOutputStream.close();
+                }
+            }
+
+            catch (IOException e) {
+                logger.error("File cannot be created.\n" + e.getMessage());
+                filename = "error";
+            }
+        }
+
+        return filename;
+    }
+
+    public String createExperimentInDeter(ExperimentEntity experimentEntity) {
+        logger.info("Create experiment in deter");
+
+        String login = experimentEntity.getUserId();
+        String maxDuration = experimentEntity.getMaxDuration().toString();
+        String idleSwap = experimentEntity.getIdleSwap().toString();
+        String description = experimentEntity.getDescription();
+        String project = experimentEntity.getTeamId();
+        String name = experimentEntity.getName();
+        String fileName = experimentEntity.getNsFile();
+
+        StringBuilder command = new StringBuilder();
+        command.append("script_wrapper.py");
+        command.append(" --server=172.18.178.10");
+        command.append(" --login=" + login);
+        command.append(" startexp");
+        command.append(" -a " + maxDuration);
+        command.append(" -l " + idleSwap);
+        command.append(" -E " + description);
+        command.append(" -p " + project);
+        command.append(" -e " + name);
+        command.append(" " + fileName);
+
+        try {
+            Process process = Runtime.getRuntime().exec(command.toString());
+            process.waitFor();
+        }
+
+        catch (Exception e) {
+            logger.error("Experiment can't be created in deter.\n" + e.getMessage());
+            return "error";
+        }
+
+        logger.info("Experiment created in deter");
+        return "done";
     }
 }

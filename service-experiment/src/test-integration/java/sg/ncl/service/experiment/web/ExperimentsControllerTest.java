@@ -25,6 +25,8 @@ import sg.ncl.service.experiment.data.jpa.ExperimentRepository;
 
 import javax.inject.Inject;
 
+import java.io.File;
+import java.nio.file.Files;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -89,10 +91,10 @@ public class ExperimentsControllerTest extends AbstractTest {
                 .andExpect(method(HttpMethod.POST))
                 .andRespond(withSuccess(predefinedResultJson.toString(), MediaType.APPLICATION_JSON));
 
-        ExperimentEntity experimentsEntity = Util.getExperimentsEntity();
+        ExperimentEntity experimentEntity = Util.getExperimentsEntity();
         ObjectMapper mapper = new ObjectMapper();
         mapper.registerModule(new JavaTimeModule());
-        String jsonString = mapper.writeValueAsString(experimentsEntity);
+        String jsonString = mapper.writeValueAsString(experimentEntity);
 
         mockMvc.perform(post("/experiments").contentType(contentType).content(jsonString))
                 .andExpect(status().isCreated());
@@ -101,17 +103,23 @@ public class ExperimentsControllerTest extends AbstractTest {
         ExperimentEntity firstExperimentEntity = experimentEntityList.get(0);
 
         Assert.assertEquals(experimentEntityList.size(), 1);
-        Assert.assertEquals(experimentsEntity.getUserId(), firstExperimentEntity.getUserId());
-        Assert.assertEquals(experimentsEntity.getTeamId(), firstExperimentEntity.getTeamId());
-        Assert.assertEquals(experimentsEntity.getName(), firstExperimentEntity.getName());
-        Assert.assertEquals(experimentsEntity.getDescription(), firstExperimentEntity.getDescription());
-        Assert.assertEquals(experimentsEntity.getIdleSwap(), firstExperimentEntity.getIdleSwap());
-        Assert.assertEquals(experimentsEntity.getMaxDuration(), firstExperimentEntity.getMaxDuration());
+        Assert.assertEquals(experimentEntity.getUserId(), firstExperimentEntity.getUserId());
+        Assert.assertEquals(experimentEntity.getTeamId(), firstExperimentEntity.getTeamId());
+        Assert.assertEquals(experimentEntity.getName(), firstExperimentEntity.getName());
+        Assert.assertEquals(experimentEntity.getDescription(), firstExperimentEntity.getDescription());
+        Assert.assertEquals(experimentEntity.getIdleSwap(), firstExperimentEntity.getIdleSwap());
+        Assert.assertEquals(experimentEntity.getMaxDuration(), firstExperimentEntity.getMaxDuration());
 
         // check new nsFile name
         String craftDate = new SimpleDateFormat("yyyyMMdd").format(new Date());
-        String fileName = experimentsEntity.getUserId() + "_" + experimentsEntity.getTeamId() + "_" + craftDate + "_" + experimentsEntity.getNsFile();
-        Assert.assertEquals(fileName, firstExperimentEntity.getNsFile());
+        String filename = experimentEntity.getUserId() + "_" + experimentEntity.getTeamId() + "_" + craftDate
+                + "_" + experimentEntity.getNsFile() + ".ns";
+
+        Assert.assertEquals(filename, firstExperimentEntity.getNsFile());
+
+        // delete the created ns file
+        File file = new File(filename);
+        Files.deleteIfExists(file.toPath());
     }
 
     @Test

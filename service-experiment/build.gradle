@@ -10,6 +10,7 @@ dependencies {
 
     runtime('mysql:mysql-connector-java')
 
+    testCompile('org.jmockit:jmockit:1.8')
     testCompile('junit:junit')
     testCompile('org.hamcrest:hamcrest-library')
     testCompile('org.apache.commons:commons-lang3:3.4')
