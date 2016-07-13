@@ -4,8 +4,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 import sg.ncl.service.experiment.data.jpa.ExperimentEntity;
-import sg.ncl.service.experiment.data.jpa.ExperimentRepository;
-import sg.ncl.service.experiment.domain.Experiment;
 import sg.ncl.service.experiment.logic.ExperimentService;
 
 import javax.inject.Inject;
@@ -48,8 +46,8 @@ public class ExperimentsController {
 
     @RequestMapping(path = "", method = RequestMethod.POST)
     @ResponseStatus(value = HttpStatus.CREATED)
-    public void addExperiment(@RequestBody @Valid ExperimentEntity experimentEntity) {
+    public void addExperiment(@RequestBody @Valid ExperimentInfo experimentInfo) {
 
-        experimentService.save(experimentEntity);
+        experimentService.save(experimentInfo);
     }
 }

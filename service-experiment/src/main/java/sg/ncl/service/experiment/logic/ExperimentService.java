@@ -3,6 +3,8 @@ package sg.ncl.service.experiment.logic;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import org.json.JSONObject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import sg.ncl.adapter.deterlab.AdapterDeterlab;
@@ -12,6 +14,7 @@ import sg.ncl.service.experiment.data.jpa.ExperimentEntity;
 import sg.ncl.service.experiment.data.jpa.ExperimentRepository;
 import sg.ncl.service.experiment.domain.Experiment;
 import sg.ncl.service.experiment.exceptions.UserIdNotFound;
+import sg.ncl.service.experiment.web.ExperimentInfo;
 
 import javax.inject.Inject;
 import java.io.*;
@@ -28,6 +31,7 @@ import java.util.List;
 @Service
 public class ExperimentService {
 
+    private static final Logger logger = LoggerFactory.getLogger(ExperimentService.class);
     private final ExperimentRepository experimentRepository;
 
     @Inject
@@ -35,18 +39,21 @@ public class ExperimentService {
         this.experimentRepository = experimentRepository;
     }
 
-    public ExperimentEntity save(Experiment experiment) {
-        String fileName = craftFileName(experiment);
+    public ExperimentEntity save(ExperimentInfo experimentInfo) {
+        logger.info("Save experiment");
+        String fileName = craftFileName(experimentInfo);
 
         // check experiment name is unique
-        long countByUserId = experimentRepository.countByTeamId(experiment.getName());
-        if (countByUserId > 0) {
-            return new ExperimentEntity();
+        long countName = experimentRepository.countByName(experimentInfo.getName());
+        if (countName > 0) {
+            logger.warn("Experiment name is in use");
+            return null;
         }
 
-        ExperimentEntity experimentEntity = experimentRepository.save(setupEntity(experiment, fileName));
-        String parametersJson = writeJsonString(experimentEntity);
-        JSONObject jsonObject = new JSONObject(parametersJson);
+        createNsFile(fileName, experimentInfo.getNsFileContents());
+
+        ExperimentEntity experimentEntity = experimentRepository.save(setupEntity(experimentInfo, fileName));
+        logger.info("Experiment saved");
 
         String returnResult = this.createExperimentInDeter(experimentEntity);
         if (returnResult == "done") {
@@ -64,7 +71,7 @@ public class ExperimentService {
     }
 
     private String craftFileName(Experiment experiment) {
-        String fileName = experiment.getNsFile();
+        String fileName = experiment.getNsFile() + ".ns";
         return experiment.getUserId() + "_" + experiment.getTeamId() + "_" + craftDate() + "_" + fileName;
     }
 
@@ -81,23 +88,25 @@ public class ExperimentService {
         return experimentEntity;
     }
 
-    private String writeJsonString(ExperimentEntity experimentEntity) {
-        String jsonString = "";
-
-        try {
-            ObjectMapper mapper = new ObjectMapper();
-            mapper.registerModule(new JavaTimeModule());
-            jsonString = mapper.writeValueAsString(experimentEntity);
-
-        } catch (Exception e) {
-//            throw e;
-
-        } finally {
-            return jsonString;
-        }
-    }
+//    private String writeJsonString(ExperimentEntity experimentEntity) {
+//        String jsonString = "";
+//
+//        try {
+//            ObjectMapper mapper = new ObjectMapper();
+//            mapper.registerModule(new JavaTimeModule());
+//            jsonString = mapper.writeValueAsString(experimentEntity);
+//
+//        } catch (Exception e) {
+////            throw e;
+//
+//        } finally {
+//            return jsonString;
+//        }
+//    }
 
     public List<ExperimentEntity> get() {
+        logger.info("Get all experiments");
+
         final List<ExperimentEntity> result = new ArrayList<>();
         for (ExperimentEntity experimentEntity : experimentRepository.findAll()) {
             result.add(experimentEntity);
@@ -106,6 +115,7 @@ public class ExperimentService {
     }
 
     public List<ExperimentEntity> findByUser(String userId) {
+        logger.info("Find user by user id");
         if (userId == null || userId.isEmpty()) {
             throw new UserIdNotFound();
         }
@@ -114,7 +124,52 @@ public class ExperimentService {
         return result;
     }
 
+    public String createNsFile(String filename, String contents) {
+        logger.info("Create NS file");
+
+        File file;
+        FileOutputStream fileOutputStream = null;
+
+        try {
+            file = new File(filename);
+            fileOutputStream = new FileOutputStream(file);
+
+            // if file doesn't exist, create it
+            if (!file.exists()) {
+                file.createNewFile();
+            }
+
+            // get contents in bytes
+            byte[] contentInBytes = contents.getBytes();
+
+            fileOutputStream.write(contentInBytes);
+            fileOutputStream.flush();
+            fileOutputStream.close();
+        }
+
+        catch (IOException e) {
+            logger.error("File cannot be created.\n" + e.getMessage());
+            filename = "error";
+        }
+
+        finally {
+            try {
+                if (fileOutputStream != null) {
+                    fileOutputStream.close();
+                }
+            }
+
+            catch (IOException e) {
+                logger.error("File cannot be created.\n" + e.getMessage());
+                filename = "error";
+            }
+        }
+
+        return filename;
+    }
+
     public String createExperimentInDeter(ExperimentEntity experimentEntity) {
+        logger.info("Create experiment in deter");
 
         String login = experimentEntity.getUserId();
         String maxDuration = experimentEntity.getMaxDuration().toString();
@@ -142,9 +197,11 @@ public class ExperimentService {
         }
 
         catch (Exception e) {
+            logger.error("Experiment can't be created in deter.\n" + e.getMessage());
             return "error";
         }
 
+        logger.info("Experiment created in deter");
         return "done";
     }
 }

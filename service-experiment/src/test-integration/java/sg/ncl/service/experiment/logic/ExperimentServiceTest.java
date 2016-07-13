@@ -8,13 +8,17 @@ import sg.ncl.service.experiment.AbstractTest;
 import sg.ncl.service.experiment.Util;
 import sg.ncl.service.experiment.data.jpa.ExperimentEntity;
 import sg.ncl.service.experiment.data.jpa.ExperimentRepository;
+import sg.ncl.service.experiment.web.ExperimentInfo;
 
 import javax.inject.Inject;
-import java.io.PrintWriter;
+import java.io.File;
+import java.nio.file.Files;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+
+import static sg.ncl.service.experiment.Util.createNsFileContents;
 
 /**
  * Created by Desmond.
@@ -30,7 +34,7 @@ public class ExperimentServiceTest extends AbstractTest {
     @Test
     public void testSaveExperiment() throws Exception {
 
-        ExperimentEntity createdExperiment = Util.getExperimentsEntity();
+        ExperimentInfo createdExperimentInfo = Util.getExperimentsInfo();
 
         ExperimentService localExperimentService = new ExperimentService(experimentRepository) {
             @Override
@@ -39,20 +43,24 @@ public class ExperimentServiceTest extends AbstractTest {
             }
         };
 
-        ExperimentEntity savedExperiment = localExperimentService.save(createdExperiment);
+        ExperimentEntity savedExperiment = localExperimentService.save(createdExperimentInfo);
 
         Assert.assertNotNull(savedExperiment);
-        Assert.assertEquals(createdExperiment.getUserId(), savedExperiment.getUserId());
-        Assert.assertEquals(createdExperiment.getTeamId(), savedExperiment.getTeamId());
-        Assert.assertEquals(createdExperiment.getName(), savedExperiment.getName());
-        Assert.assertEquals(createdExperiment.getDescription(), savedExperiment.getDescription());
-        Assert.assertEquals(createdExperiment.getIdleSwap(), savedExperiment.getIdleSwap());
-        Assert.assertEquals(createdExperiment.getMaxDuration(), savedExperiment.getMaxDuration());
+        Assert.assertEquals(createdExperimentInfo.getUserId(), savedExperiment.getUserId());
+        Assert.assertEquals(createdExperimentInfo.getTeamId(), savedExperiment.getTeamId());
+        Assert.assertEquals(createdExperimentInfo.getName(), savedExperiment.getName());
+        Assert.assertEquals(createdExperimentInfo.getDescription(), savedExperiment.getDescription());
+        Assert.assertEquals(createdExperimentInfo.getIdleSwap(), savedExperiment.getIdleSwap());
+        Assert.assertEquals(createdExperimentInfo.getMaxDuration(), savedExperiment.getMaxDuration());
 
         // check new nsFile name
         String craftDate = new SimpleDateFormat("yyyyMMdd").format(new Date());
-        String fileName = createdExperiment.getUserId() + "_" + createdExperiment.getTeamId() + "_" + craftDate + "_" + createdExperiment.getNsFile();
+        String fileName = createdExperimentInfo.getUserId() + "_" + createdExperimentInfo.getTeamId() + "_" + craftDate + "_" + createdExperimentInfo.getNsFile() + ".ns";
         Assert.assertEquals(fileName, savedExperiment.getNsFile());
+
+        // delete the created ns file
+        File file = new File(fileName);
+        Files.deleteIfExists(file.toPath());
     }
 
     @Test
@@ -110,7 +118,7 @@ public class ExperimentServiceTest extends AbstractTest {
         ExperimentEntity experimentEntity = Util.getExperimentsEntity();
         experimentEntity.setNsFile("nsfile.ns");
 
-        createNsFile();
+        createNsFileContents();
 
         ExperimentService experimentService = new ExperimentService(experimentRepository);
         new Expectations(ExperimentService.class) {{
@@ -121,30 +129,5 @@ public class ExperimentServiceTest extends AbstractTest {
         System.out.println(response);
     }
 
-    private void createNsFile() {
-        StringBuilder sb = new StringBuilder();
-        sb.append("set ns [new Simulator]\n");
-        sb.append("source tb_compat.tcl\n");
-        sb.append("set n0 [$ns node]\n");
-        sb.append("\n");
-        sb.append("$ns rtproto Static\n");
-        sb.append("$ns run\n");
 
-        PrintWriter printWriter = null;
-        try {
-            printWriter = new PrintWriter("nsfile.ns");
-            printWriter.print(sb.toString());
-        }
-        catch (Exception e) {
-
-        }
-        finally {
-            try {
-//                printWriter.flush();
-                printWriter.close();
-            }
-
-            catch (Exception e) {}
-        }
-    }
 }
