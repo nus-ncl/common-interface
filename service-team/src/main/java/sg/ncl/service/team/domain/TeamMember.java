@@ -38,4 +38,11 @@ public interface TeamMember {
      */
     TeamMemberType getMemberType();
 
+    /**
+     * Returns the associated team member status.
+     *
+     * @return the associated team member status.
+     */
+    TeamMemberStatus getMemberStatus();
+
 }
