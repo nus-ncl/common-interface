@@ -1,5 +1,6 @@
 package sg.ncl.service.team.domain;
 
+
 import java.time.ZonedDateTime;
 
 /**
@@ -8,6 +9,13 @@ import java.time.ZonedDateTime;
  * @author Christopher Zhong
  */
 public interface TeamMember {
+
+    /**
+     * Returns a {@link String} that represents the unique identifier of this {@link Team}.
+     *
+     * @return a {@link String} that represents the unique identifier of this {@link Team}.
+     */
+    Long getId();
 
     /**
      * Returns the associated user ID.
@@ -28,6 +36,6 @@ public interface TeamMember {
      *
      * @return the associated team membership.
      */
-    TeamMemberType getTeamMemberType();
+    TeamMemberType getMemberType();
 
 }

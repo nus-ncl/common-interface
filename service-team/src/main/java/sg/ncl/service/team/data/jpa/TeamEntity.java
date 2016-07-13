@@ -1,21 +1,10 @@
-package sg.ncl.service.team.data.jpa.entities;
+package sg.ncl.service.team.data.jpa;
 
 import org.hibernate.annotations.GenericGenerator;
 import sg.ncl.common.jpa.AbstractEntity;
 import sg.ncl.service.team.domain.*;
-import sg.ncl.service.team.dtos.TeamMemberInfo;
 
-import javax.persistence.CascadeType;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.persistence.ManyToMany;
-import javax.persistence.MapKey;
-import javax.persistence.Table;
-import java.lang.reflect.Member;
+import javax.persistence.*;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -164,24 +153,27 @@ public class TeamEntity extends AbstractEntity implements Team {
         return new ArrayList<>(members.values());
     }
 
-    public void addMember(final TeamMemberInfo teamMemberInfo) {
-        String userId = teamMemberInfo.getUserId();
+    public void addMember(final TeamMember member) {
+        final String userId = member.getUserId();
         if (members.containsKey(userId)) {
-//            throw new UserAlreadyInTeam();
-        } else {
-            TeamMemberEntity teamMemberEntity = new TeamMemberEntity();
-            teamMemberEntity.setUserId(userId);
-            teamMemberEntity.setTeam(this);
-            teamMemberEntity.setJoinedDate(ZonedDateTime.now());
-            teamMemberEntity.setTeamMemberType(teamMemberInfo.getTeamMemberType());
-            members.put(userId, teamMemberEntity);
+            return;
         }
+        TeamMemberEntity entity = new TeamMemberEntity();
+        entity.setUserId(userId);
+        entity.setTeam(this);
+        entity.setJoinedDate(ZonedDateTime.now());
+        entity.setMemberType(member.getMemberType());
+        members.put(userId, entity);
     }
 
     @Override
     public boolean equals(final Object o) {
-        if (this == o) { return true; }
-        if (o == null || getClass() != o.getClass()) { return false; }
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
 
         final Team that = (Team) o;
 
@@ -195,17 +187,18 @@ public class TeamEntity extends AbstractEntity implements Team {
 
     @Override
     public String toString() {
-        final StringBuilder sb = new StringBuilder("TeamEntity{");
-        sb.append("id='").append(id).append('\'');
-        sb.append(", name='").append(name).append('\'');
-        sb.append(", description='").append(description).append('\'');
-        sb.append(", visibility=").append(visibility);
-        sb.append(", status=").append(status);
-        sb.append(", applicationDate=").append(applicationDate);
-        sb.append(", processedDate=").append(processedDate);
-        sb.append(", members=").append(members);
-        sb.append(", super=").append(super.toString());
-        sb.append('}');
-        return sb.toString();
+        return "TeamEntity{" +
+                "id='" + id + '\'' +
+                ", name='" + name + '\'' +
+                ", description='" + description + '\'' +
+                ", website='" + website + '\'' +
+                ", organisationType='" + organisationType + '\'' +
+                ", visibility=" + visibility +
+                ", privacy=" + privacy +
+                ", status=" + status +
+                ", applicationDate=" + applicationDate +
+                ", processedDate=" + processedDate +
+                ", members=" + members +
+                "} " + super.toString();
     }
 }

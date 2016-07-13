@@ -18,3 +18,7 @@ ncl:
     api-key: 123
     signing-algorithm: HS256
     expiry-duration: PT1H
+  deterlab:
+    adapter:
+      ip: localhost
+      port: 8181

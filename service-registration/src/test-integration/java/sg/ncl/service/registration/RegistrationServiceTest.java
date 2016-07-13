@@ -13,9 +13,12 @@ import org.springframework.web.client.RestTemplate;
 import sg.ncl.adapter.deterlab.ConnectionProperties;
 import sg.ncl.service.authentication.data.jpa.CredentialsEntity;
 import sg.ncl.service.registration.exceptions.RegisterTeamNameDuplicateException;
+import sg.ncl.service.registration.exceptions.RegisterTeamNameEmptyException;
+import sg.ncl.service.registration.exceptions.RegisterUidNullException;
 import sg.ncl.service.registration.exceptions.UserFormException;
-import sg.ncl.service.team.TeamService;
-import sg.ncl.service.team.data.jpa.entities.TeamEntity;
+import sg.ncl.service.team.data.jpa.TeamEntity;
+import sg.ncl.service.team.domain.Team;
+import sg.ncl.service.team.domain.TeamService;
 import sg.ncl.service.user.domain.User;
 import sg.ncl.service.user.logic.UserService;
 
@@ -61,18 +64,18 @@ public class RegistrationServiceTest extends AbstractTest {
 
         // apply to join team but since no teams exists yet
         // create stub team
-        TeamEntity teamEntity = teamService.save(Util.getTeamEntity());
+        Team team = teamService.addTeam(Util.getTeamEntity());
 
         String stubUid = RandomStringUtils.randomAlphanumeric(8);
         JSONObject predefinedResultJson = new JSONObject();
         predefinedResultJson.put("msg", "user is created");
         predefinedResultJson.put("uid", stubUid);
 
-        mockServer.expect(requestTo(properties.getAddUsersUri()))
+        mockServer.expect(requestTo(properties.getJoinProjectNewUsers()))
                 .andExpect(method(HttpMethod.POST))
                 .andRespond(withSuccess(predefinedResultJson.toString(), MediaType.APPLICATION_JSON));
 
-        registrationService.register(credentialsEntity, user, teamEntity, isJoinTeam);
+        registrationService.register(credentialsEntity, user, team, isJoinTeam);
     }
 
     @Test
@@ -103,8 +106,8 @@ public class RegistrationServiceTest extends AbstractTest {
         isJoinTeam = false;
 
         TeamEntity teamEntity = Util.getTeamEntity();
-//        String teamName = teamEntity.getName();
-        teamService.save(teamEntity);
+        String teamName = teamEntity.getName();
+        teamService.addTeam(teamEntity);
 
         // purposely register for an already saved team
         // don't have to mock server since will throw exception
@@ -118,10 +121,10 @@ public class RegistrationServiceTest extends AbstractTest {
 
         // apply to join team but since no teams exists yet
         // create stub team
-        TeamEntity teamEntity = teamService.save(Util.getTeamEntity());
+        Team team = teamService.addTeam(Util.getTeamEntity());
 
         // don't have to mock server since will throw exception
-        registrationService.register(credentialsEntity, user, teamEntity, isJoinTeam);
+        registrationService.register(credentialsEntity, user, team, isJoinTeam);
     }
 
     @Test(expected = UserFormException.class)
@@ -131,10 +134,10 @@ public class RegistrationServiceTest extends AbstractTest {
 
         // apply to join team but since no teams exists yet
         // create stub team
-        TeamEntity teamEntity = teamService.save(Util.getTeamEntity());
+        Team team = teamService.addTeam(Util.getTeamEntity());
 
         // don't have to mock server since will throw exception
-        registrationService.register(credentialsEntity, user, teamEntity, isJoinTeam);
+        registrationService.register(credentialsEntity, user, team, isJoinTeam);
     }
 
     @Test(expected = UserFormException.class)
@@ -146,6 +149,23 @@ public class RegistrationServiceTest extends AbstractTest {
 
         // don't have to mock server since will throw exception
         registrationService.register(credentialsEntity, user, teamEntity, isJoinTeam);
+    }
+
+    @Test(expected = RegisterTeamNameEmptyException.class)
+    public void registerJoinTeamOldUserEmptyTeam() throws Exception {
+        String uid = RandomStringUtils.randomAlphabetic(8);
+        TeamEntity teamEntity = Util.getTeamEntity();
+        teamEntity.setName(null);
+        // don't have to mock server since will throw exception
+        registrationService.registerRequestToJoinTeam(uid, teamEntity);
+    }
+
+    @Test(expected = RegisterUidNullException.class)
+    public void registerJoinTeamOldUserEmptyUser() throws Exception {
+        String uid = null;
+        TeamEntity teamEntity = Util.getTeamEntity();
+        // don't have to mock server since will throw exception
+        registrationService.registerRequestToJoinTeam(uid, teamEntity);
     }
 
 }

@@ -4,7 +4,7 @@ buildscript {
     }
 
     dependencies {
-        classpath("org.springframework.boot:spring-boot-gradle-plugin:1.3.5.RELEASE")
+        classpath("org.springframework.boot:spring-boot-gradle-plugin:1.3.6.RELEASE")
     }
 }
 // settings for all projects
@@ -34,7 +34,7 @@ allprojects {
         }
 
         imports {
-            mavenBom 'io.spring.platform:platform-bom:2.0.5.RELEASE'
+            mavenBom 'io.spring.platform:platform-bom:2.0.6.RELEASE'
         }
     }
 
@@ -87,6 +87,7 @@ allprojects {
 
     tasks.withType(Test) {
         group 'verification'
+        ignoreFailures true
         reports {
             html {
                 destination file("${reporting.baseDir}/${task.name}/html")
@@ -118,17 +119,27 @@ dependencies {
     compile subprojects.findAll({ it.name.startsWith('service-') })
     // the runtime dependencies should be a union of all runtime dependencies needed by all subprojects
     runtime 'mysql:mysql-connector-java'
+    runtime 'com.h2database:h2'
+    runtime 'org.postgresql:postgresql'
 
     testCompile 'junit:junit'
 }
 
+task copyJunitXml(type: Copy) {
+    from(subprojects.test.reports.junitXml.destination) {
+        include '*.xml'
+    }
+    into test.reports.junitXml.destination
+}
+
 testReport {
-    dependsOn check, subprojects.testReport
-    reportOn test, integrationTest, subprojects.test, subprojects.integrationTest
+    dependsOn allprojects.check
+    reportOn allprojects.test, allprojects.integrationTest
+    finalizedBy copyJunitXml
 }
 
 jacocoTestReport {
-    dependsOn check, subprojects.jacocoTestReport
+    dependsOn allprojects.check
     executionData = fileTree(project.rootDir.absolutePath).include('**/build/jacoco/*.exec')
     sourceDirectories = files(sourceSets.main.java.srcDirs, subprojects.sourceSets.main.java.srcDirs)
     classDirectories = files(sourceSets.main.output.classesDir, subprojects.sourceSets.main.output.classesDir)

@@ -17,21 +17,20 @@ import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.web.client.RestOperations;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.context.WebApplicationContext;
+import sg.ncl.adapter.deterlab.ConnectionProperties;
 import sg.ncl.service.authentication.data.jpa.CredentialsEntity;
 import sg.ncl.service.registration.AbstractTest;
 import sg.ncl.service.registration.Util;
-import sg.ncl.service.team.TeamService;
-import sg.ncl.service.team.data.jpa.entities.TeamEntity;
+import sg.ncl.service.registration.serializers.DateTimeDeserializer;
+import sg.ncl.service.registration.serializers.DateTimeSerializer;
+import sg.ncl.service.team.data.jpa.TeamEntity;
 import sg.ncl.service.team.domain.Team;
-import sg.ncl.service.team.serializers.DateTimeDeserializer;
-import sg.ncl.service.team.serializers.DateTimeSerializer;
+import sg.ncl.service.team.domain.TeamService;
 import sg.ncl.service.user.data.jpa.UserEntity;
-import sg.ncl.adapter.deterlab.ConnectionProperties;
 import sg.ncl.service.user.domain.User;
 import sg.ncl.service.user.logic.UserService;
 
 import javax.inject.Inject;
-
 import java.time.ZonedDateTime;
 
 import static org.hamcrest.core.Is.is;
@@ -81,7 +80,7 @@ public class RegistrationControllerTest extends AbstractTest {
 
         // apply to join team but since no teams exists yet
         // create stub team
-        TeamEntity teamEntity = teamService.save(Util.getTeamEntity());
+        Team team = teamService.addTeam(Util.getTeamEntity());
 
         GsonBuilder gsonBuilder = new GsonBuilder();
         gsonBuilder.registerTypeAdapter(ZonedDateTime.class, new DateTimeSerializer());
@@ -89,7 +88,7 @@ public class RegistrationControllerTest extends AbstractTest {
         Gson gson = gsonBuilder.create();
         String credentialsJSON = gson.toJson(credentialsEntity);
         String userJSON = gson.toJson(userEntity);
-        String teamJSON = gson.toJson(teamEntity);
+        String teamJSON = gson.toJson(team);
 
         JSONObject mainJSON = new JSONObject();
         JSONObject credentialsFields = new JSONObject(credentialsJSON);
@@ -106,7 +105,7 @@ public class RegistrationControllerTest extends AbstractTest {
         predefinedResultJson.put("msg", "user is created");
         predefinedResultJson.put("uid", stubUid);
 
-        mockServer.expect(requestTo(properties.getAddUsersUri()))
+        mockServer.expect(requestTo(properties.getJoinProjectNewUsers()))
                 .andExpect(method(HttpMethod.POST))
                 .andRespond(withSuccess(predefinedResultJson.toString(), MediaType.APPLICATION_JSON));
 
@@ -153,10 +152,41 @@ public class RegistrationControllerTest extends AbstractTest {
     }
 
     @Test
-    public void addTeamUserControllerTest() throws Exception {
-        // UserController addUserToTeam test can only be tested here because it requires an existing team in the database
+    public void registerOldUserJoinTeamTest() throws Exception {
+
+        // apply to join team but since no teams exists yet
+        // create stub team
+        Team teamEntity = teamService.addTeam(Util.getTeamEntity());
         User user = userService.createUser(Util.getUserEntity());
-        Team team = teamService.save(Util.getTeamEntity());
+
+        GsonBuilder gsonBuilder = new GsonBuilder();
+        gsonBuilder.registerTypeAdapter(ZonedDateTime.class, new DateTimeSerializer());
+        gsonBuilder.registerTypeAdapter(ZonedDateTime.class, new DateTimeDeserializer());
+        Gson gson = gsonBuilder.create();
+        String teamJSON = gson.toJson(teamEntity);
+
+        JSONObject mainJSON = new JSONObject();
+        JSONObject teamFields = new JSONObject(teamJSON);
+
+        mainJSON.put("uid", user.getId());
+        mainJSON.put("team", teamFields);
+
+        JSONObject predefinedResultJson = new JSONObject();
+        predefinedResultJson.put("msg", "user has logged in and joined a project");
+
+        mockServer.expect(requestTo(properties.getJoinProject()))
+                .andExpect(method(HttpMethod.POST))
+                .andRespond(withSuccess(predefinedResultJson.toString(), MediaType.APPLICATION_JSON));
+
+        mockMvc.perform(post("/registrations/joinApplications").contentType(MediaType.APPLICATION_JSON).content(mainJSON.toString()))
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    public void addTeamUserControllerTest() throws Exception {
+        // UserController addTeamMember test can only be tested here because it requires an existing team in the database
+        User user = userService.createUser(Util.getUserEntity());
+        Team team = teamService.addTeam(Util.getTeamEntity());
 
         // craft the RequestBody to add user to team
         JSONObject userObject = new JSONObject();

@@ -1,6 +1,6 @@
 package sg.ncl.service.registration.dtos;
 
-import sg.ncl.service.team.data.jpa.entities.TeamEntity;
+import sg.ncl.service.team.data.jpa.TeamEntity;
 
 /**
  * Created by Te Ye on 17-Jun-16.

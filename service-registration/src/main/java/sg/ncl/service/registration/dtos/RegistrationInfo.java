@@ -1,7 +1,7 @@
 package sg.ncl.service.registration.dtos;
 
 import sg.ncl.service.authentication.data.jpa.CredentialsEntity;
-import sg.ncl.service.team.data.jpa.entities.TeamEntity;
+import sg.ncl.service.team.data.jpa.TeamEntity;
 import sg.ncl.service.user.data.jpa.UserEntity;
 
 /**
@@ -15,6 +15,9 @@ public class RegistrationInfo {
     private UserEntity user;
     private TeamEntity team;
     private boolean isJoinTeam;
+
+    // for joining and apply teams after logged on
+    private String uid;
 
     public CredentialsEntity getCredentials() {
         return credentials;
@@ -46,5 +49,13 @@ public class RegistrationInfo {
 
     public void setJoinTeam(boolean joinTeam) {
         isJoinTeam = joinTeam;
+    }
+
+    public String getUid() {
+        return uid;
+    }
+
+    public void setUid(String uid) {
+        this.uid = uid;
     }
 }
