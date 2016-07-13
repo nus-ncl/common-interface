@@ -54,28 +54,31 @@ public class RegistrationService {
         this.adapterDeterlab = new AdapterDeterlab(deterlabUserRepository, connectionProperties);
     }
 
-    public void registerRequestToJoinTeam(String uid, Team team) {
+    public void registerRequestToJoinTeam(String nclUserId, Team team) {
         if (team.getName() == null || team.getName().isEmpty()) {
+            logger.warn("Team name is not found");
             throw new RegisterTeamNameEmptyException();
         }
 
-        if (uid == null || uid.isEmpty()) {
+        if (nclUserId == null || nclUserId.isEmpty()) {
+            logger.warn("Uid is empty or null");
             throw new RegisterUidNullException();
         }
 
-        Team teamEntity = teamService.getTeamById(team.getId());
-        String teamId = team.getId();
+        Team teamEntity = teamService.getTeamByName(team.getName());
+        String teamId = teamEntity.getId();
 
         JSONObject userObject = new JSONObject();
+        userObject.put("uid", adapterDeterlab.getDeterUserIdByNclUserId(nclUserId));
         userObject.put("pid", teamEntity.getName());
 
         TeamMemberEntity teamMemberEntity = new TeamMemberEntity();
-        teamMemberEntity.setUserId(uid);
+        teamMemberEntity.setUserId(nclUserId);
         teamMemberEntity.setJoinedDate(ZonedDateTime.now());
         teamMemberEntity.setMemberType(TeamMemberType.MEMBER);
         TeamMemberInfo teamMemberInfo = new TeamMemberInfo(teamMemberEntity);
 
-        userService.addTeam(uid, teamId);
+        userService.addTeam(nclUserId, teamId);
         teamService.addTeamMember(teamId, teamMemberInfo);
 
         String resultJSON = adapterDeterlab.joinProject(userObject.toString());

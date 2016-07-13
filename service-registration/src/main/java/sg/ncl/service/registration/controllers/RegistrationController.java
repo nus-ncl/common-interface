@@ -37,6 +37,6 @@ public class RegistrationController {
     @RequestMapping(path = "/joinApplications", method = RequestMethod.POST)
     @ResponseStatus(HttpStatus.OK)
     public void registerRequestToJoinTeam(@RequestBody RegistrationInfo registrationInfo) {
-        registrationService.registerRequestToJoinTeam(registrationInfo.getUid(), registrationInfo.getTeam());
+        registrationService.registerRequestToJoinTeam(registrationInfo.getUser().getId(), registrationInfo.getTeam());
     }
 }
