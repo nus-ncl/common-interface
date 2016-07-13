@@ -1,33 +1,20 @@
 package sg.ncl.service.experiment.logic;
 
+import mockit.Expectations;
 import org.apache.commons.lang3.RandomStringUtils;
-import org.json.JSONObject;
 import org.junit.Assert;
-import org.junit.Before;
 import org.junit.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpMethod;
-import org.springframework.http.MediaType;
-import org.springframework.test.web.client.MockRestServiceServer;
-import org.springframework.web.client.RestOperations;
-import org.springframework.web.client.RestTemplate;
-import sg.ncl.adapter.deterlab.ConnectionProperties;
-import sg.ncl.adapter.deterlab.data.jpa.DeterlabUserRepository;
 import sg.ncl.service.experiment.AbstractTest;
 import sg.ncl.service.experiment.Util;
 import sg.ncl.service.experiment.data.jpa.ExperimentEntity;
 import sg.ncl.service.experiment.data.jpa.ExperimentRepository;
-import sg.ncl.service.experiment.domain.Experiment;
 
 import javax.inject.Inject;
+import java.io.PrintWriter;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-
-import static org.springframework.test.web.client.match.MockRestRequestMatchers.method;
-import static org.springframework.test.web.client.match.MockRestRequestMatchers.requestTo;
-import static org.springframework.test.web.client.response.MockRestResponseCreators.withSuccess;
 
 /**
  * Created by Desmond.
@@ -40,33 +27,21 @@ public class ExperimentServiceTest extends AbstractTest {
     @Inject
     private ExperimentService experimentService;
 
-    @Inject
-    private ConnectionProperties properties;
-
-    @Inject
-    private RestOperations restOperations;
-
-    private MockRestServiceServer mockServer;
-
-    @Before
-    public void setUp() throws Exception {
-        mockServer = MockRestServiceServer.createServer((RestTemplate) restOperations);
-    }
-
     @Test
     public void testSaveExperiment() throws Exception {
-        // craft the adapter-deter service reply
-        JSONObject predefinedResultJson = new JSONObject();
-        predefinedResultJson.put("msg", "experiment is created");
-
-        // mock the adapter-deter service
-        mockServer.expect(requestTo(properties.getCreateExperimentUri()))
-                .andExpect(method(HttpMethod.POST))
-                .andRespond(withSuccess(predefinedResultJson.toString(), MediaType.APPLICATION_JSON));
 
         ExperimentEntity createdExperiment = Util.getExperimentsEntity();
-        ExperimentEntity savedExperiment = experimentService.save(createdExperiment);
 
+        ExperimentService localExperimentService = new ExperimentService(experimentRepository) {
+            @Override
+            public String createExperimentInDeter(ExperimentEntity experimentEntity) {
+                return "done";
+            }
+        };
+
+        ExperimentEntity savedExperiment = localExperimentService.save(createdExperiment);
+
+        Assert.assertNotNull(savedExperiment);
         Assert.assertEquals(createdExperiment.getUserId(), savedExperiment.getUserId());
         Assert.assertEquals(createdExperiment.getTeamId(), savedExperiment.getTeamId());
         Assert.assertEquals(createdExperiment.getName(), savedExperiment.getName());
@@ -128,5 +103,48 @@ public class ExperimentServiceTest extends AbstractTest {
 
         List<ExperimentEntity> list = experimentService.findByUser(userId);
         Assert.assertEquals(list.size(), 0);
+    }
+
+    @Test
+    public void testCreateExperimentInDeter() throws Exception {
+        ExperimentEntity experimentEntity = Util.getExperimentsEntity();
+        experimentEntity.setNsFile("nsfile.ns");
+
+        createNsFile();
+
+        ExperimentService experimentService = new ExperimentService(experimentRepository);
+        new Expectations(ExperimentService.class) {{
+            experimentService.createExperimentInDeter(experimentEntity); result = "done";
+        }};
+
+        String response = experimentService.createExperimentInDeter(experimentEntity);
+        System.out.println(response);
+    }
+
+    private void createNsFile() {
+        StringBuilder sb = new StringBuilder();
+        sb.append("set ns [new Simulator]\n");
+        sb.append("source tb_compat.tcl\n");
+        sb.append("set n0 [$ns node]\n");
+        sb.append("\n");
+        sb.append("$ns rtproto Static\n");
+        sb.append("$ns run\n");
+
+        PrintWriter printWriter = null;
+        try {
+            printWriter = new PrintWriter("nsfile.ns");
+            printWriter.print(sb.toString());
+        }
+        catch (Exception e) {
+
+        }
+        finally {
+            try {
+//                printWriter.flush();
+                printWriter.close();
+            }
+
+            catch (Exception e) {}
+        }
     }
 }

@@ -14,9 +14,7 @@ import sg.ncl.service.experiment.domain.Experiment;
 import sg.ncl.service.experiment.exceptions.UserIdNotFound;
 
 import javax.inject.Inject;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.OutputStream;
+import java.io.*;
 import java.net.URL;
 import java.net.URLConnection;
 import java.text.SimpleDateFormat;
@@ -32,13 +30,9 @@ public class ExperimentService {
 
     private final ExperimentRepository experimentRepository;
 
-    @Autowired
-    private final AdapterDeterlab adapterDeterlab;
-
     @Inject
-    protected ExperimentService(final ExperimentRepository experimentRepository, final DeterlabUserRepository deterlabUserRepository, final ConnectionProperties connectionProperties) {
+    protected ExperimentService(final ExperimentRepository experimentRepository) {
         this.experimentRepository = experimentRepository;
-        this.adapterDeterlab = new AdapterDeterlab(deterlabUserRepository, connectionProperties);
     }
 
     public ExperimentEntity save(Experiment experiment) {
@@ -52,9 +46,16 @@ public class ExperimentService {
 
         ExperimentEntity experimentEntity = experimentRepository.save(setupEntity(experiment, fileName));
         String parametersJson = writeJsonString(experimentEntity);
-        adapterDeterlab.createExperiment(parametersJson);
+        JSONObject jsonObject = new JSONObject(parametersJson);
 
-        return experimentEntity;
+        String returnResult = this.createExperimentInDeter(experimentEntity);
+        if (returnResult == "done") {
+            return experimentEntity;
+        }
+
+        else {
+            return null;
+        }
     }
 
     private String craftDate() {
@@ -114,52 +115,36 @@ public class ExperimentService {
     }
 
     public String createExperimentInDeter(ExperimentEntity experimentEntity) {
-        // call python script to apply for new project
-        JSONObject jsonObject = new JSONObject();
-        jsonObject.put("id", experimentEntity.getId());
-        jsonObject.put("userId", experimentEntity.getUserId());
-        jsonObject.put("teamId", experimentEntity.getTeamId());
-        jsonObject.put("name", experimentEntity.getName());
-        jsonObject.put("description", experimentEntity.getDescription());
-        jsonObject.put("nsFile", experimentEntity.getNsFile());
-        jsonObject.put("idleSwap", experimentEntity.getIdleSwap());
-        jsonObject.put("maxDuration", experimentEntity.getMaxDuration());
 
-        String resultJson = adapterDeterlab.createExperiment(jsonObject.toString());
+        String login = experimentEntity.getUserId();
+        String maxDuration = experimentEntity.getMaxDuration().toString();
+        String idleSwap = experimentEntity.getIdleSwap().toString();
+        String description = experimentEntity.getDescription();
+        String project = experimentEntity.getTeamId();
+        String name = experimentEntity.getName();
+        String fileName = experimentEntity.getNsFile();
 
-        return resultJson;
-    }
-
-    private void uploadNsFile(String fileName) {
-        String ftpUrl = "ftp://%s:%s@%s/%s;type=i";
-        String host = "173.18.178.11";
-        String user = "ncl";
-        String pass = "deterinavm";
-        String filePath = "/nsfile/" + fileName;
-        String uploadPath = "/nsfile/ + fileName";
-
-        ftpUrl = String.format(ftpUrl, user, pass, host, uploadPath);
-        System.out.println("Upload URL: " + ftpUrl);
+        StringBuilder command = new StringBuilder();
+        command.append("script_wrapper.py");
+        command.append(" --server=172.18.178.10");
+        command.append(" --login=" + login);
+        command.append(" startexp");
+        command.append(" -a " + maxDuration);
+        command.append(" -l " + idleSwap);
+        command.append(" -E " + description);
+        command.append(" -p " + project);
+        command.append(" -e " + name);
+        command.append(" " + fileName);
 
         try {
-            URL url = new URL(ftpUrl);
-            URLConnection conn = url.openConnection();
-            OutputStream outputStream = conn.getOutputStream();
-            FileInputStream inputStream = new FileInputStream(filePath);
-
-            byte[] buffer = new byte[4096];
-            int bytesRead = -1;
-            while ((bytesRead = inputStream.read(buffer)) != -1) {
-                outputStream.write(buffer, 0, bytesRead);
-            }
-
-            inputStream.close();
-            outputStream.close();
-
-            System.out.println("File uploaded");
-
-        } catch (IOException ex) {
-            ex.printStackTrace();
+            Process process = Runtime.getRuntime().exec(command.toString());
+            process.waitFor();
         }
+
+        catch (Exception e) {
+            return "error";
+        }
+
+        return "done";
     }
 }

@@ -8,7 +8,6 @@ import sg.ncl.service.team.data.jpa.entities.TeamMemberEntity;
 import sg.ncl.service.team.data.jpa.repositories.TeamRepository;
 import sg.ncl.service.team.domain.Team;
 import sg.ncl.service.team.domain.TeamStatus;
-import sg.ncl.service.team.dtos.TeamInfo;
 import sg.ncl.service.team.dtos.TeamMemberInfo;
 import sg.ncl.service.team.exceptions.TeamIdNullException;
 import sg.ncl.service.team.exceptions.TeamNameNullException;
