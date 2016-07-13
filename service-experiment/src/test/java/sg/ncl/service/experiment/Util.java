@@ -4,7 +4,9 @@ import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.commons.lang3.RandomUtils;
 import sg.ncl.service.experiment.data.jpa.ExperimentEntity;
 import sg.ncl.service.experiment.data.jpa.ExperimentRepository;
+import sg.ncl.service.experiment.web.ExperimentInfo;
 
+import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -24,6 +26,23 @@ public class Util {
         entity.setIdleSwap(Integer.parseInt(RandomStringUtils.randomNumeric(5)));
         entity.setMaxDuration(Integer.parseInt(RandomStringUtils.randomNumeric(5)));
         return entity;
+    }
+
+    public static ExperimentInfo getExperimentsInfo() {
+        String nsFileContents = createNsFileContents();
+
+        final ExperimentInfo experimentInfo = new ExperimentInfo(
+                Long.parseLong(RandomStringUtils.randomNumeric(10)),
+                RandomStringUtils.randomAlphanumeric(20),
+                RandomStringUtils.randomAlphanumeric(20),
+                RandomStringUtils.randomAlphanumeric(20),
+                RandomStringUtils.randomAlphanumeric(20),
+                RandomStringUtils.randomAlphanumeric(20),
+                Integer.parseInt(RandomStringUtils.randomNumeric(5)),
+                Integer.parseInt(RandomStringUtils.randomNumeric(5)),
+                nsFileContents);
+
+        return experimentInfo;
     }
 
     public static boolean isListEqual(List<ExperimentEntity> one, List<ExperimentEntity> two) {
@@ -46,5 +65,16 @@ public class Util {
 
             experimentRepository.save(experimentEntity);
         }
+    }
+
+    public static String createNsFileContents() {
+        StringBuilder sb = new StringBuilder();
+        sb.append("set ns [new Simulator]\n");
+        sb.append("source tb_compat.tcl\n");
+        sb.append("set n0 [$ns node]\n");
+        sb.append("\n");
+        sb.append("$ns Static\n");
+        sb.append("$ns run\n");
+        return sb.toString();
     }
 }
