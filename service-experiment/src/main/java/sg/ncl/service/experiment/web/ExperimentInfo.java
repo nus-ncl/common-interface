@@ -14,22 +14,28 @@ public class ExperimentInfo implements Experiment {
     private String name;
     private String description;
     private String nsFile;
+    private String nsFileContent;
     private Integer idleSwap;
     private Integer maxDuration;
-    private String nsFileContents;
 
-    public ExperimentInfo(final Long id, final String userId, final String teamId, final String name,
-                          final String description, final String nsFile, final Integer idleSwap,
-                          final Integer maxDuration, final String nsFileContents) {
+    public ExperimentInfo(final Long id,
+                          final String userId,
+                          final String teamId,
+                          final String name,
+                          final String description,
+                          final String nsFile,
+                          final String nsFileContent,
+                          final Integer idleSwap,
+                          final Integer maxDuration) {
         this.id = id;
         this.userId = userId;
         this.teamId = teamId;
         this.name = name;
         this.description = description;
         this.nsFile = nsFile;
+        this.nsFileContent = nsFileContent;
         this.idleSwap = idleSwap;
         this.maxDuration = maxDuration;
-        this.nsFileContents = nsFileContents;
     }
 
     public ExperimentInfo(final Experiment experiment) {
@@ -39,9 +45,9 @@ public class ExperimentInfo implements Experiment {
                 experiment.getName(),
                 experiment.getDescription(),
                 experiment.getNsFile(),
+                experiment.getNsFileContent(),
                 experiment.getIdleSwap(),
-                experiment.getMaxDuration(),
-                null);
+                experiment.getMaxDuration());
     }
 
     public ExperimentInfo(final ExperimentEntity experimentEntity) {
@@ -51,9 +57,9 @@ public class ExperimentInfo implements Experiment {
                 experimentEntity.getName(),
                 experimentEntity.getDescription(),
                 experimentEntity.getNsFile(),
+                experimentEntity.getNsFileContent(),
                 experimentEntity.getIdleSwap(),
-                experimentEntity.getMaxDuration(),
-                null);
+                experimentEntity.getMaxDuration());
     }
 
     @Override
@@ -87,6 +93,11 @@ public class ExperimentInfo implements Experiment {
     }
 
     @Override
+    public String getNsFileContent() {
+        return nsFileContent;
+    }
+
+    @Override
     public Integer getIdleSwap() {
         return idleSwap;
     }
@@ -94,9 +105,5 @@ public class ExperimentInfo implements Experiment {
     @Override
     public Integer getMaxDuration() {
         return maxDuration;
-    }
-
-    public String getNsFileContents() {
-        return nsFileContents;
     }
 }

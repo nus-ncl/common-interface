@@ -112,6 +112,22 @@ public class ExperimentEntityTest {
     }
 
     @Test
+    public void testGetNsFileContent() throws Exception {
+        final ExperimentEntity entity = new ExperimentEntity();
+
+        assertThat(entity.getNsFileContent(), is(nullValue()));
+    }
+
+    @Test
+    public void testSetNsFileContent() throws Exception {
+        final ExperimentEntity entity = new ExperimentEntity();
+        final String nsFile = RandomStringUtils.randomAlphanumeric(20);
+        entity.setNsFileContent(nsFile);
+
+        assertThat(entity.getNsFileContent(), is(nsFile));
+    }
+
+    @Test
     public void testGetIdleSwap() throws Exception {
         final ExperimentEntity entity = new ExperimentEntity();
 

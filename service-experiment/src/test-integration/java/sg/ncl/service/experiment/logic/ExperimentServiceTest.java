@@ -8,7 +8,6 @@ import sg.ncl.service.experiment.AbstractTest;
 import sg.ncl.service.experiment.Util;
 import sg.ncl.service.experiment.data.jpa.ExperimentEntity;
 import sg.ncl.service.experiment.data.jpa.ExperimentRepository;
-import sg.ncl.service.experiment.web.ExperimentInfo;
 
 import javax.inject.Inject;
 import java.io.File;
@@ -34,7 +33,7 @@ public class ExperimentServiceTest extends AbstractTest {
     @Test
     public void testSaveExperiment() throws Exception {
 
-        ExperimentInfo createdExperimentInfo = Util.getExperimentsInfo();
+        ExperimentEntity createdExperimentSave = Util.getExperimentsEntity();
 
         ExperimentService localExperimentService = new ExperimentService(experimentRepository) {
             @Override
@@ -43,23 +42,23 @@ public class ExperimentServiceTest extends AbstractTest {
             }
         };
 
-        ExperimentEntity savedExperiment = localExperimentService.save(createdExperimentInfo);
+        ExperimentEntity savedExperiment = localExperimentService.save(createdExperimentSave);
 
         Assert.assertNotNull(savedExperiment);
-        Assert.assertEquals(createdExperimentInfo.getUserId(), savedExperiment.getUserId());
-        Assert.assertEquals(createdExperimentInfo.getTeamId(), savedExperiment.getTeamId());
-        Assert.assertEquals(createdExperimentInfo.getName(), savedExperiment.getName());
-        Assert.assertEquals(createdExperimentInfo.getDescription(), savedExperiment.getDescription());
-        Assert.assertEquals(createdExperimentInfo.getIdleSwap(), savedExperiment.getIdleSwap());
-        Assert.assertEquals(createdExperimentInfo.getMaxDuration(), savedExperiment.getMaxDuration());
+        Assert.assertEquals(createdExperimentSave.getUserId(), savedExperiment.getUserId());
+        Assert.assertEquals(createdExperimentSave.getTeamId(), savedExperiment.getTeamId());
+        Assert.assertEquals(createdExperimentSave.getName(), savedExperiment.getName());
+        Assert.assertEquals(createdExperimentSave.getDescription(), savedExperiment.getDescription());
+        Assert.assertEquals(createdExperimentSave.getIdleSwap(), savedExperiment.getIdleSwap());
+        Assert.assertEquals(createdExperimentSave.getMaxDuration(), savedExperiment.getMaxDuration());
 
         // check new nsFile name
         String craftDate = new SimpleDateFormat("yyyyMMdd").format(new Date());
-        String fileName = createdExperimentInfo.getUserId() + "_" + createdExperimentInfo.getTeamId() + "_" + craftDate + "_" + createdExperimentInfo.getNsFile() + ".ns";
-        Assert.assertEquals(fileName, savedExperiment.getNsFile());
+        String filename = createdExperimentSave.getUserId() + "_" + createdExperimentSave.getTeamId() + "_" + craftDate + "_" + createdExperimentSave.getNsFile() + ".ns";
+        Assert.assertEquals(filename, savedExperiment.getNsFile());
 
         // delete the created ns file
-        File file = new File(fileName);
+        File file = new File(filename);
         Files.deleteIfExists(file.toPath());
     }
 

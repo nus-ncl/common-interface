@@ -1,25 +1,15 @@
 package sg.ncl.service.experiment.logic;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
-import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import sg.ncl.adapter.deterlab.AdapterDeterlab;
-import sg.ncl.adapter.deterlab.ConnectionProperties;
-import sg.ncl.adapter.deterlab.data.jpa.DeterlabUserRepository;
 import sg.ncl.service.experiment.data.jpa.ExperimentEntity;
 import sg.ncl.service.experiment.data.jpa.ExperimentRepository;
 import sg.ncl.service.experiment.domain.Experiment;
 import sg.ncl.service.experiment.exceptions.UserIdNotFound;
-import sg.ncl.service.experiment.web.ExperimentInfo;
 
 import javax.inject.Inject;
 import java.io.*;
-import java.net.URL;
-import java.net.URLConnection;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -39,25 +29,25 @@ public class ExperimentService {
         this.experimentRepository = experimentRepository;
     }
 
-    public ExperimentEntity save(ExperimentInfo experimentInfo) {
+    public ExperimentEntity save(Experiment experiment) {
         logger.info("Save experiment");
-        String fileName = craftFileName(experimentInfo);
+        String fileName = craftFileName(experiment);
 
         // check experiment name is unique
-        long countName = experimentRepository.countByName(experimentInfo.getName());
+        long countName = experimentRepository.countByName(experiment.getName());
         if (countName > 0) {
             logger.warn("Experiment name is in use");
             return null;
         }
 
-        createNsFile(fileName, experimentInfo.getNsFileContents());
+        createNsFile(fileName, experiment.getNsFileContent());
 
-        ExperimentEntity experimentEntity = experimentRepository.save(setupEntity(experimentInfo, fileName));
+        ExperimentEntity savedExperimentEntity = experimentRepository.save(setupEntity(experiment, fileName));
         logger.info("Experiment saved");
 
-        String returnResult = this.createExperimentInDeter(experimentEntity);
+        String returnResult = this.createExperimentInDeter(savedExperimentEntity);
         if (returnResult == "done") {
-            return experimentEntity;
+            return savedExperimentEntity;
         }
 
         else {
@@ -83,6 +73,7 @@ public class ExperimentService {
         experimentEntity.setName(experiment.getName());
         experimentEntity.setDescription(experiment.getDescription());
         experimentEntity.setNsFile(fileName);
+        experimentEntity.setNsFileContent(experiment.getNsFileContent());
         experimentEntity.setIdleSwap(experiment.getIdleSwap());
         experimentEntity.setMaxDuration(experiment.getMaxDuration());
         return experimentEntity;

@@ -1,12 +1,11 @@
 package sg.ncl.service.experiment;
 
 import org.apache.commons.lang3.RandomStringUtils;
-import org.apache.commons.lang3.RandomUtils;
 import sg.ncl.service.experiment.data.jpa.ExperimentEntity;
 import sg.ncl.service.experiment.data.jpa.ExperimentRepository;
-import sg.ncl.service.experiment.web.ExperimentInfo;
 
-import java.io.PrintWriter;
+import java.io.File;
+import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -23,26 +22,10 @@ public class Util {
         entity.setName(RandomStringUtils.randomAlphanumeric(20));
         entity.setDescription(RandomStringUtils.randomAlphanumeric(20));
         entity.setNsFile(RandomStringUtils.randomAlphanumeric(20));
+        entity.setNsFileContent(createNsFileContents());
         entity.setIdleSwap(Integer.parseInt(RandomStringUtils.randomNumeric(5)));
         entity.setMaxDuration(Integer.parseInt(RandomStringUtils.randomNumeric(5)));
         return entity;
-    }
-
-    public static ExperimentInfo getExperimentsInfo() {
-        String nsFileContents = createNsFileContents();
-
-        final ExperimentInfo experimentInfo = new ExperimentInfo(
-                Long.parseLong(RandomStringUtils.randomNumeric(10)),
-                RandomStringUtils.randomAlphanumeric(20),
-                RandomStringUtils.randomAlphanumeric(20),
-                RandomStringUtils.randomAlphanumeric(20),
-                RandomStringUtils.randomAlphanumeric(20),
-                RandomStringUtils.randomAlphanumeric(20),
-                Integer.parseInt(RandomStringUtils.randomNumeric(5)),
-                Integer.parseInt(RandomStringUtils.randomNumeric(5)),
-                nsFileContents);
-
-        return experimentInfo;
     }
 
     public static boolean isListEqual(List<ExperimentEntity> one, List<ExperimentEntity> two) {

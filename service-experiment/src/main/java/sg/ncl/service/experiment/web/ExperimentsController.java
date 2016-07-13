@@ -46,8 +46,7 @@ public class ExperimentsController {
 
     @RequestMapping(path = "", method = RequestMethod.POST)
     @ResponseStatus(value = HttpStatus.CREATED)
-    public void addExperiment(@RequestBody @Valid ExperimentInfo experimentInfo) {
-
-        experimentService.save(experimentInfo);
+    public void addExperiment(@RequestBody @Valid ExperimentEntity experimentEntity) {
+        experimentService.save(experimentEntity);
     }
 }

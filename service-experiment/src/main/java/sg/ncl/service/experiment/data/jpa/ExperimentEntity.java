@@ -36,6 +36,9 @@ public class ExperimentEntity extends AbstractEntity implements Experiment {
     @Column(name = "ns_file", nullable = false)
     private String nsFile;
 
+    @Column(name = "ns_file_content", nullable = false, length = 1000000000)
+    private String nsFileContent;
+
     @Column(name = "idle_swap", nullable = false)
     private Integer idleSwap;
 
@@ -97,6 +100,15 @@ public class ExperimentEntity extends AbstractEntity implements Experiment {
     }
 
     @Override
+    public String getNsFileContent() {
+        return nsFileContent;
+    }
+
+    public void setNsFileContent(String nsFileContent) {
+        this.nsFileContent = nsFileContent;
+    }
+
+    @Override
     public Integer getIdleSwap() {
         return idleSwap;
     }
@@ -133,10 +145,13 @@ public class ExperimentEntity extends AbstractEntity implements Experiment {
         sb.append(", name=").append(name);
         sb.append(", description=").append(description);
         sb.append(", nsFile=").append(nsFile);
+        sb.append(", nsFileContent=").append(nsFileContent);
         sb.append(", idleSwap=").append(idleSwap);
         sb.append(", maxDuration=").append(maxDuration);
         sb.append(", super=").append(super.toString());
         sb.append('}');
         return sb.toString();
     }
+
+
 }
