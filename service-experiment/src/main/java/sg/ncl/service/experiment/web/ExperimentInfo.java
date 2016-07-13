@@ -16,8 +16,11 @@ public class ExperimentInfo implements Experiment {
     private String nsFile;
     private Integer idleSwap;
     private Integer maxDuration;
+    private String nsFileContents;
 
-    public ExperimentInfo(final Long id, final String userId, final String teamId, final String name, final String description, final String nsFile, final Integer idleSwap, final Integer maxDuration) {
+    public ExperimentInfo(final Long id, final String userId, final String teamId, final String name,
+                          final String description, final String nsFile, final Integer idleSwap,
+                          final Integer maxDuration, final String nsFileContents) {
         this.id = id;
         this.userId = userId;
         this.teamId = teamId;
@@ -26,6 +29,7 @@ public class ExperimentInfo implements Experiment {
         this.nsFile = nsFile;
         this.idleSwap = idleSwap;
         this.maxDuration = maxDuration;
+        this.nsFileContents = nsFileContents;
     }
 
     public ExperimentInfo(final Experiment experiment) {
@@ -36,7 +40,8 @@ public class ExperimentInfo implements Experiment {
                 experiment.getDescription(),
                 experiment.getNsFile(),
                 experiment.getIdleSwap(),
-                experiment.getMaxDuration());
+                experiment.getMaxDuration(),
+                null);
     }
 
     public ExperimentInfo(final ExperimentEntity experimentEntity) {
@@ -47,7 +52,8 @@ public class ExperimentInfo implements Experiment {
                 experimentEntity.getDescription(),
                 experimentEntity.getNsFile(),
                 experimentEntity.getIdleSwap(),
-                experimentEntity.getMaxDuration());
+                experimentEntity.getMaxDuration(),
+                null);
     }
 
     @Override
@@ -88,5 +94,9 @@ public class ExperimentInfo implements Experiment {
     @Override
     public Integer getMaxDuration() {
         return maxDuration;
+    }
+
+    public String getNsFileContents() {
+        return nsFileContents;
     }
 }
