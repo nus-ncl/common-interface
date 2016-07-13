@@ -19,6 +19,7 @@ import sg.ncl.service.registration.exceptions.UserFormException;
 import sg.ncl.service.team.data.jpa.TeamEntity;
 import sg.ncl.service.team.data.jpa.TeamMemberEntity;
 import sg.ncl.service.team.domain.Team;
+import sg.ncl.service.team.domain.TeamMemberStatus;
 import sg.ncl.service.team.domain.TeamMemberType;
 import sg.ncl.service.team.domain.TeamService;
 import sg.ncl.service.team.exceptions.TeamNameNullException;
@@ -76,6 +77,7 @@ public class RegistrationService {
         teamMemberEntity.setUserId(nclUserId);
         teamMemberEntity.setJoinedDate(ZonedDateTime.now());
         teamMemberEntity.setMemberType(TeamMemberType.MEMBER);
+        teamMemberEntity.setMemberStatus(TeamMemberStatus.PENDING);
         TeamMemberInfo teamMemberInfo = new TeamMemberInfo(teamMemberEntity);
 
         userService.addTeam(nclUserId, teamId);
