@@ -30,7 +30,9 @@ allprojects {
 //                entry 'hibernate-core'
 //                entry 'hibernate-entitymanager'
 //            }
+            dependency 'org.apache.commons:commons-lang3:3.4'
             dependency 'io.jsonwebtoken:jjwt:0.6.0'
+            dependency 'org.jmockit:jmockit:1.25'
         }
 
         imports {
@@ -38,67 +40,12 @@ allprojects {
         }
     }
 
-    sourceSets {
-        integrationTest {
-            compileClasspath += main.output + test.output
-            runtimeClasspath += main.output + test.output
-
-            java {
-                srcDir 'src/test-integration/java'
-            }
-
-            resources {
-                srcDir 'src/test-integration/resources'
-            }
-        }
-    }
-
-    configurations {
-        integrationTestCompile {
-            extendsFrom testCompile
-        }
-        integrationTestRuntime {
-            extendsFrom testRuntime
-        }
-    }
-
-    idea {
-        module {
-            testSourceDirs += sourceSets.integrationTest.java.srcDirs
-            testSourceDirs += sourceSets.integrationTest.resources.srcDirs
-        }
-    }
-
-    task integrationTest(type: Test) {
-        group 'verification'
-        check {
-            dependsOn integrationTest
-        }
-        testClassesDir sourceSets.integrationTest.output.classesDir
-        classpath = sourceSets.integrationTest.runtimeClasspath
-    }
-
-    task testReport(type: TestReport) {
-        group 'reporting'
-        dependsOn check
-        destinationDir file("${reporting.baseDir}/unified/html")
-        reportOn test, integrationTest
-    }
-
-    tasks.withType(Test) {
-        group 'verification'
+    test {
         ignoreFailures true
-        reports {
-            html {
-                destination file("${reporting.baseDir}/${task.name}/html")
-            }
-        }
     }
 
-    tasks.withType(JacocoReport) {
-        group 'reporting'
+    jacocoTestReport {
         dependsOn check
-        executionData test, integrationTest
         // HACK Jacoco's requirement that every test set has to have at least one test case for generating a report;
         // workaround removes test sets that does not have any test cases
         executionData = files(executionData.findAll({ it.exists() }))
@@ -119,10 +66,14 @@ dependencies {
     compile subprojects.findAll({ it.name.startsWith('service-') })
     // the runtime dependencies should be a union of all runtime dependencies needed by all subprojects
     runtime 'mysql:mysql-connector-java'
-    runtime 'com.h2database:h2'
     runtime 'org.postgresql:postgresql'
+    runtime 'com.h2database:h2'
 
     testCompile 'junit:junit'
+}
+
+check {
+    dependsOn subprojects.check
 }
 
 task copyJunitXml(type: Copy) {
@@ -132,9 +83,10 @@ task copyJunitXml(type: Copy) {
     into test.reports.junitXml.destination
 }
 
-testReport {
-    dependsOn allprojects.check
-    reportOn allprojects.test, allprojects.integrationTest
+task testReport(type: TestReport) {
+    dependsOn check
+    reportOn allprojects.test
+    destinationDir test.reports.html.destination
     finalizedBy copyJunitXml
 }
 

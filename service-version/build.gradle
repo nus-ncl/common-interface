@@ -1,10 +1,5 @@
 dependencies {
-    compile('org.springframework.boot:spring-boot-starter-web')
-    compile('javax.inject:javax.inject')
+    compile project(':common')
 
-    testCompile('junit:junit')
-    testCompile('org.hamcrest:hamcrest-library')
-    testCompile('org.apache.commons:commons-lang3:3.4')
-
-    integrationTestCompile project(':common-test')
+    testCompile project(':common-test')
 }
