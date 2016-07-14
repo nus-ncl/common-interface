@@ -1,10 +1,8 @@
-package sg.ncl.service.experiment.data.jpa.entities;
+package sg.ncl.service.experiment.data.jpa;
 
 import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.commons.lang3.RandomUtils;
 import org.junit.Test;
-import org.springframework.cache.support.NullValue;
-import sg.ncl.service.experiment.data.jpa.ExperimentEntity;
 
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.nullValue;

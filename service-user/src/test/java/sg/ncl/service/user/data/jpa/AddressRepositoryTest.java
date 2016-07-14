@@ -1,4 +1,4 @@
-package sg.ncl.service.user.data.jpa.repositories;
+package sg.ncl.service.user.data.jpa;
 
 import org.junit.Rule;
 import org.junit.Test;
@@ -6,15 +6,10 @@ import org.junit.rules.ExpectedException;
 import org.springframework.dao.DataIntegrityViolationException;
 import sg.ncl.service.user.AbstractTest;
 import sg.ncl.service.user.Util;
-import sg.ncl.service.user.data.jpa.AddressRepository;
-import sg.ncl.service.user.data.jpa.AddressEntity;
 
 import javax.inject.Inject;
 
-import static org.hamcrest.Matchers.equalTo;
-import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.not;
-import static org.hamcrest.Matchers.nullValue;
+import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.assertThat;
 import static sg.ncl.common.test.Checks.checkException;
 

@@ -1,4 +1,4 @@
-package sg.ncl.service.user.data.jpa.repositories;
+package sg.ncl.service.user.data.jpa;
 
 import org.junit.Rule;
 import org.junit.Test;
