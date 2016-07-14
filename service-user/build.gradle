@@ -8,13 +8,8 @@ dependencies {
     compile('javax.inject:javax.inject')
     compile('com.fasterxml.jackson.datatype:jackson-datatype-jsr310')
 
-    runtime('mysql:mysql-connector-java')
+    runtime 'mysql:mysql-connector-java'
+    runtime 'org.postgresql:postgresql'
 
-    testCompile('junit:junit')
-    testCompile('org.hamcrest:hamcrest-library')
-    testCompile('org.apache.commons:commons-lang3:3.4')
-
-    integrationTestCompile project(':common-test')
-
-    integrationTestRuntime('com.jayway.jsonpath:json-path')
+    testCompile project(':common-test')
 }

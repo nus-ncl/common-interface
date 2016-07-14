@@ -1,6 +1,12 @@
 version '1.0-SNAPSHOT'
 
 dependencies {
-    compile('org.springframework.boot:spring-boot-starter-web')
-    compile('javax.inject:javax.inject')
+    compile 'org.springframework.boot:spring-boot-starter-web'
+    compile 'javax.inject:javax.inject'
+
+    runtime 'org.springframework.boot:spring-boot-configuration-processor'
+}
+
+compileJava {
+    dependsOn processResources
 }

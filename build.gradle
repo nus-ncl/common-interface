@@ -30,7 +30,9 @@ allprojects {
 //                entry 'hibernate-core'
 //                entry 'hibernate-entitymanager'
 //            }
+            dependency 'org.apache.commons:commons-lang3:3.4'
             dependency 'io.jsonwebtoken:jjwt:0.6.0'
+            dependency 'org.jmockit:jmockit:1.25'
         }
 
         imports {
@@ -119,8 +121,8 @@ dependencies {
     compile subprojects.findAll({ it.name.startsWith('service-') })
     // the runtime dependencies should be a union of all runtime dependencies needed by all subprojects
     runtime 'mysql:mysql-connector-java'
-    runtime 'com.h2database:h2'
     runtime 'org.postgresql:postgresql'
+    runtime 'com.h2database:h2'
 
     testCompile 'junit:junit'
 }
