@@ -55,6 +55,25 @@ public class RegistrationService {
         this.adapterDeterlab = new AdapterDeterlab(deterlabUserRepository, connectionProperties);
     }
 
+    public void approveJoinRequest(User user, Team team, TeamMemberStatus teamMemberStatus) {
+        if (team.getName() == null || team.getName().isEmpty()) {
+            logger.warn("Team name is not found");
+            throw new RegisterTeamNameEmptyException();
+        }
+
+        if (user.getId() == null || user.getId().isEmpty()) {
+            logger.warn("User id is empty or null");
+            throw new RegisterUidNullException();
+        }
+
+        if (teamMemberStatus == null || teamMemberStatus.toString().isEmpty()) {
+            logger.warn("Team member status is empty or null");
+            throw new RegisterTeamNameEmptyException();
+        }
+
+        userService.addTeam(user.getId(), team.getId());
+    }
+
     public void registerRequestToJoinTeam(String nclUserId, Team team) {
         if (team.getName() == null || team.getName().isEmpty()) {
             logger.warn("Team name is not found");
