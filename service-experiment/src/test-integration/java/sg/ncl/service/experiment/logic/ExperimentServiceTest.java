@@ -47,6 +47,7 @@ public class ExperimentServiceTest extends AbstractTest {
         Assert.assertNotNull(savedExperiment);
         Assert.assertEquals(createdExperimentSave.getUserId(), savedExperiment.getUserId());
         Assert.assertEquals(createdExperimentSave.getTeamId(), savedExperiment.getTeamId());
+        Assert.assertEquals(createdExperimentSave.getTeamName(), savedExperiment.getTeamName());
         Assert.assertEquals(createdExperimentSave.getName(), savedExperiment.getName());
         Assert.assertEquals(createdExperimentSave.getDescription(), savedExperiment.getDescription());
         Assert.assertEquals(createdExperimentSave.getIdleSwap(), savedExperiment.getIdleSwap());

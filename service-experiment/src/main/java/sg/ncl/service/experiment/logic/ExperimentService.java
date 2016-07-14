@@ -70,6 +70,7 @@ public class ExperimentService {
 
         experimentEntity.setUserId(experiment.getUserId());
         experimentEntity.setTeamId(experiment.getTeamId());
+        experimentEntity.setTeamName(experiment.getTeamName());
         experimentEntity.setName(experiment.getName());
         experimentEntity.setDescription(experiment.getDescription());
         experimentEntity.setNsFile(fileName);
