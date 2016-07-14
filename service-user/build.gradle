@@ -2,9 +2,6 @@ version '1.0-SNAPSHOT'
 
 dependencies {
     compile project(':common')
-    compile project(':common-jwt')
-    compile('org.springframework.boot:spring-boot-starter-web')
-    compile('javax.inject:javax.inject')
     compile('com.fasterxml.jackson.datatype:jackson-datatype-jsr310')
 
     runtime 'mysql:mysql-connector-java'

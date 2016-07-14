@@ -3,7 +3,6 @@ rootProject.name = 'services-in-one'
 include 'adapter-deterlab'
 
 include 'common'
-include 'common-jwt'
 include 'common-test'
 
 include 'service-authentication'

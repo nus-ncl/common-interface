@@ -3,6 +3,7 @@ dependencies {
     compile 'org.springframework.boot:spring-boot-starter-data-jpa'
     compile 'com.h2database:h2'
     compile 'org.apache.commons:commons-lang3'
+    compile 'org.jmockit:jmockit'
 
     runtime 'com.jayway.jsonpath:json-path'
 }
