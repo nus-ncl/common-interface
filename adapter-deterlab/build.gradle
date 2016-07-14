@@ -1,14 +1,13 @@
 version '1.0-SNAPSHOT'
 
 dependencies {
-    compile project(':common-exception')
+    compile project(':common')
     compile project(':common-jpa')
     compile project(':common-jwt')
 
     runtime 'org.springframework.boot:spring-boot-configuration-processor'
 
     testCompile project(':common-test')
-//    testCompile 'org.apache.commons:commons-lang3'
 }
 
 compileJava {
