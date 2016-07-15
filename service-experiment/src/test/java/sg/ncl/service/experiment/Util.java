@@ -1,10 +1,11 @@
 package sg.ncl.service.experiment;
 
 import org.apache.commons.lang3.RandomStringUtils;
-import org.apache.commons.lang3.RandomUtils;
 import sg.ncl.service.experiment.data.jpa.ExperimentEntity;
 import sg.ncl.service.experiment.data.jpa.ExperimentRepository;
 
+import java.io.File;
+import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -21,6 +22,7 @@ public class Util {
         entity.setName(RandomStringUtils.randomAlphanumeric(20));
         entity.setDescription(RandomStringUtils.randomAlphanumeric(20));
         entity.setNsFile(RandomStringUtils.randomAlphanumeric(20));
+        entity.setNsFileContent(createNsFileContents());
         entity.setIdleSwap(Integer.parseInt(RandomStringUtils.randomNumeric(5)));
         entity.setMaxDuration(Integer.parseInt(RandomStringUtils.randomNumeric(5)));
         return entity;
@@ -46,5 +48,16 @@ public class Util {
 
             experimentRepository.save(experimentEntity);
         }
+    }
+
+    public static String createNsFileContents() {
+        StringBuilder sb = new StringBuilder();
+        sb.append("set ns [new Simulator]\n");
+        sb.append("source tb_compat.tcl\n");
+        sb.append("set n0 [$ns node]\n");
+        sb.append("\n");
+        sb.append("$ns Static\n");
+        sb.append("$ns run\n");
+        return sb.toString();
     }
 }

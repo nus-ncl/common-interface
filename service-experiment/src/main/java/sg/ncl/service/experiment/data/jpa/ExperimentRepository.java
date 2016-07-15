@@ -10,5 +10,5 @@ import java.util.List;
 public interface ExperimentRepository extends JpaRepository<ExperimentEntity, Long> {
 
     List<ExperimentEntity> findByUserId(String userId);
-    Long countByTeamId(String teamId);
+    Long countByName(String name);
 }

@@ -1,0 +1,17 @@
+version '1.0-SNAPSHOT'
+
+dependencies {
+    compile 'org.springframework.boot:spring-boot-starter-web'
+    compile 'org.springframework.boot:spring-boot-starter-data-jpa'
+    compile 'org.springframework.boot:spring-boot-starter-security'
+    compile 'javax.inject:javax.inject'
+    compile 'io.jsonwebtoken:jjwt'
+
+    runtime 'org.springframework.boot:spring-boot-configuration-processor'
+
+    testCompile project(':common-test')
+}
+
+compileJava {
+    dependsOn processResources
+}
