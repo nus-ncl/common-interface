@@ -2,6 +2,7 @@ package sg.ncl.service.team.data.jpa;
 
 import org.apache.commons.lang3.RandomStringUtils;
 import org.junit.Test;
+import sg.ncl.service.team.domain.TeamMemberStatus;
 import sg.ncl.service.team.domain.TeamMemberType;
 
 import java.time.ZonedDateTime;
@@ -91,5 +92,18 @@ public class TeamMemberEntityTest {
     public void testGetMemberType() throws Exception {
         final TeamMemberEntity entity = new TeamMemberEntity();
         assertThat(entity.getMemberType(), is(notNullValue()));
+    }
+
+    @Test
+    public void testSetMemberStatus() throws Exception {
+        final TeamMemberEntity entity = new TeamMemberEntity();
+        entity.setMemberStatus(TeamMemberStatus.APPROVED);
+        assertThat(entity.getMemberStatus(), is(TeamMemberStatus.APPROVED));
+    }
+
+    @Test
+    public void testGetMemberStatus() throws Exception {
+        final TeamMemberEntity entity = new TeamMemberEntity();
+        assertThat(entity.getMemberStatus(), is(notNullValue()));
     }
 }

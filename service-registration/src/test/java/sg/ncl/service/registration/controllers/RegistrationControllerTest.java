@@ -17,7 +17,9 @@ import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.web.client.RestOperations;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.context.WebApplicationContext;
+import sg.ncl.adapter.deterlab.AdapterDeterlab;
 import sg.ncl.adapter.deterlab.ConnectionProperties;
+import sg.ncl.adapter.deterlab.data.jpa.DeterlabUserRepository;
 import sg.ncl.service.authentication.data.jpa.CredentialsEntity;
 import sg.ncl.service.registration.AbstractTest;
 import sg.ncl.service.registration.Util;
@@ -61,6 +63,9 @@ public class RegistrationControllerTest extends AbstractTest {
 
     @Inject
     private UserService userService;
+
+    @Inject
+    private AdapterDeterlab adapterDeterlab;
 
     @Autowired
     private RestOperations restOperations;
@@ -159,16 +164,20 @@ public class RegistrationControllerTest extends AbstractTest {
         Team teamEntity = teamService.addTeam(Util.getTeamEntity());
         User user = userService.createUser(Util.getUserEntity());
 
+        adapterDeterlab.saveDeterUserIdMapping("AAAAA", user.getId());
+
         GsonBuilder gsonBuilder = new GsonBuilder();
         gsonBuilder.registerTypeAdapter(ZonedDateTime.class, new DateTimeSerializer());
         gsonBuilder.registerTypeAdapter(ZonedDateTime.class, new DateTimeDeserializer());
         Gson gson = gsonBuilder.create();
         String teamJSON = gson.toJson(teamEntity);
+        String userJSON = gson.toJson(user);
 
         JSONObject mainJSON = new JSONObject();
         JSONObject teamFields = new JSONObject(teamJSON);
+        JSONObject userFields = new JSONObject(userJSON);
 
-        mainJSON.put("uid", user.getId());
+        mainJSON.put("user", userFields);
         mainJSON.put("team", teamFields);
 
         JSONObject predefinedResultJson = new JSONObject();
