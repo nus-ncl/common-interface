@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import sg.ncl.service.user.domain.User;
 import sg.ncl.service.user.exceptions.TeamsNullOrEmptyException;
-import sg.ncl.service.user.logic.UserService;
+import sg.ncl.service.user.domain.UserService;
 
 import javax.inject.Inject;
 import java.util.List;

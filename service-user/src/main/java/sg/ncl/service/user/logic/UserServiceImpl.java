@@ -6,6 +6,7 @@ import sg.ncl.service.user.data.jpa.UserEntity;
 import sg.ncl.service.user.data.jpa.UserRepository;
 import sg.ncl.service.user.domain.Address;
 import sg.ncl.service.user.domain.User;
+import sg.ncl.service.user.domain.UserService;
 import sg.ncl.service.user.exceptions.UserIdNullException;
 import sg.ncl.service.user.exceptions.UserNotFoundException;
 
@@ -18,12 +19,12 @@ import java.util.List;
  * @author Christopher Zhong
  */
 @Service
-public class UserService {
+public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
 
     @Inject
-    protected UserService(final UserRepository userRepository) {
+    protected UserServiceImpl(final UserRepository userRepository) {
         this.userRepository = userRepository;
     }
 

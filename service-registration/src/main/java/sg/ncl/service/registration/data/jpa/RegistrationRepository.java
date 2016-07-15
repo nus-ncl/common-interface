@@ -1,7 +1,6 @@
-package sg.ncl.service.registration.data.jpa.repositories;
+package sg.ncl.service.registration.data.jpa;
 
 import org.springframework.data.jpa.repository.JpaRepository;
-import sg.ncl.service.registration.data.jpa.entities.RegistrationEntity;
 
 /**
  * @author Yeo Te Ye

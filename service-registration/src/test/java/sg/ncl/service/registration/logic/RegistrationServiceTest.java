@@ -1,4 +1,4 @@
-package sg.ncl.service.registration;
+package sg.ncl.service.registration.logic;
 
 import org.apache.commons.lang3.RandomStringUtils;
 import org.json.JSONObject;
@@ -12,15 +12,18 @@ import org.springframework.web.client.RestOperations;
 import org.springframework.web.client.RestTemplate;
 import sg.ncl.adapter.deterlab.ConnectionProperties;
 import sg.ncl.service.authentication.data.jpa.CredentialsEntity;
+import sg.ncl.service.registration.AbstractTest;
+import sg.ncl.service.registration.Util;
 import sg.ncl.service.registration.exceptions.RegisterTeamNameDuplicateException;
 import sg.ncl.service.registration.exceptions.RegisterTeamNameEmptyException;
 import sg.ncl.service.registration.exceptions.RegisterUidNullException;
 import sg.ncl.service.registration.exceptions.UserFormException;
+import sg.ncl.service.registration.domain.RegistrationService;
 import sg.ncl.service.team.data.jpa.TeamEntity;
 import sg.ncl.service.team.domain.Team;
 import sg.ncl.service.team.domain.TeamService;
 import sg.ncl.service.user.domain.User;
-import sg.ncl.service.user.logic.UserService;
+import sg.ncl.service.user.domain.UserService;
 
 import javax.inject.Inject;
 

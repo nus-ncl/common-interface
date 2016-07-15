@@ -4,7 +4,8 @@ package sg.ncl.service.registration.domain;
  * Created by Desmond and Te Ye on 16-Jun-16.
  */
 public interface Registration {
-    String getId();
+
+    Long getId();
 
     String getPid();
 
