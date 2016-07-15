@@ -19,7 +19,6 @@ import sg.ncl.service.registration.exceptions.UserFormException;
 import sg.ncl.service.team.data.jpa.TeamEntity;
 import sg.ncl.service.team.data.jpa.TeamMemberEntity;
 import sg.ncl.service.team.domain.Team;
-import sg.ncl.service.team.domain.TeamMemberStatus;
 import sg.ncl.service.team.domain.TeamMemberType;
 import sg.ncl.service.team.domain.TeamService;
 import sg.ncl.service.team.exceptions.TeamNameNullException;
@@ -55,25 +54,6 @@ public class RegistrationService {
         this.adapterDeterlab = new AdapterDeterlab(deterlabUserRepository, connectionProperties);
     }
 
-    public void approveJoinRequest(User user, Team team, TeamMemberStatus teamMemberStatus) {
-        if (team.getName() == null || team.getName().isEmpty()) {
-            logger.warn("Team name is not found");
-            throw new RegisterTeamNameEmptyException();
-        }
-
-        if (user.getId() == null || user.getId().isEmpty()) {
-            logger.warn("User id is empty or null");
-            throw new RegisterUidNullException();
-        }
-
-        if (teamMemberStatus == null || teamMemberStatus.toString().isEmpty()) {
-            logger.warn("Team member status is empty or null");
-            throw new RegisterTeamNameEmptyException();
-        }
-
-        userService.addTeam(user.getId(), team.getId());
-    }
-
     public void registerRequestToJoinTeam(String nclUserId, Team team) {
         if (team.getName() == null || team.getName().isEmpty()) {
             logger.warn("Team name is not found");
@@ -96,7 +76,6 @@ public class RegistrationService {
         teamMemberEntity.setUserId(nclUserId);
         teamMemberEntity.setJoinedDate(ZonedDateTime.now());
         teamMemberEntity.setMemberType(TeamMemberType.MEMBER);
-        teamMemberEntity.setMemberStatus(TeamMemberStatus.PENDING);
         TeamMemberInfo teamMemberInfo = new TeamMemberInfo(teamMemberEntity);
 
         userService.addTeam(nclUserId, teamId);
