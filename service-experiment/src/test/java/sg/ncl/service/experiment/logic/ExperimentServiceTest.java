@@ -4,7 +4,11 @@ import mockit.Expectations;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.junit.Assert;
 import org.junit.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
+import org.springframework.context.annotation.Configuration;
 import sg.ncl.service.experiment.AbstractTest;
+import sg.ncl.service.experiment.ConnectionProperties;
 import sg.ncl.service.experiment.Util;
 import sg.ncl.service.experiment.data.jpa.ExperimentEntity;
 import sg.ncl.service.experiment.data.jpa.ExperimentRepository;
@@ -128,6 +132,4 @@ public class ExperimentServiceTest extends AbstractTest {
         String response = experimentService.createExperimentInDeter(experimentEntity);
         System.out.println(response);
     }
-
-
 }
