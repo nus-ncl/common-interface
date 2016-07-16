@@ -215,7 +215,7 @@ public class RegistrationServiceImpl implements RegistrationService {
         }
     }
 
-    public void approveJoinRequest(String teamId, String userId, UserEntity user) {
+    public void approveJoinRequest(String teamId, String userId, User user) {
         if (teamService.isTeamOwner(user.getId(), teamId) == false) {
             logger.warn("User {} is not a team owner of Team {}", userId, teamId);
             throw new UserIsNotTeamOwnerException();
