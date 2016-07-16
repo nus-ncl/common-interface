@@ -6,10 +6,9 @@ import org.junit.Test;
 import sg.ncl.service.team.AbstractTest;
 import sg.ncl.service.team.Util;
 import sg.ncl.service.team.data.jpa.TeamEntity;
-import sg.ncl.service.team.domain.Team;
-import sg.ncl.service.team.domain.TeamService;
-import sg.ncl.service.team.domain.TeamVisibility;
+import sg.ncl.service.team.domain.*;
 import sg.ncl.service.team.exceptions.TeamIdNullException;
+import sg.ncl.service.team.exceptions.TeamMemberNotFoundException;
 import sg.ncl.service.team.exceptions.TeamNameNullException;
 import sg.ncl.service.team.exceptions.TeamNotFoundException;
 import sg.ncl.service.team.web.TeamMemberInfo;
@@ -17,6 +16,8 @@ import sg.ncl.service.team.web.TeamMemberInfo;
 import javax.inject.Inject;
 import java.util.ArrayList;
 import java.util.List;
+
+import static org.hamcrest.core.Is.is;
 
 /**
  * Created by Desmond/Te Ye
@@ -152,7 +153,7 @@ public class TeamServiceTest extends AbstractTest {
     @Test
     public void testAddUserToTeam() throws Exception {
         TeamEntity team = Util.getTeamEntity();
-        TeamMemberInfo teamMemberInfo = Util.getTeamMemberInfo();
+        TeamMemberInfo teamMemberInfo = Util.getTeamMemberInfo(TeamMemberType.MEMBER);
         Team createdTeam = teamService.addTeam(team);
 
         // get team id from newly saved team
@@ -163,6 +164,64 @@ public class TeamServiceTest extends AbstractTest {
         // find the team and check if user is in it
         Team teamFromDb = teamService.getTeamById(id);
         Assert.assertEquals(teamFromDb.getMembers().get(0).getUserId(), teamMemberInfo.getUserId());
+    }
+
+    @Test
+    public void testIsTeamOwnerGood() throws Exception {
+        TeamEntity team = Util.getTeamEntity();
+        TeamMemberInfo teamMemberInfo = Util.getTeamMemberInfo(TeamMemberType.OWNER);
+        Team createdTeam = teamService.addTeam(team);
+
+        String userId = teamMemberInfo.getUserId();
+        String teamId = createdTeam.getId();
+        teamService.addTeamMember(teamId, teamMemberInfo);
+
+        Assert.assertThat(teamService.isTeamOwner(userId, teamId), is(true));
+    }
+
+    @Test
+    public void testIsTeamOwnerBad() throws Exception {
+        TeamEntity team = Util.getTeamEntity();
+        TeamMemberInfo teamMemberInfo = Util.getTeamMemberInfo(TeamMemberType.MEMBER);
+        Team createdTeam = teamService.addTeam(team);
+
+        String userId = teamMemberInfo.getUserId();
+        String teamId = createdTeam.getId();
+        teamService.addTeamMember(teamId, teamMemberInfo);
+
+        Assert.assertThat(teamService.isTeamOwner(userId, teamId), is(false));
+    }
+
+    @Test
+    public void changeTeamMemberStatusGood() throws Exception {
+        TeamEntity team = Util.getTeamEntity();
+        TeamMemberInfo teamMemberInfo = Util.getTeamMemberInfo(TeamMemberType.MEMBER);
+        Team createdTeam = teamService.addTeam(team);
+
+        String userId = teamMemberInfo.getUserId();
+        String teamId = createdTeam.getId();
+
+        teamService.addTeamMember(teamId, teamMemberInfo);
+
+        TeamMember result = teamService.changeTeamMemberStatus(userId, teamId, TeamMemberStatus.APPROVED);
+
+        Assert.assertThat(result.getUserId(), is(userId));
+        Assert.assertThat(result.getMemberType(), is(teamMemberInfo.getMemberType()));
+        Assert.assertThat(result.getMemberStatus(), is(TeamMemberStatus.APPROVED));
+    }
+
+    @Test(expected = TeamMemberNotFoundException.class)
+    public void changeTeamMemberStatusBad() throws Exception {
+        // no add team member for this test case
+        TeamEntity team = Util.getTeamEntity();
+        TeamMemberInfo teamMemberInfo = Util.getTeamMemberInfo(TeamMemberType.MEMBER);
+        Team createdTeam = teamService.addTeam(team);
+
+        String userId = teamMemberInfo.getUserId();
+        String teamId = createdTeam.getId();
+
+        // should throw error here
+        TeamMember result = teamService.changeTeamMemberStatus(userId, teamId, TeamMemberStatus.APPROVED);
     }
 
     private boolean isListEqual(List<TeamEntity> one, List<TeamEntity> two) {
