@@ -14,16 +14,15 @@ import sg.ncl.service.authentication.web.CredentialsInfo;
 import sg.ncl.service.registration.data.jpa.RegistrationEntity;
 import sg.ncl.service.registration.data.jpa.RegistrationRepository;
 import sg.ncl.service.registration.domain.RegistrationService;
-import sg.ncl.service.registration.exceptions.RegisterTeamNameDuplicateException;
-import sg.ncl.service.registration.exceptions.RegisterTeamNameEmptyException;
-import sg.ncl.service.registration.exceptions.RegisterUidNullException;
-import sg.ncl.service.registration.exceptions.UserFormException;
+import sg.ncl.service.registration.exceptions.*;
 import sg.ncl.service.team.data.jpa.TeamEntity;
 import sg.ncl.service.team.data.jpa.TeamMemberEntity;
 import sg.ncl.service.team.domain.Team;
+import sg.ncl.service.team.domain.TeamMemberStatus;
 import sg.ncl.service.team.domain.TeamMemberType;
 import sg.ncl.service.team.domain.TeamService;
 import sg.ncl.service.team.web.TeamMemberInfo;
+import sg.ncl.service.user.data.jpa.UserEntity;
 import sg.ncl.service.user.domain.User;
 import sg.ncl.service.user.domain.UserService;
 
@@ -213,6 +212,15 @@ public class RegistrationServiceImpl implements RegistrationService {
         } else {
             // FIXME for debug purposes
             System.out.println(resultJSON);
+        }
+    }
+
+    public void approveJoinRequest(String teamId, String userId, UserEntity user) {
+        if (teamService.isTeamOwner(user.getId(), teamId) == false) {
+            logger.warn("User {} is not a team owner of Team {}", userId, teamId);
+            throw new UserIsNotTeamOwnerException();
+        } else {
+            teamService.changeTeamMemberStatus(userId, teamId, TeamMemberStatus.APPROVED);
         }
     }
 
