@@ -14,14 +14,12 @@ import sg.ncl.adapter.deterlab.ConnectionProperties;
 import sg.ncl.service.authentication.data.jpa.CredentialsEntity;
 import sg.ncl.service.registration.AbstractTest;
 import sg.ncl.service.registration.Util;
-import sg.ncl.service.registration.exceptions.RegisterTeamNameDuplicateException;
-import sg.ncl.service.registration.exceptions.RegisterTeamNameEmptyException;
-import sg.ncl.service.registration.exceptions.RegisterUidNullException;
-import sg.ncl.service.registration.exceptions.UserFormException;
+import sg.ncl.service.registration.exceptions.*;
 import sg.ncl.service.registration.domain.RegistrationService;
 import sg.ncl.service.team.data.jpa.TeamEntity;
 import sg.ncl.service.team.domain.Team;
 import sg.ncl.service.team.domain.TeamService;
+import sg.ncl.service.user.data.jpa.UserEntity;
 import sg.ncl.service.user.domain.User;
 import sg.ncl.service.user.domain.UserService;
 
@@ -169,6 +167,14 @@ public class RegistrationServiceTest extends AbstractTest {
         TeamEntity teamEntity = Util.getTeamEntity();
         // don't have to mock server since will throw exception
         registrationService.registerRequestToJoinTeam(uid, teamEntity);
+    }
+
+    @Test(expected = UserIsNotTeamOwnerException.class)
+    public void registerApproveJoinRequest() throws Exception {
+        TeamEntity teamEntity = Util.getTeamEntity();
+        User userEntity = Util.getUserEntity();
+        String teamId = teamService.addTeam(teamEntity).getId();
+        registrationService.approveJoinRequest(teamId, userEntity.getId(), userEntity);
     }
 
 }
