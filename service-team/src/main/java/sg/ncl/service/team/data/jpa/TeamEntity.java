@@ -164,6 +164,11 @@ public class TeamEntity extends AbstractEntity implements Team {
         entity.setTeam(this);
         entity.setJoinedDate(ZonedDateTime.now());
         entity.setMemberType(member.getMemberType());
+
+        if (member.getMemberStatus() != null) {
+            entity.setMemberStatus(member.getMemberStatus());
+        }
+
         members.put(userId, entity);
     }
 
