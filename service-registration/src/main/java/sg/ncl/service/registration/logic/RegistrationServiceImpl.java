@@ -215,12 +215,14 @@ public class RegistrationServiceImpl implements RegistrationService {
         }
     }
 
-    public void approveJoinRequest(String teamId, String userId, User user) {
-        if (teamService.isTeamOwner(user.getId(), teamId) == false) {
+    public void approveJoinRequest(String teamId, String userId, User approver) {
+        if (teamService.isTeamOwner(approver.getId(), teamId) == false) {
             logger.warn("User {} is not a team owner of Team {}", userId, teamId);
             throw new UserIsNotTeamOwnerException();
         } else {
             teamService.changeTeamMemberStatus(userId, teamId, TeamMemberStatus.APPROVED);
+            // already add to user side when request to join
+            // FIXME call adapter deterlab here
         }
     }
 
