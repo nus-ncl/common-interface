@@ -38,7 +38,7 @@ public class RegistrationController {
         registrationService.registerRequestToJoinTeam(registrationInfo.getUser().getId(), registrationInfo.getTeam());
     }
 
-    @RequestMapping(path = "/teams/{teamId}/members/{userId}")
+    @RequestMapping(path = "/teams/{teamId}/members/{userId}", method = RequestMethod.POST)
     @ResponseStatus(HttpStatus.ACCEPTED)
     public void approveJoinRequest(@PathVariable String teamId, @PathVariable String userId, @RequestBody RegistrationInfo registrationInfo) {
         registrationService.approveJoinRequest(teamId, userId, registrationInfo.getUser());
