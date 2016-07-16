@@ -4,11 +4,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import sg.ncl.service.team.data.jpa.TeamEntity;
 import sg.ncl.service.team.data.jpa.TeamRepository;
-import sg.ncl.service.team.domain.Team;
-import sg.ncl.service.team.domain.TeamMember;
-import sg.ncl.service.team.domain.TeamService;
-import sg.ncl.service.team.domain.TeamVisibility;
+import sg.ncl.service.team.domain.*;
 import sg.ncl.service.team.exceptions.TeamIdNullException;
+import sg.ncl.service.team.exceptions.TeamMemberNotFoundException;
 import sg.ncl.service.team.exceptions.TeamNameNullException;
 import sg.ncl.service.team.exceptions.TeamNotFoundException;
 
@@ -94,6 +92,29 @@ public class TeamServiceImpl implements TeamService {
         TeamEntity entity = findTeam(id);
         entity.addMember(teamMember);
         return teamRepository.save(entity);
+    }
+
+    @Transactional
+    public boolean isTeamOwner(final String userId, final String teamId) {
+        TeamEntity entity = findTeam(teamId);
+        List<? extends TeamMember> teamMembersList = entity.getMembers();
+        for (TeamMember teamMember: teamMembersList) {
+            if (teamMember.getUserId().equals(userId) && teamMember.getMemberType().equals(TeamMemberType.OWNER)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    @Transactional
+    public TeamMember changeTeamMemberStatus(String userId, String teamId, TeamMemberStatus teamMemberStatus) {
+        TeamEntity entity = findTeam(teamId);
+        TeamMember member = entity.getMember(userId);
+
+        if (member == null) {
+            throw new TeamMemberNotFoundException();
+        }
+        return entity.changeMemberStatus(member, teamMemberStatus);
     }
 
     private TeamEntity findTeam(final String id) {
