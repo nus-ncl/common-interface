@@ -61,7 +61,7 @@ apply plugin: 'spring-boot'
 def getVersion = {
     def major = '1'
     def minor = '0'
-    def build = System.getenv('bamboo_build_number')
+    def build = System.getenv('bamboo_buildNumber')
     if (build == null || build.isEmpty()) {
         build = 'SNAPSHOT'
     } else {
