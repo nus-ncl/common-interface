@@ -1,11 +1,9 @@
-package sg.ncl.service.registration.controllers;
+package sg.ncl.service.registration.web;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
-import sg.ncl.service.registration.RegistrationService;
-import sg.ncl.service.registration.dtos.RegistrationData;
-import sg.ncl.service.registration.dtos.RegistrationInfo;
+import sg.ncl.service.registration.domain.RegistrationService;
 
 import javax.inject.Inject;
 
@@ -26,7 +24,7 @@ public class RegistrationController {
     // new user + join team
     @RequestMapping(method = RequestMethod.POST)
     @ResponseStatus(HttpStatus.OK)
-    public void register(@RequestBody RegistrationInfo registrationInfo) {
+    public void register(@RequestBody final RegistrationInfo registrationInfo) {
 //        System.out.println("User: " + registrationInfo.getUser());
 //        System.out.println("Team: " + registrationInfo.getTeam());
 //        System.out.println("Registration: " + registrationInfo.getRegistration());

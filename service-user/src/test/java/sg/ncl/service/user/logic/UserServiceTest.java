@@ -13,10 +13,9 @@ import sg.ncl.service.user.data.jpa.UserRepository;
 import sg.ncl.service.user.domain.Address;
 import sg.ncl.service.user.domain.User;
 import sg.ncl.service.user.domain.UserDetails;
+import sg.ncl.service.user.domain.UserService;
 import sg.ncl.service.user.exceptions.UserIdNullException;
 import sg.ncl.service.user.exceptions.UserNotFoundException;
-import sg.ncl.service.user.web.UserDetailsInfo;
-import sg.ncl.service.user.web.UserInfo;
 
 import javax.inject.Inject;
 import java.util.List;
@@ -30,14 +29,14 @@ public class UserServiceTest extends AbstractTest {
 
     @Test
     public void getAllUserWithNoUserInDbTest() throws Exception {
-        UserService userService = new UserService(userRepository);
+        UserService userService = new UserServiceImpl(userRepository);
         List<User> list = userService.getAll();
         Assert.assertTrue(list.size() == 0);
     }
 
     @Test
     public void getAllUserTest() throws Exception {
-        UserService userService = new UserService(userRepository);
+        UserService userService = new UserServiceImpl(userRepository);
         User[] userArray = new User[3];
 
         for (int i = 0; i < 3; i++) {
@@ -52,25 +51,25 @@ public class UserServiceTest extends AbstractTest {
 
     @Test(expected = UserIdNullException.class)
     public void getUserWithNullIdTest() throws Exception {
-        UserService userService = new UserService(userRepository);
+        UserService userService = new UserServiceImpl(userRepository);
         userService.findUser(null);
     }
 
     @Test(expected = UserIdNullException.class)
     public void getUserWithEmptyIdTest() throws Exception {
-        UserService userService = new UserService(userRepository);
+        UserService userService = new UserServiceImpl(userRepository);
         userService.findUser("");
     }
 
     @Test(expected = UserNotFoundException.class)
     public void findUserWithNoUserInDbTest() throws Exception {
-        UserService userService = new UserService(userRepository);
+        UserService userService = new UserServiceImpl(userRepository);
         userService.findUser(RandomStringUtils.randomAlphabetic(20));
     }
 
     @Test
     public void findUserTest() throws Exception {
-        UserService userService = new UserService(userRepository);
+        UserService userService = new UserServiceImpl(userRepository);
         final UserEntity[] userArray = addUser();
         final String idString = userArray[0].getId();
         final UserEntity originalEntity = userArray[1];
@@ -100,7 +99,7 @@ public class UserServiceTest extends AbstractTest {
 
     @Test
     public void putUserTest() throws Exception {
-        UserService userService = new UserService(userRepository);
+        UserService userService = new UserServiceImpl(userRepository);
         final UserEntity[] userEntityArray = addUser();
         final String idString = userEntityArray[0].getId();
 
@@ -121,7 +120,7 @@ public class UserServiceTest extends AbstractTest {
 
     @Test
     public void updateUserNullFieldTest() throws Exception {
-        UserService userService = new UserService(userRepository);
+        UserService userService = new UserServiceImpl(userRepository);
 
         final UserEntity userEntity = Util.getUserEntity();
         UserEntity savedUserEntity = userRepository.save(userEntity);
@@ -133,14 +132,14 @@ public class UserServiceTest extends AbstractTest {
 
     @Test(expected = UserIdNullException.class)
     public void updateUserNullIdTest() throws Exception {
-        UserService userService = new UserService(userRepository);
+        UserService userService = new UserServiceImpl(userRepository);
         UserEntity userEntity = new UserEntity();
         userService.updateUser(null, userEntity);
     }
 
     @Test(expected = UserIdNullException.class)
     public void updateUserEmptyIdTest() throws Exception {
-        UserService userService = new UserService(userRepository);
+        UserService userService = new UserServiceImpl(userRepository);
         UserEntity userEntity = new UserEntity();
         userService.updateUser("", userEntity);
     }
@@ -158,7 +157,7 @@ public class UserServiceTest extends AbstractTest {
 
     @Test
     public void addUserToTeamTest() throws  Exception {
-        UserService userService = new UserService(userRepository);
+        UserService userService = new UserServiceImpl(userRepository);
         UserEntity[] userEntityArray = addUser();
         UserEntity userEntity = userEntityArray[0];
         String userId = userEntity.getId();
@@ -173,7 +172,7 @@ public class UserServiceTest extends AbstractTest {
 
     @Test
     public void addUserTest() throws Exception {
-        UserService userService = new UserService(userRepository);
+        UserService userService = new UserServiceImpl(userRepository);
         UserEntity userEntity = Util.getUserEntity();
         User user = userService.createUser(userEntity);
 

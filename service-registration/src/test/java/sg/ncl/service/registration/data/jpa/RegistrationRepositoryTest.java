@@ -1,4 +1,4 @@
-package sg.ncl.service.registration.data.jpa.repositories;
+package sg.ncl.service.registration.data.jpa;
 
 import org.junit.Rule;
 import org.junit.Test;
@@ -6,16 +6,11 @@ import org.junit.rules.ExpectedException;
 import org.springframework.dao.DataIntegrityViolationException;
 import sg.ncl.service.registration.AbstractTest;
 import sg.ncl.service.registration.Util;
-import sg.ncl.service.registration.data.jpa.entities.RegistrationEntity;
 
 import javax.inject.Inject;
-
 import java.time.ZonedDateTime;
 
-import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.not;
-import static org.hamcrest.Matchers.nullValue;
-import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.assertThat;
 import static sg.ncl.common.test.Checks.checkException;
 
@@ -215,7 +210,7 @@ public class RegistrationRepositoryTest extends AbstractTest {
             repository.saveAndFlush(entity2);
             exception.expect(DataIntegrityViolationException.class);
         } catch (Exception e) {
-            checkException(e, "PUBLIC.REGISTRATION(UID)");
+            checkException(e, "PUBLIC.REGISTRATIONS(UID)");
         }
     }
 
@@ -230,7 +225,7 @@ public class RegistrationRepositoryTest extends AbstractTest {
             repository.saveAndFlush(entity2);
             exception.expect(DataIntegrityViolationException.class);
         } catch (Exception e) {
-            checkException(e, "PUBLIC.REGISTRATION(USR_EMAIL)");
+            checkException(e, "PUBLIC.REGISTRATIONS(USR_EMAIL)");
         }
     }
 

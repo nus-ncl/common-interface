@@ -1,6 +1,5 @@
-package sg.ncl.service.registration.data.jpa.entities;
+package sg.ncl.service.registration.data.jpa;
 
-import org.hibernate.annotations.GenericGenerator;
 import sg.ncl.common.jpa.AbstractEntity;
 import sg.ncl.service.registration.domain.Registration;
 
@@ -10,14 +9,13 @@ import javax.persistence.*;
  * Created by Desmond and Te Ye on 16-Jun-16.
  */
 @Entity
-@Table(name = "registration")
+@Table(name = "registrations")
 public class RegistrationEntity extends AbstractEntity implements Registration {
 
     @Id
-    @GeneratedValue(generator = "uuid2")
-    @GenericGenerator(name = "uuid2", strategy = "uuid2")
+    @GeneratedValue
     @Column(name = "id", nullable = false, unique = true, updatable = false)
-    private String id;
+    private Long id;
 
     @Column(name = "pid", nullable = false)
     private String pid;
@@ -65,11 +63,11 @@ public class RegistrationEntity extends AbstractEntity implements Registration {
     @Column(name = "usr_phone", nullable = false)
     private String usrPhone;
 
-    public String getId() {
+    public Long getId() {
         return id;
     }
 
-    public void setId(String id) {
+    public void setId(Long id) {
         this.id = id;
     }
 

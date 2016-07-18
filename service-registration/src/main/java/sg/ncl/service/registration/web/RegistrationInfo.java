@@ -1,4 +1,4 @@
-package sg.ncl.service.registration.dtos;
+package sg.ncl.service.registration.web;
 
 import sg.ncl.service.authentication.data.jpa.CredentialsEntity;
 import sg.ncl.service.team.data.jpa.TeamEntity;

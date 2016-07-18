@@ -1,7 +1,9 @@
-package sg.ncl.service.registration.data.jpa.entities;
+package sg.ncl.service.registration.data.jpa;
 
 import org.apache.commons.lang3.RandomStringUtils;
 import org.junit.Test;
+
+import java.util.Random;
 
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.nullValue;
@@ -22,7 +24,7 @@ public class RegistrationEntityTest {
     @Test
     public void testSetId() throws Exception {
         final RegistrationEntity entity = new RegistrationEntity();
-        final String id = RandomStringUtils.randomAlphanumeric(20);
+        final Long id = new Random().nextLong();
         entity.setId(id);
 
         assertThat(entity.getId(), is(id));

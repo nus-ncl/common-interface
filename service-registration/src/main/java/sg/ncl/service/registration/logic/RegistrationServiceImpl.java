@@ -1,4 +1,4 @@
-package sg.ncl.service.registration;
+package sg.ncl.service.registration.logic;
 
 import org.json.JSONObject;
 import org.slf4j.Logger;
@@ -8,10 +8,12 @@ import org.springframework.stereotype.Service;
 import sg.ncl.adapter.deterlab.AdapterDeterlab;
 import sg.ncl.adapter.deterlab.ConnectionProperties;
 import sg.ncl.adapter.deterlab.data.jpa.DeterlabUserRepository;
-import sg.ncl.service.authentication.data.jpa.CredentialsEntity;
+import sg.ncl.service.authentication.domain.Credentials;
 import sg.ncl.service.authentication.logic.CredentialsService;
-import sg.ncl.service.registration.data.jpa.entities.RegistrationEntity;
-import sg.ncl.service.registration.data.jpa.repositories.RegistrationRepository;
+import sg.ncl.service.authentication.web.CredentialsInfo;
+import sg.ncl.service.registration.data.jpa.RegistrationEntity;
+import sg.ncl.service.registration.data.jpa.RegistrationRepository;
+import sg.ncl.service.registration.domain.RegistrationService;
 import sg.ncl.service.registration.exceptions.RegisterTeamNameDuplicateException;
 import sg.ncl.service.registration.exceptions.RegisterTeamNameEmptyException;
 import sg.ncl.service.registration.exceptions.RegisterUidNullException;
@@ -21,10 +23,9 @@ import sg.ncl.service.team.data.jpa.TeamMemberEntity;
 import sg.ncl.service.team.domain.Team;
 import sg.ncl.service.team.domain.TeamMemberType;
 import sg.ncl.service.team.domain.TeamService;
-import sg.ncl.service.team.exceptions.TeamNameNullException;
 import sg.ncl.service.team.web.TeamMemberInfo;
 import sg.ncl.service.user.domain.User;
-import sg.ncl.service.user.logic.UserService;
+import sg.ncl.service.user.domain.UserService;
 
 import javax.inject.Inject;
 import java.time.ZonedDateTime;
@@ -33,7 +34,7 @@ import java.time.ZonedDateTime;
  * @author Christopher Zhong
  */
 @Service
-public class RegistrationService {
+public class RegistrationServiceImpl implements RegistrationService {
 
     private static final Logger logger = LoggerFactory.getLogger(RegistrationService.class);
 
@@ -46,7 +47,7 @@ public class RegistrationService {
     private final AdapterDeterlab adapterDeterlab;
 
     @Inject
-    protected RegistrationService(final CredentialsService credentialsService, final TeamService teamService, final UserService userService, final RegistrationRepository registrationRepository, final DeterlabUserRepository deterlabUserRepository, final ConnectionProperties connectionProperties) {
+    protected RegistrationServiceImpl(final CredentialsService credentialsService, final TeamService teamService, final UserService userService, final RegistrationRepository registrationRepository, final DeterlabUserRepository deterlabUserRepository, final ConnectionProperties connectionProperties) {
         this.credentialsService = credentialsService;
         this.teamService = teamService;
         this.userService = userService;
@@ -84,7 +85,7 @@ public class RegistrationService {
         String resultJSON = adapterDeterlab.joinProject(userObject.toString());
     }
 
-    public void register(CredentialsEntity credentials, User user, Team team, boolean isJoinTeam) {
+    public void register(Credentials credentials, User user, Team team, boolean isJoinTeam) {
 
         if (userFormFieldsHasErrors(user)) {
             logger.warn("User form fields has errors {}", user);
@@ -111,7 +112,7 @@ public class RegistrationService {
                 logger.info("This is good, this implies team name is unique");
             }
             if (teamEntity != null && teamEntity.getId() != null) {
-                if (! teamEntity.getId().isEmpty()) {
+                if (!teamEntity.getId().isEmpty()) {
                     logger.warn("Team name duplicate entry found");
                     throw new RegisterTeamNameDuplicateException();
                 }
@@ -147,8 +148,8 @@ public class RegistrationService {
         String userId = userService.createUser(user).getId();
 
         // create the credentials after creating the users
-        credentials.setId(userId);
-        credentialsService.addCredentials(credentials);
+        final CredentialsInfo credentialsInfo = new CredentialsInfo(userId, credentials.getUsername(), credentials.getPassword(), null);
+        credentialsService.addCredentials(credentialsInfo);
 
         if (isJoinTeam == true) {
             // indicate member type based on button click

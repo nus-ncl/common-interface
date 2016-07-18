@@ -1,4 +1,4 @@
-package sg.ncl.service.registration.controllers;
+package sg.ncl.service.registration.web;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -30,7 +30,7 @@ import sg.ncl.service.team.domain.Team;
 import sg.ncl.service.team.domain.TeamService;
 import sg.ncl.service.user.data.jpa.UserEntity;
 import sg.ncl.service.user.domain.User;
-import sg.ncl.service.user.logic.UserService;
+import sg.ncl.service.user.domain.UserService;
 
 import javax.inject.Inject;
 import java.time.ZonedDateTime;
