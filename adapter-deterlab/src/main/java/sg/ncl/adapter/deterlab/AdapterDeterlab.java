@@ -29,7 +29,7 @@ public class AdapterDeterlab {
     private ConnectionProperties properties;
     private static final Logger logger = LoggerFactory.getLogger(AdapterDeterlab.class);
 
-    @Autowired
+    @Inject
     private RestTemplate restTemplate;
 
     @Inject

@@ -20,7 +20,7 @@ public class Util {
         entity.setUserId(RandomStringUtils.randomAlphanumeric(20));
         entity.setTeamId(RandomStringUtils.randomAlphanumeric(20));
         entity.setTeamName(RandomStringUtils.randomAlphanumeric(20));
-        entity.setName(RandomStringUtils.randomAlphanumeric(20));
+        entity.setName(RandomStringUtils.randomAlphanumeric(19));
         entity.setDescription(RandomStringUtils.randomAlphanumeric(20));
         entity.setNsFile(RandomStringUtils.randomAlphanumeric(20));
         entity.setNsFileContent(createNsFileContents());

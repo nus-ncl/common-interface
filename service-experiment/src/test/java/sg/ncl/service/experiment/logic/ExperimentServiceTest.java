@@ -2,11 +2,14 @@ package sg.ncl.service.experiment.logic;
 
 import mockit.Expectations;
 import org.apache.commons.lang3.RandomStringUtils;
+import org.json.JSONObject;
 import org.junit.Assert;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.MediaType;
 import sg.ncl.service.experiment.AbstractTest;
 import sg.ncl.service.experiment.ConnectionProperties;
 import sg.ncl.service.experiment.Util;
@@ -21,6 +24,9 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import static org.springframework.test.web.client.match.MockRestRequestMatchers.method;
+import static org.springframework.test.web.client.match.MockRestRequestMatchers.requestTo;
+import static org.springframework.test.web.client.response.MockRestResponseCreators.withSuccess;
 import static sg.ncl.service.experiment.Util.createNsFileContents;
 
 /**
@@ -42,7 +48,7 @@ public class ExperimentServiceTest extends AbstractTest {
         ExperimentService localExperimentService = new ExperimentService(experimentRepository) {
             @Override
             public String createExperimentInDeter(ExperimentEntity experimentEntity) {
-                return "done";
+                return "experiment created";
             }
         };
 
@@ -63,8 +69,8 @@ public class ExperimentServiceTest extends AbstractTest {
         Assert.assertEquals(filename, savedExperiment.getNsFile());
 
         // delete the created ns file
-        File file = new File(filename);
-        Files.deleteIfExists(file.toPath());
+//        File file = new File(filename);
+//        Files.deleteIfExists(file.toPath());
     }
 
     @Test
@@ -122,14 +128,12 @@ public class ExperimentServiceTest extends AbstractTest {
         ExperimentEntity experimentEntity = Util.getExperimentsEntity();
         experimentEntity.setNsFile("nsfile.ns");
 
-        createNsFileContents();
-
         ExperimentService experimentService = new ExperimentService(experimentRepository);
         new Expectations(ExperimentService.class) {{
-            experimentService.createExperimentInDeter(experimentEntity); result = "done";
+            experimentService.createExperimentInDeter(experimentEntity); result = "experiment created";
         }};
 
         String response = experimentService.createExperimentInDeter(experimentEntity);
-        System.out.println(response);
+        Assert.assertEquals("experiment created", response);
     }
 }
