@@ -58,7 +58,19 @@ configure(subprojects.findAll({ it.name.startsWith('service-') })) {
 
 apply plugin: 'spring-boot'
 
-version '1.0-SNAPSHOT'
+def getVersion = {
+    def major = '1'
+    def minor = '0'
+    def build = System.getenv('bamboo_build_number')
+    if (build == null || build.isEmpty()) {
+        build = 'SNAPSHOT'
+    } else {
+        build = 'b' + build
+    }
+    return String.format('%s.%s-%s', major, minor, build)
+}
+
+version getVersion()
 
 dependencies {
     // the only compile dependencies needed here are the services projects;
