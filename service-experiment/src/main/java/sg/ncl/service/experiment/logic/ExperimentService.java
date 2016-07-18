@@ -2,13 +2,8 @@ package sg.ncl.service.experiment.logic;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
-import org.springframework.boot.context.properties.ConfigurationProperties;
-import org.springframework.boot.context.properties.EnableConfigurationProperties;
-import org.springframework.context.annotation.Configuration;
 import org.springframework.stereotype.Service;
+import sg.ncl.adapter.deterlab.AdapterDeterlab;
 import sg.ncl.service.experiment.ConnectionProperties;
 import sg.ncl.service.experiment.data.jpa.ExperimentEntity;
 import sg.ncl.service.experiment.data.jpa.ExperimentRepository;
@@ -30,6 +25,9 @@ public class ExperimentService {
 
     private static final Logger logger = LoggerFactory.getLogger(ExperimentService.class);
     private final ExperimentRepository experimentRepository;
+
+    @Inject
+    private AdapterDeterlab adapterDeterlab;
 
     @Inject
     private ConnectionProperties connectionProperties;
@@ -159,6 +157,7 @@ public class ExperimentService {
         logger.info("Create experiment in deter");
 
         String login = experimentEntity.getUserId();
+        String deterLogin = adapterDeterlab.getDeterUserIdByNclUserId(login);
         String maxDuration = experimentEntity.getMaxDuration().toString();
         String idleSwap = experimentEntity.getIdleSwap().toString();
         String description = experimentEntity.getDescription();
@@ -167,10 +166,10 @@ public class ExperimentService {
         String fileName = experimentEntity.getNsFile();
 
         StringBuilder command = new StringBuilder();
-        command.append("script_wrapper.py");
+        command.append("python script_wrapper.py");
 //        command.append(" --server=172.18.178.11");
         command.append(" --server=" + connectionProperties.getUserurl());
-        command.append(" --login=" + login);
+        command.append(" --login=" + deterLogin);
         command.append(" startexp");
         command.append(" -a " + maxDuration);
         command.append(" -l " + idleSwap);
@@ -194,6 +193,4 @@ public class ExperimentService {
         logger.info("Experiment created in deter");
         return "done";
     }
-
-
 }
