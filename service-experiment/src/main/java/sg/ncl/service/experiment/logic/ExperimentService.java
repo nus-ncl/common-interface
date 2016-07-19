@@ -155,6 +155,7 @@ public class ExperimentService {
 
     public String createExperimentInDeter(ExperimentEntity experimentEntity) {
         logger.info("Create experiment in deter");
+        logger.info("User Sserver URI: " + connectionProperties.getUserurl());
 
         JSONObject userObject = new JSONObject();
         userObject.put("id", experimentEntity.getId().toString());
@@ -200,6 +201,9 @@ public class ExperimentService {
 //            logger.error("Experiment can't be created in deter. " + e.getMessage());
 //            return "error";
 //        }
+
+
+        System.out.println("@@@@@@@@@@@@@@@@@@@@@@ " + userObject.toString());
 
         logger.info("Experiment created in deter");
 

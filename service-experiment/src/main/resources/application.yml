@@ -40,8 +40,3 @@ spring:
     properties:
       hibernate:
         dialect: org.hibernate.dialect.MySQL5InnoDBDialect
-
-deterurl:
-  bossurl: 172.18.178.10
-  userurl: 172.18.178.11
-  port: 80
