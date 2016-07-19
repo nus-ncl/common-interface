@@ -190,8 +190,8 @@ public class RegistrationServiceTest extends AbstractTest {
         String memberId = userService.createUser(member).getId();
 
         // need to create entry in the Deterlab User Repository
-        adapterDeterlab.saveDeterUserIdMapping("leader", ownerId);
-        adapterDeterlab.saveDeterUserIdMapping("member", memberId);
+        adapterDeterlab.saveDeterUserIdMapping(RandomStringUtils.randomAlphanumeric(8), ownerId);
+        adapterDeterlab.saveDeterUserIdMapping(RandomStringUtils.randomAlphanumeric(8), memberId);
 
         // add owner and members to team members repository
 
