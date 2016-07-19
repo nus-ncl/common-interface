@@ -8,14 +8,14 @@ import javax.inject.Inject;
 /**
  * Created by Desmond.
  */
-public class ConnectionPropertiesTest extends AbstractTest {
+public class ExperimentConnectionPropertiesTest extends AbstractTest {
 
     @Inject
-    private ConnectionProperties connectionProperties;
+    private ExperimentConnectionProperties experimentConnectionProperties;
 
     @Test
     public void testGetBossUrlReturnsNotNull() throws Exception {
-        String bossUrl = connectionProperties.getBossurl();
+        String bossUrl = experimentConnectionProperties.getBossurl();
 
         Assert.assertNotNull(bossUrl);
         Assert.assertTrue(bossUrl.length() > 0);
@@ -23,7 +23,7 @@ public class ConnectionPropertiesTest extends AbstractTest {
 
     @Test
     public void testGetUserUrlReturnsNotNull() throws Exception {
-        String userUrl = connectionProperties.getUserurl();
+        String userUrl = experimentConnectionProperties.getUserurl();
 
         Assert.assertNotNull(userUrl);
         Assert.assertTrue(userUrl.length() > 0);
@@ -31,7 +31,7 @@ public class ConnectionPropertiesTest extends AbstractTest {
 
     @Test
     public void testGetPortReturnsNotNull() throws Exception {
-        String port = connectionProperties.getPort();
+        String port = experimentConnectionProperties.getPort();
 
         Assert.assertNotNull(port);
         Assert.assertTrue(port.length() > 0);

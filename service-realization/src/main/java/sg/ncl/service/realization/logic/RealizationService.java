@@ -5,7 +5,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import sg.ncl.adapter.deterlab.AdapterDeterlab;
-import sg.ncl.service.realization.ConnectionProperties;
+import sg.ncl.service.realization.RealizationConnectionProperties;
 import sg.ncl.service.realization.data.jpa.RealizationEntity;
 import sg.ncl.service.realization.data.jpa.RealizationRepository;
 import sg.ncl.service.realization.domain.RealizationState;
@@ -22,10 +22,10 @@ public class RealizationService {
     private final RealizationRepository realizationRepository;
 
     @Inject
-    private ConnectionProperties connectionProperties;
+    private AdapterDeterlab adapterDeterlab;
 
     @Inject
-    private AdapterDeterlab adapterDeterlab;
+    private RealizationConnectionProperties realizationConnectionProperties;
 
     @Inject
     protected RealizationService(final RealizationRepository realizationRepository) {
@@ -44,7 +44,7 @@ public class RealizationService {
     public void startExperimentInDeter(final String teamId, final String experimentId) {
         StringBuilder httpCommand = new StringBuilder();
         httpCommand.append("http://");
-        httpCommand.append(connectionProperties.getBossurl());
+        httpCommand.append(realizationConnectionProperties.getBossurl());
         httpCommand.append("/swapexp.php?");
         httpCommand.append("inout=in");
         httpCommand.append("&");

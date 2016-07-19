@@ -5,7 +5,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import sg.ncl.adapter.deterlab.AdapterDeterlab;
-import sg.ncl.service.experiment.ConnectionProperties;
+import sg.ncl.service.experiment.ExperimentConnectionProperties;
 import sg.ncl.service.experiment.data.jpa.ExperimentEntity;
 import sg.ncl.service.experiment.data.jpa.ExperimentRepository;
 import sg.ncl.service.experiment.domain.Experiment;
@@ -31,7 +31,7 @@ public class ExperimentService {
     private AdapterDeterlab adapterDeterlab;
 
     @Inject
-    private ConnectionProperties connectionProperties;
+    private ExperimentConnectionProperties experimentConnectionProperties;
 
     @Inject
     protected ExperimentService(final ExperimentRepository experimentRepository) {
@@ -155,7 +155,7 @@ public class ExperimentService {
 
     public String createExperimentInDeter(ExperimentEntity experimentEntity) {
         logger.info("Create experiment in deter");
-        logger.info("User Sserver URI: " + connectionProperties.getUserurl());
+        logger.info("User Sserver URI: " + experimentConnectionProperties.getUserurl());
 
         JSONObject userObject = new JSONObject();
         userObject.put("id", experimentEntity.getId().toString());
@@ -168,7 +168,7 @@ public class ExperimentService {
         userObject.put("idleSwap", experimentEntity.getIdleSwap().toString());
         userObject.put("maxDuration", experimentEntity.getMaxDuration().toString());
         userObject.put("deterLogin", adapterDeterlab.getDeterUserIdByNclUserId(experimentEntity.getUserId()));
-        userObject.put("userServerUri", connectionProperties.getUserurl());
+        userObject.put("userServerUri", experimentConnectionProperties.getUserurl());
 
 //        String login = experimentEntity.getUserId();
 //        String deterLogin = adapterDeterlab.getDeterUserIdByNclUserId(login);

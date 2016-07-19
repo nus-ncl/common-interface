@@ -2,32 +2,21 @@ package sg.ncl.service.experiment.logic;
 
 import mockit.Expectations;
 import org.apache.commons.lang3.RandomStringUtils;
-import org.json.JSONObject;
 import org.junit.Assert;
 import org.junit.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.http.HttpMethod;
-import org.springframework.http.MediaType;
 import sg.ncl.service.experiment.AbstractTest;
-import sg.ncl.service.experiment.ConnectionProperties;
 import sg.ncl.service.experiment.Util;
 import sg.ncl.service.experiment.data.jpa.ExperimentEntity;
 import sg.ncl.service.experiment.data.jpa.ExperimentRepository;
 
 import javax.inject.Inject;
-import java.io.File;
-import java.nio.file.Files;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-import static org.springframework.test.web.client.match.MockRestRequestMatchers.method;
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.requestTo;
 import static org.springframework.test.web.client.response.MockRestResponseCreators.withSuccess;
-import static sg.ncl.service.experiment.Util.createNsFileContents;
 
 /**
  * Created by Desmond.
