@@ -11,6 +11,7 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.client.MockRestServiceServer;
 import org.springframework.web.client.RestOperations;
 import org.springframework.web.client.RestTemplate;
+import sg.ncl.adapter.deterlab.AdapterDeterlab;
 import sg.ncl.adapter.deterlab.ConnectionProperties;
 import sg.ncl.service.authentication.data.jpa.CredentialsEntity;
 import sg.ncl.service.registration.AbstractTest;
@@ -21,7 +22,6 @@ import sg.ncl.service.team.data.jpa.TeamEntity;
 import sg.ncl.service.team.data.jpa.TeamMemberEntity;
 import sg.ncl.service.team.domain.*;
 import sg.ncl.service.team.web.TeamMemberInfo;
-import sg.ncl.service.user.data.jpa.UserEntity;
 import sg.ncl.service.user.domain.User;
 import sg.ncl.service.user.domain.UserService;
 
@@ -51,6 +51,9 @@ public class RegistrationServiceTest extends AbstractTest {
 
     @Inject
     private RegistrationService registrationService;
+
+    @Inject
+    private AdapterDeterlab adapterDeterlab;
 
     @Autowired
     private RestOperations restOperations;
@@ -186,6 +189,10 @@ public class RegistrationServiceTest extends AbstractTest {
         String ownerId = savedOwner.getId();
         String memberId = userService.createUser(member).getId();
 
+        // need to create entry in the Deterlab User Repository
+        adapterDeterlab.saveDeterUserIdMapping("leader", ownerId);
+        adapterDeterlab.saveDeterUserIdMapping("member", memberId);
+
         // add owner and members to team members repository
 
         // set owner to approved
@@ -204,7 +211,17 @@ public class RegistrationServiceTest extends AbstractTest {
         teamService.addTeamMember(teamId, new TeamMemberInfo(member1));
         teamService.addTeamMember(teamId, new TeamMemberInfo(member2));
 
+        /*==== start mock the adapter deterlab call ===*/
+        JSONObject predefinedResultJson = new JSONObject();
+        predefinedResultJson.put("msg", "join request approved");
+
+        mockServer.expect(requestTo(properties.getApproveJoinRequest()))
+                .andExpect(method(HttpMethod.POST))
+                .andRespond(withSuccess(predefinedResultJson.toString(), MediaType.APPLICATION_JSON));
+
         registrationService.approveJoinRequest(teamId, memberId, savedOwner);
+
+        /*==== end mock the adapter deterlab call ===*/
 
         Team resultTeam = teamService.getTeamById(teamId);
         List<? extends TeamMember> teamMembersList = resultTeam.getMembers();

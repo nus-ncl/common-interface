@@ -166,4 +166,21 @@ public class AdapterDeterlabTest extends AbstractTest {
         String expectedDeterUserId = adapterDeterlab.getDeterUserIdByNclUserId(deterlabUserEntity.getNclUserId());
         Assert.assertThat(deterlabUserEntity.getDeterUserId(), is(expectedDeterUserId));
     }
+
+    @Test
+    public void testApproveJoinRequestOnDeter() {
+        JSONObject one = Util.getApproveJoinRequestAdapterJsonObject();
+
+        JSONObject predefinedResultJson = new JSONObject();
+        predefinedResultJson.put("msg", "join request approved");
+
+        mockServer.expect(requestTo(properties.getApproveJoinRequest()))
+                .andExpect(method(HttpMethod.POST))
+                .andRespond(withSuccess(predefinedResultJson.toString(), MediaType.APPLICATION_JSON));
+
+        String result = adapterDeterlab.approveJoinRequest(one.toString());
+        JSONObject resultJSONObject = new JSONObject(result);
+        String msg = resultJSONObject.getString("msg");
+        Assert.assertThat(msg, is("join request approved"));
+    }
 }
