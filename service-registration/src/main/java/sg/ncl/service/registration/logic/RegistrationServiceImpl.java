@@ -220,15 +220,15 @@ public class RegistrationServiceImpl implements RegistrationService {
             logger.warn("User {} is not a team owner of Team {}", userId, teamId);
             throw new UserIsNotTeamOwnerException();
         }
-
-        teamService.changeTeamMemberStatus(userId, teamId, TeamMemberStatus.APPROVED);
         String pid = teamService.getTeamById(teamId).getName();
         // already add to user side when request to join
         JSONObject one = new JSONObject();
+        one.put("approverUid", adapterDeterlab.getDeterUserIdByNclUserId(approver.getId()));
         one.put("uid", adapterDeterlab.getDeterUserIdByNclUserId(userId));
         one.put("pid", pid);
         one.put("gid", pid);
         adapterDeterlab.approveJoinRequest(one.toString());
+        teamService.changeTeamMemberStatus(userId, teamId, TeamMemberStatus.APPROVED);
     }
 
     private boolean userFormFieldsHasErrors(User user) {
