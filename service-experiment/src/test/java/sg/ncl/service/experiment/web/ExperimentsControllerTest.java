@@ -17,6 +17,7 @@ import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.web.client.RestOperations;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.context.WebApplicationContext;
+import sg.ncl.adapter.deterlab.AdapterDeterlab;
 import sg.ncl.adapter.deterlab.ConnectionProperties;
 import sg.ncl.service.experiment.AbstractTest;
 import sg.ncl.service.experiment.Util;
@@ -61,7 +62,10 @@ public class ExperimentsControllerTest extends AbstractTest {
     @Inject
     private ConnectionProperties properties;
 
-    @Autowired
+    @Inject
+    private AdapterDeterlab adapterDeterlab;
+
+    @Inject
     private RestOperations restOperations;
 
     @Before
@@ -95,6 +99,9 @@ public class ExperimentsControllerTest extends AbstractTest {
         ObjectMapper mapper = new ObjectMapper();
         mapper.registerModule(new JavaTimeModule());
         String jsonString = mapper.writeValueAsString(experimentEntity);
+
+        // need this to prevent test fail when creating experiment
+        adapterDeterlab.saveDeterUserIdMapping(RandomStringUtils.randomAlphanumeric(8), experimentEntity.getUserId());
 
         mockMvc.perform(post("/experiments").contentType(contentType).content(jsonString))
                 .andExpect(status().isCreated());
