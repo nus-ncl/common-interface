@@ -91,7 +91,7 @@ public class ExperimentsControllerTest extends AbstractTest {
         predefinedResultJson.put("msg", "experiment is created");
 
         // mock the adapter-deter service
-        mockServer.expect(requestTo(properties.getCreateExperimentUri()))
+        mockServer.expect(requestTo(properties.getCreateExperiment()))
                 .andExpect(method(HttpMethod.POST))
                 .andRespond(withSuccess(predefinedResultJson.toString(), MediaType.APPLICATION_JSON));
 

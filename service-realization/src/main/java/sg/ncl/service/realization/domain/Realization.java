@@ -17,6 +17,7 @@ public interface Realization {
     String getUserId();
     String getTeamId();
     Integer getNumberOfNodes();
+    RealizationState getState();
     Long getIdleMinutes();
     Long getRunningMinutes();
 }

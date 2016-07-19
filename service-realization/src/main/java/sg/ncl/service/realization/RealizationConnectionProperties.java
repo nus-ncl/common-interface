@@ -1,4 +1,4 @@
-package sg.ncl.service.experiment;
+package sg.ncl.service.realization;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;
@@ -8,7 +8,7 @@ import org.springframework.stereotype.Component;
  */
 @Component
 @ConfigurationProperties(prefix = "deterurl")
-public class ConnectionProperties {
+public class RealizationConnectionProperties {
     private String bossurl;
     private String userurl;
     private String port;

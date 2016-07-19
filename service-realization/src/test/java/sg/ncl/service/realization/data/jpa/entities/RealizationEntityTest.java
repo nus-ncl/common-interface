@@ -3,6 +3,7 @@ package sg.ncl.service.realization.data.jpa.entities;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.junit.Test;
 import sg.ncl.service.realization.data.jpa.RealizationEntity;
+import sg.ncl.service.realization.domain.RealizationState;
 
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.nullValue;
@@ -91,6 +92,21 @@ public class RealizationEntityTest {
         entity.setNumberOfNodes(number);
 
         assertThat(entity.getNumberOfNodes(), is(number));
+    }
+
+    @Test
+    public void testGetState() throws Exception {
+        final RealizationEntity entity = new RealizationEntity();
+
+        assertThat(entity.getState(), is(RealizationState.STOP));
+    }
+
+    @Test
+    public void testSetState() throws Exception {
+        final RealizationEntity entity = new RealizationEntity();
+        entity.setState(RealizationState.WARNING);
+
+        assertThat(entity.getState(), is(RealizationState.WARNING));
     }
 
     @Test

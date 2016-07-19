@@ -144,7 +144,7 @@ public class AdapterDeterlabTest extends AbstractTest {
         JSONObject predefinedResultJson = new JSONObject();
         predefinedResultJson.put("msg", "experiment is created");
 
-        mockServer.expect(requestTo(properties.getCreateExperimentUri()))
+        mockServer.expect(requestTo(properties.getCreateExperiment()))
                 .andExpect(method(HttpMethod.POST))
                 .andRespond(withSuccess(predefinedResultJson.toString(), MediaType.APPLICATION_JSON));
 

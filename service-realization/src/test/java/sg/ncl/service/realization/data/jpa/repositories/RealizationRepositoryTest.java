@@ -1,13 +1,16 @@
 package sg.ncl.service.realization.data.jpa.repositories;
 
+import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
+import org.springframework.boot.autoconfigure.web.ResourceProperties;
 import org.springframework.dao.DataIntegrityViolationException;
 import sg.ncl.service.realization.AbstractTest;
 import sg.ncl.service.realization.Util;
 import sg.ncl.service.realization.data.jpa.RealizationEntity;
 import sg.ncl.service.realization.data.jpa.RealizationRepository;
+import sg.ncl.service.realization.domain.RealizationState;
 
 import javax.inject.Inject;
 import java.time.ZonedDateTime;
@@ -15,6 +18,8 @@ import java.time.ZonedDateTime;
 import static org.hamcrest.Matchers.*;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThat;
 import static sg.ncl.common.test.Checks.checkException;
 
@@ -41,6 +46,13 @@ public class RealizationRepositoryTest extends AbstractTest {
         final long count = repository.count();
         final RealizationEntity savedEntity = repository.saveAndFlush(entity);
         assertThat(repository.count(), is(equalTo(count + 1)));
+        assertThat(savedEntity.getUserId(), is(not(nullValue(String.class))));
+        assertThat(savedEntity.getTeamId(), is(not(nullValue(String.class))));
+        assertThat(savedEntity.getExperimentId(), is(not(nullValue(Long.class))));
+        assertThat(savedEntity.getNumberOfNodes(), is(not(nullValue(Integer.class))));
+        assertThat(savedEntity.getState(), is(not(nullValue(RealizationState.class))));
+        assertThat(savedEntity.getIdleMinutes(), is(not(nullValue(Long.class))));
+        assertThat(savedEntity.getRunningMinutes(), is(not(nullValue(Long.class))));
         assertThat(savedEntity.getCreatedDate(), is(not(nullValue(ZonedDateTime.class))));
         assertThat(savedEntity.getLastModifiedDate(), is(not(nullValue(ZonedDateTime.class))));
         assertThat(savedEntity.getVersion(), is(equalTo(0L)));
@@ -99,6 +111,19 @@ public class RealizationRepositoryTest extends AbstractTest {
     }
 
     @Test
+    public void testSaveNullState() throws Exception {
+        final RealizationEntity entity = Util.getRealizationEntity();
+        entity.setState(null);
+
+        try {
+            repository.saveAndFlush(entity);
+            exception.expect(DataIntegrityViolationException.class);
+        } catch (Exception e) {
+            checkException(e, "NULL not allowed for column \"STATE\"");
+        }
+    }
+
+    @Test
     public void testSaveNullIdleMinutes() throws Exception {
         final RealizationEntity entity = Util.getRealizationEntity();
         entity.setIdleMinutes(null);
@@ -122,5 +147,24 @@ public class RealizationRepositoryTest extends AbstractTest {
         } catch (Exception e) {
             checkException(e, "NULL not allowed for column \"RUNNING_MINUTES\"");
         }
+    }
+
+    @Test
+    public void testGetRealizationByExperimentId() throws Exception {
+        final RealizationEntity entity = Util.getRealizationEntity();
+        RealizationEntity savedRealizationEntitiy = repository.save(entity);
+
+        Long experimentId = savedRealizationEntitiy.getExperimentId();
+
+        RealizationEntity realizationEntityDB = repository.findByExperimentId(experimentId);
+
+        assertNotNull(realizationEntityDB);
+        assertEquals(entity.getUserId(), realizationEntityDB.getUserId());
+        assertEquals(entity.getTeamId(), realizationEntityDB.getTeamId());
+        assertEquals(entity.getExperimentId(), realizationEntityDB.getExperimentId());
+        assertEquals(entity.getNumberOfNodes(), realizationEntityDB.getNumberOfNodes());
+        assertEquals(entity.getState(), realizationEntityDB.getState());
+        assertEquals(entity.getIdleMinutes(), realizationEntityDB.getIdleMinutes());
+        assertEquals(entity.getRunningMinutes(), realizationEntityDB.getRunningMinutes());
     }
 }

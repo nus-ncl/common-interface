@@ -43,8 +43,16 @@ public class ConnectionProperties {
         return "http://" + ip + ":" + port + "/applyProjectNewUsers";
     }
     
-    public String getCreateExperimentUri() {
+    public String getCreateExperiment() {
         return "http://" + ip + ":" + port + "/createExperiment";
+    }
+
+    public String startExperiment() {
+        return "http://" + ip + ":" + port + "/startExperiment";
+    }
+
+    public String stopExperiment() {
+        return "http://" + ip + ":" + port + "/stopExperiment";
     }
 
     public String getUpdateCredentials() {

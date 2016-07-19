@@ -2,6 +2,7 @@ package sg.ncl.service.realization.web;
 
 import sg.ncl.service.realization.data.jpa.RealizationEntity;
 import sg.ncl.service.realization.domain.Realization;
+import sg.ncl.service.realization.domain.RealizationState;
 
 /**
  * Created by Desmond.
@@ -13,18 +14,25 @@ public class RealizationInfo implements Realization {
     private String userId;
     private String teamId;
     private Integer numberOfNodes;
+    private RealizationState state;
     private Long idleMinutes;
     private Long runningMinutes;
 
-    public RealizationInfo(final Long id, final Long experimentId, final String userId,
-                            final String teamId, final Integer numberOfNodes, final Long idleMinutes,
-                            final Long runningMinutes) {
+    public RealizationInfo(final Long id,
+                           final Long experimentId,
+                           final String userId,
+                           final String teamId,
+                           final Integer numberOfNodes,
+                           final RealizationState state,
+                           final Long idleMinutes,
+                           final Long runningMinutes) {
 
         this.id = id;
         this.experimentId = experimentId;
         this.userId = userId;
         this.teamId = teamId;
         this.numberOfNodes = numberOfNodes;
+        this.state = state;
         this.idleMinutes = idleMinutes;
         this.runningMinutes = runningMinutes;
     }
@@ -35,6 +43,7 @@ public class RealizationInfo implements Realization {
                 realizationEntity.getUserId(),
                 realizationEntity.getTeamId(),
                 realizationEntity.getNumberOfNodes(),
+                realizationEntity.getState(),
                 realizationEntity.getIdleMinutes(),
                 realizationEntity.getRunningMinutes());
     }
@@ -45,6 +54,7 @@ public class RealizationInfo implements Realization {
                 realization.getUserId(),
                 realization.getTeamId(),
                 realization.getNumberOfNodes(),
+                realization.getState(),
                 realization.getIdleMinutes(),
                 realization.getRunningMinutes());
     }
@@ -75,6 +85,11 @@ public class RealizationInfo implements Realization {
     }
 
     @Override
+    public RealizationState getState() {
+        return state;
+    }
+
+    @Override
     public Long getIdleMinutes() {
         return idleMinutes;
     }
@@ -83,4 +98,6 @@ public class RealizationInfo implements Realization {
     public Long getRunningMinutes() {
         return runningMinutes;
     }
+
+
 }
