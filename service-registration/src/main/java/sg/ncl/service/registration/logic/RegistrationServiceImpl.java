@@ -219,11 +219,16 @@ public class RegistrationServiceImpl implements RegistrationService {
         if (teamService.isTeamOwner(approver.getId(), teamId) == false) {
             logger.warn("User {} is not a team owner of Team {}", userId, teamId);
             throw new UserIsNotTeamOwnerException();
-        } else {
-            teamService.changeTeamMemberStatus(userId, teamId, TeamMemberStatus.APPROVED);
-            // already add to user side when request to join
-            // FIXME call adapter deterlab here
         }
+
+        teamService.changeTeamMemberStatus(userId, teamId, TeamMemberStatus.APPROVED);
+        String pid = teamService.getTeamById(teamId).getName();
+        // already add to user side when request to join
+        JSONObject one = new JSONObject();
+        one.put("uid", adapterDeterlab.getDeterUserIdByNclUserId(userId));
+        one.put("pid", pid);
+        one.put("gid", pid);
+        adapterDeterlab.approveJoinRequest(one.toString());
     }
 
     private boolean userFormFieldsHasErrors(User user) {
