@@ -10,5 +10,5 @@ import sg.ncl.service.realization.web.RealizationInfo;
  */
 public interface RealizationRepository extends JpaRepository<RealizationEntity, Long> {
 
-    RealizationInfo findByExperimentId(Long experimentId);
+    RealizationEntity findByExperimentId(Long experimentId);
 }
