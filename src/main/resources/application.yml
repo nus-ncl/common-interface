@@ -22,5 +22,9 @@ ncl:
     api-key: ${jwt.key}
     signing-algorithm: HS512
     expiry-duration: PT1H
+  deterlab:
+    adapter:
+      ip: test.ncl.sg
+      port: 8080
 # temporary hack
 security.user.password: password
