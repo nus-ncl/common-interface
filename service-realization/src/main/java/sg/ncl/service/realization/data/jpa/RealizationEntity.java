@@ -2,6 +2,7 @@ package sg.ncl.service.realization.data.jpa;
 
 import sg.ncl.common.jpa.AbstractEntity;
 import sg.ncl.service.realization.domain.Realization;
+import sg.ncl.service.realization.domain.RealizationState;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -33,10 +34,13 @@ public class RealizationEntity extends AbstractEntity implements Realization {
     @Column(name = "num_nodes", nullable = false, updatable = false)
     private Integer numberOfNodes;
 
-    @Column(name = "idle_minutes", nullable = false, updatable = false)
+    @Column(name = "state", nullable = false)
+    private RealizationState state = RealizationState.STOP;
+
+    @Column(name = "idle_minutes", nullable = false)
     private Long idleMinutes;
 
-    @Column(name = "running_minutes", nullable = false, updatable = false)
+    @Column(name = "running_minutes", nullable = false)
     private Long runningMinutes;
 
     @Override
@@ -82,6 +86,15 @@ public class RealizationEntity extends AbstractEntity implements Realization {
 
     public void setNumberOfNodes(Integer numberOfNodes) {
         this.numberOfNodes = numberOfNodes;
+    }
+
+    @Override
+    public RealizationState getState() {
+        return state;
+    }
+
+    public void setState(RealizationState state) {
+        this.state = state;
     }
 
     @Override

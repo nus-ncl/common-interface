@@ -3,6 +3,7 @@ package sg.ncl.service.realization;
 import org.apache.commons.lang3.RandomStringUtils;
 import sg.ncl.service.realization.data.jpa.RealizationEntity;
 import sg.ncl.service.realization.data.jpa.RealizationRepository;
+import sg.ncl.service.realization.domain.RealizationState;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -19,6 +20,7 @@ public class Util {
         entity.setUserId(RandomStringUtils.randomAlphanumeric(20));
         entity.setTeamId(RandomStringUtils.randomAlphanumeric(20));
         entity.setNumberOfNodes(Integer.parseInt(RandomStringUtils.randomNumeric(5)));
+        entity.setState(RealizationState.WARNING);
         entity.setIdleMinutes(Long.parseLong(RandomStringUtils.randomNumeric(10)));
         entity.setRunningMinutes(Long.parseLong(RandomStringUtils.randomNumeric(10)));
         return entity;

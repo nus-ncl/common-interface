@@ -99,6 +99,19 @@ public class RealizationRepositoryTest extends AbstractTest {
     }
 
     @Test
+    public void testSaveNullState() throws Exception {
+        final RealizationEntity entity = Util.getRealizationEntity();
+        entity.setState(null);
+
+        try {
+            repository.saveAndFlush(entity);
+            exception.expect(DataIntegrityViolationException.class);
+        } catch (Exception e) {
+            checkException(e, "NULL not allowed for column \"STATE\"");
+        }
+    }
+
+    @Test
     public void testSaveNullIdleMinutes() throws Exception {
         final RealizationEntity entity = Util.getRealizationEntity();
         entity.setIdleMinutes(null);
