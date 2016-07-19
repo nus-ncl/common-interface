@@ -15,6 +15,7 @@ public interface Experiment {
     Long getId();
     String getUserId();
     String getTeamId();
+    String getTeamName();
     String getName();
     String getDescription();
     String getNsFile();

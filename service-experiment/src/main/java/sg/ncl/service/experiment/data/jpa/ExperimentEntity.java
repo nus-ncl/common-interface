@@ -27,6 +27,9 @@ public class ExperimentEntity extends AbstractEntity implements Experiment {
     @Column(name = "team_id", nullable = false, updatable = false)
     private String teamId;
 
+    @Column(name = "team_name", nullable = false, updatable = false)
+    private String teamName;
+
     @Column(name = "name", nullable = false)
     private String name;
 
@@ -70,6 +73,15 @@ public class ExperimentEntity extends AbstractEntity implements Experiment {
 
     public void setTeamId(String teamId) {
         this.teamId = teamId;
+    }
+
+    @Override
+    public String getTeamName() {
+        return teamName;
+    }
+
+    public void setTeamName(String teamName) {
+        this.teamName = teamName;
     }
 
     @Override
@@ -142,6 +154,7 @@ public class ExperimentEntity extends AbstractEntity implements Experiment {
         sb.append("id='").append(id).append('\'');
         sb.append(", userId=").append(userId);
         sb.append(", teamId=").append(teamId);
+        sb.append(", teamName=").append(teamName);
         sb.append(", name=").append(name);
         sb.append(", description=").append(description);
         sb.append(", nsFile=").append(nsFile);
@@ -152,6 +165,4 @@ public class ExperimentEntity extends AbstractEntity implements Experiment {
         sb.append('}');
         return sb.toString();
     }
-
-
 }

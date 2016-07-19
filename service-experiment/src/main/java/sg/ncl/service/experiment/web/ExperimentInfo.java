@@ -11,6 +11,7 @@ public class ExperimentInfo implements Experiment {
     private Long id;
     private String userId;
     private String teamId;
+    private String teamName;
     private String name;
     private String description;
     private String nsFile;
@@ -21,6 +22,7 @@ public class ExperimentInfo implements Experiment {
     public ExperimentInfo(final Long id,
                           final String userId,
                           final String teamId,
+                          final String teamName,
                           final String name,
                           final String description,
                           final String nsFile,
@@ -30,6 +32,7 @@ public class ExperimentInfo implements Experiment {
         this.id = id;
         this.userId = userId;
         this.teamId = teamId;
+        this.teamName = teamName;
         this.name = name;
         this.description = description;
         this.nsFile = nsFile;
@@ -42,6 +45,7 @@ public class ExperimentInfo implements Experiment {
         this(experiment.getId(),
                 experiment.getUserId(),
                 experiment.getTeamId(),
+                experiment.getTeamName(),
                 experiment.getName(),
                 experiment.getDescription(),
                 experiment.getNsFile(),
@@ -54,6 +58,7 @@ public class ExperimentInfo implements Experiment {
         this(experimentEntity.getId(),
                 experimentEntity.getUserId(),
                 experimentEntity.getTeamId(),
+                experimentEntity.getTeamName(),
                 experimentEntity.getName(),
                 experimentEntity.getDescription(),
                 experimentEntity.getNsFile(),
@@ -75,6 +80,11 @@ public class ExperimentInfo implements Experiment {
     @Override
     public String getTeamId() {
         return teamId;
+    }
+
+    @Override
+    public String getTeamName() {
+        return teamName;
     }
 
     @Override
@@ -106,4 +116,6 @@ public class ExperimentInfo implements Experiment {
     public Integer getMaxDuration() {
         return maxDuration;
     }
+
+
 }
