@@ -1,8 +1,11 @@
 package sg.ncl.service.realization.logic;
 
+import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
+import sg.ncl.adapter.deterlab.AdapterDeterlab;
+import sg.ncl.service.realization.ConnectionProperties;
 import sg.ncl.service.realization.data.jpa.RealizationEntity;
 import sg.ncl.service.realization.data.jpa.RealizationRepository;
 import sg.ncl.service.realization.domain.RealizationState;
@@ -19,6 +22,12 @@ public class RealizationService {
     private final RealizationRepository realizationRepository;
 
     @Inject
+    private ConnectionProperties connectionProperties;
+
+    @Inject
+    private AdapterDeterlab adapterDeterlab;
+
+    @Inject
     protected RealizationService(final RealizationRepository realizationRepository) {
         this.realizationRepository = realizationRepository;
     }
@@ -28,10 +37,29 @@ public class RealizationService {
 
         RealizationEntity savedRealizationEntity = realizationRepository.save(realizationEntity);
 
-
-
         logger.info("Realization saved");
         return savedRealizationEntity;
+    }
+
+    public void startExperimentInDeter(final String teamId, final String experimentId) {
+        StringBuilder httpCommand = new StringBuilder();
+        httpCommand.append("http://");
+        httpCommand.append(connectionProperties.getBossurl());
+        httpCommand.append("/swapexp.php?");
+        httpCommand.append("inout=in");
+        httpCommand.append("&");
+        httpCommand.append("pid=" + teamId);
+        httpCommand.append("&");
+        httpCommand.append("eid=" + experimentId);
+
+        JSONObject jsonObject = new JSONObject();
+        jsonObject.put("httpCommand", httpCommand.toString());
+
+        adapterDeterlab.startExperiment(jsonObject.toString());
+    }
+
+    public void stopExperimentInDeter(final String teamId, final String experimentId) {
+
     }
 
     public void setState(final Long experimentId, final RealizationState state) {
