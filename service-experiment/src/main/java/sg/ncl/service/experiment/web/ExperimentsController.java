@@ -25,12 +25,14 @@ public class ExperimentsController {
         this.experimentService = experimentService;
     }
 
+    // return all experiments (for use by administration)
     @RequestMapping(path = "/experiments", method = RequestMethod.GET)
     @ResponseStatus(code = HttpStatus.OK)
     public List<ExperimentEntity> get() {
         return experimentService.get();
     }
 
+    // returns experiments that the user is part of
     @RequestMapping(path = "/users/{id}", method = RequestMethod.GET)
     @ResponseStatus(code = HttpStatus.OK)
     public List<ExperimentInfo> getByUser(@PathVariable String id) {
@@ -44,7 +46,8 @@ public class ExperimentsController {
         return infoList;
     }
 
-    @RequestMapping(path = "", method = RequestMethod.POST)
+    // create new experiment
+    @RequestMapping(method = RequestMethod.POST)
     @ResponseStatus(value = HttpStatus.CREATED)
     public void addExperiment(@RequestBody @Valid ExperimentEntity experimentEntity) {
         experimentService.save(experimentEntity);

@@ -74,6 +74,19 @@ public class ExperimentRepositoryTest extends AbstractTest {
     }
 
     @Test
+    public void testSaveNullTeamName() throws Exception {
+        final ExperimentEntity entity = Util.getExperimentsEntity();
+        entity.setTeamName(null);
+
+        try {
+            repository.saveAndFlush(entity);
+            exception.expect(DataIntegrityViolationException.class);
+        } catch (Exception e) {
+            checkException(e, "NULL not allowed for column \"TEAM_NAME\"");
+        }
+    }
+
+    @Test
     public void testSaveNullName() throws Exception {
         final ExperimentEntity entity = Util.getExperimentsEntity();
         entity.setName(null);

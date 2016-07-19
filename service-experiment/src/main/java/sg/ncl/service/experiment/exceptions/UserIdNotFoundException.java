@@ -9,4 +9,4 @@ import sg.ncl.common.exception.NotFoundException;
  */
 
 @ResponseStatus(code = HttpStatus.NOT_FOUND, reason = "User ID not found.")
-public class UserIdNotFound extends NotFoundException {}
+public class UserIdNotFoundException extends NotFoundException {}

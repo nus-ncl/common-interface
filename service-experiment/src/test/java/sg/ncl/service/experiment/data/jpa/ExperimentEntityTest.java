@@ -62,6 +62,22 @@ public class ExperimentEntityTest {
     }
 
     @Test
+    public void testGetTeamName() throws Exception {
+        final ExperimentEntity entity = new ExperimentEntity();
+
+        assertThat(entity.getTeamName(), is(nullValue()));
+    }
+
+    @Test
+    public void testSetTeamName() throws Exception {
+        final ExperimentEntity entity = new ExperimentEntity();
+        final String name = RandomStringUtils.randomAlphanumeric(20);
+        entity.setTeamName(name);
+
+        assertThat(entity.getTeamName(), is(name));
+    }
+
+    @Test
     public void testGetName() throws Exception {
         final ExperimentEntity entity = new ExperimentEntity();
 
