@@ -3,9 +3,7 @@ package sg.ncl.service.team.data.jpa;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.junit.Test;
 import sg.ncl.service.team.Util;
-import sg.ncl.service.team.domain.TeamPrivacy;
-import sg.ncl.service.team.domain.TeamStatus;
-import sg.ncl.service.team.domain.TeamVisibility;
+import sg.ncl.service.team.domain.*;
 import sg.ncl.service.team.web.TeamMemberInfo;
 
 import java.time.ZonedDateTime;
@@ -184,9 +182,36 @@ public class TeamEntityTest {
     }
 
     @Test
+    public void testGetMemberById() throws Exception {
+        TeamEntity teamEntity = Util.getTeamEntity();
+        TeamMember teamMember = Util.getTeamMemberInfo(TeamMemberType.MEMBER);
+        teamEntity.addMember(teamMember);
+        String userId = teamMember.getUserId();
+
+        TeamMember result = teamEntity.getMember(userId);
+
+        assertThat(result.getUserId(), is(teamMember.getUserId()));
+        assertThat(result.getMemberStatus(), is(teamMember.getMemberStatus()));
+        assertThat(result.getMemberType(), is(teamMember.getMemberType()));
+    }
+
+    @Test
+    public void testChangeMemberStatus() throws Exception {
+        TeamEntity teamEntity = Util.getTeamEntity();
+        TeamMember teamMember = Util.getTeamMemberInfo(TeamMemberType.MEMBER);
+        teamEntity.addMember(teamMember);
+
+        TeamMember result = teamEntity.changeMemberStatus(teamMember, TeamMemberStatus.APPROVED);
+
+        assertThat(result.getUserId(), is(teamMember.getUserId()));
+        assertThat(result.getMemberType(), is(teamMember.getMemberType()));
+        assertThat(result.getMemberStatus(), is(TeamMemberStatus.APPROVED));
+    }
+
+    @Test
     public void testAddMember() throws Exception {
         final TeamEntity entity = new TeamEntity();
-        final TeamMemberInfo teamMemberInfo = Util.getTeamMemberInfo();
+        final TeamMemberInfo teamMemberInfo = Util.getTeamMemberInfo(TeamMemberType.MEMBER);
         entity.addMember(teamMemberInfo);
 
         assertThat(entity.getMembers().get(0).getUserId(), is(teamMemberInfo.getUserId()));

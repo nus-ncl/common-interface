@@ -20,4 +20,8 @@ public interface TeamService {
     Team updateTeam(String id, Team team);
 
     Team addTeamMember(String id, TeamMember teamMember);
+
+    boolean isTeamOwner(final String userId, final String teamId);
+
+    TeamMember changeTeamMemberStatus(String userId, String teamId, TeamMemberStatus approved);
 }

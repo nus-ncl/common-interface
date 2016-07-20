@@ -35,13 +35,13 @@ public class Util {
         return entity;
     }
 
-    public static TeamMemberInfo getTeamMemberInfo() {
+    public static TeamMemberInfo getTeamMemberInfo(TeamMemberType teamMemberType) {
         final Long id = Long.parseLong(RandomStringUtils.randomNumeric(10));
         final TeamMemberEntity teamMemberEntity = new TeamMemberEntity();
         teamMemberEntity.setId(id);
         teamMemberEntity.setUserId(RandomStringUtils.randomAlphanumeric(20));
         teamMemberEntity.setJoinedDate(ZonedDateTime.now());
-        teamMemberEntity.setMemberType(TeamMemberType.MEMBER);
+        teamMemberEntity.setMemberType(teamMemberType);
         return new TeamMemberInfo(teamMemberEntity);
     }
 }

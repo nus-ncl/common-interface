@@ -67,6 +67,15 @@ public class Util {
         return experimentObject;
     }
 
+    public static JSONObject getApproveJoinRequestAdapterJsonObject() {
+        JSONObject one = new JSONObject();
+        one.put("uid", RandomStringUtils.randomAlphabetic(8));
+        one.put("pid", "ncl");
+        one.put("gid", "ncl");
+
+        return one;
+    }
+
     private static String nsFileString() {
         StringBuilder sb = new StringBuilder();
 

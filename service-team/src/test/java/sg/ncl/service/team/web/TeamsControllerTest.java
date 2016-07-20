@@ -19,6 +19,7 @@ import sg.ncl.service.team.Util;
 import sg.ncl.service.team.data.jpa.TeamEntity;
 import sg.ncl.service.team.data.jpa.TeamRepository;
 import sg.ncl.service.team.domain.Team;
+import sg.ncl.service.team.domain.TeamMemberType;
 import sg.ncl.service.team.domain.TeamStatus;
 import sg.ncl.service.team.domain.TeamVisibility;
 import sg.ncl.service.team.exceptions.TeamNotFoundException;
@@ -124,7 +125,7 @@ public class TeamsControllerTest extends AbstractTest {
         TeamEntity teamEntity = teamRepository.save(origTeamEntity);
         String teamId = teamEntity.getId();
 
-        TeamMemberInfo teamMemberInfo = Util.getTeamMemberInfo();
+        TeamMemberInfo teamMemberInfo = Util.getTeamMemberInfo(TeamMemberType.MEMBER);
         GsonBuilder gsonBuilder = new GsonBuilder();
         gsonBuilder.registerTypeAdapter(ZonedDateTime.class, new DateTimeSerializer());
         gsonBuilder.registerTypeAdapter(ZonedDateTime.class, new DateTimeDeserializer());

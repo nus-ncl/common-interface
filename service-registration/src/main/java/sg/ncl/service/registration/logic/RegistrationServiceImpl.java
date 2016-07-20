@@ -14,16 +14,15 @@ import sg.ncl.service.authentication.web.CredentialsInfo;
 import sg.ncl.service.registration.data.jpa.RegistrationEntity;
 import sg.ncl.service.registration.data.jpa.RegistrationRepository;
 import sg.ncl.service.registration.domain.RegistrationService;
-import sg.ncl.service.registration.exceptions.RegisterTeamNameDuplicateException;
-import sg.ncl.service.registration.exceptions.RegisterTeamNameEmptyException;
-import sg.ncl.service.registration.exceptions.RegisterUidNullException;
-import sg.ncl.service.registration.exceptions.UserFormException;
+import sg.ncl.service.registration.exceptions.*;
 import sg.ncl.service.team.data.jpa.TeamEntity;
 import sg.ncl.service.team.data.jpa.TeamMemberEntity;
 import sg.ncl.service.team.domain.Team;
+import sg.ncl.service.team.domain.TeamMemberStatus;
 import sg.ncl.service.team.domain.TeamMemberType;
 import sg.ncl.service.team.domain.TeamService;
 import sg.ncl.service.team.web.TeamMemberInfo;
+import sg.ncl.service.user.data.jpa.UserEntity;
 import sg.ncl.service.user.domain.User;
 import sg.ncl.service.user.domain.UserService;
 
@@ -214,6 +213,22 @@ public class RegistrationServiceImpl implements RegistrationService {
             // FIXME for debug purposes
             System.out.println(resultJSON);
         }
+    }
+
+    public void approveJoinRequest(String teamId, String userId, User approver) {
+        if (teamService.isTeamOwner(approver.getId(), teamId) == false) {
+            logger.warn("User {} is not a team owner of Team {}", userId, teamId);
+            throw new UserIsNotTeamOwnerException();
+        }
+        String pid = teamService.getTeamById(teamId).getName();
+        // already add to user side when request to join
+        JSONObject one = new JSONObject();
+        one.put("approverUid", adapterDeterlab.getDeterUserIdByNclUserId(approver.getId()));
+        one.put("uid", adapterDeterlab.getDeterUserIdByNclUserId(userId));
+        one.put("pid", pid);
+        one.put("gid", pid);
+        adapterDeterlab.approveJoinRequest(one.toString());
+        teamService.changeTeamMemberStatus(userId, teamId, TeamMemberStatus.APPROVED);
     }
 
     private boolean userFormFieldsHasErrors(User user) {

@@ -3,6 +3,7 @@ package sg.ncl.service.team.data.jpa;
 import org.hibernate.annotations.GenericGenerator;
 import sg.ncl.common.jpa.AbstractEntity;
 import sg.ncl.service.team.domain.*;
+import sg.ncl.service.team.web.TeamMemberInfo;
 
 import javax.persistence.*;
 import java.time.ZonedDateTime;
@@ -163,7 +164,32 @@ public class TeamEntity extends AbstractEntity implements Team {
         entity.setTeam(this);
         entity.setJoinedDate(ZonedDateTime.now());
         entity.setMemberType(member.getMemberType());
+
+        if (member.getMemberStatus() != null) {
+            entity.setMemberStatus(member.getMemberStatus());
+        }
+
         members.put(userId, entity);
+    }
+
+    public TeamMember getMember(final String userId) {
+        if (members.containsKey(userId)) {
+            return new TeamMemberInfo(members.get(userId));
+        } else {
+            return null;
+        }
+    }
+
+    public TeamMember changeMemberStatus(final TeamMember member, TeamMemberStatus teamMemberStatus) {
+        final String userId = member.getUserId();
+        if (members.containsKey(userId)) {
+            TeamMemberEntity entity = members.get(userId);
+            entity.setMemberStatus(teamMemberStatus);
+            members.put(userId, entity);
+            return new TeamMemberInfo(members.get(userId));
+        } else {
+            return null;
+        }
     }
 
     @Override

@@ -58,5 +58,9 @@ public class ConnectionProperties {
     public String getUpdateCredentials() {
         return "http://" + ip + ":" + port + "/changePassword";
     }
+
+    public String getApproveJoinRequest() {
+        return "http://" + ip + ":" + port + "/approveJoinRequest";
+    }
 }
 
