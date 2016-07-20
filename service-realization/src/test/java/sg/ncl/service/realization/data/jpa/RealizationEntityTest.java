@@ -1,4 +1,4 @@
-package sg.ncl.service.realization.data.jpa.entities;
+package sg.ncl.service.realization.data.jpa;
 
 import org.apache.commons.lang3.RandomStringUtils;
 import org.junit.Test;
@@ -44,6 +44,22 @@ public class RealizationEntityTest {
         entity.setExperimentId(id);
 
         assertThat(entity.getExperimentId(), is(id));
+    }
+
+    @Test
+    public void testGetExperimentName() throws Exception {
+        final RealizationEntity entity = new RealizationEntity();
+
+        assertThat(entity.getExperimentName(), is(nullValue()));
+    }
+
+    @Test
+    public void testSetExperimentName() throws Exception {
+        final RealizationEntity entity = new RealizationEntity();
+        final String name = RandomStringUtils.randomAlphanumeric(19);
+        entity.setExperimentName(name);
+
+        assertThat(entity.getExperimentName(), is(name));
     }
 
     @Test

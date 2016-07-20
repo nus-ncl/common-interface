@@ -11,6 +11,7 @@ public class RealizationInfo implements Realization {
 
     private Long id;
     private Long experimentId;
+    private String experimentName;
     private String userId;
     private String teamId;
     private Integer numberOfNodes;
@@ -20,6 +21,7 @@ public class RealizationInfo implements Realization {
 
     public RealizationInfo(final Long id,
                            final Long experimentId,
+                           final String experimentName,
                            final String userId,
                            final String teamId,
                            final Integer numberOfNodes,
@@ -29,6 +31,7 @@ public class RealizationInfo implements Realization {
 
         this.id = id;
         this.experimentId = experimentId;
+        this.experimentName = experimentName;
         this.userId = userId;
         this.teamId = teamId;
         this.numberOfNodes = numberOfNodes;
@@ -40,6 +43,7 @@ public class RealizationInfo implements Realization {
     public RealizationInfo(final RealizationEntity realizationEntity) {
         this(realizationEntity.getId(),
                 realizationEntity.getExperimentId(),
+                realizationEntity.getExperimentName(),
                 realizationEntity.getUserId(),
                 realizationEntity.getTeamId(),
                 realizationEntity.getNumberOfNodes(),
@@ -51,6 +55,7 @@ public class RealizationInfo implements Realization {
     public RealizationInfo(final Realization realization) {
         this(realization.getId(),
                 realization.getExperimentId(),
+                realization.getExperimentName(),
                 realization.getUserId(),
                 realization.getTeamId(),
                 realization.getNumberOfNodes(),
@@ -67,6 +72,11 @@ public class RealizationInfo implements Realization {
     @Override
     public Long getExperimentId() {
         return experimentId;
+    }
+
+    @Override
+    public String getExperimentName() {
+        return experimentName;
     }
 
     @Override
@@ -98,6 +108,4 @@ public class RealizationInfo implements Realization {
     public Long getRunningMinutes() {
         return runningMinutes;
     }
-
-
 }

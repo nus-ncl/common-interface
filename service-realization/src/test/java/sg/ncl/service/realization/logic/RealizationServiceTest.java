@@ -23,6 +23,51 @@ public class RealizationServiceTest extends AbstractTest {
     private RealizationRepository realizationRepository;
 
     @Test
+    public void getRealizationWithWrongIdTest() {
+
+        realizationRepository.save((Util.getRealizationEntity()));
+
+        Long id = Long.parseLong(RandomStringUtils.randomNumeric(5));
+        RealizationEntity realizationEntityDb = realizationService.getById(id);
+
+        Assert.assertNull(realizationEntityDb);
+    }
+
+    @Test
+    public void getRealizationWithIdTest() {
+
+        RealizationEntity savedRealizationEntity = realizationRepository.save((Util.getRealizationEntity()));
+
+        Long id = savedRealizationEntity.getId();
+        RealizationEntity realizationEntityDb = realizationService.getById(id);
+
+        Assert.assertNotNull(realizationEntityDb);
+    }
+
+    @Test
+    public void getRealizationWithWrongExperimentIdTest() {
+
+        realizationRepository.save((Util.getRealizationEntity()));
+
+        Long experimentId = Long.parseLong(RandomStringUtils.randomNumeric(5));
+        RealizationEntity realizationEntityDb = realizationService.getByExperimentId(experimentId);
+
+        Assert.assertNull(realizationEntityDb);
+    }
+
+    @Test
+    public void getRealizationWithExperimentIdTest() {
+
+        RealizationEntity realizationEntity = Util.getRealizationEntity();
+        Long experimentId = realizationEntity.getExperimentId();
+
+        realizationRepository.save((realizationEntity));
+        RealizationEntity realizationEntityDb = realizationService.getByExperimentId(experimentId);
+
+        Assert.assertNotNull(realizationEntityDb);
+    }
+
+    @Test
     public void saveRealizationTest() {
 
         RealizationEntity realizationEntity = Util.getRealizationEntity();

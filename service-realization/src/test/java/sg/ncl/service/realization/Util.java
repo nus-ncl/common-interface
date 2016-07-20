@@ -17,6 +17,7 @@ public class Util {
         final RealizationEntity entity = new RealizationEntity();
         entity.setId(Long.parseLong(RandomStringUtils.randomNumeric(10)));
         entity.setExperimentId(Long.parseLong(RandomStringUtils.randomNumeric(10)));
+        entity.setExperimentName(RandomStringUtils.randomAlphanumeric(19));
         entity.setUserId(RandomStringUtils.randomAlphanumeric(20));
         entity.setTeamId(RandomStringUtils.randomAlphanumeric(20));
         entity.setNumberOfNodes(Integer.parseInt(RandomStringUtils.randomNumeric(5)));

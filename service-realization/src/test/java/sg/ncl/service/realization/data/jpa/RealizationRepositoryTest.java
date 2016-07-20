@@ -1,4 +1,4 @@
-package sg.ncl.service.realization.data.jpa.repositories;
+package sg.ncl.service.realization.data.jpa;
 
 import org.junit.Assert;
 import org.junit.Rule;
@@ -68,6 +68,19 @@ public class RealizationRepositoryTest extends AbstractTest {
             exception.expect(DataIntegrityViolationException.class);
         } catch (Exception e) {
             checkException(e, "NULL not allowed for column \"EXPERIMENT_ID\"");
+        }
+    }
+
+    @Test
+    public void testSaveNullExperimentName() throws Exception {
+        final RealizationEntity entity = Util.getRealizationEntity();
+        entity.setExperimentName(null);
+
+        try {
+            repository.saveAndFlush(entity);
+            exception.expect(DataIntegrityViolationException.class);
+        } catch (Exception e) {
+            checkException(e, "NULL not allowed for column \"EXPERIMENT_NAME\"");
         }
     }
 
