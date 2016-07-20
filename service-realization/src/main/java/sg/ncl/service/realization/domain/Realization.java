@@ -14,6 +14,7 @@ public interface Realization {
      */
     Long getId();
     Long getExperimentId();
+    String getExperimentName();
     String getUserId();
     String getTeamId();
     Integer getNumberOfNodes();

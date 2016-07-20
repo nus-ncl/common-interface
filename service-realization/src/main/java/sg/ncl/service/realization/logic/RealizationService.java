@@ -32,6 +32,34 @@ public class RealizationService {
         this.realizationRepository = realizationRepository;
     }
 
+    public RealizationEntity getById(final Long id) {
+        logger.info("Get realization by id");
+
+        RealizationEntity realizationEntity = realizationRepository.findOne(id);
+
+        if (realizationEntity != null && realizationEntity.getId() > 0) {
+            return realizationEntity;
+        }
+
+        else {
+            return null;
+        }
+    }
+
+    public RealizationEntity getByExperimentId(final Long experimentId) {
+        logger.info("Get realization by experiment name");
+
+        RealizationEntity realizationEntity = realizationRepository.findByExperimentId(experimentId);
+
+        if (realizationEntity != null && realizationEntity.getId() > 0) {
+            return realizationEntity;
+        }
+
+        else {
+            return null;
+        }
+    }
+
     public RealizationEntity save(RealizationEntity realizationEntity) {
         logger.info("Save realization");
 
@@ -41,7 +69,7 @@ public class RealizationService {
         return savedRealizationEntity;
     }
 
-    public void startExperimentInDeter(final String teamId, final String experimentId) {
+    public void startExperimentInDeter(final String teamId, final String experimentName) {
         StringBuilder httpCommand = new StringBuilder();
         httpCommand.append("http://");
         httpCommand.append(realizationConnectionProperties.getBossurl());
@@ -50,7 +78,7 @@ public class RealizationService {
         httpCommand.append("&");
         httpCommand.append("pid=" + teamId);
         httpCommand.append("&");
-        httpCommand.append("eid=" + experimentId);
+        httpCommand.append("eid=" + experimentName);
 
         JSONObject jsonObject = new JSONObject();
         jsonObject.put("httpCommand", httpCommand.toString());

@@ -25,6 +25,9 @@ public class RealizationEntity extends AbstractEntity implements Realization {
     @Column(name = "experiment_id", nullable = false, updatable = false)
     private Long experimentId;
 
+    @Column(name = "experiment_name", nullable = false, updatable = false)
+    private String experimentName;
+
     @Column(name = "user_id", nullable = false, updatable = false)
     private String userId;
 
@@ -59,6 +62,15 @@ public class RealizationEntity extends AbstractEntity implements Realization {
 
     public void setExperimentId(Long experimentId) {
         this.experimentId = experimentId;
+    }
+
+    @Override
+    public String getExperimentName() {
+        return experimentName;
+    }
+
+    public void setExperimentName(String experimentName) {
+        this.experimentName = experimentName;
     }
 
     @Override
@@ -138,4 +150,6 @@ public class RealizationEntity extends AbstractEntity implements Realization {
         sb.append('}');
         return sb.toString();
     }
+
+
 }
