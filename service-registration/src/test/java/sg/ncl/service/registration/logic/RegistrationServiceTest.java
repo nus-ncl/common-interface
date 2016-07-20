@@ -278,4 +278,22 @@ public class RegistrationServiceTest extends AbstractTest {
         // purposely create a team with the same name and id
         registrationService.registerRequestToApplyTeam(createdUser.getId(), one);
     }
+
+    @Test
+    public void registerRequestToApplyTeamGood() throws Exception {
+        Team one = Util.getTeamEntity();
+        User user = Util.getUserEntity();
+        User createdUser = userService.createUser(user);
+        registrationService.registerRequestToApplyTeam(createdUser.getId(), one);
+
+        List<? extends TeamMember> membersList = teamService.getTeamByName(one.getName()).getMembers();
+
+        // should have only one owner
+        Assert.assertThat(membersList.size(), is(1));
+
+        for (TeamMember member: membersList) {
+            Assert.assertThat(member.getUserId(), is(createdUser.getId()));
+            Assert.assertThat(member.getMemberType(), is(TeamMemberType.OWNER));
+        }
+    }
 }
