@@ -24,6 +24,7 @@ import sg.ncl.service.team.domain.*;
 import sg.ncl.service.team.web.TeamMemberInfo;
 import sg.ncl.service.user.domain.User;
 import sg.ncl.service.user.domain.UserService;
+import sg.ncl.service.user.exceptions.UserNotFoundException;
 
 import javax.inject.Inject;
 
@@ -247,4 +248,63 @@ public class RegistrationServiceTest extends AbstractTest {
         registrationService.approveJoinRequest(teamId, userEntity.getId(), userEntity);
     }
 
+    @Test(expected = RegisterTeamNameEmptyException.class)
+    public void registerRequestToApplyTeamNameError() throws Exception {
+        TeamEntity one = Util.getTeamEntity();
+        one.setName(null);
+        registrationService.registerRequestToApplyTeam(RandomStringUtils.randomAlphanumeric(8), one);
+    }
+
+    @Test(expected = RegisterUidNullException.class)
+    public void registerRequestToApplyTeamUserNameError() throws Exception {
+        TeamEntity one = Util.getTeamEntity();
+        registrationService.registerRequestToApplyTeam("", one);
+    }
+
+    @Test(expected = UserNotFoundException.class)
+    public void registerRequestToApplyTeamUserNullError() throws Exception {
+        TeamEntity one = Util.getTeamEntity();
+        registrationService.registerRequestToApplyTeam(RandomStringUtils.randomAlphanumeric(8), one);
+    }
+
+    @Test(expected = RegisterTeamNameDuplicateException.class)
+    public void registerRequestToApplyTeamDuplicateError() throws Exception {
+        Team one = Util.getTeamEntity();
+        User user = Util.getUserEntity();
+        // create an existing team
+        teamService.addTeam(one);
+        User createdUser = userService.createUser(user);
+
+        // purposely create a team with the same name and id
+        registrationService.registerRequestToApplyTeam(createdUser.getId(), one);
+    }
+
+    @Test
+    public void registerRequestToApplyTeamGood() throws Exception {
+        Team one = Util.getTeamEntity();
+        User user = Util.getUserEntity();
+        User createdUser = userService.createUser(user);
+
+        // need to create entry in the Deterlab User Repository
+        adapterDeterlab.saveDeterUserIdMapping(RandomStringUtils.randomAlphanumeric(8), createdUser.getId());
+
+        JSONObject predefinedResultJson = new JSONObject();
+        predefinedResultJson.put("msg", "user has logged in and applied a project");
+
+        mockServer.expect(requestTo(properties.getApplyProject()))
+                .andExpect(method(HttpMethod.POST))
+                .andRespond(withSuccess(predefinedResultJson.toString(), MediaType.APPLICATION_JSON));
+
+        registrationService.registerRequestToApplyTeam(createdUser.getId(), one);
+
+        List<? extends TeamMember> membersList = teamService.getTeamByName(one.getName()).getMembers();
+
+        // should have only one owner
+        Assert.assertThat(membersList.size(), is(1));
+
+        for (TeamMember member: membersList) {
+            Assert.assertThat(member.getUserId(), is(createdUser.getId()));
+            Assert.assertThat(member.getMemberType(), is(TeamMemberType.OWNER));
+        }
+    }
 }

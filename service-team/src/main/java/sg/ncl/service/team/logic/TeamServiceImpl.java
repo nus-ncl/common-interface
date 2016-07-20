@@ -11,6 +11,7 @@ import sg.ncl.service.team.exceptions.TeamNameNullException;
 import sg.ncl.service.team.exceptions.TeamNotFoundException;
 
 import javax.inject.Inject;
+import java.time.ZonedDateTime;
 import java.util.List;
 
 /**
@@ -34,7 +35,7 @@ public class TeamServiceImpl implements TeamService {
         entity.setDescription(team.getDescription());
         entity.setWebsite(team.getWebsite());
         entity.setOrganisationType(team.getOrganisationType());
-        entity.setApplicationDate(team.getApplicationDate());
+        entity.setApplicationDate(ZonedDateTime.now());
 
         return teamRepository.save(entity);
     }

@@ -80,6 +80,18 @@ public class AdapterDeterlab {
     }
 
     // for logged on users
+    public String applyProject(String jsonString) {
+        logger.info("Applying project as logged on user to {} at {}: {}", properties.getIp(), properties.getPort(), jsonString);
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        HttpEntity<String> request = new HttpEntity<String>(jsonString, headers);
+
+        ResponseEntity responseEntity = restTemplate.exchange(properties.getApplyProject(), HttpMethod.POST, request, String.class);
+        return responseEntity.getBody().toString();
+    }
+
+    // for logged on users
     public String joinProject(String jsonString) {
         logger.info("Joining project as logged on user to {} at {}: {}", properties.getIp(), properties.getPort(), jsonString);
 
