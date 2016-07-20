@@ -128,7 +128,7 @@ public class AdapterDeterlab {
     }
 
     public String startExperiment(String jsonString) {
-        logger.info("Sending message to {} at {}: {}", properties.getIp(), properties.getPort(), jsonString);
+        logger.info("Start experiment - {} at {}: {}", properties.getIp(), properties.getPort(), jsonString);
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
@@ -140,7 +140,7 @@ public class AdapterDeterlab {
     }
 
     public String stopExperiment(String jsonString) {
-        logger.info("Sending message to {} at {}: {}", properties.getIp(), properties.getPort(), jsonString);
+        logger.info("Stop experiment - {} at {}: {}", properties.getIp(), properties.getPort(), jsonString);
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
