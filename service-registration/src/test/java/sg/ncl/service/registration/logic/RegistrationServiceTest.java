@@ -24,6 +24,7 @@ import sg.ncl.service.team.domain.*;
 import sg.ncl.service.team.web.TeamMemberInfo;
 import sg.ncl.service.user.domain.User;
 import sg.ncl.service.user.domain.UserService;
+import sg.ncl.service.user.exceptions.UserNotFoundException;
 
 import javax.inject.Inject;
 
@@ -247,4 +248,34 @@ public class RegistrationServiceTest extends AbstractTest {
         registrationService.approveJoinRequest(teamId, userEntity.getId(), userEntity);
     }
 
+    @Test(expected = RegisterTeamNameEmptyException.class)
+    public void registerRequestToApplyTeamNameError() throws Exception {
+        TeamEntity one = Util.getTeamEntity();
+        one.setName(null);
+        registrationService.registerRequestToApplyTeam(RandomStringUtils.randomAlphanumeric(8), one);
+    }
+
+    @Test(expected = RegisterUidNullException.class)
+    public void registerRequestToApplyTeamUserNameError() throws Exception {
+        TeamEntity one = Util.getTeamEntity();
+        registrationService.registerRequestToApplyTeam("", one);
+    }
+
+    @Test(expected = UserNotFoundException.class)
+    public void registerRequestToApplyTeamUserNullError() throws Exception {
+        TeamEntity one = Util.getTeamEntity();
+        registrationService.registerRequestToApplyTeam(RandomStringUtils.randomAlphanumeric(8), one);
+    }
+
+    @Test(expected = RegisterTeamNameDuplicateException.class)
+    public void registerRequestToApplyTeamDuplicateError() throws Exception {
+        Team one = Util.getTeamEntity();
+        User user = Util.getUserEntity();
+        // create an existing team
+        teamService.addTeam(one);
+        User createdUser = userService.createUser(user);
+
+        // purposely create a team with the same name and id
+        registrationService.registerRequestToApplyTeam(createdUser.getId(), one);
+    }
 }
