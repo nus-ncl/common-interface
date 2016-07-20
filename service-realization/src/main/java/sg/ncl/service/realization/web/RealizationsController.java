@@ -27,7 +27,7 @@ public class RealizationsController {
     @RequestMapping(method = RequestMethod.GET)
     public void get() {}
 
-    @RequestMapping(path = "/start", method = RequestMethod.PUT)
+    @RequestMapping(path = "/start", method = RequestMethod.POST)
     public void startExperiment(final RealizationEntity realizationEntity) {
         RealizationEntity realizationEntityDb = realizationService.getByExperimentId(realizationEntity.getExperimentId());
 

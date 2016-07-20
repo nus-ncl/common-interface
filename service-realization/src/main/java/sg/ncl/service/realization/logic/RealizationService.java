@@ -25,9 +25,6 @@ public class RealizationService {
     private AdapterDeterlab adapterDeterlab;
 
     @Inject
-    private RealizationConnectionProperties realizationConnectionProperties;
-
-    @Inject
     protected RealizationService(final RealizationRepository realizationRepository) {
         this.realizationRepository = realizationRepository;
     }
@@ -71,10 +68,7 @@ public class RealizationService {
 
     public void startExperimentInDeter(final String teamId, final String experimentName) {
         StringBuilder httpCommand = new StringBuilder();
-        httpCommand.append("http://");
-        httpCommand.append(realizationConnectionProperties.getBossurl());
-        httpCommand.append("/swapexp.php?");
-        httpCommand.append("inout=in");
+        httpCommand.append("?inout=in");
         httpCommand.append("&");
         httpCommand.append("pid=" + teamId);
         httpCommand.append("&");
