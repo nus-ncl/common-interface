@@ -89,7 +89,6 @@ public class RegistrationServiceImpl implements RegistrationService {
         teamService.addTeamMember(createdTeam.getId(), teamMemberInfo);
 
         // FIXME call adapter deterlab here
-
     }
 
     public void registerRequestToJoinTeam(String nclUserId, Team team) {

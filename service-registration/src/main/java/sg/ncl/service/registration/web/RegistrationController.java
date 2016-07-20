@@ -3,6 +3,7 @@ package sg.ncl.service.registration.web;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
+import sg.ncl.service.registration.domain.Registration;
 import sg.ncl.service.registration.domain.RegistrationService;
 
 import javax.inject.Inject;
@@ -29,6 +30,12 @@ public class RegistrationController {
 //        System.out.println("Team: " + registrationInfo.getTeam());
 //        System.out.println("Registration: " + registrationInfo.getRegistration());
         registrationService.register(registrationInfo.getCredentials(), registrationInfo.getUser(), registrationInfo.getTeam(), registrationInfo.getIsJoinTeam());
+    }
+
+    @RequestMapping(path = "/newTeam/{nclUserId}", method = RequestMethod.POST)
+    @ResponseStatus(HttpStatus.CREATED)
+    public void registerRequestToApplyTeam(@PathVariable String nclUserId, @RequestBody RegistrationInfo registrationInfo) {
+        registrationService.registerRequestToApplyTeam(nclUserId, registrationInfo.getTeam());
     }
 
     // old user + join team
