@@ -66,7 +66,7 @@ public class RealizationService {
         return savedRealizationEntity;
     }
 
-    public void startExperimentInDeter(final String teamName, final String experimentName) {
+    public String startExperimentInDeter(final String teamName, final String experimentName) {
         StringBuilder httpCommand = new StringBuilder();
         httpCommand.append("?inout=in");
         httpCommand.append("&");
@@ -78,10 +78,24 @@ public class RealizationService {
         jsonObject.put("httpCommand", httpCommand.toString());
 
         adapterDeterlab.startExperiment(jsonObject.toString());
+
+        return httpCommand.toString();
     }
 
-    public void stopExperimentInDeter(final String teamId, final String experimentId) {
+    public String stopExperimentInDeter(final String teamName, final String experimentName) {
+        StringBuilder httpCommand = new StringBuilder();
+        httpCommand.append("?inout=out");
+        httpCommand.append("&");
+        httpCommand.append("pid=" + teamName);
+        httpCommand.append("&");
+        httpCommand.append("eid=" + experimentName);
 
+        JSONObject jsonObject = new JSONObject();
+        jsonObject.put("httpCommand", httpCommand.toString());
+
+        adapterDeterlab.stopExperiment(jsonObject.toString());
+
+        return httpCommand.toString();
     }
 
     public void setState(final Long experimentId, final RealizationState state) {

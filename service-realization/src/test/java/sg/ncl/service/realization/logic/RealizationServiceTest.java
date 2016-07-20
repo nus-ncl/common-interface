@@ -1,8 +1,20 @@
 package sg.ncl.service.realization.logic;
 
 import org.apache.commons.lang3.RandomStringUtils;
+import org.apache.commons.lang3.SystemUtils;
+import org.json.JSONObject;
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Test;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.MediaType;
+import org.springframework.test.web.client.MockRestServiceServer;
+import org.springframework.web.client.RestOperations;
+import org.springframework.web.client.RestTemplate;
+import sg.ncl.adapter.deterlab.AdapterDeterlab;
+import sg.ncl.adapter.deterlab.ConnectionProperties;
+import sg.ncl.adapter.deterlab.data.jpa.DeterlabUserRepository;
+import sg.ncl.adapter.deterlab.domain.DeterlabUser;
 import sg.ncl.service.realization.AbstractTest;
 import sg.ncl.service.realization.Util;
 import sg.ncl.service.realization.data.jpa.RealizationEntity;
@@ -10,6 +22,11 @@ import sg.ncl.service.realization.data.jpa.RealizationRepository;
 import sg.ncl.service.realization.domain.RealizationState;
 
 import javax.inject.Inject;
+
+import static org.mockito.Mockito.mock;
+import static org.springframework.test.web.client.match.MockRestRequestMatchers.method;
+import static org.springframework.test.web.client.match.MockRestRequestMatchers.requestTo;
+import static org.springframework.test.web.client.response.MockRestResponseCreators.withSuccess;
 
 /**
  * Created by Desmond.
@@ -22,8 +39,21 @@ public class RealizationServiceTest extends AbstractTest {
     @Inject
     private RealizationRepository realizationRepository;
 
+    @Inject
+    private ConnectionProperties properties;
+
+    @Inject
+    private RestOperations restOperations;
+
+    private MockRestServiceServer mockServer;
+
+    @Before
+    public void setUp() throws Exception {
+        mockServer = MockRestServiceServer.createServer((RestTemplate) restOperations);
+    }
+
     @Test
-    public void getRealizationWithWrongIdTest() {
+    public void testGetRealizationWithWrongId() {
 
         realizationRepository.save((Util.getRealizationEntity()));
 
@@ -34,7 +64,7 @@ public class RealizationServiceTest extends AbstractTest {
     }
 
     @Test
-    public void getRealizationWithIdTest() {
+    public void testGetRealizationWithId() {
 
         RealizationEntity savedRealizationEntity = realizationRepository.save((Util.getRealizationEntity()));
 
@@ -45,7 +75,7 @@ public class RealizationServiceTest extends AbstractTest {
     }
 
     @Test
-    public void getRealizationWithWrongExperimentIdTest() {
+    public void testRealizationWithWrongExperimentId() {
 
         realizationRepository.save((Util.getRealizationEntity()));
 
@@ -56,7 +86,7 @@ public class RealizationServiceTest extends AbstractTest {
     }
 
     @Test
-    public void getRealizationWithExperimentIdTest() {
+    public void testGetRealizationWithExperimentId() {
 
         RealizationEntity realizationEntity = Util.getRealizationEntity();
         Long experimentId = realizationEntity.getExperimentId();
@@ -68,7 +98,7 @@ public class RealizationServiceTest extends AbstractTest {
     }
 
     @Test
-    public void saveRealizationTest() {
+    public void testSaveRealization() {
 
         RealizationEntity realizationEntity = Util.getRealizationEntity();
         RealizationEntity savedRealizationEntiy = realizationService.save(realizationEntity);
@@ -83,7 +113,7 @@ public class RealizationServiceTest extends AbstractTest {
     }
 
     @Test
-    public void getStateTest() {
+    public void testGetState() {
         RealizationEntity realizationEntity = Util.getRealizationEntity();
         RealizationEntity savedRealizationEntity = realizationRepository.save(realizationEntity);
 
@@ -91,7 +121,7 @@ public class RealizationServiceTest extends AbstractTest {
     }
 
     @Test
-    public void setStateTest() {
+    public void testSetState() {
 
         RealizationEntity realizationEntity = Util.getRealizationEntity();
         RealizationEntity savedRealizationEntity = realizationRepository.save(realizationEntity);
@@ -106,7 +136,7 @@ public class RealizationServiceTest extends AbstractTest {
     }
 
     @Test
-    public void getIdleMinutesTest() {
+    public void testGetIdleMinutes() {
         RealizationEntity realizationEntity = Util.getRealizationEntity();
         RealizationEntity savedRealizationEntity = realizationRepository.save(realizationEntity);
 
@@ -114,7 +144,7 @@ public class RealizationServiceTest extends AbstractTest {
     }
 
     @Test
-    public void setIdleMinutesTest() {
+    public void testSetIdleMinutes() {
 
         RealizationEntity realizationEntity = Util.getRealizationEntity();
         RealizationEntity savedRealizationEntity = realizationRepository.save(realizationEntity);
@@ -130,7 +160,7 @@ public class RealizationServiceTest extends AbstractTest {
     }
 
     @Test
-    public void getRunningMinutesTest() {
+    public void testGetRunningMinutes() {
         RealizationEntity realizationEntity = Util.getRealizationEntity();
         RealizationEntity savedRealizationEntity = realizationRepository.save(realizationEntity);
 
@@ -138,7 +168,7 @@ public class RealizationServiceTest extends AbstractTest {
     }
 
     @Test
-    public void setRunningMinutesTest() {
+    public void testSetRunningMinutes() {
 
         RealizationEntity realizationEntity = Util.getRealizationEntity();
         RealizationEntity savedRealizationEntity = realizationRepository.save(realizationEntity);
@@ -151,5 +181,51 @@ public class RealizationServiceTest extends AbstractTest {
         RealizationEntity realizationEntityDB = realizationRepository.findByExperimentId(experimentId);
 
         Assert.assertEquals(realizationEntityDB.getRunningMinutes(), minutes);
+    }
+
+    @Test
+    public void testStartExperiment() {
+        JSONObject predefinedResultJson = new JSONObject();
+        predefinedResultJson.put("msg", "Experiment started");
+
+        mockServer.expect(requestTo(properties.startExperiment()))
+                .andExpect(method(HttpMethod.POST))
+                .andRespond(withSuccess(predefinedResultJson.toString(), MediaType.APPLICATION_JSON));
+
+        String teamName = RandomStringUtils.randomAlphanumeric(20);
+        String experimentName = RandomStringUtils.randomAlphanumeric(20);
+        String httpCommand = realizationService.startExperimentInDeter(teamName, experimentName);
+
+        StringBuilder sb = new StringBuilder();
+        sb.append("?inout=in");
+        sb.append("&");
+        sb.append("pid=" + teamName);
+        sb.append("&");
+        sb.append("eid=" + experimentName);
+
+        Assert.assertEquals(httpCommand, sb.toString());
+    }
+
+    @Test
+    public void testStopExperiment() {
+        JSONObject predefinedResultJson = new JSONObject();
+        predefinedResultJson.put("msg", "Experiment stopped");
+
+        mockServer.expect(requestTo(properties.stopExperiment()))
+                .andExpect(method(HttpMethod.POST))
+                .andRespond(withSuccess(predefinedResultJson.toString(), MediaType.APPLICATION_JSON));
+
+        String teamName = RandomStringUtils.randomAlphanumeric(20);
+        String experimentName = RandomStringUtils.randomAlphanumeric(20);
+        String httpCommand = realizationService.stopExperimentInDeter(teamName, experimentName);
+
+        StringBuilder sb = new StringBuilder();
+        sb.append("?inout=out");
+        sb.append("&");
+        sb.append("pid=" + teamName);
+        sb.append("&");
+        sb.append("eid=" + experimentName);
+
+        Assert.assertEquals(httpCommand, sb.toString());
     }
 }
