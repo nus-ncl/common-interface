@@ -183,4 +183,21 @@ public class AdapterDeterlabTest extends AbstractTest {
         String msg = resultJSONObject.getString("msg");
         Assert.assertThat(msg, is("join request approved"));
     }
+
+    @Test
+    public void testApplyProject() {
+        JSONObject one = new JSONObject();
+
+        JSONObject predefinedResultJson = new JSONObject();
+        predefinedResultJson.put("msg", "user has logged in and applied a project");
+
+        mockServer.expect(requestTo(properties.getApplyProject()))
+                .andExpect(method(HttpMethod.POST))
+                .andRespond(withSuccess(predefinedResultJson.toString(), MediaType.APPLICATION_JSON));
+
+        String result = adapterDeterlab.applyProject(one.toString());
+        JSONObject resultJSONObject = new JSONObject(result);
+        String msg = resultJSONObject.getString("msg");
+        Assert.assertThat(msg, is("user has logged in and applied a project"));
+    }
 }

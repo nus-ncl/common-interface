@@ -62,5 +62,9 @@ public class ConnectionProperties {
     public String getApproveJoinRequest() {
         return "http://" + ip + ":" + port + "/approveJoinRequest";
     }
+
+    public String getApplyProject() {
+        return "http://" + ip + ":" + port + "/applyProject";
+    }
 }
 
