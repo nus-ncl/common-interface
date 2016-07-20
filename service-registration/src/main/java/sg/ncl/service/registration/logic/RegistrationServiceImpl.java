@@ -85,10 +85,19 @@ public class RegistrationServiceImpl implements RegistrationService {
         teamMemberEntity.setMemberType(TeamMemberType.OWNER);
         TeamMemberInfo teamMemberInfo = new TeamMemberInfo(teamMemberEntity);
 
+        // FIXME call adapter deterlab here
+        JSONObject mainObject = new JSONObject();
+        mainObject.put("uid", adapterDeterlab.getDeterUserIdByNclUserId(nclUserId));
+        mainObject.put("projName", team.getName());
+        mainObject.put("pid", team.getName());
+        mainObject.put("projGoals", team.getDescription());
+        mainObject.put("projWeb", team.getWebsite());
+        mainObject.put("projOrg", team.getOrganisationType());
+        mainObject.put("projPublic", team.getVisibility());
+        String resultJSON = adapterDeterlab.applyProject(mainObject.toString());
+
         userService.addTeam(nclUserId, createdTeam.getId());
         teamService.addTeamMember(createdTeam.getId(), teamMemberInfo);
-
-        // FIXME call adapter deterlab here
     }
 
     public void registerRequestToJoinTeam(String nclUserId, Team team) {

@@ -284,6 +284,17 @@ public class RegistrationServiceTest extends AbstractTest {
         Team one = Util.getTeamEntity();
         User user = Util.getUserEntity();
         User createdUser = userService.createUser(user);
+
+        // need to create entry in the Deterlab User Repository
+        adapterDeterlab.saveDeterUserIdMapping(RandomStringUtils.randomAlphanumeric(8), createdUser.getId());
+
+        JSONObject predefinedResultJson = new JSONObject();
+        predefinedResultJson.put("msg", "user has logged in and applied a project");
+
+        mockServer.expect(requestTo(properties.getApplyProject()))
+                .andExpect(method(HttpMethod.POST))
+                .andRespond(withSuccess(predefinedResultJson.toString(), MediaType.APPLICATION_JSON));
+
         registrationService.registerRequestToApplyTeam(createdUser.getId(), one);
 
         List<? extends TeamMember> membersList = teamService.getTeamByName(one.getName()).getMembers();
