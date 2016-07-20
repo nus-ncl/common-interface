@@ -66,11 +66,11 @@ public class RealizationService {
         return savedRealizationEntity;
     }
 
-    public void startExperimentInDeter(final String teamId, final String experimentName) {
+    public void startExperimentInDeter(final String teamName, final String experimentName) {
         StringBuilder httpCommand = new StringBuilder();
         httpCommand.append("?inout=in");
         httpCommand.append("&");
-        httpCommand.append("pid=" + teamId);
+        httpCommand.append("pid=" + teamName);
         httpCommand.append("&");
         httpCommand.append("eid=" + experimentName);
 

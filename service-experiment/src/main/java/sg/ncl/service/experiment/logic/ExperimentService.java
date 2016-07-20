@@ -10,6 +10,8 @@ import sg.ncl.service.experiment.data.jpa.ExperimentEntity;
 import sg.ncl.service.experiment.data.jpa.ExperimentRepository;
 import sg.ncl.service.experiment.domain.Experiment;
 import sg.ncl.service.experiment.exceptions.UserIdNotFoundException;
+import sg.ncl.service.realization.data.jpa.RealizationEntity;
+import sg.ncl.service.realization.logic.RealizationService;
 
 import javax.inject.Inject;
 import java.io.*;
@@ -34,6 +36,9 @@ public class ExperimentService {
     private ExperimentConnectionProperties experimentConnectionProperties;
 
     @Inject
+    private RealizationService realizationService;
+
+    @Inject
     protected ExperimentService(final ExperimentRepository experimentRepository) {
         this.experimentRepository = experimentRepository;
     }
@@ -53,6 +58,17 @@ public class ExperimentService {
 
         ExperimentEntity savedExperimentEntity = experimentRepository.save(setupEntity(experiment, fileName));
         logger.info("Experiment saved");
+
+        RealizationEntity realizationEntity = new RealizationEntity();
+        realizationEntity.setExperimentId(savedExperimentEntity.getId());
+        realizationEntity.setExperimentName(savedExperimentEntity.getName());
+        realizationEntity.setUserId(savedExperimentEntity.getUserId());
+        realizationEntity.setTeamId(savedExperimentEntity.getTeamId());
+        realizationEntity.setNumberOfNodes(0);
+        realizationEntity.setIdleMinutes(0L);
+        realizationEntity.setRunningMinutes(0L);
+
+        realizationService.save(realizationEntity);
 
         String returnResult = this.createExperimentInDeter(savedExperimentEntity);
         if (returnResult == "experiment created") {
@@ -161,6 +177,7 @@ public class ExperimentService {
         userObject.put("id", experimentEntity.getId().toString());
         userObject.put("userId", experimentEntity.getUserId());
         userObject.put("teamId", experimentEntity.getTeamId());
+        userObject.put("teamName", experimentEntity.getTeamName());
         userObject.put("name", experimentEntity.getName());
         userObject.put("description", experimentEntity.getDescription());
         userObject.put("nsFile", experimentEntity.getNsFile());

@@ -27,14 +27,21 @@ public class RealizationsController {
     @RequestMapping(method = RequestMethod.GET)
     public void get() {}
 
-    @RequestMapping(path = "/start", method = RequestMethod.POST)
-    public void startExperiment(final RealizationEntity realizationEntity) {
-        RealizationEntity realizationEntityDb = realizationService.getByExperimentId(realizationEntity.getExperimentId());
+//    @RequestMapping(path = "/start", method = RequestMethod.POST)
+//    public void startExperiment(final RealizationEntity realizationEntity) {
+//        RealizationEntity realizationEntityDb = realizationService.getByExperimentId(realizationEntity.getExperimentId());
+//
+//        if (realizationEntity == null) {
+//            realizationService.save(realizationEntity);
+//        }
+//
+//        realizationService.startExperimentInDeter(realizationEntityDb.getTeamId(), realizationEntityDb.getExperimentName());
+//    }
 
-        if (realizationEntity == null) {
-            realizationService.save(realizationEntity);
-        }
+    @RequestMapping(path = "/start/team/{teamName}/experiment/{expId}", method = RequestMethod.POST)
+    public void startExperiment(@PathVariable String teamName, @PathVariable String expId) {
+        RealizationEntity realizationEntityDb = realizationService.getByExperimentId(Long.parseLong(expId));
 
-        realizationService.startExperimentInDeter(realizationEntityDb.getTeamId(), realizationEntityDb.getExperimentName());
+        realizationService.startExperimentInDeter(teamName, realizationEntityDb.getExperimentName());
     }
 }

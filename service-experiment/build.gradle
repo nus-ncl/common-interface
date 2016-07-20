@@ -3,6 +3,7 @@ version '1.0-SNAPSHOT'
 dependencies {
     compile project(':common')
     compile project(':adapter-deterlab')
+    compile project(':service-realization')
     compile 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310'
 
     runtime('mysql:mysql-connector-java')
