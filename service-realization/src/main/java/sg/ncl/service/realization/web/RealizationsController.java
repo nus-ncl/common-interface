@@ -27,9 +27,14 @@ public class RealizationsController {
     @RequestMapping(method = RequestMethod.GET)
     public void get() {}
 
-    @RequestMapping(path = "/start/{experimentId}", method = RequestMethod.PUT)
-    public void startExperiment(@PathVariable Long experimentId) {
-        RealizationEntity realizationEntity = realizationService.getByExperimentId(experimentId);
-        realizationService.startExperimentInDeter(realizationEntity.getTeamId(), realizationEntity.getExperimentName());
+    @RequestMapping(path = "/start", method = RequestMethod.PUT)
+    public void startExperiment(final RealizationEntity realizationEntity) {
+        RealizationEntity realizationEntityDb = realizationService.getByExperimentId(realizationEntity.getExperimentId());
+
+        if (realizationEntity == null) {
+            realizationService.save(realizationEntity);
+        }
+
+        realizationService.startExperimentInDeter(realizationEntityDb.getTeamId(), realizationEntityDb.getExperimentName());
     }
 }
