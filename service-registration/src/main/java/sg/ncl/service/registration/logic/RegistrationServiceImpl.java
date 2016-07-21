@@ -351,28 +351,6 @@ public class RegistrationServiceImpl implements RegistrationService {
         adapterDeterlab.saveDeterUserIdMapping(deterUserId, nclUserId);
     }
 
-//    private void helloWorld() {
-//        Process p = null;
-//        try {
-//            p = Runtime.getRuntime().exec("ssh ncl@172.18.178.10");
-//            PrintStream out = new PrintStream(p.getOutputStream());
-//            BufferedReader in = new BufferedReader(new InputStreamReader(p.getInputStream()));
-//
-//            out.println("ls -l");
-//            while (in.ready()) {
-//                String s = in.readLine();
-//                System.out.println(s);
-//            }
-//            out.println("exit");
-//
-//            p.waitFor();
-//        } catch (IOException e) {
-//            e.printStackTrace();
-//        } catch (InterruptedException e) {
-//            e.printStackTrace();
-//        }
-//    }
-
     private void addUserToRegistrationRepository(String resultJSON, User user, Team team) {
 
         JSONObject jsonObjectFromAdapter = new JSONObject(resultJSON);
