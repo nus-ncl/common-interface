@@ -312,19 +312,19 @@ public class RegistrationServiceTest extends AbstractTest {
 
     @Test(expected = RegisterTeamIdEmptyException.class)
     public void approveTeamNullTeamId() throws Exception {
-        registrationService.approveTeam(null);
+        registrationService.approveTeam(null, TeamStatus.APPROVED);
     }
 
     @Test(expected = TeamNotFoundException.class)
     public void approveTeamNoSuchTeam() throws Exception {
-        registrationService.approveTeam(RandomStringUtils.randomAlphanumeric(20));
+        registrationService.approveTeam(RandomStringUtils.randomAlphanumeric(20), TeamStatus.APPROVED);
     }
 
     @Test(expected = NoOwnerInTeamException.class)
     public void approveTeamNoOwner() throws Exception {
         Team one = Util.getTeamEntity();
         Team createdTeam = teamService.addTeam(one);
-        registrationService.approveTeam(createdTeam.getId());
+        registrationService.approveTeam(createdTeam.getId(), TeamStatus.APPROVED);
     }
 
     @Test
@@ -334,7 +334,7 @@ public class RegistrationServiceTest extends AbstractTest {
         TeamMemberInfo owner = Util.getTeamMemberInfo(TeamMemberType.OWNER);
         teamService.addTeamMember(createdTeam.getId(), owner);
 
-        registrationService.approveTeam(createdTeam.getId());
+        registrationService.approveTeam(createdTeam.getId(), TeamStatus.APPROVED);
 
         Team approvedTeam = teamService.getTeamById(createdTeam.getId());
 
