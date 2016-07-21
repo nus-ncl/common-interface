@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 import sg.ncl.adapter.deterlab.AdapterDeterlab;
 import sg.ncl.adapter.deterlab.ConnectionProperties;
 import sg.ncl.adapter.deterlab.data.jpa.DeterlabUserRepository;
+import sg.ncl.adapter.deterlab.exceptions.UserNotFoundException;
 import sg.ncl.service.authentication.domain.Credentials;
 import sg.ncl.service.authentication.logic.CredentialsService;
 import sg.ncl.service.authentication.web.CredentialsInfo;
@@ -52,6 +53,51 @@ public class RegistrationServiceImpl implements RegistrationService {
         this.userService = userService;
         this.registrationRepository = registrationRepository;
         this.adapterDeterlab = new AdapterDeterlab(deterlabUserRepository, connectionProperties);
+    }
+
+    public void registerRequestToApplyTeam(String nclUserId, Team team) {
+        if (team.getName() == null || team.getName().isEmpty()) {
+            logger.warn("Team name is empty or null");
+            throw new RegisterTeamNameEmptyException();
+        }
+
+        if (nclUserId == null || nclUserId.isEmpty()) {
+            logger.warn("Uid is empty or null");
+            throw new RegisterUidNullException();
+        }
+
+        try {
+            userService.findUser(nclUserId);
+        } catch (UserNotFoundException e) {
+            logger.warn("No such user, {}", e);
+        }
+
+        // will throw exception if name already exists
+        checkTeamNameDuplicate(team.getName());
+
+        // no problem with the team
+        // create the team
+        Team createdTeam = teamService.addTeam(team);
+
+        TeamMemberEntity teamMemberEntity = new TeamMemberEntity();
+        teamMemberEntity.setUserId(nclUserId);
+        teamMemberEntity.setJoinedDate(ZonedDateTime.now());
+        teamMemberEntity.setMemberType(TeamMemberType.OWNER);
+        TeamMemberInfo teamMemberInfo = new TeamMemberInfo(teamMemberEntity);
+
+        // FIXME call adapter deterlab here
+        JSONObject mainObject = new JSONObject();
+        mainObject.put("uid", adapterDeterlab.getDeterUserIdByNclUserId(nclUserId));
+        mainObject.put("projName", team.getName());
+        mainObject.put("pid", team.getName());
+        mainObject.put("projGoals", team.getDescription());
+        mainObject.put("projWeb", team.getWebsite());
+        mainObject.put("projOrg", team.getOrganisationType());
+        mainObject.put("projPublic", team.getVisibility());
+        String resultJSON = adapterDeterlab.applyProject(mainObject.toString());
+
+        userService.addTeam(nclUserId, createdTeam.getId());
+        teamService.addTeamMember(createdTeam.getId(), teamMemberInfo);
     }
 
     public void registerRequestToJoinTeam(String nclUserId, Team team) {
@@ -352,6 +398,22 @@ public class RegistrationServiceImpl implements RegistrationService {
         registrationEntity.setUsrZip(user.getUserDetails().getAddress().getZipCode());
 
         registrationRepository.save(registrationEntity);
+    }
+
+    private void checkTeamNameDuplicate(String teamName) {
+        Team one = null;
+        try {
+            logger.info("New team name is {}", teamName);
+            one = teamService.getTeamByName(teamName);
+        } catch (NullPointerException e) {
+            logger.info("This is good, this implies team name is unique");
+        }
+        if (one != null && one.getId() != null) {
+            if (!one.getId().isEmpty()) {
+                logger.warn("Team name duplicate entry found");
+                throw new RegisterTeamNameDuplicateException();
+            }
+        }
     }
 
 }

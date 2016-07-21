@@ -2,9 +2,8 @@ package sg.ncl.service.experiment;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
-import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
-import org.springframework.transaction.annotation.EnableTransactionManagement;
+import org.springframework.context.annotation.Import;
+import sg.ncl.adapter.deterlab.DeterlabAutoConfiguration;
 import sg.ncl.common.jpa.UseJpa;
 
 /**
@@ -12,6 +11,10 @@ import sg.ncl.common.jpa.UseJpa;
  */
 @SpringBootApplication
 @UseJpa
+@Import({
+        DeterlabAutoConfiguration.class,
+        sg.ncl.service.realization.App.class,
+})
 public class App {
 
     public static void main(final String[] args) {
