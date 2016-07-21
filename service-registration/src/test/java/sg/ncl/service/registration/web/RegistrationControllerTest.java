@@ -26,14 +26,15 @@ import sg.ncl.service.registration.Util;
 import sg.ncl.service.registration.serializers.DateTimeDeserializer;
 import sg.ncl.service.registration.serializers.DateTimeSerializer;
 import sg.ncl.service.team.data.jpa.TeamEntity;
-import sg.ncl.service.team.domain.Team;
-import sg.ncl.service.team.domain.TeamService;
+import sg.ncl.service.team.domain.*;
+import sg.ncl.service.team.web.TeamMemberInfo;
 import sg.ncl.service.user.data.jpa.UserEntity;
 import sg.ncl.service.user.domain.User;
 import sg.ncl.service.user.domain.UserService;
 
 import javax.inject.Inject;
 import java.time.ZonedDateTime;
+import java.util.List;
 
 import static org.hamcrest.core.Is.is;
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.method;
@@ -216,5 +217,16 @@ public class RegistrationControllerTest extends AbstractTest {
         JSONObject resultObject = new JSONObject(result.getResponse().getContentAsString());
         JSONArray resulTeamArray = resultObject.getJSONArray("teams");
         Assert.assertThat(team.getId(), is(resulTeamArray.get(0).toString()));
+    }
+
+    @Test
+    public void approveTeam() throws Exception {
+        Team one = Util.getTeamEntity();
+        Team createdTeam = teamService.addTeam(one);
+        TeamMemberInfo owner = Util.getTeamMemberInfo(TeamMemberType.OWNER);
+        teamService.addTeamMember(createdTeam.getId(), owner);
+
+        mockMvc.perform(post("/registrations/teams/" + createdTeam.getId() + "?status=" + TeamStatus.APPROVED))
+                .andExpect(status().isOk());
     }
 }
