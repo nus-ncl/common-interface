@@ -277,7 +277,7 @@ public class RegistrationServiceImpl implements RegistrationService {
     }
 
     @Transactional
-    public void approveTeam(String teamId) {
+    public void approveTeam(String teamId, TeamStatus status) {
         // FIXME required additional parameters to validate if approver is of admin or ordinary user
         if (teamId == null || teamId.isEmpty()) {
             logger.warn("Team Id is empty or null");
@@ -286,7 +286,7 @@ public class RegistrationServiceImpl implements RegistrationService {
 
         // change team status
         // invoked method already ensure there is at least a team member of type owner
-        Team team  = teamService.changeTeamStatus(teamId, TeamStatus.APPROVED);
+        Team team  = teamService.changeTeamStatus(teamId, status);
 
         // change team owner member status
         List<? extends TeamMember> membersList = team.getMembers();

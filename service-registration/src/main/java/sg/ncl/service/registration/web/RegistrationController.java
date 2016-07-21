@@ -5,6 +5,7 @@ import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 import sg.ncl.service.registration.domain.Registration;
 import sg.ncl.service.registration.domain.RegistrationService;
+import sg.ncl.service.team.domain.TeamStatus;
 
 import javax.inject.Inject;
 
@@ -49,5 +50,11 @@ public class RegistrationController {
     @ResponseStatus(HttpStatus.ACCEPTED)
     public void approveJoinRequest(@PathVariable String teamId, @PathVariable String userId, @RequestBody RegistrationInfo registrationInfo) {
         registrationService.approveJoinRequest(teamId, userId, registrationInfo.getUser());
+    }
+
+    @RequestMapping(path = "/teams/{teamId}", method = RequestMethod.POST, params = {"status"})
+    @ResponseStatus(HttpStatus.OK)
+    public void approveTeam(@PathVariable String teamId, @RequestParam("status") final TeamStatus teamStatus) {
+        registrationService.approveTeam(teamId, teamStatus);
     }
 }
