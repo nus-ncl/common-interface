@@ -3,6 +3,7 @@ package sg.ncl.service.experiment.logic;
 import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import sg.ncl.adapter.deterlab.AdapterDeterlab;
 import sg.ncl.service.experiment.ExperimentConnectionProperties;
@@ -29,18 +30,20 @@ public class ExperimentService {
     private static final Logger logger = LoggerFactory.getLogger(ExperimentService.class);
     private final ExperimentRepository experimentRepository;
 
-    @Inject
+    @Autowired
     private AdapterDeterlab adapterDeterlab;
 
     @Inject
     private ExperimentConnectionProperties experimentConnectionProperties;
 
-    @Inject
     private RealizationService realizationService;
 
     @Inject
-    protected ExperimentService(final ExperimentRepository experimentRepository) {
+    protected ExperimentService(final ExperimentRepository experimentRepository, final AdapterDeterlab adapterDeterlab, final RealizationService realizationService, final ExperimentConnectionProperties experimentConnectionProperties) {
         this.experimentRepository = experimentRepository;
+        this.adapterDeterlab = adapterDeterlab;
+        this.realizationService = realizationService;
+        this.experimentConnectionProperties = experimentConnectionProperties;
     }
 
     public ExperimentEntity save(Experiment experiment) {
