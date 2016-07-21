@@ -21,6 +21,8 @@ import sg.ncl.service.registration.domain.RegistrationService;
 import sg.ncl.service.team.data.jpa.TeamEntity;
 import sg.ncl.service.team.data.jpa.TeamMemberEntity;
 import sg.ncl.service.team.domain.*;
+import sg.ncl.service.team.exceptions.NoOwnerInTeamException;
+import sg.ncl.service.team.exceptions.TeamNotFoundException;
 import sg.ncl.service.team.web.TeamMemberInfo;
 import sg.ncl.service.user.domain.User;
 import sg.ncl.service.user.domain.UserService;
@@ -305,6 +307,49 @@ public class RegistrationServiceTest extends AbstractTest {
         for (TeamMember member: membersList) {
             Assert.assertThat(member.getUserId(), is(createdUser.getId()));
             Assert.assertThat(member.getMemberType(), is(TeamMemberType.OWNER));
+        }
+    }
+
+    @Test(expected = RegisterTeamIdEmptyException.class)
+    public void approveTeamNullTeamId() throws Exception {
+        registrationService.approveTeam(null);
+    }
+
+    @Test(expected = TeamNotFoundException.class)
+    public void approveTeamNoSuchTeam() throws Exception {
+        registrationService.approveTeam(RandomStringUtils.randomAlphanumeric(20));
+    }
+
+    @Test(expected = NoOwnerInTeamException.class)
+    public void approveTeamNoOwner() throws Exception {
+        Team one = Util.getTeamEntity();
+        Team createdTeam = teamService.addTeam(one);
+        registrationService.approveTeam(createdTeam.getId());
+    }
+
+    @Test
+    public void approveTeamGood() throws Exception {
+        Team one = Util.getTeamEntity();
+        Team createdTeam = teamService.addTeam(one);
+        TeamMemberInfo owner = Util.getTeamMemberInfo(TeamMemberType.OWNER);
+        teamService.addTeamMember(createdTeam.getId(), owner);
+
+        registrationService.approveTeam(createdTeam.getId());
+
+        Team approvedTeam = teamService.getTeamById(createdTeam.getId());
+
+        // should be approved
+        Assert.assertThat(approvedTeam.getStatus(), is(TeamStatus.APPROVED));
+
+        List<? extends  TeamMember> membersList = approvedTeam.getMembers();
+
+        // members should contain only the owner
+        Assert.assertThat(membersList.size(), is(1));
+
+        for (TeamMember teamMember : membersList) {
+            // owner should be approved
+            Assert.assertThat(teamMember.getMemberType(), is(TeamMemberType.OWNER));
+            Assert.assertThat(teamMember.getMemberStatus(), is(TeamMemberStatus.APPROVED));
         }
     }
 }

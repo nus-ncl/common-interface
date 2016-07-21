@@ -285,11 +285,14 @@ public class RegistrationServiceImpl implements RegistrationService {
         }
 
         // change team status
+        // invoked method already ensure there is at least a team member of type owner
         Team team  = teamService.changeTeamStatus(teamId, TeamStatus.APPROVED);
 
         // change team owner member status
         List<? extends TeamMember> membersList = team.getMembers();
+
         if (membersList.isEmpty()) {
+            // paranoid check, just in case
             throw new NoMembersInTeamException();
         }
 
@@ -298,6 +301,8 @@ public class RegistrationServiceImpl implements RegistrationService {
                 teamService.changeTeamMemberStatus(teamMember.getUserId(), teamId, TeamMemberStatus.APPROVED);
             }
         }
+
+        // FIXME adapter deterlab call here
     }
 
     private boolean userFormFieldsHasErrors(User user) {

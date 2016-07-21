@@ -4,6 +4,9 @@ import org.apache.commons.lang3.RandomStringUtils;
 import sg.ncl.service.authentication.data.jpa.CredentialsEntity;
 import sg.ncl.service.registration.data.jpa.RegistrationEntity;
 import sg.ncl.service.team.data.jpa.TeamEntity;
+import sg.ncl.service.team.data.jpa.TeamMemberEntity;
+import sg.ncl.service.team.domain.TeamMemberType;
+import sg.ncl.service.team.web.TeamMemberInfo;
 import sg.ncl.service.user.data.jpa.AddressEntity;
 import sg.ncl.service.user.data.jpa.UserDetailsEntity;
 import sg.ncl.service.user.data.jpa.UserEntity;
@@ -35,6 +38,16 @@ public class Util {
         entity.setOrganisationType(RandomStringUtils.randomAlphanumeric(20));
         entity.setApplicationDate(ZonedDateTime.now());
         return entity;
+    }
+
+    public static TeamMemberInfo getTeamMemberInfo(TeamMemberType teamMemberType) {
+        final Long id = Long.parseLong(RandomStringUtils.randomNumeric(10));
+        final TeamMemberEntity teamMemberEntity = new TeamMemberEntity();
+        teamMemberEntity.setId(id);
+        teamMemberEntity.setUserId(RandomStringUtils.randomAlphanumeric(20));
+        teamMemberEntity.setJoinedDate(ZonedDateTime.now());
+        teamMemberEntity.setMemberType(teamMemberType);
+        return new TeamMemberInfo(teamMemberEntity);
     }
 
     public static UserEntity getUserEntity() {
