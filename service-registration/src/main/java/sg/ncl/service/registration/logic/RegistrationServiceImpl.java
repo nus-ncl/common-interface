@@ -5,6 +5,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import sg.ncl.adapter.deterlab.AdapterDeterlab;
 import sg.ncl.adapter.deterlab.ConnectionProperties;
 import sg.ncl.adapter.deterlab.data.jpa.DeterlabUserRepository;
@@ -18,10 +19,7 @@ import sg.ncl.service.registration.domain.RegistrationService;
 import sg.ncl.service.registration.exceptions.*;
 import sg.ncl.service.team.data.jpa.TeamEntity;
 import sg.ncl.service.team.data.jpa.TeamMemberEntity;
-import sg.ncl.service.team.domain.Team;
-import sg.ncl.service.team.domain.TeamMemberStatus;
-import sg.ncl.service.team.domain.TeamMemberType;
-import sg.ncl.service.team.domain.TeamService;
+import sg.ncl.service.team.domain.*;
 import sg.ncl.service.team.web.TeamMemberInfo;
 import sg.ncl.service.user.data.jpa.UserEntity;
 import sg.ncl.service.user.domain.User;
@@ -29,6 +27,7 @@ import sg.ncl.service.user.domain.UserService;
 
 import javax.inject.Inject;
 import java.time.ZonedDateTime;
+import java.util.List;
 
 /**
  * @author Christopher Zhong
@@ -275,6 +274,30 @@ public class RegistrationServiceImpl implements RegistrationService {
         one.put("gid", pid);
         adapterDeterlab.approveJoinRequest(one.toString());
         teamService.changeTeamMemberStatus(userId, teamId, TeamMemberStatus.APPROVED);
+    }
+
+    @Transactional
+    public void approveTeam(String teamId) {
+        // FIXME required additional parameters to validate if approver is of admin or ordinary user
+        if (teamId == null || teamId.isEmpty()) {
+            logger.warn("Team Id is empty or null");
+            throw new RegisterTeamIdEmptyException();
+        }
+
+        // change team status
+        Team team  = teamService.changeTeamStatus(teamId, TeamStatus.APPROVED);
+
+        // change team owner member status
+        List<? extends TeamMember> membersList = team.getMembers();
+        if (membersList.isEmpty()) {
+            throw new NoMembersInTeamException();
+        }
+
+        for (TeamMember teamMember : membersList) {
+            if (teamMember.getMemberType().equals(TeamMemberType.OWNER)) {
+                teamService.changeTeamMemberStatus(teamMember.getUserId(), teamId, TeamMemberStatus.APPROVED);
+            }
+        }
     }
 
     private boolean userFormFieldsHasErrors(User user) {
