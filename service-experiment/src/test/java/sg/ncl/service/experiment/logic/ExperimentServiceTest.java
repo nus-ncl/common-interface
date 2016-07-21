@@ -4,10 +4,14 @@ import mockit.Expectations;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.junit.Assert;
 import org.junit.Test;
+import sg.ncl.adapter.deterlab.AdapterDeterlab;
 import sg.ncl.service.experiment.AbstractTest;
+import sg.ncl.service.experiment.ExperimentConnectionProperties;
 import sg.ncl.service.experiment.Util;
 import sg.ncl.service.experiment.data.jpa.ExperimentEntity;
 import sg.ncl.service.experiment.data.jpa.ExperimentRepository;
+import sg.ncl.service.realization.domain.Realization;
+import sg.ncl.service.realization.logic.RealizationService;
 
 import javax.inject.Inject;
 import java.text.SimpleDateFormat;
@@ -29,12 +33,21 @@ public class ExperimentServiceTest extends AbstractTest {
     @Inject
     private ExperimentService experimentService;
 
+    @Inject
+    private RealizationService realizationService;
+
+    @Inject
+    private AdapterDeterlab adapterDeterlab;
+
+    @Inject
+    private ExperimentConnectionProperties experimentConnectionProperties;
+
     @Test
     public void testSaveExperiment() throws Exception {
 
         ExperimentEntity createdExperimentSave = Util.getExperimentsEntity();
 
-        ExperimentService localExperimentService = new ExperimentService(experimentRepository) {
+        ExperimentService localExperimentService = new ExperimentService(experimentRepository, adapterDeterlab, realizationService, experimentConnectionProperties) {
             @Override
             public String createExperimentInDeter(ExperimentEntity experimentEntity) {
                 return "experiment created";
@@ -117,7 +130,7 @@ public class ExperimentServiceTest extends AbstractTest {
         ExperimentEntity experimentEntity = Util.getExperimentsEntity();
         experimentEntity.setNsFile("nsfile.ns");
 
-        ExperimentService experimentService = new ExperimentService(experimentRepository);
+        ExperimentService experimentService = new ExperimentService(experimentRepository, adapterDeterlab, realizationService, experimentConnectionProperties);
         new Expectations(ExperimentService.class) {{
             experimentService.createExperimentInDeter(experimentEntity); result = "experiment created";
         }};
