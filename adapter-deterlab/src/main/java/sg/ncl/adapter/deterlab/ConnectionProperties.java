@@ -66,5 +66,9 @@ public class ConnectionProperties {
     public String getApplyProject() {
         return "http://" + ip + ":" + port + "/applyProject";
     }
+
+    public String getApproveProject() {
+        return "http://" + ip + ":" + port + "/approveProject";
+    }
 }
 

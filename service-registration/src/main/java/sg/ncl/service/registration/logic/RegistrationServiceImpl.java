@@ -303,6 +303,9 @@ public class RegistrationServiceImpl implements RegistrationService {
         }
 
         // FIXME adapter deterlab call here
+        JSONObject one = new JSONObject();
+        one.put("pid", team.getName());
+        adapterDeterlab.approveProject(one.toString());
     }
 
     private boolean userFormFieldsHasErrors(User user) {
