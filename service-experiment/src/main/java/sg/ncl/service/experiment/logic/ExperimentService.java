@@ -105,6 +105,7 @@ public class ExperimentService {
         experimentEntity.setNsFileContent(experiment.getNsFileContent());
         experimentEntity.setIdleSwap(experiment.getIdleSwap());
         experimentEntity.setMaxDuration(experiment.getMaxDuration());
+
         return experimentEntity;
     }
 
@@ -112,19 +113,20 @@ public class ExperimentService {
         logger.info("Get all experiments");
 
         final List<ExperimentEntity> result = new ArrayList<>();
-        for (ExperimentEntity experimentEntity : experimentRepository.findAll()) {
-            result.add(experimentEntity);
-        }
+        result.addAll(experimentRepository.findAll());
+
         return result;
     }
 
     public List<ExperimentEntity> findByUser(String userId) {
         logger.info("Find user by user id");
+
         if (userId == null || userId.isEmpty()) {
             throw new UserIdNotFoundException();
         }
 
         List<ExperimentEntity> result = experimentRepository.findByUserId(userId);
+
         return result;
     }
 
