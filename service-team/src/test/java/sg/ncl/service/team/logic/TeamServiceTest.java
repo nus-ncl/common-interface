@@ -88,7 +88,9 @@ public class TeamServiceTest extends AbstractTest {
 
         Assert.assertEquals(createdTeam.getName(), resultTeam.getName());
         Assert.assertEquals(createdTeam.getDescription(), resultTeam.getDescription());
-        Assert.assertEquals(createdTeam.getApplicationDate(), resultTeam.getApplicationDate());
+
+        Assert.assertNotNull(resultTeam.getId());
+        Assert.assertNotNull(resultTeam.getApplicationDate());
     }
 
     @Test
