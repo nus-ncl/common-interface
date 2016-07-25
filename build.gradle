@@ -4,7 +4,8 @@ buildscript {
     }
 
     dependencies {
-        classpath("org.springframework.boot:spring-boot-gradle-plugin:1.3.6.RELEASE")
+        classpath 'org.springframework.boot:spring-boot-gradle-plugin:1.3.6.RELEASE'
+        classpath 'org.kt3k.gradle.plugin:coveralls-gradle-plugin:2.6.3'
     }
 }
 // settings for all projects
@@ -57,6 +58,7 @@ configure(subprojects.findAll({ it.name.startsWith('service-') })) {
 }
 
 apply plugin: 'spring-boot'
+apply plugin: 'com.github.kt3k.coveralls'
 
 def getVersion = {
     def major = '1'

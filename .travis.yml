@@ -15,9 +15,14 @@ cache:
 
 before_install:
   - chmod +x gradlew # make gradlew script executable
+  - ./gradlew clean
 
 install:
   - ./gradlew assemble
 
 script:
-  - ./gradlew check jacocoTestReport # perform tests and compile jacoco test reports
+  - ./gradlew check # perform tests
+  - ./gradlew testReport jacocoTestReport # compile test reports
+
+after_success:
+  - ./gradlew coveralls #
