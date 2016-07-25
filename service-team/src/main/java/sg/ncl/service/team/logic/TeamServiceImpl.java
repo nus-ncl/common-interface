@@ -85,6 +85,10 @@ public class TeamServiceImpl implements TeamService {
             entity.setVisibility(team.getVisibility());
         }
 
+        if (team.getWebsite() != null) {
+            entity.setWebsite(team.getWebsite());
+        }
+
         return teamRepository.save(entity);
     }
 
