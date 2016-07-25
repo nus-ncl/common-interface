@@ -2,7 +2,7 @@
 
 All of NCL micro-services running under the same JVM.
 
-[![Build Status]([ci-img])]([ci-lnk])
+[![Build Status][ci-img]][ci-lnk]
 
 # Running the services
 
