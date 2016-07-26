@@ -3,13 +3,22 @@ package sg.ncl.service.experiment.logic;
 import mockit.Expectations;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Test;
+import org.springframework.http.HttpMethod;
+import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.web.client.MockRestServiceServer;
+import org.springframework.web.client.RestOperations;
+import org.springframework.web.client.RestTemplate;
 import sg.ncl.adapter.deterlab.AdapterDeterlab;
+import sg.ncl.adapter.deterlab.ConnectionProperties;
 import sg.ncl.service.experiment.AbstractTest;
 import sg.ncl.service.experiment.ExperimentConnectionProperties;
 import sg.ncl.service.experiment.Util;
 import sg.ncl.service.experiment.data.jpa.ExperimentEntity;
 import sg.ncl.service.experiment.data.jpa.ExperimentRepository;
+import sg.ncl.service.realization.data.jpa.RealizationEntity;
+import sg.ncl.service.realization.data.jpa.RealizationRepository;
 import sg.ncl.service.realization.logic.RealizationService;
 
 import javax.inject.Inject;
@@ -18,9 +27,13 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import static org.springframework.test.web.client.match.MockRestRequestMatchers.method;
+import static org.springframework.test.web.client.match.MockRestRequestMatchers.requestTo;
+
 /**
  * Created by Desmond.
  */
+@ActiveProfiles({"mock-deter-adapter"})
 public class ExperimentServiceTest extends AbstractTest {
 
     @Inject
@@ -33,10 +46,26 @@ public class ExperimentServiceTest extends AbstractTest {
     private RealizationService realizationService;
 
     @Inject
+    private RealizationRepository realizationRepository;
+
+    @Inject
     private AdapterDeterlab adapterDeterlab;
 
     @Inject
     private ExperimentConnectionProperties experimentConnectionProperties;
+
+    @Inject
+    private ConnectionProperties properties;
+
+    @Inject
+    private RestOperations restOperations;
+
+    private MockRestServiceServer mockServer;
+
+    @Before
+    public void setUp() throws Exception {
+        mockServer = MockRestServiceServer.createServer((RestTemplate) restOperations);
+    }
 
     @Test
     public void testSaveExperiment() throws Exception {
@@ -65,10 +94,6 @@ public class ExperimentServiceTest extends AbstractTest {
         String craftDate = new SimpleDateFormat("yyyyMMdd").format(new Date());
         String filename = createdExperimentSave.getUserId() + "_" + createdExperimentSave.getTeamId() + "_" + craftDate + "_" + createdExperimentSave.getNsFile() + ".ns";
         Assert.assertEquals(filename, savedExperiment.getNsFile());
-
-        // delete the created ns file
-//        File file = new File(filename);
-//        Files.deleteIfExists(file.toPath());
     }
 
     @Test
@@ -133,5 +158,49 @@ public class ExperimentServiceTest extends AbstractTest {
 
         String response = experimentService.createExperimentInDeter(experimentEntity);
         Assert.assertEquals("experiment created", response);
+    }
+
+    @Test
+    public void testDeleteExperimentInDeter() throws Exception {
+        mockServer.expect(requestTo(properties.stopExperiment()))
+                .andExpect(method(HttpMethod.POST));
+
+        final String name = RandomStringUtils.randomAlphanumeric(8);
+
+        experimentService.deleteExperimentInDeter(name);
+    }
+
+    @Test
+    public void testDeleteExperiment() throws Exception {
+
+        mockServer.expect(requestTo(properties.stopExperiment()))
+                .andExpect(method(HttpMethod.POST));
+
+        ExperimentEntity experimentEntity = Util.getExperimentsEntity();
+        ExperimentEntity savedExperiment = experimentRepository.save(experimentEntity);
+
+        RealizationEntity realizationEntity = new RealizationEntity();
+        realizationEntity.setExperimentId(savedExperiment.getId());
+        realizationEntity.setExperimentName(savedExperiment.getName());
+        realizationEntity.setUserId(savedExperiment.getUserId());
+        realizationEntity.setTeamId(savedExperiment.getTeamId());
+        realizationEntity.setNumberOfNodes(Integer.parseInt(RandomStringUtils.randomNumeric(5)));
+        realizationEntity.setIdleMinutes(Long.parseLong(RandomStringUtils.randomNumeric(5)));
+        realizationEntity.setRunningMinutes(Long.parseLong(RandomStringUtils.randomNumeric(5)));
+        realizationRepository.save(realizationEntity);
+
+        Long experimentCount = experimentRepository.count();
+        Long realizationCount = realizationRepository.count();
+
+        Assert.assertEquals(experimentCount, new Long(1L));
+        Assert.assertEquals(realizationCount, new Long(1L));
+
+        experimentService.deleteExperiment(savedExperiment.getId());
+
+        experimentCount = experimentRepository.count();
+        realizationCount = realizationRepository.count();
+
+        Assert.assertEquals(experimentCount, new Long(0L));
+        Assert.assertEquals(realizationCount, new Long(0L));
     }
 }

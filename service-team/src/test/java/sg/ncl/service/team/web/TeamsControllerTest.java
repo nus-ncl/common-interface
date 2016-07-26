@@ -156,7 +156,7 @@ public class TeamsControllerTest extends AbstractTest {
     }
 
     @Test
-    public void testPutTeam() throws Exception {
+    public void testUpdateTeamDetailsGood() throws Exception {
         TeamEntity origTeamEntity = Util.getTeamEntity();
         TeamEntity savedTeamEntity = teamRepository.save(origTeamEntity);
         final String id = savedTeamEntity.getId();
@@ -166,8 +166,10 @@ public class TeamsControllerTest extends AbstractTest {
         // change name
         String editedName = RandomStringUtils.randomAlphanumeric(20);
         String editedDescription = RandomStringUtils.randomAlphanumeric(20);
+        String editedWebsite = "http://" + RandomStringUtils.randomAlphabetic(8) + ".com";
         teamEntityFromDb.setName(editedName);
         teamEntityFromDb.setDescription(editedDescription);
+        teamEntityFromDb.setWebsite(editedWebsite);
 
         // create GSON
         GsonBuilder gsonBuilder = new GsonBuilder();
@@ -187,11 +189,12 @@ public class TeamsControllerTest extends AbstractTest {
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$.name", is(editedName)))
-                .andExpect(jsonPath("$.description", is(editedDescription)));
+                .andExpect(jsonPath("$.description", is(editedDescription)))
+                .andExpect(jsonPath("$.website", is(editedWebsite)));
     }
 
     @Test
-    public void testPutTeamWithWrongId() throws Exception {
+    public void testUpdateTeamDetailsWithWrongTeamId() throws Exception {
         TeamEntity teamEntity = Util.getTeamEntity();
         final String idString = "123456";
 
