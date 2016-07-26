@@ -19,4 +19,11 @@ import static org.mockito.Mockito.mock;
 @Configuration
 public class TestConfig {
 
+    @Bean
+    @Profile("mock-realization-service")
+    public RealizationService realizationService() {
+//        logger.info("Mocking: {}", RealizationService.class);
+        return mock(RealizationService.class);
+    }
+
 }
