@@ -5,7 +5,9 @@ jdk:
   - oraclejdk8 # test against version 1.8
 
 notifications:
-  slack: ${SLACK}
+  slack:
+    rooms:
+      - ${SLACK}
     on_success: change
     on_failure: always
 
