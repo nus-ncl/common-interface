@@ -163,6 +163,18 @@ public class AdapterDeterlab {
         return responseEntity.getBody().toString();
     }
 
+    public String deleteExperiment(String jsonString) {
+        logger.info("Delete experiment - {} at {} : {}", properties.getIp(), properties.getPort(), jsonString);
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        HttpEntity<String> request = new HttpEntity<String>(jsonString, headers);
+
+        ResponseEntity responseEntity = restTemplate.exchange(properties.deleteExperiment(), HttpMethod.POST, request, String.class);
+
+        return responseEntity.getBody().toString();
+    }
+
     public String approveJoinRequest(String jsonString) {
         // for team leaders to accept join request
         logger.info("Approving join request to {} at {}: {}", properties.getIp(), properties.getPort(), jsonString);

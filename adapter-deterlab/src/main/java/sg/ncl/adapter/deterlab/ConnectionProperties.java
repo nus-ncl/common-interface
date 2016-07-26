@@ -55,6 +55,8 @@ public class ConnectionProperties {
         return "http://" + ip + ":" + port + "/stopExperiment";
     }
 
+    public String deleteExperiment() { return "http://" + ip + ":" + port + "/deleteExperiment"; }
+
     public String getUpdateCredentials() {
         return "http://" + ip + ":" + port + "/changePassword";
     }
