@@ -34,15 +34,12 @@ allprojects {
             dependency 'org.apache.commons:commons-lang3:3.4'
             dependency 'io.jsonwebtoken:jjwt:0.6.0'
             dependency 'org.jmockit:jmockit:1.25'
+            dependency 'org.projectlombok:lombok:1.16.10'
         }
 
         imports {
             mavenBom 'io.spring.platform:platform-bom:2.0.6.RELEASE'
         }
-    }
-
-    test {
-        ignoreFailures true
     }
 
     jacocoTestReport {
@@ -78,6 +75,7 @@ dependencies {
     // the only compile dependencies needed here are the services projects;
     // there should be no other compile dependencies
     compile subprojects.findAll({ it.name.startsWith('service-') })
+    compile 'org.projectlombok:lombok'
     // the runtime dependencies should be a union of all runtime dependencies needed by all subprojects
     runtime 'mysql:mysql-connector-java'
     runtime 'org.postgresql:postgresql'
