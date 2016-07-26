@@ -226,6 +226,13 @@ public class RegistrationControllerTest extends AbstractTest {
         TeamMemberInfo owner = Util.getTeamMemberInfo(TeamMemberType.OWNER);
         teamService.addTeamMember(createdTeam.getId(), owner);
 
+        JSONObject predefinedResultJson = new JSONObject();
+        predefinedResultJson.put("msg", "project approved");
+
+        mockServer.expect(requestTo(properties.getApproveProject()))
+                .andExpect(method(HttpMethod.POST))
+                .andRespond(withSuccess(predefinedResultJson.toString(), MediaType.APPLICATION_JSON));
+
         mockMvc.perform(post("/registrations/teams/" + createdTeam.getId() + "?status=" + TeamStatus.APPROVED))
                 .andExpect(status().isOk());
     }
