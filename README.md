@@ -2,7 +2,7 @@
 
 All of NCL micro-services running under the same JVM.
 
-[![Build Status][ci-img]][ci-lnk]
+[![Build Status][ci-img]][ci-lnk] [![Coverage Status][co-img]][co-lnk]
 
 # Running the services
 
@@ -22,3 +22,5 @@ With Gradle, it is possible to run all services together in one process or just 
 
 [ci-img]: https://travis-ci.org/nus-ncl/services-in-one.svg?branch=master
 [ci-lnk]: https://travis-ci.org/nus-ncl/services-in-one
+[co-img]: https://coveralls.io/repos/github/nus-ncl/services-in-one/badge.svg?branch=master
+[co-lnk]: https://coveralls.io/github/nus-ncl/services-in-one?branch=master
