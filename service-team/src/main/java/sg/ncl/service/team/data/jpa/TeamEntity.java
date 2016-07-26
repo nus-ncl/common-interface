@@ -145,7 +145,7 @@ public class TeamEntity extends AbstractEntity implements Team {
         return processedDate;
     }
 
-    void setProcessedDate(ZonedDateTime processedDate) {
+    public void setProcessedDate(ZonedDateTime processedDate) {
         this.processedDate = processedDate;
     }
 

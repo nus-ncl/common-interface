@@ -7,10 +7,7 @@ import sg.ncl.service.team.AbstractTest;
 import sg.ncl.service.team.Util;
 import sg.ncl.service.team.data.jpa.TeamEntity;
 import sg.ncl.service.team.domain.*;
-import sg.ncl.service.team.exceptions.TeamIdNullException;
-import sg.ncl.service.team.exceptions.TeamMemberNotFoundException;
-import sg.ncl.service.team.exceptions.TeamNameNullException;
-import sg.ncl.service.team.exceptions.TeamNotFoundException;
+import sg.ncl.service.team.exceptions.*;
 import sg.ncl.service.team.web.TeamMemberInfo;
 
 import javax.inject.Inject;
@@ -223,6 +220,36 @@ public class TeamServiceTest extends AbstractTest {
 
         // should throw error here
         TeamMember result = teamService.changeTeamMemberStatus(userId, teamId, TeamMemberStatus.APPROVED);
+    }
+
+    @Test(expected = TeamIdNullException.class)
+    public void changeTeamStatusNullTeam() throws Exception {
+        teamService.changeTeamStatus(null, TeamStatus.APPROVED);
+    }
+
+    @Test(expected = TeamNotFoundException.class)
+    public void changeTeamStatusNoSuchTeam() throws Exception {
+        teamService.changeTeamStatus(RandomStringUtils.randomAlphanumeric(20), TeamStatus.APPROVED);
+    }
+
+    @Test(expected = NoOwnerInTeamException.class)
+    public void changeTeamStatusNoOwner() throws Exception {
+        Team one = Util.getTeamEntity();
+        Team createdTeam = teamService.addTeam(one);
+        teamService.changeTeamStatus(createdTeam.getId(), TeamStatus.APPROVED);
+    }
+
+    @Test
+    public void changeTeamStatusGood() throws Exception {
+        Team one = Util.getTeamEntity();
+        TeamMemberInfo owner = Util.getTeamMemberInfo(TeamMemberType.OWNER);
+        Team createdTeam = teamService.addTeam(one);
+        teamService.addTeamMember(createdTeam.getId(), owner);
+        Team approvedTeam = teamService.changeTeamStatus(createdTeam.getId(), TeamStatus.APPROVED);
+
+        Assert.assertThat(approvedTeam.getId(), is(createdTeam.getId()));
+        Assert.assertThat(approvedTeam.getStatus(), is(TeamStatus.APPROVED));
+        Assert.assertThat(approvedTeam.getMembers().size(), is(1));
     }
 
     private boolean isListEqual(List<TeamEntity> one, List<TeamEntity> two) {

@@ -24,4 +24,6 @@ public interface TeamService {
     boolean isTeamOwner(final String userId, final String teamId);
 
     TeamMember changeTeamMemberStatus(String userId, String teamId, TeamMemberStatus approved);
+
+    Team changeTeamStatus(String teamId, TeamStatus approved);
 }

@@ -5,6 +5,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import sg.ncl.adapter.deterlab.AdapterDeterlab;
 import sg.ncl.adapter.deterlab.ConnectionProperties;
 import sg.ncl.adapter.deterlab.data.jpa.DeterlabUserRepository;
@@ -18,10 +19,7 @@ import sg.ncl.service.registration.domain.RegistrationService;
 import sg.ncl.service.registration.exceptions.*;
 import sg.ncl.service.team.data.jpa.TeamEntity;
 import sg.ncl.service.team.data.jpa.TeamMemberEntity;
-import sg.ncl.service.team.domain.Team;
-import sg.ncl.service.team.domain.TeamMemberStatus;
-import sg.ncl.service.team.domain.TeamMemberType;
-import sg.ncl.service.team.domain.TeamService;
+import sg.ncl.service.team.domain.*;
 import sg.ncl.service.team.web.TeamMemberInfo;
 import sg.ncl.service.user.data.jpa.UserEntity;
 import sg.ncl.service.user.domain.User;
@@ -29,6 +27,7 @@ import sg.ncl.service.user.domain.UserService;
 
 import javax.inject.Inject;
 import java.time.ZonedDateTime;
+import java.util.List;
 
 /**
  * @author Christopher Zhong
@@ -277,6 +276,38 @@ public class RegistrationServiceImpl implements RegistrationService {
         teamService.changeTeamMemberStatus(userId, teamId, TeamMemberStatus.APPROVED);
     }
 
+    @Transactional
+    public void approveTeam(String teamId, TeamStatus status) {
+        // FIXME required additional parameters to validate if approver is of admin or ordinary user
+        if (teamId == null || teamId.isEmpty()) {
+            logger.warn("Team Id is empty or null");
+            throw new RegisterTeamIdEmptyException();
+        }
+
+        // change team status
+        // invoked method already ensure there is at least a team member of type owner
+        Team team  = teamService.changeTeamStatus(teamId, status);
+
+        // change team owner member status
+        List<? extends TeamMember> membersList = team.getMembers();
+
+        if (membersList.isEmpty()) {
+            // paranoid check, just in case
+            throw new NoMembersInTeamException();
+        }
+
+        for (TeamMember teamMember : membersList) {
+            if (teamMember.getMemberType().equals(TeamMemberType.OWNER)) {
+                teamService.changeTeamMemberStatus(teamMember.getUserId(), teamId, TeamMemberStatus.APPROVED);
+            }
+        }
+
+        // FIXME adapter deterlab call here
+        JSONObject one = new JSONObject();
+        one.put("pid", team.getName());
+        adapterDeterlab.approveProject(one.toString());
+    }
+
     private boolean userFormFieldsHasErrors(User user) {
         boolean errorsFound = false;
 
@@ -350,28 +381,6 @@ public class RegistrationServiceImpl implements RegistrationService {
         String deterUserId = userObject.getString("uid");
         adapterDeterlab.saveDeterUserIdMapping(deterUserId, nclUserId);
     }
-
-//    private void helloWorld() {
-//        Process p = null;
-//        try {
-//            p = Runtime.getRuntime().exec("ssh ncl@172.18.178.10");
-//            PrintStream out = new PrintStream(p.getOutputStream());
-//            BufferedReader in = new BufferedReader(new InputStreamReader(p.getInputStream()));
-//
-//            out.println("ls -l");
-//            while (in.ready()) {
-//                String s = in.readLine();
-//                System.out.println(s);
-//            }
-//            out.println("exit");
-//
-//            p.waitFor();
-//        } catch (IOException e) {
-//            e.printStackTrace();
-//        } catch (InterruptedException e) {
-//            e.printStackTrace();
-//        }
-//    }
 
     private void addUserToRegistrationRepository(String resultJSON, User user, Team team) {
 
