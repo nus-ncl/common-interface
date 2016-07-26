@@ -8,9 +8,12 @@ import org.json.JSONObject;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.Matchers;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.PropertySources;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.client.MockRestServiceServer;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
@@ -24,6 +27,8 @@ import sg.ncl.service.experiment.ExperimentConnectionProperties;
 import sg.ncl.service.experiment.Util;
 import sg.ncl.service.experiment.data.jpa.ExperimentEntity;
 import sg.ncl.service.experiment.data.jpa.ExperimentRepository;
+import sg.ncl.service.experiment.logic.ExperimentService;
+import sg.ncl.service.realization.data.jpa.RealizationEntity;
 
 import javax.inject.Inject;
 
@@ -34,6 +39,12 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import static org.hamcrest.Matchers.any;
+import static org.hamcrest.Matchers.is;
+import static org.junit.Assert.assertThat;
+import static org.mockito.Matchers.anyLong;
+import static org.mockito.Mockito.mockingDetails;
+import static org.mockito.Mockito.when;
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.method;
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.requestTo;
 import static org.springframework.test.web.client.response.MockRestResponseCreators.withSuccess;
@@ -46,6 +57,7 @@ import static org.springframework.test.web.servlet.setup.MockMvcBuilders.webAppC
 /**
  * Created by Desmond.
  */
+@ActiveProfiles({"mock-experiment-service"})
 public class ExperimentsControllerTest extends AbstractTest {
 
     private MediaType contentType = new MediaType(MediaType.APPLICATION_JSON.getType(), MediaType.APPLICATION_JSON.getSubtype());
@@ -54,23 +66,16 @@ public class ExperimentsControllerTest extends AbstractTest {
     // to mock the adapter server
     private MockRestServiceServer mockServer;
 
-    @Inject
-    private ExperimentRepository experimentRepository;
-
-    @Inject
-    private WebApplicationContext webApplicationContext;
-
-    @Inject
-    private ConnectionProperties properties;
-
-    @Inject
-    private AdapterDeterlab adapterDeterlab;
-
-    @Inject
-    private RestOperations restOperations;
+    @Inject private ExperimentService experimentService;
+    @Inject private ExperimentRepository experimentRepository;
+    @Inject private WebApplicationContext webApplicationContext;
+    @Inject private ConnectionProperties properties;
+    @Inject private AdapterDeterlab adapterDeterlab;
+    @Inject private RestOperations restOperations;
 
     @Before
     public void setUp() throws Exception {
+        assertThat(mockingDetails(experimentService).isMock(), is(true));
         mockServer = MockRestServiceServer.createServer((RestTemplate) restOperations);
         mockMvc = webAppContextSetup(webApplicationContext).build();
     }
@@ -85,49 +90,18 @@ public class ExperimentsControllerTest extends AbstractTest {
     }
 
     @Test
-    public void testPostExperiment() throws Exception {
-
-        // craft the adapter-deter service reply
-        JSONObject predefinedResultJson = new JSONObject();
-        predefinedResultJson.put("msg", "experiment is created");
-
-        // mock the adapter-deter service
-        mockServer.expect(requestTo(properties.getCreateExperiment()))
-                .andExpect(method(HttpMethod.POST))
-                .andRespond(withSuccess(predefinedResultJson.toString(), MediaType.APPLICATION_JSON));
+    public void testAddExperiment() throws Exception {
 
         ExperimentEntity experimentEntity = Util.getExperimentsEntity();
+        when(experimentService.save(Matchers.any())).thenReturn(experimentEntity);
+
+        ExperimentEntity experimentEntity2 = Util.getExperimentsEntity();
         ObjectMapper mapper = new ObjectMapper();
         mapper.registerModule(new JavaTimeModule());
-        String jsonString = mapper.writeValueAsString(experimentEntity);
-
-        // need this to prevent test fail when creating experiment
-        adapterDeterlab.saveDeterUserIdMapping(RandomStringUtils.randomAlphanumeric(8), experimentEntity.getUserId());
+        String jsonString = mapper.writeValueAsString(experimentEntity2);
 
         mockMvc.perform(post("/experiments").contentType(contentType).content(jsonString))
                 .andExpect(status().isCreated());
-
-        List<ExperimentEntity> experimentEntityList = experimentRepository.findAll();
-        ExperimentEntity firstExperimentEntity = experimentEntityList.get(0);
-
-        Assert.assertEquals(experimentEntityList.size(), 1);
-        Assert.assertEquals(experimentEntity.getUserId(), firstExperimentEntity.getUserId());
-        Assert.assertEquals(experimentEntity.getTeamId(), firstExperimentEntity.getTeamId());
-        Assert.assertEquals(experimentEntity.getName(), firstExperimentEntity.getName());
-        Assert.assertEquals(experimentEntity.getDescription(), firstExperimentEntity.getDescription());
-        Assert.assertEquals(experimentEntity.getIdleSwap(), firstExperimentEntity.getIdleSwap());
-        Assert.assertEquals(experimentEntity.getMaxDuration(), firstExperimentEntity.getMaxDuration());
-
-        // check new nsFile name
-        String craftDate = new SimpleDateFormat("yyyyMMdd").format(new Date());
-        String filename = experimentEntity.getUserId() + "_" + experimentEntity.getTeamId() + "_" + craftDate
-                + "_" + experimentEntity.getNsFile() + ".ns";
-
-        Assert.assertEquals(filename, firstExperimentEntity.getNsFile());
-
-        // delete the created ns file
-        File file = new File(filename);
-        Files.deleteIfExists(file.toPath());
     }
 
     @Test
@@ -140,49 +114,39 @@ public class ExperimentsControllerTest extends AbstractTest {
             experimentEntityList.add(Util.getExperimentsEntity());
         }
 
-        experimentEntityList = experimentRepository.save(experimentEntityList);
+        // mocking the get all experiments
+        when(experimentService.get()).thenReturn(experimentEntityList);
 
         // get all entries from database
-        MvcResult result = mockMvc.perform(get("/experiments/experiments"))
+        mockMvc.perform(get("/experiments/experiments"))
                 .andExpect(status().isOk())
-                .andExpect(content().contentType(contentType))
-                .andReturn();
-
-        String allUserJsonString = result.getResponse().getContentAsString();
-
-        ObjectMapper mapper = new ObjectMapper();
-        mapper.registerModule(new JavaTimeModule());
-        List<ExperimentEntity> experimentEntityList2 = mapper.readValue(allUserJsonString, new TypeReference<List<ExperimentEntity>>(){});
-
-        Assert.assertTrue(Util.isListEqual(experimentEntityList2, experimentEntityList));
+                .andExpect(content().contentType(contentType));
     }
 
     @Test
     public void testGetExperimentsByUserId() throws Exception {
 
+        List<ExperimentEntity> experimentEntityList = new ArrayList<>();
         String userId = RandomStringUtils.randomAlphanumeric(20);
-        int numEntries = 6;
 
-        Util.addExperiments(numEntries, userId, experimentRepository);
-
-        MvcResult result = mockMvc.perform(get("/experiments/users/" + userId))
-                .andExpect(status().isOk())
-                .andExpect(content().contentType(contentType))
-                .andReturn();
-
-        String allUserJsonString = result.getResponse().getContentAsString();
-
-        ObjectMapper mapper = new ObjectMapper();
-        mapper.registerModule(new JavaTimeModule());
-        List<ExperimentEntity> experimentEntityList = mapper.readValue(allUserJsonString, new TypeReference<List<ExperimentEntity>>(){});
-
-        Assert.assertEquals(experimentEntityList.size(), numEntries / 2);
-
-        for (ExperimentEntity forEntity : experimentEntityList) {
-            Assert.assertEquals(forEntity.getUserId(), userId);
+        for (int i = 0; i < 3; i++) {
+            experimentEntityList.add(Util.getExperimentsEntity());
         }
 
-        List<ExperimentEntity> allExperiments = experimentRepository.findAll();
-        Assert.assertEquals(allExperiments.size(), numEntries);
+        when(experimentService.findByUser(userId)).thenReturn(experimentEntityList);
+
+        mockMvc.perform(get("/experiments/users/" + userId))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(contentType));
+    }
+
+    @Test
+    public void testDeleteExperiment() throws Exception {
+        Long experimentId = Long.parseLong(RandomStringUtils.randomNumeric(5));
+
+        when(experimentService.deleteExperiment(experimentId)).thenReturn("Experiment deleted.");
+
+        mockMvc.perform(post("/experiments/experiments/" + experimentId))
+                .andExpect(status().isOk());
     }
 }

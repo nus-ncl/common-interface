@@ -231,25 +231,29 @@ public class ExperimentService {
         return result.getString("msg");
     }
 
-    public void deleteExperiment(final Long id) {
+    public String deleteExperiment(final Long id) {
         logger.info("Begin delete experiment.");
+        String returnString = "Experiment deleted.";
 
         Long realizationId = realizationService.getByExperimentId(id).getId();
 
         if (realizationId != null && realizationId > 0) {
             realizationService.deleteRealization(realizationId);
             logger.info("Realization deleted.");
+
+            ExperimentEntity experimentEntity = experimentRepository.getOne(id);
+            deleteExperimentInDeter(experimentEntity.getName());
+            logger.info("Experiment deleted in deter.");
+
+            experimentRepository.delete(id);
+            logger.info("Experiment deleted.");
         }
         else {
             logger.warn("Realization not deleted.");
+            returnString = "Experiment not deleted.";
         }
 
-        ExperimentEntity experimentEntity = experimentRepository.getOne(id);
-        deleteExperimentInDeter(experimentEntity.getName());
-        logger.info("Experiment deleted in deter.");
-
-        experimentRepository.delete(id);
-        logger.info("Experiment deleted.");
+        return returnString;
     }
 
     public void deleteExperimentInDeter(final String experimentName) {

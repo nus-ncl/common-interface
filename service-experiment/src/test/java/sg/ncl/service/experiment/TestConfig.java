@@ -6,6 +6,7 @@ import org.springframework.context.annotation.Profile;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseBuilder;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseType;
 import sg.ncl.adapter.deterlab.AdapterDeterlab;
+import sg.ncl.service.experiment.logic.ExperimentService;
 import sg.ncl.service.realization.logic.RealizationService;
 
 import javax.sql.DataSource;
@@ -24,4 +25,9 @@ public class TestConfig {
         return mock(AdapterDeterlab.class);
     }
 
+    @Bean
+    @Profile("mock-experiment-service")
+    public ExperimentService experimentService() {
+        return mock(ExperimentService.class);
+    }
 }
