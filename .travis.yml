@@ -14,15 +14,8 @@ cache:
     - '$HOME/.gradle/wrapper' # cache the gradle wrapper directory
 
 before_install:
-  - chmod +x gradlew # make gradlew script executable
-  - ./gradlew clean
+  - chmod +x gradlew # ensure that the gradlew script is executable
+  - ./gradlew clean # just in case, ensures a clean build environment
 
-install:
-  - ./gradlew assemble
-
-script:
-  - ./gradlew check # perform tests
-  - ./gradlew testReport jacocoTestReport # compile test reports
-
-after_success:
-  - ./gradlew coveralls #
+after_script:
+  - ./gradlew coveralls # collect jacoco reports from subprojects send them to coveralls

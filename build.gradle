@@ -90,6 +90,7 @@ check {
     dependsOn subprojects.check
 }
 
+
 task copyJunitXml(type: Copy) {
     from(subprojects.test.reports.junitXml.destination) {
         include '*.xml'
@@ -109,6 +110,19 @@ jacocoTestReport {
     executionData = fileTree(project.rootDir.absolutePath).include('**/build/jacoco/*.exec')
     sourceDirectories = files(sourceSets.main.java.srcDirs, subprojects.sourceSets.main.java.srcDirs)
     classDirectories = files(sourceSets.main.output.classesDir, subprojects.sourceSets.main.output.classesDir)
+    reports {
+        xml {
+            enabled true
+        }
+    }
+}
+
+coveralls {
+    sourceDirs = allprojects.sourceSets.main.java.srcDirs.flatten()
+}
+
+tasks.coveralls {
+    dependsOn jacocoTestReport
 }
 
 task wrapper(type: Wrapper) {
