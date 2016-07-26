@@ -27,7 +27,6 @@ import static org.springframework.test.web.client.response.MockRestResponseCreat
 /**
  * Created by Desmond.
  */
-@ActiveProfiles({"mock-realization-service"})
 public class RealizationServiceTest extends AbstractTest {
 
     @Inject
