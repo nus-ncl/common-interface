@@ -229,4 +229,21 @@ public class ExperimentService {
         JSONObject result = new JSONObject(resultJSON);
         return result.getString("msg");
     }
+
+    public void deleteExperiment(final Long experimentId) {
+        logger.info("Begin delete experiment.");
+
+        Long realizationId = realizationService.getByExperimentId(experimentId).getId();
+
+        if (realizationId != null && realizationId > 0) {
+            realizationService.deleteRealization(realizationId);
+            logger.info("Realization deleted.");
+        }
+        else {
+            logger.warn("Realization not deleted.");
+        }
+
+        experimentRepository.delete(experimentId);
+        logger.info("Experiment deleted.");
+    }
 }
