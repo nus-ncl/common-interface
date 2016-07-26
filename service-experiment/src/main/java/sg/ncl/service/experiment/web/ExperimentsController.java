@@ -52,4 +52,11 @@ public class ExperimentsController {
     public void addExperiment(@RequestBody @Valid ExperimentEntity experimentEntity) {
         experimentService.save(experimentEntity);
     }
+
+    // delete experiment
+    @RequestMapping(path = "/experiments/{expId}", method = RequestMethod.POST)
+    @ResponseStatus(code = HttpStatus.OK)
+    public void deleteExperiment(@PathVariable String expId) {
+        experimentService.deleteExperiment(Long.parseLong(expId));
+    }
 }

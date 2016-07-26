@@ -36,29 +36,14 @@ import static org.springframework.test.web.client.match.MockRestRequestMatchers.
 @ActiveProfiles({"mock-deter-adapter"})
 public class ExperimentServiceTest extends AbstractTest {
 
-    @Inject
-    private ExperimentRepository experimentRepository;
-
-    @Inject
-    private ExperimentService experimentService;
-
-    @Inject
-    private RealizationService realizationService;
-
-    @Inject
-    private RealizationRepository realizationRepository;
-
-    @Inject
-    private AdapterDeterlab adapterDeterlab;
-
-    @Inject
-    private ExperimentConnectionProperties experimentConnectionProperties;
-
-    @Inject
-    private ConnectionProperties properties;
-
-    @Inject
-    private RestOperations restOperations;
+    @Inject private ExperimentRepository experimentRepository;
+    @Inject private ExperimentService experimentService;
+    @Inject private RealizationService realizationService;
+    @Inject private RealizationRepository realizationRepository;
+    @Inject private AdapterDeterlab adapterDeterlab;
+    @Inject private ExperimentConnectionProperties experimentConnectionProperties;
+    @Inject private ConnectionProperties properties;
+    @Inject private RestOperations restOperations;
 
     private MockRestServiceServer mockServer;
 
