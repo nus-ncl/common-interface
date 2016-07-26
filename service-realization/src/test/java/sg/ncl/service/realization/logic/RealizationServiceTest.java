@@ -113,7 +113,7 @@ public class RealizationServiceTest extends AbstractTest {
         RealizationEntity realizationEntity = Util.getRealizationEntity();
         RealizationEntity savedRealizationEntity = realizationRepository.save(realizationEntity);
 
-        Assert.assertEquals(savedRealizationEntity.getState(), RealizationState.STOP);
+        Assert.assertEquals(savedRealizationEntity.getState(), RealizationState.NEW);
     }
 
     @Test
