@@ -133,4 +133,9 @@ public class RealizationService {
         logger.info("Get realization running minutes. {}", experimentId);
         return realizationRepository.findByExperimentId(experimentId).getRunningMinutes();
     }
+
+    public void deleteRealization(final Long realizationId) {
+        logger.info("Delete realization. {}", realizationId);
+        realizationRepository.delete(realizationId);
+    }
 }

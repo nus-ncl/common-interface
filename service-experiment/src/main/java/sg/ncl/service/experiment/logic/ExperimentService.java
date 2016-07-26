@@ -53,14 +53,14 @@ public class ExperimentService {
         // check experiment name is unique
         long countName = experimentRepository.countByName(experiment.getName());
         if (countName > 0) {
-            logger.warn("Experiment name is in use");
+            logger.warn("Experiment name is in use.");
             return null;
         }
 
 //        createNsFile(fileName, experiment.getNsFileContent());
 
         ExperimentEntity savedExperimentEntity = experimentRepository.save(setupEntity(experiment, fileName));
-        logger.info("Experiment saved");
+        logger.info("Experiment saved.");
 
         RealizationEntity realizationEntity = new RealizationEntity();
         realizationEntity.setExperimentId(savedExperimentEntity.getId());
@@ -72,6 +72,7 @@ public class ExperimentService {
         realizationEntity.setRunningMinutes(0L);
 
         realizationService.save(realizationEntity);
+        logger.info("Realization saved.");
 
         String returnResult = this.createExperimentInDeter(savedExperimentEntity);
         if (returnResult == "experiment created") {
@@ -228,5 +229,36 @@ public class ExperimentService {
         String resultJSON = adapterDeterlab.createExperiment(userObject.toString());
         JSONObject result = new JSONObject(resultJSON);
         return result.getString("msg");
+    }
+
+    public void deleteExperiment(final Long id) {
+        logger.info("Begin delete experiment.");
+
+        Long realizationId = realizationService.getByExperimentId(id).getId();
+
+        if (realizationId != null && realizationId > 0) {
+            realizationService.deleteRealization(realizationId);
+            logger.info("Realization deleted.");
+        }
+        else {
+            logger.warn("Realization not deleted.");
+        }
+
+        ExperimentEntity experimentEntity = experimentRepository.getOne(id);
+        deleteExperimentInDeter(experimentEntity.getName());
+        logger.info("Experiment deleted in deter.");
+
+        experimentRepository.delete(id);
+        logger.info("Experiment deleted.");
+    }
+
+    public void deleteExperimentInDeter(final String experimentName) {
+        StringBuilder httpCommand = new StringBuilder();
+        httpCommand.append("?experiment=" + experimentName);
+
+        JSONObject jsonObject = new JSONObject();
+        jsonObject.put("httpCommand", httpCommand.toString());
+
+        adapterDeterlab.deleteExperiment(jsonObject.toString());
     }
 }

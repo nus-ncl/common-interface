@@ -3,6 +3,7 @@ package sg.ncl.service.experiment;
 import org.apache.commons.lang3.RandomStringUtils;
 import sg.ncl.service.experiment.data.jpa.ExperimentEntity;
 import sg.ncl.service.experiment.data.jpa.ExperimentRepository;
+import sg.ncl.service.realization.data.jpa.RealizationEntity;
 
 import java.io.File;
 import java.nio.file.Files;
@@ -26,6 +27,19 @@ public class Util {
         entity.setNsFileContent(createNsFileContents());
         entity.setIdleSwap(Integer.parseInt(RandomStringUtils.randomNumeric(5)));
         entity.setMaxDuration(Integer.parseInt(RandomStringUtils.randomNumeric(5)));
+        return entity;
+    }
+
+    public static RealizationEntity getRealizationEntity() {
+        final RealizationEntity entity = new RealizationEntity();
+        entity.setId(Long.parseLong(RandomStringUtils.randomNumeric(10)));
+        entity.setExperimentId(Long.parseLong(RandomStringUtils.randomNumeric(10)));
+        entity.setExperimentName(RandomStringUtils.randomAlphanumeric(19));
+        entity.setUserId(RandomStringUtils.randomAlphanumeric(20));
+        entity.setTeamId(RandomStringUtils.randomAlphanumeric(20));
+        entity.setNumberOfNodes(Integer.parseInt(RandomStringUtils.randomNumeric(5)));
+        entity.setIdleMinutes(Long.parseLong(RandomStringUtils.randomNumeric(10)));
+        entity.setRunningMinutes(Long.parseLong(RandomStringUtils.randomNumeric(10)));
         return entity;
     }
 

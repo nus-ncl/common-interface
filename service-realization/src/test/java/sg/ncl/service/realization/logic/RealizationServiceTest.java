@@ -8,6 +8,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.client.MockRestServiceServer;
 import org.springframework.web.client.RestOperations;
 import org.springframework.web.client.RestTemplate;
@@ -31,6 +32,7 @@ import static org.springframework.test.web.client.response.MockRestResponseCreat
 /**
  * Created by Desmond.
  */
+@ActiveProfiles({"mock-realization-service"})
 public class RealizationServiceTest extends AbstractTest {
 
     @Inject
