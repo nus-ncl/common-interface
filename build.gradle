@@ -88,7 +88,6 @@ check {
     dependsOn subprojects.check
 }
 
-
 task copyJunitXml(type: Copy) {
     from(subprojects.test.reports.junitXml.destination) {
         include '*.xml'
@@ -117,10 +116,6 @@ jacocoTestReport {
 
 coveralls {
     sourceDirs = allprojects.sourceSets.main.java.srcDirs.flatten()
-}
-
-tasks.coveralls {
-    dependsOn jacocoTestReport
 }
 
 task wrapper(type: Wrapper) {
