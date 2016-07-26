@@ -1,7 +1,6 @@
 package sg.ncl.service.realization.logic;
 
 import org.apache.commons.lang3.RandomStringUtils;
-import org.apache.commons.lang3.SystemUtils;
 import org.json.JSONObject;
 import org.junit.Assert;
 import org.junit.Before;
@@ -11,10 +10,7 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.client.MockRestServiceServer;
 import org.springframework.web.client.RestOperations;
 import org.springframework.web.client.RestTemplate;
-import sg.ncl.adapter.deterlab.AdapterDeterlab;
 import sg.ncl.adapter.deterlab.ConnectionProperties;
-import sg.ncl.adapter.deterlab.data.jpa.DeterlabUserRepository;
-import sg.ncl.adapter.deterlab.domain.DeterlabUser;
 import sg.ncl.service.realization.AbstractTest;
 import sg.ncl.service.realization.Util;
 import sg.ncl.service.realization.data.jpa.RealizationEntity;
@@ -23,7 +19,6 @@ import sg.ncl.service.realization.domain.RealizationState;
 
 import javax.inject.Inject;
 
-import static org.mockito.Mockito.mock;
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.method;
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.requestTo;
 import static org.springframework.test.web.client.response.MockRestResponseCreators.withSuccess;
