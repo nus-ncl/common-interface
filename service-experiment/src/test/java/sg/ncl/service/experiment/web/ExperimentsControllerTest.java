@@ -67,10 +67,7 @@ public class ExperimentsControllerTest extends AbstractTest {
     private MockRestServiceServer mockServer;
 
     @Inject private ExperimentService experimentService;
-    @Inject private ExperimentRepository experimentRepository;
     @Inject private WebApplicationContext webApplicationContext;
-    @Inject private ConnectionProperties properties;
-    @Inject private AdapterDeterlab adapterDeterlab;
     @Inject private RestOperations restOperations;
 
     @Before
