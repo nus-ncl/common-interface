@@ -1,0 +1,21 @@
+sudo: false # use container-based infrastructure
+
+language: java
+jdk:
+  - oraclejdk8 # test against version 1.8
+
+before_cache:
+  - rm -f  $HOME/.gradle/caches/modules-2/modules-2.lock
+  - rm -fr $HOME/.gradle/caches/*/plugin-resolution/
+
+cache:
+  directories:
+    - '$HOME/.gradle/caches' # cache the gradle cache directory
+    - '$HOME/.gradle/wrapper' # cache the gradle wrapper directory
+
+before_install:
+  - chmod +x gradlew # ensure that the gradlew script is executable
+  - ./gradlew clean # just in case, ensures a clean build environment
+
+after_script:
+  - ./gradlew coveralls # collect jacoco reports from subprojects send them to coveralls
