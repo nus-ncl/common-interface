@@ -38,7 +38,7 @@ public class RealizationEntity extends AbstractEntity implements Realization {
     private Integer numberOfNodes;
 
     @Column(name = "state", nullable = false)
-    private RealizationState state = RealizationState.STOP;
+    private RealizationState state = RealizationState.NEW;
 
     @Column(name = "idle_minutes", nullable = false)
     private Long idleMinutes;
