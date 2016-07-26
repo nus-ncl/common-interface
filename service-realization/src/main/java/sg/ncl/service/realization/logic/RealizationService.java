@@ -114,7 +114,7 @@ public class RealizationService {
         logger.info("Set realization idle minutes. {} : {}", experimentId, minutes);
         RealizationEntity realizationEntity = realizationRepository.findByExperimentId(experimentId);
         realizationEntity.setIdleMinutes(minutes);
-        realizationRepository.save(realizationEntity);
+        realizationRepository.saveAndFlush(realizationEntity);
     }
 
     public Long getIdleMinutes(final Long experimentId) {
@@ -126,7 +126,7 @@ public class RealizationService {
         logger.info("Set realization running minutes. {} : {}", experimentId, minutes);
         RealizationEntity realizationEntity = realizationRepository.findByExperimentId(experimentId);
         realizationEntity.setRunningMinutes(minutes);
-        realizationRepository.save(realizationEntity);
+        realizationRepository.saveAndFlush(realizationEntity);
     }
 
     public Long getRunningMinutes(final Long experimentId) {
