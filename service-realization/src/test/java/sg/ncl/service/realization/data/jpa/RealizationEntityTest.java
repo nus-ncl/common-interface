@@ -114,7 +114,7 @@ public class RealizationEntityTest {
     public void testGetState() throws Exception {
         final RealizationEntity entity = new RealizationEntity();
 
-        assertThat(entity.getState(), is(RealizationState.STOP));
+        assertThat(entity.getState(), is(RealizationState.NEW));
     }
 
     @Test
