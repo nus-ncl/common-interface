@@ -24,6 +24,7 @@ import sg.ncl.service.team.domain.*;
 import sg.ncl.service.team.exceptions.NoOwnerInTeamException;
 import sg.ncl.service.team.exceptions.TeamNotFoundException;
 import sg.ncl.service.team.web.TeamMemberInfo;
+import sg.ncl.service.user.data.jpa.UserEntity;
 import sg.ncl.service.user.domain.User;
 import sg.ncl.service.user.domain.UserService;
 import sg.ncl.service.user.exceptions.UserNotFoundException;
@@ -358,5 +359,49 @@ public class RegistrationServiceTest extends AbstractTest {
             Assert.assertThat(teamMember.getMemberType(), is(TeamMemberType.OWNER));
             Assert.assertThat(teamMember.getMemberStatus(), is(TeamMemberStatus.APPROVED));
         }
+    }
+
+    @Test
+    public void approveTeamReject() throws Exception {
+        User user = Util.getUserEntity();
+        User createdUser = userService.createUser(user);
+
+        Team one = Util.getTeamEntity();
+        Team createdTeam = teamService.addTeam(one);
+        TeamMemberInfo owner = Util.getTeamMemberInfo(createdUser.getId(), TeamMemberType.OWNER);
+        teamService.addTeamMember(createdTeam.getId(), owner);
+
+        Team two = Util.getTeamEntity();
+        Team createdTeamTwo = teamService.addTeam(two);
+        teamService.addTeamMember(createdTeamTwo.getId(), owner);
+
+        String teamId = createdTeam.getId();
+        String teamId_Two = createdTeamTwo.getId();
+
+        userService.addTeam(createdUser.getId(), teamId);
+        userService.addTeam(createdUser.getId(), teamId_Two);
+
+        JSONObject predefinedResultJson = new JSONObject();
+        predefinedResultJson.put("msg", "project rejected");
+
+        mockServer.expect(requestTo(properties.getRejectProject()))
+                .andExpect(method(HttpMethod.POST))
+                .andRespond(withSuccess(predefinedResultJson.toString(), MediaType.APPLICATION_JSON));
+
+        registrationService.approveTeam(teamId, TeamStatus.REJECTED);
+
+        // team should have been removed
+        try {
+            Team approvedTeam = teamService.getTeamById(teamId);
+        } catch (TeamNotFoundException e) {
+            Assert.assertThat(e.getMessage(), is(teamId));
+        }
+
+        User resultUser = userService.findUser(createdUser.getId());
+        List<String> teamsIdList = resultUser.getTeams();
+
+        // user should not be in deleted team
+        Assert.assertThat(teamsIdList.size(), is(1));
+        Assert.assertThat(teamsIdList.get(0), is(teamId_Two));
     }
 }

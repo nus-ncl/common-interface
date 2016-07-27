@@ -21,7 +21,7 @@ import javax.inject.Inject;
 import java.util.List;
 
 /**
- * Created by Desmond
+ * @author Desmond
  */
 public class UserServiceTest extends AbstractTest {
     @Inject
@@ -178,5 +178,40 @@ public class UserServiceTest extends AbstractTest {
 
         User userFromDb = userService.findUser(user.getId());
         Assert.assertEquals(userEntity.getUserDetails().getFirstName(), userFromDb.getUserDetails().getFirstName());
+    }
+
+    @Test(expected = UserIdNullException.class)
+    public void removeUserFromTeamTestUserIdNull() throws Exception {
+        UserService userService = new UserServiceImpl(userRepository);
+        userService.removeTeam(null, RandomStringUtils.randomAlphanumeric(20));
+    }
+
+    @Test(expected = UserNotFoundException.class)
+    public void removeUserFromTeamTestUserNotFound() throws Exception {
+        UserService userService = new UserServiceImpl(userRepository);
+        userService.removeTeam(RandomStringUtils.randomAlphanumeric(20), RandomStringUtils.randomAlphanumeric(20));
+    }
+
+    @Test
+    public void removeUserFromTeamTestGood() throws Exception {
+        UserService userService = new UserServiceImpl(userRepository);
+        UserEntity userEntity = Util.getUserEntity();
+        User user = userService.createUser(userEntity);
+        String userId = user.getId();
+        String teamId = RandomStringUtils.randomAlphabetic(20);
+
+        userService.addTeam(userId, teamId);
+
+        // ensure team is added from the user side
+        User userFromDb = userService.findUser(userId);
+        List<String> teamList = userFromDb.getTeams();
+        Assert.assertEquals(teamList.get(0), teamId);
+
+        // ensure team is removed from the user side
+        userService.removeTeam(userId, teamId);
+
+        User userFromDb2 = userService.findUser(userId);
+        List<String> teamList2 = userFromDb2.getTeams();
+        Assert.assertEquals(teamList2.isEmpty(), true);
     }
 }

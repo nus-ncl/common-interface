@@ -50,6 +50,16 @@ public class Util {
         return new TeamMemberInfo(teamMemberEntity);
     }
 
+    public static TeamMemberInfo getTeamMemberInfo(String userId, TeamMemberType teamMemberType) {
+        final Long id = Long.parseLong(RandomStringUtils.randomNumeric(10));
+        final TeamMemberEntity teamMemberEntity = new TeamMemberEntity();
+        teamMemberEntity.setId(id);
+        teamMemberEntity.setUserId(userId);
+        teamMemberEntity.setJoinedDate(ZonedDateTime.now());
+        teamMemberEntity.setMemberType(teamMemberType);
+        return new TeamMemberInfo(teamMemberEntity);
+    }
+
     public static UserEntity getUserEntity() {
         final UserEntity userEntity = new UserEntity();
         userEntity.setApplicationDate(ZonedDateTime.now());
