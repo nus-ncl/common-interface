@@ -305,7 +305,17 @@ public class RegistrationServiceImpl implements RegistrationService {
         // FIXME adapter deterlab call here
         JSONObject one = new JSONObject();
         one.put("pid", team.getName());
-        adapterDeterlab.approveProject(one.toString());
+
+        if (status.equals(TeamStatus.APPROVED)) {
+            adapterDeterlab.approveProject(one.toString());
+        } else {
+            adapterDeterlab.rejectProject(one.toString());
+        }
+    }
+
+    @Transactional
+    public void rejectTeam(String teamId, TeamStatus status) {
+        // FIXME required additional parameters to validate if approver is of admin or ordinary user
     }
 
     private boolean userFormFieldsHasErrors(User user) {

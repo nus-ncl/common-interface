@@ -359,4 +359,37 @@ public class RegistrationServiceTest extends AbstractTest {
             Assert.assertThat(teamMember.getMemberStatus(), is(TeamMemberStatus.APPROVED));
         }
     }
+
+    @Test
+    public void approveTeamReject() throws Exception {
+        Team one = Util.getTeamEntity();
+        Team createdTeam = teamService.addTeam(one);
+        TeamMemberInfo owner = Util.getTeamMemberInfo(TeamMemberType.OWNER);
+        teamService.addTeamMember(createdTeam.getId(), owner);
+
+        JSONObject predefinedResultJson = new JSONObject();
+        predefinedResultJson.put("msg", "project rejected");
+
+        mockServer.expect(requestTo(properties.getRejectProject()))
+                .andExpect(method(HttpMethod.POST))
+                .andRespond(withSuccess(predefinedResultJson.toString(), MediaType.APPLICATION_JSON));
+
+        registrationService.approveTeam(createdTeam.getId(), TeamStatus.REJECTED);
+
+        Team approvedTeam = teamService.getTeamById(createdTeam.getId());
+
+        // should be approved
+        Assert.assertThat(approvedTeam.getStatus(), is(TeamStatus.REJECTED));
+
+        List<? extends  TeamMember> membersList = approvedTeam.getMembers();
+
+        // members should contain only the owner
+        Assert.assertThat(membersList.size(), is(1));
+
+        for (TeamMember teamMember : membersList) {
+            // owner should be approved
+            Assert.assertThat(teamMember.getMemberType(), is(TeamMemberType.OWNER));
+            Assert.assertThat(teamMember.getMemberStatus(), is(TeamMemberStatus.APPROVED));
+        }
+    }
 }
