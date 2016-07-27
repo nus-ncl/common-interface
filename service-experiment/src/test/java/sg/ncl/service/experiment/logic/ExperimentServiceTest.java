@@ -145,15 +145,15 @@ public class ExperimentServiceTest extends AbstractTest {
         Assert.assertEquals("experiment created", response);
     }
 
-    @Test
-    public void testDeleteExperimentInDeter() throws Exception {
-        mockServer.expect(requestTo(properties.stopExperiment()))
-                .andExpect(method(HttpMethod.POST));
-
-        final String name = RandomStringUtils.randomAlphanumeric(8);
-
-        experimentService.deleteExperimentInDeter(name);
-    }
+//    @Test
+//    public void testDeleteExperimentInDeter() throws Exception {
+//        mockServer.expect(requestTo(properties.stopExperiment()))
+//                .andExpect(method(HttpMethod.POST));
+//
+//        final String name = RandomStringUtils.randomAlphanumeric(8);
+//
+//        experimentService.deleteExperimentInDeter(name);
+//    }
 
     @Test
     public void testDeleteExperiment() throws Exception {

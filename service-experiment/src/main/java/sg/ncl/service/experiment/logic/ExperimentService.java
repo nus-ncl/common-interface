@@ -237,6 +237,8 @@ public class ExperimentService {
 
         Long realizationId = realizationService.getByExperimentId(id).getId();
 
+        // TODO: DELETE team from member-team and team
+
         if (realizationId != null && realizationId > 0) {
             realizationService.deleteRealization(realizationId);
             logger.info("Realization deleted.");
@@ -256,7 +258,7 @@ public class ExperimentService {
         return returnString;
     }
 
-    public void deleteExperimentInDeter(final String experimentName) {
+    private void deleteExperimentInDeter(final String experimentName) {
         StringBuilder httpCommand = new StringBuilder();
         httpCommand.append("?experiment=" + experimentName);
 
