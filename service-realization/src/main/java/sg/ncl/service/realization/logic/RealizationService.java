@@ -138,4 +138,6 @@ public class RealizationService {
         logger.info("Delete realization. {}", realizationId);
         realizationRepository.delete(realizationId);
     }
+
+    // TODO: DELETE team from user
 }
