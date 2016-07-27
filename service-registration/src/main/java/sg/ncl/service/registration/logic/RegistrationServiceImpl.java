@@ -309,6 +309,15 @@ public class RegistrationServiceImpl implements RegistrationService {
         if (status.equals(TeamStatus.APPROVED)) {
             adapterDeterlab.approveProject(one.toString());
         } else {
+            // FIXME may need to be more specific and check if TeamStatus is REJECTED
+            Team existingTeam = teamService.getTeamById(teamId);
+            List<? extends TeamMember> existingMembersList = existingTeam.getMembers();
+            for (TeamMember member : existingMembersList) {
+                // remove from user side
+                userService.removeTeam(member.getUserId(), teamId);
+            }
+            // remove from team side
+            teamService.removeTeam(teamId);
             adapterDeterlab.rejectProject(one.toString());
         }
     }
