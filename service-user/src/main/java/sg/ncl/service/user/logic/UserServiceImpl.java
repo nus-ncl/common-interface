@@ -129,6 +129,13 @@ public class UserServiceImpl implements UserService {
         userRepository.save(one);
     }
 
+    @Transactional
+    public void removeTeam(final String userId, final String teamId) {
+        UserEntity one = findUserEntity(userId);
+        one.removeTeamId(teamId);
+        userRepository.save(one);
+    }
+
     private UserEntity findUserEntity(final String userId) {
         if (userId == null || userId.isEmpty()) {
             throw new UserIdNullException();
