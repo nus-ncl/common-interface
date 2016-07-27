@@ -38,6 +38,13 @@ public class TeamServiceImpl implements TeamService {
     }
 
     @Transactional
+    public void removeTeam(final String id) {
+        // check if entity exists first
+        TeamEntity entity = findTeam(id);
+        teamRepository.delete(id);
+    }
+
+    @Transactional
     public List<? extends Team> getTeams() {
         return teamRepository.findAll();
     }
