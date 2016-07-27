@@ -1,7 +1,9 @@
 package sg.ncl.service.user.data.jpa;
 
 import org.apache.commons.lang3.RandomStringUtils;
+import org.junit.Assert;
 import org.junit.Test;
+import sg.ncl.service.user.Util;
 import sg.ncl.service.user.domain.UserStatus;
 
 import java.time.ZonedDateTime;
@@ -204,6 +206,55 @@ public class UserEntityTest {
         assertThat(toString, containsString(String.valueOf("null")));
         assertThat(toString, containsString(registrationDate.toString()));
         assertThat(toString, containsString(processedDate.toString()));
+    }
+
+    @Test
+    public void testRemoveTeamNotFound() throws Exception {
+        final UserEntity userEntity = Util.getUserEntity();
+        String teamId_1 = RandomStringUtils.randomAlphanumeric(20);
+        String teamId_2 = RandomStringUtils.randomAlphanumeric(20);
+
+        userEntity.addTeamId(teamId_1);
+        userEntity.addTeamId(teamId_2);
+
+        // first assert that the team don't exist
+        List<String> teamsList = userEntity.getTeams();
+
+        assertThat(teamsList.size(), is(2));
+
+        userEntity.removeTeamId(RandomStringUtils.randomAlphanumeric(20));
+
+        // finally assert that initial added teams have not been removed
+        List<String> result = userEntity.getTeams();
+
+        for (String teamId : result) {
+            if (!teamId.equals(teamId_1) && !teamId.equals(teamId_2)) {
+                Assert.fail("One of the team ids has been wrongly removed!");
+            }
+        }
+    }
+
+    @Test
+    public void testRemoveTeamGood() throws Exception {
+        final UserEntity userEntity = Util.getUserEntity();
+        String teamId_1 = RandomStringUtils.randomAlphanumeric(20);
+        String teamId_2 = RandomStringUtils.randomAlphanumeric(20);
+
+        userEntity.addTeamId(teamId_1);
+        userEntity.addTeamId(teamId_2);
+
+        // first assert that the team don't exist
+        List<String> teamsList = userEntity.getTeams();
+
+        assertThat(teamsList.size(), is(2));
+
+        userEntity.removeTeamId(teamId_2);
+
+        // finally assert that only teamId_2 is removed
+        List<String> result = userEntity.getTeams();
+
+        assertThat(result.size(), is(1));
+        assertThat(result.get(0), is(teamId_1));
     }
 
 }
