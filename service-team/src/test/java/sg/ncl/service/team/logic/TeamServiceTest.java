@@ -252,6 +252,26 @@ public class TeamServiceTest extends AbstractTest {
         Assert.assertThat(approvedTeam.getMembers().size(), is(1));
     }
 
+    @Test(expected = TeamIdNullException.class)
+    public void removeTeamNullId() throws Exception {
+        teamService.removeTeam(null);
+    }
+
+    @Test(expected = TeamNotFoundException.class)
+    public void removeTeamNotFound() throws Exception {
+        teamService.removeTeam(RandomStringUtils.randomAlphanumeric(20));
+    }
+
+    @Test(expected = TeamNotFoundException.class)
+    public void removeTeamGood() throws Exception {
+        Team one = Util.getTeamEntity();
+        Team createdTeam = teamService.addTeam(one);
+        teamService.removeTeam(createdTeam.getId());
+
+        // expect a team not found exception here when retrieving since we already remove the team previously
+        teamService.getTeamById(createdTeam.getId());
+    }
+
     private boolean isListEqual(List<TeamEntity> one, List<TeamEntity> two) {
         ArrayList<TeamEntity> cp = new ArrayList<>(one);
         for (TeamEntity twoIterator : two) {

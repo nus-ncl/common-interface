@@ -77,4 +77,17 @@ public class TeamRepositoryTest extends AbstractTest {
             checkException(e, "NULL not allowed for column \"ORGANISATION_TYPE\"");
         }
     }
+
+    @Test
+    public void testDeleteTeam() throws Exception {
+        final TeamEntity entity = Util.getTeamEntity();
+
+        final long count = repository.count();
+        final TeamEntity savedEntity = repository.save(entity);
+        assertThat(repository.count(), is(equalTo(count + 1)));
+        assertThat(entity.getName(), is(equalTo(savedEntity.getName())));
+
+        repository.delete(savedEntity.getId());
+        assertThat(repository.count(), is(equalTo(count)));
+    }
 }
