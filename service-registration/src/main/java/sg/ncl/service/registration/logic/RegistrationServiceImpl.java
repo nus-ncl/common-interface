@@ -322,11 +322,6 @@ public class RegistrationServiceImpl implements RegistrationService {
         }
     }
 
-    @Transactional
-    public void rejectTeam(String teamId, TeamStatus status) {
-        // FIXME required additional parameters to validate if approver is of admin or ordinary user
-    }
-
     private boolean userFormFieldsHasErrors(User user) {
         boolean errorsFound = false;
 
