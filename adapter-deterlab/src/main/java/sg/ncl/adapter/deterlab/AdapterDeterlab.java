@@ -200,4 +200,17 @@ public class AdapterDeterlab {
 
         return responseEntity.getBody().toString();
     }
+
+    public String rejectProject(String jsonString) {
+        // for ncl admins to reject teams
+        logger.info("Rejecting team to {} at {}: {}", properties.getIp(), properties.getPort(), jsonString);
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        HttpEntity<String> request = new HttpEntity<String>(jsonString, headers);
+
+        ResponseEntity responseEntity = restTemplate.exchange(properties.getRejectProject(), HttpMethod.POST, request, String.class);
+
+        return responseEntity.getBody().toString();
+    }
 }

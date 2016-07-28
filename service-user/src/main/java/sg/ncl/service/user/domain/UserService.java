@@ -17,4 +17,6 @@ public interface UserService {
 
     void addTeam(final String userId, final String teamId);
 
+    void removeTeam(final String userId, final String teamId);
+
 }
