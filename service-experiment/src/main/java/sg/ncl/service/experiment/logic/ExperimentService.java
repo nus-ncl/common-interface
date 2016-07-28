@@ -202,24 +202,25 @@ public class ExperimentService {
 
     public String deleteExperiment(final Long id) {
         logger.info("Start deleteExperiment");
-        String returnString = "Experiment deleted.";
+        String returnString = "experiment deleted";
 
         Long realizationId = realizationService.getByExperimentId(id).getId();
 
         if (realizationId != null && realizationId > 0) {
             realizationService.deleteRealization(realizationId);
-            logger.info("Realization deleted.");
+            logger.info("Realization deleted");
 
             ExperimentEntity experimentEntity = experimentRepository.getOne(id);
+            // TODO: use other deleteExperimentInDeter(teamName, experimentName) if using script_wrapper.py
             deleteExperimentInDeter(experimentEntity.getName());
-            logger.info("Experiment deleted in deter.");
+            logger.info("Experiment deleted in deter");
 
             experimentRepository.delete(id);
-            logger.info("Experiment deleted.");
+            logger.info("Experiment deleted");
         }
         else {
-            logger.warn("Experiment not deleted.");
-            returnString = "Experiment not deleted.";
+            logger.warn("Experiment not deleted");
+            returnString = "experiment not deleted";
         }
 
         logger.info("End deleteExperiment");
@@ -228,10 +229,16 @@ public class ExperimentService {
     }
 
     private void deleteExperimentInDeter(final String experimentName) {
-//        StringBuilder httpCommand = new StringBuilder();
-//        httpCommand.append("?experiment=" + experimentName);
-
         JSONObject jsonObject = new JSONObject();
+        jsonObject.put("experimentName", experimentName);
+
+        adapterDeterlab.deleteExperiment(jsonObject.toString());
+    }
+
+    // TODO: Use this if using script_wrapper.py
+    private void deleteExperimentInDeter(final String teamName, final String experimentName) {
+        JSONObject jsonObject = new JSONObject();
+        jsonObject.put("teamName", teamName);
         jsonObject.put("experimentName", experimentName);
 
         adapterDeterlab.deleteExperiment(jsonObject.toString());
