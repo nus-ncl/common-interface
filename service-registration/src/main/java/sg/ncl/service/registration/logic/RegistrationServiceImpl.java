@@ -54,6 +54,7 @@ public class RegistrationServiceImpl implements RegistrationService {
         this.adapterDeterlab = new AdapterDeterlab(deterlabUserRepository, connectionProperties);
     }
 
+    @Transactional
     public void registerRequestToApplyTeam(String nclUserId, Team team) {
         if (team.getName() == null || team.getName().isEmpty()) {
             logger.warn("Team name is empty or null");
@@ -99,6 +100,7 @@ public class RegistrationServiceImpl implements RegistrationService {
         teamService.addTeamMember(createdTeam.getId(), teamMemberInfo);
     }
 
+    @Transactional
     public void registerRequestToJoinTeam(String nclUserId, Team team) {
         if (team.getName() == null || team.getName().isEmpty()) {
             logger.warn("Team name is not found");
@@ -129,6 +131,7 @@ public class RegistrationServiceImpl implements RegistrationService {
         String resultJSON = adapterDeterlab.joinProject(userObject.toString());
     }
 
+    @Transactional
     public void register(Credentials credentials, User user, Team team, boolean isJoinTeam) {
 
         if (userFormFieldsHasErrors(user)) {
@@ -260,6 +263,7 @@ public class RegistrationServiceImpl implements RegistrationService {
         }
     }
 
+    @Transactional
     public void approveJoinRequest(String teamId, String userId, User approver) {
         if (teamService.isTeamOwner(approver.getId(), teamId) == false) {
             logger.warn("User {} is not a team owner of Team {}", userId, teamId);
