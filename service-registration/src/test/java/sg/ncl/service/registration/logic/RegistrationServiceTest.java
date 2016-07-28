@@ -22,9 +22,9 @@ import sg.ncl.service.team.data.jpa.TeamEntity;
 import sg.ncl.service.team.data.jpa.TeamMemberEntity;
 import sg.ncl.service.team.domain.*;
 import sg.ncl.service.team.exceptions.NoOwnerInTeamException;
+import sg.ncl.service.team.exceptions.TeamIdNullException;
 import sg.ncl.service.team.exceptions.TeamNotFoundException;
 import sg.ncl.service.team.web.TeamMemberInfo;
-import sg.ncl.service.user.data.jpa.UserEntity;
 import sg.ncl.service.user.domain.User;
 import sg.ncl.service.user.domain.UserService;
 import sg.ncl.service.user.exceptions.UserNotFoundException;
@@ -403,5 +403,50 @@ public class RegistrationServiceTest extends AbstractTest {
         // user should not be in deleted team
         Assert.assertThat(teamsIdList.size(), is(1));
         Assert.assertThat(teamsIdList.get(0), is(teamId_Two));
+    }
+
+    @Test(expected = UserIsNotTeamOwnerException.class)
+    public void rejectJoinRequestUserIsNotTeamOwner() throws Exception {
+        User user = userService.createUser(Util.getUserEntity());
+        User user2 = userService.createUser(Util.getUserEntity());
+        Team team = teamService.addTeam(Util.getTeamEntity());
+
+        teamService.addTeamMember(team.getId(), Util.getTeamMemberInfo(user.getId(), TeamMemberType.OWNER));
+        teamService.addTeamMember(team.getId(), Util.getTeamMemberInfo(user2.getId(), TeamMemberType.MEMBER));
+        registrationService.rejectJoinRequest(team.getId(), user2.getId(), user2);
+    }
+
+    @Test(expected = TeamIdNullException.class)
+    public void rejectJoinRequestTeamIdNull() throws Exception {
+        User user = userService.createUser(Util.getUserEntity());
+        registrationService.rejectJoinRequest(null, user.getId(), user);
+    }
+
+    @Test(expected = TeamNotFoundException.class)
+    public void rejectJoinRequestTeamNotFound() throws Exception {
+        User user = userService.createUser(Util.getUserEntity());
+        registrationService.rejectJoinRequest(RandomStringUtils.randomAlphanumeric(20), user.getId(), user);
+    }
+
+    @Test
+    public void rejectJoinRequestGood() throws Exception {
+        User user = userService.createUser(Util.getUserEntity());
+        User user2 = userService.createUser(Util.getUserEntity());
+        Team team = teamService.addTeam(Util.getTeamEntity());
+
+        userService.addTeam(user.getId(), team.getId());
+        userService.addTeam(user2.getId(), team.getId());
+        teamService.addTeamMember(team.getId(), Util.getTeamMemberInfo(user.getId(), TeamMemberType.OWNER));
+        teamService.addTeamMember(team.getId(), Util.getTeamMemberInfo(user2.getId(), TeamMemberType.MEMBER));
+        registrationService.rejectJoinRequest(team.getId(), user2.getId(), user);
+
+        // userService should remove the team
+        User resultUser = userService.findUser(user2.getId());
+        Assert.assertThat(resultUser.getTeams().isEmpty(), is(true));
+
+        // teamService should remove team member
+        List<? extends TeamMember> membersList = teamService.getTeamById(team.getId()).getMembers();
+        Assert.assertThat(membersList.size(), is(1));
+        Assert.assertThat(membersList.get(0).getUserId(), is(user.getId()));
     }
 }

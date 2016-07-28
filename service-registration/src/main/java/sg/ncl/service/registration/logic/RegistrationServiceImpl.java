@@ -265,7 +265,7 @@ public class RegistrationServiceImpl implements RegistrationService {
 
     @Transactional
     public void approveJoinRequest(String teamId, String userId, User approver) {
-        if (teamService.isTeamOwner(approver.getId(), teamId) == false) {
+        if (!teamService.isTeamOwner(approver.getId(), teamId)) {
             logger.warn("User {} is not a team owner of Team {}", userId, teamId);
             throw new UserIsNotTeamOwnerException();
         }
@@ -278,6 +278,30 @@ public class RegistrationServiceImpl implements RegistrationService {
         one.put("gid", pid);
         adapterDeterlab.approveJoinRequest(one.toString());
         teamService.changeTeamMemberStatus(userId, teamId, TeamMemberStatus.APPROVED);
+    }
+
+    @Transactional
+    public void rejectJoinRequest(String teamId, String userId, User approver) {
+        if (!teamService.isTeamOwner(approver.getId(), teamId)) {
+            logger.warn("User {} is not a team owner of Team {}", userId, teamId);
+            throw new UserIsNotTeamOwnerException();
+        }
+
+        Team one = teamService.getTeamById(teamId);
+        List<? extends TeamMember> membersList = one.getMembers();
+
+        if (membersList.isEmpty()) {
+            // by right not possible to be empty since isTeamOwner ensures there exists at least one member of type owner
+            throw new NoMembersInTeamException();
+        }
+
+        for (TeamMember member : membersList) {
+            if (member.getUserId().equals(userId)) {
+                userService.removeTeam(userId, teamId);
+                teamService.removeTeamMember(teamId, member);
+                // FIXME call adapter deterlab
+            }
+        }
     }
 
     @Transactional

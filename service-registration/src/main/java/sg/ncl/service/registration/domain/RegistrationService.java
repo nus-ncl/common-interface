@@ -19,5 +19,7 @@ public interface RegistrationService {
 
     void approveJoinRequest(String teamId, String userId, User user);
 
+    void rejectJoinRequest(String teamId, String userId, User user);
+
     void approveTeam(String teamId, TeamStatus teamStatus);
 }
