@@ -104,6 +104,13 @@ public class TeamServiceImpl implements TeamService {
     }
 
     @Transactional
+    public Team removeTeamMember(final String id, final TeamMember teamMember) {
+        TeamEntity entity = findTeam(id);
+        entity.removeMember(teamMember);
+        return teamRepository.save(entity);
+    }
+
+    @Transactional
     public boolean isTeamOwner(final String userId, final String teamId) {
         TeamEntity entity = findTeam(teamId);
         List<? extends TeamMember> teamMembersList = entity.getMembers();

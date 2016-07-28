@@ -23,6 +23,8 @@ public interface TeamService {
 
     Team addTeamMember(String id, TeamMember teamMember);
 
+    Team removeTeamMember(String id, TeamMember teamMember);
+
     boolean isTeamOwner(final String userId, final String teamId);
 
     TeamMember changeTeamMemberStatus(String userId, String teamId, TeamMemberStatus approved);
