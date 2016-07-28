@@ -172,6 +172,10 @@ public class TeamEntity extends AbstractEntity implements Team {
         members.put(userId, entity);
     }
 
+    public void removeMember(final TeamMember member) {
+        members.remove(member.getUserId());
+    }
+
     public TeamMember getMember(final String userId) {
         if (members.containsKey(userId)) {
             return new TeamMemberInfo(members.get(userId));
