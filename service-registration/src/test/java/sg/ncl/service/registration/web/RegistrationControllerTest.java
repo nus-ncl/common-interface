@@ -257,6 +257,11 @@ public class RegistrationControllerTest extends AbstractTest {
         teamService.addTeamMember(createdTeam.getId(), owner);
         teamService.addTeamMember(createdTeam.getId(), member);
 
+        String deterUserIdOne = RandomStringUtils.randomAlphabetic(8);
+        String deterUserIdTwo = RandomStringUtils.randomAlphabetic(8);
+        adapterDeterlab.saveDeterUserIdMapping(deterUserIdOne, createdUser.getId());
+        adapterDeterlab.saveDeterUserIdMapping(deterUserIdTwo, createdUser2.getId());
+
         // craft the RequestBody to remove user from team
         GsonBuilder gsonBuilder = new GsonBuilder();
         gsonBuilder.registerTypeAdapter(ZonedDateTime.class, new DateTimeSerializer());

@@ -434,10 +434,23 @@ public class RegistrationServiceTest extends AbstractTest {
         User user2 = userService.createUser(Util.getUserEntity());
         Team team = teamService.addTeam(Util.getTeamEntity());
 
+        String deterUserIdOne = RandomStringUtils.randomAlphabetic(8);
+        String deterUserIdTwo = RandomStringUtils.randomAlphabetic(8);
+        adapterDeterlab.saveDeterUserIdMapping(deterUserIdOne, user.getId());
+        adapterDeterlab.saveDeterUserIdMapping(deterUserIdTwo, user2.getId());
+
         userService.addTeam(user.getId(), team.getId());
         userService.addTeam(user2.getId(), team.getId());
         teamService.addTeamMember(team.getId(), Util.getTeamMemberInfo(user.getId(), TeamMemberType.OWNER));
         teamService.addTeamMember(team.getId(), Util.getTeamMemberInfo(user2.getId(), TeamMemberType.MEMBER));
+
+        JSONObject predefinedResultJson = new JSONObject();
+        predefinedResultJson.put("msg", "join request rejected");
+
+        mockServer.expect(requestTo(properties.getRejectJoinRequest()))
+                .andExpect(method(HttpMethod.POST))
+                .andRespond(withSuccess(predefinedResultJson.toString(), MediaType.APPLICATION_JSON));
+
         registrationService.rejectJoinRequest(team.getId(), user2.getId(), user);
 
         // userService should remove the team
