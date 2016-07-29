@@ -7,10 +7,7 @@ import sg.ncl.service.team.web.TeamMemberInfo;
 
 import javax.persistence.*;
 import java.time.ZonedDateTime;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * @author Christopher Zhong
@@ -170,6 +167,15 @@ public class TeamEntity extends AbstractEntity implements Team {
         }
 
         members.put(userId, entity);
+    }
+
+    public void removeMember(final TeamMember member) {
+        for (Iterator<Map.Entry<String, TeamMemberEntity>> it = members.entrySet().iterator(); it.hasNext();) {
+            Map.Entry<String, TeamMemberEntity> entry = it.next();
+            if (entry.getKey().equals(member.getUserId())) {
+                it.remove();
+            }
+        }
     }
 
     public TeamMember getMember(final String userId) {

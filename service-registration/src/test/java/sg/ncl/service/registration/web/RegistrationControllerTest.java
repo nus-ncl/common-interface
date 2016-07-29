@@ -40,6 +40,7 @@ import static org.hamcrest.core.Is.is;
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.method;
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.requestTo;
 import static org.springframework.test.web.client.response.MockRestResponseCreators.withSuccess;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
@@ -235,5 +236,61 @@ public class RegistrationControllerTest extends AbstractTest {
 
         mockMvc.perform(post("/registrations/teams/" + createdTeam.getId() + "?status=" + TeamStatus.APPROVED))
                 .andExpect(status().isOk());
+    }
+
+    @Test
+    public void rejectJoinRequest() throws Exception {
+
+        Team one = Util.getTeamEntity();
+        Team createdTeam = teamService.addTeam(one);
+
+        User user = Util.getUserEntity();
+        User user2 = Util.getUserEntity();
+
+        User createdUser = userService.createUser(user);
+        User createdUser2 = userService.createUser(user2);
+        userService.addTeam(createdUser.getId(), createdTeam.getId());
+        userService.addTeam(createdUser2.getId(), createdTeam.getId());
+
+        TeamMemberInfo owner = Util.getTeamMemberInfo(createdUser.getId(), TeamMemberType.OWNER);
+        TeamMemberInfo member = Util.getTeamMemberInfo(createdUser2.getId(), TeamMemberType.MEMBER);
+        teamService.addTeamMember(createdTeam.getId(), owner);
+        teamService.addTeamMember(createdTeam.getId(), member);
+
+        String deterUserIdOne = RandomStringUtils.randomAlphabetic(8);
+        String deterUserIdTwo = RandomStringUtils.randomAlphabetic(8);
+        adapterDeterlab.saveDeterUserIdMapping(deterUserIdOne, createdUser.getId());
+        adapterDeterlab.saveDeterUserIdMapping(deterUserIdTwo, createdUser2.getId());
+
+        // craft the RequestBody to remove user from team
+        GsonBuilder gsonBuilder = new GsonBuilder();
+        gsonBuilder.registerTypeAdapter(ZonedDateTime.class, new DateTimeSerializer());
+        gsonBuilder.registerTypeAdapter(ZonedDateTime.class, new DateTimeDeserializer());
+        Gson gson = gsonBuilder.create();
+        String userJSON = gson.toJson(createdUser);
+
+        JSONObject object = new JSONObject();
+        JSONObject userFields = new JSONObject(userJSON);
+        object.put("user", userFields);
+
+        JSONObject predefinedResultJson = new JSONObject();
+        predefinedResultJson.put("msg", "join request rejected");
+
+        mockServer.expect(requestTo(properties.getRejectJoinRequest()))
+                .andExpect(method(HttpMethod.POST))
+                .andRespond(withSuccess(predefinedResultJson.toString(), MediaType.APPLICATION_JSON));
+
+        mockMvc.perform(delete("/registrations/teams/" + createdTeam.getId() + "/" + "members/" + member.getUserId()).contentType(MediaType.APPLICATION_JSON).content(object.toString()))
+                .andExpect(status().isAccepted());
+
+        User resultUser = userService.findUser(createdUser.getId());
+        User resultUser2 = userService.findUser(createdUser2.getId());
+        List<? extends TeamMember> membersList = teamService.getTeamById(createdTeam.getId()).getMembers();
+
+        // owner should be in team
+        Assert.assertThat(resultUser.getTeams().get(0), is(createdTeam.getId()));
+        Assert.assertThat(membersList.get(0).getUserId(), is(createdUser.getId()));
+        // member should be deleted from team
+        Assert.assertThat(resultUser2.getTeams().isEmpty(), is(true));
     }
 }
