@@ -76,29 +76,10 @@ dependencies {
     testCompile project(':common-test')
 }
 
-check {
-    dependsOn subprojects.check
-}
-
-task copyJunitXml(type: Copy) {
-    from(subprojects.test.reports.junitXml.destination) {
-        include '*.xml'
-    }
-    into test.reports.junitXml.destination
-}
-
-task testReport(type: TestReport) {
-    dependsOn check
-    reportOn allprojects.test
-    destinationDir test.reports.html.destination
-    finalizedBy copyJunitXml
-}
-
 jacocoTestReport {
     dependsOn subprojects.jacocoTestReport
     sourceDirectories = files(allprojects.sourceSets.main.java.srcDirs)
     classDirectories = files(allprojects.sourceSets.main.output.classesDir)
-//    executionData = fileTree(project.rootDir.absolutePath).include('**/build/jacoco/*.exec')
     executionData = files(allprojects.jacocoTestReport.executionData).filter { it.exists() }
 }
 
