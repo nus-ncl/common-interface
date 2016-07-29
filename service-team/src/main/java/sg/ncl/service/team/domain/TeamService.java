@@ -9,6 +9,8 @@ public interface TeamService {
 
     Team addTeam(Team team);
 
+    void removeTeam(String id);
+
     List<? extends Team> getTeams();
 
     List<? extends Team> getTeamsByVisibility(TeamVisibility visibility);

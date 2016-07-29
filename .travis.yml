@@ -7,7 +7,7 @@ jdk:
 notifications:
   slack:
     rooms:
-      - ${SLACK}
+      - secure: "Bwu4f/O7rdatVpV56wGLNloWJXXCfBf0V9DZLcBl8jbZmqsvwuDVoqItvFMwqmaZU1hx/BWkU1lnWq9OOP+KdcrsmStu4q2RgWzi+DhzTHeFuCog91ekBIt7q2+sYfLVcsUyIo9v0Lajd6sVE0Sn8MDLdVVPER0YIZ24WUndkS/UZb4FfE5xmo9RGHMXtqzTDlwpRCb8RkSQtqT4u15SdVJQnx1rUcD4XUvghdbwGDZD2vLg7ewWT+ubgOPcQ3FzFm9tCldOl5ou75Gz7mt6Gf/QIfK0FiDA0HWD1+RYfw7ipD3Pclr2ZWCTv3tbMdLvA6t0p7HV+r8JH604SpeltgdR1GMcQMG2xva9QYhYg1oZo7+R1DaMiPkWwMaXO2to78WaU5dLvzt6SAv/rLarxaYwAAoo73DEsi65bhmYdTFhKRjdSgZ1l4CfA6ThsYn7Bz4MJPE6h4MtgVc22QHsyLK0IMVg1xAg6aLpPwsKLmjDF8SdrslhD5dRyDoitv1ygwqwXl78GlNArrv7doClzj+PO/e1wdtjyPR9gClib2reVOFT4OftEeqqWD6ffEUTEra9I+U3k4TJjvp5CID/buOZoQaDOcnYYMrxPp7HBoZurb8LPEehyQDSli8wDvHv71HXEa+cYyvc9di8saEwr5zvaqLHjzyKy2aTezAHi2g="
     on_success: change
     on_failure: always
 
@@ -22,10 +22,11 @@ cache:
 
 before_install:
   - chmod +x gradlew # ensure that the gradlew script is executable
-  - ./gradlew clean # just in case, ensures a clean build environment
+
+install: true
 
 script:
-  - ./gradlew --continue check jacocoTestReport # continue perform tests from all subprojects instead of failing at the first one
+  - ./gradlew --continue build jacocoTestReport # continue flag to prevent build from terminating at first error
 
 after_script:
-  - ./gradlew --continue coveralls # collect jacoco reports from subprojects send them to coveralls
+  - ./gradlew jacocoTestReport coveralls sonarqube
