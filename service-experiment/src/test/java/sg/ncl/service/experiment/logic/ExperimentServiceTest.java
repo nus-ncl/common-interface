@@ -145,16 +145,6 @@ public class ExperimentServiceTest extends AbstractTest {
         Assert.assertEquals("experiment created", response);
     }
 
-//    @Test
-//    public void testDeleteExperimentInDeter() throws Exception {
-//        mockServer.expect(requestTo(properties.stopExperiment()))
-//                .andExpect(method(HttpMethod.POST));
-//
-//        final String name = RandomStringUtils.randomAlphanumeric(8);
-//
-//        experimentService.deleteExperimentInDeter(name);
-//    }
-
     @Test
     public void testDeleteExperiment() throws Exception {
 
@@ -174,18 +164,18 @@ public class ExperimentServiceTest extends AbstractTest {
         realizationEntity.setRunningMinutes(Long.parseLong(RandomStringUtils.randomNumeric(5)));
         realizationRepository.save(realizationEntity);
 
-        Long experimentCount = experimentRepository.count();
-        Long realizationCount = realizationRepository.count();
-
-        Assert.assertEquals(experimentCount, new Long(1L));
-        Assert.assertEquals(realizationCount, new Long(1L));
+        compareCounts(new Long(1L));
 
         experimentService.deleteExperiment(savedExperiment.getId());
 
-        experimentCount = experimentRepository.count();
-        realizationCount = realizationRepository.count();
+        compareCounts(new Long(0L));
+    }
 
-        Assert.assertEquals(experimentCount, new Long(0L));
-        Assert.assertEquals(realizationCount, new Long(0L));
+    private void compareCounts(Long count) {
+        Long experimentCount = experimentRepository.count();
+        Long realizationCount = realizationRepository.count();
+
+        Assert.assertEquals(experimentCount, count);
+        Assert.assertEquals(realizationCount, count);
     }
 }

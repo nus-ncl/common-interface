@@ -30,7 +30,7 @@ public class ExperimentService {
     private static final Logger logger = LoggerFactory.getLogger(ExperimentService.class);
     private final ExperimentRepository experimentRepository;
 
-    @Autowired
+    @Inject
     private AdapterDeterlab adapterDeterlab;
 
     @Inject
