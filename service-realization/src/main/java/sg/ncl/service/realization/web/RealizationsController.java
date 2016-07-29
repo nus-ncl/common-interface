@@ -42,13 +42,13 @@ public class RealizationsController {
     public void startExperiment(@PathVariable String teamName, @PathVariable String expId) {
 
         RealizationEntity realizationEntityDb = realizationService.getByExperimentId(Long.parseLong(expId));
-        realizationService.startExperimentInDeter(teamName, realizationEntityDb.getExperimentName());
+        realizationService.startExperimentInDeter(teamName, realizationEntityDb.getExperimentName(), realizationEntityDb.getUserId());
     }
 
     @RequestMapping(path = "/stop/team/{teamName}/experiment/{expId}", method = RequestMethod.POST)
     public void stopExperiment(@PathVariable String teamName, @PathVariable String expId) {
 
         RealizationEntity realizationEntityDb = realizationService.getByExperimentId(Long.parseLong(expId));
-        realizationService.stopExperimentInDeter(teamName, realizationEntityDb.getExperimentName());
+        realizationService.stopExperimentInDeter(teamName, realizationEntityDb.getExperimentName(), realizationEntityDb.getUserId());
     }
 }
