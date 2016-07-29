@@ -50,7 +50,7 @@ public class UsersController {
     public void updateUser(@PathVariable String id, @RequestBody UserInfo user) {
         userService.updateUser(id, user);
     }
-
+    // CW: this method is no long used; to be removed
     @RequestMapping(path = "/{id}/teams", method = RequestMethod.POST)
     @ResponseStatus(value = HttpStatus.OK)
     public void addTeam(@PathVariable String id, @RequestBody UserInfo user) {
