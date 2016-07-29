@@ -31,7 +31,8 @@ public class TeamServiceTest extends AbstractTest {
 
         Assert.assertEquals(createdTeam.getName(), saveTeam.getName());
         Assert.assertEquals(createdTeam.getDescription(), saveTeam.getDescription());
-        Assert.assertEquals(createdTeam.getApplicationDate(), saveTeam.getApplicationDate());
+        Assert.assertEquals(createdTeam.getOrganisationType(), saveTeam.getOrganisationType());
+        Assert.assertEquals(createdTeam.getWebsite(), saveTeam.getWebsite());
     }
 
     @Test(expected = TeamNotFoundException.class)
