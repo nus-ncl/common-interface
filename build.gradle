@@ -9,17 +9,12 @@ buildscript {
 }
 
 plugins {
-    id 'java'
     id 'eclipse'
     id 'idea'
     id 'com.github.kt3k.coveralls' version '2.6.3'
     id 'org.sonarqube' version '2.0.1'
 }
 apply plugin: 'spring-boot'
-
-group 'sg.ncl'
-
-version "1.0-${System.getenv('TRAVIS_BUILD_NUMBER') == null ? 'SNAPSHOT' : 'b' + System.getenv('TRAVIS_BUILD_NUMBER')}"
 
 // settings for all projects
 allprojects {
@@ -28,6 +23,8 @@ allprojects {
     apply plugin: 'jacoco'
 
     group 'sg.ncl'
+
+    version "1.0-${System.getenv('TRAVIS_BUILD_NUMBER') == null ? 'SNAPSHOT' : 'b' + System.getenv('TRAVIS_BUILD_NUMBER')}"
 
     sourceCompatibility = JavaVersion.VERSION_1_8
     targetCompatibility = JavaVersion.VERSION_1_8
@@ -54,10 +51,11 @@ allprojects {
     }
 
     jacocoTestReport {
-        dependsOn check
-        // HACK Jacoco's requirement that every test set has to have at least one test case for generating a report;
-        // workaround removes test sets that does not have any test cases
-        executionData = files(executionData.findAll({ it.exists() }))
+        reports {
+            xml {
+                enabled true
+            }
+        }
     }
 }
 
@@ -70,12 +68,12 @@ dependencies {
     // there should be no other compile dependencies
     compile subprojects.findAll({ it.name.startsWith('service-') })
     compile 'org.projectlombok:lombok'
-    // the runtime dependencies should be a union of all runtime dependencies needed by all subprojects
+    // the runtime dependencies should be a union of all runtime dependencies needed by all sub-projects
     runtime 'mysql:mysql-connector-java'
     runtime 'org.postgresql:postgresql'
     runtime 'com.h2database:h2'
 
-    testCompile 'junit:junit'
+    testCompile project(':common-test')
 }
 
 check {
@@ -97,15 +95,11 @@ task testReport(type: TestReport) {
 }
 
 jacocoTestReport {
-    dependsOn allprojects.check
-    executionData = fileTree(project.rootDir.absolutePath).include('**/build/jacoco/*.exec')
-    sourceDirectories = files(sourceSets.main.java.srcDirs, subprojects.sourceSets.main.java.srcDirs)
-    classDirectories = files(sourceSets.main.output.classesDir, subprojects.sourceSets.main.output.classesDir)
-    reports {
-        xml {
-            enabled true
-        }
-    }
+    dependsOn subprojects.jacocoTestReport
+    sourceDirectories = files(allprojects.sourceSets.main.java.srcDirs)
+    classDirectories = files(allprojects.sourceSets.main.output.classesDir)
+//    executionData = fileTree(project.rootDir.absolutePath).include('**/build/jacoco/*.exec')
+    executionData = files(allprojects.jacocoTestReport.executionData).filter { it.exists() }
 }
 
 coveralls {
