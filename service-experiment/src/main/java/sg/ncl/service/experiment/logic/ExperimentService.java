@@ -12,6 +12,7 @@ import sg.ncl.service.experiment.data.jpa.ExperimentRepository;
 import sg.ncl.service.experiment.domain.Experiment;
 import sg.ncl.service.experiment.exceptions.UserIdNotFoundException;
 import sg.ncl.service.realization.data.jpa.RealizationEntity;
+import sg.ncl.service.realization.domain.Realization;
 import sg.ncl.service.realization.logic.RealizationService;
 
 import javax.inject.Inject;
@@ -30,7 +31,7 @@ public class ExperimentService {
     private static final Logger logger = LoggerFactory.getLogger(ExperimentService.class);
     private final ExperimentRepository experimentRepository;
 
-    @Autowired
+    @Inject
     private AdapterDeterlab adapterDeterlab;
 
     @Inject
@@ -176,7 +177,7 @@ public class ExperimentService {
     }
 
     public String createExperimentInDeter(ExperimentEntity experimentEntity) {
-        logger.info("Create experiment in deter");
+        logger.info("Start createExperimentInDeter");
 
         JSONObject userObject = new JSONObject();
         userObject.put("id", experimentEntity.getId().toString());
@@ -192,77 +193,57 @@ public class ExperimentService {
         userObject.put("deterLogin", adapterDeterlab.getDeterUserIdByNclUserId(experimentEntity.getUserId()));
         userObject.put("userServerUri", experimentConnectionProperties.getUserurl());
 
-//        String login = experimentEntity.getUserId();
-//        String deterLogin = adapterDeterlab.getDeterUserIdByNclUserId(login);
-//        String maxDuration = experimentEntity.getMaxDuration().toString();
-//        String idleSwap = experimentEntity.getIdleSwap().toString();
-//        String description = experimentEntity.getDescription();
-//        String project = experimentEntity.getTeamId();
-//        String name = experimentEntity.getName();
-//        String fileName = experimentEntity.getNsFile();
-//
-//        StringBuilder command = new StringBuilder();
-//        command.append("python script_wrapper.py");
-////        command.append(" --server=172.18.178.11");
-//        command.append(" --server=" + connectionProperties.getUserurl());
-//        command.append(" --login=" + deterLogin);
-//        command.append(" startexp");
-//        command.append(" -a " + maxDuration);
-//        command.append(" -l " + idleSwap);
-//        command.append(" -E " + description);
-//        command.append(" -p " + project);
-//        command.append(" -e " + name);
-//        command.append(" " + fileName);
-
-//        try {
-//            Process process = Runtime.getRuntime().exec(command.toString());
-//            process.waitFor();
-//        }
-//
-//        catch (Exception e) {
-//            logger.error("Experiment can't be created in deter. " + e.getMessage());
-//            return "error";
-//        }
-
-        logger.info("Experiment created in deter");
-
         String resultJSON = adapterDeterlab.createExperiment(userObject.toString());
         JSONObject result = new JSONObject(resultJSON);
+
+        logger.info("End createExperimentInDeter");
+
         return result.getString("msg");
     }
 
     public String deleteExperiment(final Long id) {
-        logger.info("Begin delete experiment.");
-        String returnString = "Experiment deleted.";
+        logger.info("Start deleteExperiment");
+        String returnString = "experiment deleted";
 
-        Long realizationId = realizationService.getByExperimentId(id).getId();
+        RealizationEntity realizationEntity = realizationService.getByExperimentId(id);
+        Long realizationId = realizationEntity.getId();
 
         if (realizationId != null && realizationId > 0) {
             realizationService.deleteRealization(realizationId);
-            logger.info("Realization deleted.");
+            logger.info("Realization deleted");
 
             ExperimentEntity experimentEntity = experimentRepository.getOne(id);
-            deleteExperimentInDeter(experimentEntity.getName());
-            logger.info("Experiment deleted in deter.");
+            // TODO: use other deleteExperimentInDeter(teamName, experimentName) if using script_wrapper.py
+            deleteExperimentInDeter(experimentEntity.getName(), realizationEntity.getUserId());
+            logger.info("Experiment deleted in deter");
 
             experimentRepository.delete(id);
-            logger.info("Experiment deleted.");
+            logger.info("Experiment deleted");
         }
         else {
-            logger.warn("Realization not deleted.");
-            returnString = "Experiment not deleted.";
+            logger.warn("Experiment not deleted");
+            returnString = "experiment not deleted";
         }
+
+        logger.info("End deleteExperiment");
 
         return returnString;
     }
 
-    public void deleteExperimentInDeter(final String experimentName) {
-        StringBuilder httpCommand = new StringBuilder();
-        httpCommand.append("?experiment=" + experimentName);
-
+    private void deleteExperimentInDeter(final String experimentName, final String nclUserId) {
         JSONObject jsonObject = new JSONObject();
-        jsonObject.put("httpCommand", httpCommand.toString());
+        jsonObject.put("experimentName", experimentName);
+        jsonObject.put("deterLogin", adapterDeterlab.getDeterUserIdByNclUserId(nclUserId));
 
         adapterDeterlab.deleteExperiment(jsonObject.toString());
     }
+
+    // TODO: Use this if using script_wrapper.py
+//    private void deleteExperimentInDeter(final String teamName, final String experimentName) {
+//        JSONObject jsonObject = new JSONObject();
+//        jsonObject.put("teamName", teamName);
+//        jsonObject.put("experimentName", experimentName);
+//
+//        adapterDeterlab.deleteExperiment(jsonObject.toString());
+//    }
 }

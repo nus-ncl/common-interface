@@ -143,7 +143,7 @@ public class ExperimentsControllerTest extends AbstractTest {
 
         when(experimentService.deleteExperiment(experimentId)).thenReturn("Experiment deleted.");
 
-        mockMvc.perform(post("/experiments/experiments/" + experimentId))
+        mockMvc.perform(post("/experiments/delete/" + experimentId))
                 .andExpect(status().isOk());
     }
 }
