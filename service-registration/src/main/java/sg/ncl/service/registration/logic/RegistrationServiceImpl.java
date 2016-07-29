@@ -288,6 +288,7 @@ public class RegistrationServiceImpl implements RegistrationService {
         }
 
         Team one = teamService.getTeamById(teamId);
+        String pid = one.getName();
         List<? extends TeamMember> membersList = one.getMembers();
 
         if (membersList.isEmpty()) {
@@ -297,9 +298,16 @@ public class RegistrationServiceImpl implements RegistrationService {
 
         for (TeamMember member : membersList) {
             if (member.getUserId().equals(userId)) {
+                logger.info("Reject join request from User {}, Team {}", member.getUserId(), teamId);
                 userService.removeTeam(userId, teamId);
                 teamService.removeTeamMember(teamId, member);
                 // FIXME call adapter deterlab
+                JSONObject object = new JSONObject();
+                object.put("approverUid", adapterDeterlab.getDeterUserIdByNclUserId(approver.getId()));
+                object.put("uid", adapterDeterlab.getDeterUserIdByNclUserId(userId));
+                object.put("pid", pid);
+                object.put("gid", pid);
+                adapterDeterlab.rejectJoinRequest(object.toString());
             }
         }
     }
