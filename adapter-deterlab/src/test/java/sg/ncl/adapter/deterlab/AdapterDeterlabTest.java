@@ -234,4 +234,21 @@ public class AdapterDeterlabTest extends AbstractTest {
         String msg = resultJSONObject.getString("msg");
         Assert.assertThat(msg, is("project rejected"));
     }
+
+    @Test
+    public void testRejectJoinRequest() {
+        JSONObject one = new JSONObject();
+
+        JSONObject predefinedResultJson = new JSONObject();
+        predefinedResultJson.put("msg", "join request rejected");
+
+        mockServer.expect(requestTo(properties.getRejectJoinRequest()))
+                .andExpect(method(HttpMethod.POST))
+                .andRespond(withSuccess(predefinedResultJson.toString(), MediaType.APPLICATION_JSON));
+
+        String result = adapterDeterlab.rejectJoinRequest(one.toString());
+        JSONObject resultJSONObject = new JSONObject(result);
+        String msg = resultJSONObject.getString("msg");
+        Assert.assertThat(msg, is("join request rejected"));
+    }
 }

@@ -1,11 +1,14 @@
 buildscript {
     repositories {
         jcenter()
-    }
+        maven {
+            url "https://plugins.gradle.org/m2/"
+        }   }
 
     dependencies {
         classpath 'org.springframework.boot:spring-boot-gradle-plugin:1.3.6.RELEASE'
         classpath 'org.kt3k.gradle.plugin:coveralls-gradle-plugin:2.6.3'
+        classpath 'org.sonarsource.scanner.gradle:sonarqube-gradle-plugin:2.0.1'
     }
 }
 // settings for all projects
@@ -56,6 +59,7 @@ configure(subprojects.findAll({ it.name.startsWith('service-') })) {
 
 apply plugin: 'spring-boot'
 apply plugin: 'com.github.kt3k.coveralls'
+apply plugin: 'org.sonarqube'
 
 def getVersion = {
     def major = '1'
@@ -116,6 +120,20 @@ jacocoTestReport {
 
 coveralls {
     sourceDirs = allprojects.sourceSets.main.java.srcDirs.flatten()
+}
+
+sonarqube {
+    properties {
+        property 'sonar.host.url', 'https://sonarqube.com'
+        property 'sonar.login', System.getenv('SONAR_TOKEN')
+        property 'sonar.projectKey', 'nus-ncl:services-in-one'
+        if (System.getenv('TRAVIS_PULL_REQUEST') != null) {
+            property 'sonar.analysis.mode', 'preview'
+            property 'sonar.github.pullRequest', System.getenv('TRAVIS_PULL_REQUEST')
+            property 'sonar.github.repository', System.getenv('TRAVIS_REPO_SLUG')
+            property 'sonar.github.oauth', System.getenv('GITHUB_TOKEN')
+        }
+    }
 }
 
 task wrapper(type: Wrapper) {

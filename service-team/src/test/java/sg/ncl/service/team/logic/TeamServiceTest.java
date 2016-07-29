@@ -31,7 +31,8 @@ public class TeamServiceTest extends AbstractTest {
 
         Assert.assertEquals(createdTeam.getName(), saveTeam.getName());
         Assert.assertEquals(createdTeam.getDescription(), saveTeam.getDescription());
-        Assert.assertEquals(createdTeam.getApplicationDate(), saveTeam.getApplicationDate());
+        Assert.assertEquals(createdTeam.getOrganisationType(), saveTeam.getOrganisationType());
+        Assert.assertEquals(createdTeam.getWebsite(), saveTeam.getWebsite());
     }
 
     @Test(expected = TeamNotFoundException.class)
@@ -270,6 +271,33 @@ public class TeamServiceTest extends AbstractTest {
 
         // expect a team not found exception here when retrieving since we already remove the team previously
         teamService.getTeamById(createdTeam.getId());
+    }
+
+    @Test(expected = TeamIdNullException.class)
+    public void removeTeamMemberTeamIdNull() throws Exception {
+        teamService.removeTeamMember(null, Util.getTeamMemberInfo(TeamMemberType.MEMBER));
+    }
+
+    @Test(expected = TeamNotFoundException.class)
+    public void removeTeamMemberTeamNotFound() throws Exception {
+        teamService.removeTeamMember(RandomStringUtils.randomAlphanumeric(20), Util.getTeamMemberInfo(TeamMemberType.MEMBER));
+    }
+
+    @Test
+    public void removeTeamMemberGood() throws Exception {
+        Team one = Util.getTeamEntity();
+        Team createdTeam = teamService.addTeam(one);
+        TeamMemberInfo teamMemberOne = Util.getTeamMemberInfo(TeamMemberType.OWNER);
+        TeamMemberInfo teamMemberTwo = Util.getTeamMemberInfo(TeamMemberType.MEMBER);
+
+        teamService.addTeamMember(createdTeam.getId(), teamMemberOne);
+        teamService.addTeamMember(createdTeam.getId(), teamMemberTwo);
+
+        Team result = teamService.removeTeamMember(createdTeam.getId(), teamMemberTwo);
+        List<? extends TeamMember> membersList = result.getMembers();
+
+        Assert.assertThat(membersList.size(), is(1));
+        Assert.assertThat(membersList.get(0).getUserId(), is(teamMemberOne.getUserId()));
     }
 
     private boolean isListEqual(List<TeamEntity> one, List<TeamEntity> two) {

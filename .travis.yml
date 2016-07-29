@@ -22,10 +22,11 @@ cache:
 
 before_install:
   - chmod +x gradlew # ensure that the gradlew script is executable
-  - ./gradlew clean # just in case, ensures a clean build environment
+
+install: true
 
 script:
-  - ./gradlew --continue check jacocoTestReport # continue perform tests from all subprojects instead of failing at the first one
+  - ./gradlew --continue build jacocoTestReport # continue flag to prevent build from terminating at first error
 
 after_script:
-  - ./gradlew coveralls # collect jacoco reports from subprojects send them to coveralls
+  - ./gradlew jacocoTestReport coveralls sonarqube
