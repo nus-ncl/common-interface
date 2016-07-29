@@ -12,6 +12,7 @@ import sg.ncl.service.experiment.data.jpa.ExperimentRepository;
 import sg.ncl.service.experiment.domain.Experiment;
 import sg.ncl.service.experiment.exceptions.UserIdNotFoundException;
 import sg.ncl.service.realization.data.jpa.RealizationEntity;
+import sg.ncl.service.realization.domain.Realization;
 import sg.ncl.service.realization.logic.RealizationService;
 
 import javax.inject.Inject;
@@ -204,7 +205,8 @@ public class ExperimentService {
         logger.info("Start deleteExperiment");
         String returnString = "experiment deleted";
 
-        Long realizationId = realizationService.getByExperimentId(id).getId();
+        RealizationEntity realizationEntity = realizationService.getByExperimentId(id);
+        Long realizationId = realizationEntity.getId();
 
         if (realizationId != null && realizationId > 0) {
             realizationService.deleteRealization(realizationId);
@@ -212,7 +214,7 @@ public class ExperimentService {
 
             ExperimentEntity experimentEntity = experimentRepository.getOne(id);
             // TODO: use other deleteExperimentInDeter(teamName, experimentName) if using script_wrapper.py
-            deleteExperimentInDeter(experimentEntity.getName());
+            deleteExperimentInDeter(experimentEntity.getName(), realizationEntity.getUserId());
             logger.info("Experiment deleted in deter");
 
             experimentRepository.delete(id);
@@ -228,19 +230,20 @@ public class ExperimentService {
         return returnString;
     }
 
-    private void deleteExperimentInDeter(final String experimentName) {
+    private void deleteExperimentInDeter(final String experimentName, final String nclUserId) {
         JSONObject jsonObject = new JSONObject();
         jsonObject.put("experimentName", experimentName);
+        jsonObject.put("deterLogin", adapterDeterlab.getDeterUserIdByNclUserId(nclUserId));
 
         adapterDeterlab.deleteExperiment(jsonObject.toString());
     }
 
     // TODO: Use this if using script_wrapper.py
-    private void deleteExperimentInDeter(final String teamName, final String experimentName) {
-        JSONObject jsonObject = new JSONObject();
-        jsonObject.put("teamName", teamName);
-        jsonObject.put("experimentName", experimentName);
-
-        adapterDeterlab.deleteExperiment(jsonObject.toString());
-    }
+//    private void deleteExperimentInDeter(final String teamName, final String experimentName) {
+//        JSONObject jsonObject = new JSONObject();
+//        jsonObject.put("teamName", teamName);
+//        jsonObject.put("experimentName", experimentName);
+//
+//        adapterDeterlab.deleteExperiment(jsonObject.toString());
+//    }
 }
