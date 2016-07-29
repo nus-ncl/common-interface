@@ -65,6 +65,10 @@ public class ConnectionProperties {
         return "http://" + ip + ":" + port + "/approveJoinRequest";
     }
 
+    public String getRejectJoinRequest() {
+        return "http://" + ip + ":" + port + "/rejectJoinRequest";
+    }
+
     public String getApplyProject() {
         return "http://" + ip + ":" + port + "/applyProject";
     }

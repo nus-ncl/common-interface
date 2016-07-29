@@ -27,9 +27,6 @@ public class RegistrationController {
     @RequestMapping(method = RequestMethod.POST)
     @ResponseStatus(HttpStatus.OK)
     public void register(@RequestBody final RegistrationInfo registrationInfo) {
-//        System.out.println("User: " + registrationInfo.getUser());
-//        System.out.println("Team: " + registrationInfo.getTeam());
-//        System.out.println("Registration: " + registrationInfo.getRegistration());
         registrationService.register(registrationInfo.getCredentials(), registrationInfo.getUser(), registrationInfo.getTeam(), registrationInfo.getIsJoinTeam());
     }
 
@@ -50,6 +47,12 @@ public class RegistrationController {
     @ResponseStatus(HttpStatus.ACCEPTED)
     public void approveJoinRequest(@PathVariable String teamId, @PathVariable String userId, @RequestBody RegistrationInfo registrationInfo) {
         registrationService.approveJoinRequest(teamId, userId, registrationInfo.getUser());
+    }
+
+    @RequestMapping(path = "/teams/{teamId}/members/{userId}", method = RequestMethod.DELETE)
+    @ResponseStatus(HttpStatus.ACCEPTED)
+    public void rejectJoinRequest(@PathVariable String teamId, @PathVariable String userId, @RequestBody RegistrationInfo registrationInfo) {
+        registrationService.rejectJoinRequest(teamId, userId, registrationInfo.getUser());
     }
 
     @RequestMapping(path = "/teams/{teamId}", method = RequestMethod.POST, params = {"status"})
