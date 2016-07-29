@@ -43,9 +43,10 @@ public class RealizationsControllerTest extends AbstractTest {
     public void testStartExperiment() throws Exception {
         final String teamName = RandomStringUtils.randomAlphanumeric(8);
         final String experimentId = RandomStringUtils.randomNumeric(5);
+        final String userId = RandomStringUtils.randomAlphanumeric(20);
 
         when(realizationService.getByExperimentId(Long.parseLong(experimentId))).thenReturn(new RealizationEntity());
-        when(realizationService.startExperimentInDeter(teamName, experimentId)).thenReturn("");
+        when(realizationService.startExperimentInDeter(teamName, experimentId, userId)).thenReturn("");
 
         mockMvc.perform(post("/realizations/start/team/" + teamName + "/experiment/" + experimentId))
                 .andExpect(status().isOk());
@@ -55,9 +56,10 @@ public class RealizationsControllerTest extends AbstractTest {
     public void testStopExperiment() throws Exception {
         final String teamName = RandomStringUtils.randomAlphanumeric(8);
         final String experimentId = RandomStringUtils.randomNumeric(5);
+        final String userId = RandomStringUtils.randomAlphanumeric(20);
 
         when(realizationService.getByExperimentId(Long.parseLong(experimentId))).thenReturn(new RealizationEntity());
-        when(realizationService.stopExperimentInDeter(teamName, experimentId)).thenReturn("");
+        when(realizationService.stopExperimentInDeter(teamName, experimentId, userId)).thenReturn("");
 
         mockMvc.perform(post("/realizations/stop/team/" + teamName + "/experiment/" + experimentId))
                 .andExpect(status().isOk());

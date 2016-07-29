@@ -5,12 +5,14 @@ import org.json.JSONObject;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.client.MockRestServiceServer;
 import org.springframework.web.client.RestOperations;
 import org.springframework.web.client.RestTemplate;
+import sg.ncl.adapter.deterlab.AdapterDeterlab;
 import sg.ncl.adapter.deterlab.ConnectionProperties;
 import sg.ncl.service.realization.AbstractTest;
 import sg.ncl.service.realization.Util;
@@ -42,6 +44,9 @@ public class RealizationServiceTest extends AbstractTest {
     private RestOperations restOperations;
 
     private MockRestServiceServer mockServer;
+
+    @Inject
+    private AdapterDeterlab adapterDeterlab;
 
     @Before
     public void setUp() throws Exception {
@@ -190,7 +195,10 @@ public class RealizationServiceTest extends AbstractTest {
 
         String teamName = RandomStringUtils.randomAlphanumeric(20);
         String experimentName = RandomStringUtils.randomAlphanumeric(20);
-        String httpCommand = realizationService.startExperimentInDeter(teamName, experimentName);
+        String userId = RandomStringUtils.randomAlphanumeric(20);
+
+        adapterDeterlab.saveDeterUserIdMapping(RandomStringUtils.randomAlphanumeric(20), userId);
+        String httpCommand = realizationService.startExperimentInDeter(teamName, experimentName, userId);
 
         StringBuilder sb = new StringBuilder();
         sb.append("?inout=in");
@@ -213,7 +221,10 @@ public class RealizationServiceTest extends AbstractTest {
 
         String teamName = RandomStringUtils.randomAlphanumeric(20);
         String experimentName = RandomStringUtils.randomAlphanumeric(20);
-        String httpCommand = realizationService.stopExperimentInDeter(teamName, experimentName);
+        String userId = RandomStringUtils.randomAlphanumeric(20);
+
+        adapterDeterlab.saveDeterUserIdMapping(RandomStringUtils.randomAlphanumeric(20), userId);
+        String httpCommand = realizationService.stopExperimentInDeter(teamName, experimentName, userId);
 
         StringBuilder sb = new StringBuilder();
         sb.append("?inout=out");
