@@ -54,7 +54,7 @@ public class ExperimentsController {
     }
 
     // delete experiment
-    @RequestMapping(path = "/experiments/{expId}", method = RequestMethod.POST)
+    @RequestMapping(path = "/delete/{expId}", method = RequestMethod.POST)
     @ResponseStatus(code = HttpStatus.OK)
     public void deleteExperiment(@PathVariable String expId) {
         experimentService.deleteExperiment(Long.parseLong(expId));
