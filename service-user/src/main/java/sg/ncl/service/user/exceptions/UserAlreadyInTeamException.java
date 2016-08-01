@@ -5,7 +5,8 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import sg.ncl.common.exception.BadRequestException;
 
 /**
- * Created by Desmond/Te Ye
+ * Created by chunwang
  */
 @ResponseStatus(code = HttpStatus.BAD_REQUEST, reason = "User already in team")
-public class UserAlreadyInTeam extends BadRequestException {}
+public class UserAlreadyInTeamException extends BadRequestException {}
+
