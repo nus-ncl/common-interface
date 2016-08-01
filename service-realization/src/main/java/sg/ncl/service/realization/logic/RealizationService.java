@@ -99,9 +99,9 @@ public class RealizationService {
         jsonObject.put("pid", teamName);
         jsonObject.put("eid", experimentName);
 
-        adapterDeterlab.stopExperiment(jsonObject.toString());
+        return adapterDeterlab.stopExperiment(jsonObject.toString());
 
-        return httpCommand.toString();
+//        return httpCommand.toString();
     }
 
     public void setState(final Long experimentId, final RealizationState state) {
