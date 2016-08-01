@@ -77,10 +77,12 @@ public class RealizationService {
         JSONObject jsonObject = new JSONObject();
         jsonObject.put("httpCommand", httpCommand.toString());
         jsonObject.put("deterLogin", adapterDeterlab.getDeterUserIdByNclUserId(userId));
+        jsonObject.put("pid", teamName);
+        jsonObject.put("eid", experimentName);
 
-        adapterDeterlab.startExperiment(jsonObject.toString());
+        return adapterDeterlab.startExperiment(jsonObject.toString());
 
-        return httpCommand.toString();
+//        return httpCommand.toString();
     }
 
     public String stopExperimentInDeter(final String teamName, final String experimentName, final String userId) {
@@ -94,6 +96,8 @@ public class RealizationService {
         JSONObject jsonObject = new JSONObject();
         jsonObject.put("httpCommand", httpCommand.toString());
         jsonObject.put("deterLogin", adapterDeterlab.getDeterUserIdByNclUserId(userId));
+        jsonObject.put("pid", teamName);
+        jsonObject.put("eid", experimentName);
 
         adapterDeterlab.stopExperiment(jsonObject.toString());
 

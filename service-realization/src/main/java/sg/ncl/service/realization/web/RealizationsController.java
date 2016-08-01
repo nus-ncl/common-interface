@@ -39,10 +39,10 @@ public class RealizationsController {
 //    }
 
     @RequestMapping(path = "/start/team/{teamName}/experiment/{expId}", method = RequestMethod.POST)
-    public void startExperiment(@PathVariable String teamName, @PathVariable String expId) {
+    public String startExperiment(@PathVariable String teamName, @PathVariable String expId) {
 
         RealizationEntity realizationEntityDb = realizationService.getByExperimentId(Long.parseLong(expId));
-        realizationService.startExperimentInDeter(teamName, realizationEntityDb.getExperimentName(), realizationEntityDb.getUserId());
+        return realizationService.startExperimentInDeter(teamName, realizationEntityDb.getExperimentName(), realizationEntityDb.getUserId());
     }
 
     @RequestMapping(path = "/stop/team/{teamName}/experiment/{expId}", method = RequestMethod.POST)
