@@ -46,6 +46,20 @@ public class ExperimentsController {
         return infoList;
     }
 
+    // returns experiments that are part of the team
+    @RequestMapping(path = "/teams/{id}", method = RequestMethod.GET)
+    @ResponseStatus(code = HttpStatus.OK)
+    public List<ExperimentInfo> getByTeamId(@PathVariable String id) {
+        List<ExperimentInfo> infoList = new ArrayList<>();
+        List<ExperimentEntity> entityList = experimentService.findByTeam(id);
+
+        for (ExperimentEntity entity : entityList) {
+            infoList.add(new ExperimentInfo(entity));
+        }
+
+        return infoList;
+    }
+
     // create new experiment
     @RequestMapping(method = RequestMethod.POST)
     @ResponseStatus(value = HttpStatus.CREATED)

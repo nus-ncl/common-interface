@@ -53,12 +53,24 @@ public class Util {
         return cp.isEmpty();
     }
 
-    public static void addExperiments(int numEntries, String userId, ExperimentRepository experimentRepository) {
+    public static void addExperimentsChangeUserId(int numEntries, String userId, ExperimentRepository experimentRepository) {
         for (int i = 0; i < numEntries; i++) {
             ExperimentEntity experimentEntity = Util.getExperimentsEntity();
 
             if (i % 2 == 0) {
                 experimentEntity.setUserId(userId);
+            }
+
+            experimentRepository.save(experimentEntity);
+        }
+    }
+
+    public static void addExperimentsChangeTeamId(int numEntries, String teamId, ExperimentRepository experimentRepository) {
+        for (int i = 0; i < numEntries; i++) {
+            ExperimentEntity experimentEntity = Util.getExperimentsEntity();
+
+            if (i % 2 == 0) {
+                experimentEntity.setTeamId(teamId);
             }
 
             experimentRepository.save(experimentEntity);

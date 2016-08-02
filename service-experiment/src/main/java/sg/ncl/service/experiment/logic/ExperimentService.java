@@ -132,6 +132,18 @@ public class ExperimentService {
         return result;
     }
 
+    public List<ExperimentEntity> findByTeam(String teamId) {
+        logger.info("Find teams by team id");
+
+        if (teamId == null || teamId.isEmpty()) {
+            throw new UserIdNotFoundException();
+        }
+
+        List<ExperimentEntity> result = experimentRepository.findByTeamId(teamId);
+
+        return result;
+    }
+
     public String createNsFile(String filename, String contents) {
         logger.info("Create NS file");
 
