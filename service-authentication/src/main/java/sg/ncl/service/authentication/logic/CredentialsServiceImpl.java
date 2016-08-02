@@ -87,7 +87,7 @@ public class CredentialsServiceImpl implements CredentialsService {
         if (credentials.getPassword() != null && !credentials.getPassword().isEmpty()) {
             hashPassword(entity, credentials.getPassword());
         }
-        // CW: need to handle error when changePassword() failed
+        // FIXME: need to handle error when changePassword() failed
         changePassword(id, credentials.getPassword());
         final CredentialsEntity savedEntity = credentialsRepository.save(entity);
         logger.info("Credentials updated: {}", savedEntity);
@@ -100,12 +100,12 @@ public class CredentialsServiceImpl implements CredentialsService {
 
     private void changePassword(String nclUserId, String password) {
         JSONObject adapterObject = new JSONObject();
-        // CW: need to handle error when getDeterUserIdByNclUserId() returns nothing
+        // FIXME: need to handle error when getDeterUserIdByNclUserId() returns nothing
         adapterObject.put("uid", adapterDeterlab.getDeterUserIdByNclUserId(nclUserId));
         adapterObject.put("password1", password);
         adapterObject.put("password2", password);
         logger.info("Credentials to be updated on Deter: {}", adapterObject.toString());
-        // CW added: need to handle error if Deter failed to update password
+        // FIXME added: need to handle error if Deter failed to update password
         adapterDeterlab.updateCredentials(adapterObject.toString());
     }
 

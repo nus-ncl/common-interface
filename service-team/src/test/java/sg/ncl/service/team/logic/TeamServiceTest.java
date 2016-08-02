@@ -67,12 +67,12 @@ public class TeamServiceTest extends AbstractTest {
         teamService.getTeamById("");
     }
 
-    @Test(expected = TeamNameNullException.class)
+    @Test(expected = TeamNameNullOrEmptyException.class)
     public void testGetTeamWithNullName() throws Exception {
         teamService.getTeamByName(null);
     }
 
-    @Test(expected = TeamNameNullException.class)
+    @Test(expected = TeamNameNullOrEmptyException.class)
     public void testGetTeamWithEmptyName() throws Exception {
         teamService.getTeamByName("");
     }
