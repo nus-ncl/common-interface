@@ -200,14 +200,9 @@ public class RealizationServiceTest extends AbstractTest {
         adapterDeterlab.saveDeterUserIdMapping(RandomStringUtils.randomAlphanumeric(20), userId);
         String httpCommand = realizationService.startExperimentInDeter(teamName, experimentName, userId);
 
-        StringBuilder sb = new StringBuilder();
-        sb.append("?inout=in");
-        sb.append("&");
-        sb.append("pid=" + teamName);
-        sb.append("&");
-        sb.append("eid=" + experimentName);
+        String returnString = "{\"msg\":\"Experiment started\"}";
 
-        Assert.assertEquals(httpCommand, sb.toString());
+        Assert.assertEquals(httpCommand, returnString);
     }
 
     @Test
@@ -226,13 +221,8 @@ public class RealizationServiceTest extends AbstractTest {
         adapterDeterlab.saveDeterUserIdMapping(RandomStringUtils.randomAlphanumeric(20), userId);
         String httpCommand = realizationService.stopExperimentInDeter(teamName, experimentName, userId);
 
-        StringBuilder sb = new StringBuilder();
-        sb.append("?inout=out");
-        sb.append("&");
-        sb.append("pid=" + teamName);
-        sb.append("&");
-        sb.append("eid=" + experimentName);
+        String returnString = "{\"msg\":\"Experiment stopped\"}";
 
-        Assert.assertEquals(httpCommand, sb.toString());
+        Assert.assertEquals(httpCommand, returnString);
     }
 }
