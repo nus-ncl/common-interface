@@ -16,6 +16,7 @@ import javax.inject.Inject;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -37,6 +38,16 @@ public class RealizationsControllerTest extends AbstractTest {
     public void before() {
         assertThat(mockingDetails(realizationService).isMock(), is(true));
         mockMvc = MockMvcBuilders.webAppContextSetup(webApplicationContext).build();
+    }
+
+    @Test
+    public void testGetRealization() throws Exception {
+        final String experimentId = RandomStringUtils.randomNumeric(5);
+
+        when(realizationService.getByExperimentId(Long.parseLong(experimentId))).thenReturn(new RealizationEntity());
+
+        mockMvc.perform(get("/realizations/" + experimentId))
+                .andExpect(status().isOk());
     }
 
     @Test

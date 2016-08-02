@@ -140,6 +140,18 @@ public class RealizationService {
         return realizationRepository.findByExperimentId(experimentId).getRunningMinutes();
     }
 
+    public void setRealizationDetails(final Long experimentId, final String details) {
+        logger.info("Set realization details. {} : {}", experimentId, details);
+        RealizationEntity realizationEntity = realizationRepository.findByExperimentId(experimentId);
+        realizationEntity.setDetails(details);
+        realizationRepository.saveAndFlush(realizationEntity);
+    }
+
+    public String getRealizationDetails(final Long experimentId) {
+        logger.info("Get realization details. {}", experimentId);
+        return realizationRepository.findByExperimentId(experimentId).getDetails();
+    }
+
     public void deleteRealization(final Long realizationId) {
         logger.info("Delete realization. {}", realizationId);
         realizationRepository.delete(realizationId);

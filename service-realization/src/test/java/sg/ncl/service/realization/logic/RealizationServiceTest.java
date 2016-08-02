@@ -185,6 +185,30 @@ public class RealizationServiceTest extends AbstractTest {
     }
 
     @Test
+    public void testGetRealizationDetails() {
+        RealizationEntity realizationEntity = Util.getRealizationEntity();
+        RealizationEntity savedRealizationEntity = realizationRepository.save(realizationEntity);
+
+        Assert.assertEquals(savedRealizationEntity.getDetails(), realizationEntity.getDetails());
+    }
+
+    @Test
+    public void testSetRealizationDetails() {
+
+        RealizationEntity realizationEntity = Util.getRealizationEntity();
+        RealizationEntity savedRealizationEntity = realizationRepository.save(realizationEntity);
+
+        Long experimentId = savedRealizationEntity.getExperimentId();
+        String details = RandomStringUtils.randomAlphanumeric(20);
+
+        realizationService.setRealizationDetails(experimentId, details);
+
+        RealizationEntity realizationEntityDB = realizationRepository.findByExperimentId(experimentId);
+
+        Assert.assertEquals(realizationEntityDB.getDetails(), details);
+    }
+
+    @Test
     public void testStartExperiment() {
         JSONObject predefinedResultJson = new JSONObject();
         predefinedResultJson.put("msg", "Experiment started");

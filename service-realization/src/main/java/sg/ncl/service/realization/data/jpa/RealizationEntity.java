@@ -43,6 +43,9 @@ public class RealizationEntity extends AbstractEntity implements Realization {
     @Column(name = "running_minutes", nullable = false)
     private Long runningMinutes;
 
+    @Column(name = "details", length = 1000000000)
+    private String details;
+
     @Override
     public Long getId() {
         return id;
@@ -125,6 +128,15 @@ public class RealizationEntity extends AbstractEntity implements Realization {
     }
 
     @Override
+    public String getDetails() {
+        return details;
+    }
+
+    public void setDetails(String details) {
+        this.details = details;
+    }
+
+    @Override
     public boolean equals(final Object o) {
         if (this == o) { return true; }
         if (o == null || getClass() != o.getClass()) { return false; }
@@ -147,6 +159,7 @@ public class RealizationEntity extends AbstractEntity implements Realization {
         sb.append('}');
         return sb.toString();
     }
+
 
 
 }
