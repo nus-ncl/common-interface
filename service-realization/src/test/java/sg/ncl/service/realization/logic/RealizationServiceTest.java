@@ -22,6 +22,7 @@ import sg.ncl.service.realization.domain.RealizationState;
 
 import javax.inject.Inject;
 
+import static org.hamcrest.core.Is.is;
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.method;
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.requestTo;
 import static org.springframework.test.web.client.response.MockRestResponseCreators.withSuccess;
@@ -243,14 +244,16 @@ public class RealizationServiceTest extends AbstractTest {
                 .andRespond(withSuccess(predefinedResultJson.toString(), MediaType.APPLICATION_JSON));
 
         String teamName = RandomStringUtils.randomAlphanumeric(20);
-        String experimentName = RandomStringUtils.randomAlphanumeric(20);
         String userId = RandomStringUtils.randomAlphanumeric(20);
 
+        RealizationEntity one = Util.getRealizationEntity();
+        String experimentName = one.getExperimentName();
+        realizationService.save(one);
+
         adapterDeterlab.saveDeterUserIdMapping(RandomStringUtils.randomAlphanumeric(20), userId);
-        String httpCommand = realizationService.stopExperimentInDeter(teamName, experimentName, userId);
+        RealizationEntity result = realizationService.stopExperimentInDeter(teamName, experimentName, userId);
 
-        String returnString = "{\"msg\":\"Experiment stopped\"}";
-
-        Assert.assertEquals(httpCommand, returnString);
+        Assert.assertThat(result.getState(), is(RealizationState.STOP));
+        Assert.assertThat(result.getDetails(), is(""));
     }
 }

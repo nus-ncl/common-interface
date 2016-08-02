@@ -108,7 +108,7 @@ public class RealizationService {
         return realizationRepository.save(realizationEntity);
     }
 
-    public String stopExperimentInDeter(final String teamName, final String experimentName, final String userId) {
+    public RealizationEntity stopExperimentInDeter(final String teamName, final String experimentName, final String userId) {
         StringBuilder httpCommand = new StringBuilder();
         httpCommand.append("?inout=out");
         httpCommand.append("&");
@@ -122,9 +122,13 @@ public class RealizationService {
         jsonObject.put("pid", teamName);
         jsonObject.put("eid", experimentName);
 
-        return adapterDeterlab.stopExperiment(jsonObject.toString());
+        adapterDeterlab.stopExperiment(jsonObject.toString());
 
-//        return httpCommand.toString();
+        RealizationEntity realizationEntity = realizationRepository.findByExperimentName(experimentName);
+        // FIXME may need to check if stopping experiments have error
+        realizationEntity.setState(RealizationState.STOP);
+        realizationEntity.setDetails("");
+        return realizationRepository.save(realizationEntity);
     }
 
     public void setState(final Long experimentId, final RealizationState state) {
