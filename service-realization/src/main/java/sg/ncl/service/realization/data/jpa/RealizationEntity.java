@@ -4,11 +4,7 @@ import sg.ncl.common.jpa.AbstractEntity;
 import sg.ncl.service.realization.domain.Realization;
 import sg.ncl.service.realization.domain.RealizationState;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.persistence.Table;
+import javax.persistence.*;
 
 /**
  * @author Christopher Zhong
@@ -38,6 +34,7 @@ public class RealizationEntity extends AbstractEntity implements Realization {
     private Integer numberOfNodes;
 
     @Column(name = "state", nullable = false)
+    @Enumerated(EnumType.STRING)
     private RealizationState state = RealizationState.NEW;
 
     @Column(name = "idle_minutes", nullable = false)
