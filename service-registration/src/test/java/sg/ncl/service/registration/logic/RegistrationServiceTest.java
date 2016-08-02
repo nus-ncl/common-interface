@@ -22,7 +22,7 @@ import sg.ncl.service.team.data.jpa.TeamEntity;
 import sg.ncl.service.team.data.jpa.TeamMemberEntity;
 import sg.ncl.service.team.domain.*;
 import sg.ncl.service.team.exceptions.NoOwnerInTeamException;
-import sg.ncl.service.team.exceptions.TeamIdNullException;
+import sg.ncl.service.team.exceptions.TeamIdNullOrEmptyException;
 import sg.ncl.service.team.exceptions.TeamNotFoundException;
 import sg.ncl.service.team.web.TeamMemberInfo;
 import sg.ncl.service.user.domain.User;
@@ -247,8 +247,9 @@ public class RegistrationServiceTest extends AbstractTest {
     public void registerApproveJoinRequestBad() throws Exception {
         TeamEntity teamEntity = Util.getTeamEntity();
         User userEntity = Util.getUserEntity();
+        User createdUser = userService.createUser(userEntity);
         String teamId = teamService.addTeam(teamEntity).getId();
-        registrationService.approveJoinRequest(teamId, userEntity.getId(), userEntity);
+        registrationService.approveJoinRequest(teamId, createdUser.getId(), createdUser);
     }
 
     @Test(expected = RegisterTeamNameEmptyException.class)
@@ -416,7 +417,7 @@ public class RegistrationServiceTest extends AbstractTest {
         registrationService.rejectJoinRequest(team.getId(), user2.getId(), user2);
     }
 
-    @Test(expected = TeamIdNullException.class)
+    @Test(expected = TeamIdNullOrEmptyException.class)
     public void rejectJoinRequestTeamIdNull() throws Exception {
         User user = userService.createUser(Util.getUserEntity());
         registrationService.rejectJoinRequest(null, user.getId(), user);

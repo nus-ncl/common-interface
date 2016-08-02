@@ -27,7 +27,7 @@ public class TeamServiceImpl implements TeamService {
     @Transactional
     public Team addTeam(final Team team) {
         if (team == null) {
-             throw new IllegalArgumentException("Team is NULL");
+             throw new IllegalArgumentException("Team object is NULL");
         }
         if (team.getName() == null || team.getName().isEmpty()) {
             throw new TeamNameNullOrEmptyException();
@@ -49,7 +49,9 @@ public class TeamServiceImpl implements TeamService {
 
     @Transactional
     public void removeTeam(final String id) {
-        // check if entity exists first
+        if (id == null || id.isEmpty()) {
+            throw new TeamIdNullOrEmptyException();
+        }
         TeamEntity entity = findTeam(id);
         if (entity == null) {
             throw new TeamNotFoundException(id);
@@ -75,15 +77,18 @@ public class TeamServiceImpl implements TeamService {
     @Transactional
     public Team getTeamByName(final String name) {
         if (name == null || name.isEmpty()) {
-            throw new IllegalArgumentException();
+            throw new TeamNameNullOrEmptyException();
         }
         return teamRepository.findByName(name);
     }
 
     @Transactional
     public Team updateTeam(final String id, final Team team) {
-        if (id == null || id.isEmpty() || team == null) {
-            throw new IllegalArgumentException();
+        if (id == null || id.isEmpty()) {
+            throw new TeamIdNullOrEmptyException();
+        }
+        if (team == null) {
+            throw new IllegalArgumentException("Team object is NULL");
         }
         // Note: team name should be unchangeable
         final TeamEntity entity = findTeam(id);
@@ -116,8 +121,11 @@ public class TeamServiceImpl implements TeamService {
 
     @Transactional
     public Team addTeamMember(final String id, final TeamMember teamMember) {
-        if (id == null || id.isEmpty() || teamMember == null) {
-            throw new IllegalArgumentException();
+        if (id == null || id.isEmpty()) {
+            throw new TeamIdNullOrEmptyException();
+        }
+        if (teamMember == null) {
+            throw new IllegalArgumentException("TeamMember object null");
         }
         TeamEntity entity = findTeam(id);
         if (entity == null) {
@@ -129,8 +137,11 @@ public class TeamServiceImpl implements TeamService {
 
     @Transactional
     public Team removeTeamMember(final String id, final TeamMember teamMember) {
-        if (id == null || id.isEmpty() || teamMember == null) {
-            throw new IllegalArgumentException();
+        if (id == null || id.isEmpty()) {
+            throw new TeamIdNullOrEmptyException();
+        }
+        if (teamMember == null) {
+            throw new IllegalArgumentException("TeamMember object null");
         }
         TeamEntity entity = findTeam(id);
         if (entity == null) {
@@ -142,8 +153,11 @@ public class TeamServiceImpl implements TeamService {
 
     @Transactional
     public boolean isTeamOwner(final String userId, final String teamId) {
-        if (userId == null || userId.isEmpty() || teamId == null || teamId.isEmpty()) {
-            throw new IllegalArgumentException();
+        if (userId == null || userId.isEmpty()){
+            throw new UserIdNullOrEmptyException();
+        }
+        if (teamId == null || teamId.isEmpty()) {
+            throw new TeamIdNullOrEmptyException();
         }
         TeamEntity entity = findTeam(teamId);
         if (entity == null) {
@@ -160,10 +174,15 @@ public class TeamServiceImpl implements TeamService {
 
     @Transactional
     public TeamMember changeTeamMemberStatus(String userId, String teamId, TeamMemberStatus teamMemberStatus) {
-        if (userId == null || userId.isEmpty() || teamId == null || teamId.isEmpty() || teamMemberStatus == null) {
-            throw new IllegalArgumentException();
+        if (userId == null || userId.isEmpty()){
+            throw new UserIdNullOrEmptyException();
         }
-
+        if (teamId == null || teamId.isEmpty()) {
+            throw new TeamIdNullOrEmptyException();
+        }
+        if (teamMemberStatus == null) {
+            throw new IllegalArgumentException("TeamMemberStatus object null");
+        }
         TeamEntity entity = findTeam(teamId);
         if (entity == null) {
             throw new TeamNotFoundException(teamId);
@@ -179,8 +198,11 @@ public class TeamServiceImpl implements TeamService {
 
     @Transactional
     public Team changeTeamStatus(String teamId, TeamStatus teamStatus) {
-        if (teamId == null || teamId.isEmpty() || teamStatus == null) {
-            throw new IllegalArgumentException();
+        if (teamId == null || teamId.isEmpty()) {
+            throw new TeamIdNullOrEmptyException();
+        }
+        if (teamStatus == null) {
+            throw new IllegalArgumentException("TeamStatus object null");
         }
 
         TeamEntity entity = findTeam(teamId);
@@ -202,7 +224,7 @@ public class TeamServiceImpl implements TeamService {
 
     private TeamEntity findTeam(final String id) {
         if (id == null || id.isEmpty()) {
-            throw new IllegalArgumentException();
+            return null;
         }
 
         return teamRepository.findOne(id);
@@ -210,7 +232,7 @@ public class TeamServiceImpl implements TeamService {
 
     private boolean hasTeamOwner(final String teamId) {
         if (teamId == null || teamId.isEmpty()) {
-            throw new IllegalArgumentException();
+            throw new TeamIdNullOrEmptyException();
         }
 
         TeamEntity entity = findTeam(teamId);
