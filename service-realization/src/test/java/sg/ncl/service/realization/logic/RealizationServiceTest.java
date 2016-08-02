@@ -212,21 +212,25 @@ public class RealizationServiceTest extends AbstractTest {
     public void testStartExperiment() {
         JSONObject predefinedResultJson = new JSONObject();
         predefinedResultJson.put("msg", "Experiment started");
+        predefinedResultJson.put("status", "active");
+        predefinedResultJson.put("report", "this is a report");
 
         mockServer.expect(requestTo(properties.startExperiment()))
                 .andExpect(method(HttpMethod.POST))
                 .andRespond(withSuccess(predefinedResultJson.toString(), MediaType.APPLICATION_JSON));
 
         String teamName = RandomStringUtils.randomAlphanumeric(20);
-        String experimentName = RandomStringUtils.randomAlphanumeric(20);
         String userId = RandomStringUtils.randomAlphanumeric(20);
 
+        RealizationEntity one = Util.getRealizationEntity();
+        String experimentName = one.getExperimentName();
+        realizationService.save(one);
+
         adapterDeterlab.saveDeterUserIdMapping(RandomStringUtils.randomAlphanumeric(20), userId);
-        String httpCommand = realizationService.startExperimentInDeter(teamName, experimentName, userId);
+        RealizationEntity result = realizationService.startExperimentInDeter(teamName, experimentName, userId);
 
-        String returnString = "{\"msg\":\"Experiment started\"}";
-
-        Assert.assertEquals(httpCommand, returnString);
+        Assert.assertNotEquals(one.getState(), result.getState());
+        Assert.assertNotEquals(one.getDetails(), result.getDetails());
     }
 
     @Test

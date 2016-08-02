@@ -30,7 +30,7 @@ public class RealizationsController {
     }
 
     @RequestMapping(path = "/start/team/{teamName}/experiment/{expId}", method = RequestMethod.POST)
-    public String startExperiment(@PathVariable String teamName, @PathVariable String expId) {
+    public RealizationEntity startExperiment(@PathVariable String teamName, @PathVariable String expId) {
 
         RealizationEntity realizationEntityDb = realizationService.getByExperimentId(Long.parseLong(expId));
         return realizationService.startExperimentInDeter(teamName, realizationEntityDb.getExperimentName(), realizationEntityDb.getUserId());

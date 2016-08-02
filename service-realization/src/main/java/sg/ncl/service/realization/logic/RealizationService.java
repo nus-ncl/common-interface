@@ -8,6 +8,7 @@ import sg.ncl.adapter.deterlab.AdapterDeterlab;
 import sg.ncl.service.realization.RealizationConnectionProperties;
 import sg.ncl.service.realization.data.jpa.RealizationEntity;
 import sg.ncl.service.realization.data.jpa.RealizationRepository;
+import sg.ncl.service.realization.domain.Realization;
 import sg.ncl.service.realization.domain.RealizationState;
 
 import javax.inject.Inject;
@@ -66,7 +67,7 @@ public class RealizationService {
         return savedRealizationEntity;
     }
 
-    public String startExperimentInDeter(final String teamName, final String experimentName, final String userId) {
+    public RealizationEntity startExperimentInDeter(final String teamName, final String experimentName, final String userId) {
         StringBuilder httpCommand = new StringBuilder();
         httpCommand.append("?inout=in");
         httpCommand.append("&");
@@ -80,9 +81,31 @@ public class RealizationService {
         jsonObject.put("pid", teamName);
         jsonObject.put("eid", experimentName);
 
-        return adapterDeterlab.startExperiment(jsonObject.toString());
+        RealizationEntity realizationEntity = realizationRepository.findByExperimentName(experimentName);
+        realizationEntity.setState(RealizationState.ACTIVATING);
+        realizationRepository.save(realizationEntity);
 
-//        return httpCommand.toString();
+        String stringFromExperiment = adapterDeterlab.startExperiment(jsonObject.toString());
+        JSONObject jsonObjectFromExperiment = new JSONObject(stringFromExperiment);
+
+        String status = jsonObjectFromExperiment.getString("status");
+        String report = jsonObjectFromExperiment.getString("report");
+        RealizationState realizationState;
+
+        switch (status) {
+            case "active":
+                realizationState = RealizationState.ACTIVE;
+                break;
+            case "activating":
+                realizationState = RealizationState.ACTIVATING;
+                break;
+            default:
+                realizationState = RealizationState.STOP;
+                break;
+        }
+        realizationEntity.setState(realizationState);
+        realizationEntity.setDetails(report);
+        return realizationRepository.save(realizationEntity);
     }
 
     public String stopExperimentInDeter(final String teamName, final String experimentName, final String userId) {

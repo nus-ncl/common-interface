@@ -57,7 +57,7 @@ public class RealizationsControllerTest extends AbstractTest {
         final String userId = RandomStringUtils.randomAlphanumeric(20);
 
         when(realizationService.getByExperimentId(Long.parseLong(experimentId))).thenReturn(new RealizationEntity());
-        when(realizationService.startExperimentInDeter(teamName, experimentId, userId)).thenReturn("");
+//        when(realizationService.startExperimentInDeter(teamName, experimentId, userId)).thenReturn("");
 
         mockMvc.perform(post("/realizations/start/team/" + teamName + "/experiment/" + experimentId))
                 .andExpect(status().isOk());
