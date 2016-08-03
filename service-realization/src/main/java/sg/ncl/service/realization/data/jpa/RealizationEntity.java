@@ -4,11 +4,7 @@ import sg.ncl.common.jpa.AbstractEntity;
 import sg.ncl.service.realization.domain.Realization;
 import sg.ncl.service.realization.domain.RealizationState;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.persistence.Table;
+import javax.persistence.*;
 
 /**
  * @author Christopher Zhong
@@ -38,6 +34,7 @@ public class RealizationEntity extends AbstractEntity implements Realization {
     private Integer numberOfNodes;
 
     @Column(name = "state", nullable = false)
+    @Enumerated(EnumType.STRING)
     private RealizationState state = RealizationState.NEW;
 
     @Column(name = "idle_minutes", nullable = false)
@@ -45,6 +42,9 @@ public class RealizationEntity extends AbstractEntity implements Realization {
 
     @Column(name = "running_minutes", nullable = false)
     private Long runningMinutes;
+
+    @Column(name = "details", length = 1000000000)
+    private String details;
 
     @Override
     public Long getId() {
@@ -128,6 +128,15 @@ public class RealizationEntity extends AbstractEntity implements Realization {
     }
 
     @Override
+    public String getDetails() {
+        return details;
+    }
+
+    public void setDetails(String details) {
+        this.details = details;
+    }
+
+    @Override
     public boolean equals(final Object o) {
         if (this == o) { return true; }
         if (o == null || getClass() != o.getClass()) { return false; }
@@ -150,6 +159,7 @@ public class RealizationEntity extends AbstractEntity implements Realization {
         sb.append('}');
         return sb.toString();
     }
+
 
 
 }

@@ -138,6 +138,23 @@ public class ExperimentsControllerTest extends AbstractTest {
     }
 
     @Test
+    public void testGetExperimentsByTeamId() throws Exception {
+
+        List<ExperimentEntity> experimentEntityList = new ArrayList<>();
+        String teamId = RandomStringUtils.randomAlphanumeric(20);
+
+        for (int i = 0; i < 3; i++) {
+            experimentEntityList.add(Util.getExperimentsEntity());
+        }
+
+        when(experimentService.findByTeam(teamId)).thenReturn(experimentEntityList);
+
+        mockMvc.perform(get("/experiments/teams/" + teamId))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(contentType));
+    }
+
+    @Test
     public void testDeleteExperiment() throws Exception {
         Long experimentId = Long.parseLong(RandomStringUtils.randomNumeric(5));
 

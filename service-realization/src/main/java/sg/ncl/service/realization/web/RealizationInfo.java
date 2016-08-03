@@ -18,6 +18,7 @@ public class RealizationInfo implements Realization {
     private RealizationState state;
     private Long idleMinutes;
     private Long runningMinutes;
+    private String details;
 
     public RealizationInfo(final Long id,
                            final Long experimentId,
@@ -27,7 +28,8 @@ public class RealizationInfo implements Realization {
                            final Integer numberOfNodes,
                            final RealizationState state,
                            final Long idleMinutes,
-                           final Long runningMinutes) {
+                           final Long runningMinutes,
+                           final String details) {
 
         this.id = id;
         this.experimentId = experimentId;
@@ -38,6 +40,7 @@ public class RealizationInfo implements Realization {
         this.state = state;
         this.idleMinutes = idleMinutes;
         this.runningMinutes = runningMinutes;
+        this.details = details;
     }
 
     public RealizationInfo(final RealizationEntity realizationEntity) {
@@ -49,7 +52,8 @@ public class RealizationInfo implements Realization {
                 realizationEntity.getNumberOfNodes(),
                 realizationEntity.getState(),
                 realizationEntity.getIdleMinutes(),
-                realizationEntity.getRunningMinutes());
+                realizationEntity.getRunningMinutes(),
+                realizationEntity.getDetails());
     }
 
     public RealizationInfo(final Realization realization) {
@@ -61,7 +65,8 @@ public class RealizationInfo implements Realization {
                 realization.getNumberOfNodes(),
                 realization.getState(),
                 realization.getIdleMinutes(),
-                realization.getRunningMinutes());
+                realization.getRunningMinutes(),
+                realization.getDetails());
     }
 
     @Override
@@ -107,5 +112,10 @@ public class RealizationInfo implements Realization {
     @Override
     public Long getRunningMinutes() {
         return runningMinutes;
+    }
+
+    @Override
+    public String getDetails() {
+        return details;
     }
 }

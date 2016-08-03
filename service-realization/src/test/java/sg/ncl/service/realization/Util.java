@@ -23,6 +23,7 @@ public class Util {
         entity.setNumberOfNodes(Integer.parseInt(RandomStringUtils.randomNumeric(5)));
         entity.setIdleMinutes(Long.parseLong(RandomStringUtils.randomNumeric(10)));
         entity.setRunningMinutes(Long.parseLong(RandomStringUtils.randomNumeric(10)));
+        entity.setDetails(RandomStringUtils.randomAlphanumeric(20));
         return entity;
     }
 

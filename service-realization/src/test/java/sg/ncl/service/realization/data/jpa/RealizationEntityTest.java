@@ -156,4 +156,20 @@ public class RealizationEntityTest {
 
         assertThat(entity.getRunningMinutes(), is(id));
     }
+
+    @Test
+    public void testGetDetails() throws Exception {
+        final RealizationEntity entity = new RealizationEntity();
+
+        assertThat(entity.getRunningMinutes(), is(nullValue()));
+    }
+
+    @Test
+    public void testSetDetails() throws Exception {
+        final RealizationEntity entity = new RealizationEntity();
+        final String detailsString = RandomStringUtils.randomAlphanumeric(20);
+        entity.setDetails(detailsString);
+
+        assertThat(entity.getDetails(), is(detailsString));
+    }
 }

@@ -24,30 +24,19 @@ public class RealizationsController {
         this.realizationService = realizationService;
     }
 
-//    @RequestMapping(method = RequestMethod.GET)
-//    public void get() {}
-
-//    @RequestMapping(path = "/start", method = RequestMethod.POST)
-//    public void startExperiment(final RealizationEntity realizationEntity) {
-//        RealizationEntity realizationEntityDb = realizationService.getByExperimentId(realizationEntity.getExperimentId());
-//
-//        if (realizationEntity == null) {
-//            realizationService.save(realizationEntity);
-//        }
-//
-//        realizationService.startExperimentInDeter(realizationEntityDb.getTeamId(), realizationEntityDb.getExperimentName());
-//    }
+    @RequestMapping(path = "/{expId}", method = RequestMethod.GET)
+    public RealizationEntity get(@PathVariable String expId) {
+        return realizationService.getByExperimentId(Long.parseLong(expId));
+    }
 
     @RequestMapping(path = "/start/team/{teamName}/experiment/{expId}", method = RequestMethod.POST)
-    public String startExperiment(@PathVariable String teamName, @PathVariable String expId) {
-
+    public RealizationEntity startExperiment(@PathVariable String teamName, @PathVariable String expId) {
         RealizationEntity realizationEntityDb = realizationService.getByExperimentId(Long.parseLong(expId));
         return realizationService.startExperimentInDeter(teamName, realizationEntityDb.getExperimentName(), realizationEntityDb.getUserId());
     }
 
     @RequestMapping(path = "/stop/team/{teamName}/experiment/{expId}", method = RequestMethod.POST)
-    public String stopExperiment(@PathVariable String teamName, @PathVariable String expId) {
-
+    public RealizationEntity stopExperiment(@PathVariable String teamName, @PathVariable String expId) {
         RealizationEntity realizationEntityDb = realizationService.getByExperimentId(Long.parseLong(expId));
         return realizationService.stopExperimentInDeter(teamName, realizationEntityDb.getExperimentName(), realizationEntityDb.getUserId());
     }

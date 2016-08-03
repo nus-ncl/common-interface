@@ -22,6 +22,7 @@ import sg.ncl.service.realization.domain.RealizationState;
 
 import javax.inject.Inject;
 
+import static org.hamcrest.core.Is.is;
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.method;
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.requestTo;
 import static org.springframework.test.web.client.response.MockRestResponseCreators.withSuccess;
@@ -185,24 +186,52 @@ public class RealizationServiceTest extends AbstractTest {
     }
 
     @Test
+    public void testGetRealizationDetails() {
+        RealizationEntity realizationEntity = Util.getRealizationEntity();
+        RealizationEntity savedRealizationEntity = realizationRepository.save(realizationEntity);
+
+        Assert.assertEquals(savedRealizationEntity.getDetails(), realizationEntity.getDetails());
+    }
+
+    @Test
+    public void testSetRealizationDetails() {
+
+        RealizationEntity realizationEntity = Util.getRealizationEntity();
+        RealizationEntity savedRealizationEntity = realizationRepository.save(realizationEntity);
+
+        Long experimentId = savedRealizationEntity.getExperimentId();
+        String details = RandomStringUtils.randomAlphanumeric(20);
+
+        realizationService.setRealizationDetails(experimentId, details);
+
+        RealizationEntity realizationEntityDB = realizationRepository.findByExperimentId(experimentId);
+
+        Assert.assertEquals(realizationEntityDB.getDetails(), details);
+    }
+
+    @Test
     public void testStartExperiment() {
         JSONObject predefinedResultJson = new JSONObject();
         predefinedResultJson.put("msg", "Experiment started");
+        predefinedResultJson.put("status", "active");
+        predefinedResultJson.put("report", "this is a report");
 
         mockServer.expect(requestTo(properties.startExperiment()))
                 .andExpect(method(HttpMethod.POST))
                 .andRespond(withSuccess(predefinedResultJson.toString(), MediaType.APPLICATION_JSON));
 
         String teamName = RandomStringUtils.randomAlphanumeric(20);
-        String experimentName = RandomStringUtils.randomAlphanumeric(20);
         String userId = RandomStringUtils.randomAlphanumeric(20);
 
+        RealizationEntity one = Util.getRealizationEntity();
+        String experimentName = one.getExperimentName();
+        realizationService.save(one);
+
         adapterDeterlab.saveDeterUserIdMapping(RandomStringUtils.randomAlphanumeric(20), userId);
-        String httpCommand = realizationService.startExperimentInDeter(teamName, experimentName, userId);
+        RealizationEntity result = realizationService.startExperimentInDeter(teamName, experimentName, userId);
 
-        String returnString = "{\"msg\":\"Experiment started\"}";
-
-        Assert.assertEquals(httpCommand, returnString);
+        Assert.assertNotEquals(one.getState(), result.getState());
+        Assert.assertNotEquals(one.getDetails(), result.getDetails());
     }
 
     @Test
@@ -215,14 +244,16 @@ public class RealizationServiceTest extends AbstractTest {
                 .andRespond(withSuccess(predefinedResultJson.toString(), MediaType.APPLICATION_JSON));
 
         String teamName = RandomStringUtils.randomAlphanumeric(20);
-        String experimentName = RandomStringUtils.randomAlphanumeric(20);
         String userId = RandomStringUtils.randomAlphanumeric(20);
 
+        RealizationEntity one = Util.getRealizationEntity();
+        String experimentName = one.getExperimentName();
+        realizationService.save(one);
+
         adapterDeterlab.saveDeterUserIdMapping(RandomStringUtils.randomAlphanumeric(20), userId);
-        String httpCommand = realizationService.stopExperimentInDeter(teamName, experimentName, userId);
+        RealizationEntity result = realizationService.stopExperimentInDeter(teamName, experimentName, userId);
 
-        String returnString = "{\"msg\":\"Experiment stopped\"}";
-
-        Assert.assertEquals(httpCommand, returnString);
+        Assert.assertThat(result.getState(), is(RealizationState.STOP));
+        Assert.assertThat(result.getDetails(), is(""));
     }
 }

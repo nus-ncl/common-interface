@@ -21,4 +21,5 @@ public interface Realization {
     RealizationState getState();
     Long getIdleMinutes();
     Long getRunningMinutes();
+    String getDetails();
 }

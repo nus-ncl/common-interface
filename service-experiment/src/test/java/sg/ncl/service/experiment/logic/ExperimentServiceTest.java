@@ -107,13 +107,32 @@ public class ExperimentServiceTest extends AbstractTest {
         int numEntries = 6;
 
         final String userId = RandomStringUtils.randomAlphanumeric(20);
-        Util.addExperiments(numEntries, userId, experimentRepository);
+        Util.addExperimentsChangeUserId(numEntries, userId, experimentRepository);
 
         List<ExperimentEntity> list = experimentService.findByUser(userId);
         Assert.assertEquals(list.size(), numEntries / 2);
 
         for (ExperimentEntity forEntity : list) {
             Assert.assertEquals(forEntity.getUserId(), userId);
+        }
+
+        List<ExperimentEntity> allExperiments = experimentService.get();
+        Assert.assertEquals(allExperiments.size(), numEntries);
+    }
+
+    @Test
+    public void testGetExperimentsByTeam() throws Exception {
+
+        int numEntries = 6;
+
+        final String teamId = RandomStringUtils.randomAlphanumeric(20);
+        Util.addExperimentsChangeTeamId(numEntries, teamId, experimentRepository);
+
+        List<ExperimentEntity> list = experimentService.findByTeam(teamId);
+        Assert.assertEquals(list.size(), numEntries / 2);
+
+        for (ExperimentEntity forEntity : list) {
+            Assert.assertEquals(forEntity.getTeamId(), teamId);
         }
 
         List<ExperimentEntity> allExperiments = experimentService.get();
@@ -128,6 +147,17 @@ public class ExperimentServiceTest extends AbstractTest {
         }
 
         List<ExperimentEntity> list = experimentService.findByUser(userId);
+        Assert.assertEquals(list.size(), 0);
+    }
+
+    @Test
+    public void testGetExperimentsTeamHasNoExperiments() throws Exception {
+        final String teamId = RandomStringUtils.randomAlphanumeric(20);
+        for (int i = 0; i < 3; i++) {
+            experimentRepository.save(Util.getExperimentsEntity());
+        }
+
+        List<ExperimentEntity> list = experimentService.findByTeam(teamId);
         Assert.assertEquals(list.size(), 0);
     }
 
