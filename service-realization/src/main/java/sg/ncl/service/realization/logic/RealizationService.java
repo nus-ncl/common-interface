@@ -122,9 +122,12 @@ public class RealizationService {
         jsonObject.put("pid", teamName);
         jsonObject.put("eid", experimentName);
 
+        RealizationEntity realizationEntity = realizationRepository.findByExperimentName(experimentName);
+        realizationEntity.setState(RealizationState.STOPPING);
+        realizationRepository.save(realizationEntity);
+
         adapterDeterlab.stopExperiment(jsonObject.toString());
 
-        RealizationEntity realizationEntity = realizationRepository.findByExperimentName(experimentName);
         // FIXME may need to check if stopping experiments have error
         realizationEntity.setState(RealizationState.STOP);
         realizationEntity.setDetails("");
