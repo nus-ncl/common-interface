@@ -26,8 +26,18 @@ public class TeamServiceImpl implements TeamService {
 
     @Transactional
     public Team addTeam(final Team team) {
-        TeamEntity entity = new TeamEntity();
+        if (team == null) {
+             throw new IllegalArgumentException("Team object is NULL");
+        }
+        if (team.getName() == null || team.getName().isEmpty()) {
+            throw new TeamNameNullOrEmptyException();
+        }
+        // FIXME: need to check whether team already exists or not
+        if (teamRepository.findByName(team.getName()) != null) {
+            // throw new TeamAlreadyExistsException();
+        }
 
+        TeamEntity entity = new TeamEntity();
         entity.setName(team.getName());
         entity.setDescription(team.getDescription());
         entity.setWebsite(team.getWebsite());
@@ -39,8 +49,13 @@ public class TeamServiceImpl implements TeamService {
 
     @Transactional
     public void removeTeam(final String id) {
-        // check if entity exists first
+        if (id == null || id.isEmpty()) {
+            throw new TeamIdNullOrEmptyException();
+        }
         TeamEntity entity = findTeam(id);
+        if (entity == null) {
+            throw new TeamNotFoundException(id);
+        }
         teamRepository.delete(id);
     }
 
@@ -62,16 +77,24 @@ public class TeamServiceImpl implements TeamService {
     @Transactional
     public Team getTeamByName(final String name) {
         if (name == null || name.isEmpty()) {
-            throw new TeamNameNullException();
+            throw new TeamNameNullOrEmptyException();
         }
         return teamRepository.findByName(name);
     }
 
     @Transactional
     public Team updateTeam(final String id, final Team team) {
-
+        if (id == null || id.isEmpty()) {
+            throw new TeamIdNullOrEmptyException();
+        }
+        if (team == null) {
+            throw new IllegalArgumentException("Team object is NULL");
+        }
         // Note: team name should be unchangeable
         final TeamEntity entity = findTeam(id);
+        if (entity == null) {
+            throw new TeamNotFoundException(id);
+        }
 
         if (team.getDescription() != null) {
             entity.setDescription(team.getDescription());
@@ -98,21 +121,48 @@ public class TeamServiceImpl implements TeamService {
 
     @Transactional
     public Team addTeamMember(final String id, final TeamMember teamMember) {
+        if (id == null || id.isEmpty()) {
+            throw new TeamIdNullOrEmptyException();
+        }
+        if (teamMember == null) {
+            throw new IllegalArgumentException("TeamMember object null");
+        }
         TeamEntity entity = findTeam(id);
+        if (entity == null) {
+            throw new TeamNotFoundException(id);
+        }
         entity.addMember(teamMember);
         return teamRepository.save(entity);
     }
 
     @Transactional
     public Team removeTeamMember(final String id, final TeamMember teamMember) {
+        if (id == null || id.isEmpty()) {
+            throw new TeamIdNullOrEmptyException();
+        }
+        if (teamMember == null) {
+            throw new IllegalArgumentException("TeamMember object null");
+        }
         TeamEntity entity = findTeam(id);
+        if (entity == null) {
+            throw new TeamNotFoundException(id);
+        }
         entity.removeMember(teamMember);
         return teamRepository.save(entity);
     }
 
     @Transactional
     public boolean isTeamOwner(final String userId, final String teamId) {
+        if (userId == null || userId.isEmpty()){
+            throw new UserIdNullOrEmptyException();
+        }
+        if (teamId == null || teamId.isEmpty()) {
+            throw new TeamIdNullOrEmptyException();
+        }
         TeamEntity entity = findTeam(teamId);
+        if (entity == null) {
+            throw new TeamNotFoundException(teamId);
+        }
         List<? extends TeamMember> teamMembersList = entity.getMembers();
         for (TeamMember teamMember: teamMembersList) {
             if (teamMember.getUserId().equals(userId) && teamMember.getMemberType().equals(TeamMemberType.OWNER)) {
@@ -124,42 +174,72 @@ public class TeamServiceImpl implements TeamService {
 
     @Transactional
     public TeamMember changeTeamMemberStatus(String userId, String teamId, TeamMemberStatus teamMemberStatus) {
+        if (userId == null || userId.isEmpty()){
+            throw new UserIdNullOrEmptyException();
+        }
+        if (teamId == null || teamId.isEmpty()) {
+            throw new TeamIdNullOrEmptyException();
+        }
+        if (teamMemberStatus == null) {
+            throw new IllegalArgumentException("TeamMemberStatus object null");
+        }
         TeamEntity entity = findTeam(teamId);
-        TeamMember member = entity.getMember(userId);
+        if (entity == null) {
+            throw new TeamNotFoundException(teamId);
+        }
 
+        TeamMember member = entity.getMember(userId);
         if (member == null) {
             throw new TeamMemberNotFoundException();
         }
+
         return entity.changeMemberStatus(member, teamMemberStatus);
     }
 
     @Transactional
     public Team changeTeamStatus(String teamId, TeamStatus teamStatus) {
-        TeamEntity entity = findTeam(teamId);
+        if (teamId == null || teamId.isEmpty()) {
+            throw new TeamIdNullOrEmptyException();
+        }
+        if (teamStatus == null) {
+            throw new IllegalArgumentException("TeamStatus object null");
+        }
 
+        TeamEntity entity = findTeam(teamId);
+        if (entity == null) {
+            throw new TeamNotFoundException(teamId);
+        }
+
+        // FIXME: why need to check team owner exists here???
         if (hasTeamOwner(teamId) == false) {
             throw new NoOwnerInTeamException();
         }
 
         entity.setStatus(teamStatus);
         entity.setProcessedDate(ZonedDateTime.now());
+
+        // FIXME: why don't save(entity)???
         return entity;
     }
 
     private TeamEntity findTeam(final String id) {
         if (id == null || id.isEmpty()) {
-            throw new TeamIdNullException();
+            return null;
         }
 
-        final TeamEntity team = teamRepository.findOne(id);
-        if (team == null) {
-            throw new TeamNotFoundException(id);
-        }
-        return team;
+        return teamRepository.findOne(id);
     }
 
     private boolean hasTeamOwner(final String teamId) {
+        if (teamId == null || teamId.isEmpty()) {
+            throw new TeamIdNullOrEmptyException();
+        }
+
         TeamEntity entity = findTeam(teamId);
+        if (entity == null) {
+            throw new TeamNotFoundException(teamId);
+        }
+
         List<? extends TeamMember> teamMembersList = entity.getMembers();
         for (TeamMember teamMember: teamMembersList) {
             if (teamMember.getMemberType().equals(TeamMemberType.OWNER)) {
