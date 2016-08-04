@@ -38,18 +38,6 @@ public class AdapterDeterlab {
         this.properties = connectionProperties;
     }
 
-//    public String loginUsers(String jsonString) {
-//        logger.info("Logining in to {} at {}: {}", properties.getIp(), properties.getPort(), jsonString);
-//
-//        HttpHeaders headers = new HttpHeaders();
-//        headers.setContentType(MediaType.APPLICATION_JSON);
-//        HttpEntity<String> request = new HttpEntity<String>(jsonString, headers);
-//
-//        ResponseEntity responseEntity = restTemplate.exchange(properties.getLogin(), HttpMethod.POST, request, String.class);
-//
-//        return responseEntity.getBody().toString();
-//    }
-
     public String joinProjectNewUsers(String jsonString) {
 
         logger.info("Joining project as new user to {} at {}: {}", properties.getIp(), properties.getPort(), jsonString);
@@ -103,13 +91,19 @@ public class AdapterDeterlab {
         return responseEntity.getBody().toString();
     }
 
-    public String updateCredentials(String jsonString) {
+    public boolean updateCredentials(String jsonString) {
         logger.info("Updating credentials to {} at {}: {}", properties.getIp(), properties.getPort(), jsonString);
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
         HttpEntity<String> request = new HttpEntity<String>(jsonString, headers);
-        ResponseEntity responseEntity = restTemplate.exchange(properties.getUpdateCredentials(), HttpMethod.POST, request, String.class);
-        return responseEntity.getBody().toString();
+        ResponseEntity respEntity = restTemplate.exchange(properties.getUpdateCredentials(), HttpMethod.POST, request, String.class);
+
+        String jsonResult = new JSONObject(respEntity.getBody().toString()).getString("msg");
+        if (jsonResult.equals("password change fail")) {
+            return false;
+        }
+
+        return true;
     }
 
     public void saveDeterUserIdMapping(String deterUserId, String nclUserId) {
