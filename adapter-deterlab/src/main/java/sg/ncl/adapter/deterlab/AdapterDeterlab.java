@@ -99,7 +99,7 @@ public class AdapterDeterlab {
         ResponseEntity respEntity = restTemplate.exchange(properties.getUpdateCredentials(), HttpMethod.POST, request, String.class);
 
         String jsonResult = new JSONObject(respEntity.getBody().toString()).getString("msg");
-        if (jsonResult.equals("password change fail")) {
+        if ("password change fail".equals(jsonResult)) {
             return false;
         }
 
