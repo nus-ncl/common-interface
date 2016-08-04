@@ -239,6 +239,7 @@ public class CredentialsServiceTest extends AbstractTest {
         when(credentialsRepository.findOne(anyString())).thenReturn(entity);
         when(passwordEncoder.encode(anyString())).thenReturn(password);
         when(credentialsRepository.save(any(CredentialsEntity.class))).thenReturn(entity);
+        when(adapterDeterlab.updateCredentials(anyString())).thenReturn(true);
 
         credentialsService.updateCredentials(entity.getId(), info);
 
@@ -257,6 +258,7 @@ public class CredentialsServiceTest extends AbstractTest {
 
         when(credentialsRepository.findOne(eq(entity.getId()))).thenReturn(entity);
         when(credentialsRepository.save(entity)).thenReturn(entity);
+        when(adapterDeterlab.updateCredentials(anyString())).thenReturn(true);
 
         credentialsService.updateCredentials(entity.getId(), info);
 
@@ -275,6 +277,7 @@ public class CredentialsServiceTest extends AbstractTest {
 
         when(credentialsRepository.findOne(eq(entity.getId()))).thenReturn(entity);
         when(credentialsRepository.save(entity)).thenReturn(entity);
+        when(adapterDeterlab.updateCredentials(anyString())).thenReturn(true);
 
         credentialsService.updateCredentials(entity.getId(), info);
 
@@ -293,6 +296,7 @@ public class CredentialsServiceTest extends AbstractTest {
         when(credentialsRepository.findOne(eq(entity.getId()))).thenReturn(entity);
         when(passwordEncoder.encode(eq(password))).thenReturn(password);
         when(credentialsRepository.save(entity)).thenReturn(entity);
+        when(adapterDeterlab.updateCredentials(anyString())).thenReturn(true);
 
         credentialsService.updateCredentials(entity.getId(), info);
 
@@ -311,6 +315,7 @@ public class CredentialsServiceTest extends AbstractTest {
         when(credentialsRepository.findOne(eq(entity.getId()))).thenReturn(entity);
         when(passwordEncoder.encode(eq(password))).thenReturn(password);
         when(credentialsRepository.save(entity)).thenReturn(entity);
+        when(adapterDeterlab.updateCredentials(anyString())).thenReturn(true);
 
         credentialsService.updateCredentials(entity.getId(), info);
 

@@ -263,15 +263,15 @@ public class CredentialsControllerTest extends AbstractTest {
                 .andExpect(status().isBadRequest());
     }
 
-    @Test
+    @Test(expected = CredentialsNotFoundException.class)
     public void testUpdateCredentialsGoodUsernameAndPassword() throws Exception {
         final CredentialsInfo credentialsInfo = new CredentialsInfo(null, "username", "password", null);
         final byte[] content = mapper.writeValueAsBytes(credentialsInfo);
 
-        doNothing().when(credentialsService).updateCredentials(anyString(), any(Credentials.class));
+        when(credentialsService.updateCredentials(anyString(), any(Credentials.class))).thenReturn(credentialsInfo);
 
         mockMvc.perform(put(CredentialsController.PATH + "/id").contentType(MediaType.APPLICATION_JSON).content(content))
-                .andExpect(status().isAccepted()).andDo(print());
+                .andExpect(status().isAccepted());
     }
 
     @Test
@@ -279,7 +279,7 @@ public class CredentialsControllerTest extends AbstractTest {
         final CredentialsInfo credentialsInfo = new CredentialsInfo(null, "username", null, null);
         final byte[] content = mapper.writeValueAsBytes(credentialsInfo);
 
-        doNothing().when(credentialsService).updateCredentials(anyString(), any(Credentials.class));
+        when(credentialsService.updateCredentials(anyString(), any(Credentials.class))).thenReturn(credentialsInfo);
 
         mockMvc.perform(put(CredentialsController.PATH + "/id").contentType(MediaType.APPLICATION_JSON).content(content))
                 .andExpect(status().isAccepted());
@@ -290,21 +290,21 @@ public class CredentialsControllerTest extends AbstractTest {
         final CredentialsInfo credentialsInfo = new CredentialsInfo(null, "username", "", null);
         final byte[] content = mapper.writeValueAsBytes(credentialsInfo);
 
-        doNothing().when(credentialsService).updateCredentials(anyString(), any(Credentials.class));
+        when(credentialsService.updateCredentials(anyString(), any(Credentials.class))).thenReturn(credentialsInfo);
 
         mockMvc.perform(put(CredentialsController.PATH + "/id").contentType(MediaType.APPLICATION_JSON).content(content))
                 .andExpect(status().isAccepted());
     }
 
-    @Test
+    @Test(expected = CredentialsNotFoundException.class)
     public void testUpdateCredentialsNullUsernameAndGoodPassword() throws Exception {
         final CredentialsInfo credentialsInfo = new CredentialsInfo(null, null, "password", null);
         final byte[] content = mapper.writeValueAsBytes(credentialsInfo);
 
-        doNothing().when(credentialsService).updateCredentials(anyString(), any(Credentials.class));
+        when(credentialsService.updateCredentials(anyString(), any(Credentials.class))).thenReturn(credentialsInfo);
 
         mockMvc.perform(put(CredentialsController.PATH + "/id").contentType(MediaType.APPLICATION_JSON).content(content))
-                .andExpect(status().isAccepted()).andDo(print());
+                .andExpect(status().isAccepted());
     }
 
     @Test
@@ -312,10 +312,8 @@ public class CredentialsControllerTest extends AbstractTest {
         final CredentialsInfo credentialsInfo = new CredentialsInfo(null, "", "password", null);
         final byte[] content = mapper.writeValueAsBytes(credentialsInfo);
 
-        doNothing().when(credentialsService).updateCredentials(anyString(), any(Credentials.class));
-
         mockMvc.perform(put(CredentialsController.PATH + "/id").contentType(MediaType.APPLICATION_JSON).content(content))
-                .andExpect(status().isAccepted());
+                .andExpect(status().isNotFound());
     }
 
     @Test
