@@ -54,9 +54,9 @@ public class CredentialsController {
 
     @RequestMapping(path = "/{id}", method = RequestMethod.PUT, consumes = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.ACCEPTED)
-    public void updateCredentials(@PathVariable final String id, @RequestBody final CredentialsInfo credentials) {
+    public Credentials updateCredentials(@PathVariable final String id, @RequestBody final CredentialsInfo credentials) {
         validateForUpdate(credentials);
-        credentialsService.updateCredentials(id, credentials);
+        return new CredentialsInfo(credentialsService.updateCredentials(id, credentials));
     }
 
 }

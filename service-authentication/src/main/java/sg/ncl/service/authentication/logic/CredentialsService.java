@@ -13,6 +13,6 @@ public interface CredentialsService {
 
     Credentials addCredentials(final Credentials credentials);
 
-    void updateCredentials(final String id, final Credentials credentials);
+    Credentials updateCredentials(final String id, final Credentials credentials);
 
 }
