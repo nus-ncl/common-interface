@@ -12,6 +12,7 @@ import sg.ncl.service.authentication.data.jpa.CredentialsRepository;
 import sg.ncl.service.authentication.domain.Credentials;
 import sg.ncl.service.authentication.domain.CredentialsStatus;
 import sg.ncl.service.authentication.exceptions.CredentialsNotFoundException;
+import sg.ncl.service.authentication.exceptions.CredentialsUpdateException;
 import sg.ncl.service.authentication.exceptions.UserIdAlreadyExistsException;
 import sg.ncl.service.authentication.exceptions.UsernameAlreadyExistsException;
 
@@ -73,7 +74,7 @@ public class CredentialsServiceImpl implements CredentialsService {
     }
 
     @Transactional
-    public void updateCredentials(@NotNull final String id, @NotNull final Credentials credentials) {
+    public CredentialsEntity updateCredentials(@NotNull final String id, @NotNull final Credentials credentials) {
         validateForUpdate(credentials);
         // check if the username exists
         final CredentialsEntity entity = credentialsRepository.findOne(id);
@@ -91,6 +92,7 @@ public class CredentialsServiceImpl implements CredentialsService {
         changePassword(id, credentials.getPassword());
         final CredentialsEntity savedEntity = credentialsRepository.save(entity);
         logger.info("Credentials updated: {}", savedEntity);
+        return savedEntity;
     }
 
     private void hashPassword(final CredentialsEntity entity, final String password) {
@@ -106,7 +108,9 @@ public class CredentialsServiceImpl implements CredentialsService {
         adapterObject.put("password2", password);
         logger.info("Credentials to be updated on Deter: {}", adapterObject.toString());
         // FIXME added: need to handle error if Deter failed to update password
-        adapterDeterlab.updateCredentials(adapterObject.toString());
+        if (!adapterDeterlab.updateCredentials(adapterObject.toString())) {
+            throw new CredentialsUpdateException();
+        }
     }
 
 }
