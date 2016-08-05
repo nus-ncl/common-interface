@@ -7,7 +7,7 @@ import sg.ncl.common.exception.BadRequestException;
 /**
  * @author Te Ye
  */
-@ResponseStatus(value= HttpStatus.BAD_REQUEST, reason = "Exp name already exists")
+@ResponseStatus(value = HttpStatus.BAD_REQUEST, reason = "Exp name already exists")
 public class ExpNameAlreadyExistsException extends BadRequestException {
 
     public ExpNameAlreadyExistsException() {

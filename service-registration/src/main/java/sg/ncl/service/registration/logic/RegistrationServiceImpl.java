@@ -154,7 +154,6 @@ public class RegistrationServiceImpl implements RegistrationService {
             throw new UserFormException();
         }
 
-
         if (isJoinTeam == true && (team.getId() == null || team.getId().isEmpty())) {
             logger.warn("Team id from join existing team is empty");
             throw new UserFormException();
@@ -332,7 +331,7 @@ public class RegistrationServiceImpl implements RegistrationService {
 
         // change team status
         // invoked method already ensure there is at least a team member of type owner
-        Team team  = teamService.changeTeamStatus(teamId, status);
+        Team team = teamService.changeTeamStatus(teamId, status);
 
         // change team owner member status
         List<? extends TeamMember> membersList = team.getMembers();

@@ -45,6 +45,8 @@ public interface UserDetails {
     String getPhone();
 
     String getInstitution();
+
     String getInstitutionAbbreviation();
+
     String getInstitutionWeb();
 }

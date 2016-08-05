@@ -6,7 +6,9 @@ package sg.ncl.adapter.deterlab.domain;
 public interface DeterlabProject {
 
     String getId();
+
     String getNclTeamId();
+
     String getDeterProjectId();
 
 }

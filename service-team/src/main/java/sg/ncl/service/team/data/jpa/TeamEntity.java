@@ -188,7 +188,7 @@ public class TeamEntity extends AbstractEntity implements Team {
     }
 
     public void removeMember(final TeamMember member) {
-        for (Iterator<Map.Entry<String, TeamMemberEntity>> it = members.entrySet().iterator(); it.hasNext();) {
+        for (Iterator<Map.Entry<String, TeamMemberEntity>> it = members.entrySet().iterator(); it.hasNext(); ) {
             Map.Entry<String, TeamMemberEntity> entry = it.next();
             if (entry.getKey().equals(member.getUserId())) {
                 it.remove();

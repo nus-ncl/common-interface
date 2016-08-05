@@ -37,14 +37,24 @@ public class VersionInfo {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) { return true; }
-        if (o == null || getClass() != o.getClass()) { return false; }
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
 
         VersionInfo that = (VersionInfo) o;
 
-        if (getMajor() != that.getMajor()) { return false; }
-        if (getMinor() != that.getMinor()) { return false; }
-        if (!getBuild().equals(that.getBuild())) { return false; }
+        if (getMajor() != that.getMajor()) {
+            return false;
+        }
+        if (getMinor() != that.getMinor()) {
+            return false;
+        }
+        if (!getBuild().equals(that.getBuild())) {
+            return false;
+        }
         return getDate().equals(that.getDate());
     }
 

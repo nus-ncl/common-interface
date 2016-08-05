@@ -46,7 +46,7 @@ public class TeamServiceTest extends AbstractTest {
     }
 
     @Test
-            //(expected = TeamNotFoundException.class)
+    //(expected = TeamNotFoundException.class)
     public void testFindTeamWithNoTeamsInDb() throws Exception {
         Team team = teamService.getTeamById(RandomStringUtils.randomAlphabetic(20));
         Assert.assertTrue(team == null);
@@ -70,14 +70,14 @@ public class TeamServiceTest extends AbstractTest {
     }
 
     @Test
-            //(expected = TeamIdNullOrEmptyException.class)
+    //(expected = TeamIdNullOrEmptyException.class)
     public void testGetTeamWithNullId() throws Exception {
         Team team = teamService.getTeamById(null);
         Assert.assertTrue(team == null);
     }
 
     @Test
-            //(expected = TeamIdNullOrEmptyException.class)
+    //(expected = TeamIdNullOrEmptyException.class)
     public void testGetTeamWithEmptyId() throws Exception {
         Team team = teamService.getTeamById("");
         Assert.assertTrue(team == null);
@@ -280,7 +280,7 @@ public class TeamServiceTest extends AbstractTest {
     }
 
     @Test
-            //(expected = TeamNotFoundException.class)
+    //(expected = TeamNotFoundException.class)
     public void removeTeamGood() throws Exception {
         Team one = Util.getTeamEntity();
         Team createdTeam = teamService.addTeam(one);

@@ -16,7 +16,7 @@ import sg.ncl.common.jpa.UseJpa;
 @UseJpa
 public class DeterlabAutoConfiguration {
 
-//    @Bean
+    //    @Bean
 //    @ConditionalOnMissingBean(AdapterDeterlab.class)
 //    public AdapterDeterlab adapterDeterlab(DeterlabUserRepository deterlabUserRepository, Co) {
 //        return new AdapterDeterlab(deterlabUserRepository);

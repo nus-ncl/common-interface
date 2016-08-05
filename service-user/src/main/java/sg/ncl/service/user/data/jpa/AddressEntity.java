@@ -125,5 +125,4 @@ public class AddressEntity extends AbstractEntity implements Address {
         return entity;
     }
 
-
 }

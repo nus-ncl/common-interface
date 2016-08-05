@@ -8,5 +8,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
 public interface RealizationRepository extends JpaRepository<RealizationEntity, Long> {
 
     RealizationEntity findByExperimentId(Long experimentId);
+
     RealizationEntity findByExperimentName(String experimentName);
 }

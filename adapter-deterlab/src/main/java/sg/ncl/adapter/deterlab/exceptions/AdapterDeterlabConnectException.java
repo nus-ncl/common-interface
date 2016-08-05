@@ -7,7 +7,7 @@ import sg.ncl.common.exception.NotFoundException;
 /**
  * @author Te Ye
  */
-@ResponseStatus(value= HttpStatus.REQUEST_TIMEOUT, reason = "Connection refused to remote adapter deterlab")
+@ResponseStatus(value = HttpStatus.REQUEST_TIMEOUT, reason = "Connection refused to remote adapter deterlab")
 public class AdapterDeterlabConnectException extends NotFoundException {
 
     public AdapterDeterlabConnectException() {

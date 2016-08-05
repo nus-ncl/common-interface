@@ -94,5 +94,4 @@ public class AddressRepositoryTest extends AbstractTest {
         exception.expect(DataIntegrityViolationException.class);
     }
 
-
 }

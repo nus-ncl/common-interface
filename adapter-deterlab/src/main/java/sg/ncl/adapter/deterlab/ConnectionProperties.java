@@ -42,7 +42,7 @@ public class ConnectionProperties {
     public String getApplyProjectNewUsers() {
         return "http://" + ip + ":" + port + "/applyProjectNewUsers";
     }
-    
+
     public String getCreateExperiment() {
         return "http://" + ip + ":" + port + "/createExperiment";
     }

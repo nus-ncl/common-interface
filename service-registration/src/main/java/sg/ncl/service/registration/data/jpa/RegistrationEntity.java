@@ -75,7 +75,6 @@ public class RegistrationEntity extends AbstractEntity implements Registration {
         this.id = id;
     }
 
-
     @Override
     public String getPid() {
         return pid;

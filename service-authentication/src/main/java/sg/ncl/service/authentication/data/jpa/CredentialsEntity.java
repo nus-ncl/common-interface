@@ -71,8 +71,12 @@ public class CredentialsEntity extends AbstractEntity implements Credentials {
 
     @Override
     public boolean equals(final Object o) {
-        if (this == o) { return true; }
-        if (o == null || getClass() != o.getClass()) { return false; }
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
 
         final Credentials that = (Credentials) o;
 

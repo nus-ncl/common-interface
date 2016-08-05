@@ -315,7 +315,7 @@ public class RegistrationServiceTest extends AbstractTest {
         // should have only one owner
         Assert.assertThat(membersList.size(), is(1));
 
-        for (TeamMember member: membersList) {
+        for (TeamMember member : membersList) {
             Assert.assertThat(member.getUserId(), is(createdUser.getId()));
             Assert.assertThat(member.getMemberType(), is(TeamMemberType.OWNER));
         }
@@ -359,7 +359,7 @@ public class RegistrationServiceTest extends AbstractTest {
         // should be approved
         Assert.assertThat(approvedTeam.getStatus(), is(TeamStatus.APPROVED));
 
-        List<? extends  TeamMember> membersList = approvedTeam.getMembers();
+        List<? extends TeamMember> membersList = approvedTeam.getMembers();
 
         // members should contain only the owner
         Assert.assertThat(membersList.size(), is(1));

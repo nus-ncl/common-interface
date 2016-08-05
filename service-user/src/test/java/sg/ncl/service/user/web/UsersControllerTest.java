@@ -82,7 +82,7 @@ public class UsersControllerTest extends AbstractTest {
 
         ObjectMapper mapper = new ObjectMapper();
         mapper.registerModule(new JavaTimeModule());
-        List<UserEntity> userEntityList2 = mapper.readValue(allUserJsonString, new TypeReference<List<UserEntity>>(){});
+        List<UserEntity> userEntityList2 = mapper.readValue(allUserJsonString, new TypeReference<List<UserEntity>>() {});
 
         Assert.assertThat(userEntityList2, IsIterableContainingInAnyOrder.containsInAnyOrder(userEntityList));
     }
@@ -133,7 +133,7 @@ public class UsersControllerTest extends AbstractTest {
         final UserEntity[] userEntityArray = addUser();
         final String idString = userEntityArray[0].getId();
 
-         // get user
+        // get user
         MvcResult result = mockMvc.perform(get("/users/" + idString))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(contentType))

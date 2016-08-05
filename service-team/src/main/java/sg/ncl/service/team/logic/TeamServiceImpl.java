@@ -38,7 +38,7 @@ public class TeamServiceImpl implements TeamService {
     @Transactional
     public Team addTeam(final Team team) {
         if (team == null) {
-             throw new IllegalArgumentException("Team object is NULL");
+            throw new IllegalArgumentException("Team object is NULL");
         }
         if (team.getName() == null || team.getName().isEmpty()) {
             throw new TeamNameNullOrEmptyException();
@@ -164,7 +164,7 @@ public class TeamServiceImpl implements TeamService {
 
     @Transactional
     public boolean isTeamOwner(final String userId, final String teamId) {
-        if (userId == null || userId.isEmpty()){
+        if (userId == null || userId.isEmpty()) {
             throw new UserIdNullOrEmptyException();
         }
         if (teamId == null || teamId.isEmpty()) {
@@ -175,7 +175,7 @@ public class TeamServiceImpl implements TeamService {
             throw new TeamNotFoundException(teamId);
         }
         List<? extends TeamMember> teamMembersList = entity.getMembers();
-        for (TeamMember teamMember: teamMembersList) {
+        for (TeamMember teamMember : teamMembersList) {
             if (teamMember.getUserId().equals(userId) && teamMember.getMemberType().equals(TeamMemberType.OWNER)) {
                 return true;
             }
@@ -185,7 +185,7 @@ public class TeamServiceImpl implements TeamService {
 
     @Transactional
     public TeamMember changeTeamMemberStatus(String userId, String teamId, TeamMemberStatus teamMemberStatus) {
-        if (userId == null || userId.isEmpty()){
+        if (userId == null || userId.isEmpty()) {
             throw new UserIdNullOrEmptyException();
         }
         if (teamId == null || teamId.isEmpty()) {
@@ -252,7 +252,7 @@ public class TeamServiceImpl implements TeamService {
         }
 
         List<? extends TeamMember> teamMembersList = entity.getMembers();
-        for (TeamMember teamMember: teamMembersList) {
+        for (TeamMember teamMember : teamMembersList) {
             if (teamMember.getMemberType().equals(TeamMemberType.OWNER)) {
                 return true;
             }

@@ -35,9 +35,7 @@ public class RealizationService {
 
         if (realizationEntity != null && realizationEntity.getId() > 0) {
             return realizationEntity;
-        }
-
-        else {
+        } else {
             return null;
         }
     }
@@ -49,9 +47,7 @@ public class RealizationService {
 
         if (realizationEntity != null && realizationEntity.getId() > 0) {
             return realizationEntity;
-        }
-
-        else {
+        } else {
             return null;
         }
     }
