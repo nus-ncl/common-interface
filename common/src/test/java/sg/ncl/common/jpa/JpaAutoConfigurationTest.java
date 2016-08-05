@@ -1,7 +1,7 @@
 package sg.ncl.common.jpa;
 
 import org.junit.Test;
-import org.springframework.boot.test.SpringApplicationConfiguration;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.ApplicationContext;
 import sg.ncl.common.test.AbstractTest;
 
@@ -17,7 +17,7 @@ import static org.junit.Assert.assertThat;
  * @author Christopher Zhong
  * @version 1.0
  */
-@SpringApplicationConfiguration(TestApp.class)
+@SpringBootTest(classes = TestApp.class)
 public class JpaAutoConfigurationTest extends AbstractTest {
 
     @Inject

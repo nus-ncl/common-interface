@@ -1,6 +1,6 @@
 package sg.ncl.service.experiment;
 
-import org.springframework.boot.test.SpringApplicationConfiguration;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.web.WebAppConfiguration;
 
 /**
@@ -12,6 +12,6 @@ import org.springframework.test.context.web.WebAppConfiguration;
 //public abstract class AbstractTest extends AbstractJUnit4SpringContextTests {
 //}
 
-@SpringApplicationConfiguration(App.class)
+@SpringBootTest(classes = App.class)
 @WebAppConfiguration
 public abstract class AbstractTest extends sg.ncl.common.test.AbstractTest {}

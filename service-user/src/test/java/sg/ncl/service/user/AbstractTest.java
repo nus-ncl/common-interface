@@ -1,9 +1,9 @@
 package sg.ncl.service.user;
 
-import org.springframework.boot.test.SpringApplicationConfiguration;
+import org.springframework.boot.test.context.SpringBootTest;
 
 /**
  * @author Christopher Zhong
  */
-@SpringApplicationConfiguration(UserApplication.class)
+@SpringBootTest(classes = UserApplication.class)
 public abstract class AbstractTest extends sg.ncl.common.test.AbstractTest {}
