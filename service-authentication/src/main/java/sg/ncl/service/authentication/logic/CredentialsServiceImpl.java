@@ -12,7 +12,6 @@ import sg.ncl.service.authentication.data.jpa.CredentialsRepository;
 import sg.ncl.service.authentication.domain.Credentials;
 import sg.ncl.service.authentication.domain.CredentialsStatus;
 import sg.ncl.service.authentication.exceptions.CredentialsNotFoundException;
-import sg.ncl.service.authentication.exceptions.CredentialsUpdateException;
 import sg.ncl.service.authentication.exceptions.UserIdAlreadyExistsException;
 import sg.ncl.service.authentication.exceptions.UsernameAlreadyExistsException;
 
@@ -109,9 +108,7 @@ public class CredentialsServiceImpl implements CredentialsService {
 
         logger.info("Credentials to be updated on Deter: {}", adapterObject.toString());
 
-        if (!adapterDeterlab.updateCredentials(adapterObject.toString())) {
-            throw new CredentialsUpdateException();
-        }
+        adapterDeterlab.updateCredentials(adapterObject.toString());
     }
 
 }
