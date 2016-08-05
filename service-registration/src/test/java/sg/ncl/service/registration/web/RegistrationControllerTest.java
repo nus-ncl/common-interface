@@ -215,7 +215,7 @@ public class RegistrationControllerTest extends AbstractTest {
         // assert that the team ids are identical
         MvcResult result = mockMvc.perform(get("/users/" + user.getId()))
                 .andExpect(status().isOk())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
                 .andReturn();
 
         JSONObject resultObject = new JSONObject(result.getResponse().getContentAsString());

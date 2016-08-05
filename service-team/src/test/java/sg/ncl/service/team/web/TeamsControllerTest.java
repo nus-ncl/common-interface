@@ -119,7 +119,7 @@ public class TeamsControllerTest extends AbstractTest {
 
         mockMvc.perform(get("/teams/" + idString))
                 .andExpect(status().isOk())
-                .andExpect(content().contentType(contentType))
+                .andExpect(content().contentTypeCompatibleWith(contentType))
                 .andExpect(jsonPath("$.name", is(originalEntity.getName())));
     }
 
@@ -191,7 +191,7 @@ public class TeamsControllerTest extends AbstractTest {
         // check if name is new name and description is the same
         mockMvc.perform(get("/teams/" + id))
                 .andExpect(status().isOk())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$.name", is(editedName)))
                 .andExpect(jsonPath("$.description", is(editedDescription)))
                 .andExpect(jsonPath("$.website", is(editedWebsite)));
@@ -235,7 +235,7 @@ public class TeamsControllerTest extends AbstractTest {
 
         MvcResult mvcResult = mockMvc.perform(get("/teams/?visibility=PUBLIC"))
                 .andExpect(status().isOk())
-                .andExpect(content().contentType(contentType))
+                .andExpect(content().contentTypeCompatibleWith(contentType))
                 .andReturn();
 
         // create GSON
@@ -267,7 +267,7 @@ public class TeamsControllerTest extends AbstractTest {
 
         MvcResult mvcResult = mockMvc.perform(get("/teams?name=" + name))
                 .andExpect(status().isOk())
-                .andExpect(content().contentType(contentType))
+                .andExpect(content().contentTypeCompatibleWith(contentType))
                 .andReturn();
 
         // create GSON

@@ -91,7 +91,7 @@ public class ExperimentsControllerTest extends AbstractTest {
         // get all entries from database
         mockMvc.perform(get("/experiments/experiments"))
                 .andExpect(status().isOk())
-                .andExpect(content().contentType(contentType));
+                .andExpect(content().contentTypeCompatibleWith(contentType));
     }
 
     @Test
@@ -108,7 +108,7 @@ public class ExperimentsControllerTest extends AbstractTest {
 
         mockMvc.perform(get("/experiments/users/" + userId))
                 .andExpect(status().isOk())
-                .andExpect(content().contentType(contentType));
+                .andExpect(content().contentTypeCompatibleWith(contentType));
     }
 
     @Test
@@ -125,7 +125,7 @@ public class ExperimentsControllerTest extends AbstractTest {
 
         mockMvc.perform(get("/experiments/teams/" + teamId))
                 .andExpect(status().isOk())
-                .andExpect(content().contentType(contentType));
+                .andExpect(content().contentTypeCompatibleWith(contentType));
     }
 
     @Test

@@ -81,7 +81,7 @@ public class CredentialsControllerTest extends AbstractTest {
 
         mockMvc.perform(get(CredentialsController.PATH))
                 .andExpect(status().isOk())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
 
                 .andExpect(jsonPath("$", hasSize(3)))
 
