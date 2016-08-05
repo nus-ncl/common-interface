@@ -4,9 +4,7 @@ import org.apache.commons.lang3.RandomStringUtils;
 import org.json.JSONObject;
 import org.junit.Assert;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
-import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
@@ -15,14 +13,11 @@ import org.springframework.web.client.RestOperations;
 import org.springframework.web.client.RestTemplate;
 import sg.ncl.adapter.deterlab.data.jpa.DeterlabUserRepository;
 import sg.ncl.adapter.deterlab.dtos.entities.DeterlabUserEntity;
+import sg.ncl.adapter.deterlab.exceptions.ExpNameAlreadyExistsException;
+import sg.ncl.adapter.deterlab.exceptions.NSFileParseException;
 import sg.ncl.adapter.deterlab.exceptions.UserNotFoundException;
 
 import javax.inject.Inject;
-
-import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.InputStream;
 
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.not;
@@ -82,22 +77,6 @@ public class AdapterDeterlabTest extends AbstractTest {
         JSONObject teamObject = Util.getTeamAdapterJSONObject();
     }
 
-/*    @Test
-    public void testLoginOnDeter() {
-        JSONObject userLoginObject = Util.getLoginAdapterJSONObject();
-        JSONObject predefinedResultJson = new JSONObject();
-        predefinedResultJson.put("msg", "user is logged in");
-
-        mockServer.expect(requestTo(properties.getLogin()))
-                .andExpect(method(HttpMethod.POST))
-                .andRespond(withSuccess(predefinedResultJson.toString(), MediaType.APPLICATION_JSON));
-
-        String loginResultJSON = adapterDeterlab.loginUsers(userLoginObject.toString());
-        JSONObject loginResultJSONObject = new JSONObject(loginResultJSON);
-        String loginMsg = loginResultJSONObject.getString("msg");
-        Assert.assertThat(loginMsg, is("user is logged in"));
-    }*/
-
     @Test
     public void testJoinProjectOnDeter() {
         // below is actual invocation of the remote join project function
@@ -148,10 +127,35 @@ public class AdapterDeterlabTest extends AbstractTest {
                 .andExpect(method(HttpMethod.POST))
                 .andRespond(withSuccess(predefinedResultJson.toString(), MediaType.APPLICATION_JSON));
 
-        String result = adapterDeterlab.createExperiment(experimentObject.toString());
-        JSONObject resultJSONObject = new JSONObject(result);
-        String msg = resultJSONObject.getString("msg");
-        Assert.assertThat(msg, is("experiment is created"));
+        adapterDeterlab.createExperiment(experimentObject.toString());
+    }
+
+    @Test(expected = NSFileParseException.class)
+    public void testCreateExperimentNSFIleError() {
+        JSONObject experimentObject = Util.getExperimentAdapterJsonObject();
+
+        JSONObject predefinedResultJson = new JSONObject();
+        predefinedResultJson.put("msg", "experiment create fail ns file error");
+
+        mockServer.expect(requestTo(properties.getCreateExperiment()))
+                .andExpect(method(HttpMethod.POST))
+                .andRespond(withSuccess(predefinedResultJson.toString(), MediaType.APPLICATION_JSON));
+
+        adapterDeterlab.createExperiment(experimentObject.toString());
+    }
+
+    @Test(expected = ExpNameAlreadyExistsException.class)
+    public void testCreateExperimentExpNameExistsError() {
+        JSONObject experimentObject = Util.getExperimentAdapterJsonObject();
+
+        JSONObject predefinedResultJson = new JSONObject();
+        predefinedResultJson.put("msg", "experiment create fail exp name already in use");
+
+        mockServer.expect(requestTo(properties.getCreateExperiment()))
+                .andExpect(method(HttpMethod.POST))
+                .andRespond(withSuccess(predefinedResultJson.toString(), MediaType.APPLICATION_JSON));
+
+        adapterDeterlab.createExperiment(experimentObject.toString());
     }
 
     @Test(expected = UserNotFoundException.class)

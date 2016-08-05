@@ -5,7 +5,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import sg.ncl.adapter.deterlab.AdapterDeterlab;
+import sg.ncl.adapter.deterlab.exceptions.ExpNameAlreadyExistsException;
 import sg.ncl.service.experiment.ExperimentConnectionProperties;
 import sg.ncl.service.experiment.data.jpa.ExperimentEntity;
 import sg.ncl.service.experiment.data.jpa.ExperimentRepository;
@@ -47,6 +49,7 @@ public class ExperimentService {
         this.experimentConnectionProperties = experimentConnectionProperties;
     }
 
+    @Transactional
     public ExperimentEntity save(Experiment experiment) {
         logger.info("Save experiment");
         String fileName = craftFileName(experiment);
@@ -61,6 +64,7 @@ public class ExperimentService {
 //        createNsFile(fileName, experiment.getNsFileContent());
 
         ExperimentEntity savedExperimentEntity = experimentRepository.save(setupEntity(experiment, fileName));
+        createExperimentInDeter(savedExperimentEntity);
         logger.info("Experiment saved.");
 
         RealizationEntity realizationEntity = new RealizationEntity();
@@ -75,14 +79,7 @@ public class ExperimentService {
         realizationService.save(realizationEntity);
         logger.info("Realization saved.");
 
-        String returnResult = this.createExperimentInDeter(savedExperimentEntity);
-        if (returnResult == "experiment created") {
-            return savedExperimentEntity;
-        }
-
-        else {
-            return null;
-        }
+        return savedExperimentEntity;
     }
 
     private String craftDate() {
@@ -188,7 +185,7 @@ public class ExperimentService {
         return filename;
     }
 
-    public String createExperimentInDeter(ExperimentEntity experimentEntity) {
+    public void createExperimentInDeter(ExperimentEntity experimentEntity) {
         logger.info("Start createExperimentInDeter");
 
         JSONObject userObject = new JSONObject();
@@ -205,12 +202,9 @@ public class ExperimentService {
         userObject.put("deterLogin", adapterDeterlab.getDeterUserIdByNclUserId(experimentEntity.getUserId()));
         userObject.put("userServerUri", experimentConnectionProperties.getUserurl());
 
-        String resultJSON = adapterDeterlab.createExperiment(userObject.toString());
-        JSONObject result = new JSONObject(resultJSON);
+        adapterDeterlab.createExperiment(userObject.toString());
 
         logger.info("End createExperimentInDeter");
-
-        return result.getString("msg");
     }
 
     public String deleteExperiment(final Long id) {

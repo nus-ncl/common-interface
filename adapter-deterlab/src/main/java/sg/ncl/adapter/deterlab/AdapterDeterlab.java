@@ -10,6 +10,8 @@ import org.springframework.web.client.RestTemplate;
 import sg.ncl.adapter.deterlab.data.jpa.DeterlabUserRepository;
 import sg.ncl.adapter.deterlab.domain.DeterlabUser;
 import sg.ncl.adapter.deterlab.dtos.entities.DeterlabUserEntity;
+import sg.ncl.adapter.deterlab.exceptions.ExpNameAlreadyExistsException;
+import sg.ncl.adapter.deterlab.exceptions.NSFileParseException;
 import sg.ncl.adapter.deterlab.exceptions.UserNotFoundException;
 
 import javax.inject.Inject;
@@ -121,16 +123,22 @@ public class AdapterDeterlab {
         return deterlabUserEntity.getDeterUserId();
     }
 
-    public String createExperiment(String jsonString) {
-        logger.info("Sending message to {} at {}: {}", properties.getIp(), properties.getPort(), jsonString);
+    public void createExperiment(String jsonString) {
+        logger.info("Creating experiment to {} at {}: {}", properties.getIp(), properties.getPort(), jsonString);
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
-        HttpEntity<String> request = new HttpEntity<String>(jsonString, headers);
+        HttpEntity<String> request = new HttpEntity<>(jsonString, headers);
 
         ResponseEntity responseEntity = restTemplate.exchange(properties.getCreateExperiment(), HttpMethod.POST, request, String.class);
 
-        return responseEntity.getBody().toString();
+        String jsonResult = new JSONObject(responseEntity.getBody().toString()).getString("msg");
+
+        if ("experiment create fail ns file error".equals(jsonResult)) {
+            throw new NSFileParseException();
+        } else if ("experiment create fail exp name already in use".equals(jsonResult)) {
+            throw new ExpNameAlreadyExistsException();
+        }
     }
 
     public String startExperiment(String jsonString) {
