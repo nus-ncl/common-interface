@@ -1,5 +1,6 @@
 package sg.ncl.service.experiment.data.jpa;
 
+import org.hibernate.annotations.Type;
 import sg.ncl.common.jpa.AbstractEntity;
 import sg.ncl.service.experiment.domain.Experiment;
 
@@ -39,7 +40,8 @@ public class ExperimentEntity extends AbstractEntity implements Experiment {
     @Column(name = "ns_file", nullable = false)
     private String nsFile;
 
-    @Column(name = "ns_file_content", nullable = false, length = 1000000000)
+    @Type(type="text")
+    @Column(name = "ns_file_content", nullable = false)
     private String nsFileContent;
 
     @Column(name = "idle_swap", nullable = false)
