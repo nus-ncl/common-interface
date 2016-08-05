@@ -1,5 +1,6 @@
 package sg.ncl.service.realization.data.jpa;
 
+import org.hibernate.annotations.Type;
 import sg.ncl.common.jpa.AbstractEntity;
 import sg.ncl.service.realization.domain.Realization;
 import sg.ncl.service.realization.domain.RealizationState;
@@ -43,7 +44,8 @@ public class RealizationEntity extends AbstractEntity implements Realization {
     @Column(name = "running_minutes", nullable = false)
     private Long runningMinutes;
 
-    @Column(name = "details", length = 1000000000)
+    @Type(type="text")
+    @Column(name = "details")
     private String details;
 
     @Override
