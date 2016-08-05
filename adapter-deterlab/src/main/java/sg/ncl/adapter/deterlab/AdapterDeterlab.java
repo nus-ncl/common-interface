@@ -3,21 +3,18 @@ package sg.ncl.adapter.deterlab;
 import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.*;
 import org.springframework.stereotype.Component;
+import org.springframework.web.client.ResourceAccessException;
 import org.springframework.web.client.RestTemplate;
 import sg.ncl.adapter.deterlab.data.jpa.DeterlabUserRepository;
-import sg.ncl.adapter.deterlab.domain.DeterlabUser;
 import sg.ncl.adapter.deterlab.dtos.entities.DeterlabUserEntity;
+import sg.ncl.adapter.deterlab.exceptions.AdapterDeterlabConnectException;
 import sg.ncl.adapter.deterlab.exceptions.ExpNameAlreadyExistsException;
 import sg.ncl.adapter.deterlab.exceptions.NSFileParseException;
 import sg.ncl.adapter.deterlab.exceptions.UserNotFoundException;
 
 import javax.inject.Inject;
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
 
 
 /**
@@ -130,9 +127,15 @@ public class AdapterDeterlab {
         headers.setContentType(MediaType.APPLICATION_JSON);
         HttpEntity<String> request = new HttpEntity<>(jsonString, headers);
 
-        ResponseEntity responseEntity = restTemplate.exchange(properties.getCreateExperiment(), HttpMethod.POST, request, String.class);
+        ResponseEntity response = null;
 
-        String jsonResult = new JSONObject(responseEntity.getBody().toString()).getString("msg");
+        try {
+            response = restTemplate.exchange(properties.getCreateExperiment(), HttpMethod.POST, request, String.class);
+        } catch (ResourceAccessException e) {
+            throw new AdapterDeterlabConnectException();
+        }
+
+        String jsonResult = new JSONObject(response.getBody().toString()).getString("msg");
 
         if ("experiment create fail ns file error".equals(jsonResult)) {
             throw new NSFileParseException();
