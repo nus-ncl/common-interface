@@ -63,23 +63,20 @@ public class ExperimentsControllerTest extends AbstractTest {
     private MediaType contentType = new MediaType(MediaType.APPLICATION_JSON.getType(), MediaType.APPLICATION_JSON.getSubtype());
     private MockMvc mockMvc;
 
-    // to mock the adapter server
-    private MockRestServiceServer mockServer;
+    @Inject
+    private ExperimentService experimentService;
 
-    @Inject private ExperimentService experimentService;
-    @Inject private WebApplicationContext webApplicationContext;
-    @Inject private RestOperations restOperations;
+    @Inject
+    private WebApplicationContext webApplicationContext;
 
     @Before
     public void setUp() throws Exception {
         assertThat(mockingDetails(experimentService).isMock(), is(true));
-        mockServer = MockRestServiceServer.createServer((RestTemplate) restOperations);
         mockMvc = webAppContextSetup(webApplicationContext).build();
     }
 
     @Test
     public void testGetAllExperimentsWithNothingInDb() throws Exception {
-        
         MvcResult result = mockMvc.perform(get("/experiments/experiments")
                 .contentType(contentType))
                 .andReturn();

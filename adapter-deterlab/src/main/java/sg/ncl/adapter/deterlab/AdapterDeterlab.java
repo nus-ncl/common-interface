@@ -3,19 +3,14 @@ package sg.ncl.adapter.deterlab;
 import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.*;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 import sg.ncl.adapter.deterlab.data.jpa.DeterlabUserRepository;
-import sg.ncl.adapter.deterlab.domain.DeterlabUser;
 import sg.ncl.adapter.deterlab.dtos.entities.DeterlabUserEntity;
-import sg.ncl.adapter.deterlab.exceptions.UserNotFoundException;
+import sg.ncl.adapter.deterlab.exceptions.*;
 
 import javax.inject.Inject;
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
 
 
 /**
@@ -91,19 +86,24 @@ public class AdapterDeterlab {
         return responseEntity.getBody().toString();
     }
 
-    public boolean updateCredentials(String jsonString) {
+    public void updateCredentials(String jsonString) {
         logger.info("Updating credentials to {} at {}: {}", properties.getIp(), properties.getPort(), jsonString);
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
-        HttpEntity<String> request = new HttpEntity<String>(jsonString, headers);
-        ResponseEntity respEntity = restTemplate.exchange(properties.getUpdateCredentials(), HttpMethod.POST, request, String.class);
 
-        String jsonResult = new JSONObject(respEntity.getBody().toString()).getString("msg");
-        if ("password change fail".equals(jsonResult)) {
-            return false;
+        HttpEntity<String> request = new HttpEntity<>(jsonString, headers);
+        ResponseEntity response;
+
+        try {
+            response = restTemplate.exchange(properties.getUpdateCredentials(), HttpMethod.POST, request, String.class);
+        } catch (Exception e) {
+            throw new AdapterDeterlabConnectException();
         }
 
-        return true;
+        String jsonResult = new JSONObject(response.getBody().toString()).getString("msg");
+        if ("password change fail".equals(jsonResult)) {
+            throw new CredentialsUpdateException();
+        }
     }
 
     public void saveDeterUserIdMapping(String deterUserId, String nclUserId) {
@@ -121,16 +121,30 @@ public class AdapterDeterlab {
         return deterlabUserEntity.getDeterUserId();
     }
 
-    public String createExperiment(String jsonString) {
-        logger.info("Sending message to {} at {}: {}", properties.getIp(), properties.getPort(), jsonString);
+    public void createExperiment(String jsonString) {
+        logger.info("Creating experiment to {} at {}: {}", properties.getIp(), properties.getPort(), jsonString);
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
-        HttpEntity<String> request = new HttpEntity<String>(jsonString, headers);
+        HttpEntity<String> request = new HttpEntity<>(jsonString, headers);
 
-        ResponseEntity responseEntity = restTemplate.exchange(properties.getCreateExperiment(), HttpMethod.POST, request, String.class);
+        ResponseEntity response;
 
-        return responseEntity.getBody().toString();
+        try {
+            response = restTemplate.exchange(properties.getCreateExperiment(), HttpMethod.POST, request, String.class);
+        } catch (Exception e) {
+            throw new AdapterDeterlabConnectException();
+        }
+
+        String jsonResult = new JSONObject(response.getBody().toString()).getString("msg");
+
+        if ("experiment create fail ns file error".equals(jsonResult)) {
+            throw new NSFileParseException();
+        } else if ("experiment create fail exp name already in use".equals(jsonResult)) {
+            throw new ExpNameAlreadyExistsException();
+        } else if (!"experiment create success".equals(jsonResult)) {
+            throw new AdapterDeterlabConnectException();
+        }
     }
 
     public String startExperiment(String jsonString) {
