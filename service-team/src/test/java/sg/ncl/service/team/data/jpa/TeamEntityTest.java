@@ -3,13 +3,22 @@ package sg.ncl.service.team.data.jpa;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.junit.Test;
 import sg.ncl.service.team.Util;
-import sg.ncl.service.team.domain.*;
+import sg.ncl.service.team.domain.TeamMember;
+import sg.ncl.service.team.domain.TeamMemberStatus;
+import sg.ncl.service.team.domain.TeamMemberType;
+import sg.ncl.service.team.domain.TeamPrivacy;
+import sg.ncl.service.team.domain.TeamStatus;
+import sg.ncl.service.team.domain.TeamVisibility;
 import sg.ncl.service.team.web.TeamMemberInfo;
 
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 
-import static org.hamcrest.Matchers.*;
+import static org.hamcrest.Matchers.containsString;
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.not;
+import static org.hamcrest.Matchers.nullValue;
 import static org.junit.Assert.assertThat;
 
 /**

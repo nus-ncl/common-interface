@@ -9,7 +9,10 @@ import sg.ncl.service.user.Util;
 
 import javax.inject.Inject;
 
-import static org.hamcrest.Matchers.*;
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.not;
+import static org.hamcrest.Matchers.nullValue;
 import static org.junit.Assert.assertThat;
 import static sg.ncl.common.test.Checks.checkException;
 

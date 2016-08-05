@@ -1,8 +1,5 @@
 package sg.ncl.service.user.domain;
 
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import sg.ncl.service.user.data.jpa.UserEntity;
-
 import java.time.ZonedDateTime;
 import java.util.List;
 

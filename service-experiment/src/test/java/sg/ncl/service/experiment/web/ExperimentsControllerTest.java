@@ -1,53 +1,30 @@
 package sg.ncl.service.experiment.web;
 
-import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import org.apache.commons.lang3.RandomStringUtils;
-import org.json.JSONObject;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Matchers;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.PropertySources;
-import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.web.client.MockRestServiceServer;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
-import org.springframework.web.client.RestOperations;
-import org.springframework.web.client.RestTemplate;
 import org.springframework.web.context.WebApplicationContext;
-import sg.ncl.adapter.deterlab.AdapterDeterlab;
-import sg.ncl.adapter.deterlab.ConnectionProperties;
 import sg.ncl.service.experiment.AbstractTest;
-import sg.ncl.service.experiment.ExperimentConnectionProperties;
 import sg.ncl.service.experiment.Util;
 import sg.ncl.service.experiment.data.jpa.ExperimentEntity;
-import sg.ncl.service.experiment.data.jpa.ExperimentRepository;
 import sg.ncl.service.experiment.logic.ExperimentService;
-import sg.ncl.service.realization.data.jpa.RealizationEntity;
 
 import javax.inject.Inject;
-
-import java.io.File;
-import java.nio.file.Files;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
-import static org.hamcrest.Matchers.any;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
-import static org.mockito.Matchers.anyLong;
 import static org.mockito.Mockito.mockingDetails;
 import static org.mockito.Mockito.when;
-import static org.springframework.test.web.client.match.MockRestRequestMatchers.method;
-import static org.springframework.test.web.client.match.MockRestRequestMatchers.requestTo;
-import static org.springframework.test.web.client.response.MockRestResponseCreators.withSuccess;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;

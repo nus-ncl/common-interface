@@ -1,12 +1,10 @@
 package sg.ncl.adapter.deterlab;
 
-import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.client.RestTemplate;
-import sg.ncl.adapter.deterlab.data.jpa.DeterlabUserRepository;
 import sg.ncl.common.jpa.UseJpa;
 
 /**

@@ -3,7 +3,11 @@ package sg.ncl.service.registration.data.jpa;
 import sg.ncl.common.jpa.AbstractEntity;
 import sg.ncl.service.registration.domain.Registration;
 
-import javax.persistence.*;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
+import javax.persistence.Table;
 
 /**
  * Created by Desmond and Te Ye on 16-Jun-16.

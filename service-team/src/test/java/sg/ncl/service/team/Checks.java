@@ -3,7 +3,9 @@ package sg.ncl.service.team;
 import org.springframework.web.util.NestedServletException;
 import sg.ncl.service.team.exceptions.TeamNotFoundException;
 
-import static org.hamcrest.Matchers.*;
+import static org.hamcrest.Matchers.containsString;
+import static org.hamcrest.Matchers.instanceOf;
+import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
 
 /**

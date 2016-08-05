@@ -1,23 +1,20 @@
 package sg.ncl.service.realization.data.jpa;
 
-import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
-import org.springframework.boot.autoconfigure.web.ResourceProperties;
 import org.springframework.dao.DataIntegrityViolationException;
 import sg.ncl.service.realization.AbstractTest;
 import sg.ncl.service.realization.Util;
-import sg.ncl.service.realization.data.jpa.RealizationEntity;
-import sg.ncl.service.realization.data.jpa.RealizationRepository;
 import sg.ncl.service.realization.domain.RealizationState;
 
 import javax.inject.Inject;
 import java.time.ZonedDateTime;
 
-import static org.hamcrest.Matchers.*;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.not;
+import static org.hamcrest.Matchers.nullValue;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThat;

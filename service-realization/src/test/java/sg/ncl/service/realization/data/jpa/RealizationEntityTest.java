@@ -2,7 +2,6 @@ package sg.ncl.service.realization.data.jpa;
 
 import org.apache.commons.lang3.RandomStringUtils;
 import org.junit.Test;
-import sg.ncl.service.realization.data.jpa.RealizationEntity;
 import sg.ncl.service.realization.domain.RealizationState;
 
 import static org.hamcrest.Matchers.is;

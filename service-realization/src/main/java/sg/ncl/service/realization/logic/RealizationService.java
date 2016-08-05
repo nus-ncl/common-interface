@@ -5,10 +5,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import sg.ncl.adapter.deterlab.AdapterDeterlab;
-import sg.ncl.service.realization.RealizationConnectionProperties;
 import sg.ncl.service.realization.data.jpa.RealizationEntity;
 import sg.ncl.service.realization.data.jpa.RealizationRepository;
-import sg.ncl.service.realization.domain.Realization;
 import sg.ncl.service.realization.domain.RealizationState;
 
 import javax.inject.Inject;

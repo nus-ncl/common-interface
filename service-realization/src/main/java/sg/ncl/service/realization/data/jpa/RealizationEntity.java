@@ -5,7 +5,13 @@ import sg.ncl.common.jpa.AbstractEntity;
 import sg.ncl.service.realization.domain.Realization;
 import sg.ncl.service.realization.domain.RealizationState;
 
-import javax.persistence.*;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
+import javax.persistence.Table;
 
 /**
  * @author Christopher Zhong

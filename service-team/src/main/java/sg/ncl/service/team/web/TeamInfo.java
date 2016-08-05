@@ -2,7 +2,11 @@ package sg.ncl.service.team.web;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import sg.ncl.service.team.domain.*;
+import sg.ncl.service.team.domain.Team;
+import sg.ncl.service.team.domain.TeamMember;
+import sg.ncl.service.team.domain.TeamPrivacy;
+import sg.ncl.service.team.domain.TeamStatus;
+import sg.ncl.service.team.domain.TeamVisibility;
 
 import java.time.ZonedDateTime;
 import java.util.List;
