@@ -142,6 +142,8 @@ public class AdapterDeterlab {
             throw new NSFileParseException();
         } else if ("experiment create fail exp name already in use".equals(jsonResult)) {
             throw new ExpNameAlreadyExistsException();
+        } else if (!"experiment create success".equals(jsonResult)) {
+            throw new AdapterDeterlabConnectException();
         }
     }
 

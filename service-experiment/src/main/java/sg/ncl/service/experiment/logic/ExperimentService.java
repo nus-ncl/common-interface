@@ -10,18 +10,18 @@ import java.util.List;
  */
 public interface ExperimentService {
 
-    public ExperimentEntity save(Experiment experiment);
+    ExperimentEntity save(Experiment experiment);
 
-    public List<ExperimentEntity> get();
+    List<ExperimentEntity> get();
 
-    public List<ExperimentEntity> findByUser(String userId);
+    List<ExperimentEntity> findByUser(String userId);
 
-    public List<ExperimentEntity> findByTeam(String teamId);
+    List<ExperimentEntity> findByTeam(String teamId);
 
-//    public String createNsFile(String filename, String contents);
+//  String createNsFile(String filename, String contents);
 
-    public void createExperimentInDeter(ExperimentEntity experimentEntity);
+    void createExperimentInDeter(ExperimentEntity experimentEntity);
 
-    public String deleteExperiment(final Long id);
+    String deleteExperiment(final Long id);
 
 }
