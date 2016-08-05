@@ -38,10 +38,7 @@ public class ExperimentServiceTest extends AbstractTest {
 
     @Inject private ExperimentRepository experimentRepository;
     @Inject private ExperimentService experimentService;
-    @Inject private RealizationService realizationService;
     @Inject private RealizationRepository realizationRepository;
-    @Inject private AdapterDeterlab adapterDeterlab;
-    @Inject private ExperimentConnectionProperties experimentConnectionProperties;
     @Inject private ConnectionProperties properties;
     @Inject private RestOperations restOperations;
 
@@ -57,14 +54,8 @@ public class ExperimentServiceTest extends AbstractTest {
 
         ExperimentEntity createdExperimentSave = Util.getExperimentsEntity();
 
-        ExperimentService localExperimentService = new ExperimentService(experimentRepository, adapterDeterlab, realizationService, experimentConnectionProperties) {
-            @Override
-            public String createExperimentInDeter(ExperimentEntity experimentEntity) {
-                return "experiment created";
-            }
-        };
 
-        ExperimentEntity savedExperiment = localExperimentService.save(createdExperimentSave);
+        ExperimentEntity savedExperiment = experimentService.save(createdExperimentSave);
 
         Assert.assertNotNull(savedExperiment);
         Assert.assertEquals(createdExperimentSave.getUserId(), savedExperiment.getUserId());
@@ -166,13 +157,7 @@ public class ExperimentServiceTest extends AbstractTest {
         ExperimentEntity experimentEntity = Util.getExperimentsEntity();
         experimentEntity.setNsFile("nsfile.ns");
 
-        ExperimentService experimentService = new ExperimentService(experimentRepository, adapterDeterlab, realizationService, experimentConnectionProperties);
-        new Expectations(ExperimentService.class) {{
-            experimentService.createExperimentInDeter(experimentEntity); result = "experiment created";
-        }};
-
-        String response = experimentService.createExperimentInDeter(experimentEntity);
-        Assert.assertEquals("experiment created", response);
+        experimentService.createExperimentInDeter(experimentEntity);
     }
 
     @Test
