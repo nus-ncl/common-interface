@@ -13,6 +13,7 @@ import org.springframework.web.client.RestOperations;
 import org.springframework.web.client.RestTemplate;
 import sg.ncl.adapter.deterlab.data.jpa.DeterlabUserRepository;
 import sg.ncl.adapter.deterlab.dtos.entities.DeterlabUserEntity;
+import sg.ncl.adapter.deterlab.exceptions.AdapterDeterlabConnectException;
 import sg.ncl.adapter.deterlab.exceptions.ExpNameAlreadyExistsException;
 import sg.ncl.adapter.deterlab.exceptions.NSFileParseException;
 import sg.ncl.adapter.deterlab.exceptions.UserNotFoundException;
@@ -116,7 +117,7 @@ public class AdapterDeterlabTest extends AbstractTest {
         Assert.assertThat(deterUserId, is(deterlabUserRepository.findByDeterUserId(deterUserId).getDeterUserId()));
     }
 
-    @Test
+    @Test(expected = AdapterDeterlabConnectException.class)
     public void testCreateExperimentOnDeter() {
         JSONObject experimentObject = Util.getExperimentAdapterJsonObject();
 
