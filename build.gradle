@@ -34,19 +34,15 @@ allprojects {
     }
 
     dependencyManagement {
+        imports {
+            mavenBom 'io.spring.platform:platform-bom:2.0.7.RELEASE'
+            mavenBom 'org.springframework.boot:spring-boot-dependencies:1.4.0.RELEASE'
+        }
         dependencies {
-//            dependencySet(group: 'org.hibernate', version: '5.1.0.Final') {
-//                entry 'hibernate-core'
-//                entry 'hibernate-entitymanager'
-//            }
             dependency 'org.apache.commons:commons-lang3:3.4'
             dependency 'io.jsonwebtoken:jjwt:0.6.0'
             dependency 'org.jmockit:jmockit:1.25'
             dependency 'org.projectlombok:lombok:1.16.10'
-        }
-
-        imports {
-            mavenBom 'io.spring.platform:platform-bom:2.0.6.RELEASE'
         }
     }
 
