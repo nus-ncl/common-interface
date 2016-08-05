@@ -5,14 +5,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.*;
 import org.springframework.stereotype.Component;
-import org.springframework.web.client.ResourceAccessException;
 import org.springframework.web.client.RestTemplate;
 import sg.ncl.adapter.deterlab.data.jpa.DeterlabUserRepository;
 import sg.ncl.adapter.deterlab.dtos.entities.DeterlabUserEntity;
-import sg.ncl.adapter.deterlab.exceptions.AdapterDeterlabConnectException;
-import sg.ncl.adapter.deterlab.exceptions.ExpNameAlreadyExistsException;
-import sg.ncl.adapter.deterlab.exceptions.NSFileParseException;
-import sg.ncl.adapter.deterlab.exceptions.UserNotFoundException;
+import sg.ncl.adapter.deterlab.exceptions.*;
 
 import javax.inject.Inject;
 
@@ -90,19 +86,24 @@ public class AdapterDeterlab {
         return responseEntity.getBody().toString();
     }
 
-    public boolean updateCredentials(String jsonString) {
+    public void updateCredentials(String jsonString) {
         logger.info("Updating credentials to {} at {}: {}", properties.getIp(), properties.getPort(), jsonString);
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
-        HttpEntity<String> request = new HttpEntity<String>(jsonString, headers);
-        ResponseEntity respEntity = restTemplate.exchange(properties.getUpdateCredentials(), HttpMethod.POST, request, String.class);
 
-        String jsonResult = new JSONObject(respEntity.getBody().toString()).getString("msg");
-        if ("password change fail".equals(jsonResult)) {
-            return false;
+        HttpEntity<String> request = new HttpEntity<>(jsonString, headers);
+        ResponseEntity response;
+
+        try {
+            response = restTemplate.exchange(properties.getUpdateCredentials(), HttpMethod.POST, request, String.class);
+        } catch (Exception e) {
+            throw new AdapterDeterlabConnectException();
         }
 
-        return true;
+        String jsonResult = new JSONObject(response.getBody().toString()).getString("msg");
+        if ("password change fail".equals(jsonResult)) {
+            throw new CredentialsUpdateException();
+        }
     }
 
     public void saveDeterUserIdMapping(String deterUserId, String nclUserId) {
@@ -127,11 +128,11 @@ public class AdapterDeterlab {
         headers.setContentType(MediaType.APPLICATION_JSON);
         HttpEntity<String> request = new HttpEntity<>(jsonString, headers);
 
-        ResponseEntity response = null;
+        ResponseEntity response;
 
         try {
             response = restTemplate.exchange(properties.getCreateExperiment(), HttpMethod.POST, request, String.class);
-        } catch (ResourceAccessException e) {
+        } catch (Exception e) {
             throw new AdapterDeterlabConnectException();
         }
 
