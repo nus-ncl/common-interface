@@ -6,6 +6,7 @@ dependencies {
     compile 'org.springframework.boot:spring-boot-starter-security'
     compile 'javax.inject:javax.inject'
     compile 'io.jsonwebtoken:jjwt'
+    compile 'org.projectlombok:lombok'
 
     runtime 'org.springframework.boot:spring-boot-configuration-processor'
 
