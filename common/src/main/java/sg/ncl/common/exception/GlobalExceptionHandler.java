@@ -1,9 +1,7 @@
 package sg.ncl.common.exception;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -11,52 +9,27 @@ import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
 import javax.inject.Inject;
+import javax.validation.constraints.NotNull;
 
 /**
  * @author Christopher Zhong
  * @version 1.0
  */
 @ControllerAdvice
+@Slf4j
 class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 
-    private static final Logger logger = LoggerFactory.getLogger(GlobalExceptionHandler.class);
-
-    private final ExceptionToHttpStatus mapping;
+    private final ExceptionHttpStatusMap exceptionHttpStatusMap;
 
     @Inject
-    protected GlobalExceptionHandler(final ExceptionToHttpStatus mapping) {
-        this.mapping = mapping;
+    GlobalExceptionHandler(@NotNull final ExceptionHttpStatusMap exceptionHttpStatusMap) {
+        this.exceptionHttpStatusMap = exceptionHttpStatusMap;
     }
 
-    @ExceptionHandler(BadRequestException.class)
-    public ResponseEntity<Object> handleBadRequestExceptions(final Exception ex, final WebRequest request) {
-        return handleExceptionInternal(ex, new ExceptionInfo(ex), new HttpHeaders(), HttpStatus.BAD_REQUEST, request);
-    }
-
-    @ExceptionHandler(ConflictException.class)
-    public ResponseEntity<Object> handleConflictExceptions(final Exception ex, final WebRequest request) {
-        return handleExceptionInternal(ex, new ExceptionInfo(ex), new HttpHeaders(), HttpStatus.CONFLICT, request);
-    }
-
-    @ExceptionHandler(NotFoundException.class)
-    public ResponseEntity<Object> handleNotFoundExceptions(final Exception ex, final WebRequest request) {
-        return handleExceptionInternal(ex, new ExceptionInfo(ex), new HttpHeaders(), HttpStatus.NOT_FOUND, request);
-    }
-
-    @ExceptionHandler(NotModifiedException.class)
-    public ResponseEntity<Object> handleNotModifiedExceptions(final Exception ex, final WebRequest request) {
-        return handleExceptionInternal(ex, new ExceptionInfo(ex), new HttpHeaders(), HttpStatus.NOT_MODIFIED, request);
-    }
-
-    @ExceptionHandler(UnauthorizedException.class)
-    public ResponseEntity<Object> handleUnauthorizedExceptions(final Exception ex, final WebRequest request) {
-        return handleExceptionInternal(ex, new ExceptionInfo(ex), new HttpHeaders(), HttpStatus.UNAUTHORIZED, request);
-    }
-
-    @Override
-    protected ResponseEntity<Object> handleExceptionInternal(final Exception ex, final Object body, final HttpHeaders headers, final HttpStatus status, final WebRequest request) {
-        logger.warn("{}: {}", ex.getClass().getName(), ex.getLocalizedMessage());
-        return super.handleExceptionInternal(ex, body, headers, status, request);
+    @ExceptionHandler(Exception.class)
+    public ResponseEntity<Object> handleBadRequestExceptions(final Exception exception, final WebRequest request) {
+        log.warn("{}: message = '{}': localizedMessage = '{}'", exception.getClass().getName(), exception.getLocalizedMessage());
+        return handleExceptionInternal(exception, new ExceptionInfo(exception), new HttpHeaders(), exceptionHttpStatusMap.get(exception), request);
     }
 
 }

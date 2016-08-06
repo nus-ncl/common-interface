@@ -1,19 +1,26 @@
 package sg.ncl.common.exception;
 
+import lombok.Getter;
+
+import java.io.Serializable;
+
 /**
+ * A simplified representation of an {@link Exception} that to be returned through by the {@link GlobalExceptionHandler}.
+ *
  * @author Christopher Zhong
  * @version 1.0
  */
-public class ExceptionInfo {
+@Getter
+public final class ExceptionInfo implements Serializable {
 
-    private final String exceptionName;
+    private final String name;
+    private final String message;
+    private final String localizedMessage;
 
-    public ExceptionInfo(final Exception exception) {
-        exceptionName = exception.getClass().getName();
-    }
-
-    public String getExceptionName() {
-        return exceptionName;
+    ExceptionInfo(final Exception exception) {
+        name = exception.getClass().getName();
+        message = exception.getMessage();
+        localizedMessage = exception.getLocalizedMessage();
     }
 
 }

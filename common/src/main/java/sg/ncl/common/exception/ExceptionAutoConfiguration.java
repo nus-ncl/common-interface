@@ -1,7 +1,6 @@
 package sg.ncl.common.exception;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
@@ -13,15 +12,16 @@ import javax.validation.constraints.NotNull;
 import java.util.Map;
 
 /**
+ * Configures exception handling.
+ *
  * @author Christopher Zhong
  * @version 1.0
  */
 @Configuration
 @ComponentScan
 @EnableConfigurationProperties(ExceptionProperties.class)
+@Slf4j
 public class ExceptionAutoConfiguration {
-
-    private static final Logger logger = LoggerFactory.getLogger(ExceptionAutoConfiguration.class);
 
     private final ExceptionProperties properties;
 
@@ -31,22 +31,22 @@ public class ExceptionAutoConfiguration {
     }
 
     @Bean
-    public ExceptionToHttpStatus exceptionToHttpStatus() {
-        final ExceptionToHttpStatus exceptionToHttpStatus = new ExceptionToHttpStatus();
+    public ExceptionHttpStatusMap exceptionToHttpStatus() {
+        final ExceptionHttpStatusMap exceptionHttpStatusMap = new ExceptionHttpStatusMap();
         final Map<String, String> mappings = properties.getMappings();
         mappings.entrySet().forEach(entry -> {
             try {
                 final Class<? extends Exception> clazz = Class.forName(entry.getKey()).asSubclass(Exception.class);
                 final HttpStatus status = HttpStatus.valueOf(entry.getValue());
-                logger.info("Mapped: {} -> {}", clazz, status);
-                exceptionToHttpStatus.put(clazz, status);
+                log.info("Mapping: '{}' -> '{}'", clazz, status);
+                exceptionHttpStatusMap.put(clazz, status);
             } catch (ClassNotFoundException | ClassCastException e) {
-                logger.warn("{}: {}", e.getClass().getName(), entry.getKey());
+                log.warn("{}: '{}'", e, entry.getKey());
             } catch (IllegalArgumentException e) {
-                logger.warn("{}: {}", e.getClass().getName(), entry.getValue());
+                log.warn("{}: '{}'", e, entry.getValue());
             }
         });
-        return exceptionToHttpStatus;
+        return exceptionHttpStatusMap;
     }
 
 }
