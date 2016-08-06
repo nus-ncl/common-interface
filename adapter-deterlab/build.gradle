@@ -2,8 +2,7 @@ version '1.0-SNAPSHOT'
 
 dependencies {
     compile project(':common')
-
-    runtime 'org.springframework.boot:spring-boot-configuration-processor'
+    compile 'org.json:json'
 
     testCompile project(':common-test')
 }
