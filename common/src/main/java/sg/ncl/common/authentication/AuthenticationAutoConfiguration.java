@@ -2,10 +2,15 @@ package sg.ncl.common.authentication;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 import javax.inject.Inject;
 import javax.validation.constraints.NotNull;
@@ -15,6 +20,7 @@ import javax.validation.constraints.NotNull;
  * @version 1.0
  */
 @Configuration
+@ConditionalOnClass({BCryptPasswordEncoder.class, HttpSecurity.class})
 @EnableConfigurationProperties(AuthenticationProperties.class)
 public class AuthenticationAutoConfiguration extends WebSecurityConfigurerAdapter {
 
@@ -25,6 +31,12 @@ public class AuthenticationAutoConfiguration extends WebSecurityConfigurerAdapte
     @Inject
     AuthenticationAutoConfiguration(@NotNull final AuthenticationProperties properties) {
         this.properties = properties;
+    }
+
+    @Bean
+    @ConditionalOnMissingBean(PasswordEncoder.class)
+    public PasswordEncoder passwordEncoder() {
+        return new BCryptPasswordEncoder();
     }
 
     @Override
