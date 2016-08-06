@@ -8,6 +8,7 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 
 import javax.inject.Inject;
+import javax.validation.constraints.NotNull;
 
 /**
  * @author Christopher Zhong
@@ -19,8 +20,12 @@ public class AuthenticationAutoConfiguration extends WebSecurityConfigurerAdapte
 
     private static final Logger logger = LoggerFactory.getLogger(AuthenticationAutoConfiguration.class);
 
+    private final AuthenticationProperties properties;
+
     @Inject
-    private AuthenticationProperties properties;
+    AuthenticationAutoConfiguration(@NotNull final AuthenticationProperties properties) {
+        this.properties = properties;
+    }
 
     @Override
     protected void configure(final HttpSecurity http) throws Exception {
@@ -33,7 +38,7 @@ public class AuthenticationAutoConfiguration extends WebSecurityConfigurerAdapte
         } else {
             logger.info("Authentication path: {}", url);
             http
-                    .authorizeRequests().antMatchers("/authentication").permitAll().and();
+                    .authorizeRequests().antMatchers(url).permitAll().and();
         }
         http
                 // TODO add authentication

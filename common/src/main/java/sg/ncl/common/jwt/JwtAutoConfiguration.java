@@ -14,6 +14,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 
 import javax.crypto.spec.SecretKeySpec;
 import javax.inject.Inject;
+import javax.validation.constraints.NotNull;
 import java.security.Key;
 import java.time.Duration;
 import java.time.format.DateTimeParseException;
@@ -34,8 +35,12 @@ public class JwtAutoConfiguration {
     private static final Duration DEFAULT_EXPIRY_DURATION = Duration.ofHours(24L);
     private static final UUID DEFAULT_API_KEY = UUID.randomUUID();
 
+    private final JwtProperties properties;
+
     @Inject
-    private JwtProperties properties;
+    JwtAutoConfiguration(@NotNull final JwtProperties properties) {
+        this.properties = properties;
+    }
 
     @Bean
     @ConditionalOnMissingBean(PasswordEncoder.class)

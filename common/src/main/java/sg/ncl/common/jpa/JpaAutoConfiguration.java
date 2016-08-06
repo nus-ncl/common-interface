@@ -11,6 +11,7 @@ import org.springframework.context.annotation.Configuration;
 
 import javax.inject.Inject;
 import javax.sql.DataSource;
+import javax.validation.constraints.NotNull;
 
 /**
  * @author Christopher Zhong
@@ -22,13 +23,17 @@ public class JpaAutoConfiguration {
 
     private static final Logger logger = LoggerFactory.getLogger(JpaAutoConfiguration.class);
 
+    private final DataSourceProperties properties;
+
     @Inject
-    private DataSourceProperties dataSourceProperties;
+    JpaAutoConfiguration(@NotNull final DataSourceProperties properties) {
+        this.properties = properties;
+    }
 
     @Bean
     public DataSource dataSource() {
-        logger.info("Connecting to '{}' as '{}'", dataSourceProperties.getUrl(), dataSourceProperties.getUsername());
-        return DataSourceBuilder.create().url(dataSourceProperties.getUrl()).username(dataSourceProperties.getUsername()).password(dataSourceProperties.getPassword()).build();
+        logger.info("Connecting to '{}' as '{}'", properties.getUrl(), properties.getUsername());
+        return DataSourceBuilder.create().url(properties.getUrl()).username(properties.getUsername()).password(properties.getPassword()).build();
     }
 
 }

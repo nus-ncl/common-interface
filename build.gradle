@@ -55,10 +55,6 @@ allprojects {
     }
 }
 
-configure(subprojects.findAll({ it.name.startsWith('service-') })) {
-    apply plugin: 'spring-boot'
-}
-
 dependencies {
     // the only compile dependencies needed here are the services projects;
     // there should be no other compile dependencies
@@ -105,6 +101,6 @@ sonarqube {
 }
 
 task wrapper(type: Wrapper) {
-    gradleVersion '2.14'
+    gradleVersion '2.14.1'
     distributionUrl "https://services.gradle.org/distributions/gradle-${gradleVersion}-all.zip"
 }

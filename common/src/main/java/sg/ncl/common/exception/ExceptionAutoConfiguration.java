@@ -9,6 +9,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpStatus;
 
 import javax.inject.Inject;
+import javax.validation.constraints.NotNull;
 import java.util.Map;
 
 /**
@@ -22,14 +23,18 @@ public class ExceptionAutoConfiguration {
 
     private static final Logger logger = LoggerFactory.getLogger(ExceptionAutoConfiguration.class);
 
+    private final ExceptionProperties properties;
+
     @Inject
-    private ExceptionProperties properties;
+    ExceptionAutoConfiguration(@NotNull final ExceptionProperties properties) {
+        this.properties = properties;
+    }
 
     @Bean
     public ExceptionToHttpStatus exceptionToHttpStatus() {
         final ExceptionToHttpStatus exceptionToHttpStatus = new ExceptionToHttpStatus();
         final Map<String, String> mappings = properties.getMappings();
-        mappings.entrySet().stream().forEach(entry -> {
+        mappings.entrySet().forEach(entry -> {
             try {
                 final Class<? extends Exception> clazz = Class.forName(entry.getKey()).asSubclass(Exception.class);
                 final HttpStatus status = HttpStatus.valueOf(entry.getValue());
