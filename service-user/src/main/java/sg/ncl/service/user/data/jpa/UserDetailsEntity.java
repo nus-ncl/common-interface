@@ -53,8 +53,6 @@ public class UserDetailsEntity extends AbstractEntity implements UserDetails {
     @Column(name = "institution_web", nullable = false)
     private String institutionWeb;
 
-
-
     public Long getId() {
         return id;
     }
@@ -146,8 +144,12 @@ public class UserDetailsEntity extends AbstractEntity implements UserDetails {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) { return true; }
-        if (o == null || getClass() != o.getClass()) { return false; }
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
 
         UserDetails that = (UserDetails) o;
 

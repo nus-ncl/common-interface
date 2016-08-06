@@ -98,7 +98,6 @@ public class CredentialsServiceImpl implements CredentialsService {
         entity.setPassword(passwordEncoder.encode(password));
     }
 
-
     private void changePassword(String nclUserId, String password) {
         JSONObject adapterObject = new JSONObject();
         // FIXME: need to handle error when getDeterUserIdByNclUserId() returns nothing

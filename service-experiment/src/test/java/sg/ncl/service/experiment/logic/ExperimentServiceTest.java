@@ -1,6 +1,5 @@
 package sg.ncl.service.experiment.logic;
 
-import mockit.Expectations;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.junit.Assert;
 import org.junit.Before;
@@ -10,16 +9,13 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.client.MockRestServiceServer;
 import org.springframework.web.client.RestOperations;
 import org.springframework.web.client.RestTemplate;
-import sg.ncl.adapter.deterlab.AdapterDeterlab;
 import sg.ncl.adapter.deterlab.ConnectionProperties;
 import sg.ncl.service.experiment.AbstractTest;
-import sg.ncl.service.experiment.ExperimentConnectionProperties;
 import sg.ncl.service.experiment.Util;
 import sg.ncl.service.experiment.data.jpa.ExperimentEntity;
 import sg.ncl.service.experiment.data.jpa.ExperimentRepository;
 import sg.ncl.service.realization.data.jpa.RealizationEntity;
 import sg.ncl.service.realization.data.jpa.RealizationRepository;
-import sg.ncl.service.realization.logic.RealizationService;
 
 import javax.inject.Inject;
 import java.text.SimpleDateFormat;
@@ -36,11 +32,16 @@ import static org.springframework.test.web.client.match.MockRestRequestMatchers.
 @ActiveProfiles({"mock-deter-adapter"})
 public class ExperimentServiceTest extends AbstractTest {
 
-    @Inject private ExperimentRepository experimentRepository;
-    @Inject private ExperimentService experimentService;
-    @Inject private RealizationRepository realizationRepository;
-    @Inject private ConnectionProperties properties;
-    @Inject private RestOperations restOperations;
+    @Inject
+    private ExperimentRepository experimentRepository;
+    @Inject
+    private ExperimentService experimentService;
+    @Inject
+    private RealizationRepository realizationRepository;
+    @Inject
+    private ConnectionProperties properties;
+    @Inject
+    private RestOperations restOperations;
 
     private MockRestServiceServer mockServer;
 
@@ -53,7 +54,6 @@ public class ExperimentServiceTest extends AbstractTest {
     public void testSaveExperiment() throws Exception {
 
         ExperimentEntity createdExperimentSave = Util.getExperimentsEntity();
-
 
         ExperimentEntity savedExperiment = experimentService.save(createdExperimentSave);
 

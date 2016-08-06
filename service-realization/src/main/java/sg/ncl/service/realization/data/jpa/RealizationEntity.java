@@ -5,7 +5,13 @@ import sg.ncl.common.jpa.AbstractEntity;
 import sg.ncl.service.realization.domain.Realization;
 import sg.ncl.service.realization.domain.RealizationState;
 
-import javax.persistence.*;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
+import javax.persistence.Table;
 
 /**
  * @author Christopher Zhong
@@ -44,7 +50,7 @@ public class RealizationEntity extends AbstractEntity implements Realization {
     @Column(name = "running_minutes", nullable = false)
     private Long runningMinutes;
 
-    @Type(type="text")
+    @Type(type = "text")
     @Column(name = "details")
     private String details;
 
@@ -140,8 +146,12 @@ public class RealizationEntity extends AbstractEntity implements Realization {
 
     @Override
     public boolean equals(final Object o) {
-        if (this == o) { return true; }
-        if (o == null || getClass() != o.getClass()) { return false; }
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
 
         final Realization that = (Realization) o;
 
@@ -161,7 +171,5 @@ public class RealizationEntity extends AbstractEntity implements Realization {
         sb.append('}');
         return sb.toString();
     }
-
-
 
 }

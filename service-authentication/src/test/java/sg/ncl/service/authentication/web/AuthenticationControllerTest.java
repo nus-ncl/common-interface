@@ -57,7 +57,7 @@ public class AuthenticationControllerTest extends AbstractTest {
 
         mockMvc.perform(post.header(HttpHeaders.AUTHORIZATION, "Basic " + s))
                 .andExpect(status().isOk())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$.id", is(equalTo("id"))))
                 .andExpect(jsonPath("$.token", is(equalTo("jwt token"))));
     }

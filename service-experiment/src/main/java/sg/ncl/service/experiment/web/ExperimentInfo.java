@@ -117,5 +117,4 @@ public class ExperimentInfo implements Experiment {
         return maxDuration;
     }
 
-
 }

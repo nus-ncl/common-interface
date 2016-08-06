@@ -1,6 +1,5 @@
 package sg.ncl.service.team.domain;
 
-
 import java.time.ZonedDateTime;
 
 /**

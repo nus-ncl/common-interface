@@ -7,7 +7,9 @@ import sg.ncl.service.team.domain.TeamMemberType;
 
 import java.time.ZonedDateTime;
 
-import static org.hamcrest.Matchers.*;
+import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.notNullValue;
+import static org.hamcrest.Matchers.nullValue;
 import static org.junit.Assert.assertThat;
 
 /**

@@ -75,14 +75,14 @@ public class UsersControllerTest extends AbstractTest {
 
         MvcResult result = mockMvc.perform(get("/users"))
                 .andExpect(status().isOk())
-                .andExpect(content().contentType(contentType))
+                .andExpect(content().contentTypeCompatibleWith(contentType))
                 .andReturn();
 
         String allUserJsonString = result.getResponse().getContentAsString();
 
         ObjectMapper mapper = new ObjectMapper();
         mapper.registerModule(new JavaTimeModule());
-        List<UserEntity> userEntityList2 = mapper.readValue(allUserJsonString, new TypeReference<List<UserEntity>>(){});
+        List<UserEntity> userEntityList2 = mapper.readValue(allUserJsonString, new TypeReference<List<UserEntity>>() {});
 
         Assert.assertThat(userEntityList2, IsIterableContainingInAnyOrder.containsInAnyOrder(userEntityList));
     }
@@ -105,7 +105,7 @@ public class UsersControllerTest extends AbstractTest {
 
         mockMvc.perform(get("/users/" + idString))
                 .andExpect(status().isOk())
-                .andExpect(content().contentType(contentType))
+                .andExpect(content().contentTypeCompatibleWith(contentType))
                 .andExpect(jsonPath("$.userDetails.firstName", is(originalEntity.getUserDetails().getFirstName())))
                 .andExpect(jsonPath("$.userDetails.lastName", is(originalEntity.getUserDetails().getLastName())))
                 .andExpect(jsonPath("$.userDetails.jobTitle", is(originalEntity.getUserDetails().getJobTitle())))
@@ -133,10 +133,10 @@ public class UsersControllerTest extends AbstractTest {
         final UserEntity[] userEntityArray = addUser();
         final String idString = userEntityArray[0].getId();
 
-         // get user
+        // get user
         MvcResult result = mockMvc.perform(get("/users/" + idString))
                 .andExpect(status().isOk())
-                .andExpect(content().contentType(contentType))
+                .andExpect(content().contentTypeCompatibleWith(contentType))
                 .andReturn();
 
         String jsonString = result.getResponse().getContentAsString();
@@ -160,7 +160,7 @@ public class UsersControllerTest extends AbstractTest {
         // check if first name is new first name and last name is the same
         mockMvc.perform(get("/users/" + idString))
                 .andExpect(status().isOk())
-                .andExpect(content().contentType(contentType))
+                .andExpect(content().contentTypeCompatibleWith(contentType))
                 .andExpect(jsonPath("$.userDetails.firstName", is(newFirstName)))
                 .andExpect(jsonPath("$.userDetails.lastName", is(originalLastName)));
     }
@@ -176,7 +176,7 @@ public class UsersControllerTest extends AbstractTest {
         // get user
         MvcResult result = mockMvc.perform(get("/users/" + idString))
                 .andExpect(status().isOk())
-                .andExpect(content().contentType(contentType))
+                .andExpect(content().contentTypeCompatibleWith(contentType))
                 .andReturn();
 
         String jsonString = result.getResponse().getContentAsString();

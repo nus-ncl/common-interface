@@ -161,21 +161,15 @@ public class ExperimentServiceImpl implements ExperimentService {
             fileOutputStream.write(contentInBytes);
             fileOutputStream.flush();
             fileOutputStream.close();
-        }
-
-        catch (IOException e) {
+        } catch (IOException e) {
             logger.error("File cannot be created.\n" + e.getMessage());
             filename = "error";
-        }
-
-        finally {
+        } finally {
             try {
                 if (fileOutputStream != null) {
                     fileOutputStream.close();
                 }
-            }
-
-            catch (IOException e) {
+            } catch (IOException e) {
                 logger.error("File cannot be created.\n" + e.getMessage());
                 filename = "error";
             }
@@ -224,8 +218,7 @@ public class ExperimentServiceImpl implements ExperimentService {
 
             experimentRepository.delete(id);
             logger.info("Experiment deleted");
-        }
-        else {
+        } else {
             logger.warn("Experiment not deleted");
             returnString = "experiment not deleted";
         }

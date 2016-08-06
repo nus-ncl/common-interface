@@ -156,7 +156,7 @@ public class UserServiceTest extends AbstractTest {
     }
 
     @Test
-    public void addUserToTeamTest() throws  Exception {
+    public void addUserToTeamTest() throws Exception {
         UserService userService = new UserServiceImpl(userRepository);
         UserEntity[] userEntityArray = addUser();
         UserEntity userEntity = userEntityArray[0];

@@ -2,12 +2,30 @@ package sg.ncl.service.team.data.jpa;
 
 import org.hibernate.annotations.GenericGenerator;
 import sg.ncl.common.jpa.AbstractEntity;
-import sg.ncl.service.team.domain.*;
+import sg.ncl.service.team.domain.Team;
+import sg.ncl.service.team.domain.TeamMember;
+import sg.ncl.service.team.domain.TeamMemberStatus;
+import sg.ncl.service.team.domain.TeamPrivacy;
+import sg.ncl.service.team.domain.TeamStatus;
+import sg.ncl.service.team.domain.TeamVisibility;
 import sg.ncl.service.team.web.TeamMemberInfo;
 
-import javax.persistence.*;
+import javax.persistence.CascadeType;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
+import javax.persistence.ManyToMany;
+import javax.persistence.MapKey;
+import javax.persistence.Table;
 import java.time.ZonedDateTime;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
 
 /**
  * @author Christopher Zhong
@@ -170,7 +188,7 @@ public class TeamEntity extends AbstractEntity implements Team {
     }
 
     public void removeMember(final TeamMember member) {
-        for (Iterator<Map.Entry<String, TeamMemberEntity>> it = members.entrySet().iterator(); it.hasNext();) {
+        for (Iterator<Map.Entry<String, TeamMemberEntity>> it = members.entrySet().iterator(); it.hasNext(); ) {
             Map.Entry<String, TeamMemberEntity> entry = it.next();
             if (entry.getKey().equals(member.getUserId())) {
                 it.remove();

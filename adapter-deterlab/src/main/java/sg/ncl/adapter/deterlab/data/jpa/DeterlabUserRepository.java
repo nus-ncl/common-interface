@@ -1,7 +1,6 @@
 package sg.ncl.adapter.deterlab.data.jpa;
 
 import org.springframework.data.jpa.repository.JpaRepository;
-import sg.ncl.adapter.deterlab.domain.DeterlabUser;
 import sg.ncl.adapter.deterlab.dtos.entities.DeterlabUserEntity;
 
 /**
@@ -10,5 +9,6 @@ import sg.ncl.adapter.deterlab.dtos.entities.DeterlabUserEntity;
 public interface DeterlabUserRepository extends JpaRepository<DeterlabUserEntity, String> {
 
     DeterlabUserEntity findByDeterUserId(String deterUserId);
+
     DeterlabUserEntity findByNclUserId(String nclUserId);
 }

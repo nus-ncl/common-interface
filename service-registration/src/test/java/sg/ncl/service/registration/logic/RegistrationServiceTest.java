@@ -16,11 +16,21 @@ import sg.ncl.adapter.deterlab.ConnectionProperties;
 import sg.ncl.service.authentication.data.jpa.CredentialsEntity;
 import sg.ncl.service.registration.AbstractTest;
 import sg.ncl.service.registration.Util;
-import sg.ncl.service.registration.exceptions.*;
 import sg.ncl.service.registration.domain.RegistrationService;
+import sg.ncl.service.registration.exceptions.RegisterTeamIdEmptyException;
+import sg.ncl.service.registration.exceptions.RegisterTeamNameDuplicateException;
+import sg.ncl.service.registration.exceptions.RegisterTeamNameEmptyException;
+import sg.ncl.service.registration.exceptions.RegisterUidNullException;
+import sg.ncl.service.registration.exceptions.UserFormException;
+import sg.ncl.service.registration.exceptions.UserIsNotTeamOwnerException;
 import sg.ncl.service.team.data.jpa.TeamEntity;
 import sg.ncl.service.team.data.jpa.TeamMemberEntity;
-import sg.ncl.service.team.domain.*;
+import sg.ncl.service.team.domain.Team;
+import sg.ncl.service.team.domain.TeamMember;
+import sg.ncl.service.team.domain.TeamMemberStatus;
+import sg.ncl.service.team.domain.TeamMemberType;
+import sg.ncl.service.team.domain.TeamService;
+import sg.ncl.service.team.domain.TeamStatus;
 import sg.ncl.service.team.exceptions.NoOwnerInTeamException;
 import sg.ncl.service.team.exceptions.TeamIdNullOrEmptyException;
 import sg.ncl.service.team.exceptions.TeamNotFoundException;
@@ -30,7 +40,6 @@ import sg.ncl.service.user.domain.UserService;
 import sg.ncl.service.user.exceptions.UserNotFoundException;
 
 import javax.inject.Inject;
-
 import java.time.ZonedDateTime;
 import java.util.List;
 
@@ -306,7 +315,7 @@ public class RegistrationServiceTest extends AbstractTest {
         // should have only one owner
         Assert.assertThat(membersList.size(), is(1));
 
-        for (TeamMember member: membersList) {
+        for (TeamMember member : membersList) {
             Assert.assertThat(member.getUserId(), is(createdUser.getId()));
             Assert.assertThat(member.getMemberType(), is(TeamMemberType.OWNER));
         }
@@ -350,7 +359,7 @@ public class RegistrationServiceTest extends AbstractTest {
         // should be approved
         Assert.assertThat(approvedTeam.getStatus(), is(TeamStatus.APPROVED));
 
-        List<? extends  TeamMember> membersList = approvedTeam.getMembers();
+        List<? extends TeamMember> membersList = approvedTeam.getMembers();
 
         // members should contain only the owner
         Assert.assertThat(membersList.size(), is(1));

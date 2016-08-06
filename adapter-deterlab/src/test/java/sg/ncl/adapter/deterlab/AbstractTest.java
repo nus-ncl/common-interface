@@ -1,9 +1,9 @@
 package sg.ncl.adapter.deterlab;
 
-import org.springframework.boot.test.SpringApplicationConfiguration;
+import org.springframework.boot.test.context.SpringBootTest;
 
 /**
  * @author Christopher Zhong
  */
-@SpringApplicationConfiguration(TestApp.class)
+@SpringBootTest(classes = TestApp.class)
 public abstract class AbstractTest extends sg.ncl.common.test.AbstractTest {}

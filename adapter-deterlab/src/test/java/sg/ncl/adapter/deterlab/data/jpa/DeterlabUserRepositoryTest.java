@@ -7,10 +7,12 @@ import sg.ncl.adapter.deterlab.AbstractTest;
 import sg.ncl.adapter.deterlab.Util;
 import sg.ncl.adapter.deterlab.dtos.entities.DeterlabUserEntity;
 
-
 import javax.inject.Inject;
 
-import static org.hamcrest.Matchers.*;
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.not;
+import static org.hamcrest.Matchers.nullValue;
 import static org.junit.Assert.assertThat;
 
 /**

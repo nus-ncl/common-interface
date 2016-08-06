@@ -36,7 +36,7 @@ public class VersionControllerTest extends AbstractTest {
 
         resultActions
                 .andExpect(MockMvcResultMatchers.status().isOk())
-                .andExpect(MockMvcResultMatchers.content().contentType(MediaType.APPLICATION_JSON));
+                .andExpect(MockMvcResultMatchers.content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON));
         // TODO complete the test
     }
 

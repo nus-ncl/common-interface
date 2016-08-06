@@ -19,14 +19,17 @@ import org.springframework.web.client.RestTemplate;
 import org.springframework.web.context.WebApplicationContext;
 import sg.ncl.adapter.deterlab.AdapterDeterlab;
 import sg.ncl.adapter.deterlab.ConnectionProperties;
-import sg.ncl.adapter.deterlab.data.jpa.DeterlabUserRepository;
 import sg.ncl.service.authentication.data.jpa.CredentialsEntity;
 import sg.ncl.service.registration.AbstractTest;
 import sg.ncl.service.registration.Util;
 import sg.ncl.service.registration.serializers.DateTimeDeserializer;
 import sg.ncl.service.registration.serializers.DateTimeSerializer;
 import sg.ncl.service.team.data.jpa.TeamEntity;
-import sg.ncl.service.team.domain.*;
+import sg.ncl.service.team.domain.Team;
+import sg.ncl.service.team.domain.TeamMember;
+import sg.ncl.service.team.domain.TeamMemberType;
+import sg.ncl.service.team.domain.TeamService;
+import sg.ncl.service.team.domain.TeamStatus;
 import sg.ncl.service.team.web.TeamMemberInfo;
 import sg.ncl.service.user.data.jpa.UserEntity;
 import sg.ncl.service.user.domain.User;
@@ -212,7 +215,7 @@ public class RegistrationControllerTest extends AbstractTest {
         // assert that the team ids are identical
         MvcResult result = mockMvc.perform(get("/users/" + user.getId()))
                 .andExpect(status().isOk())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
                 .andReturn();
 
         JSONObject resultObject = new JSONObject(result.getResponse().getContentAsString());

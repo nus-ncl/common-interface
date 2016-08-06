@@ -3,7 +3,6 @@ package sg.ncl.service.registration.domain;
 import sg.ncl.service.authentication.domain.Credentials;
 import sg.ncl.service.team.domain.Team;
 import sg.ncl.service.team.domain.TeamStatus;
-import sg.ncl.service.user.data.jpa.UserEntity;
 import sg.ncl.service.user.domain.User;
 
 /**

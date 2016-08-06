@@ -3,15 +3,22 @@ package sg.ncl.adapter.deterlab;
 import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.http.*;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 import sg.ncl.adapter.deterlab.data.jpa.DeterlabUserRepository;
 import sg.ncl.adapter.deterlab.dtos.entities.DeterlabUserEntity;
-import sg.ncl.adapter.deterlab.exceptions.*;
+import sg.ncl.adapter.deterlab.exceptions.AdapterDeterlabConnectException;
+import sg.ncl.adapter.deterlab.exceptions.CredentialsUpdateException;
+import sg.ncl.adapter.deterlab.exceptions.ExpNameAlreadyExistsException;
+import sg.ncl.adapter.deterlab.exceptions.NSFileParseException;
+import sg.ncl.adapter.deterlab.exceptions.UserNotFoundException;
 
 import javax.inject.Inject;
-
 
 /**
  * This is to invoke python scripts on the BOSS

@@ -2,7 +2,7 @@ package sg.ncl.common.jwt;
 
 import io.jsonwebtoken.SignatureAlgorithm;
 import org.junit.Test;
-import org.springframework.boot.test.SpringApplicationConfiguration;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.ApplicationContext;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import sg.ncl.common.test.AbstractTest;
@@ -20,7 +20,7 @@ import static org.junit.Assert.assertThat;
  * @author Christopher Zhong
  * @version 1.0
  */
-@SpringApplicationConfiguration(TestApp.class)
+@SpringBootTest(classes = TestApp.class)
 public class JwtAutoConfigurationTest extends AbstractTest {
 
     @Inject

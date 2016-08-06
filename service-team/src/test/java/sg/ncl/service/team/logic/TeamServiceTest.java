@@ -6,8 +6,18 @@ import org.junit.Test;
 import sg.ncl.service.team.AbstractTest;
 import sg.ncl.service.team.Util;
 import sg.ncl.service.team.data.jpa.TeamEntity;
-import sg.ncl.service.team.domain.*;
-import sg.ncl.service.team.exceptions.*;
+import sg.ncl.service.team.domain.Team;
+import sg.ncl.service.team.domain.TeamMember;
+import sg.ncl.service.team.domain.TeamMemberStatus;
+import sg.ncl.service.team.domain.TeamMemberType;
+import sg.ncl.service.team.domain.TeamService;
+import sg.ncl.service.team.domain.TeamStatus;
+import sg.ncl.service.team.domain.TeamVisibility;
+import sg.ncl.service.team.exceptions.NoOwnerInTeamException;
+import sg.ncl.service.team.exceptions.TeamIdNullOrEmptyException;
+import sg.ncl.service.team.exceptions.TeamMemberNotFoundException;
+import sg.ncl.service.team.exceptions.TeamNameNullOrEmptyException;
+import sg.ncl.service.team.exceptions.TeamNotFoundException;
 import sg.ncl.service.team.web.TeamMemberInfo;
 
 import javax.inject.Inject;
@@ -36,7 +46,7 @@ public class TeamServiceTest extends AbstractTest {
     }
 
     @Test
-            //(expected = TeamNotFoundException.class)
+    //(expected = TeamNotFoundException.class)
     public void testFindTeamWithNoTeamsInDb() throws Exception {
         Team team = teamService.getTeamById(RandomStringUtils.randomAlphabetic(20));
         Assert.assertTrue(team == null);
@@ -60,14 +70,14 @@ public class TeamServiceTest extends AbstractTest {
     }
 
     @Test
-            //(expected = TeamIdNullOrEmptyException.class)
+    //(expected = TeamIdNullOrEmptyException.class)
     public void testGetTeamWithNullId() throws Exception {
         Team team = teamService.getTeamById(null);
         Assert.assertTrue(team == null);
     }
 
     @Test
-            //(expected = TeamIdNullOrEmptyException.class)
+    //(expected = TeamIdNullOrEmptyException.class)
     public void testGetTeamWithEmptyId() throws Exception {
         Team team = teamService.getTeamById("");
         Assert.assertTrue(team == null);
@@ -270,7 +280,7 @@ public class TeamServiceTest extends AbstractTest {
     }
 
     @Test
-            //(expected = TeamNotFoundException.class)
+    //(expected = TeamNotFoundException.class)
     public void removeTeamGood() throws Exception {
         Team one = Util.getTeamEntity();
         Team createdTeam = teamService.addTeam(one);

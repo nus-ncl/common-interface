@@ -16,12 +16,22 @@ import sg.ncl.service.authentication.web.CredentialsInfo;
 import sg.ncl.service.registration.data.jpa.RegistrationEntity;
 import sg.ncl.service.registration.data.jpa.RegistrationRepository;
 import sg.ncl.service.registration.domain.RegistrationService;
-import sg.ncl.service.registration.exceptions.*;
+import sg.ncl.service.registration.exceptions.NoMembersInTeamException;
+import sg.ncl.service.registration.exceptions.RegisterTeamIdEmptyException;
+import sg.ncl.service.registration.exceptions.RegisterTeamNameDuplicateException;
+import sg.ncl.service.registration.exceptions.RegisterTeamNameEmptyException;
+import sg.ncl.service.registration.exceptions.RegisterUidNullException;
+import sg.ncl.service.registration.exceptions.UserFormException;
+import sg.ncl.service.registration.exceptions.UserIsNotTeamOwnerException;
 import sg.ncl.service.team.data.jpa.TeamEntity;
 import sg.ncl.service.team.data.jpa.TeamMemberEntity;
-import sg.ncl.service.team.domain.*;
+import sg.ncl.service.team.domain.Team;
+import sg.ncl.service.team.domain.TeamMember;
+import sg.ncl.service.team.domain.TeamMemberStatus;
+import sg.ncl.service.team.domain.TeamMemberType;
+import sg.ncl.service.team.domain.TeamService;
+import sg.ncl.service.team.domain.TeamStatus;
 import sg.ncl.service.team.web.TeamMemberInfo;
-import sg.ncl.service.user.data.jpa.UserEntity;
 import sg.ncl.service.user.domain.User;
 import sg.ncl.service.user.domain.UserService;
 
@@ -143,7 +153,6 @@ public class RegistrationServiceImpl implements RegistrationService {
             logger.warn("Credentials password is empty");
             throw new UserFormException();
         }
-
 
         if (isJoinTeam == true && (team.getId() == null || team.getId().isEmpty())) {
             logger.warn("Team id from join existing team is empty");
@@ -322,7 +331,7 @@ public class RegistrationServiceImpl implements RegistrationService {
 
         // change team status
         // invoked method already ensure there is at least a team member of type owner
-        Team team  = teamService.changeTeamStatus(teamId, status);
+        Team team = teamService.changeTeamStatus(teamId, status);
 
         // change team owner member status
         List<? extends TeamMember> membersList = team.getMembers();

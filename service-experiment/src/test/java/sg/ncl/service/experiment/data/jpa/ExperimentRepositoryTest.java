@@ -4,18 +4,16 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.springframework.dao.DataIntegrityViolationException;
-import org.springframework.orm.jpa.JpaSystemException;
 import sg.ncl.service.experiment.AbstractTest;
 import sg.ncl.service.experiment.Util;
-import sg.ncl.service.experiment.data.jpa.ExperimentEntity;
-import sg.ncl.service.experiment.data.jpa.ExperimentRepository;
-
 
 import javax.inject.Inject;
-
 import java.time.ZonedDateTime;
 
-import static org.hamcrest.Matchers.*;
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.not;
+import static org.hamcrest.Matchers.nullValue;
 import static org.junit.Assert.assertThat;
 import static sg.ncl.common.test.Checks.checkException;
 

@@ -40,7 +40,7 @@ public class ExperimentEntity extends AbstractEntity implements Experiment {
     @Column(name = "ns_file", nullable = false)
     private String nsFile;
 
-    @Type(type="text")
+    @Type(type = "text")
     @Column(name = "ns_file_content", nullable = false)
     private String nsFileContent;
 
@@ -142,8 +142,12 @@ public class ExperimentEntity extends AbstractEntity implements Experiment {
 
     @Override
     public boolean equals(final Object o) {
-        if (this == o) { return true; }
-        if (o == null || getClass() != o.getClass()) { return false; }
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
 
         final Experiment that = (Experiment) o;
 

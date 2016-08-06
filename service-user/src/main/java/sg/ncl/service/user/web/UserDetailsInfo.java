@@ -70,7 +70,6 @@ public class UserDetailsInfo implements UserDetails {
         return phone;
     }
 
-
     @Override
     public String getInstitution() {
         return institution;

@@ -4,7 +4,7 @@ buildscript {
     }
 
     dependencies {
-        classpath 'org.springframework.boot:spring-boot-gradle-plugin:1.3.6.RELEASE'
+        classpath 'org.springframework.boot:spring-boot-gradle-plugin:1.4.0.RELEASE'
     }
 }
 
@@ -34,19 +34,15 @@ allprojects {
     }
 
     dependencyManagement {
+        imports {
+            mavenBom 'io.spring.platform:platform-bom:2.0.7.RELEASE'
+            mavenBom 'org.springframework.boot:spring-boot-dependencies:1.4.0.RELEASE'
+        }
         dependencies {
-//            dependencySet(group: 'org.hibernate', version: '5.1.0.Final') {
-//                entry 'hibernate-core'
-//                entry 'hibernate-entitymanager'
-//            }
             dependency 'org.apache.commons:commons-lang3:3.4'
             dependency 'io.jsonwebtoken:jjwt:0.6.0'
             dependency 'org.jmockit:jmockit:1.25'
             dependency 'org.projectlombok:lombok:1.16.10'
-        }
-
-        imports {
-            mavenBom 'io.spring.platform:platform-bom:2.0.6.RELEASE'
         }
     }
 
@@ -57,10 +53,6 @@ allprojects {
             }
         }
     }
-}
-
-configure(subprojects.findAll({ it.name.startsWith('service-') })) {
-    apply plugin: 'spring-boot'
 }
 
 dependencies {
@@ -109,6 +101,6 @@ sonarqube {
 }
 
 task wrapper(type: Wrapper) {
-    gradleVersion '2.14'
+    gradleVersion '2.14.1'
     distributionUrl "https://services.gradle.org/distributions/gradle-${gradleVersion}-all.zip"
 }
