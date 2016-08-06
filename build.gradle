@@ -105,6 +105,6 @@ sonarqube {
 }
 
 task wrapper(type: Wrapper) {
-    gradleVersion '2.14'
+    gradleVersion '2.14.1'
     distributionUrl "https://services.gradle.org/distributions/gradle-${gradleVersion}-all.zip"
 }
