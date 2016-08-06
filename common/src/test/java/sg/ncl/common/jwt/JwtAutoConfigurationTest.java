@@ -4,7 +4,6 @@ import io.jsonwebtoken.SignatureAlgorithm;
 import org.junit.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.ApplicationContext;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import sg.ncl.common.test.AbstractTest;
 
 import javax.inject.Inject;
@@ -25,13 +24,6 @@ public class JwtAutoConfigurationTest extends AbstractTest {
 
     @Inject
     private ApplicationContext applicationContext;
-
-    @Test
-    public void testPasswordEncoder() throws Exception {
-        final PasswordEncoder bean = applicationContext.getBean(PasswordEncoder.class);
-
-        assertThat(bean, is(not(nullValue(PasswordEncoder.class))));
-    }
 
     @Test
     public void testSignatureAlgorithm() throws Exception {
