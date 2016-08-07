@@ -29,9 +29,9 @@ import java.util.UUID;
 @Slf4j
 public class JwtAutoConfiguration {
 
-    private static final SignatureAlgorithm DEFAULT_SIGNATURE_ALGORITHM = SignatureAlgorithm.HS512;
-    private static final UUID DEFAULT_API_KEY = UUID.randomUUID();
-    private static final Duration DEFAULT_EXPIRY_DURATION = Duration.ofHours(24L);
+    static final SignatureAlgorithm DEFAULT_SIGNATURE_ALGORITHM = SignatureAlgorithm.HS512;
+    static final UUID DEFAULT_API_KEY = UUID.randomUUID();
+    static final Duration DEFAULT_EXPIRY_DURATION = Duration.ofHours(24L);
 
     private final JwtProperties properties;
 
@@ -53,7 +53,7 @@ public class JwtAutoConfiguration {
             log.info("Using specified signature algorithm: {}", signatureAlgorithm);
             return signatureAlgorithm;
         } catch (SignatureException e) {
-            log.warn("SignatureException: '{}'; signature algorithm '{}' is unknown; using default: {}", e, value, DEFAULT_SIGNATURE_ALGORITHM);
+            log.warn("{}; using default: {}", e, DEFAULT_SIGNATURE_ALGORITHM);
             return DEFAULT_SIGNATURE_ALGORITHM;
         }
     }
@@ -83,7 +83,7 @@ public class JwtAutoConfiguration {
             log.info("Using specified expiry duration: {}", duration);
             return duration;
         } catch (DateTimeParseException e) {
-            log.warn("DateTimeParseException: '{}'; duration format '{}' is invalid; using default: {}", e, value, DEFAULT_EXPIRY_DURATION);
+            log.warn("{}: '{}'; using default: {}", e, value, DEFAULT_EXPIRY_DURATION);
             return DEFAULT_EXPIRY_DURATION;
         }
     }

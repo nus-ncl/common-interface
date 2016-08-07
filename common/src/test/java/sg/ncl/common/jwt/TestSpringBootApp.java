@@ -10,8 +10,8 @@ import org.springframework.context.annotation.Import;
  */
 @SpringBootApplication
 @Import(JwtAutoConfiguration.class)
-public class TestApp {
+public class TestSpringBootApp {
     public static void main(String[] args) {
-        SpringApplication.run(TestApp.class, args);
+        SpringApplication.run(TestSpringBootApp.class, args);
     }
 }
