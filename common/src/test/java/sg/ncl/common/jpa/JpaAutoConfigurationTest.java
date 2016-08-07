@@ -1,33 +1,38 @@
 package sg.ncl.common.jpa;
 
-import org.junit.Test;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.context.ApplicationContext;
-import sg.ncl.common.test.AbstractTest;
-
-import javax.inject.Inject;
-import javax.sql.DataSource;
-
-import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.not;
-import static org.hamcrest.Matchers.nullValue;
-import static org.junit.Assert.assertThat;
+import org.junit.Before;
+import org.junit.Rule;
+import org.mockito.Mock;
+import org.mockito.junit.MockitoJUnit;
+import org.mockito.junit.MockitoRule;
+import org.springframework.boot.autoconfigure.jdbc.DataSourceProperties;
+import org.springframework.boot.autoconfigure.orm.jpa.JpaProperties;
 
 /**
  * @author Christopher Zhong
  * @version 1.0
  */
-@SpringBootTest(classes = TestApp.class)
-public class JpaAutoConfigurationTest extends AbstractTest {
+public class JpaAutoConfigurationTest {
 
-    @Inject
-    private ApplicationContext applicationContext;
+    @Rule
+    public MockitoRule mockito = MockitoJUnit.rule();
+    @Mock
+    private DataSourceProperties dataSourceProperties;
+    @Mock
+    private JpaProperties jpaProperties;
 
-    @Test
-    public void testDataSource() throws Exception {
-        final DataSource bean = applicationContext.getBean(DataSource.class);
+    private JpaAutoConfiguration configuration;
 
-        assertThat(bean, is(not(nullValue(DataSource.class))));
+    @Before
+    public void before() {
+        configuration = new JpaAutoConfiguration(dataSourceProperties, jpaProperties);
     }
+
+//    @Test
+//    public void testDataSource() throws Exception {
+//        final DataSource dataSource = configuration.dataSource();
+//
+//        assertThat(dataSource, is(not(nullValue(DataSource.class))));
+//    }
 
 }

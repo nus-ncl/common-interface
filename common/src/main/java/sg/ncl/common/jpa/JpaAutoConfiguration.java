@@ -1,12 +1,10 @@
 package sg.ncl.common.jpa;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
-import org.springframework.boot.autoconfigure.jdbc.DataSourceBuilder;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceProperties;
+import org.springframework.boot.autoconfigure.orm.jpa.JpaProperties;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
-import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 import javax.inject.Inject;
@@ -17,23 +15,18 @@ import javax.validation.constraints.NotNull;
  * @author Christopher Zhong
  */
 @Configuration
-@ConditionalOnClass(DataSource.class)
-@EnableConfigurationProperties(DataSourceProperties.class)
+@ConditionalOnClass({DataSource.class, JpaProperties.class})
+@EnableConfigurationProperties({DataSourceProperties.class, JpaProperties.class})
+@Slf4j
 public class JpaAutoConfiguration {
 
-    private static final Logger logger = LoggerFactory.getLogger(JpaAutoConfiguration.class);
-
-    private final DataSourceProperties properties;
+    private final DataSourceProperties dataSourceProperties;
+    private final JpaProperties jpaProperties;
 
     @Inject
-    JpaAutoConfiguration(@NotNull final DataSourceProperties properties) {
-        this.properties = properties;
-    }
-
-    @Bean
-    public DataSource dataSource() {
-        logger.info("Connecting to '{}' as '{}'", properties.getUrl(), properties.getUsername());
-        return DataSourceBuilder.create().url(properties.getUrl()).username(properties.getUsername()).password(properties.getPassword()).build();
+    JpaAutoConfiguration(@NotNull final DataSourceProperties dataSourceProperties, @NotNull final JpaProperties jpaProperties) {
+        this.dataSourceProperties = dataSourceProperties;
+        this.jpaProperties = jpaProperties;
     }
 
 }

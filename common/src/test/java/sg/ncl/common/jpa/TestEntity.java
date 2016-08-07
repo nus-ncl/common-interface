@@ -5,13 +5,11 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 
 /**
- * @author Christopher Zhong
- * @version 1.0
+ * Created by Chris on 8/7/2016.
  */
 @Entity
-public class TestEntity extends AbstractEntity {
+class TestEntity extends AbstractEntity {
     @GeneratedValue
     @Id
     private Long id;
-
 }

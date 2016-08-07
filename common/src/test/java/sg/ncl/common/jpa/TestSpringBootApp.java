@@ -9,8 +9,8 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
  */
 @SpringBootApplication
 @UseJpa
-public class TestApp {
+public class TestSpringBootApp {
     public static void main(String[] args) {
-        SpringApplication.run(TestApp.class, args);
+        SpringApplication.run(TestSpringBootApp.class, args);
     }
 }

@@ -3,8 +3,7 @@ package sg.ncl.common.jpa;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 /**
- * @author Christopher Zhong
- * @version 1.0
+ * Created by Chris on 8/7/2016.
  */
-public interface TestRepository extends JpaRepository<TestEntity, Long> {
+interface TestRepository extends JpaRepository<TestEntity, Long> {
 }
