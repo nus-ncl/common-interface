@@ -10,6 +10,7 @@ import sg.ncl.common.exception.base.NotModifiedException;
 import sg.ncl.common.exception.base.UnauthorizedException;
 
 import java.util.ArrayList;
+import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -30,7 +31,7 @@ public class ExceptionHttpStatusMap {
     static final HttpStatus DEFAULT_HTTP_STATUS = HttpStatus.INTERNAL_SERVER_ERROR;
 
     private final Map<Class<? extends Exception>, HttpStatus> exceptionToStatus = new HashMap<>();
-    private final Map<HttpStatus, List<Class<? extends Exception>>> statusToExceptions = new HashMap<>();
+    private final Map<HttpStatus, List<Class<? extends Exception>>> statusToExceptions = new EnumMap<>(HttpStatus.class);
 
     ExceptionHttpStatusMap() {
         put(BadRequestException.class, HttpStatus.BAD_REQUEST);
