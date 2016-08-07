@@ -1,6 +1,6 @@
 package sg.ncl.service.user.exceptions;
 
-import sg.ncl.common.exception.BadRequestException;
+import sg.ncl.common.exception.base.BadRequestException;
 
 /**
  * Created by Desmond

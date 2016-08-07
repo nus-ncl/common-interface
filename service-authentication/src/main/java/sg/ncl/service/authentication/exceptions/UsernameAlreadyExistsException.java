@@ -1,6 +1,6 @@
 package sg.ncl.service.authentication.exceptions;
 
-import sg.ncl.common.exception.ConflictException;
+import sg.ncl.common.exception.base.ConflictException;
 
 /**
  * @author Christopher Zhong

@@ -1,6 +1,6 @@
 package sg.ncl.service.authentication.exceptions;
 
-import sg.ncl.common.exception.NotModifiedException;
+import sg.ncl.common.exception.base.NotModifiedException;
 
 /**
  * @author Christopher Zhong

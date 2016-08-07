@@ -1,8 +1,10 @@
 package sg.ncl.common.jwt;
 
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.springframework.boot.test.context.SpringBootTest;
-import sg.ncl.common.test.AbstractTest;
+import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
+import org.springframework.test.context.junit4.SpringRunner;
 
 import javax.inject.Inject;
 
@@ -14,20 +16,21 @@ import static org.junit.Assert.assertThat;
  * @author Christopher Zhong
  * @version 1.0
  */
-@SpringBootTest(classes = TestApp.class)
-public class JwtPropertiesTest extends AbstractTest {
+@RunWith(SpringRunner.class)
+@SpringBootTest(classes = TestSpringBootApp.class, webEnvironment = WebEnvironment.NONE)
+public class JwtPropertiesTest {
 
     @Inject
     private JwtProperties jwtProperties;
 
     @Test
-    public void testApiKey() throws Exception {
-        assertThat(jwtProperties.getApiKey(), is(equalTo("123")));
+    public void testSignatureAlgorithm() throws Exception {
+        assertThat(jwtProperties.getSigningAlgorithm(), is(equalTo("HS256")));
     }
 
     @Test
-    public void testSignatureAlgorithm() throws Exception {
-        assertThat(jwtProperties.getSigningAlgorithm(), is(equalTo("HS256")));
+    public void testApiKey() throws Exception {
+        assertThat(jwtProperties.getApiKey(), is(equalTo("123")));
     }
 
     @Test

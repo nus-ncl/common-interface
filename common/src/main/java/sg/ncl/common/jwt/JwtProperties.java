@@ -1,46 +1,33 @@
 package sg.ncl.common.jwt;
 
-import io.jsonwebtoken.SignatureAlgorithm;
+import lombok.Getter;
+import lombok.Setter;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
-import java.time.Duration;
-import java.util.UUID;
-
 /**
+ * Base class for configuration of JWTs.
+ *
  * @author Christopher Zhong
  * @version 1.0
  */
 @ConfigurationProperties(prefix = JwtProperties.PREFIX)
+@Getter
+@Setter
 public class JwtProperties {
 
-    public static final String PREFIX = "ncl.jwt";
+    static final String PREFIX = "ncl.jwt";
 
-    private String apiKey = UUID.randomUUID().toString();
-    private String signingAlgorithm = SignatureAlgorithm.HS512.name();
-    private String expiryDuration = Duration.ofHours(24L).toString();
-
-    public String getApiKey() {
-        return apiKey;
-    }
-
-    public void setApiKey(final String apiKey) {
-        this.apiKey = apiKey;
-    }
-
-    public String getSigningAlgorithm() {
-        return signingAlgorithm;
-    }
-
-    public void setSigningAlgorithm(final String signingAlgorithm) {
-        this.signingAlgorithm = signingAlgorithm;
-    }
-
-    public String getExpiryDuration() {
-        return expiryDuration;
-    }
-
-    public void setExpiryDuration(final String expiryDuration) {
-        this.expiryDuration = expiryDuration;
-    }
+    /**
+     * The algorithm to be used to sign JWTs.
+     */
+    private String signingAlgorithm = null;
+    /**
+     * The key to be used to sign JWTs.
+     */
+    private String apiKey = null;
+    /**
+     * The expiry duration of JWTs.
+     */
+    private String expiryDuration = null;
 
 }

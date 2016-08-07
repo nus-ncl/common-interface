@@ -1,6 +1,6 @@
 package sg.ncl.service.team.exceptions;
 
-import sg.ncl.common.exception.NotFoundException;
+import sg.ncl.common.exception.base.NotFoundException;
 
 /**
  * Created by Desmond / Te Ye
