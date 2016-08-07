@@ -38,7 +38,6 @@ public class ExceptionAutoConfiguration {
             try {
                 final Class<? extends Exception> clazz = Class.forName(entry.getKey()).asSubclass(Exception.class);
                 final HttpStatus status = HttpStatus.valueOf(entry.getValue());
-                log.info("Mapping: '{}' -> '{}'", clazz, status);
                 exceptionHttpStatusMap.put(clazz, status);
             } catch (ClassNotFoundException | ClassCastException e) {
                 log.warn("{}: '{}'", e, entry.getKey());

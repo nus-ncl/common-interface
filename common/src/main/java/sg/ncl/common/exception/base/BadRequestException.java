@@ -1,4 +1,4 @@
-package sg.ncl.common.exception;
+package sg.ncl.common.exception.base;
 
 /**
  * @author Christopher Zhong

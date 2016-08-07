@@ -1,6 +1,6 @@
 package sg.ncl.service.authentication.exceptions;
 
-import sg.ncl.common.exception.BadRequestException;
+import sg.ncl.common.exception.base.BadRequestException;
 
 /**
  * @author Christopher Zhong
