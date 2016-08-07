@@ -1,8 +1,9 @@
 package sg.ncl.common.authentication;
 
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.springframework.boot.test.context.SpringBootTest;
-import sg.ncl.common.test.AbstractTest;
+import org.springframework.test.context.junit4.SpringRunner;
 
 import javax.inject.Inject;
 
@@ -13,8 +14,9 @@ import static org.junit.Assert.assertThat;
 /**
  * Created by Chris on 8/6/2016.
  */
-@SpringBootTest(classes = TestApp.class)
-public class AuthenticationPropertiesTest extends AbstractTest {
+@RunWith(SpringRunner.class)
+@SpringBootTest(classes = TestSpringBootApp.class)
+public class AuthenticationPropertiesTest {
 
     @Inject
     private AuthenticationProperties properties;
