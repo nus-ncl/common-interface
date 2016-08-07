@@ -27,7 +27,7 @@ import java.util.stream.Collectors;
 @Slf4j
 public class ExceptionHttpStatusMap {
 
-    private static final HttpStatus DEFAULT_HTTP_STATUS = HttpStatus.INTERNAL_SERVER_ERROR;
+    static final HttpStatus DEFAULT_HTTP_STATUS = HttpStatus.INTERNAL_SERVER_ERROR;
 
     private final Map<Class<? extends Exception>, HttpStatus> exceptionToStatus = new HashMap<>();
     private final Map<HttpStatus, List<Class<? extends Exception>>> statusToExceptions = new HashMap<>();
@@ -42,7 +42,7 @@ public class ExceptionHttpStatusMap {
 
     @Synchronized
     void put(final Class<? extends Exception> clazz, final HttpStatus status) {
-        log.info("Mapping exception = '{}' to status = '{}'", clazz, status);
+        log.info("Mapping {} to status {}", clazz, status);
         exceptionToStatus.put(clazz, status);
         statusToExceptions.computeIfAbsent(status, k -> new ArrayList<>()).add(clazz);
     }
@@ -58,18 +58,18 @@ public class ExceptionHttpStatusMap {
     public HttpStatus get(final Class<? extends Exception> clazz) {
         final HttpStatus status = exceptionToStatus.get(clazz);
         if (status == null) {
-            log.warn("Unmapped exception: '{}'", clazz);
+            log.warn("Unmapped exception: {}", clazz);
             final List<Entry<Class<? extends Exception>, HttpStatus>> list = exceptionToStatus.entrySet().stream().filter(e -> e.getKey().isAssignableFrom(clazz)).collect(Collectors.toList());
             if (list.isEmpty()) {
-                log.warn("No super class match found for '{}'; mapping to '{}'", clazz, DEFAULT_HTTP_STATUS);
+                log.warn("No super class match found for {}; using {}", clazz, DEFAULT_HTTP_STATUS);
                 put(clazz, DEFAULT_HTTP_STATUS);
                 return DEFAULT_HTTP_STATUS;
             } else {
                 final Entry<Class<? extends Exception>, HttpStatus> entry = list.get(0);
                 if (list.size() == 1) {
-                    log.info("Found exact super class match: '{}'", entry);
+                    log.info("Found exact super class match: {}", entry);
                 } else {
-                    log.warn("Found {} super class matches: '{}'; using the first match: '{}'", list.size(), list, entry);
+                    log.warn("Found {} super class matches: {}; using the first match: {}", list.size(), list, entry);
                 }
                 put(clazz, entry.getValue());
                 return entry.getValue();
@@ -85,9 +85,17 @@ public class ExceptionHttpStatusMap {
      * @param exception the {@link Exception}.
      * @return the {@link HttpStatus} that is mapped to the given {@link Exception}, otherwise {@link HttpStatus#INTERNAL_SERVER_ERROR}.
      */
-
     public HttpStatus get(final Exception exception) {
         return get(exception.getClass());
+    }
+
+    /**
+     * Returns the number of mappings ({@link Exception} to  {@link HttpStatus}).
+     *
+     * @return the number of mappings.
+     */
+    public Integer size() {
+        return exceptionToStatus.size();
     }
 
 }

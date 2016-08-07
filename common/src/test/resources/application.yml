@@ -16,6 +16,9 @@ spring:
 ncl:
   authentication:
     url: "/authentications"
+  exception:
+    mappings:
+      mapping1: "value1"
   jwt:
     api-key: 123
     signing-algorithm: HS256
