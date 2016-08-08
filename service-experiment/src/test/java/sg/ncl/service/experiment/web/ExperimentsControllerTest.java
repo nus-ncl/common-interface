@@ -15,7 +15,7 @@ import org.springframework.web.context.WebApplicationContext;
 import sg.ncl.service.experiment.AbstractTest;
 import sg.ncl.service.experiment.Util;
 import sg.ncl.service.experiment.data.jpa.ExperimentEntity;
-import sg.ncl.service.experiment.logic.ExperimentService;
+import sg.ncl.service.experiment.domain.ExperimentService;
 
 import javax.inject.Inject;
 import java.util.ArrayList;

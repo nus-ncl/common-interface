@@ -1,7 +1,6 @@
-package sg.ncl.service.experiment.logic;
+package sg.ncl.service.experiment.domain;
 
 import sg.ncl.service.experiment.data.jpa.ExperimentEntity;
-import sg.ncl.service.experiment.domain.Experiment;
 
 import java.util.List;
 
