@@ -4,7 +4,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
 import sg.ncl.adapter.deterlab.AdapterDeterlab;
-import sg.ncl.service.experiment.logic.ExperimentService;
+import sg.ncl.service.experiment.domain.ExperimentService;
 
 import static org.mockito.Mockito.mock;
 
