@@ -14,6 +14,7 @@ import sg.ncl.service.authentication.AbstractTest;
 import sg.ncl.service.authentication.data.jpa.CredentialsEntity;
 import sg.ncl.service.authentication.data.jpa.CredentialsRepository;
 import sg.ncl.service.authentication.domain.Credentials;
+import sg.ncl.service.authentication.domain.CredentialsService;
 import sg.ncl.service.authentication.exceptions.CredentialsNotFoundException;
 import sg.ncl.service.authentication.exceptions.NeitherUsernameNorPasswordModifiedException;
 import sg.ncl.service.authentication.exceptions.PasswordNullOrEmptyException;

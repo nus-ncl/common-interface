@@ -1,6 +1,4 @@
-package sg.ncl.service.authentication.logic;
-
-import sg.ncl.service.authentication.domain.Credentials;
+package sg.ncl.service.authentication.domain;
 
 import java.util.List;
 

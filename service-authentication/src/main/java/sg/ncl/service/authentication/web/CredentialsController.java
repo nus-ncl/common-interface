@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import sg.ncl.service.authentication.domain.Credentials;
-import sg.ncl.service.authentication.logic.CredentialsService;
+import sg.ncl.service.authentication.domain.CredentialsService;
 
 import javax.inject.Inject;
 import java.util.List;

@@ -16,7 +16,7 @@ import sg.ncl.service.authentication.data.jpa.CredentialsEntity;
 import sg.ncl.service.authentication.domain.Credentials;
 import sg.ncl.service.authentication.domain.CredentialsStatus;
 import sg.ncl.service.authentication.exceptions.CredentialsNotFoundException;
-import sg.ncl.service.authentication.logic.CredentialsService;
+import sg.ncl.service.authentication.domain.CredentialsService;
 
 import javax.inject.Inject;
 import java.util.ArrayList;

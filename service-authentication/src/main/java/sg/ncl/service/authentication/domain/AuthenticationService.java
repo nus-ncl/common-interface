@@ -1,6 +1,4 @@
-package sg.ncl.service.authentication.logic;
-
-import sg.ncl.service.authentication.domain.Authorization;
+package sg.ncl.service.authentication.domain;
 
 /**
  * @author Christopher Zhong

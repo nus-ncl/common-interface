@@ -15,7 +15,7 @@ import sg.ncl.service.authentication.domain.Authorization;
 import sg.ncl.service.authentication.exceptions.EmptyAuthorizationHeaderException;
 import sg.ncl.service.authentication.exceptions.InvalidBasicAuthenticationException;
 import sg.ncl.service.authentication.exceptions.UnknownAuthorizationSchemeException;
-import sg.ncl.service.authentication.logic.AuthenticationService;
+import sg.ncl.service.authentication.domain.AuthenticationService;
 
 import javax.inject.Inject;
 
