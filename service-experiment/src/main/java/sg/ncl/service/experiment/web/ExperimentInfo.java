@@ -1,11 +1,14 @@
 package sg.ncl.service.experiment.web;
 
-import sg.ncl.service.experiment.data.jpa.ExperimentEntity;
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import lombok.Getter;
 import sg.ncl.service.experiment.domain.Experiment;
 
 /**
  * Created by Desmond.
  */
+@Getter
 public class ExperimentInfo implements Experiment {
 
     private Long id;
@@ -19,16 +22,19 @@ public class ExperimentInfo implements Experiment {
     private Integer idleSwap;
     private Integer maxDuration;
 
-    public ExperimentInfo(final Long id,
-                          final String userId,
-                          final String teamId,
-                          final String teamName,
-                          final String name,
-                          final String description,
-                          final String nsFile,
-                          final String nsFileContent,
-                          final Integer idleSwap,
-                          final Integer maxDuration) {
+    @JsonCreator
+    public ExperimentInfo(
+            @JsonProperty("id") final Long id,
+            @JsonProperty("userId") final String userId,
+            @JsonProperty("teamId") final String teamId,
+            @JsonProperty("teamName") final String teamName,
+            @JsonProperty("name") final String name,
+            @JsonProperty("description") final String description,
+            @JsonProperty("nsFile") final String nsFile,
+            @JsonProperty("nsFileContent") final String nsFileContent,
+            @JsonProperty("idleSwap") final Integer idleSwap,
+            @JsonProperty("maxDuration") final Integer maxDuration
+    ) {
         this.id = id;
         this.userId = userId;
         this.teamId = teamId;
@@ -42,7 +48,8 @@ public class ExperimentInfo implements Experiment {
     }
 
     public ExperimentInfo(final Experiment experiment) {
-        this(experiment.getId(),
+        this(
+                experiment.getId(),
                 experiment.getUserId(),
                 experiment.getTeamId(),
                 experiment.getTeamName(),
@@ -51,70 +58,8 @@ public class ExperimentInfo implements Experiment {
                 experiment.getNsFile(),
                 experiment.getNsFileContent(),
                 experiment.getIdleSwap(),
-                experiment.getMaxDuration());
-    }
-
-    public ExperimentInfo(final ExperimentEntity experimentEntity) {
-        this(experimentEntity.getId(),
-                experimentEntity.getUserId(),
-                experimentEntity.getTeamId(),
-                experimentEntity.getTeamName(),
-                experimentEntity.getName(),
-                experimentEntity.getDescription(),
-                experimentEntity.getNsFile(),
-                experimentEntity.getNsFileContent(),
-                experimentEntity.getIdleSwap(),
-                experimentEntity.getMaxDuration());
-    }
-
-    @Override
-    public Long getId() {
-        return id;
-    }
-
-    @Override
-    public String getUserId() {
-        return userId;
-    }
-
-    @Override
-    public String getTeamId() {
-        return teamId;
-    }
-
-    @Override
-    public String getTeamName() {
-        return teamName;
-    }
-
-    @Override
-    public String getName() {
-        return name;
-    }
-
-    @Override
-    public String getDescription() {
-        return description;
-    }
-
-    @Override
-    public String getNsFile() {
-        return nsFile;
-    }
-
-    @Override
-    public String getNsFileContent() {
-        return nsFileContent;
-    }
-
-    @Override
-    public Integer getIdleSwap() {
-        return idleSwap;
-    }
-
-    @Override
-    public Integer getMaxDuration() {
-        return maxDuration;
+                experiment.getMaxDuration()
+        );
     }
 
 }
