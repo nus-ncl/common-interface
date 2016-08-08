@@ -3,8 +3,7 @@ package sg.ncl.service.authentication.logic;
 import io.jsonwebtoken.JwtBuilder;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import sg.ncl.service.authentication.data.jpa.CredentialsEntity;
@@ -27,9 +26,8 @@ import java.util.Date;
  * @author Christopher Zhong
  */
 @Service
+@Slf4j
 public class AuthenticationServiceImpl implements AuthenticationService {
-
-    private static final Logger logger = LoggerFactory.getLogger(AuthenticationService.class);
 
     private final CredentialsRepository credentialsRepository;
     private final PasswordEncoder passwordEncoder;
@@ -38,7 +36,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     private final Duration expiryDuration;
 
     @Inject
-    protected AuthenticationServiceImpl(final CredentialsRepository credentialsRepository, final PasswordEncoder passwordEncoder, final SignatureAlgorithm signatureAlgorithm, final Key apiKey, final Duration expiryDuration) {
+    AuthenticationServiceImpl(@NotNull final CredentialsRepository credentialsRepository, @NotNull final PasswordEncoder passwordEncoder, @NotNull final SignatureAlgorithm signatureAlgorithm, @NotNull final Key apiKey, @NotNull final Duration expiryDuration) {
         this.credentialsRepository = credentialsRepository;
         this.passwordEncoder = passwordEncoder;
         this.signatureAlgorithm = signatureAlgorithm;
@@ -51,7 +49,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         // find the credentials first
         final CredentialsEntity credentials = credentialsRepository.findByUsername(username);
         if (credentials == null) {
-            logger.warn("Credentials for '{}' not found", username);
+            log.warn("Credentials for '{}' not found", username);
             throw new CredentialsNotFoundException(username);
         }
         // compare the password

@@ -2,12 +2,14 @@ package sg.ncl.service.authentication.web;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import lombok.Getter;
 import sg.ncl.service.authentication.domain.Credentials;
 import sg.ncl.service.authentication.domain.CredentialsStatus;
 
 /**
  * @author Christopher Zhong
  */
+@Getter
 public class CredentialsInfo implements Credentials {
 
     private final String id;
@@ -25,26 +27,6 @@ public class CredentialsInfo implements Credentials {
 
     public CredentialsInfo(final Credentials credentials) {
         this(credentials.getId(), credentials.getUsername(), "*****", credentials.getStatus());
-    }
-
-    @Override
-    public String getId() {
-        return id;
-    }
-
-    @Override
-    public String getUsername() {
-        return username;
-    }
-
-    @Override
-    public String getPassword() {
-        return password;
-    }
-
-    @Override
-    public CredentialsStatus getStatus() {
-        return status;
     }
 
 }

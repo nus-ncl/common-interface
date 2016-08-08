@@ -7,7 +7,7 @@ import java.util.List;
  */
 public interface CredentialsService {
 
-    List<? extends Credentials> getAll();
+    List<Credentials> getAll();
 
     Credentials addCredentials(final Credentials credentials);
 
