@@ -33,20 +33,20 @@ public class CredentialsController {
         this.credentialsService = credentialsService;
     }
 
-    @RequestMapping(method = RequestMethod.GET)
+    @GetMapping
     @ResponseStatus(HttpStatus.OK)
     public List<Credentials> getAll() {
         return credentialsService.getAll().stream().map(CredentialsInfo::new).collect(Collectors.toList());
     }
 
-    @RequestMapping(method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
+    @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.CREATED)
     public Credentials addCredentials(@RequestBody final CredentialsInfo credentials) {
         validateForCreation(credentials);
         return new CredentialsInfo(credentialsService.addCredentials(credentials));
     }
 
-    @RequestMapping(path = "/{id}", method = RequestMethod.PUT, consumes = MediaType.APPLICATION_JSON_VALUE)
+    @PutMapping(path = "/{id}", consumes = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.ACCEPTED)
     public Credentials updateCredentials(@PathVariable final String id, @RequestBody final CredentialsInfo credentials) {
         validateForUpdate(credentials);
