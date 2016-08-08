@@ -30,7 +30,7 @@ public class AuthenticationController {
         this.authenticationService = authenticationService;
     }
 
-    @RequestMapping(method = RequestMethod.POST)
+    @PostMapping
     @ResponseStatus(HttpStatus.OK)
     public Authorization login(@RequestHeader(HttpHeaders.AUTHORIZATION) final String authorization) {
         if (authorization.isEmpty()) {
