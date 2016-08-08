@@ -1,6 +1,4 @@
-package sg.ncl.service.authentication.logic;
-
-import sg.ncl.service.authentication.domain.Credentials;
+package sg.ncl.service.authentication.domain;
 
 import java.util.List;
 
@@ -9,7 +7,7 @@ import java.util.List;
  */
 public interface CredentialsService {
 
-    List<? extends Credentials> getAll();
+    List<Credentials> getAll();
 
     Credentials addCredentials(final Credentials credentials);
 

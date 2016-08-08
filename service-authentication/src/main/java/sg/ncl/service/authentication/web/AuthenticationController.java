@@ -1,37 +1,32 @@
 package sg.ncl.service.authentication.web;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.util.Base64Utils;
-import org.springframework.web.bind.annotation.RequestHeader;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.ResponseStatus;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+import sg.ncl.service.authentication.domain.AuthenticationService;
 import sg.ncl.service.authentication.domain.Authorization;
 import sg.ncl.service.authentication.exceptions.EmptyAuthorizationHeaderException;
 import sg.ncl.service.authentication.exceptions.InvalidBasicAuthenticationException;
 import sg.ncl.service.authentication.exceptions.UnknownAuthorizationSchemeException;
-import sg.ncl.service.authentication.logic.AuthenticationService;
 
 import javax.inject.Inject;
+import javax.validation.constraints.NotNull;
 
 /**
  * @author Christopher Zhong
  */
 @RestController
 @RequestMapping(path = "/authentication", produces = MediaType.APPLICATION_JSON_VALUE)
+@Slf4j
 public class AuthenticationController {
-
-    private static final Logger logger = LoggerFactory.getLogger(AuthenticationController.class);
 
     private final AuthenticationService authenticationService;
 
     @Inject
-    protected AuthenticationController(final AuthenticationService authenticationService) {
+    AuthenticationController(@NotNull final AuthenticationService authenticationService) {
         this.authenticationService = authenticationService;
     }
 
@@ -39,7 +34,7 @@ public class AuthenticationController {
     @ResponseStatus(HttpStatus.OK)
     public Authorization login(@RequestHeader(HttpHeaders.AUTHORIZATION) final String authorization) {
         if (authorization.isEmpty()) {
-            logger.warn("Authorization header is empty");
+            log.warn("Authorization header is empty");
             throw new EmptyAuthorizationHeaderException();
         }
         if (authorization.startsWith("Basic ")) {
@@ -51,10 +46,10 @@ public class AuthenticationController {
                 final String password = split[1];
                 return authenticationService.login(username, password);
             }
-            logger.warn("Invalid basic authentication: {}", authorization);
+            log.warn("Invalid basic authentication: {}", authorization);
             throw new InvalidBasicAuthenticationException(authorization);
         }
-        logger.warn("Unknown authorization scheme: {}", authorization);
+        log.warn("Unknown authorization scheme: {}", authorization);
         throw new UnknownAuthorizationSchemeException(authorization);
     }
 

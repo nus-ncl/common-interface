@@ -1,19 +1,14 @@
 package sg.ncl.service.authentication.web;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.ResponseStatus;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import sg.ncl.service.authentication.domain.Credentials;
-import sg.ncl.service.authentication.logic.CredentialsService;
+import sg.ncl.service.authentication.domain.CredentialsService;
 
 import javax.inject.Inject;
+import javax.validation.constraints.NotNull;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -26,22 +21,21 @@ import static sg.ncl.service.authentication.web.CredentialsController.PATH;
  */
 @RestController
 @RequestMapping(path = PATH, produces = MediaType.APPLICATION_JSON_VALUE)
+@Slf4j
 public class CredentialsController {
 
-    public static final String PATH = "/credentials";
-
-    private static final Logger logger = LoggerFactory.getLogger(CredentialsController.class);
+    static final String PATH = "/credentials";
 
     private final CredentialsService credentialsService;
 
     @Inject
-    protected CredentialsController(final CredentialsService credentialsService) {
+    CredentialsController(@NotNull final CredentialsService credentialsService) {
         this.credentialsService = credentialsService;
     }
 
     @RequestMapping(method = RequestMethod.GET)
     @ResponseStatus(HttpStatus.OK)
-    public List<? extends Credentials> getAll() {
+    public List<Credentials> getAll() {
         return credentialsService.getAll().stream().map(CredentialsInfo::new).collect(Collectors.toList());
     }
 

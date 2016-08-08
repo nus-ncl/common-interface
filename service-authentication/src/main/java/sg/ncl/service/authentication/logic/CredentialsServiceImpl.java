@@ -1,15 +1,14 @@
 package sg.ncl.service.authentication.logic;
 
+import lombok.extern.slf4j.Slf4j;
 import org.json.JSONObject;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import sg.ncl.adapter.deterlab.AdapterDeterlab;
 import sg.ncl.service.authentication.data.jpa.CredentialsEntity;
 import sg.ncl.service.authentication.data.jpa.CredentialsRepository;
 import sg.ncl.service.authentication.domain.Credentials;
+import sg.ncl.service.authentication.domain.CredentialsService;
 import sg.ncl.service.authentication.domain.CredentialsStatus;
 import sg.ncl.service.authentication.exceptions.CredentialsNotFoundException;
 import sg.ncl.service.authentication.exceptions.UserIdAlreadyExistsException;
@@ -19,6 +18,7 @@ import javax.inject.Inject;
 import javax.transaction.Transactional;
 import javax.validation.constraints.NotNull;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static sg.ncl.service.authentication.validation.Validator.validateForCreation;
 import static sg.ncl.service.authentication.validation.Validator.validateForUpdate;
@@ -27,30 +27,27 @@ import static sg.ncl.service.authentication.validation.Validator.validateForUpda
  * @author Christopher Zhong
  */
 @Service
+@Slf4j
 public class CredentialsServiceImpl implements CredentialsService {
-
-    private static final Logger logger = LoggerFactory.getLogger(CredentialsService.class);
 
     private final CredentialsRepository credentialsRepository;
     private final PasswordEncoder passwordEncoder;
-
-    @Autowired
     private final AdapterDeterlab adapterDeterlab;
 
     @Inject
-    protected CredentialsServiceImpl(final CredentialsRepository credentialsRepository, final PasswordEncoder passwordEncoder, final AdapterDeterlab adapterDeterlab) {
+    protected CredentialsServiceImpl(@NotNull final CredentialsRepository credentialsRepository, @NotNull final PasswordEncoder passwordEncoder, @NotNull final AdapterDeterlab adapterDeterlab) {
         this.credentialsRepository = credentialsRepository;
         this.passwordEncoder = passwordEncoder;
         this.adapterDeterlab = adapterDeterlab;
     }
 
     @Transactional
-    public List<? extends Credentials> getAll() {
-        return credentialsRepository.findAll();
+    public List<Credentials> getAll() {
+        return credentialsRepository.findAll().stream().collect(Collectors.toList());
     }
 
     @Transactional
-    public CredentialsEntity addCredentials(@NotNull final Credentials credentials) {
+    public Credentials addCredentials(@NotNull final Credentials credentials) {
         validateForCreation(credentials);
         // check if the user id already exists
         if (credentialsRepository.findOne(credentials.getId()) == null) {
@@ -62,23 +59,23 @@ public class CredentialsServiceImpl implements CredentialsService {
                 entity.setId(credentials.getId());
                 entity.setStatus(CredentialsStatus.ACTIVE);
                 final CredentialsEntity savedEntity = credentialsRepository.save(entity);
-                logger.info("Credentials created: {}", savedEntity);
+                log.info("Credentials created: {}", savedEntity);
                 return savedEntity;
             }
-            logger.warn("Username '{}' is already associated with a credentials", credentials.getUsername());
+            log.warn("Username '{}' is already associated with a credentials", credentials.getUsername());
             throw new UsernameAlreadyExistsException(credentials.getUsername());
         }
-        logger.warn("User Id '{}' is already associated with a credentials", credentials.getId());
+        log.warn("User Id '{}' is already associated with a credentials", credentials.getId());
         throw new UserIdAlreadyExistsException(credentials.getId());
     }
 
     @Transactional
-    public CredentialsEntity updateCredentials(@NotNull final String id, @NotNull final Credentials credentials) {
+    public Credentials updateCredentials(@NotNull final String id, @NotNull final Credentials credentials) {
         validateForUpdate(credentials);
         // check if the username exists
         final CredentialsEntity entity = credentialsRepository.findOne(id);
         if (entity == null) {
-            logger.warn("Credentials for '{}' not found", id);
+            log.warn("Credentials for '{}' not found", id);
             throw new CredentialsNotFoundException(id);
         }
         if (credentials.getUsername() != null && !credentials.getUsername().isEmpty()) {
@@ -90,7 +87,7 @@ public class CredentialsServiceImpl implements CredentialsService {
         // FIXME: need to handle error when changePassword() failed
         changePassword(id, credentials.getPassword());
         final CredentialsEntity savedEntity = credentialsRepository.save(entity);
-        logger.info("Credentials updated: {}", savedEntity);
+        log.info("Credentials updated: {}", savedEntity);
         return savedEntity;
     }
 
@@ -105,7 +102,7 @@ public class CredentialsServiceImpl implements CredentialsService {
         adapterObject.put("password1", password);
         adapterObject.put("password2", password);
 
-        logger.info("Credentials to be updated on Deter: {}", adapterObject.toString());
+        log.info("Credentials to be updated on Deter: {}", adapterObject.toString());
 
         adapterDeterlab.updateCredentials(adapterObject.toString());
     }
