@@ -14,6 +14,7 @@ import sg.ncl.service.experiment.AbstractTest;
 import sg.ncl.service.experiment.Util;
 import sg.ncl.service.experiment.data.jpa.ExperimentEntity;
 import sg.ncl.service.experiment.data.jpa.ExperimentRepository;
+import sg.ncl.service.experiment.domain.Experiment;
 import sg.ncl.service.experiment.domain.ExperimentService;
 import sg.ncl.service.realization.data.jpa.RealizationEntity;
 import sg.ncl.service.realization.data.jpa.RealizationRepository;
@@ -56,7 +57,7 @@ public class ExperimentServiceTest extends AbstractTest {
 
         ExperimentEntity createdExperimentSave = Util.getExperimentsEntity();
 
-        ExperimentEntity savedExperiment = experimentService.save(createdExperimentSave);
+        Experiment savedExperiment = experimentService.save(createdExperimentSave);
 
         Assert.assertNotNull(savedExperiment);
         Assert.assertEquals(createdExperimentSave.getUserId(), savedExperiment.getUserId());
@@ -76,20 +77,20 @@ public class ExperimentServiceTest extends AbstractTest {
     @Test
     public void testGetExperimentIfNoExperimentInDb() throws Exception {
 
-        List<ExperimentEntity> experimentEntityList = experimentService.get();
+        List<Experiment> experimentEntityList = experimentService.getAll();
 
         Assert.assertEquals(experimentEntityList.size(), 0);
     }
 
     @Test
     public void testGetExperiment() throws Exception {
-        List<ExperimentEntity> list = new ArrayList<>();
+        List<Experiment> list = new ArrayList<>();
 
         for (int i = 0; i < 3; i++) {
             list.add(experimentRepository.save(Util.getExperimentsEntity()));
         }
 
-        List<ExperimentEntity> listFromDb = experimentService.get();
+        List<Experiment> listFromDb = experimentService.getAll();
         Assert.assertTrue(Util.isListEqual(list, listFromDb));
     }
 
@@ -101,14 +102,14 @@ public class ExperimentServiceTest extends AbstractTest {
         final String userId = RandomStringUtils.randomAlphanumeric(20);
         Util.addExperimentsChangeUserId(numEntries, userId, experimentRepository);
 
-        List<ExperimentEntity> list = experimentService.findByUser(userId);
+        List<Experiment> list = experimentService.findByUser(userId);
         Assert.assertEquals(list.size(), numEntries / 2);
 
-        for (ExperimentEntity forEntity : list) {
+        for (Experiment forEntity : list) {
             Assert.assertEquals(forEntity.getUserId(), userId);
         }
 
-        List<ExperimentEntity> allExperiments = experimentService.get();
+        List<Experiment> allExperiments = experimentService.getAll();
         Assert.assertEquals(allExperiments.size(), numEntries);
     }
 
@@ -120,14 +121,14 @@ public class ExperimentServiceTest extends AbstractTest {
         final String teamId = RandomStringUtils.randomAlphanumeric(20);
         Util.addExperimentsChangeTeamId(numEntries, teamId, experimentRepository);
 
-        List<ExperimentEntity> list = experimentService.findByTeam(teamId);
+        List<Experiment> list = experimentService.findByTeam(teamId);
         Assert.assertEquals(list.size(), numEntries / 2);
 
-        for (ExperimentEntity forEntity : list) {
+        for (Experiment forEntity : list) {
             Assert.assertEquals(forEntity.getTeamId(), teamId);
         }
 
-        List<ExperimentEntity> allExperiments = experimentService.get();
+        List<Experiment> allExperiments = experimentService.getAll();
         Assert.assertEquals(allExperiments.size(), numEntries);
     }
 
@@ -138,7 +139,7 @@ public class ExperimentServiceTest extends AbstractTest {
             experimentRepository.save(Util.getExperimentsEntity());
         }
 
-        List<ExperimentEntity> list = experimentService.findByUser(userId);
+        List<Experiment> list = experimentService.findByUser(userId);
         Assert.assertEquals(list.size(), 0);
     }
 
@@ -149,7 +150,7 @@ public class ExperimentServiceTest extends AbstractTest {
             experimentRepository.save(Util.getExperimentsEntity());
         }
 
-        List<ExperimentEntity> list = experimentService.findByTeam(teamId);
+        List<Experiment> list = experimentService.findByTeam(teamId);
         Assert.assertEquals(list.size(), 0);
     }
 

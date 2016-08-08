@@ -15,6 +15,7 @@ import org.springframework.web.context.WebApplicationContext;
 import sg.ncl.service.experiment.AbstractTest;
 import sg.ncl.service.experiment.Util;
 import sg.ncl.service.experiment.data.jpa.ExperimentEntity;
+import sg.ncl.service.experiment.domain.Experiment;
 import sg.ncl.service.experiment.domain.ExperimentService;
 
 import javax.inject.Inject;
@@ -79,16 +80,16 @@ public class ExperimentsControllerTest extends AbstractTest {
     public void testGetAllExperiments() throws Exception {
 
         // add 3 entries to database
-        List<ExperimentEntity> experimentEntityList = new ArrayList<>();
+        List<Experiment> experimentEntityList = new ArrayList<>();
 
         for (int i = 0; i < 3; i++) {
             experimentEntityList.add(Util.getExperimentsEntity());
         }
 
-        // mocking the get all experiments
-        when(experimentService.get()).thenReturn(experimentEntityList);
+        // mocking the getAll all experiments
+        when(experimentService.getAll()).thenReturn(experimentEntityList);
 
-        // get all entries from database
+        // getAll all entries from database
         mockMvc.perform(get("/experiments/experiments"))
                 .andExpect(status().isOk())
                 .andExpect(content().contentTypeCompatibleWith(contentType));
@@ -97,7 +98,7 @@ public class ExperimentsControllerTest extends AbstractTest {
     @Test
     public void testGetExperimentsByUserId() throws Exception {
 
-        List<ExperimentEntity> experimentEntityList = new ArrayList<>();
+        List<Experiment> experimentEntityList = new ArrayList<>();
         String userId = RandomStringUtils.randomAlphanumeric(20);
 
         for (int i = 0; i < 3; i++) {
@@ -114,7 +115,7 @@ public class ExperimentsControllerTest extends AbstractTest {
     @Test
     public void testGetExperimentsByTeamId() throws Exception {
 
-        List<ExperimentEntity> experimentEntityList = new ArrayList<>();
+        List<Experiment> experimentEntityList = new ArrayList<>();
         String teamId = RandomStringUtils.randomAlphanumeric(20);
 
         for (int i = 0; i < 3; i++) {

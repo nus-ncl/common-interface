@@ -1,7 +1,5 @@
 package sg.ncl.service.experiment.domain;
 
-import sg.ncl.service.experiment.data.jpa.ExperimentEntity;
-
 import java.util.List;
 
 /**
@@ -9,17 +7,17 @@ import java.util.List;
  */
 public interface ExperimentService {
 
-    ExperimentEntity save(Experiment experiment);
+    Experiment save(Experiment experiment);
 
-    List<ExperimentEntity> get();
+    List<Experiment> getAll();
 
-    List<ExperimentEntity> findByUser(String userId);
+    List<Experiment> findByUser(String userId);
 
-    List<ExperimentEntity> findByTeam(String teamId);
+    List<Experiment> findByTeam(String teamId);
 
 //  String createNsFile(String filename, String contents);
 
-    void createExperimentInDeter(ExperimentEntity experimentEntity);
+    void createExperimentInDeter(Experiment experiment);
 
     String deleteExperiment(final Long id);
 
