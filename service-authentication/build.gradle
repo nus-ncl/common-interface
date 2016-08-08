@@ -5,7 +5,6 @@ dependencies {
     compile project(':adapter-deterlab')
 
     runtime 'mysql:mysql-connector-java'
-    runtime 'org.postgresql:postgresql'
 
     testCompile project(':common-test')
 }

@@ -6,7 +6,7 @@ import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.annotation.Import;
 import sg.ncl.adapter.deterlab.DeterlabAutoConfiguration;
 import sg.ncl.common.jpa.UseJpa;
-import sg.ncl.service.realization.App;
+import sg.ncl.service.realization.RealizationApplication;
 
 /**
  * @author Christopher Zhong
@@ -15,7 +15,7 @@ import sg.ncl.service.realization.App;
 @UseJpa
 @Import({
         DeterlabAutoConfiguration.class,
-        App.class,
+        RealizationApplication.class,
 })
 public class ExperimentApplication {
 

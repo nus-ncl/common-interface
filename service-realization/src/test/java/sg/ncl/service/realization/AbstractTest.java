@@ -9,7 +9,7 @@ import org.springframework.test.context.web.WebAppConfiguration;
 //@SpringApplicationConfiguration(App.class)
 //public abstract class AbstractTest extends sg.ncl.common.test.AbstractTest {}
 
-@SpringBootTest(classes = App.class)
+@SpringBootTest(classes = RealizationApplication.class)
 @WebAppConfiguration
 public abstract class AbstractTest extends sg.ncl.common.test.AbstractTest {}
 
