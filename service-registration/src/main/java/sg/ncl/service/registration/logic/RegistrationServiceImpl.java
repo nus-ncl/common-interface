@@ -24,10 +24,10 @@ import sg.ncl.service.registration.exceptions.UserFormException;
 import sg.ncl.service.registration.exceptions.UserIsNotTeamOwnerException;
 import sg.ncl.service.team.data.jpa.TeamEntity;
 import sg.ncl.service.team.data.jpa.TeamMemberEntity;
+import sg.ncl.service.team.domain.MemberStatus;
+import sg.ncl.service.team.domain.MemberType;
 import sg.ncl.service.team.domain.Team;
 import sg.ncl.service.team.domain.TeamMember;
-import sg.ncl.service.team.domain.TeamMemberStatus;
-import sg.ncl.service.team.domain.TeamMemberType;
 import sg.ncl.service.team.domain.TeamService;
 import sg.ncl.service.team.domain.TeamStatus;
 import sg.ncl.service.team.web.TeamMemberInfo;
@@ -88,12 +88,12 @@ public class RegistrationServiceImpl implements RegistrationService {
 
         // no problem with the team
         // create the team
-        Team createdTeam = teamService.addTeam(team);
+        Team createdTeam = teamService.createTeam(team);
 
         TeamMemberEntity teamMemberEntity = new TeamMemberEntity();
         teamMemberEntity.setUserId(nclUserId);
         teamMemberEntity.setJoinedDate(ZonedDateTime.now());
-        teamMemberEntity.setMemberType(TeamMemberType.OWNER);
+        teamMemberEntity.setMemberType(MemberType.OWNER);
         TeamMemberInfo teamMemberInfo = new TeamMemberInfo(teamMemberEntity);
 
         // FIXME call adapter deterlab here
@@ -108,7 +108,7 @@ public class RegistrationServiceImpl implements RegistrationService {
         String resultJSON = adapterDeterlab.applyProject(mainObject.toString());
 
         userService.addTeam(nclUserId, createdTeam.getId());
-        teamService.addTeamMember(createdTeam.getId(), teamMemberInfo);
+        teamService.addMember(createdTeam.getId(), teamMemberInfo);
     }
 
     @Transactional
@@ -133,11 +133,11 @@ public class RegistrationServiceImpl implements RegistrationService {
         TeamMemberEntity teamMemberEntity = new TeamMemberEntity();
         teamMemberEntity.setUserId(nclUserId);
         teamMemberEntity.setJoinedDate(ZonedDateTime.now());
-        teamMemberEntity.setMemberType(TeamMemberType.MEMBER);
+        teamMemberEntity.setMemberType(MemberType.MEMBER);
         TeamMemberInfo teamMemberInfo = new TeamMemberInfo(teamMemberEntity);
 
         userService.addTeam(nclUserId, teamId);
-        teamService.addTeamMember(teamId, teamMemberInfo);
+        teamService.addMember(teamId, teamMemberInfo);
 
         String resultJSON = adapterDeterlab.joinProject(userObject.toString());
     }
@@ -176,7 +176,7 @@ public class RegistrationServiceImpl implements RegistrationService {
             }
         }
 
-        TeamMemberType memberType;
+        MemberType memberType;
         String resultJSON;
         String teamId;
         Team teamEntity;
@@ -197,7 +197,7 @@ public class RegistrationServiceImpl implements RegistrationService {
             teamEntity1.setWebsite(team.getWebsite());
             teamEntity1.setOrganisationType(team.getOrganisationType());
             teamEntity1.setPrivacy(team.getPrivacy());
-            teamEntity = teamService.addTeam(teamEntity1);
+            teamEntity = teamService.createTeam(teamEntity1);
             teamId = teamEntity.getId();
         }
 
@@ -210,9 +210,9 @@ public class RegistrationServiceImpl implements RegistrationService {
 
         if (isJoinTeam == true) {
             // indicate member type based on button click
-            memberType = TeamMemberType.MEMBER;
+            memberType = MemberType.MEMBER;
         } else {
-            memberType = TeamMemberType.OWNER;
+            memberType = MemberType.OWNER;
         }
 
         TeamMemberEntity teamMemberEntity = new TeamMemberEntity();
@@ -222,7 +222,7 @@ public class RegistrationServiceImpl implements RegistrationService {
         teamMemberInfo = new TeamMemberInfo(teamMemberEntity);
 
         userService.addTeam(userId, teamId);
-        teamService.addTeamMember(teamId, teamMemberInfo);
+        teamService.addMember(teamId, teamMemberInfo);
 
         JSONObject userObject = new JSONObject();
         userObject.put("firstName", user.getUserDetails().getFirstName());
@@ -275,7 +275,7 @@ public class RegistrationServiceImpl implements RegistrationService {
 
     @Transactional
     public void approveJoinRequest(String teamId, String userId, User approver) {
-        if (!teamService.isTeamOwner(approver.getId(), teamId)) {
+        if (!teamService.isOwner(teamId, approver.getId())) {
             log.warn("User {} is not a team owner of Team {}", userId, teamId);
             throw new UserIsNotTeamOwnerException();
         }
@@ -287,12 +287,12 @@ public class RegistrationServiceImpl implements RegistrationService {
         one.put("pid", pid);
         one.put("gid", pid);
         adapterDeterlab.approveJoinRequest(one.toString());
-        teamService.changeTeamMemberStatus(userId, teamId, TeamMemberStatus.APPROVED);
+        teamService.updateMemberStatus(teamId, userId, MemberStatus.APPROVED);
     }
 
     @Transactional
     public void rejectJoinRequest(String teamId, String userId, User approver) {
-        if (!teamService.isTeamOwner(approver.getId(), teamId)) {
+        if (!teamService.isOwner(teamId, approver.getId())) {
             log.warn("User {} is not a team owner of Team {}", userId, teamId);
             throw new UserIsNotTeamOwnerException();
         }
@@ -302,7 +302,7 @@ public class RegistrationServiceImpl implements RegistrationService {
         List<? extends TeamMember> membersList = one.getMembers();
 
         if (membersList.isEmpty()) {
-            // by right not possible to be empty since isTeamOwner ensures there exists at least one member of type owner
+            // by right not possible to be empty since isOwner ensures there exists at least one member of type owner
             throw new NoMembersInTeamException();
         }
 
@@ -310,7 +310,7 @@ public class RegistrationServiceImpl implements RegistrationService {
             if (member.getUserId().equals(userId)) {
                 log.info("Reject join request from User {}, Team {}", member.getUserId(), teamId);
                 userService.removeTeam(userId, teamId);
-                teamService.removeTeamMember(teamId, member);
+                teamService.removeMember(teamId, member);
                 // FIXME call adapter deterlab
                 JSONObject object = new JSONObject();
                 object.put("approverUid", adapterDeterlab.getDeterUserIdByNclUserId(approver.getId()));
@@ -332,7 +332,7 @@ public class RegistrationServiceImpl implements RegistrationService {
 
         // change team status
         // invoked method already ensure there is at least a team member of type owner
-        Team team = teamService.changeTeamStatus(teamId, status);
+        Team team = teamService.updateTeamStatus(teamId, status);
 
         // change team owner member status
         List<? extends TeamMember> membersList = team.getMembers();
@@ -343,8 +343,8 @@ public class RegistrationServiceImpl implements RegistrationService {
         }
 
         for (TeamMember teamMember : membersList) {
-            if (teamMember.getMemberType().equals(TeamMemberType.OWNER)) {
-                teamService.changeTeamMemberStatus(teamMember.getUserId(), teamId, TeamMemberStatus.APPROVED);
+            if (teamMember.getMemberType().equals(MemberType.OWNER)) {
+                teamService.updateMemberStatus(teamId, teamMember.getUserId(), MemberStatus.APPROVED);
             }
         }
 
