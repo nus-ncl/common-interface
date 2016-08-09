@@ -1,8 +1,7 @@
 package sg.ncl.service.registration.logic;
 
+import lombok.extern.slf4j.Slf4j;
 import org.json.JSONObject;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -36,6 +35,7 @@ import sg.ncl.service.user.domain.User;
 import sg.ncl.service.user.domain.UserService;
 
 import javax.inject.Inject;
+import javax.validation.constraints.NotNull;
 import java.time.ZonedDateTime;
 import java.util.List;
 
@@ -43,43 +43,44 @@ import java.util.List;
  * @author Christopher Zhong
  */
 @Service
+@Slf4j
 public class RegistrationServiceImpl implements RegistrationService {
-
-    private static final Logger logger = LoggerFactory.getLogger(RegistrationService.class);
 
     private final CredentialsService credentialsService;
     private final TeamService teamService;
     private final UserService userService;
     private final RegistrationRepository registrationRepository;
 
+    // FIXME: what is this autowired?
     @Autowired
     private final AdapterDeterlab adapterDeterlab;
 
     @Inject
-    protected RegistrationServiceImpl(final CredentialsService credentialsService, final TeamService teamService, final UserService userService, final RegistrationRepository registrationRepository, final DeterlabUserRepository deterlabUserRepository, final ConnectionProperties connectionProperties) {
+    RegistrationServiceImpl(@NotNull final CredentialsService credentialsService, @NotNull final TeamService teamService, @NotNull final UserService userService, @NotNull final RegistrationRepository registrationRepository, final DeterlabUserRepository deterlabUserRepository, final ConnectionProperties connectionProperties) {
         this.credentialsService = credentialsService;
         this.teamService = teamService;
         this.userService = userService;
         this.registrationRepository = registrationRepository;
+        // FIXME: why is this getting replaced?
         this.adapterDeterlab = new AdapterDeterlab(deterlabUserRepository, connectionProperties);
     }
 
     @Transactional
     public void registerRequestToApplyTeam(String nclUserId, Team team) {
         if (team.getName() == null || team.getName().isEmpty()) {
-            logger.warn("Team name is empty or null");
+            log.warn("Team name is empty or null");
             throw new RegisterTeamNameEmptyException();
         }
 
         if (nclUserId == null || nclUserId.isEmpty()) {
-            logger.warn("Uid is empty or null");
+            log.warn("Uid is empty or null");
             throw new RegisterUidNullException();
         }
 
         try {
             userService.findUser(nclUserId);
         } catch (UserNotFoundException e) {
-            logger.warn("No such user, {}", e);
+            log.warn("No such user, {}", e);
         }
 
         // will throw exception if name already exists
@@ -113,12 +114,12 @@ public class RegistrationServiceImpl implements RegistrationService {
     @Transactional
     public void registerRequestToJoinTeam(String nclUserId, Team team) {
         if (team.getName() == null || team.getName().isEmpty()) {
-            logger.warn("Team name is not found");
+            log.warn("Team name is not found");
             throw new RegisterTeamNameEmptyException();
         }
 
         if (nclUserId == null || nclUserId.isEmpty()) {
-            logger.warn("Uid is empty or null");
+            log.warn("Uid is empty or null");
             throw new RegisterUidNullException();
         }
 
@@ -145,31 +146,31 @@ public class RegistrationServiceImpl implements RegistrationService {
     public void register(Credentials credentials, User user, Team team, boolean isJoinTeam) {
 
         if (userFormFieldsHasErrors(user)) {
-            logger.warn("User form fields has errors {}", user);
+            log.warn("User form fields has errors {}", user);
             throw new UserFormException();
         }
 
         if (credentials.getPassword() == null || credentials.getPassword().isEmpty()) {
-            logger.warn("Credentials password is empty");
+            log.warn("Credentials password is empty");
             throw new UserFormException();
         }
 
         if (isJoinTeam == true && (team.getId() == null || team.getId().isEmpty())) {
-            logger.warn("Team id from join existing team is empty");
+            log.warn("Team id from join existing team is empty");
             throw new UserFormException();
         }
 
         if (isJoinTeam == false && (team.getName() != null || !team.getName().isEmpty())) {
             Team teamEntity = new TeamEntity();
             try {
-                logger.info("New team name is {}", team.getName());
+                log.info("New team name is {}", team.getName());
                 teamEntity = teamService.getTeamByName(team.getName());
             } catch (NullPointerException e) {
-                logger.info("This is good, this implies team name is unique");
+                log.info("This is good, this implies team name is unique");
             }
             if (teamEntity != null && teamEntity.getId() != null) {
                 if (!teamEntity.getId().isEmpty()) {
-                    logger.warn("Team name duplicate entry found");
+                    log.warn("Team name duplicate entry found");
                     throw new RegisterTeamNameDuplicateException();
                 }
             }
@@ -275,7 +276,7 @@ public class RegistrationServiceImpl implements RegistrationService {
     @Transactional
     public void approveJoinRequest(String teamId, String userId, User approver) {
         if (!teamService.isTeamOwner(approver.getId(), teamId)) {
-            logger.warn("User {} is not a team owner of Team {}", userId, teamId);
+            log.warn("User {} is not a team owner of Team {}", userId, teamId);
             throw new UserIsNotTeamOwnerException();
         }
         String pid = teamService.getTeamById(teamId).getName();
@@ -292,7 +293,7 @@ public class RegistrationServiceImpl implements RegistrationService {
     @Transactional
     public void rejectJoinRequest(String teamId, String userId, User approver) {
         if (!teamService.isTeamOwner(approver.getId(), teamId)) {
-            logger.warn("User {} is not a team owner of Team {}", userId, teamId);
+            log.warn("User {} is not a team owner of Team {}", userId, teamId);
             throw new UserIsNotTeamOwnerException();
         }
 
@@ -307,7 +308,7 @@ public class RegistrationServiceImpl implements RegistrationService {
 
         for (TeamMember member : membersList) {
             if (member.getUserId().equals(userId)) {
-                logger.info("Reject join request from User {}, Team {}", member.getUserId(), teamId);
+                log.info("Reject join request from User {}, Team {}", member.getUserId(), teamId);
                 userService.removeTeam(userId, teamId);
                 teamService.removeTeamMember(teamId, member);
                 // FIXME call adapter deterlab
@@ -325,7 +326,7 @@ public class RegistrationServiceImpl implements RegistrationService {
     public void approveTeam(String teamId, TeamStatus status) {
         // FIXME required additional parameters to validate if approver is of admin or ordinary user
         if (teamId == null || teamId.isEmpty()) {
-            logger.warn("Team Id is empty or null");
+            log.warn("Team Id is empty or null");
             throw new RegisterTeamIdEmptyException();
         }
 
@@ -471,14 +472,14 @@ public class RegistrationServiceImpl implements RegistrationService {
     private void checkTeamNameDuplicate(String teamName) {
         Team one = null;
         try {
-            logger.info("New team name is {}", teamName);
+            log.info("New team name is {}", teamName);
             one = teamService.getTeamByName(teamName);
         } catch (NullPointerException e) {
-            logger.info("This is good, this implies team name is unique");
+            log.info("This is good, this implies team name is unique");
         }
         if (one != null && one.getId() != null) {
             if (!one.getId().isEmpty()) {
-                logger.warn("Team name duplicate entry found");
+                log.warn("Team name duplicate entry found");
                 throw new RegisterTeamNameDuplicateException();
             }
         }
