@@ -3,9 +3,9 @@ package sg.ncl.service.team.data.jpa;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.junit.Test;
 import sg.ncl.service.team.Util;
+import sg.ncl.service.team.domain.MemberStatus;
+import sg.ncl.service.team.domain.MemberType;
 import sg.ncl.service.team.domain.TeamMember;
-import sg.ncl.service.team.domain.TeamMemberStatus;
-import sg.ncl.service.team.domain.TeamMemberType;
 import sg.ncl.service.team.domain.TeamPrivacy;
 import sg.ncl.service.team.domain.TeamStatus;
 import sg.ncl.service.team.domain.TeamVisibility;
@@ -193,7 +193,7 @@ public class TeamEntityTest {
     @Test
     public void testGetMemberById() throws Exception {
         TeamEntity teamEntity = Util.getTeamEntity();
-        TeamMember teamMember = Util.getTeamMemberInfo(TeamMemberType.MEMBER);
+        TeamMember teamMember = Util.getTeamMemberInfo(MemberType.MEMBER);
         teamEntity.addMember(teamMember);
         String userId = teamMember.getUserId();
 
@@ -207,20 +207,20 @@ public class TeamEntityTest {
     @Test
     public void testChangeMemberStatus() throws Exception {
         TeamEntity teamEntity = Util.getTeamEntity();
-        TeamMember teamMember = Util.getTeamMemberInfo(TeamMemberType.MEMBER);
+        TeamMember teamMember = Util.getTeamMemberInfo(MemberType.MEMBER);
         teamEntity.addMember(teamMember);
 
-        TeamMember result = teamEntity.changeMemberStatus(teamMember, TeamMemberStatus.APPROVED);
+        TeamMember result = teamEntity.changeMemberStatus(teamMember, MemberStatus.APPROVED);
 
         assertThat(result.getUserId(), is(teamMember.getUserId()));
         assertThat(result.getMemberType(), is(teamMember.getMemberType()));
-        assertThat(result.getMemberStatus(), is(TeamMemberStatus.APPROVED));
+        assertThat(result.getMemberStatus(), is(MemberStatus.APPROVED));
     }
 
     @Test
     public void testAddMember() throws Exception {
         final TeamEntity entity = new TeamEntity();
-        final TeamMemberInfo teamMemberInfo = Util.getTeamMemberInfo(TeamMemberType.MEMBER);
+        final TeamMemberInfo teamMemberInfo = Util.getTeamMemberInfo(MemberType.MEMBER);
         entity.addMember(teamMemberInfo);
 
         assertThat(entity.getMembers().get(0).getUserId(), is(teamMemberInfo.getUserId()));
@@ -229,8 +229,8 @@ public class TeamEntityTest {
     @Test
     public void testRemoveMemberBad() throws Exception {
         final TeamEntity entity = new TeamEntity();
-        final TeamMemberInfo teamMemberOne = Util.getTeamMemberInfo(TeamMemberType.MEMBER);
-        final TeamMemberInfo teamMemberTwo = Util.getTeamMemberInfo(TeamMemberType.MEMBER);
+        final TeamMemberInfo teamMemberOne = Util.getTeamMemberInfo(MemberType.MEMBER);
+        final TeamMemberInfo teamMemberTwo = Util.getTeamMemberInfo(MemberType.MEMBER);
 
         // purposely add team member one but try and remove two
         entity.addMember(teamMemberOne);
@@ -242,8 +242,8 @@ public class TeamEntityTest {
     @Test
     public void testRemoveMemberGood() throws Exception {
         final TeamEntity entity = new TeamEntity();
-        final TeamMemberInfo teamMemberOne = Util.getTeamMemberInfo(TeamMemberType.MEMBER);
-        final TeamMemberInfo teamMemberTwo = Util.getTeamMemberInfo(TeamMemberType.MEMBER);
+        final TeamMemberInfo teamMemberOne = Util.getTeamMemberInfo(MemberType.MEMBER);
+        final TeamMemberInfo teamMemberTwo = Util.getTeamMemberInfo(MemberType.MEMBER);
 
         entity.addMember(teamMemberOne);
         entity.addMember(teamMemberTwo);

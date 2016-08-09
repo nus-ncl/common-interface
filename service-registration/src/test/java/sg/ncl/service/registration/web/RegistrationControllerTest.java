@@ -25,9 +25,9 @@ import sg.ncl.service.registration.Util;
 import sg.ncl.service.registration.serializers.DateTimeDeserializer;
 import sg.ncl.service.registration.serializers.DateTimeSerializer;
 import sg.ncl.service.team.data.jpa.TeamEntity;
+import sg.ncl.service.team.domain.MemberType;
 import sg.ncl.service.team.domain.Team;
 import sg.ncl.service.team.domain.TeamMember;
-import sg.ncl.service.team.domain.TeamMemberType;
 import sg.ncl.service.team.domain.TeamService;
 import sg.ncl.service.team.domain.TeamStatus;
 import sg.ncl.service.team.web.TeamMemberInfo;
@@ -90,7 +90,7 @@ public class RegistrationControllerTest extends AbstractTest {
 
         // apply to join team but since no teams exists yet
         // create stub team
-        Team team = teamService.addTeam(Util.getTeamEntity());
+        Team team = teamService.createTeam(Util.getTeamEntity());
 
         GsonBuilder gsonBuilder = new GsonBuilder();
         gsonBuilder.registerTypeAdapter(ZonedDateTime.class, new DateTimeSerializer());
@@ -166,7 +166,7 @@ public class RegistrationControllerTest extends AbstractTest {
 
         // apply to join team but since no teams exists yet
         // create stub team
-        Team teamEntity = teamService.addTeam(Util.getTeamEntity());
+        Team teamEntity = teamService.createTeam(Util.getTeamEntity());
         User user = userService.createUser(Util.getUserEntity());
 
         adapterDeterlab.saveDeterUserIdMapping("AAAAA", user.getId());
@@ -198,9 +198,9 @@ public class RegistrationControllerTest extends AbstractTest {
 
     @Test
     public void addTeamUserControllerTest() throws Exception {
-        // UserController addTeamMember test can only be tested here because it requires an existing team in the database
+        // UserController addMember test can only be tested here because it requires an existing team in the database
         User user = userService.createUser(Util.getUserEntity());
-        Team team = teamService.addTeam(Util.getTeamEntity());
+        Team team = teamService.createTeam(Util.getTeamEntity());
 
         // craft the RequestBody to add user to team
         JSONObject userObject = new JSONObject();
@@ -226,9 +226,9 @@ public class RegistrationControllerTest extends AbstractTest {
     @Test
     public void approveTeam() throws Exception {
         Team one = Util.getTeamEntity();
-        Team createdTeam = teamService.addTeam(one);
-        TeamMemberInfo owner = Util.getTeamMemberInfo(TeamMemberType.OWNER);
-        teamService.addTeamMember(createdTeam.getId(), owner);
+        Team createdTeam = teamService.createTeam(one);
+        TeamMemberInfo owner = Util.getTeamMemberInfo(MemberType.OWNER);
+        teamService.addMember(createdTeam.getId(), owner);
 
         JSONObject predefinedResultJson = new JSONObject();
         predefinedResultJson.put("msg", "project approved");
@@ -245,7 +245,7 @@ public class RegistrationControllerTest extends AbstractTest {
     public void rejectJoinRequest() throws Exception {
 
         Team one = Util.getTeamEntity();
-        Team createdTeam = teamService.addTeam(one);
+        Team createdTeam = teamService.createTeam(one);
 
         User user = Util.getUserEntity();
         User user2 = Util.getUserEntity();
@@ -255,10 +255,10 @@ public class RegistrationControllerTest extends AbstractTest {
         userService.addTeam(createdUser.getId(), createdTeam.getId());
         userService.addTeam(createdUser2.getId(), createdTeam.getId());
 
-        TeamMemberInfo owner = Util.getTeamMemberInfo(createdUser.getId(), TeamMemberType.OWNER);
-        TeamMemberInfo member = Util.getTeamMemberInfo(createdUser2.getId(), TeamMemberType.MEMBER);
-        teamService.addTeamMember(createdTeam.getId(), owner);
-        teamService.addTeamMember(createdTeam.getId(), member);
+        TeamMemberInfo owner = Util.getTeamMemberInfo(createdUser.getId(), MemberType.OWNER);
+        TeamMemberInfo member = Util.getTeamMemberInfo(createdUser2.getId(), MemberType.MEMBER);
+        teamService.addMember(createdTeam.getId(), owner);
+        teamService.addMember(createdTeam.getId(), member);
 
         String deterUserIdOne = RandomStringUtils.randomAlphabetic(8);
         String deterUserIdTwo = RandomStringUtils.randomAlphabetic(8);

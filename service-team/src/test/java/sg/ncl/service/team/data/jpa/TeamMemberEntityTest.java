@@ -2,8 +2,8 @@ package sg.ncl.service.team.data.jpa;
 
 import org.apache.commons.lang3.RandomStringUtils;
 import org.junit.Test;
-import sg.ncl.service.team.domain.TeamMemberStatus;
-import sg.ncl.service.team.domain.TeamMemberType;
+import sg.ncl.service.team.domain.MemberStatus;
+import sg.ncl.service.team.domain.MemberType;
 
 import java.time.ZonedDateTime;
 
@@ -86,8 +86,8 @@ public class TeamMemberEntityTest {
     @Test
     public void testSetMemberType() throws Exception {
         final TeamMemberEntity entity = new TeamMemberEntity();
-        entity.setMemberType(TeamMemberType.OWNER);
-        assertThat(entity.getMemberType(), is(TeamMemberType.OWNER));
+        entity.setMemberType(MemberType.OWNER);
+        assertThat(entity.getMemberType(), is(MemberType.OWNER));
     }
 
     @Test
@@ -99,8 +99,8 @@ public class TeamMemberEntityTest {
     @Test
     public void testSetMemberStatus() throws Exception {
         final TeamMemberEntity entity = new TeamMemberEntity();
-        entity.setMemberStatus(TeamMemberStatus.APPROVED);
-        assertThat(entity.getMemberStatus(), is(TeamMemberStatus.APPROVED));
+        entity.setMemberStatus(MemberStatus.APPROVED);
+        assertThat(entity.getMemberStatus(), is(MemberStatus.APPROVED));
     }
 
     @Test

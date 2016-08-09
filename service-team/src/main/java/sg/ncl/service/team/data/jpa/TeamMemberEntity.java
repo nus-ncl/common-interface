@@ -1,9 +1,9 @@
 package sg.ncl.service.team.data.jpa;
 
 import sg.ncl.common.jpa.AbstractEntity;
+import sg.ncl.service.team.domain.MemberStatus;
+import sg.ncl.service.team.domain.MemberType;
 import sg.ncl.service.team.domain.TeamMember;
-import sg.ncl.service.team.domain.TeamMemberStatus;
-import sg.ncl.service.team.domain.TeamMemberType;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -42,11 +42,11 @@ public class TeamMemberEntity extends AbstractEntity implements TeamMember {
 
     @Column(name = "member_type", nullable = false)
     @Enumerated(EnumType.STRING)
-    private TeamMemberType memberType = TeamMemberType.MEMBER;
+    private MemberType memberType = MemberType.MEMBER;
 
     @Column(name = "status", nullable = false)
     @Enumerated(EnumType.STRING)
-    private TeamMemberStatus memberStatus = TeamMemberStatus.PENDING;
+    private MemberStatus memberStatus = MemberStatus.PENDING;
 
     public Long getId() {
         return id;
@@ -83,20 +83,20 @@ public class TeamMemberEntity extends AbstractEntity implements TeamMember {
     }
 
     @Override
-    public TeamMemberType getMemberType() {
+    public MemberType getMemberType() {
         return memberType;
     }
 
-    public void setMemberType(TeamMemberType memberType) {
+    public void setMemberType(MemberType memberType) {
         this.memberType = memberType;
     }
 
     @Override
-    public TeamMemberStatus getMemberStatus() {
+    public MemberStatus getMemberStatus() {
         return memberStatus;
     }
 
-    public void setMemberStatus(TeamMemberStatus memberStatus) {
+    public void setMemberStatus(MemberStatus memberStatus) {
         this.memberStatus = memberStatus;
     }
 }

@@ -7,13 +7,13 @@ import java.util.List;
  */
 public interface TeamService {
 
-    Team addTeam(Team team);
+    Team createTeam(Team team);
 
     void removeTeam(String id);
 
-    List<? extends Team> getTeams();
+    List<Team> getAllTeams();
 
-    List<? extends Team> getTeamsByVisibility(TeamVisibility visibility);
+    List<Team> getTeamsByVisibility(TeamVisibility visibility);
 
     Team getTeamById(String id);
 
@@ -21,13 +21,14 @@ public interface TeamService {
 
     Team updateTeam(String id, Team team);
 
-    Team addTeamMember(String id, TeamMember teamMember);
+    Team updateTeamStatus(String id, TeamStatus status);
 
-    Team removeTeamMember(String id, TeamMember teamMember);
+    Team addMember(String id, TeamMember teamMember);
 
-    boolean isTeamOwner(final String userId, final String teamId);
+    Team removeMember(String id, TeamMember teamMember);
 
-    TeamMember changeTeamMemberStatus(String userId, String teamId, TeamMemberStatus approved);
+    Boolean isOwner(String teamId, String userId);
 
-    Team changeTeamStatus(String teamId, TeamStatus approved);
+    TeamMember updateMemberStatus(String teamId, String userId, MemberStatus status);
+
 }
