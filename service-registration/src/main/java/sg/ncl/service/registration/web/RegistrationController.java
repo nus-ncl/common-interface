@@ -2,14 +2,7 @@ package sg.ncl.service.registration.web;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseStatus;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import sg.ncl.service.registration.domain.RegistrationService;
 import sg.ncl.service.team.domain.TeamStatus;
 
@@ -66,10 +59,18 @@ public class RegistrationController {
         registrationService.rejectJoinRequest(teamId, userId, registrationInfo.getUser());
     }
 
-    @PostMapping(path = "/teams/{teamId}", params = {"status"})
+    @PostMapping(path = "/teams/{teamId}/owner/{ownerId}", params = {"status"})
     // FIXME: the path is wrong, there should not be multiple paths for different registrations
     @ResponseStatus(HttpStatus.OK)
-    public void approveTeam(@PathVariable String teamId, @RequestParam("status") final TeamStatus teamStatus) {
-        registrationService.approveTeam(teamId, teamStatus);
+    public void approveTeam(@PathVariable String teamId, @PathVariable String ownerId, @RequestParam("status") final TeamStatus teamStatus) {
+        // need to specify to deterlab who is the owner so that they can set it as project_root
+        // else trust level is always none
+        registrationService.approveTeam(teamId, ownerId, teamStatus);
+    }
+
+    @GetMapping(path = "/user/{id}")
+    @ResponseStatus(HttpStatus.OK)
+    public String getDeterUid(@PathVariable String id) {
+        return registrationService.getDeterUid(id);
     }
 }
