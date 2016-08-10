@@ -73,4 +73,10 @@ public class RegistrationController {
     public String getDeterUid(@PathVariable String id) {
         return registrationService.getDeterUid(id);
     }
+
+    @PutMapping(path = "/activate", params = {"uid", "key"})
+    @ResponseStatus(HttpStatus.OK)
+    private void activateAccount(@RequestParam("uid") final String uid, @RequestParam("key") final String key) {
+        registrationService.activateAccount(uid, key);
+    }
 }

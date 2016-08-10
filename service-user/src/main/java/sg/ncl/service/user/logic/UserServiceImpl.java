@@ -58,6 +58,10 @@ public class UserServiceImpl implements UserService {
     public void updateUser(final String id, final User user) {
         final UserEntity one = findUserEntity(id);
 
+        if (user.getStatus() != null) {
+            one.setStatus(user.getStatus());
+        }
+
         if (user.getUserDetails().getFirstName() != null) {
             one.getUserDetails().setFirstName(user.getUserDetails().getFirstName());
         }

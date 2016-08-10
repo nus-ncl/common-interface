@@ -32,8 +32,11 @@ import sg.ncl.service.team.domain.TeamMember;
 import sg.ncl.service.team.domain.TeamService;
 import sg.ncl.service.team.domain.TeamStatus;
 import sg.ncl.service.team.web.TeamMemberInfo;
+import sg.ncl.service.user.data.jpa.UserDetailsEntity;
+import sg.ncl.service.user.data.jpa.UserEntity;
 import sg.ncl.service.user.domain.User;
 import sg.ncl.service.user.domain.UserService;
+import sg.ncl.service.user.domain.UserStatus;
 
 import javax.inject.Inject;
 import javax.validation.constraints.NotNull;
@@ -506,6 +509,20 @@ public class RegistrationServiceImpl implements RegistrationService {
                 throw new RegisterTeamNameDuplicateException();
             }
         }
+    }
+
+    public void activateAccount (@NotNull final String uid, @NotNull final String key) {
+        log.info("uid '{}' ", uid);
+        log.info("key '{}'", key);
+        User user = userService.findUser(uid);
+        if (user == null) {
+            log.warn("Cannot find user '{}'", uid);
+            throw new UserNotFoundException();
+        }
+
+        UserEntity newUser = new UserEntity();
+        newUser.setStatus(UserStatus.APPROVED);
+        userService.updateUser(uid, newUser);
     }
 
 }
