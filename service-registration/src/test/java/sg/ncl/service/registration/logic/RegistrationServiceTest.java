@@ -11,26 +11,16 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.client.MockRestServiceServer;
 import org.springframework.web.client.RestOperations;
 import org.springframework.web.client.RestTemplate;
-import sg.ncl.adapter.deterlab.AdapterDeterlab;
+import sg.ncl.adapter.deterlab.AdapterDeterLab;
 import sg.ncl.adapter.deterlab.ConnectionProperties;
 import sg.ncl.service.authentication.data.jpa.CredentialsEntity;
 import sg.ncl.service.registration.AbstractTest;
 import sg.ncl.service.registration.Util;
 import sg.ncl.service.registration.domain.RegistrationService;
-import sg.ncl.service.registration.exceptions.RegisterTeamIdEmptyException;
-import sg.ncl.service.registration.exceptions.RegisterTeamNameDuplicateException;
-import sg.ncl.service.registration.exceptions.RegisterTeamNameEmptyException;
-import sg.ncl.service.registration.exceptions.RegisterUidNullException;
-import sg.ncl.service.registration.exceptions.UserFormException;
-import sg.ncl.service.registration.exceptions.UserIsNotTeamOwnerException;
+import sg.ncl.service.registration.exceptions.*;
 import sg.ncl.service.team.data.jpa.TeamEntity;
 import sg.ncl.service.team.data.jpa.TeamMemberEntity;
-import sg.ncl.service.team.domain.MemberStatus;
-import sg.ncl.service.team.domain.MemberType;
-import sg.ncl.service.team.domain.Team;
-import sg.ncl.service.team.domain.TeamMember;
-import sg.ncl.service.team.domain.TeamService;
-import sg.ncl.service.team.domain.TeamStatus;
+import sg.ncl.service.team.domain.*;
 import sg.ncl.service.team.exceptions.NoOwnerInTeamException;
 import sg.ncl.service.team.exceptions.TeamIdNullOrEmptyException;
 import sg.ncl.service.team.exceptions.TeamNotFoundException;
@@ -66,7 +56,7 @@ public class RegistrationServiceTest extends AbstractTest {
     private RegistrationService registrationService;
 
     @Inject
-    private AdapterDeterlab adapterDeterlab;
+    private AdapterDeterLab adapterDeterLab;
 
     @Autowired
     private RestOperations restOperations;
@@ -203,8 +193,8 @@ public class RegistrationServiceTest extends AbstractTest {
         String memberId = userService.createUser(member).getId();
 
         // need to create entry in the Deterlab User Repository
-        adapterDeterlab.saveDeterUserIdMapping(RandomStringUtils.randomAlphanumeric(8), ownerId);
-        adapterDeterlab.saveDeterUserIdMapping(RandomStringUtils.randomAlphanumeric(8), memberId);
+        adapterDeterLab.saveDeterUserIdMapping(RandomStringUtils.randomAlphanumeric(8), ownerId);
+        adapterDeterLab.saveDeterUserIdMapping(RandomStringUtils.randomAlphanumeric(8), memberId);
 
         // add owner and members to team members repository
 
@@ -299,7 +289,7 @@ public class RegistrationServiceTest extends AbstractTest {
         User createdUser = userService.createUser(user);
 
         // need to create entry in the Deterlab User Repository
-        adapterDeterlab.saveDeterUserIdMapping(RandomStringUtils.randomAlphanumeric(8), createdUser.getId());
+        adapterDeterLab.saveDeterUserIdMapping(RandomStringUtils.randomAlphanumeric(8), createdUser.getId());
 
         JSONObject predefinedResultJson = new JSONObject();
         predefinedResultJson.put("msg", "user has logged in and applied a project");
@@ -446,8 +436,8 @@ public class RegistrationServiceTest extends AbstractTest {
 
         String deterUserIdOne = RandomStringUtils.randomAlphabetic(8);
         String deterUserIdTwo = RandomStringUtils.randomAlphabetic(8);
-        adapterDeterlab.saveDeterUserIdMapping(deterUserIdOne, user.getId());
-        adapterDeterlab.saveDeterUserIdMapping(deterUserIdTwo, user2.getId());
+        adapterDeterLab.saveDeterUserIdMapping(deterUserIdOne, user.getId());
+        adapterDeterLab.saveDeterUserIdMapping(deterUserIdTwo, user2.getId());
 
         userService.addTeam(user.getId(), team.getId());
         userService.addTeam(user2.getId(), team.getId());

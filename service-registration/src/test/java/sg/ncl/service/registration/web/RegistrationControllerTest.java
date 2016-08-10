@@ -17,7 +17,7 @@ import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.web.client.RestOperations;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.context.WebApplicationContext;
-import sg.ncl.adapter.deterlab.AdapterDeterlab;
+import sg.ncl.adapter.deterlab.AdapterDeterLab;
 import sg.ncl.adapter.deterlab.ConnectionProperties;
 import sg.ncl.service.authentication.data.jpa.CredentialsEntity;
 import sg.ncl.service.registration.AbstractTest;
@@ -25,11 +25,7 @@ import sg.ncl.service.registration.Util;
 import sg.ncl.service.registration.serializers.DateTimeDeserializer;
 import sg.ncl.service.registration.serializers.DateTimeSerializer;
 import sg.ncl.service.team.data.jpa.TeamEntity;
-import sg.ncl.service.team.domain.MemberType;
-import sg.ncl.service.team.domain.Team;
-import sg.ncl.service.team.domain.TeamMember;
-import sg.ncl.service.team.domain.TeamService;
-import sg.ncl.service.team.domain.TeamStatus;
+import sg.ncl.service.team.domain.*;
 import sg.ncl.service.team.web.TeamMemberInfo;
 import sg.ncl.service.user.data.jpa.UserEntity;
 import sg.ncl.service.user.domain.User;
@@ -43,9 +39,7 @@ import static org.hamcrest.core.Is.is;
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.method;
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.requestTo;
 import static org.springframework.test.web.client.response.MockRestResponseCreators.withSuccess;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.springframework.test.web.servlet.setup.MockMvcBuilders.webAppContextSetup;
@@ -70,7 +64,7 @@ public class RegistrationControllerTest extends AbstractTest {
     private UserService userService;
 
     @Inject
-    private AdapterDeterlab adapterDeterlab;
+    private AdapterDeterLab adapterDeterLab;
 
     @Autowired
     private RestOperations restOperations;
@@ -169,7 +163,7 @@ public class RegistrationControllerTest extends AbstractTest {
         Team teamEntity = teamService.createTeam(Util.getTeamEntity());
         User user = userService.createUser(Util.getUserEntity());
 
-        adapterDeterlab.saveDeterUserIdMapping("AAAAA", user.getId());
+        adapterDeterLab.saveDeterUserIdMapping("AAAAA", user.getId());
 
         GsonBuilder gsonBuilder = new GsonBuilder();
         gsonBuilder.registerTypeAdapter(ZonedDateTime.class, new DateTimeSerializer());
@@ -262,8 +256,8 @@ public class RegistrationControllerTest extends AbstractTest {
 
         String deterUserIdOne = RandomStringUtils.randomAlphabetic(8);
         String deterUserIdTwo = RandomStringUtils.randomAlphabetic(8);
-        adapterDeterlab.saveDeterUserIdMapping(deterUserIdOne, createdUser.getId());
-        adapterDeterlab.saveDeterUserIdMapping(deterUserIdTwo, createdUser2.getId());
+        adapterDeterLab.saveDeterUserIdMapping(deterUserIdOne, createdUser.getId());
+        adapterDeterLab.saveDeterUserIdMapping(deterUserIdTwo, createdUser2.getId());
 
         // craft the RequestBody to remove user from team
         GsonBuilder gsonBuilder = new GsonBuilder();

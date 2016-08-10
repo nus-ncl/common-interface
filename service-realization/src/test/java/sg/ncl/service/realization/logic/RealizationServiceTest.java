@@ -10,7 +10,7 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.client.MockRestServiceServer;
 import org.springframework.web.client.RestOperations;
 import org.springframework.web.client.RestTemplate;
-import sg.ncl.adapter.deterlab.AdapterDeterlab;
+import sg.ncl.adapter.deterlab.AdapterDeterLab;
 import sg.ncl.adapter.deterlab.ConnectionProperties;
 import sg.ncl.service.realization.AbstractTest;
 import sg.ncl.service.realization.Util;
@@ -46,7 +46,7 @@ public class RealizationServiceTest extends AbstractTest {
     private MockRestServiceServer mockServer;
 
     @Inject
-    private AdapterDeterlab adapterDeterlab;
+    private AdapterDeterLab adapterDeterLab;
 
     @Before
     public void setUp() throws Exception {
@@ -226,7 +226,7 @@ public class RealizationServiceTest extends AbstractTest {
         String experimentName = one.getExperimentName();
         realizationService.save(one);
 
-        adapterDeterlab.saveDeterUserIdMapping(RandomStringUtils.randomAlphanumeric(20), userId);
+        adapterDeterLab.saveDeterUserIdMapping(RandomStringUtils.randomAlphanumeric(20), userId);
         RealizationEntity result = realizationService.startExperimentInDeter(teamName, experimentName, userId);
 
         Assert.assertNotEquals(one.getState(), result.getState());
@@ -249,7 +249,7 @@ public class RealizationServiceTest extends AbstractTest {
         String experimentName = one.getExperimentName();
         realizationService.save(one);
 
-        adapterDeterlab.saveDeterUserIdMapping(RandomStringUtils.randomAlphanumeric(20), userId);
+        adapterDeterLab.saveDeterUserIdMapping(RandomStringUtils.randomAlphanumeric(20), userId);
         RealizationEntity result = realizationService.stopExperimentInDeter(teamName, experimentName, userId);
 
         Assert.assertThat(result.getState(), is(RealizationState.STOP));

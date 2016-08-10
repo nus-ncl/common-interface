@@ -9,19 +9,13 @@ import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.context.ActiveProfiles;
-import sg.ncl.adapter.deterlab.AdapterDeterlab;
+import sg.ncl.adapter.deterlab.AdapterDeterLab;
 import sg.ncl.service.authentication.AbstractTest;
 import sg.ncl.service.authentication.data.jpa.CredentialsEntity;
 import sg.ncl.service.authentication.data.jpa.CredentialsRepository;
 import sg.ncl.service.authentication.domain.Credentials;
 import sg.ncl.service.authentication.domain.CredentialsService;
-import sg.ncl.service.authentication.exceptions.CredentialsNotFoundException;
-import sg.ncl.service.authentication.exceptions.NeitherUsernameNorPasswordModifiedException;
-import sg.ncl.service.authentication.exceptions.PasswordNullOrEmptyException;
-import sg.ncl.service.authentication.exceptions.UserIdAlreadyExistsException;
-import sg.ncl.service.authentication.exceptions.UserIdNullOrEmptyException;
-import sg.ncl.service.authentication.exceptions.UsernameAlreadyExistsException;
-import sg.ncl.service.authentication.exceptions.UsernameNullOrEmptyException;
+import sg.ncl.service.authentication.exceptions.*;
 import sg.ncl.service.authentication.web.CredentialsInfo;
 
 import static org.hamcrest.Matchers.equalTo;
@@ -29,11 +23,7 @@ import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
-import static org.mockito.Mockito.any;
-import static org.mockito.Mockito.mockingDetails;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 import static sg.ncl.service.authentication.util.TestUtil.getCredentialsEntity;
 
 /**
@@ -57,13 +47,13 @@ public class CredentialsServiceTest extends AbstractTest {
     private CredentialsService credentialsService;
 
     @Mock
-    private AdapterDeterlab adapterDeterlab;
+    private AdapterDeterLab adapterDeterLab;
 
     @Before
     public void before() {
         assertThat(mockingDetails(passwordEncoder).isMock(), is(true));
         assertThat(mockingDetails(credentialsRepository).isMock(), is(true));
-        credentialsService = new CredentialsServiceImpl(credentialsRepository, passwordEncoder, adapterDeterlab);
+        credentialsService = new CredentialsServiceImpl(credentialsRepository, passwordEncoder, adapterDeterLab);
     }
 
     @Test

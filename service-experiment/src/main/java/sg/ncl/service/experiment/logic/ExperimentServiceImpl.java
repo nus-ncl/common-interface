@@ -4,7 +4,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.json.JSONObject;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import sg.ncl.adapter.deterlab.AdapterDeterlab;
+import sg.ncl.adapter.deterlab.AdapterDeterLab;
 import sg.ncl.service.experiment.ExperimentConnectionProperties;
 import sg.ncl.service.experiment.data.jpa.ExperimentEntity;
 import sg.ncl.service.experiment.data.jpa.ExperimentRepository;
@@ -32,14 +32,14 @@ import java.util.stream.Collectors;
 public class ExperimentServiceImpl implements ExperimentService {
 
     private final ExperimentRepository experimentRepository;
-    private final AdapterDeterlab adapterDeterlab;
+    private final AdapterDeterLab adapterDeterLab;
     private final ExperimentConnectionProperties experimentConnectionProperties;
     private final RealizationService realizationService;
 
     @Inject
-    ExperimentServiceImpl(@NotNull final ExperimentRepository experimentRepository, @NotNull final AdapterDeterlab adapterDeterlab, @NotNull final RealizationService realizationService, @NotNull final ExperimentConnectionProperties experimentConnectionProperties) {
+    ExperimentServiceImpl(@NotNull final ExperimentRepository experimentRepository, @NotNull final AdapterDeterLab adapterDeterLab, @NotNull final RealizationService realizationService, @NotNull final ExperimentConnectionProperties experimentConnectionProperties) {
         this.experimentRepository = experimentRepository;
-        this.adapterDeterlab = adapterDeterlab;
+        this.adapterDeterLab = adapterDeterLab;
         this.realizationService = realizationService;
         this.experimentConnectionProperties = experimentConnectionProperties;
     }
@@ -182,10 +182,10 @@ public class ExperimentServiceImpl implements ExperimentService {
         userObject.put("nsFileContent", experiment.getNsFileContent());
         userObject.put("idleSwap", experiment.getIdleSwap().toString());
         userObject.put("maxDuration", experiment.getMaxDuration().toString());
-        userObject.put("deterLogin", adapterDeterlab.getDeterUserIdByNclUserId(experiment.getUserId()));
+        userObject.put("deterLogin", adapterDeterLab.getDeterUserIdByNclUserId(experiment.getUserId()));
         userObject.put("userServerUri", experimentConnectionProperties.getUserurl());
 
-        adapterDeterlab.createExperiment(userObject.toString());
+        adapterDeterLab.createExperiment(userObject.toString());
 
         log.info("End createExperimentInDeter");
     }
@@ -221,9 +221,9 @@ public class ExperimentServiceImpl implements ExperimentService {
     private void deleteExperimentInDeter(final String experimentName, final String nclUserId) {
         JSONObject jsonObject = new JSONObject();
         jsonObject.put("experimentName", experimentName);
-        jsonObject.put("deterLogin", adapterDeterlab.getDeterUserIdByNclUserId(nclUserId));
+        jsonObject.put("deterLogin", adapterDeterLab.getDeterUserIdByNclUserId(nclUserId));
 
-        adapterDeterlab.deleteExperiment(jsonObject.toString());
+        adapterDeterLab.deleteExperiment(jsonObject.toString());
     }
 
     // TODO: Use this if using script_wrapper.py

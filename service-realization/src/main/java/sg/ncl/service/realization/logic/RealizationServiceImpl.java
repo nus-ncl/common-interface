@@ -3,7 +3,7 @@ package sg.ncl.service.realization.logic;
 import lombok.extern.slf4j.Slf4j;
 import org.json.JSONObject;
 import org.springframework.stereotype.Service;
-import sg.ncl.adapter.deterlab.AdapterDeterlab;
+import sg.ncl.adapter.deterlab.AdapterDeterLab;
 import sg.ncl.service.realization.data.jpa.RealizationEntity;
 import sg.ncl.service.realization.data.jpa.RealizationRepository;
 import sg.ncl.service.realization.domain.RealizationService;
@@ -20,12 +20,12 @@ import javax.validation.constraints.NotNull;
 public class RealizationServiceImpl implements RealizationService {
 
     private final RealizationRepository realizationRepository;
-    private final AdapterDeterlab adapterDeterlab;
+    private final AdapterDeterLab adapterDeterLab;
 
     @Inject
-    RealizationServiceImpl(@NotNull final RealizationRepository realizationRepository, @NotNull final AdapterDeterlab adapterDeterlab) {
+    RealizationServiceImpl(@NotNull final RealizationRepository realizationRepository, @NotNull final AdapterDeterLab adapterDeterLab) {
         this.realizationRepository = realizationRepository;
-        this.adapterDeterlab = adapterDeterlab;
+        this.adapterDeterLab = adapterDeterLab;
     }
 
     public RealizationEntity getById(final Long id) {
@@ -71,7 +71,7 @@ public class RealizationServiceImpl implements RealizationService {
 
         JSONObject jsonObject = new JSONObject();
         jsonObject.put("httpCommand", httpCommand.toString());
-        jsonObject.put("deterLogin", adapterDeterlab.getDeterUserIdByNclUserId(userId));
+        jsonObject.put("deterLogin", adapterDeterLab.getDeterUserIdByNclUserId(userId));
         jsonObject.put("pid", teamName);
         jsonObject.put("eid", experimentName);
 
@@ -79,7 +79,7 @@ public class RealizationServiceImpl implements RealizationService {
         realizationEntity.setState(RealizationState.ACTIVATING);
         realizationRepository.save(realizationEntity);
 
-        String stringFromExperiment = adapterDeterlab.startExperiment(jsonObject.toString());
+        String stringFromExperiment = adapterDeterLab.startExperiment(jsonObject.toString());
         JSONObject jsonObjectFromExperiment = new JSONObject(stringFromExperiment);
 
         String status = jsonObjectFromExperiment.getString("status");
@@ -112,7 +112,7 @@ public class RealizationServiceImpl implements RealizationService {
 
         JSONObject jsonObject = new JSONObject();
         jsonObject.put("httpCommand", httpCommand.toString());
-        jsonObject.put("deterLogin", adapterDeterlab.getDeterUserIdByNclUserId(userId));
+        jsonObject.put("deterLogin", adapterDeterLab.getDeterUserIdByNclUserId(userId));
         jsonObject.put("pid", teamName);
         jsonObject.put("eid", experimentName);
 
@@ -120,7 +120,7 @@ public class RealizationServiceImpl implements RealizationService {
         realizationEntity.setState(RealizationState.STOPPING);
         realizationRepository.save(realizationEntity);
 
-        adapterDeterlab.stopExperiment(jsonObject.toString());
+        adapterDeterLab.stopExperiment(jsonObject.toString());
 
         // FIXME may need to check if stopping experiments have error
         realizationEntity.setState(RealizationState.STOP);

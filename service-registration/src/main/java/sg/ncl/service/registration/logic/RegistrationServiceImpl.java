@@ -5,7 +5,7 @@ import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import sg.ncl.adapter.deterlab.AdapterDeterlab;
+import sg.ncl.adapter.deterlab.AdapterDeterLab;
 import sg.ncl.adapter.deterlab.ConnectionProperties;
 import sg.ncl.adapter.deterlab.data.jpa.DeterlabUserRepository;
 import sg.ncl.adapter.deterlab.exceptions.UserNotFoundException;
@@ -15,21 +15,10 @@ import sg.ncl.service.authentication.web.CredentialsInfo;
 import sg.ncl.service.registration.data.jpa.RegistrationEntity;
 import sg.ncl.service.registration.data.jpa.RegistrationRepository;
 import sg.ncl.service.registration.domain.RegistrationService;
-import sg.ncl.service.registration.exceptions.NoMembersInTeamException;
-import sg.ncl.service.registration.exceptions.RegisterTeamIdEmptyException;
-import sg.ncl.service.registration.exceptions.RegisterTeamNameDuplicateException;
-import sg.ncl.service.registration.exceptions.RegisterTeamNameEmptyException;
-import sg.ncl.service.registration.exceptions.RegisterUidNullException;
-import sg.ncl.service.registration.exceptions.UserFormException;
-import sg.ncl.service.registration.exceptions.UserIsNotTeamOwnerException;
+import sg.ncl.service.registration.exceptions.*;
 import sg.ncl.service.team.data.jpa.TeamEntity;
 import sg.ncl.service.team.data.jpa.TeamMemberEntity;
-import sg.ncl.service.team.domain.MemberStatus;
-import sg.ncl.service.team.domain.MemberType;
-import sg.ncl.service.team.domain.Team;
-import sg.ncl.service.team.domain.TeamMember;
-import sg.ncl.service.team.domain.TeamService;
-import sg.ncl.service.team.domain.TeamStatus;
+import sg.ncl.service.team.domain.*;
 import sg.ncl.service.team.web.TeamMemberInfo;
 import sg.ncl.service.user.domain.User;
 import sg.ncl.service.user.domain.UserService;
@@ -53,7 +42,7 @@ public class RegistrationServiceImpl implements RegistrationService {
 
     // FIXME: what is this autowired?
     @Autowired
-    private final AdapterDeterlab adapterDeterlab;
+    private final AdapterDeterLab adapterDeterLab;
 
     @Inject
     RegistrationServiceImpl(@NotNull final CredentialsService credentialsService, @NotNull final TeamService teamService, @NotNull final UserService userService, @NotNull final RegistrationRepository registrationRepository, final DeterlabUserRepository deterlabUserRepository, final ConnectionProperties connectionProperties) {
@@ -62,7 +51,7 @@ public class RegistrationServiceImpl implements RegistrationService {
         this.userService = userService;
         this.registrationRepository = registrationRepository;
         // FIXME: why is this getting replaced?
-        this.adapterDeterlab = new AdapterDeterlab(deterlabUserRepository, connectionProperties);
+        this.adapterDeterLab = new AdapterDeterLab(deterlabUserRepository, connectionProperties);
     }
 
     @Transactional
@@ -98,14 +87,14 @@ public class RegistrationServiceImpl implements RegistrationService {
 
         // FIXME call adapter deterlab here
         JSONObject mainObject = new JSONObject();
-        mainObject.put("uid", adapterDeterlab.getDeterUserIdByNclUserId(nclUserId));
+        mainObject.put("uid", adapterDeterLab.getDeterUserIdByNclUserId(nclUserId));
         mainObject.put("projName", team.getName());
         mainObject.put("pid", team.getName());
         mainObject.put("projGoals", team.getDescription());
         mainObject.put("projWeb", team.getWebsite());
         mainObject.put("projOrg", team.getOrganisationType());
         mainObject.put("projPublic", team.getVisibility());
-        String resultJSON = adapterDeterlab.applyProject(mainObject.toString());
+        String resultJSON = adapterDeterLab.applyProject(mainObject.toString());
 
         userService.addTeam(nclUserId, createdTeam.getId());
         teamService.addMember(createdTeam.getId(), teamMemberInfo);
@@ -127,7 +116,7 @@ public class RegistrationServiceImpl implements RegistrationService {
         String teamId = teamEntity.getId();
 
         JSONObject userObject = new JSONObject();
-        userObject.put("uid", adapterDeterlab.getDeterUserIdByNclUserId(nclUserId));
+        userObject.put("uid", adapterDeterLab.getDeterUserIdByNclUserId(nclUserId));
         userObject.put("pid", teamEntity.getName());
 
         TeamMemberEntity teamMemberEntity = new TeamMemberEntity();
@@ -139,7 +128,7 @@ public class RegistrationServiceImpl implements RegistrationService {
         userService.addTeam(nclUserId, teamId);
         teamService.addMember(teamId, teamMemberInfo);
 
-        String resultJSON = adapterDeterlab.joinProject(userObject.toString());
+        String resultJSON = adapterDeterLab.joinProject(userObject.toString());
     }
 
     @Transactional
@@ -247,7 +236,7 @@ public class RegistrationServiceImpl implements RegistrationService {
             // call python script (create a new user in deterlab)
             // parse in a the json string
             userObject.put("pid", teamEntity.getName());
-            resultJSON = adapterDeterlab.joinProjectNewUsers(userObject.toString());
+            resultJSON = adapterDeterLab.joinProjectNewUsers(userObject.toString());
 
         } else {
             // call python script to apply for new project
@@ -257,7 +246,7 @@ public class RegistrationServiceImpl implements RegistrationService {
             userObject.put("projWeb", "http://www.nus.edu.sg");
             userObject.put("projOrg", "Academic");
             userObject.put("projPublic", teamEntity.getVisibility());
-            resultJSON = adapterDeterlab.applyProjectNewUsers(userObject.toString());
+            resultJSON = adapterDeterLab.applyProjectNewUsers(userObject.toString());
         }
 
         if (getUserCreationStatus(resultJSON).equals("user is created")) {
@@ -282,11 +271,11 @@ public class RegistrationServiceImpl implements RegistrationService {
         String pid = teamService.getTeamById(teamId).getName();
         // already add to user side when request to join
         JSONObject one = new JSONObject();
-        one.put("approverUid", adapterDeterlab.getDeterUserIdByNclUserId(approver.getId()));
-        one.put("uid", adapterDeterlab.getDeterUserIdByNclUserId(userId));
+        one.put("approverUid", adapterDeterLab.getDeterUserIdByNclUserId(approver.getId()));
+        one.put("uid", adapterDeterLab.getDeterUserIdByNclUserId(userId));
         one.put("pid", pid);
         one.put("gid", pid);
-        adapterDeterlab.approveJoinRequest(one.toString());
+        adapterDeterLab.approveJoinRequest(one.toString());
         teamService.updateMemberStatus(teamId, userId, MemberStatus.APPROVED);
     }
 
@@ -313,11 +302,11 @@ public class RegistrationServiceImpl implements RegistrationService {
                 teamService.removeMember(teamId, member);
                 // FIXME call adapter deterlab
                 JSONObject object = new JSONObject();
-                object.put("approverUid", adapterDeterlab.getDeterUserIdByNclUserId(approver.getId()));
-                object.put("uid", adapterDeterlab.getDeterUserIdByNclUserId(userId));
+                object.put("approverUid", adapterDeterLab.getDeterUserIdByNclUserId(approver.getId()));
+                object.put("uid", adapterDeterLab.getDeterUserIdByNclUserId(userId));
                 object.put("pid", pid);
                 object.put("gid", pid);
-                adapterDeterlab.rejectJoinRequest(object.toString());
+                adapterDeterLab.rejectJoinRequest(object.toString());
             }
         }
     }
@@ -353,7 +342,7 @@ public class RegistrationServiceImpl implements RegistrationService {
         one.put("pid", team.getName());
 
         if (status.equals(TeamStatus.APPROVED)) {
-            adapterDeterlab.approveProject(one.toString());
+            adapterDeterLab.approveProject(one.toString());
         } else {
             // FIXME may need to be more specific and check if TeamStatus is REJECTED
             Team existingTeam = teamService.getTeamById(teamId);
@@ -364,7 +353,7 @@ public class RegistrationServiceImpl implements RegistrationService {
             }
             // remove from team side
             teamService.removeTeam(teamId);
-            adapterDeterlab.rejectProject(one.toString());
+            adapterDeterLab.rejectProject(one.toString());
         }
     }
 
@@ -439,7 +428,7 @@ public class RegistrationServiceImpl implements RegistrationService {
     private void addNclUserIdMapping(String resultJSON, String nclUserId) {
         JSONObject userObject = new JSONObject(resultJSON);
         String deterUserId = userObject.getString("uid");
-        adapterDeterlab.saveDeterUserIdMapping(deterUserId, nclUserId);
+        adapterDeterLab.saveDeterUserIdMapping(deterUserId, nclUserId);
     }
 
     private void addUserToRegistrationRepository(String resultJSON, User user, Team team) {

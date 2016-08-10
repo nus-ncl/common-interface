@@ -3,20 +3,12 @@ package sg.ncl.adapter.deterlab;
 import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpMethod;
-import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.*;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 import sg.ncl.adapter.deterlab.data.jpa.DeterlabUserRepository;
 import sg.ncl.adapter.deterlab.dtos.entities.DeterlabUserEntity;
-import sg.ncl.adapter.deterlab.exceptions.AdapterDeterlabConnectException;
-import sg.ncl.adapter.deterlab.exceptions.CredentialsUpdateException;
-import sg.ncl.adapter.deterlab.exceptions.ExpNameAlreadyExistsException;
-import sg.ncl.adapter.deterlab.exceptions.NSFileParseException;
-import sg.ncl.adapter.deterlab.exceptions.UserNotFoundException;
+import sg.ncl.adapter.deterlab.exceptions.*;
 
 import javax.inject.Inject;
 
@@ -25,17 +17,17 @@ import javax.inject.Inject;
  * Created by Te Ye on 15-Jun-16.
  */
 @Component
-public class AdapterDeterlab {
+public class AdapterDeterLab {
 
     private DeterlabUserRepository deterlabUserRepository;
     private ConnectionProperties properties;
-    private static final Logger logger = LoggerFactory.getLogger(AdapterDeterlab.class);
+    private static final Logger logger = LoggerFactory.getLogger(AdapterDeterLab.class);
 
     @Inject
     private RestTemplate restTemplate;
 
     @Inject
-    public AdapterDeterlab(DeterlabUserRepository repository, ConnectionProperties connectionProperties) {
+    public AdapterDeterLab(DeterlabUserRepository repository, ConnectionProperties connectionProperties) {
         this.deterlabUserRepository = repository;
         this.properties = connectionProperties;
     }
