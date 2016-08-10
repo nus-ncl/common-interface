@@ -1,14 +1,14 @@
 package sg.ncl.service.realization.web;
 
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import sg.ncl.service.realization.data.jpa.RealizationEntity;
+import sg.ncl.service.realization.domain.Realization;
 import sg.ncl.service.realization.logic.RealizationService;
 
 import javax.inject.Inject;
+import javax.validation.constraints.NotNull;
 
 /**
  * @author Christopher Zhong
@@ -20,23 +20,29 @@ public class RealizationsController {
     private final RealizationService realizationService;
 
     @Inject
-    protected RealizationsController(final RealizationService realizationService) {
+    RealizationsController(@NotNull final RealizationService realizationService) {
         this.realizationService = realizationService;
     }
 
-    @RequestMapping(path = "/{expId}", method = RequestMethod.GET)
-    public RealizationEntity get(@PathVariable String expId) {
-        return realizationService.getByExperimentId(Long.parseLong(expId));
+    @GetMapping(path = "/{id}")
+    @ResponseStatus(HttpStatus.OK)
+    public Realization get(@PathVariable String id) {
+        return realizationService.getByExperimentId(Long.parseLong(id));
     }
 
-    @RequestMapping(path = "/start/team/{teamName}/experiment/{expId}", method = RequestMethod.POST)
-    public RealizationEntity startExperiment(@PathVariable String teamName, @PathVariable String expId) {
+    @PostMapping(path = "/start/team/{teamName}/experiment/{expId}")
+    // FIXME: path should be blank
+    @ResponseStatus(HttpStatus.ACCEPTED)
+    public Realization startExperiment(@PathVariable String teamName, @PathVariable String expId) {
         RealizationEntity realizationEntityDb = realizationService.getByExperimentId(Long.parseLong(expId));
         return realizationService.startExperimentInDeter(teamName, realizationEntityDb.getExperimentName(), realizationEntityDb.getUserId());
     }
 
+    @PostMapping(path = "/stop/team/{teamName}/experiment/{expId}")
+    // FIXME: path should be "/{id}"
     @RequestMapping(path = "/stop/team/{teamName}/experiment/{expId}", method = RequestMethod.POST)
-    public RealizationEntity stopExperiment(@PathVariable String teamName, @PathVariable String expId) {
+    @ResponseStatus(HttpStatus.ACCEPTED)
+    public Realization stopExperiment(@PathVariable String teamName, @PathVariable String expId) {
         RealizationEntity realizationEntityDb = realizationService.getByExperimentId(Long.parseLong(expId));
         return realizationService.stopExperimentInDeter(teamName, realizationEntityDb.getExperimentName(), realizationEntityDb.getUserId());
     }
