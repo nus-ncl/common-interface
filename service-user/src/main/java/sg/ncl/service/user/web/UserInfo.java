@@ -17,28 +17,28 @@ import java.util.List;
 public class UserInfo implements User {
 
     private final String id;
-    private final UserDetailsInfo details;
-    private final Boolean emailVerification;
+    private final UserDetailsInfo userDetails;
+    private final boolean emailVerified;
     private final UserStatus status;
     private final ZonedDateTime applicationDate;
     private final ZonedDateTime processedDate;
-    private final List<LoginActivity> loginActivities;
+    private final List<? extends LoginActivity> loginActivities;
     private final List<String> teams;
 
     @JsonCreator
     public UserInfo(
             @JsonProperty("id") final String id,
-            @JsonProperty("userDetails") final UserDetailsInfo details,
-            @JsonProperty("emailVerified") final Boolean emailVerification,
+            @JsonProperty("userDetails") final UserDetailsInfo userDetails,
+            @JsonProperty("emailVerified") final boolean emailVerified,
             @JsonProperty("status") final UserStatus status,
             @JsonProperty("applicationDate") final ZonedDateTime applicationDate,
             @JsonProperty("processedDate") final ZonedDateTime processedDate,
-            @JsonProperty("loginActivities") final List<LoginActivity> loginActivities,
+            @JsonProperty("loginActivities") final List<? extends LoginActivity> loginActivities,
             @JsonProperty("teams") final List<String> teams
     ) {
         this.id = id;
-        this.details = details;
-        this.emailVerification = emailVerification;
+        this.userDetails = userDetails;
+        this.emailVerified = emailVerified;
         this.status = status;
         this.applicationDate = applicationDate;
         this.processedDate = processedDate;
@@ -49,8 +49,8 @@ public class UserInfo implements User {
     public UserInfo(final User user) {
         this(
                 user.getId(),
-                new UserDetailsInfo(user.getDetails()),
-                user.getEmailVerification(),
+                new UserDetailsInfo(user.getUserDetails()),
+                user.isEmailVerified(),
                 user.getStatus(),
                 user.getApplicationDate(),
                 user.getProcessedDate(),

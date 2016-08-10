@@ -76,8 +76,8 @@ public class UserServiceTest extends AbstractTest {
 
         User fromDbEntity = userService.getUser(idString);
 
-        UserDetailsEntity originalDetails = originalEntity.getDetails();
-        UserDetails fromDbDetails = fromDbEntity.getDetails();
+        UserDetailsEntity originalDetails = originalEntity.getUserDetails();
+        UserDetails fromDbDetails = fromDbEntity.getUserDetails();
         Assert.assertEquals(originalDetails.getFirstName(), fromDbDetails.getFirstName());
         Assert.assertEquals(originalDetails.getLastName(), fromDbDetails.getLastName());
         Assert.assertEquals(originalDetails.getJobTitle(), fromDbDetails.getJobTitle());
@@ -105,17 +105,17 @@ public class UserServiceTest extends AbstractTest {
 
         // get user and store the original last name
         User user = userService.getUser(idString);
-        final String originalLastName = user.getDetails().getLastName();
+        final String originalLastName = user.getUserDetails().getLastName();
 
         // change first name and put
         String newFirstName = RandomStringUtils.randomAlphabetic(20);
-        userEntityArray[0].getDetails().setFirstName(newFirstName);
+        userEntityArray[0].getUserDetails().setFirstName(newFirstName);
 
         userService.updateUser(idString, userEntityArray[0]);
 
         user = userService.getUser(idString);
-        Assert.assertEquals(user.getDetails().getFirstName(), newFirstName);
-        Assert.assertEquals(user.getDetails().getLastName(), originalLastName);
+        Assert.assertEquals(user.getUserDetails().getFirstName(), newFirstName);
+        Assert.assertEquals(user.getUserDetails().getLastName(), originalLastName);
     }
 
     @Test
@@ -125,7 +125,7 @@ public class UserServiceTest extends AbstractTest {
         final UserEntity userEntity = Util.getUserEntity();
         UserEntity savedUserEntity = userRepository.save(userEntity);
 
-        savedUserEntity.getDetails().setFirstName(null);
+        savedUserEntity.getUserDetails().setFirstName(null);
 
         userService.updateUser(savedUserEntity.getId(), savedUserEntity);
     }
@@ -177,7 +177,7 @@ public class UserServiceTest extends AbstractTest {
         User user = userService.createUser(userEntity);
 
         User userFromDb = userService.getUser(user.getId());
-        Assert.assertEquals(userEntity.getDetails().getFirstName(), userFromDb.getDetails().getFirstName());
+        Assert.assertEquals(userEntity.getUserDetails().getFirstName(), userFromDb.getUserDetails().getFirstName());
     }
 
     @Test(expected = UserIdNullException.class)

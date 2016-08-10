@@ -51,7 +51,7 @@ public class UsersController {
     }
 
     // FIXME: this method is no long used; to be removed
-    @RequestMapping(path = "/{id}/teams", method = RequestMethod.POST)
+    @RequestMapping(path = "/users/{id}/teams", method = RequestMethod.POST)
     @ResponseStatus(value = HttpStatus.OK)
     public void addTeam(@PathVariable String id, @RequestBody UserInfo user) {
         if (user.getTeams() == null || user.getTeams().isEmpty()) {

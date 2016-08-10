@@ -106,20 +106,20 @@ public class UsersControllerTest extends AbstractTest {
         mockMvc.perform(get("/users/" + idString))
                 .andExpect(status().isOk())
                 .andExpect(content().contentTypeCompatibleWith(contentType))
-                .andExpect(jsonPath("$.userDetails.firstName", is(originalEntity.getDetails().getFirstName())))
-                .andExpect(jsonPath("$.userDetails.lastName", is(originalEntity.getDetails().getLastName())))
-                .andExpect(jsonPath("$.userDetails.jobTitle", is(originalEntity.getDetails().getJobTitle())))
-                .andExpect(jsonPath("$.userDetails.email", is(originalEntity.getDetails().getEmail())))
-                .andExpect(jsonPath("$.userDetails.phone", is(originalEntity.getDetails().getPhone())))
-                .andExpect(jsonPath("$.userDetails.institution", is(originalEntity.getDetails().getInstitution())))
-                .andExpect(jsonPath("$.userDetails.institutionAbbreviation", is(originalEntity.getDetails().getInstitutionAbbreviation())))
-                .andExpect(jsonPath("$.userDetails.institutionWeb", is(originalEntity.getDetails().getInstitutionWeb())))
-                .andExpect(jsonPath("$.userDetails.address.address1", is(originalEntity.getDetails().getAddress().getAddress1())))
-                .andExpect(jsonPath("$.userDetails.address.address2", is(originalEntity.getDetails().getAddress().getAddress2())))
-                .andExpect(jsonPath("$.userDetails.address.country", is(originalEntity.getDetails().getAddress().getCountry())))
-                .andExpect(jsonPath("$.userDetails.address.region", is(originalEntity.getDetails().getAddress().getRegion())))
-                .andExpect(jsonPath("$.userDetails.address.city", is(originalEntity.getDetails().getAddress().getCity())))
-                .andExpect(jsonPath("$.userDetails.address.zipCode", is(originalEntity.getDetails().getAddress().getZipCode())));
+                .andExpect(jsonPath("$.userDetails.firstName", is(originalEntity.getUserDetails().getFirstName())))
+                .andExpect(jsonPath("$.userDetails.lastName", is(originalEntity.getUserDetails().getLastName())))
+                .andExpect(jsonPath("$.userDetails.jobTitle", is(originalEntity.getUserDetails().getJobTitle())))
+                .andExpect(jsonPath("$.userDetails.email", is(originalEntity.getUserDetails().getEmail())))
+                .andExpect(jsonPath("$.userDetails.phone", is(originalEntity.getUserDetails().getPhone())))
+                .andExpect(jsonPath("$.userDetails.institution", is(originalEntity.getUserDetails().getInstitution())))
+                .andExpect(jsonPath("$.userDetails.institutionAbbreviation", is(originalEntity.getUserDetails().getInstitutionAbbreviation())))
+                .andExpect(jsonPath("$.userDetails.institutionWeb", is(originalEntity.getUserDetails().getInstitutionWeb())))
+                .andExpect(jsonPath("$.userDetails.address.address1", is(originalEntity.getUserDetails().getAddress().getAddress1())))
+                .andExpect(jsonPath("$.userDetails.address.address2", is(originalEntity.getUserDetails().getAddress().getAddress2())))
+                .andExpect(jsonPath("$.userDetails.address.country", is(originalEntity.getUserDetails().getAddress().getCountry())))
+                .andExpect(jsonPath("$.userDetails.address.region", is(originalEntity.getUserDetails().getAddress().getRegion())))
+                .andExpect(jsonPath("$.userDetails.address.city", is(originalEntity.getUserDetails().getAddress().getCity())))
+                .andExpect(jsonPath("$.userDetails.address.zipCode", is(originalEntity.getUserDetails().getAddress().getZipCode())));
     }
 
     @Test
@@ -145,17 +145,17 @@ public class UsersControllerTest extends AbstractTest {
         mapper.registerModule(new JavaTimeModule());
 
         UserEntity userEntityFromDb = mapper.readValue(jsonString, UserEntity.class);
-        String originalLastName = userEntityFromDb.getDetails().getLastName();
+        String originalLastName = userEntityFromDb.getUserDetails().getLastName();
 
         // change first name
         String newFirstName = RandomStringUtils.randomAlphabetic(20);
-        userEntityFromDb.getDetails().setFirstName(newFirstName);
+        userEntityFromDb.getUserDetails().setFirstName(newFirstName);
 
         String jsonInString = mapper.writeValueAsString(userEntityFromDb);
 
         // put
         mockMvc.perform(put("/users/" + idString).contentType(contentType).content(jsonInString))
-                .andExpect(status().isAccepted());
+                .andExpect(status().isOk());
 
         // check if first name is new first name and last name is the same
         mockMvc.perform(get("/users/" + idString))
@@ -184,13 +184,13 @@ public class UsersControllerTest extends AbstractTest {
         mapper.registerModule(new JavaTimeModule());
 
         UserEntity userEntity = mapper.readValue(jsonString, UserEntity.class);
-        userEntity.getDetails().setFirstName(null);
+        userEntity.getUserDetails().setFirstName(null);
 
         String jsonInString = mapper.writeValueAsString(userEntity);
 
         // put
         mockMvc.perform(put("/users/" + idString).contentType(contentType).content(jsonInString))
-                .andExpect(status().isAccepted());
+                .andExpect(status().isOk());
     }
 
     @Test

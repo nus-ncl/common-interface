@@ -45,7 +45,7 @@ public class UserEntity extends AbstractEntity implements User {
 
     @Column(name = "is_email_verified", nullable = false)
     @Type(type = "yes_no")
-    private boolean emailVerified;
+    private boolean emailVerified = false;
 
     @Column(name = "status", nullable = false)
     @Enumerated(EnumType.STRING)
@@ -76,7 +76,7 @@ public class UserEntity extends AbstractEntity implements User {
     }
 
     @Override
-    public UserDetailsEntity getDetails() {
+    public UserDetailsEntity getUserDetails() {
         return userDetails;
     }
 
@@ -85,7 +85,7 @@ public class UserEntity extends AbstractEntity implements User {
     }
 
     @Override
-    public boolean getEmailVerification() {
+    public boolean isEmailVerified() {
         return emailVerified;
     }
 

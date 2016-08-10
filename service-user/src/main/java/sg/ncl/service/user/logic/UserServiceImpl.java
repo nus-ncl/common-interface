@@ -33,7 +33,7 @@ public class UserServiceImpl implements UserService {
         final UserEntity userEntity = new UserEntity();
         userEntity.setApplicationDate(user.getApplicationDate());
         userEntity.setProcessedDate(user.getProcessedDate());
-        userEntity.setUserDetails((UserDetailsEntity) user.getDetails());
+        userEntity.setUserDetails((UserDetailsEntity) user.getUserDetails());
 
         UserEntity savedUserEntity = userRepository.save(userEntity);
         return savedUserEntity;
@@ -53,64 +53,64 @@ public class UserServiceImpl implements UserService {
     public void updateUser(final String id, final User user) {
         final UserEntity one = findUser(id);
 
-        if (user.getDetails().getFirstName() != null) {
-            one.getDetails().setFirstName(user.getDetails().getFirstName());
+        if (user.getUserDetails().getFirstName() != null) {
+            one.getUserDetails().setFirstName(user.getUserDetails().getFirstName());
         }
 
-        if (user.getDetails().getLastName() != null) {
-            one.getDetails().setLastName(user.getDetails().getLastName());
+        if (user.getUserDetails().getLastName() != null) {
+            one.getUserDetails().setLastName(user.getUserDetails().getLastName());
         }
 
-        if (user.getDetails().getJobTitle() != null) {
-            one.getDetails().setJobTitle(user.getDetails().getJobTitle());
+        if (user.getUserDetails().getJobTitle() != null) {
+            one.getUserDetails().setJobTitle(user.getUserDetails().getJobTitle());
         }
 
-        if (user.getDetails().getEmail() != null) {
-            one.getDetails().setEmail(user.getDetails().getEmail());
+        if (user.getUserDetails().getEmail() != null) {
+            one.getUserDetails().setEmail(user.getUserDetails().getEmail());
         }
 
-        if (user.getDetails().getPhone() != null) {
-            one.getDetails().setPhone(user.getDetails().getPhone());
+        if (user.getUserDetails().getPhone() != null) {
+            one.getUserDetails().setPhone(user.getUserDetails().getPhone());
         }
 
-        if (user.getDetails().getInstitution() != null) {
-            one.getDetails().setInstitution(user.getDetails().getInstitution());
+        if (user.getUserDetails().getInstitution() != null) {
+            one.getUserDetails().setInstitution(user.getUserDetails().getInstitution());
         }
 
-        if (user.getDetails().getInstitutionAbbreviation() != null) {
-            one.getDetails().setInstitutionAbbreviation(user.getDetails().getInstitutionAbbreviation());
+        if (user.getUserDetails().getInstitutionAbbreviation() != null) {
+            one.getUserDetails().setInstitutionAbbreviation(user.getUserDetails().getInstitutionAbbreviation());
         }
 
-        if (user.getDetails().getInstitutionWeb() != null) {
-            one.getDetails().setInstitutionWeb(user.getDetails().getInstitutionWeb());
+        if (user.getUserDetails().getInstitutionWeb() != null) {
+            one.getUserDetails().setInstitutionWeb(user.getUserDetails().getInstitutionWeb());
         }
 
-        final Address userAddress = user.getDetails().getAddress();
+        final Address userAddress = user.getUserDetails().getAddress();
 
         if (userAddress != null) {
 
             if (userAddress.getAddress1() != null) {
-                one.getDetails().getAddress().setAddress1(userAddress.getAddress1());
+                one.getUserDetails().getAddress().setAddress1(userAddress.getAddress1());
             }
 
             if (userAddress.getAddress2() != null) {
-                one.getDetails().getAddress().setAddress2(userAddress.getAddress2());
+                one.getUserDetails().getAddress().setAddress2(userAddress.getAddress2());
             }
 
             if (userAddress.getCountry() != null) {
-                one.getDetails().getAddress().setCountry(userAddress.getCountry());
+                one.getUserDetails().getAddress().setCountry(userAddress.getCountry());
             }
 
             if (userAddress.getCity() != null) {
-                one.getDetails().getAddress().setCity(userAddress.getCity());
+                one.getUserDetails().getAddress().setCity(userAddress.getCity());
             }
 
             if (userAddress.getRegion() != null) {
-                one.getDetails().getAddress().setRegion(userAddress.getRegion());
+                one.getUserDetails().getAddress().setRegion(userAddress.getRegion());
             }
 
             if (userAddress.getZipCode() != null) {
-                one.getDetails().getAddress().setZipCode((userAddress.getZipCode()));
+                one.getUserDetails().getAddress().setZipCode((userAddress.getZipCode()));
             }
         }
 
