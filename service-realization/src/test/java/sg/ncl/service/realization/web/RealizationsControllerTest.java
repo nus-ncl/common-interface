@@ -9,7 +9,7 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 import sg.ncl.service.realization.AbstractTest;
 import sg.ncl.service.realization.data.jpa.RealizationEntity;
-import sg.ncl.service.realization.logic.RealizationService;
+import sg.ncl.service.realization.domain.RealizationService;
 
 import javax.inject.Inject;
 

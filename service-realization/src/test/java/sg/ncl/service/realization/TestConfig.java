@@ -3,7 +3,7 @@ package sg.ncl.service.realization;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
-import sg.ncl.service.realization.logic.RealizationService;
+import sg.ncl.service.realization.domain.RealizationService;
 
 import static org.mockito.Mockito.mock;
 

@@ -16,6 +16,7 @@ import sg.ncl.service.realization.AbstractTest;
 import sg.ncl.service.realization.Util;
 import sg.ncl.service.realization.data.jpa.RealizationEntity;
 import sg.ncl.service.realization.data.jpa.RealizationRepository;
+import sg.ncl.service.realization.domain.RealizationService;
 import sg.ncl.service.realization.domain.RealizationState;
 
 import javax.inject.Inject;

@@ -12,7 +12,7 @@ import sg.ncl.service.experiment.domain.Experiment;
 import sg.ncl.service.experiment.domain.ExperimentService;
 import sg.ncl.service.experiment.exceptions.UserIdNotFoundException;
 import sg.ncl.service.realization.data.jpa.RealizationEntity;
-import sg.ncl.service.realization.logic.RealizationService;
+import sg.ncl.service.realization.domain.RealizationService;
 
 import javax.inject.Inject;
 import javax.validation.constraints.NotNull;
