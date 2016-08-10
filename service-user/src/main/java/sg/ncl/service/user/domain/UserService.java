@@ -11,7 +11,7 @@ public interface UserService {
 
     List<User> getAll();
 
-    User findUser(final String id);
+    User getUser(final String id);
 
     void updateUser(final String id, final User user);
 

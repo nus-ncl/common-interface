@@ -78,7 +78,7 @@ public class RegistrationServiceImpl implements RegistrationService {
         }
 
         try {
-            userService.findUser(nclUserId);
+            userService.getUser(nclUserId);
         } catch (UserNotFoundException e) {
             log.warn("No such user, {}", e);
         }

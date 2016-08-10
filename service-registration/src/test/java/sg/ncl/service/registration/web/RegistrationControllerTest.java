@@ -289,8 +289,8 @@ public class RegistrationControllerTest extends AbstractTest {
         mockMvc.perform(delete("/registrations/teams/" + createdTeam.getId() + "/" + "members/" + member.getUserId()).contentType(MediaType.APPLICATION_JSON).content(object.toString()))
                 .andExpect(status().isAccepted());
 
-        User resultUser = userService.findUser(createdUser.getId());
-        User resultUser2 = userService.findUser(createdUser2.getId());
+        User resultUser = userService.getUser(createdUser.getId());
+        User resultUser2 = userService.getUser(createdUser2.getId());
         List<? extends TeamMember> membersList = teamService.getTeamById(createdTeam.getId()).getMembers();
 
         // owner should be in team

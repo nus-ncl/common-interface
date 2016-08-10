@@ -415,7 +415,7 @@ public class RegistrationServiceTest extends AbstractTest {
             Assert.assertThat(e.getMessage(), is(teamId));
         }
 
-        User resultUser = userService.findUser(createdUser.getId());
+        User resultUser = userService.getUser(createdUser.getId());
         List<String> teamsIdList = resultUser.getTeams();
 
         // user should not be in deleted team
@@ -472,7 +472,7 @@ public class RegistrationServiceTest extends AbstractTest {
         registrationService.rejectJoinRequest(team.getId(), user2.getId(), user);
 
         // userService should remove the team
-        User resultUser = userService.findUser(user2.getId());
+        User resultUser = userService.getUser(user2.getId());
         Assert.assertThat(resultUser.getTeams().isEmpty(), is(true));
 
         // teamService should remove team member

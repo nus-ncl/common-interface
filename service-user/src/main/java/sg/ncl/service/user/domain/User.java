@@ -8,7 +8,6 @@ import java.util.List;
  *
  * @author Christopher Zhong
  */
-//@JsonDeserialize(as = UserEntity.class)
 public interface User {
 
     /**
