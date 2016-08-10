@@ -7,7 +7,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import sg.ncl.adapter.deterlab.AdapterDeterLab;
 import sg.ncl.adapter.deterlab.ConnectionProperties;
-import sg.ncl.adapter.deterlab.data.jpa.DeterlabUserRepository;
+import sg.ncl.adapter.deterlab.data.jpa.DeterLabUserRepository;
 import sg.ncl.adapter.deterlab.exceptions.UserNotFoundException;
 import sg.ncl.service.authentication.domain.Credentials;
 import sg.ncl.service.authentication.domain.CredentialsService;
@@ -45,13 +45,13 @@ public class RegistrationServiceImpl implements RegistrationService {
     private final AdapterDeterLab adapterDeterLab;
 
     @Inject
-    RegistrationServiceImpl(@NotNull final CredentialsService credentialsService, @NotNull final TeamService teamService, @NotNull final UserService userService, @NotNull final RegistrationRepository registrationRepository, final DeterlabUserRepository deterlabUserRepository, final ConnectionProperties connectionProperties) {
+    RegistrationServiceImpl(@NotNull final CredentialsService credentialsService, @NotNull final TeamService teamService, @NotNull final UserService userService, @NotNull final RegistrationRepository registrationRepository, final DeterLabUserRepository deterLabUserRepository, final ConnectionProperties connectionProperties) {
         this.credentialsService = credentialsService;
         this.teamService = teamService;
         this.userService = userService;
         this.registrationRepository = registrationRepository;
         // FIXME: why is this getting replaced?
-        this.adapterDeterLab = new AdapterDeterLab(deterlabUserRepository, connectionProperties);
+        this.adapterDeterLab = new AdapterDeterLab(deterLabUserRepository, connectionProperties);
     }
 
     @Transactional

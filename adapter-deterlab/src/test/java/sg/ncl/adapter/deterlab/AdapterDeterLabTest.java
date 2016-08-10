@@ -11,8 +11,8 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.client.MockRestServiceServer;
 import org.springframework.web.client.RestOperations;
 import org.springframework.web.client.RestTemplate;
-import sg.ncl.adapter.deterlab.data.jpa.DeterlabUserRepository;
-import sg.ncl.adapter.deterlab.dtos.entities.DeterlabUserEntity;
+import sg.ncl.adapter.deterlab.data.jpa.DeterLabUserRepository;
+import sg.ncl.adapter.deterlab.dtos.entities.DeterLabUserEntity;
 import sg.ncl.adapter.deterlab.exceptions.AdapterDeterlabConnectException;
 import sg.ncl.adapter.deterlab.exceptions.ExpNameAlreadyExistsException;
 import sg.ncl.adapter.deterlab.exceptions.NSFileParseException;
@@ -34,7 +34,7 @@ public class AdapterDeterLabTest extends AbstractTest {
     private RestOperations restOperations;
 
     @Inject
-    private DeterlabUserRepository deterlabUserRepository;
+    private DeterLabUserRepository deterLabUserRepository;
 
     @Inject
     private AdapterDeterLab adapterDeterLab;
@@ -111,8 +111,8 @@ public class AdapterDeterLabTest extends AbstractTest {
         String deterUserId = RandomStringUtils.randomAlphanumeric(8);
 
         adapterDeterLab.saveDeterUserIdMapping(deterUserId, nclUserId);
-        Assert.assertThat(deterlabUserRepository.findByDeterUserId(deterUserId), not(nullValue()));
-        Assert.assertThat(deterUserId, is(deterlabUserRepository.findByDeterUserId(deterUserId).getDeterUserId()));
+        Assert.assertThat(deterLabUserRepository.findByDeterUserId(deterUserId), not(nullValue()));
+        Assert.assertThat(deterUserId, is(deterLabUserRepository.findByDeterUserId(deterUserId).getDeterUserId()));
     }
 
     @Test(expected = AdapterDeterlabConnectException.class)
@@ -164,10 +164,10 @@ public class AdapterDeterLabTest extends AbstractTest {
 
     @Test
     public void testGetDeterUserIdGood() {
-        DeterlabUserEntity deterlabUserEntity = Util.getDeterlabUserEntity();
-        deterlabUserRepository.saveAndFlush(deterlabUserEntity);
-        String expectedDeterUserId = adapterDeterLab.getDeterUserIdByNclUserId(deterlabUserEntity.getNclUserId());
-        Assert.assertThat(deterlabUserEntity.getDeterUserId(), is(expectedDeterUserId));
+        DeterLabUserEntity deterLabUserEntity = Util.getDeterlabUserEntity();
+        deterLabUserRepository.saveAndFlush(deterLabUserEntity);
+        String expectedDeterUserId = adapterDeterLab.getDeterUserIdByNclUserId(deterLabUserEntity.getNclUserId());
+        Assert.assertThat(deterLabUserEntity.getDeterUserId(), is(expectedDeterUserId));
     }
 
     @Test

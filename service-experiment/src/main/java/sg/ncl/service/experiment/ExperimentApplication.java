@@ -4,7 +4,7 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.annotation.Import;
-import sg.ncl.adapter.deterlab.DeterlabAutoConfiguration;
+import sg.ncl.adapter.deterlab.DeterLabAutoConfiguration;
 import sg.ncl.common.jpa.UseJpa;
 import sg.ncl.service.realization.RealizationApplication;
 
@@ -14,7 +14,7 @@ import sg.ncl.service.realization.RealizationApplication;
 @SpringBootApplication
 @UseJpa
 @Import({
-        DeterlabAutoConfiguration.class,
+        DeterLabAutoConfiguration.class,
         RealizationApplication.class,
 })
 public class ExperimentApplication {

@@ -16,7 +16,7 @@ public class TestConfig {
 
     @Bean
     @Profile("mock-deter-adapter")
-    public AdapterDeterLab adapterDeterlab() {
+    public AdapterDeterLab adapterDeterLab() {
         return mock(AdapterDeterLab.class);
     }
 

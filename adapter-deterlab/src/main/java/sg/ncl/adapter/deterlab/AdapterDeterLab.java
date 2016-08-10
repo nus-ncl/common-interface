@@ -6,8 +6,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.http.*;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
-import sg.ncl.adapter.deterlab.data.jpa.DeterlabUserRepository;
-import sg.ncl.adapter.deterlab.dtos.entities.DeterlabUserEntity;
+import sg.ncl.adapter.deterlab.data.jpa.DeterLabUserRepository;
+import sg.ncl.adapter.deterlab.dtos.entities.DeterLabUserEntity;
 import sg.ncl.adapter.deterlab.exceptions.*;
 
 import javax.inject.Inject;
@@ -19,7 +19,7 @@ import javax.inject.Inject;
 @Component
 public class AdapterDeterLab {
 
-    private DeterlabUserRepository deterlabUserRepository;
+    private DeterLabUserRepository deterLabUserRepository;
     private ConnectionProperties properties;
     private static final Logger logger = LoggerFactory.getLogger(AdapterDeterLab.class);
 
@@ -27,8 +27,8 @@ public class AdapterDeterLab {
     private RestTemplate restTemplate;
 
     @Inject
-    public AdapterDeterLab(DeterlabUserRepository repository, ConnectionProperties connectionProperties) {
-        this.deterlabUserRepository = repository;
+    public AdapterDeterLab(DeterLabUserRepository repository, ConnectionProperties connectionProperties) {
+        this.deterLabUserRepository = repository;
         this.properties = connectionProperties;
     }
 
@@ -106,18 +106,18 @@ public class AdapterDeterLab {
     }
 
     public void saveDeterUserIdMapping(String deterUserId, String nclUserId) {
-        DeterlabUserEntity deterlabUserEntity = new DeterlabUserEntity();
-        deterlabUserEntity.setNclUserId(nclUserId);
-        deterlabUserEntity.setDeterUserId(deterUserId);
-        deterlabUserRepository.save(deterlabUserEntity);
+        DeterLabUserEntity deterLabUserEntity = new DeterLabUserEntity();
+        deterLabUserEntity.setNclUserId(nclUserId);
+        deterLabUserEntity.setDeterUserId(deterUserId);
+        deterLabUserRepository.save(deterLabUserEntity);
     }
 
     public String getDeterUserIdByNclUserId(String nclUserId) {
-        DeterlabUserEntity deterlabUserEntity = deterlabUserRepository.findByNclUserId(nclUserId);
-        if (deterlabUserEntity == null) {
+        DeterLabUserEntity deterLabUserEntity = deterLabUserRepository.findByNclUserId(nclUserId);
+        if (deterLabUserEntity == null) {
             throw new UserNotFoundException();
         }
-        return deterlabUserEntity.getDeterUserId();
+        return deterLabUserEntity.getDeterUserId();
     }
 
     public void createExperiment(String jsonString) {
