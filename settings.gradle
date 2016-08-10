@@ -7,10 +7,12 @@ include 'common-test'
 
 include 'service-authentication'
 include 'service-experiment'
+include 'service-mail'
 include 'service-realization'
 include 'service-registration'
 include 'service-team'
 include 'service-user'
 include 'service-version'
+
 
 
