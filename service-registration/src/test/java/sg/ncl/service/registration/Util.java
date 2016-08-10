@@ -5,7 +5,7 @@ import sg.ncl.service.authentication.data.jpa.CredentialsEntity;
 import sg.ncl.service.registration.data.jpa.RegistrationEntity;
 import sg.ncl.service.team.data.jpa.TeamEntity;
 import sg.ncl.service.team.data.jpa.TeamMemberEntity;
-import sg.ncl.service.team.domain.TeamMemberType;
+import sg.ncl.service.team.domain.MemberType;
 import sg.ncl.service.team.web.TeamMemberInfo;
 import sg.ncl.service.user.data.jpa.AddressEntity;
 import sg.ncl.service.user.data.jpa.UserDetailsEntity;
@@ -40,23 +40,23 @@ public class Util {
         return entity;
     }
 
-    public static TeamMemberInfo getTeamMemberInfo(TeamMemberType teamMemberType) {
+    public static TeamMemberInfo getTeamMemberInfo(MemberType memberType) {
         final Long id = Long.parseLong(RandomStringUtils.randomNumeric(10));
         final TeamMemberEntity teamMemberEntity = new TeamMemberEntity();
         teamMemberEntity.setId(id);
         teamMemberEntity.setUserId(RandomStringUtils.randomAlphanumeric(20));
         teamMemberEntity.setJoinedDate(ZonedDateTime.now());
-        teamMemberEntity.setMemberType(teamMemberType);
+        teamMemberEntity.setMemberType(memberType);
         return new TeamMemberInfo(teamMemberEntity);
     }
 
-    public static TeamMemberInfo getTeamMemberInfo(String userId, TeamMemberType teamMemberType) {
+    public static TeamMemberInfo getTeamMemberInfo(String userId, MemberType memberType) {
         final Long id = Long.parseLong(RandomStringUtils.randomNumeric(10));
         final TeamMemberEntity teamMemberEntity = new TeamMemberEntity();
         teamMemberEntity.setId(id);
         teamMemberEntity.setUserId(userId);
         teamMemberEntity.setJoinedDate(ZonedDateTime.now());
-        teamMemberEntity.setMemberType(teamMemberType);
+        teamMemberEntity.setMemberType(memberType);
         return new TeamMemberInfo(teamMemberEntity);
     }
 

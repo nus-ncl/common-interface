@@ -5,6 +5,4 @@ import org.springframework.data.jpa.repository.JpaRepository;
 /**
  * @author Yeo Te Ye
  */
-public interface RegistrationRepository extends JpaRepository<RegistrationEntity, String> {
-
-}
+public interface RegistrationRepository extends JpaRepository<RegistrationEntity, String> {}

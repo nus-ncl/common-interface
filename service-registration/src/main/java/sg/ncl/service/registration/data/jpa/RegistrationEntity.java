@@ -14,6 +14,7 @@ import javax.persistence.Table;
  */
 @Entity
 @Table(name = "registrations")
+// FIXME: a number of deterlab related stuff should be moved to the adapter
 public class RegistrationEntity extends AbstractEntity implements Registration {
 
     @Id

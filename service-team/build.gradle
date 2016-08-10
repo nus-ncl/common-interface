@@ -2,13 +2,11 @@ version '1.0-SNAPSHOT'
 
 dependencies {
     compile project(':common')
-    compile('com.fasterxml.jackson.datatype:jackson-datatype-jsr310')
-    compile('com.google.code.gson:gson')
-    compile('org.json:json')
-    compile('org.apache.commons:commons-lang3:3.4')
+    compile 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310'
+    // FIXME: jsr310 should not be needed
 
     runtime 'mysql:mysql-connector-java'
-    runtime 'org.postgresql:postgresql'
 
     testCompile project(':common-test')
+    testCompile 'com.google.code.gson:gson'
 }

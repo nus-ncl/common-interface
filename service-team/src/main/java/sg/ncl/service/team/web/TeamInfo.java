@@ -2,6 +2,7 @@ package sg.ncl.service.team.web;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import lombok.Getter;
 import sg.ncl.service.team.domain.Team;
 import sg.ncl.service.team.domain.TeamMember;
 import sg.ncl.service.team.domain.TeamPrivacy;
@@ -15,6 +16,7 @@ import java.util.stream.Collectors;
 /**
  * Created by Te Ye
  */
+@Getter
 public class TeamInfo implements Team {
 
     private final String id;
@@ -57,7 +59,8 @@ public class TeamInfo implements Team {
     }
 
     public TeamInfo(final Team team) {
-        this(team.getId(),
+        this(
+                team.getId(),
                 team.getName(),
                 team.getDescription(),
                 team.getWebsite(),
@@ -67,67 +70,7 @@ public class TeamInfo implements Team {
                 team.getStatus(),
                 team.getApplicationDate(),
                 team.getProcessedDate(),
-                team.getMembers());
-    }
-
-    public String getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public String getWebsite() {
-        return website;
-    }
-
-    public String getOrganisationType() {
-        return organisationType;
-    }
-
-    public TeamVisibility getVisibility() {
-        return visibility;
-    }
-
-    public TeamPrivacy getPrivacy() {
-        return privacy;
-    }
-
-    public TeamStatus getStatus() {
-        return status;
-    }
-
-    public ZonedDateTime getApplicationDate() {
-        return applicationDate;
-    }
-
-    public ZonedDateTime getProcessedDate() {
-        return processedDate;
-    }
-
-    public List<? extends TeamMember> getMembers() {
-        return members;
-    }
-
-    @Override
-    public String toString() {
-        return "TeamInfo{" +
-                "id='" + id + '\'' +
-                ", name='" + name + '\'' +
-                ", description='" + description + '\'' +
-                ", website='" + website + '\'' +
-                ", organisationType='" + organisationType + '\'' +
-                ", visibility=" + visibility +
-                ", privacy=" + privacy +
-                ", status=" + status +
-                ", applicationDate=" + applicationDate +
-                ", processedDate=" + processedDate +
-                ", members=" + members +
-                '}';
+                team.getMembers()
+        );
     }
 }

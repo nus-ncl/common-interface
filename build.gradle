@@ -46,6 +46,10 @@ allprojects {
         }
     }
 
+    compileJava {
+        dependsOn(processResources)
+    }
+
     jacocoTestReport {
         reports {
             xml {
@@ -59,11 +63,7 @@ dependencies {
     // the only compile dependencies needed here are the services projects;
     // there should be no other compile dependencies
     compile subprojects.findAll({ it.name.startsWith('service-') })
-    compile 'org.projectlombok:lombok'
     // the runtime dependencies should be a union of all runtime dependencies needed by all sub-projects
-    runtime 'mysql:mysql-connector-java'
-    runtime 'org.postgresql:postgresql'
-    runtime 'com.h2database:h2'
 
     testCompile project(':common-test')
 }

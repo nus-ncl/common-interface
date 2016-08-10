@@ -12,7 +12,3 @@ dependencies {
 
     testCompile project(':common-test')
 }
-
-compileJava {
-    dependsOn processResources
-}

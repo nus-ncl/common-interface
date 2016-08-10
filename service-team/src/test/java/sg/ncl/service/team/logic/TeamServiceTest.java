@@ -6,10 +6,10 @@ import org.junit.Test;
 import sg.ncl.service.team.AbstractTest;
 import sg.ncl.service.team.Util;
 import sg.ncl.service.team.data.jpa.TeamEntity;
+import sg.ncl.service.team.domain.MemberStatus;
+import sg.ncl.service.team.domain.MemberType;
 import sg.ncl.service.team.domain.Team;
 import sg.ncl.service.team.domain.TeamMember;
-import sg.ncl.service.team.domain.TeamMemberStatus;
-import sg.ncl.service.team.domain.TeamMemberType;
 import sg.ncl.service.team.domain.TeamService;
 import sg.ncl.service.team.domain.TeamStatus;
 import sg.ncl.service.team.domain.TeamVisibility;
@@ -37,7 +37,7 @@ public class TeamServiceTest extends AbstractTest {
     @Test
     public void testSaveTeam() {
         TeamEntity createdTeam = Util.getTeamEntity();
-        Team saveTeam = teamService.addTeam(createdTeam);
+        Team saveTeam = teamService.createTeam(createdTeam);
 
         Assert.assertEquals(createdTeam.getName(), saveTeam.getName());
         Assert.assertEquals(createdTeam.getDescription(), saveTeam.getDescription());
@@ -55,7 +55,7 @@ public class TeamServiceTest extends AbstractTest {
     @Test
     public void testFindTeam() {
         TeamEntity createdTeam = Util.getTeamEntity();
-        Team team = teamService.addTeam(createdTeam);
+        Team team = teamService.createTeam(createdTeam);
 
         Team getTeam = teamService.getTeamById(team.getId());
 
@@ -65,7 +65,7 @@ public class TeamServiceTest extends AbstractTest {
 
     @Test
     public void testGetAllTeamsWithNoUserInDb() throws Exception {
-        List<? extends Team> list = teamService.getTeams();
+        List<? extends Team> list = teamService.getAllTeams();
         Assert.assertTrue(list.size() == 0);
     }
 
@@ -96,7 +96,7 @@ public class TeamServiceTest extends AbstractTest {
     @Test
     public void testGetTeamWithValidName() throws Exception {
         TeamEntity createdTeam = Util.getTeamEntity();
-        Team team = teamService.addTeam(createdTeam);
+        Team team = teamService.createTeam(createdTeam);
 
         Team resultTeam = teamService.getTeamByName(team.getName());
 
@@ -112,10 +112,10 @@ public class TeamServiceTest extends AbstractTest {
         List<Team> teamInfoList = new ArrayList<>();
 
         for (int i = 0; i < 3; i++) {
-            teamInfoList.add(teamService.addTeam(Util.getTeamEntity()));
+            teamInfoList.add(teamService.createTeam(Util.getTeamEntity()));
         }
 
-        List<? extends Team> resultTeamList = teamService.getTeams();
+        List<? extends Team> resultTeamList = teamService.getAllTeams();
 
         Assert.assertTrue(isListTeamEqual(resultTeamList, teamInfoList));
     }
@@ -123,7 +123,7 @@ public class TeamServiceTest extends AbstractTest {
     @Test
     public void testUpdateTeamInfo() throws Exception {
         TeamEntity teamEntity = Util.getTeamEntity();
-        Team createdTeam = teamService.addTeam(teamEntity);
+        Team createdTeam = teamService.createTeam(teamEntity);
         final String id = createdTeam.getId();
 
         String description = RandomStringUtils.randomAlphanumeric(20);
@@ -149,14 +149,14 @@ public class TeamServiceTest extends AbstractTest {
     public void testUpdateTeamEmptyId() throws Exception {
         TeamEntity teamEntity = Util.getTeamEntity();
         teamEntity.setName(RandomStringUtils.randomAlphanumeric(20));
-        Team team = teamService.addTeam(teamEntity);
+        Team team = teamService.createTeam(teamEntity);
         teamService.updateTeam("", team);
     }
 
     @Test
     public void testUpdateTeamNullField() {
         TeamEntity team = Util.getTeamEntity();
-        Team createdTeam = teamService.addTeam(team);
+        Team createdTeam = teamService.createTeam(team);
         final String id = createdTeam.getId();
 
         team.setDescription(null);
@@ -168,13 +168,13 @@ public class TeamServiceTest extends AbstractTest {
     @Test
     public void testAddUserToTeam() throws Exception {
         TeamEntity team = Util.getTeamEntity();
-        TeamMemberInfo teamMemberInfo = Util.getTeamMemberInfo(TeamMemberType.MEMBER);
-        Team createdTeam = teamService.addTeam(team);
+        TeamMemberInfo teamMemberInfo = Util.getTeamMemberInfo(MemberType.MEMBER);
+        Team createdTeam = teamService.createTeam(team);
 
         // get team id from newly saved team
         String id = createdTeam.getId();
 
-        teamService.addTeamMember(id, teamMemberInfo);
+        teamService.addMember(id, teamMemberInfo);
 
         // find the team and check if user is in it
         Team teamFromDb = teamService.getTeamById(id);
@@ -184,85 +184,85 @@ public class TeamServiceTest extends AbstractTest {
     @Test
     public void testIsTeamOwnerGood() throws Exception {
         TeamEntity team = Util.getTeamEntity();
-        TeamMemberInfo teamMemberInfo = Util.getTeamMemberInfo(TeamMemberType.OWNER);
-        Team createdTeam = teamService.addTeam(team);
+        TeamMemberInfo teamMemberInfo = Util.getTeamMemberInfo(MemberType.OWNER);
+        Team createdTeam = teamService.createTeam(team);
 
         String userId = teamMemberInfo.getUserId();
         String teamId = createdTeam.getId();
-        teamService.addTeamMember(teamId, teamMemberInfo);
+        teamService.addMember(teamId, teamMemberInfo);
 
-        Assert.assertThat(teamService.isTeamOwner(userId, teamId), is(true));
+        Assert.assertThat(teamService.isOwner(teamId, userId), is(true));
     }
 
     @Test
     public void testIsTeamOwnerBad() throws Exception {
         TeamEntity team = Util.getTeamEntity();
-        TeamMemberInfo teamMemberInfo = Util.getTeamMemberInfo(TeamMemberType.MEMBER);
-        Team createdTeam = teamService.addTeam(team);
+        TeamMemberInfo teamMemberInfo = Util.getTeamMemberInfo(MemberType.MEMBER);
+        Team createdTeam = teamService.createTeam(team);
 
         String userId = teamMemberInfo.getUserId();
         String teamId = createdTeam.getId();
-        teamService.addTeamMember(teamId, teamMemberInfo);
+        teamService.addMember(teamId, teamMemberInfo);
 
-        Assert.assertThat(teamService.isTeamOwner(userId, teamId), is(false));
+        Assert.assertThat(teamService.isOwner(teamId, userId), is(false));
     }
 
     @Test
     public void changeTeamMemberStatusGood() throws Exception {
         TeamEntity team = Util.getTeamEntity();
-        TeamMemberInfo teamMemberInfo = Util.getTeamMemberInfo(TeamMemberType.MEMBER);
-        Team createdTeam = teamService.addTeam(team);
+        TeamMemberInfo teamMemberInfo = Util.getTeamMemberInfo(MemberType.MEMBER);
+        Team createdTeam = teamService.createTeam(team);
 
         String userId = teamMemberInfo.getUserId();
         String teamId = createdTeam.getId();
 
-        teamService.addTeamMember(teamId, teamMemberInfo);
+        teamService.addMember(teamId, teamMemberInfo);
 
-        TeamMember result = teamService.changeTeamMemberStatus(userId, teamId, TeamMemberStatus.APPROVED);
+        TeamMember result = teamService.updateMemberStatus(teamId, userId, MemberStatus.APPROVED);
 
         Assert.assertThat(result.getUserId(), is(userId));
         Assert.assertThat(result.getMemberType(), is(teamMemberInfo.getMemberType()));
-        Assert.assertThat(result.getMemberStatus(), is(TeamMemberStatus.APPROVED));
+        Assert.assertThat(result.getMemberStatus(), is(MemberStatus.APPROVED));
     }
 
     @Test(expected = TeamMemberNotFoundException.class)
     public void changeTeamMemberStatusBad() throws Exception {
         // no add team member for this test case
         TeamEntity team = Util.getTeamEntity();
-        TeamMemberInfo teamMemberInfo = Util.getTeamMemberInfo(TeamMemberType.MEMBER);
-        Team createdTeam = teamService.addTeam(team);
+        TeamMemberInfo teamMemberInfo = Util.getTeamMemberInfo(MemberType.MEMBER);
+        Team createdTeam = teamService.createTeam(team);
 
         String userId = teamMemberInfo.getUserId();
         String teamId = createdTeam.getId();
 
         // should throw error here
-        TeamMember result = teamService.changeTeamMemberStatus(userId, teamId, TeamMemberStatus.APPROVED);
+        TeamMember result = teamService.updateMemberStatus(teamId, userId, MemberStatus.APPROVED);
     }
 
     @Test(expected = TeamIdNullOrEmptyException.class)
     public void changeTeamStatusNullTeam() throws Exception {
-        teamService.changeTeamStatus(null, TeamStatus.APPROVED);
+        teamService.updateTeamStatus(null, TeamStatus.APPROVED);
     }
 
     @Test(expected = TeamNotFoundException.class)
     public void changeTeamStatusNoSuchTeam() throws Exception {
-        teamService.changeTeamStatus(RandomStringUtils.randomAlphanumeric(20), TeamStatus.APPROVED);
+        teamService.updateTeamStatus(RandomStringUtils.randomAlphanumeric(20), TeamStatus.APPROVED);
     }
 
     @Test(expected = NoOwnerInTeamException.class)
     public void changeTeamStatusNoOwner() throws Exception {
         Team one = Util.getTeamEntity();
-        Team createdTeam = teamService.addTeam(one);
-        teamService.changeTeamStatus(createdTeam.getId(), TeamStatus.APPROVED);
+        Team createdTeam = teamService.createTeam(one);
+        teamService.updateTeamStatus(createdTeam.getId(), TeamStatus.APPROVED);
     }
 
     @Test
     public void changeTeamStatusGood() throws Exception {
         Team one = Util.getTeamEntity();
-        TeamMemberInfo owner = Util.getTeamMemberInfo(TeamMemberType.OWNER);
-        Team createdTeam = teamService.addTeam(one);
-        teamService.addTeamMember(createdTeam.getId(), owner);
-        Team approvedTeam = teamService.changeTeamStatus(createdTeam.getId(), TeamStatus.APPROVED);
+        TeamMemberInfo owner = Util.getTeamMemberInfo(MemberType.OWNER);
+        Team createdTeam = teamService.createTeam(one);
+        teamService.addMember(createdTeam.getId(), owner);
+        Team approvedTeam = teamService.updateTeamStatus(createdTeam.getId(), TeamStatus.APPROVED);
 
         Assert.assertThat(approvedTeam.getId(), is(createdTeam.getId()));
         Assert.assertThat(approvedTeam.getStatus(), is(TeamStatus.APPROVED));
@@ -283,7 +283,7 @@ public class TeamServiceTest extends AbstractTest {
     //(expected = TeamNotFoundException.class)
     public void removeTeamGood() throws Exception {
         Team one = Util.getTeamEntity();
-        Team createdTeam = teamService.addTeam(one);
+        Team createdTeam = teamService.createTeam(one);
         teamService.removeTeam(createdTeam.getId());
 
         // expect a team not found exception here when retrieving since we already remove the team previously
@@ -293,25 +293,25 @@ public class TeamServiceTest extends AbstractTest {
 
     @Test(expected = TeamIdNullOrEmptyException.class)
     public void removeTeamMemberTeamIdNull() throws Exception {
-        teamService.removeTeamMember(null, Util.getTeamMemberInfo(TeamMemberType.MEMBER));
+        teamService.removeMember(null, Util.getTeamMemberInfo(MemberType.MEMBER));
     }
 
     @Test(expected = TeamNotFoundException.class)
     public void removeTeamMemberTeamNotFound() throws Exception {
-        teamService.removeTeamMember(RandomStringUtils.randomAlphanumeric(20), Util.getTeamMemberInfo(TeamMemberType.MEMBER));
+        teamService.removeMember(RandomStringUtils.randomAlphanumeric(20), Util.getTeamMemberInfo(MemberType.MEMBER));
     }
 
     @Test
     public void removeTeamMemberGood() throws Exception {
         Team one = Util.getTeamEntity();
-        Team createdTeam = teamService.addTeam(one);
-        TeamMemberInfo teamMemberOne = Util.getTeamMemberInfo(TeamMemberType.OWNER);
-        TeamMemberInfo teamMemberTwo = Util.getTeamMemberInfo(TeamMemberType.MEMBER);
+        Team createdTeam = teamService.createTeam(one);
+        TeamMemberInfo teamMemberOne = Util.getTeamMemberInfo(MemberType.OWNER);
+        TeamMemberInfo teamMemberTwo = Util.getTeamMemberInfo(MemberType.MEMBER);
 
-        teamService.addTeamMember(createdTeam.getId(), teamMemberOne);
-        teamService.addTeamMember(createdTeam.getId(), teamMemberTwo);
+        teamService.addMember(createdTeam.getId(), teamMemberOne);
+        teamService.addMember(createdTeam.getId(), teamMemberTwo);
 
-        Team result = teamService.removeTeamMember(createdTeam.getId(), teamMemberTwo);
+        Team result = teamService.removeMember(createdTeam.getId(), teamMemberTwo);
         List<? extends TeamMember> membersList = result.getMembers();
 
         Assert.assertThat(membersList.size(), is(1));

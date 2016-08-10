@@ -7,8 +7,8 @@ import sg.ncl.common.exception.base.NotFoundException;
  */
 public class TeamNotFoundException extends NotFoundException {
 
-    public TeamNotFoundException(String teamId) {
-        super(teamId);
+    public TeamNotFoundException(String id) {
+        super(id);
     }
 
 }
