@@ -5,6 +5,7 @@ import org.json.JSONObject;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
@@ -323,23 +324,26 @@ public class RegistrationServiceTest extends AbstractTest {
 
     @Test(expected = RegisterTeamIdEmptyException.class)
     public void approveTeamNullTeamId() throws Exception {
-        registrationService.approveTeam(null, TeamStatus.APPROVED);
+        registrationService.approveTeam(null, null, TeamStatus.APPROVED);
     }
 
     @Test(expected = TeamNotFoundException.class)
     public void approveTeamNoSuchTeam() throws Exception {
-        registrationService.approveTeam(RandomStringUtils.randomAlphanumeric(20), TeamStatus.APPROVED);
+        final String one = RandomStringUtils.randomAlphanumeric(20);
+        registrationService.approveTeam(one, null, TeamStatus.APPROVED);
     }
 
     @Test(expected = NoOwnerInTeamException.class)
     public void approveTeamNoOwner() throws Exception {
         Team one = Util.getTeamEntity();
         Team createdTeam = teamService.createTeam(one);
-        registrationService.approveTeam(createdTeam.getId(), TeamStatus.APPROVED);
+        registrationService.approveTeam(createdTeam.getId(), null, TeamStatus.APPROVED);
     }
 
     @Test
     public void approveTeamGood() throws Exception {
+        final String ownerId = RandomStringUtils.randomAlphanumeric(20);
+        final String deterUserId = RandomStringUtils.randomAlphabetic(8);
         Team one = Util.getTeamEntity();
         Team createdTeam = teamService.createTeam(one);
         TeamMemberInfo owner = Util.getTeamMemberInfo(MemberType.OWNER);
@@ -348,11 +352,13 @@ public class RegistrationServiceTest extends AbstractTest {
         JSONObject predefinedResultJson = new JSONObject();
         predefinedResultJson.put("msg", "project approved");
 
+        adapterDeterlab.saveDeterUserIdMapping(deterUserId, ownerId);
+
         mockServer.expect(requestTo(properties.getApproveProject()))
                 .andExpect(method(HttpMethod.POST))
                 .andRespond(withSuccess(predefinedResultJson.toString(), MediaType.APPLICATION_JSON));
 
-        registrationService.approveTeam(createdTeam.getId(), TeamStatus.APPROVED);
+        registrationService.approveTeam(createdTeam.getId(), ownerId, TeamStatus.APPROVED);
 
         Team approvedTeam = teamService.getTeamById(createdTeam.getId());
 
@@ -394,11 +400,14 @@ public class RegistrationServiceTest extends AbstractTest {
         JSONObject predefinedResultJson = new JSONObject();
         predefinedResultJson.put("msg", "project rejected");
 
+        final String deterUserId = RandomStringUtils.randomAlphabetic(8);
+        adapterDeterlab.saveDeterUserIdMapping(deterUserId, owner.getUserId());
+
         mockServer.expect(requestTo(properties.getRejectProject()))
                 .andExpect(method(HttpMethod.POST))
                 .andRespond(withSuccess(predefinedResultJson.toString(), MediaType.APPLICATION_JSON));
 
-        registrationService.approveTeam(teamId, TeamStatus.REJECTED);
+        registrationService.approveTeam(teamId, owner.getUserId(), TeamStatus.REJECTED);
 
         // team should have been removed
         try {
@@ -471,5 +480,19 @@ public class RegistrationServiceTest extends AbstractTest {
         List<? extends TeamMember> membersList = teamService.getTeamById(team.getId()).getMembers();
         Assert.assertThat(membersList.size(), is(1));
         Assert.assertThat(membersList.get(0).getUserId(), is(user.getId()));
+    }
+
+    @Test(expected = sg.ncl.adapter.deterlab.exceptions.UserNotFoundException.class)
+    public void testGetDeterUidNotFound() throws Exception {
+        registrationService.getDeterUid(null);
+    }
+
+    @Test
+    public void testGetDeterUid() throws Exception {
+        final String deterUid = RandomStringUtils.randomAlphanumeric(20);
+        final String nclUid = RandomStringUtils.randomAlphanumeric(20);
+        adapterDeterlab.saveDeterUserIdMapping(deterUid, nclUid);
+        String result = registrationService.getDeterUid(nclUid);
+        Assert.assertThat(result, is(deterUid));
     }
 }
