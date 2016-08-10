@@ -25,10 +25,10 @@ import sg.ncl.service.registration.exceptions.UserFormException;
 import sg.ncl.service.registration.exceptions.UserIsNotTeamOwnerException;
 import sg.ncl.service.team.data.jpa.TeamEntity;
 import sg.ncl.service.team.data.jpa.TeamMemberEntity;
+import sg.ncl.service.team.domain.MemberStatus;
+import sg.ncl.service.team.domain.MemberType;
 import sg.ncl.service.team.domain.Team;
 import sg.ncl.service.team.domain.TeamMember;
-import sg.ncl.service.team.domain.TeamMemberStatus;
-import sg.ncl.service.team.domain.TeamMemberType;
 import sg.ncl.service.team.domain.TeamService;
 import sg.ncl.service.team.domain.TeamStatus;
 import sg.ncl.service.team.exceptions.NoOwnerInTeamException;
@@ -87,7 +87,7 @@ public class RegistrationServiceTest extends AbstractTest {
 
         // apply to join team but since no teams exists yet
         // create stub team
-        Team team = teamService.addTeam(Util.getTeamEntity());
+        Team team = teamService.createTeam(Util.getTeamEntity());
 
         String stubUid = RandomStringUtils.randomAlphanumeric(8);
         JSONObject predefinedResultJson = new JSONObject();
@@ -130,7 +130,7 @@ public class RegistrationServiceTest extends AbstractTest {
 
         TeamEntity teamEntity = Util.getTeamEntity();
         String teamName = teamEntity.getName();
-        teamService.addTeam(teamEntity);
+        teamService.createTeam(teamEntity);
 
         // purposely register for an already saved team
         // don't have to mock server since will throw exception
@@ -144,7 +144,7 @@ public class RegistrationServiceTest extends AbstractTest {
 
         // apply to join team but since no teams exists yet
         // create stub team
-        Team team = teamService.addTeam(Util.getTeamEntity());
+        Team team = teamService.createTeam(Util.getTeamEntity());
 
         // don't have to mock server since will throw exception
         registrationService.register(credentialsEntity, user, team, isJoinTeam);
@@ -157,7 +157,7 @@ public class RegistrationServiceTest extends AbstractTest {
 
         // apply to join team but since no teams exists yet
         // create stub team
-        Team team = teamService.addTeam(Util.getTeamEntity());
+        Team team = teamService.createTeam(Util.getTeamEntity());
 
         // don't have to mock server since will throw exception
         registrationService.register(credentialsEntity, user, team, isJoinTeam);
@@ -198,7 +198,7 @@ public class RegistrationServiceTest extends AbstractTest {
         User member = Util.getUserEntity();
         User savedOwner = userService.createUser(owner);
 
-        String teamId = teamService.addTeam(team).getId();
+        String teamId = teamService.createTeam(team).getId();
         String ownerId = savedOwner.getId();
         String memberId = userService.createUser(member).getId();
 
@@ -212,17 +212,17 @@ public class RegistrationServiceTest extends AbstractTest {
         TeamMemberEntity member1 = new TeamMemberEntity();
         member1.setUserId(ownerId);
         member1.setJoinedDate(ZonedDateTime.now());
-        member1.setMemberType(TeamMemberType.OWNER);
-        member1.setMemberStatus(TeamMemberStatus.APPROVED);
+        member1.setMemberType(MemberType.OWNER);
+        member1.setMemberStatus(MemberStatus.APPROVED);
 
         TeamMemberEntity member2 = new TeamMemberEntity();
         member2.setUserId(memberId);
         member2.setJoinedDate(ZonedDateTime.now());
-        member2.setMemberType(TeamMemberType.MEMBER);
-        member2.setMemberStatus(TeamMemberStatus.PENDING);
+        member2.setMemberType(MemberType.MEMBER);
+        member2.setMemberStatus(MemberStatus.PENDING);
 
-        teamService.addTeamMember(teamId, new TeamMemberInfo(member1));
-        teamService.addTeamMember(teamId, new TeamMemberInfo(member2));
+        teamService.addMember(teamId, new TeamMemberInfo(member1));
+        teamService.addMember(teamId, new TeamMemberInfo(member2));
 
         /*==== start mock the adapter deterlab call ===*/
         JSONObject predefinedResultJson = new JSONObject();
@@ -243,7 +243,7 @@ public class RegistrationServiceTest extends AbstractTest {
         Assert.assertThat(teamMembersList.size(), is(2));
 
         for (TeamMember teamMember : teamMembersList) {
-            if (!teamMember.getMemberStatus().equals(TeamMemberStatus.APPROVED)) {
+            if (!teamMember.getMemberStatus().equals(MemberStatus.APPROVED)) {
                 Assert.fail("One of the team member " + teamMember.getUserId() + " is still PENDING");
             }
             if (!teamMember.getUserId().equals(ownerId) && !teamMember.getUserId().equals(memberId)) {
@@ -257,7 +257,7 @@ public class RegistrationServiceTest extends AbstractTest {
         TeamEntity teamEntity = Util.getTeamEntity();
         User userEntity = Util.getUserEntity();
         User createdUser = userService.createUser(userEntity);
-        String teamId = teamService.addTeam(teamEntity).getId();
+        String teamId = teamService.createTeam(teamEntity).getId();
         registrationService.approveJoinRequest(teamId, createdUser.getId(), createdUser);
     }
 
@@ -285,7 +285,7 @@ public class RegistrationServiceTest extends AbstractTest {
         Team one = Util.getTeamEntity();
         User user = Util.getUserEntity();
         // create an existing team
-        teamService.addTeam(one);
+        teamService.createTeam(one);
         User createdUser = userService.createUser(user);
 
         // purposely create a team with the same name and id
@@ -317,7 +317,7 @@ public class RegistrationServiceTest extends AbstractTest {
 
         for (TeamMember member : membersList) {
             Assert.assertThat(member.getUserId(), is(createdUser.getId()));
-            Assert.assertThat(member.getMemberType(), is(TeamMemberType.OWNER));
+            Assert.assertThat(member.getMemberType(), is(MemberType.OWNER));
         }
     }
 
@@ -334,16 +334,16 @@ public class RegistrationServiceTest extends AbstractTest {
     @Test(expected = NoOwnerInTeamException.class)
     public void approveTeamNoOwner() throws Exception {
         Team one = Util.getTeamEntity();
-        Team createdTeam = teamService.addTeam(one);
+        Team createdTeam = teamService.createTeam(one);
         registrationService.approveTeam(createdTeam.getId(), TeamStatus.APPROVED);
     }
 
     @Test
     public void approveTeamGood() throws Exception {
         Team one = Util.getTeamEntity();
-        Team createdTeam = teamService.addTeam(one);
-        TeamMemberInfo owner = Util.getTeamMemberInfo(TeamMemberType.OWNER);
-        teamService.addTeamMember(createdTeam.getId(), owner);
+        Team createdTeam = teamService.createTeam(one);
+        TeamMemberInfo owner = Util.getTeamMemberInfo(MemberType.OWNER);
+        teamService.addMember(createdTeam.getId(), owner);
 
         JSONObject predefinedResultJson = new JSONObject();
         predefinedResultJson.put("msg", "project approved");
@@ -366,8 +366,8 @@ public class RegistrationServiceTest extends AbstractTest {
 
         for (TeamMember teamMember : membersList) {
             // owner should be approved
-            Assert.assertThat(teamMember.getMemberType(), is(TeamMemberType.OWNER));
-            Assert.assertThat(teamMember.getMemberStatus(), is(TeamMemberStatus.APPROVED));
+            Assert.assertThat(teamMember.getMemberType(), is(MemberType.OWNER));
+            Assert.assertThat(teamMember.getMemberStatus(), is(MemberStatus.APPROVED));
         }
     }
 
@@ -377,13 +377,13 @@ public class RegistrationServiceTest extends AbstractTest {
         User createdUser = userService.createUser(user);
 
         Team one = Util.getTeamEntity();
-        Team createdTeam = teamService.addTeam(one);
-        TeamMemberInfo owner = Util.getTeamMemberInfo(createdUser.getId(), TeamMemberType.OWNER);
-        teamService.addTeamMember(createdTeam.getId(), owner);
+        Team createdTeam = teamService.createTeam(one);
+        TeamMemberInfo owner = Util.getTeamMemberInfo(createdUser.getId(), MemberType.OWNER);
+        teamService.addMember(createdTeam.getId(), owner);
 
         Team two = Util.getTeamEntity();
-        Team createdTeamTwo = teamService.addTeam(two);
-        teamService.addTeamMember(createdTeamTwo.getId(), owner);
+        Team createdTeamTwo = teamService.createTeam(two);
+        teamService.addMember(createdTeamTwo.getId(), owner);
 
         String teamId = createdTeam.getId();
         String teamId_Two = createdTeamTwo.getId();
@@ -419,10 +419,10 @@ public class RegistrationServiceTest extends AbstractTest {
     public void rejectJoinRequestUserIsNotTeamOwner() throws Exception {
         User user = userService.createUser(Util.getUserEntity());
         User user2 = userService.createUser(Util.getUserEntity());
-        Team team = teamService.addTeam(Util.getTeamEntity());
+        Team team = teamService.createTeam(Util.getTeamEntity());
 
-        teamService.addTeamMember(team.getId(), Util.getTeamMemberInfo(user.getId(), TeamMemberType.OWNER));
-        teamService.addTeamMember(team.getId(), Util.getTeamMemberInfo(user2.getId(), TeamMemberType.MEMBER));
+        teamService.addMember(team.getId(), Util.getTeamMemberInfo(user.getId(), MemberType.OWNER));
+        teamService.addMember(team.getId(), Util.getTeamMemberInfo(user2.getId(), MemberType.MEMBER));
         registrationService.rejectJoinRequest(team.getId(), user2.getId(), user2);
     }
 
@@ -442,7 +442,7 @@ public class RegistrationServiceTest extends AbstractTest {
     public void rejectJoinRequestGood() throws Exception {
         User user = userService.createUser(Util.getUserEntity());
         User user2 = userService.createUser(Util.getUserEntity());
-        Team team = teamService.addTeam(Util.getTeamEntity());
+        Team team = teamService.createTeam(Util.getTeamEntity());
 
         String deterUserIdOne = RandomStringUtils.randomAlphabetic(8);
         String deterUserIdTwo = RandomStringUtils.randomAlphabetic(8);
@@ -451,8 +451,8 @@ public class RegistrationServiceTest extends AbstractTest {
 
         userService.addTeam(user.getId(), team.getId());
         userService.addTeam(user2.getId(), team.getId());
-        teamService.addTeamMember(team.getId(), Util.getTeamMemberInfo(user.getId(), TeamMemberType.OWNER));
-        teamService.addTeamMember(team.getId(), Util.getTeamMemberInfo(user2.getId(), TeamMemberType.MEMBER));
+        teamService.addMember(team.getId(), Util.getTeamMemberInfo(user.getId(), MemberType.OWNER));
+        teamService.addMember(team.getId(), Util.getTeamMemberInfo(user2.getId(), MemberType.MEMBER));
 
         JSONObject predefinedResultJson = new JSONObject();
         predefinedResultJson.put("msg", "join request rejected");

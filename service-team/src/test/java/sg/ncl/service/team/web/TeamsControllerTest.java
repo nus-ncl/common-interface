@@ -18,11 +18,10 @@ import sg.ncl.service.team.AbstractTest;
 import sg.ncl.service.team.Util;
 import sg.ncl.service.team.data.jpa.TeamEntity;
 import sg.ncl.service.team.data.jpa.TeamRepository;
+import sg.ncl.service.team.domain.MemberType;
 import sg.ncl.service.team.domain.Team;
-import sg.ncl.service.team.domain.TeamMemberType;
 import sg.ncl.service.team.domain.TeamStatus;
 import sg.ncl.service.team.domain.TeamVisibility;
-import sg.ncl.service.team.exceptions.TeamNotFoundException;
 import sg.ncl.service.team.serializers.DateTimeDeserializer;
 import sg.ncl.service.team.serializers.DateTimeSerializer;
 
@@ -40,7 +39,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.springframework.test.web.servlet.setup.MockMvcBuilders.webAppContextSetup;
-import static sg.ncl.service.team.Checks.checkException;
 
 /**
  * Created by Desmond / Te Ye
@@ -95,15 +93,8 @@ public class TeamsControllerTest extends AbstractTest {
 
     @Test
     public void testGetTeamWithNoUserInDb() throws Exception {
-        try {
             mockMvc.perform(get("/teams/" + RandomStringUtils.randomAlphabetic(20)))
-                    .andExpect(status().isNotFound())
-                    .andExpect(status().reason("Team not found"));
-        } catch (Exception e) {
-            checkException(e, "");
-            return;
-        }
-        exception.expect(TeamNotFoundException.class);
+                    .andExpect(status().isNotFound());
     }
 
     @Test
@@ -129,7 +120,7 @@ public class TeamsControllerTest extends AbstractTest {
         TeamEntity teamEntity = teamRepository.save(origTeamEntity);
         String teamId = teamEntity.getId();
 
-        TeamMemberInfo teamMemberInfo = Util.getTeamMemberInfo(TeamMemberType.MEMBER);
+        TeamMemberInfo teamMemberInfo = Util.getTeamMemberInfo(MemberType.MEMBER);
         GsonBuilder gsonBuilder = new GsonBuilder();
         gsonBuilder.registerTypeAdapter(ZonedDateTime.class, new DateTimeSerializer());
         gsonBuilder.registerTypeAdapter(ZonedDateTime.class, new DateTimeDeserializer());
@@ -186,7 +177,7 @@ public class TeamsControllerTest extends AbstractTest {
         String jsonString = gson.toJson(new TeamInfo(teamEntityFromDb));
 
         mockMvc.perform(put("/teams/" + id).contentType(MediaType.APPLICATION_JSON).content(jsonString))
-                .andExpect(status().isAccepted());
+                .andExpect(status().isOk());
 
         // check if name is new name and description is the same
         mockMvc.perform(get("/teams/" + id))
@@ -209,15 +200,8 @@ public class TeamsControllerTest extends AbstractTest {
         Gson gson = gsonBuilder.create();
 
         // put
-        try {
-            mockMvc.perform(put("/teams/" + idString).contentType(MediaType.APPLICATION_JSON).content(gson.toJson(new TeamInfo(teamEntity))))
-                    .andExpect(status().isNotFound())
-                    .andExpect(status().reason("Team not found"));
-        } catch (Exception e) {
-            checkException(e, idString);
-            return;
-        }
-        exception.expect(TeamNotFoundException.class);
+        mockMvc.perform(put("/teams/" + idString).contentType(MediaType.APPLICATION_JSON).content(gson.toJson(new TeamInfo(teamEntity))))
+                .andExpect(status().isNotFound());
     }
 
     @Test

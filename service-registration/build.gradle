@@ -6,7 +6,7 @@ dependencies {
     compile project(':service-user')
 
     runtime 'mysql:mysql-connector-java'
-    runtime 'org.postgresql:postgresql'
 
     testCompile project(':common-test')
+    testCompile 'com.google.code.gson:gson'
 }

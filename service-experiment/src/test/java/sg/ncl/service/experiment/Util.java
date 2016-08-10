@@ -3,6 +3,7 @@ package sg.ncl.service.experiment;
 import org.apache.commons.lang3.RandomStringUtils;
 import sg.ncl.service.experiment.data.jpa.ExperimentEntity;
 import sg.ncl.service.experiment.data.jpa.ExperimentRepository;
+import sg.ncl.service.experiment.domain.Experiment;
 import sg.ncl.service.realization.data.jpa.RealizationEntity;
 
 import java.util.ArrayList;
@@ -41,9 +42,9 @@ public class Util {
         return entity;
     }
 
-    public static boolean isListEqual(List<ExperimentEntity> one, List<ExperimentEntity> two) {
-        ArrayList<ExperimentEntity> cp = new ArrayList<>(one);
-        for (ExperimentEntity twoIterator : two) {
+    public static boolean isListEqual(List<Experiment> one, List<Experiment> two) {
+        ArrayList<Experiment> cp = new ArrayList<>(one);
+        for (Experiment twoIterator : two) {
             if (!cp.remove(twoIterator)) {
                 return false;
             }

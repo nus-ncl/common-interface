@@ -2,9 +2,9 @@ package sg.ncl.service.team.data.jpa;
 
 import org.hibernate.annotations.GenericGenerator;
 import sg.ncl.common.jpa.AbstractEntity;
+import sg.ncl.service.team.domain.MemberStatus;
 import sg.ncl.service.team.domain.Team;
 import sg.ncl.service.team.domain.TeamMember;
-import sg.ncl.service.team.domain.TeamMemberStatus;
 import sg.ncl.service.team.domain.TeamPrivacy;
 import sg.ncl.service.team.domain.TeamStatus;
 import sg.ncl.service.team.domain.TeamVisibility;
@@ -204,11 +204,11 @@ public class TeamEntity extends AbstractEntity implements Team {
         }
     }
 
-    public TeamMember changeMemberStatus(final TeamMember member, TeamMemberStatus teamMemberStatus) {
+    public TeamMember changeMemberStatus(final TeamMember member, MemberStatus memberStatus) {
         final String userId = member.getUserId();
         if (members.containsKey(userId)) {
             TeamMemberEntity entity = members.get(userId);
-            entity.setMemberStatus(teamMemberStatus);
+            entity.setMemberStatus(memberStatus);
             members.put(userId, entity);
             return new TeamMemberInfo(members.get(userId));
         } else {

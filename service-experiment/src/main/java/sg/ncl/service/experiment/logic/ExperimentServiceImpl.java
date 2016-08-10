@@ -1,8 +1,7 @@
 package sg.ncl.service.experiment.logic;
 
+import lombok.extern.slf4j.Slf4j;
 import org.json.JSONObject;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import sg.ncl.adapter.deterlab.AdapterDeterlab;
@@ -10,38 +9,35 @@ import sg.ncl.service.experiment.ExperimentConnectionProperties;
 import sg.ncl.service.experiment.data.jpa.ExperimentEntity;
 import sg.ncl.service.experiment.data.jpa.ExperimentRepository;
 import sg.ncl.service.experiment.domain.Experiment;
+import sg.ncl.service.experiment.domain.ExperimentService;
 import sg.ncl.service.experiment.exceptions.UserIdNotFoundException;
 import sg.ncl.service.realization.data.jpa.RealizationEntity;
 import sg.ncl.service.realization.logic.RealizationService;
 
 import javax.inject.Inject;
+import javax.validation.constraints.NotNull;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * Created by Desmond.
  */
 @Service
+@Slf4j
 public class ExperimentServiceImpl implements ExperimentService {
 
-    private static final Logger logger = LoggerFactory.getLogger(ExperimentServiceImpl.class);
     private final ExperimentRepository experimentRepository;
+    private final AdapterDeterlab adapterDeterlab;
+    private final ExperimentConnectionProperties experimentConnectionProperties;
+    private final RealizationService realizationService;
 
     @Inject
-    private AdapterDeterlab adapterDeterlab;
-
-    @Inject
-    private ExperimentConnectionProperties experimentConnectionProperties;
-
-    private RealizationService realizationService;
-
-    @Inject
-    protected ExperimentServiceImpl(final ExperimentRepository experimentRepository, final AdapterDeterlab adapterDeterlab, final RealizationService realizationService, final ExperimentConnectionProperties experimentConnectionProperties) {
+    ExperimentServiceImpl(@NotNull final ExperimentRepository experimentRepository, @NotNull final AdapterDeterlab adapterDeterlab, @NotNull final RealizationService realizationService, @NotNull final ExperimentConnectionProperties experimentConnectionProperties) {
         this.experimentRepository = experimentRepository;
         this.adapterDeterlab = adapterDeterlab;
         this.realizationService = realizationService;
@@ -49,14 +45,14 @@ public class ExperimentServiceImpl implements ExperimentService {
     }
 
     @Transactional
-    public ExperimentEntity save(Experiment experiment) {
-        logger.info("Save experiment");
+    public Experiment save(Experiment experiment) {
+        log.info("Save experiment");
         String fileName = craftFileName(experiment);
 
         // check experiment name is unique
         long countName = experimentRepository.countByName(experiment.getName());
         if (countName > 0) {
-            logger.warn("Experiment name is in use.");
+            log.warn("Experiment name is in use.");
             return null;
         }
 
@@ -64,7 +60,7 @@ public class ExperimentServiceImpl implements ExperimentService {
 
         ExperimentEntity savedExperimentEntity = experimentRepository.save(setupEntity(experiment, fileName));
         createExperimentInDeter(savedExperimentEntity);
-        logger.info("Experiment saved.");
+        log.info("Experiment saved.");
 
         RealizationEntity realizationEntity = new RealizationEntity();
         realizationEntity.setExperimentId(savedExperimentEntity.getId());
@@ -76,7 +72,7 @@ public class ExperimentServiceImpl implements ExperimentService {
         realizationEntity.setRunningMinutes(0L);
 
         realizationService.save(realizationEntity);
-        logger.info("Realization saved.");
+        log.info("Realization saved.");
 
         return savedExperimentEntity;
     }
@@ -107,41 +103,35 @@ public class ExperimentServiceImpl implements ExperimentService {
         return experimentEntity;
     }
 
-    public List<ExperimentEntity> get() {
-        logger.info("Get all experiments");
-
-        final List<ExperimentEntity> result = new ArrayList<>();
-        result.addAll(experimentRepository.findAll());
-
-        return result;
+    public List<Experiment> getAll() {
+        log.info("Get all experiments");
+        return experimentRepository.findAll().stream().collect(Collectors.toList());
     }
 
-    public List<ExperimentEntity> findByUser(String userId) {
-        logger.info("Find user by user id");
+    public List<Experiment> findByUser(String userId) {
+        log.info("Find user by user id");
 
         if (userId == null || userId.isEmpty()) {
+            // FIXME: this is the wrong exception to throw; it should be a BadRequestException type
             throw new UserIdNotFoundException();
         }
 
-        List<ExperimentEntity> result = experimentRepository.findByUserId(userId);
-
-        return result;
+        return experimentRepository.findByUserId(userId).stream().collect(Collectors.toList());
     }
 
-    public List<ExperimentEntity> findByTeam(String teamId) {
-        logger.info("Find teams by team id");
+    public List<Experiment> findByTeam(String teamId) {
+        log.info("Find teams by team id");
 
         if (teamId == null || teamId.isEmpty()) {
+            // FIXME: this is the wrong exception to throw; it should be a BadRequestException type
             throw new UserIdNotFoundException();
         }
 
-        List<ExperimentEntity> result = experimentRepository.findByTeamId(teamId);
-
-        return result;
+        return experimentRepository.findByTeamId(teamId).stream().collect(Collectors.toList());
     }
 
     public String createNsFile(String filename, String contents) {
-        logger.info("Create NS file");
+        log.info("Create NS file");
 
         File file;
         FileOutputStream fileOutputStream = null;
@@ -155,14 +145,14 @@ public class ExperimentServiceImpl implements ExperimentService {
                 file.createNewFile();
             }
 
-            // get contents in bytes
+            // getAll contents in bytes
             byte[] contentInBytes = contents.getBytes();
 
             fileOutputStream.write(contentInBytes);
             fileOutputStream.flush();
             fileOutputStream.close();
         } catch (IOException e) {
-            logger.error("File cannot be created.\n" + e.getMessage());
+            log.error("File cannot be created.\n" + e.getMessage());
             filename = "error";
         } finally {
             try {
@@ -170,7 +160,7 @@ public class ExperimentServiceImpl implements ExperimentService {
                     fileOutputStream.close();
                 }
             } catch (IOException e) {
-                logger.error("File cannot be created.\n" + e.getMessage());
+                log.error("File cannot be created.\n" + e.getMessage());
                 filename = "error";
             }
         }
@@ -178,30 +168,30 @@ public class ExperimentServiceImpl implements ExperimentService {
         return filename;
     }
 
-    public void createExperimentInDeter(ExperimentEntity experimentEntity) {
-        logger.info("Start createExperimentInDeter");
+    public void createExperimentInDeter(Experiment experiment) {
+        log.info("Start createExperimentInDeter");
 
         JSONObject userObject = new JSONObject();
-        userObject.put("id", experimentEntity.getId().toString());
-        userObject.put("userId", experimentEntity.getUserId());
-        userObject.put("teamId", experimentEntity.getTeamId());
-        userObject.put("teamName", experimentEntity.getTeamName());
-        userObject.put("name", experimentEntity.getName());
-        userObject.put("description", experimentEntity.getDescription());
-        userObject.put("nsFile", experimentEntity.getNsFile());
-        userObject.put("nsFileContent", experimentEntity.getNsFileContent());
-        userObject.put("idleSwap", experimentEntity.getIdleSwap().toString());
-        userObject.put("maxDuration", experimentEntity.getMaxDuration().toString());
-        userObject.put("deterLogin", adapterDeterlab.getDeterUserIdByNclUserId(experimentEntity.getUserId()));
+        userObject.put("id", experiment.getId().toString());
+        userObject.put("userId", experiment.getUserId());
+        userObject.put("teamId", experiment.getTeamId());
+        userObject.put("teamName", experiment.getTeamName());
+        userObject.put("name", experiment.getName());
+        userObject.put("description", experiment.getDescription());
+        userObject.put("nsFile", experiment.getNsFile());
+        userObject.put("nsFileContent", experiment.getNsFileContent());
+        userObject.put("idleSwap", experiment.getIdleSwap().toString());
+        userObject.put("maxDuration", experiment.getMaxDuration().toString());
+        userObject.put("deterLogin", adapterDeterlab.getDeterUserIdByNclUserId(experiment.getUserId()));
         userObject.put("userServerUri", experimentConnectionProperties.getUserurl());
 
         adapterDeterlab.createExperiment(userObject.toString());
 
-        logger.info("End createExperimentInDeter");
+        log.info("End createExperimentInDeter");
     }
 
     public String deleteExperiment(final Long id) {
-        logger.info("Start deleteExperiment");
+        log.info("Start deleteExperiment");
         String returnString = "experiment deleted";
 
         RealizationEntity realizationEntity = realizationService.getByExperimentId(id);
@@ -209,21 +199,21 @@ public class ExperimentServiceImpl implements ExperimentService {
 
         if (realizationId != null && realizationId > 0) {
             realizationService.deleteRealization(realizationId);
-            logger.info("Realization deleted");
+            log.info("Realization deleted");
 
             ExperimentEntity experimentEntity = experimentRepository.getOne(id);
             // TODO: use other deleteExperimentInDeter(teamName, experimentName) if using script_wrapper.py
             deleteExperimentInDeter(experimentEntity.getName(), realizationEntity.getUserId());
-            logger.info("Experiment deleted in deter");
+            log.info("Experiment deleted in deter");
 
             experimentRepository.delete(id);
-            logger.info("Experiment deleted");
+            log.info("Experiment deleted");
         } else {
-            logger.warn("Experiment not deleted");
+            log.warn("Experiment not deleted");
             returnString = "experiment not deleted";
         }
 
-        logger.info("End deleteExperiment");
+        log.info("End deleteExperiment");
 
         return returnString;
     }

@@ -2,6 +2,7 @@ package sg.ncl.service.realization;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.context.ConfigurableApplicationContext;
 import sg.ncl.common.jpa.UseJpa;
 
 /**
@@ -9,10 +10,12 @@ import sg.ncl.common.jpa.UseJpa;
  */
 @SpringBootApplication
 @UseJpa
-public class App {
+public class RealizationApplication {
 
     public static void main(final String[] args) {
-        SpringApplication.run(App.class, args);
+        try (final ConfigurableApplicationContext context = SpringApplication.run(RealizationApplication.class, args)) {
+            // nothing to do
+        }
     }
 
 }

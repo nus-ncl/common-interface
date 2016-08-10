@@ -2,9 +2,11 @@ package sg.ncl.service.experiment;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.annotation.Import;
 import sg.ncl.adapter.deterlab.DeterlabAutoConfiguration;
 import sg.ncl.common.jpa.UseJpa;
+import sg.ncl.service.realization.RealizationApplication;
 
 /**
  * @author Christopher Zhong
@@ -13,12 +15,14 @@ import sg.ncl.common.jpa.UseJpa;
 @UseJpa
 @Import({
         DeterlabAutoConfiguration.class,
-        sg.ncl.service.realization.App.class,
+        RealizationApplication.class,
 })
-public class App {
+public class ExperimentApplication {
 
     public static void main(final String[] args) {
-        SpringApplication.run(App.class, args);
+        try (final ConfigurableApplicationContext context = SpringApplication.run(ExperimentApplication.class, args)) {
+            // nothing to do
+        }
     }
 
 }

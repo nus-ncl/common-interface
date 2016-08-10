@@ -8,6 +8,7 @@ import org.springframework.stereotype.Component;
  */
 @Component
 @ConfigurationProperties(prefix = "deterurl")
+// FIXME: this should be in the "adapter-deterlab" project
 public class ExperimentConnectionProperties {
     private String bossurl;
     private String userurl;

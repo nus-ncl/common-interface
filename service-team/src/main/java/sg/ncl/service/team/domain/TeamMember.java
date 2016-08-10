@@ -35,13 +35,13 @@ public interface TeamMember {
      *
      * @return the associated team membership.
      */
-    TeamMemberType getMemberType();
+    MemberType getMemberType();
 
     /**
      * Returns the associated team member status.
      *
      * @return the associated team member status.
      */
-    TeamMemberStatus getMemberStatus();
+    MemberStatus getMemberStatus();
 
 }
