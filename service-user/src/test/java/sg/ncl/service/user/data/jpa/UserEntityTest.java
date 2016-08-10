@@ -43,7 +43,7 @@ public class UserEntityTest {
     public void testGetUserDetails() throws Exception {
         final UserEntity userEntity = new UserEntity();
 
-        assertThat(userEntity.getUserDetails(), is(nullValue()));
+        assertThat(userEntity.getDetails(), is(nullValue()));
     }
 
     @Test
@@ -52,14 +52,14 @@ public class UserEntityTest {
         final UserDetailsEntity userDetailsEntity = new UserDetailsEntity();
         userEntity.setUserDetails(userDetailsEntity);
 
-        assertThat(userEntity.getUserDetails(), is(equalTo(userDetailsEntity)));
+        assertThat(userEntity.getDetails(), is(equalTo(userDetailsEntity)));
     }
 
     @Test
     public void testIsEmailVerified() throws Exception {
         final UserEntity userEntity = new UserEntity();
 
-        assertThat(userEntity.isEmailVerified(), is(equalTo(false)));
+        assertThat(userEntity.getEmailVerification(), is(equalTo(false)));
     }
 
     @Test
@@ -67,7 +67,7 @@ public class UserEntityTest {
         final UserEntity userEntity = new UserEntity();
         userEntity.setEmailVerified(true);
 
-        assertThat(userEntity.isEmailVerified(), is(equalTo(true)));
+        assertThat(userEntity.getEmailVerification(), is(equalTo(true)));
     }
 
     @Test

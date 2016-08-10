@@ -76,7 +76,7 @@ public class UserEntity extends AbstractEntity implements User {
     }
 
     @Override
-    public UserDetailsEntity getUserDetails() {
+    public UserDetailsEntity getDetails() {
         return userDetails;
     }
 
@@ -85,7 +85,7 @@ public class UserEntity extends AbstractEntity implements User {
     }
 
     @Override
-    public boolean isEmailVerified() {
+    public boolean getEmailVerification() {
         return emailVerified;
     }
 

@@ -78,7 +78,7 @@ public class RegistrationServiceImpl implements RegistrationService {
         }
 
         try {
-            userService.findUser(nclUserId);
+            userService.getUser(nclUserId);
         } catch (UserNotFoundException e) {
             log.warn("No such user, {}", e);
         }
@@ -225,22 +225,22 @@ public class RegistrationServiceImpl implements RegistrationService {
         teamService.addMember(teamId, teamMemberInfo);
 
         JSONObject userObject = new JSONObject();
-        userObject.put("firstName", user.getUserDetails().getFirstName());
-        userObject.put("lastName", user.getUserDetails().getLastName());
-        userObject.put("jobTitle", user.getUserDetails().getJobTitle());
+        userObject.put("firstName", user.getDetails().getFirstName());
+        userObject.put("lastName", user.getDetails().getLastName());
+        userObject.put("jobTitle", user.getDetails().getJobTitle());
         userObject.put("password", credentials.getPassword()); // cannot get from credentialsEntity else will be hashed
-        userObject.put("email", user.getUserDetails().getEmail());
-        userObject.put("phone", user.getUserDetails().getPhone());
-        userObject.put("institution", user.getUserDetails().getInstitution());
-        userObject.put("institutionAbbreviation", user.getUserDetails().getInstitutionAbbreviation());
-        userObject.put("institutionWeb", user.getUserDetails().getInstitutionWeb());
+        userObject.put("email", user.getDetails().getEmail());
+        userObject.put("phone", user.getDetails().getPhone());
+        userObject.put("institution", user.getDetails().getInstitution());
+        userObject.put("institutionAbbreviation", user.getDetails().getInstitutionAbbreviation());
+        userObject.put("institutionWeb", user.getDetails().getInstitutionWeb());
 
-        userObject.put("address1", user.getUserDetails().getAddress().getAddress1());
-        userObject.put("address2", user.getUserDetails().getAddress().getAddress2());
-        userObject.put("country", user.getUserDetails().getAddress().getCountry());
-        userObject.put("region", user.getUserDetails().getAddress().getRegion());
-        userObject.put("city", user.getUserDetails().getAddress().getCity());
-        userObject.put("zipCode", user.getUserDetails().getAddress().getZipCode());
+        userObject.put("address1", user.getDetails().getAddress().getAddress1());
+        userObject.put("address2", user.getDetails().getAddress().getAddress2());
+        userObject.put("country", user.getDetails().getAddress().getCountry());
+        userObject.put("region", user.getDetails().getAddress().getRegion());
+        userObject.put("city", user.getDetails().getAddress().getCity());
+        userObject.put("zipCode", user.getDetails().getAddress().getZipCode());
 
         if (isJoinTeam == true) {
 
@@ -376,55 +376,55 @@ public class RegistrationServiceImpl implements RegistrationService {
             errorsFound = true;
         }
 
-        if (errorsFound == false && (user.getUserDetails().getFirstName() == null || user.getUserDetails().getFirstName().isEmpty())) {
+        if (errorsFound == false && (user.getDetails().getFirstName() == null || user.getDetails().getFirstName().isEmpty())) {
             errorsFound = true;
         }
 
-        if (errorsFound == false && (user.getUserDetails().getLastName() == null || user.getUserDetails().getLastName().isEmpty())) {
+        if (errorsFound == false && (user.getDetails().getLastName() == null || user.getDetails().getLastName().isEmpty())) {
             errorsFound = true;
         }
 
-        if (errorsFound == false && (user.getUserDetails().getJobTitle() == null || user.getUserDetails().getJobTitle().isEmpty())) {
+        if (errorsFound == false && (user.getDetails().getJobTitle() == null || user.getDetails().getJobTitle().isEmpty())) {
             errorsFound = true;
         }
 
-        if (errorsFound == false && (user.getUserDetails().getEmail() == null || user.getUserDetails().getEmail().isEmpty())) {
+        if (errorsFound == false && (user.getDetails().getEmail() == null || user.getDetails().getEmail().isEmpty())) {
             errorsFound = true;
         }
 
-        if (errorsFound == false && (user.getUserDetails().getPhone() == null || user.getUserDetails().getPhone().isEmpty())) {
+        if (errorsFound == false && (user.getDetails().getPhone() == null || user.getDetails().getPhone().isEmpty())) {
             errorsFound = true;
         }
 
-        if (errorsFound == false && (user.getUserDetails().getInstitution() == null || user.getUserDetails().getInstitution().isEmpty())) {
+        if (errorsFound == false && (user.getDetails().getInstitution() == null || user.getDetails().getInstitution().isEmpty())) {
             errorsFound = true;
         }
 
-        if (errorsFound == false && (user.getUserDetails().getInstitutionAbbreviation() == null || user.getUserDetails().getInstitutionAbbreviation().isEmpty())) {
+        if (errorsFound == false && (user.getDetails().getInstitutionAbbreviation() == null || user.getDetails().getInstitutionAbbreviation().isEmpty())) {
             errorsFound = true;
         }
 
-        if (errorsFound == false && (user.getUserDetails().getInstitutionWeb() == null || user.getUserDetails().getInstitutionWeb().isEmpty())) {
+        if (errorsFound == false && (user.getDetails().getInstitutionWeb() == null || user.getDetails().getInstitutionWeb().isEmpty())) {
             errorsFound = true;
         }
 
-        if (errorsFound == false && (user.getUserDetails().getAddress().getAddress1() == null || user.getUserDetails().getAddress().getAddress1().isEmpty())) {
+        if (errorsFound == false && (user.getDetails().getAddress().getAddress1() == null || user.getDetails().getAddress().getAddress1().isEmpty())) {
             errorsFound = true;
         }
 
-        if (errorsFound == false && (user.getUserDetails().getAddress().getCountry() == null || user.getUserDetails().getAddress().getCountry().isEmpty())) {
+        if (errorsFound == false && (user.getDetails().getAddress().getCountry() == null || user.getDetails().getAddress().getCountry().isEmpty())) {
             errorsFound = true;
         }
 
-        if (errorsFound == false && (user.getUserDetails().getAddress().getRegion() == null || user.getUserDetails().getAddress().getRegion().isEmpty())) {
+        if (errorsFound == false && (user.getDetails().getAddress().getRegion() == null || user.getDetails().getAddress().getRegion().isEmpty())) {
             errorsFound = true;
         }
 
-        if (errorsFound == false && (user.getUserDetails().getAddress().getCity() == null || user.getUserDetails().getAddress().getCity().isEmpty())) {
+        if (errorsFound == false && (user.getDetails().getAddress().getCity() == null || user.getDetails().getAddress().getCity().isEmpty())) {
             errorsFound = true;
         }
 
-        if (errorsFound == false && (user.getUserDetails().getAddress().getZipCode() == null || user.getUserDetails().getAddress().getZipCode().isEmpty())) {
+        if (errorsFound == false && (user.getDetails().getAddress().getZipCode() == null || user.getDetails().getAddress().getZipCode().isEmpty())) {
             errorsFound = true;
         }
 
@@ -458,19 +458,19 @@ public class RegistrationServiceImpl implements RegistrationService {
         registrationEntity.setPid(team.getId());
         registrationEntity.setUid(uid);
 
-        registrationEntity.setUsrAddr(user.getUserDetails().getAddress().getAddress1());
-        registrationEntity.setUsrAddr2(user.getUserDetails().getAddress().getAddress2());
-        registrationEntity.setUsrAffil(user.getUserDetails().getInstitution());
-        registrationEntity.setUsrAffilAbbrev(user.getUserDetails().getInstitutionAbbreviation());
-        registrationEntity.setUsrCity(user.getUserDetails().getAddress().getCity());
-        registrationEntity.setUsrCountry(user.getUserDetails().getAddress().getCountry());
-        registrationEntity.setUsrState(user.getUserDetails().getAddress().getRegion());
+        registrationEntity.setUsrAddr(user.getDetails().getAddress().getAddress1());
+        registrationEntity.setUsrAddr2(user.getDetails().getAddress().getAddress2());
+        registrationEntity.setUsrAffil(user.getDetails().getInstitution());
+        registrationEntity.setUsrAffilAbbrev(user.getDetails().getInstitutionAbbreviation());
+        registrationEntity.setUsrCity(user.getDetails().getAddress().getCity());
+        registrationEntity.setUsrCountry(user.getDetails().getAddress().getCountry());
+        registrationEntity.setUsrState(user.getDetails().getAddress().getRegion());
 
-        registrationEntity.setUsrEmail(user.getUserDetails().getEmail());
-        registrationEntity.setUsrName(user.getUserDetails().getLastName() + " " + user.getUserDetails().getFirstName());
-        registrationEntity.setUsrPhone(user.getUserDetails().getPhone());
-        registrationEntity.setUsrTitle(user.getUserDetails().getJobTitle());
-        registrationEntity.setUsrZip(user.getUserDetails().getAddress().getZipCode());
+        registrationEntity.setUsrEmail(user.getDetails().getEmail());
+        registrationEntity.setUsrName(user.getDetails().getLastName() + " " + user.getDetails().getFirstName());
+        registrationEntity.setUsrPhone(user.getDetails().getPhone());
+        registrationEntity.setUsrTitle(user.getDetails().getJobTitle());
+        registrationEntity.setUsrZip(user.getDetails().getAddress().getZipCode());
 
         registrationRepository.save(registrationEntity);
     }

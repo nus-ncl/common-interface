@@ -8,7 +8,6 @@ import java.util.List;
  *
  * @author Christopher Zhong
  */
-//@JsonDeserialize(as = UserEntity.class)
 public interface User {
 
     /**
@@ -23,14 +22,14 @@ public interface User {
      *
      * @return the {@link UserDetails} of this {@link User}.
      */
-    UserDetails getUserDetails();
+    UserDetails getDetails();
 
     /**
      * Returns {@code true} if the email is verified, {@code false} otherwise.
      *
      * @return {@code true} if the email is verified, {@code false} otherwise.
      */
-    boolean isEmailVerified();
+    Boolean getEmailVerification();
 
     /**
      * Returns the {@link UserStatus} of this {@link User}.
@@ -58,7 +57,7 @@ public interface User {
      *
      * @return a list of {@link LoginActivity} for this {@link User}.
      */
-    List<? extends LoginActivity> getLoginActivities();
+    List<LoginActivity> getLoginActivities();
 
     /**
      * Returns a list of teams for this {@link User}.

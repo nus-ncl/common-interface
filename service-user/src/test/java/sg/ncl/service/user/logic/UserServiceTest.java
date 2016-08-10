@@ -52,19 +52,19 @@ public class UserServiceTest extends AbstractTest {
     @Test(expected = UserIdNullException.class)
     public void getUserWithNullIdTest() throws Exception {
         UserService userService = new UserServiceImpl(userRepository);
-        userService.findUser(null);
+        userService.getUser(null);
     }
 
     @Test(expected = UserIdNullException.class)
     public void getUserWithEmptyIdTest() throws Exception {
         UserService userService = new UserServiceImpl(userRepository);
-        userService.findUser("");
+        userService.getUser("");
     }
 
     @Test(expected = UserNotFoundException.class)
     public void findUserWithNoUserInDbTest() throws Exception {
         UserService userService = new UserServiceImpl(userRepository);
-        userService.findUser(RandomStringUtils.randomAlphabetic(20));
+        userService.getUser(RandomStringUtils.randomAlphabetic(20));
     }
 
     @Test
@@ -74,10 +74,10 @@ public class UserServiceTest extends AbstractTest {
         final String idString = userArray[0].getId();
         final UserEntity originalEntity = userArray[1];
 
-        User fromDbEntity = userService.findUser(idString);
+        User fromDbEntity = userService.getUser(idString);
 
-        UserDetailsEntity originalDetails = originalEntity.getUserDetails();
-        UserDetails fromDbDetails = fromDbEntity.getUserDetails();
+        UserDetailsEntity originalDetails = originalEntity.getDetails();
+        UserDetails fromDbDetails = fromDbEntity.getDetails();
         Assert.assertEquals(originalDetails.getFirstName(), fromDbDetails.getFirstName());
         Assert.assertEquals(originalDetails.getLastName(), fromDbDetails.getLastName());
         Assert.assertEquals(originalDetails.getJobTitle(), fromDbDetails.getJobTitle());
@@ -104,18 +104,18 @@ public class UserServiceTest extends AbstractTest {
         final String idString = userEntityArray[0].getId();
 
         // get user and store the original last name
-        User user = userService.findUser(idString);
-        final String originalLastName = user.getUserDetails().getLastName();
+        User user = userService.getUser(idString);
+        final String originalLastName = user.getDetails().getLastName();
 
         // change first name and put
         String newFirstName = RandomStringUtils.randomAlphabetic(20);
-        userEntityArray[0].getUserDetails().setFirstName(newFirstName);
+        userEntityArray[0].getDetails().setFirstName(newFirstName);
 
         userService.updateUser(idString, userEntityArray[0]);
 
-        user = userService.findUser(idString);
-        Assert.assertEquals(user.getUserDetails().getFirstName(), newFirstName);
-        Assert.assertEquals(user.getUserDetails().getLastName(), originalLastName);
+        user = userService.getUser(idString);
+        Assert.assertEquals(user.getDetails().getFirstName(), newFirstName);
+        Assert.assertEquals(user.getDetails().getLastName(), originalLastName);
     }
 
     @Test
@@ -125,7 +125,7 @@ public class UserServiceTest extends AbstractTest {
         final UserEntity userEntity = Util.getUserEntity();
         UserEntity savedUserEntity = userRepository.save(userEntity);
 
-        savedUserEntity.getUserDetails().setFirstName(null);
+        savedUserEntity.getDetails().setFirstName(null);
 
         userService.updateUser(savedUserEntity.getId(), savedUserEntity);
     }
@@ -165,7 +165,7 @@ public class UserServiceTest extends AbstractTest {
         userEntity.addTeamId(teamId);
         userService.updateUser(userId, userEntity);
 
-        User userFromDb = userService.findUser(userId);
+        User userFromDb = userService.getUser(userId);
         List<String> teamList = userFromDb.getTeams();
         Assert.assertEquals(teamList.get(0), teamId);
     }
@@ -176,8 +176,8 @@ public class UserServiceTest extends AbstractTest {
         UserEntity userEntity = Util.getUserEntity();
         User user = userService.createUser(userEntity);
 
-        User userFromDb = userService.findUser(user.getId());
-        Assert.assertEquals(userEntity.getUserDetails().getFirstName(), userFromDb.getUserDetails().getFirstName());
+        User userFromDb = userService.getUser(user.getId());
+        Assert.assertEquals(userEntity.getDetails().getFirstName(), userFromDb.getDetails().getFirstName());
     }
 
     @Test(expected = UserIdNullException.class)
@@ -203,14 +203,14 @@ public class UserServiceTest extends AbstractTest {
         userService.addTeam(userId, teamId);
 
         // ensure team is added from the user side
-        User userFromDb = userService.findUser(userId);
+        User userFromDb = userService.getUser(userId);
         List<String> teamList = userFromDb.getTeams();
         Assert.assertEquals(teamList.get(0), teamId);
 
         // ensure team is removed from the user side
         userService.removeTeam(userId, teamId);
 
-        User userFromDb2 = userService.findUser(userId);
+        User userFromDb2 = userService.getUser(userId);
         List<String> teamList2 = userFromDb2.getTeams();
         Assert.assertEquals(teamList2.isEmpty(), true);
     }

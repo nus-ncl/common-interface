@@ -1,10 +1,11 @@
 package sg.ncl.service.user.web;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -21,32 +22,30 @@ import java.util.List;
  * @author Christopher Zhong
  */
 @RestController
-@RequestMapping(path = "/users", produces = MediaType.APPLICATION_JSON_VALUE)
+@Slf4j
 public class UsersController {
-
-    private static final Logger logger = LoggerFactory.getLogger(UsersController.class);
 
     private final UserService userService;
 
     @Inject
-    protected UsersController(final UserService userService) {
+    UsersController(final UserService userService) {
         this.userService = userService;
     }
 
-    @RequestMapping(method = RequestMethod.GET)
-    @ResponseStatus(code = HttpStatus.OK)
-    public List<User> get() {
+    @GetMapping(path = "/users", produces = MediaType.APPLICATION_JSON_VALUE)
+    @ResponseStatus(HttpStatus.OK)
+    public List<User> getAllUsers() {
         return userService.getAll();
     }
 
-    @RequestMapping(path = "/{id}", method = RequestMethod.GET)
-    @ResponseStatus(code = HttpStatus.OK)
+    @GetMapping(path = "/users/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
+    @ResponseStatus(HttpStatus.OK)
     public User getUser(@PathVariable String id) {
-        return new UserInfo(userService.findUser(id));
+        return new UserInfo(userService.getUser(id));
     }
 
-    @RequestMapping(path = "/{id}", method = RequestMethod.PUT)
-    @ResponseStatus(code = HttpStatus.ACCEPTED)
+    @PutMapping(path = "/users/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
+    @ResponseStatus(HttpStatus.OK)
     public void updateUser(@PathVariable String id, @RequestBody UserInfo user) {
         userService.updateUser(id, user);
     }
@@ -56,11 +55,10 @@ public class UsersController {
     @ResponseStatus(value = HttpStatus.OK)
     public void addTeam(@PathVariable String id, @RequestBody UserInfo user) {
         if (user.getTeams() == null || user.getTeams().isEmpty()) {
-            logger.warn("Teams field is null or empty: {}", user.getTeams());
+            log.warn("Teams field is null or empty: {}", user.getTeams());
             throw new TeamsNullOrEmptyException();
         }
         // keep it simple for RegistrationService when parsing add user to team
         userService.addTeam(id, user.getTeams().get(0));
     }
-
 }
