@@ -12,6 +12,7 @@ import sg.ncl.adapter.deterlab.exceptions.UserNotFoundException;
 import sg.ncl.service.authentication.domain.Credentials;
 import sg.ncl.service.authentication.domain.CredentialsService;
 import sg.ncl.service.authentication.web.CredentialsInfo;
+import sg.ncl.service.mail.domain.MailService;
 import sg.ncl.service.registration.data.jpa.RegistrationEntity;
 import sg.ncl.service.registration.data.jpa.RegistrationRepository;
 import sg.ncl.service.registration.domain.RegistrationService;
@@ -51,18 +52,25 @@ public class RegistrationServiceImpl implements RegistrationService {
     private final UserService userService;
     private final RegistrationRepository registrationRepository;
 
+    private final MailService mailService;
+
     // FIXME: what is this autowired?
     @Autowired
     private final AdapterDeterlab adapterDeterlab;
 
     @Inject
-    RegistrationServiceImpl(@NotNull final CredentialsService credentialsService, @NotNull final TeamService teamService, @NotNull final UserService userService, @NotNull final RegistrationRepository registrationRepository, final DeterlabUserRepository deterlabUserRepository, final ConnectionProperties connectionProperties) {
+    RegistrationServiceImpl(@NotNull final CredentialsService credentialsService, @NotNull final TeamService teamService,
+                            @NotNull final UserService userService, @NotNull final RegistrationRepository registrationRepository,
+                            final DeterlabUserRepository deterlabUserRepository, final ConnectionProperties connectionProperties,
+                            @NotNull final MailService mailService) {
         this.credentialsService = credentialsService;
         this.teamService = teamService;
         this.userService = userService;
         this.registrationRepository = registrationRepository;
         // FIXME: why is this getting replaced?
         this.adapterDeterlab = new AdapterDeterlab(deterlabUserRepository, connectionProperties);
+
+        this.mailService = mailService;
     }
 
     @Transactional
@@ -266,6 +274,15 @@ public class RegistrationServiceImpl implements RegistrationService {
 
             // call deterlab adapter to store ncluid to deteruid mapping
             addNclUserIdMapping(resultJSON, userId);
+
+            // send notification email
+            String content = "Dear " + user.getUserDetails().getFirstName() + " " +
+                    user.getUserDetails().getLastName() + ",\n";
+            content += "Please use below link to activate your user account: \n\n";
+            content += "https://testbed.ncl.sg/login.php?uid=" + userId + "&key="+userId +"\n\n";
+            content += "Thanks,\nNCL Testbed Operations";
+
+            mailService.send("testbed-approval@ncl.sg", user.getUserDetails().getEmail(), "NCL.SG: User Account Activation", content);
 
         } else {
             // FIXME for debug purposes
