@@ -312,7 +312,7 @@ public class RegistrationServiceImpl implements RegistrationService {
     }
 
     @Transactional
-    public void approveTeam(String teamId, TeamStatus status) {
+    public void approveTeam(String teamId, String ownerId, TeamStatus status) {
         // FIXME required additional parameters to validate if approver is of admin or ordinary user
         if (teamId == null || teamId.isEmpty()) {
             log.warn("Team Id is empty or null");
@@ -340,6 +340,7 @@ public class RegistrationServiceImpl implements RegistrationService {
         // FIXME adapter deterlab call here
         JSONObject one = new JSONObject();
         one.put("pid", team.getName());
+        one.put("uid", adapterDeterlab.getDeterUserIdByNclUserId(ownerId));
 
         if (status.equals(TeamStatus.APPROVED)) {
             adapterDeterLab.approveProject(one.toString());
@@ -417,6 +418,11 @@ public class RegistrationServiceImpl implements RegistrationService {
         }
 
         return errorsFound;
+    }
+
+    @Transactional
+    public String getDeterUid(String id) {
+        return adapterDeterlab.getDeterUserIdByNclUserId(id);
     }
 
     private String getUserCreationStatus(String resultJSON) {

@@ -231,7 +231,10 @@ public class RegistrationControllerTest extends AbstractTest {
                 .andExpect(method(HttpMethod.POST))
                 .andRespond(withSuccess(predefinedResultJson.toString(), MediaType.APPLICATION_JSON));
 
-        mockMvc.perform(post("/registrations/teams/" + createdTeam.getId() + "?status=" + TeamStatus.APPROVED))
+        String deterUserIdOne = RandomStringUtils.randomAlphabetic(8);
+        adapterDeterlab.saveDeterUserIdMapping(deterUserIdOne, owner.getUserId());
+
+        mockMvc.perform(post("/registrations/teams/" + createdTeam.getId() + "/owner/" + owner.getUserId() + "?status=" + TeamStatus.APPROVED))
                 .andExpect(status().isOk());
     }
 
@@ -289,5 +292,18 @@ public class RegistrationControllerTest extends AbstractTest {
         Assert.assertThat(membersList.get(0).getUserId(), is(createdUser.getId()));
         // member should be deleted from team
         Assert.assertThat(resultUser2.getTeams().isEmpty(), is(true));
+    }
+
+    @Test
+    public void testGetDeterUid() throws Exception {
+        final String deterUid = RandomStringUtils.randomAlphanumeric(20);
+        final String nclUid = RandomStringUtils.randomAlphanumeric(20);
+        adapterDeterlab.saveDeterUserIdMapping(deterUid, nclUid);
+
+        MvcResult mvcResult = mockMvc.perform(get("/registrations/user/" + nclUid))
+                                        .andExpect(status().isOk())
+                                        .andReturn();
+
+        Assert.assertThat(mvcResult.getResponse().getContentAsString(), is(deterUid));
     }
 }
