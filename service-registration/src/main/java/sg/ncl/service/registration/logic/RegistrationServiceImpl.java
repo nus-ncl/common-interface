@@ -15,10 +15,21 @@ import sg.ncl.service.authentication.web.CredentialsInfo;
 import sg.ncl.service.registration.data.jpa.RegistrationEntity;
 import sg.ncl.service.registration.data.jpa.RegistrationRepository;
 import sg.ncl.service.registration.domain.RegistrationService;
-import sg.ncl.service.registration.exceptions.*;
+import sg.ncl.service.registration.exceptions.NoMembersInTeamException;
+import sg.ncl.service.registration.exceptions.RegisterTeamIdEmptyException;
+import sg.ncl.service.registration.exceptions.RegisterTeamNameDuplicateException;
+import sg.ncl.service.registration.exceptions.RegisterTeamNameEmptyException;
+import sg.ncl.service.registration.exceptions.RegisterUidNullException;
+import sg.ncl.service.registration.exceptions.UserFormException;
+import sg.ncl.service.registration.exceptions.UserIsNotTeamOwnerException;
 import sg.ncl.service.team.data.jpa.TeamEntity;
 import sg.ncl.service.team.data.jpa.TeamMemberEntity;
-import sg.ncl.service.team.domain.*;
+import sg.ncl.service.team.domain.MemberStatus;
+import sg.ncl.service.team.domain.MemberType;
+import sg.ncl.service.team.domain.Team;
+import sg.ncl.service.team.domain.TeamMember;
+import sg.ncl.service.team.domain.TeamService;
+import sg.ncl.service.team.domain.TeamStatus;
 import sg.ncl.service.team.web.TeamMemberInfo;
 import sg.ncl.service.user.domain.User;
 import sg.ncl.service.user.domain.UserService;
@@ -340,7 +351,7 @@ public class RegistrationServiceImpl implements RegistrationService {
         // FIXME adapter deterlab call here
         JSONObject one = new JSONObject();
         one.put("pid", team.getName());
-        one.put("uid", adapterDeterlab.getDeterUserIdByNclUserId(ownerId));
+        one.put("uid", adapterDeterLab.getDeterUserIdByNclUserId(ownerId));
 
         if (status.equals(TeamStatus.APPROVED)) {
             adapterDeterLab.approveProject(one.toString());
@@ -422,7 +433,7 @@ public class RegistrationServiceImpl implements RegistrationService {
 
     @Transactional
     public String getDeterUid(String id) {
-        return adapterDeterlab.getDeterUserIdByNclUserId(id);
+        return adapterDeterLab.getDeterUserIdByNclUserId(id);
     }
 
     private String getUserCreationStatus(String resultJSON) {

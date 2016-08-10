@@ -5,7 +5,6 @@ import org.json.JSONObject;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
@@ -18,10 +17,20 @@ import sg.ncl.service.authentication.data.jpa.CredentialsEntity;
 import sg.ncl.service.registration.AbstractTest;
 import sg.ncl.service.registration.Util;
 import sg.ncl.service.registration.domain.RegistrationService;
-import sg.ncl.service.registration.exceptions.*;
+import sg.ncl.service.registration.exceptions.RegisterTeamIdEmptyException;
+import sg.ncl.service.registration.exceptions.RegisterTeamNameDuplicateException;
+import sg.ncl.service.registration.exceptions.RegisterTeamNameEmptyException;
+import sg.ncl.service.registration.exceptions.RegisterUidNullException;
+import sg.ncl.service.registration.exceptions.UserFormException;
+import sg.ncl.service.registration.exceptions.UserIsNotTeamOwnerException;
 import sg.ncl.service.team.data.jpa.TeamEntity;
 import sg.ncl.service.team.data.jpa.TeamMemberEntity;
-import sg.ncl.service.team.domain.*;
+import sg.ncl.service.team.domain.MemberStatus;
+import sg.ncl.service.team.domain.MemberType;
+import sg.ncl.service.team.domain.Team;
+import sg.ncl.service.team.domain.TeamMember;
+import sg.ncl.service.team.domain.TeamService;
+import sg.ncl.service.team.domain.TeamStatus;
 import sg.ncl.service.team.exceptions.NoOwnerInTeamException;
 import sg.ncl.service.team.exceptions.TeamIdNullOrEmptyException;
 import sg.ncl.service.team.exceptions.TeamNotFoundException;
@@ -342,7 +351,7 @@ public class RegistrationServiceTest extends AbstractTest {
         JSONObject predefinedResultJson = new JSONObject();
         predefinedResultJson.put("msg", "project approved");
 
-        adapterDeterlab.saveDeterUserIdMapping(deterUserId, ownerId);
+        adapterDeterLab.saveDeterUserIdMapping(deterUserId, ownerId);
 
         mockServer.expect(requestTo(properties.getApproveProject()))
                 .andExpect(method(HttpMethod.POST))
@@ -391,7 +400,7 @@ public class RegistrationServiceTest extends AbstractTest {
         predefinedResultJson.put("msg", "project rejected");
 
         final String deterUserId = RandomStringUtils.randomAlphabetic(8);
-        adapterDeterlab.saveDeterUserIdMapping(deterUserId, owner.getUserId());
+        adapterDeterLab.saveDeterUserIdMapping(deterUserId, owner.getUserId());
 
         mockServer.expect(requestTo(properties.getRejectProject()))
                 .andExpect(method(HttpMethod.POST))
@@ -481,7 +490,7 @@ public class RegistrationServiceTest extends AbstractTest {
     public void testGetDeterUid() throws Exception {
         final String deterUid = RandomStringUtils.randomAlphanumeric(20);
         final String nclUid = RandomStringUtils.randomAlphanumeric(20);
-        adapterDeterlab.saveDeterUserIdMapping(deterUid, nclUid);
+        adapterDeterLab.saveDeterUserIdMapping(deterUid, nclUid);
         String result = registrationService.getDeterUid(nclUid);
         Assert.assertThat(result, is(deterUid));
     }

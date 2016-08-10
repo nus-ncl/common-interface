@@ -25,7 +25,11 @@ import sg.ncl.service.registration.Util;
 import sg.ncl.service.registration.serializers.DateTimeDeserializer;
 import sg.ncl.service.registration.serializers.DateTimeSerializer;
 import sg.ncl.service.team.data.jpa.TeamEntity;
-import sg.ncl.service.team.domain.*;
+import sg.ncl.service.team.domain.MemberType;
+import sg.ncl.service.team.domain.Team;
+import sg.ncl.service.team.domain.TeamMember;
+import sg.ncl.service.team.domain.TeamService;
+import sg.ncl.service.team.domain.TeamStatus;
 import sg.ncl.service.team.web.TeamMemberInfo;
 import sg.ncl.service.user.data.jpa.UserEntity;
 import sg.ncl.service.user.domain.User;
@@ -39,7 +43,9 @@ import static org.hamcrest.core.Is.is;
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.method;
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.requestTo;
 import static org.springframework.test.web.client.response.MockRestResponseCreators.withSuccess;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.springframework.test.web.servlet.setup.MockMvcBuilders.webAppContextSetup;
@@ -232,7 +238,7 @@ public class RegistrationControllerTest extends AbstractTest {
                 .andRespond(withSuccess(predefinedResultJson.toString(), MediaType.APPLICATION_JSON));
 
         String deterUserIdOne = RandomStringUtils.randomAlphabetic(8);
-        adapterDeterlab.saveDeterUserIdMapping(deterUserIdOne, owner.getUserId());
+        adapterDeterLab.saveDeterUserIdMapping(deterUserIdOne, owner.getUserId());
 
         mockMvc.perform(post("/registrations/teams/" + createdTeam.getId() + "/owner/" + owner.getUserId() + "?status=" + TeamStatus.APPROVED))
                 .andExpect(status().isOk());
@@ -298,7 +304,7 @@ public class RegistrationControllerTest extends AbstractTest {
     public void testGetDeterUid() throws Exception {
         final String deterUid = RandomStringUtils.randomAlphanumeric(20);
         final String nclUid = RandomStringUtils.randomAlphanumeric(20);
-        adapterDeterlab.saveDeterUserIdMapping(deterUid, nclUid);
+        adapterDeterLab.saveDeterUserIdMapping(deterUid, nclUid);
 
         MvcResult mvcResult = mockMvc.perform(get("/registrations/user/" + nclUid))
                                         .andExpect(status().isOk())
