@@ -3,7 +3,7 @@ package sg.ncl.service.experiment;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
-import sg.ncl.adapter.deterlab.AdapterDeterlab;
+import sg.ncl.adapter.deterlab.AdapterDeterLab;
 import sg.ncl.service.experiment.domain.ExperimentService;
 
 import static org.mockito.Mockito.mock;
@@ -16,8 +16,8 @@ public class TestConfig {
 
     @Bean
     @Profile("mock-deter-adapter")
-    public AdapterDeterlab adapterDeterlab() {
-        return mock(AdapterDeterlab.class);
+    public AdapterDeterLab adapterDeterLab() {
+        return mock(AdapterDeterLab.class);
     }
 
     @Bean

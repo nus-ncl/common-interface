@@ -5,14 +5,13 @@ import org.json.JSONObject;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.client.MockRestServiceServer;
 import org.springframework.web.client.RestOperations;
 import org.springframework.web.client.RestTemplate;
-import sg.ncl.adapter.deterlab.AdapterDeterlab;
+import sg.ncl.adapter.deterlab.AdapterDeterLab;
 import sg.ncl.adapter.deterlab.ConnectionProperties;
 import sg.ncl.service.authentication.data.jpa.CredentialsEntity;
 import sg.ncl.service.registration.AbstractTest;
@@ -67,7 +66,7 @@ public class RegistrationServiceTest extends AbstractTest {
     private RegistrationService registrationService;
 
     @Inject
-    private AdapterDeterlab adapterDeterlab;
+    private AdapterDeterLab adapterDeterLab;
 
     @Autowired
     private RestOperations restOperations;
@@ -204,8 +203,8 @@ public class RegistrationServiceTest extends AbstractTest {
         String memberId = userService.createUser(member).getId();
 
         // need to create entry in the Deterlab User Repository
-        adapterDeterlab.saveDeterUserIdMapping(RandomStringUtils.randomAlphanumeric(8), ownerId);
-        adapterDeterlab.saveDeterUserIdMapping(RandomStringUtils.randomAlphanumeric(8), memberId);
+        adapterDeterLab.saveDeterUserIdMapping(RandomStringUtils.randomAlphanumeric(8), ownerId);
+        adapterDeterLab.saveDeterUserIdMapping(RandomStringUtils.randomAlphanumeric(8), memberId);
 
         // add owner and members to team members repository
 
@@ -300,7 +299,7 @@ public class RegistrationServiceTest extends AbstractTest {
         User createdUser = userService.createUser(user);
 
         // need to create entry in the Deterlab User Repository
-        adapterDeterlab.saveDeterUserIdMapping(RandomStringUtils.randomAlphanumeric(8), createdUser.getId());
+        adapterDeterLab.saveDeterUserIdMapping(RandomStringUtils.randomAlphanumeric(8), createdUser.getId());
 
         JSONObject predefinedResultJson = new JSONObject();
         predefinedResultJson.put("msg", "user has logged in and applied a project");
@@ -352,7 +351,7 @@ public class RegistrationServiceTest extends AbstractTest {
         JSONObject predefinedResultJson = new JSONObject();
         predefinedResultJson.put("msg", "project approved");
 
-        adapterDeterlab.saveDeterUserIdMapping(deterUserId, ownerId);
+        adapterDeterLab.saveDeterUserIdMapping(deterUserId, ownerId);
 
         mockServer.expect(requestTo(properties.getApproveProject()))
                 .andExpect(method(HttpMethod.POST))
@@ -401,7 +400,7 @@ public class RegistrationServiceTest extends AbstractTest {
         predefinedResultJson.put("msg", "project rejected");
 
         final String deterUserId = RandomStringUtils.randomAlphabetic(8);
-        adapterDeterlab.saveDeterUserIdMapping(deterUserId, owner.getUserId());
+        adapterDeterLab.saveDeterUserIdMapping(deterUserId, owner.getUserId());
 
         mockServer.expect(requestTo(properties.getRejectProject()))
                 .andExpect(method(HttpMethod.POST))
@@ -455,8 +454,8 @@ public class RegistrationServiceTest extends AbstractTest {
 
         String deterUserIdOne = RandomStringUtils.randomAlphabetic(8);
         String deterUserIdTwo = RandomStringUtils.randomAlphabetic(8);
-        adapterDeterlab.saveDeterUserIdMapping(deterUserIdOne, user.getId());
-        adapterDeterlab.saveDeterUserIdMapping(deterUserIdTwo, user2.getId());
+        adapterDeterLab.saveDeterUserIdMapping(deterUserIdOne, user.getId());
+        adapterDeterLab.saveDeterUserIdMapping(deterUserIdTwo, user2.getId());
 
         userService.addTeam(user.getId(), team.getId());
         userService.addTeam(user2.getId(), team.getId());
@@ -491,7 +490,7 @@ public class RegistrationServiceTest extends AbstractTest {
     public void testGetDeterUid() throws Exception {
         final String deterUid = RandomStringUtils.randomAlphanumeric(20);
         final String nclUid = RandomStringUtils.randomAlphanumeric(20);
-        adapterDeterlab.saveDeterUserIdMapping(deterUid, nclUid);
+        adapterDeterLab.saveDeterUserIdMapping(deterUid, nclUid);
         String result = registrationService.getDeterUid(nclUid);
         Assert.assertThat(result, is(deterUid));
     }

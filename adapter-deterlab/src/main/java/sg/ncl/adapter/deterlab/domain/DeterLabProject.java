@@ -3,12 +3,12 @@ package sg.ncl.adapter.deterlab.domain;
 /**
  * Created by dcsyeoty on 16-Jun-16.
  */
-public interface DeterlabUser {
+public interface DeterLabProject {
 
     String getId();
 
-    String getNclUserId();
+    String getNclTeamId();
 
-    String getDeterUserId();
+    String getDeterProjectId();
 
 }

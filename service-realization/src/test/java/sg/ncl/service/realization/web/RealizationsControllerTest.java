@@ -9,7 +9,7 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 import sg.ncl.service.realization.AbstractTest;
 import sg.ncl.service.realization.data.jpa.RealizationEntity;
-import sg.ncl.service.realization.logic.RealizationService;
+import sg.ncl.service.realization.domain.RealizationService;
 
 import javax.inject.Inject;
 
@@ -61,7 +61,7 @@ public class RealizationsControllerTest extends AbstractTest {
 //        when(realizationService.startExperimentInDeter(teamName, experimentId, userId)).thenReturn("");
 
         mockMvc.perform(post("/realizations/start/team/" + teamName + "/experiment/" + experimentId))
-                .andExpect(status().isOk());
+                .andExpect(status().isAccepted());
     }
 
     @Test
@@ -72,6 +72,6 @@ public class RealizationsControllerTest extends AbstractTest {
         when(realizationService.getByExperimentId(Long.parseLong(experimentId))).thenReturn(new RealizationEntity());
 
         mockMvc.perform(post("/realizations/stop/team/" + teamName + "/experiment/" + experimentId))
-                .andExpect(status().isOk());
+                .andExpect(status().isAccepted());
     }
 }

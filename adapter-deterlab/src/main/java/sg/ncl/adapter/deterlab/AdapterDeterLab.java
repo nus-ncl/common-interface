@@ -3,20 +3,12 @@ package sg.ncl.adapter.deterlab;
 import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpMethod;
-import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.*;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
-import sg.ncl.adapter.deterlab.data.jpa.DeterlabUserRepository;
-import sg.ncl.adapter.deterlab.dtos.entities.DeterlabUserEntity;
-import sg.ncl.adapter.deterlab.exceptions.AdapterDeterlabConnectException;
-import sg.ncl.adapter.deterlab.exceptions.CredentialsUpdateException;
-import sg.ncl.adapter.deterlab.exceptions.ExpNameAlreadyExistsException;
-import sg.ncl.adapter.deterlab.exceptions.NSFileParseException;
-import sg.ncl.adapter.deterlab.exceptions.UserNotFoundException;
+import sg.ncl.adapter.deterlab.data.jpa.DeterLabUserRepository;
+import sg.ncl.adapter.deterlab.dtos.entities.DeterLabUserEntity;
+import sg.ncl.adapter.deterlab.exceptions.*;
 
 import javax.inject.Inject;
 
@@ -25,18 +17,18 @@ import javax.inject.Inject;
  * Created by Te Ye on 15-Jun-16.
  */
 @Component
-public class AdapterDeterlab {
+public class AdapterDeterLab {
 
-    private DeterlabUserRepository deterlabUserRepository;
+    private DeterLabUserRepository deterLabUserRepository;
     private ConnectionProperties properties;
-    private static final Logger logger = LoggerFactory.getLogger(AdapterDeterlab.class);
+    private static final Logger logger = LoggerFactory.getLogger(AdapterDeterLab.class);
 
     @Inject
     private RestTemplate restTemplate;
 
     @Inject
-    public AdapterDeterlab(DeterlabUserRepository repository, ConnectionProperties connectionProperties) {
-        this.deterlabUserRepository = repository;
+    public AdapterDeterLab(DeterLabUserRepository repository, ConnectionProperties connectionProperties) {
+        this.deterLabUserRepository = repository;
         this.properties = connectionProperties;
     }
 
@@ -114,18 +106,18 @@ public class AdapterDeterlab {
     }
 
     public void saveDeterUserIdMapping(String deterUserId, String nclUserId) {
-        DeterlabUserEntity deterlabUserEntity = new DeterlabUserEntity();
-        deterlabUserEntity.setNclUserId(nclUserId);
-        deterlabUserEntity.setDeterUserId(deterUserId);
-        deterlabUserRepository.save(deterlabUserEntity);
+        DeterLabUserEntity deterLabUserEntity = new DeterLabUserEntity();
+        deterLabUserEntity.setNclUserId(nclUserId);
+        deterLabUserEntity.setDeterUserId(deterUserId);
+        deterLabUserRepository.save(deterLabUserEntity);
     }
 
     public String getDeterUserIdByNclUserId(String nclUserId) {
-        DeterlabUserEntity deterlabUserEntity = deterlabUserRepository.findByNclUserId(nclUserId);
-        if (deterlabUserEntity == null) {
+        DeterLabUserEntity deterLabUserEntity = deterLabUserRepository.findByNclUserId(nclUserId);
+        if (deterLabUserEntity == null) {
             throw new UserNotFoundException();
         }
-        return deterlabUserEntity.getDeterUserId();
+        return deterLabUserEntity.getDeterUserId();
     }
 
     public void createExperiment(String jsonString) {
