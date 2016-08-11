@@ -6,5 +6,5 @@ reviewers:
   name: pullapprove
   teams:
   - reviewers
-  required: 2
+  required: 1
   
