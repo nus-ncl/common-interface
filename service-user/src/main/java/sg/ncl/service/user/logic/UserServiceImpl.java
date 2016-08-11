@@ -1,5 +1,6 @@
 package sg.ncl.service.user.logic;
 
+import org.apache.commons.lang3.RandomStringUtils;
 import org.springframework.stereotype.Service;
 import sg.ncl.service.user.data.jpa.UserDetailsEntity;
 import sg.ncl.service.user.data.jpa.UserEntity;
@@ -34,6 +35,8 @@ public class UserServiceImpl implements UserService {
         userEntity.setApplicationDate(user.getApplicationDate());
         userEntity.setProcessedDate(user.getProcessedDate());
         userEntity.setUserDetails((UserDetailsEntity) user.getUserDetails());
+
+        userEntity.setVerificationKey(RandomStringUtils.random(20));
 
         UserEntity savedUserEntity = userRepository.save(userEntity);
         return savedUserEntity;

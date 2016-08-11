@@ -7,12 +7,12 @@ spring:
     #url: ${jdbc.url}
     #username: ${jdbc.username}
     #password: ${jdbc.password}
-    url: jdbc:mysql://localhost:32768/database
+    url: jdbc:mysql://localhost:32768/test
     username: root
     password: password
   jpa:
     hibernate:
-      ddl-auto: validate
+      ddl-auto: create-drop
     show-sql: false
     properties:
       hibernate:
