@@ -21,6 +21,6 @@ public class MailServiceImplTest {
 
     @Test
     public void testSend() {
-        mail.send("testbed-approval@ncl.sg", "dcszwang@nus.edu.sg", "Test", "NCL test email 2");
+        //mail.send("testbed-approval@ncl.sg", "dcszwang@nus.edu.sg", "Test", "NCL test email 2");
     }
 }
