@@ -14,6 +14,7 @@ import sg.ncl.service.authentication.domain.CredentialsService;
 import sg.ncl.service.authentication.web.CredentialsInfo;
 import sg.ncl.service.registration.data.jpa.RegistrationEntity;
 import sg.ncl.service.registration.data.jpa.RegistrationRepository;
+import sg.ncl.service.registration.domain.Registration;
 import sg.ncl.service.registration.domain.RegistrationService;
 import sg.ncl.service.registration.exceptions.NoMembersInTeamException;
 import sg.ncl.service.registration.exceptions.RegisterTeamIdEmptyException;
@@ -30,6 +31,7 @@ import sg.ncl.service.team.domain.Team;
 import sg.ncl.service.team.domain.TeamMember;
 import sg.ncl.service.team.domain.TeamService;
 import sg.ncl.service.team.domain.TeamStatus;
+import sg.ncl.service.team.exceptions.TeamNotFoundException;
 import sg.ncl.service.team.web.TeamMemberInfo;
 import sg.ncl.service.user.domain.User;
 import sg.ncl.service.user.domain.UserService;
@@ -112,7 +114,7 @@ public class RegistrationServiceImpl implements RegistrationService {
     }
 
     @Transactional
-    public void registerRequestToJoinTeam(String nclUserId, Team team) {
+    public String registerRequestToJoinTeam(String nclUserId, Team team) {
         if (team.getName() == null || team.getName().isEmpty()) {
             log.warn("Team name is not found");
             throw new RegisterTeamNameEmptyException();
@@ -123,7 +125,14 @@ public class RegistrationServiceImpl implements RegistrationService {
             throw new RegisterUidNullException();
         }
 
+        log.info("Getting the team entity to be join");
         Team teamEntity = teamService.getTeamByName(team.getName());
+
+        if (teamEntity == null) {
+            throw new TeamNotFoundException();
+        }
+
+        log.info("Team to join: {}", teamEntity.getName());
         String teamId = teamEntity.getId();
 
         JSONObject userObject = new JSONObject();
@@ -139,7 +148,11 @@ public class RegistrationServiceImpl implements RegistrationService {
         userService.addTeam(nclUserId, teamId);
         teamService.addMember(teamId, teamMemberInfo);
 
-        String resultJSON = adapterDeterLab.joinProject(userObject.toString());
+        log.info("Calling the adapter to join project");
+        adapterDeterLab.joinProject(userObject.toString());
+
+        log.info("Submitted join team request");
+        return "join team request submitted";
     }
 
     @Transactional
@@ -165,7 +178,8 @@ public class RegistrationServiceImpl implements RegistrationService {
             try {
                 log.info("New team name is {}", team.getName());
                 teamEntity = teamService.getTeamByName(team.getName());
-            } catch (NullPointerException e) {
+            } catch (TeamNotFoundException e) {
+                // in order to continue the registration must catch instead of letting the service to throw
                 log.info("This is good, this implies team name is unique");
             }
             if (teamEntity != null && teamEntity.getId() != null) {
@@ -480,7 +494,8 @@ public class RegistrationServiceImpl implements RegistrationService {
         try {
             log.info("New team name is {}", teamName);
             one = teamService.getTeamByName(teamName);
-        } catch (NullPointerException e) {
+        } catch (TeamNotFoundException e) {
+            // in order to continue the registration must catch instead of letting the service to throw
             log.info("This is good, this implies team name is unique");
         }
         if (one != null && one.getId() != null) {

@@ -294,6 +294,7 @@ public class RegistrationServiceTest extends AbstractTest {
 
     @Test
     public void registerRequestToApplyTeamGood() throws Exception {
+        // alright for team name not to be found since we are applying for a new team
         Team one = Util.getTeamEntity();
         User user = Util.getUserEntity();
         User createdUser = userService.createUser(user);
