@@ -13,23 +13,9 @@ spring:
       hibernate:
         dialect: org.hibernate.dialect.H2Dialect
         format-sql: true
-  mail:
-    host: smtp-relay.gmail.com
-    port: 465
-    username: testbed-ops@ncl.sg
-    password: deterinavm
-    protocol: smtps
-    properties:
-      starttls:
-        enable: true
-      auth: true
 ncl:
   jwt:
     apiKey: 123
     signing-algorithm: HS256
     expiry:
       duration: PT1H
-  deterlab:
-    adapter:
-      ip: localhost
-      port: 8181
