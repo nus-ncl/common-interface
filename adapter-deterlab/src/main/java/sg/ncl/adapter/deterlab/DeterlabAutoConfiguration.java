@@ -14,11 +14,11 @@ import sg.ncl.common.jpa.UseJpa;
 @ComponentScan
 @EnableConfigurationProperties(ConnectionProperties.class)
 @UseJpa
-public class DeterlabAutoConfiguration {
+public class DeterLabAutoConfiguration {
 
     //    @Bean
 //    @ConditionalOnMissingBean(AdapterDeterlab.class)
-//    public AdapterDeterlab adapterDeterlab(DeterlabUserRepository deterlabUserRepository, Co) {
+//    public AdapterDeterlab adapterDeterlab(DeterLabUserRepository deterlabUserRepository, Co) {
 //        return new AdapterDeterlab(deterlabUserRepository);
 //    }
     @Bean
