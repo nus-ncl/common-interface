@@ -23,6 +23,4 @@ public interface RegistrationService {
     void approveTeam(String teamId, String ownerId, TeamStatus teamStatus);
 
     String getDeterUid(String id);
-
-    void activateAccount(String uid, String key);
 }

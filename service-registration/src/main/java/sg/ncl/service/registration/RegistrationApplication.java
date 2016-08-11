@@ -7,7 +7,6 @@ import org.springframework.context.annotation.Import;
 import sg.ncl.adapter.deterlab.DeterLabAutoConfiguration;
 import sg.ncl.common.jpa.UseJpa;
 import sg.ncl.service.authentication.AuthenticationApplication;
-import sg.ncl.service.mail.MailApplication;
 import sg.ncl.service.team.TeamApplication;
 import sg.ncl.service.user.UserApplication;
 
@@ -20,8 +19,7 @@ import sg.ncl.service.user.UserApplication;
         AuthenticationApplication.class,
         TeamApplication.class,
         UserApplication.class,
-        DeterLabAutoConfiguration.class,
-        MailApplication.class
+        DeterLabAutoConfiguration.class
 })
 public class RegistrationApplication {
 

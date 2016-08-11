@@ -12,7 +12,6 @@ import sg.ncl.adapter.deterlab.exceptions.UserNotFoundException;
 import sg.ncl.service.authentication.domain.Credentials;
 import sg.ncl.service.authentication.domain.CredentialsService;
 import sg.ncl.service.authentication.web.CredentialsInfo;
-import sg.ncl.service.mail.domain.MailService;
 import sg.ncl.service.registration.data.jpa.RegistrationEntity;
 import sg.ncl.service.registration.data.jpa.RegistrationRepository;
 import sg.ncl.service.registration.domain.Registration;
@@ -34,11 +33,8 @@ import sg.ncl.service.team.domain.TeamService;
 import sg.ncl.service.team.domain.TeamStatus;
 import sg.ncl.service.team.exceptions.TeamNotFoundException;
 import sg.ncl.service.team.web.TeamMemberInfo;
-import sg.ncl.service.user.data.jpa.UserDetailsEntity;
-import sg.ncl.service.user.data.jpa.UserEntity;
 import sg.ncl.service.user.domain.User;
 import sg.ncl.service.user.domain.UserService;
-import sg.ncl.service.user.domain.UserStatus;
 
 import javax.inject.Inject;
 import javax.validation.constraints.NotNull;
@@ -57,25 +53,18 @@ public class RegistrationServiceImpl implements RegistrationService {
     private final UserService userService;
     private final RegistrationRepository registrationRepository;
 
-    private final MailService mailService;
-
     // FIXME: what is this autowired?
     @Autowired
     private final AdapterDeterLab adapterDeterLab;
 
     @Inject
-    RegistrationServiceImpl(@NotNull final CredentialsService credentialsService, @NotNull final TeamService teamService,
-                            @NotNull final UserService userService, @NotNull final RegistrationRepository registrationRepository,
-                            final DeterLabUserRepository deterlabUserRepository, final ConnectionProperties connectionProperties,
-                            @NotNull final MailService mailService) {
+    RegistrationServiceImpl(@NotNull final CredentialsService credentialsService, @NotNull final TeamService teamService, @NotNull final UserService userService, @NotNull final RegistrationRepository registrationRepository, final DeterLabUserRepository deterLabUserRepository, final ConnectionProperties connectionProperties) {
         this.credentialsService = credentialsService;
         this.teamService = teamService;
         this.userService = userService;
         this.registrationRepository = registrationRepository;
         // FIXME: why is this getting replaced?
-        this.adapterDeterLab = new AdapterDeterLab(deterlabUserRepository, connectionProperties);
-
-        this.mailService = mailService;
+        this.adapterDeterLab = new AdapterDeterLab(deterLabUserRepository, connectionProperties);
     }
 
     @Transactional
@@ -291,15 +280,6 @@ public class RegistrationServiceImpl implements RegistrationService {
 
             // call deterlab adapter to store ncluid to deteruid mapping
             addNclUserIdMapping(resultJSON, userId);
-
-            // send notification email
-            String content = "Dear " + user.getUserDetails().getFirstName() + " " +
-                    user.getUserDetails().getLastName() + ",\n";
-            content += "Please use below link to activate your user account: \n\n";
-            content += "https://testbed.ncl.sg/login.php?uid=" + userId + "&key="+userId +"\n\n";
-            content += "Thanks,\nNCL Testbed Operations";
-
-            //mailService.send("testbed-approval@ncl.sg", user.getUserDetails().getEmail(), "NCL.SG: User Account Activation", content);
 
         } else {
             // FIXME for debug purposes
@@ -524,20 +504,6 @@ public class RegistrationServiceImpl implements RegistrationService {
                 throw new RegisterTeamNameDuplicateException();
             }
         }
-    }
-
-    public void activateAccount (@NotNull final String uid, @NotNull final String key) {
-        log.info("uid '{}' ", uid);
-        log.info("key '{}'", key);
-        User user = userService.getUser(uid);
-        if (user == null) {
-            log.warn("Cannot find user '{}'", uid);
-            throw new UserNotFoundException();
-        }
-
-        UserEntity newUser = new UserEntity();
-        newUser.setStatus(UserStatus.APPROVED);
-        userService.updateUser(uid, newUser);
     }
 
 }
