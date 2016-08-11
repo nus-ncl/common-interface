@@ -10,6 +10,7 @@ import org.springframework.context.ConfigurableApplicationContext;
 
 @SpringBootApplication
 public class MailApplication {
+
     public static void main(final String[] args) {
         try (final ConfigurableApplicationContext context = SpringApplication.run(MailApplication.class, args)) {
             // nothing to do

@@ -57,64 +57,66 @@ public class UserServiceImpl implements UserService {
             one.setStatus(user.getStatus());
         }
 
-        if (user.getUserDetails().getFirstName() != null) {
-            one.getUserDetails().setFirstName(user.getUserDetails().getFirstName());
-        }
-
-        if (user.getUserDetails().getLastName() != null) {
-            one.getUserDetails().setLastName(user.getUserDetails().getLastName());
-        }
-
-        if (user.getUserDetails().getJobTitle() != null) {
-            one.getUserDetails().setJobTitle(user.getUserDetails().getJobTitle());
-        }
-
-        if (user.getUserDetails().getEmail() != null) {
-            one.getUserDetails().setEmail(user.getUserDetails().getEmail());
-        }
-
-        if (user.getUserDetails().getPhone() != null) {
-            one.getUserDetails().setPhone(user.getUserDetails().getPhone());
-        }
-
-        if (user.getUserDetails().getInstitution() != null) {
-            one.getUserDetails().setInstitution(user.getUserDetails().getInstitution());
-        }
-
-        if (user.getUserDetails().getInstitutionAbbreviation() != null) {
-            one.getUserDetails().setInstitutionAbbreviation(user.getUserDetails().getInstitutionAbbreviation());
-        }
-
-        if (user.getUserDetails().getInstitutionWeb() != null) {
-            one.getUserDetails().setInstitutionWeb(user.getUserDetails().getInstitutionWeb());
-        }
-
-        final Address userAddress = user.getUserDetails().getAddress();
-
-        if (userAddress != null) {
-
-            if (userAddress.getAddress1() != null) {
-                one.getUserDetails().getAddress().setAddress1(userAddress.getAddress1());
+        if(user.getUserDetails() != null) {
+            if (user.getUserDetails().getFirstName() != null) {
+                one.getUserDetails().setFirstName(user.getUserDetails().getFirstName());
             }
 
-            if (userAddress.getAddress2() != null) {
-                one.getUserDetails().getAddress().setAddress2(userAddress.getAddress2());
+            if (user.getUserDetails().getLastName() != null) {
+                one.getUserDetails().setLastName(user.getUserDetails().getLastName());
             }
 
-            if (userAddress.getCountry() != null) {
-                one.getUserDetails().getAddress().setCountry(userAddress.getCountry());
+            if (user.getUserDetails().getJobTitle() != null) {
+                one.getUserDetails().setJobTitle(user.getUserDetails().getJobTitle());
             }
 
-            if (userAddress.getCity() != null) {
-                one.getUserDetails().getAddress().setCity(userAddress.getCity());
+            if (user.getUserDetails().getEmail() != null) {
+                one.getUserDetails().setEmail(user.getUserDetails().getEmail());
             }
 
-            if (userAddress.getRegion() != null) {
-                one.getUserDetails().getAddress().setRegion(userAddress.getRegion());
+            if (user.getUserDetails().getPhone() != null) {
+                one.getUserDetails().setPhone(user.getUserDetails().getPhone());
             }
 
-            if (userAddress.getZipCode() != null) {
-                one.getUserDetails().getAddress().setZipCode((userAddress.getZipCode()));
+            if (user.getUserDetails().getInstitution() != null) {
+                one.getUserDetails().setInstitution(user.getUserDetails().getInstitution());
+            }
+
+            if (user.getUserDetails().getInstitutionAbbreviation() != null) {
+                one.getUserDetails().setInstitutionAbbreviation(user.getUserDetails().getInstitutionAbbreviation());
+            }
+
+            if (user.getUserDetails().getInstitutionWeb() != null) {
+                one.getUserDetails().setInstitutionWeb(user.getUserDetails().getInstitutionWeb());
+            }
+
+            final Address userAddress = user.getUserDetails().getAddress();
+
+            if (userAddress != null) {
+
+                if (userAddress.getAddress1() != null) {
+                    one.getUserDetails().getAddress().setAddress1(userAddress.getAddress1());
+                }
+
+                if (userAddress.getAddress2() != null) {
+                    one.getUserDetails().getAddress().setAddress2(userAddress.getAddress2());
+                }
+
+                if (userAddress.getCountry() != null) {
+                    one.getUserDetails().getAddress().setCountry(userAddress.getCountry());
+                }
+
+                if (userAddress.getCity() != null) {
+                    one.getUserDetails().getAddress().setCity(userAddress.getCity());
+                }
+
+                if (userAddress.getRegion() != null) {
+                    one.getUserDetails().getAddress().setRegion(userAddress.getRegion());
+                }
+
+                if (userAddress.getZipCode() != null) {
+                    one.getUserDetails().getAddress().setZipCode((userAddress.getZipCode()));
+                }
             }
         }
 

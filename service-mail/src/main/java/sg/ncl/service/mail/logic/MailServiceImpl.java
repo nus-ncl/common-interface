@@ -19,13 +19,14 @@ import javax.validation.constraints.NotNull;
 @Slf4j
 public class MailServiceImpl implements MailService{
 
-    JavaMailSender sender;
+    private final JavaMailSender sender;
 
     @Inject
     MailServiceImpl(@NotNull final JavaMailSender sender) {
         this.sender = sender;
     }
 
+    @Override
     public void send(@NotNull final String from, @NotNull final String to, @NotNull final String subject, @NotNull final String content) {
         SimpleMailMessage msg = new SimpleMailMessage();
         msg.setFrom(from);

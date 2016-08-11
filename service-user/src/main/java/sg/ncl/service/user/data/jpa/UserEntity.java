@@ -22,6 +22,7 @@ import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import javax.persistence.UniqueConstraint;
+import javax.validation.constraints.NotNull;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -50,6 +51,9 @@ public class UserEntity extends AbstractEntity implements User {
     @Column(name = "status", nullable = false)
     @Enumerated(EnumType.STRING)
     private UserStatus status = UserStatus.PENDING;
+
+    @Column(name = "verification_key", nullable = false)
+    private String verificationKey;
 
     @Column(name = "application_date", nullable = false)
     private ZonedDateTime applicationDate;
@@ -100,6 +104,15 @@ public class UserEntity extends AbstractEntity implements User {
 
     public void setStatus(final UserStatus status) {
         this.status = status;
+    }
+
+    @Override
+    public String getVerificationKey() {
+        return verificationKey;
+    }
+
+    public void setVerificationKey(@NotNull String verificationKey) {
+        this.verificationKey = verificationKey;
     }
 
     @Override
@@ -173,6 +186,7 @@ public class UserEntity extends AbstractEntity implements User {
                 ", userDetails=" + userDetails +
                 ", emailVerified=" + emailVerified +
                 ", status=" + status +
+                ", verificationKey=" + verificationKey +
                 ", applicationDate=" + applicationDate +
                 ", processedDate=" + processedDate +
                 ", loginActivities=" + loginActivities +
