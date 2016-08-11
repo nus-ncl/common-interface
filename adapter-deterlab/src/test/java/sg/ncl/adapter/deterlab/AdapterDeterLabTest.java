@@ -84,7 +84,7 @@ public class AdapterDeterLabTest extends AbstractTest {
 
         JSONObject userJoinTeamObject = Util.getTeamAdapterJSONObject();
 
-        adapterDeterlab.joinProject(userJoinTeamObject.toString());
+        adapterDeterLab.joinProject(userJoinTeamObject.toString());
     }
 
     @Test(expected = JoinProjectException.class)
