@@ -14,7 +14,6 @@ import sg.ncl.service.authentication.domain.CredentialsService;
 import sg.ncl.service.authentication.web.CredentialsInfo;
 import sg.ncl.service.registration.data.jpa.RegistrationEntity;
 import sg.ncl.service.registration.data.jpa.RegistrationRepository;
-import sg.ncl.service.registration.domain.Registration;
 import sg.ncl.service.registration.domain.RegistrationService;
 import sg.ncl.service.registration.exceptions.NoMembersInTeamException;
 import sg.ncl.service.registration.exceptions.RegisterTeamIdEmptyException;
@@ -98,7 +97,6 @@ public class RegistrationServiceImpl implements RegistrationService {
         teamMemberEntity.setMemberType(MemberType.OWNER);
         TeamMemberInfo teamMemberInfo = new TeamMemberInfo(teamMemberEntity);
 
-        // FIXME call adapter deterlab here
         JSONObject mainObject = new JSONObject();
         mainObject.put("uid", adapterDeterLab.getDeterUserIdByNclUserId(nclUserId));
         mainObject.put("projName", team.getName());
@@ -107,10 +105,12 @@ public class RegistrationServiceImpl implements RegistrationService {
         mainObject.put("projWeb", team.getWebsite());
         mainObject.put("projOrg", team.getOrganisationType());
         mainObject.put("projPublic", team.getVisibility());
-        String resultJSON = adapterDeterLab.applyProject(mainObject.toString());
 
+        log.info("User side add team");
         userService.addTeam(nclUserId, createdTeam.getId());
         teamService.addMember(createdTeam.getId(), teamMemberInfo);
+
+        adapterDeterLab.applyProject(mainObject.toString());
     }
 
     @Transactional
