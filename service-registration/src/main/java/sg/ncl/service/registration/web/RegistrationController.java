@@ -3,6 +3,7 @@ package sg.ncl.service.registration.web;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
+import sg.ncl.service.registration.domain.Registration;
 import sg.ncl.service.registration.domain.RegistrationService;
 import sg.ncl.service.team.domain.TeamStatus;
 
@@ -40,9 +41,9 @@ public class RegistrationController {
     // old user + join team
     @PostMapping(path = "/joinApplications")
     // FIXME: the path is wrong, there should not be multiple paths for different registrations; status should be ACCEPTED
-    @ResponseStatus(HttpStatus.OK)
-    public void registerRequestToJoinTeam(@RequestBody RegistrationInfo registrationInfo) {
-        registrationService.registerRequestToJoinTeam(registrationInfo.getUser().getId(), registrationInfo.getTeam());
+    @ResponseStatus(HttpStatus.ACCEPTED)
+    public String registerRequestToJoinTeam(@RequestBody RegistrationInfo registrationInfo) {
+        return registrationService.registerRequestToJoinTeam(registrationInfo.getUser().getId(), registrationInfo.getTeam());
     }
 
     @PostMapping(path = "/teams/{teamId}/members/{userId}")

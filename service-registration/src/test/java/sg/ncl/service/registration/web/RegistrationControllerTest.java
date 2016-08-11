@@ -30,6 +30,7 @@ import sg.ncl.service.team.domain.Team;
 import sg.ncl.service.team.domain.TeamMember;
 import sg.ncl.service.team.domain.TeamService;
 import sg.ncl.service.team.domain.TeamStatus;
+import sg.ncl.service.team.exceptions.TeamNotFoundException;
 import sg.ncl.service.team.web.TeamMemberInfo;
 import sg.ncl.service.user.data.jpa.UserEntity;
 import sg.ncl.service.user.domain.User;
@@ -186,14 +187,14 @@ public class RegistrationControllerTest extends AbstractTest {
         mainJSON.put("team", teamFields);
 
         JSONObject predefinedResultJson = new JSONObject();
-        predefinedResultJson.put("msg", "user has logged in and joined a project");
+        predefinedResultJson.put("msg", "join project request existing users success");
 
         mockServer.expect(requestTo(properties.getJoinProject()))
                 .andExpect(method(HttpMethod.POST))
                 .andRespond(withSuccess(predefinedResultJson.toString(), MediaType.APPLICATION_JSON));
 
         mockMvc.perform(post("/registrations/joinApplications").contentType(MediaType.APPLICATION_JSON).content(mainJSON.toString()))
-                .andExpect(status().isOk());
+                .andExpect(status().isAccepted());
     }
 
     @Test

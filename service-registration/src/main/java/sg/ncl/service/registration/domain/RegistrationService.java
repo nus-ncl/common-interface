@@ -12,7 +12,7 @@ public interface RegistrationService {
 
     void registerRequestToApplyTeam(String uid, Team team);
 
-    void registerRequestToJoinTeam(String uid, Team team);
+    String registerRequestToJoinTeam(String uid, Team team);
 
     void register(Credentials credentials, User user, Team team, boolean isJoinTeam);
 

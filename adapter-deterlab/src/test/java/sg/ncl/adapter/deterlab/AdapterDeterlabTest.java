@@ -13,10 +13,7 @@ import org.springframework.web.client.RestOperations;
 import org.springframework.web.client.RestTemplate;
 import sg.ncl.adapter.deterlab.data.jpa.DeterLabUserRepository;
 import sg.ncl.adapter.deterlab.dtos.entities.DeterLabUserEntity;
-import sg.ncl.adapter.deterlab.exceptions.AdapterDeterlabConnectException;
-import sg.ncl.adapter.deterlab.exceptions.ExpNameAlreadyExistsException;
-import sg.ncl.adapter.deterlab.exceptions.NSFileParseException;
-import sg.ncl.adapter.deterlab.exceptions.UserNotFoundException;
+import sg.ncl.adapter.deterlab.exceptions.*;
 
 import javax.inject.Inject;
 
@@ -77,21 +74,9 @@ public class AdapterDeterLabTest extends AbstractTest {
     }
 
     @Test
-    public void testJoinProjectOnDeter() {
-        // below is actual invocation of the remote join project function
-//        JSONObject userLoginObject = new JSONObject();
-//        userLoginObject.put("uid", "mickey");
-//        userLoginObject.put("password", "deterinavm");
-//
-//        JSONObject userJoinTeamObject = new JSONObject();
-//        userJoinTeamObject.put("uid", "mickey");
-//        userJoinTeamObject.put("pid", "NCL");
-//
-//        String loginResultJSON = adapterDeterlab.loginUsers(userLoginObject.toString());
-//        String joinTeamResultJSON = adapterDeterlab.joinProject(userJoinTeamObject.toString());
-
+    public void testJoinProjectGood() {
         JSONObject predefinedResultJson = new JSONObject();
-        predefinedResultJson.put("msg", "user has logged in and joined a project");
+        predefinedResultJson.put("msg", "join project request existing users success");
 
         mockServer.expect(requestTo(properties.getJoinProject()))
                 .andExpect(method(HttpMethod.POST))
@@ -99,10 +84,21 @@ public class AdapterDeterLabTest extends AbstractTest {
 
         JSONObject userJoinTeamObject = Util.getTeamAdapterJSONObject();
 
-        String joinTeamResultJSON = adapterDeterLab.joinProject(userJoinTeamObject.toString());
-        JSONObject joinTeamResultJSONObject = new JSONObject(joinTeamResultJSON);
-        String joinMsg = joinTeamResultJSONObject.getString("msg");
-        Assert.assertThat(joinMsg, is("user has logged in and joined a project"));
+        adapterDeterLab.joinProject(userJoinTeamObject.toString());
+    }
+
+    @Test(expected = JoinProjectException.class)
+    public void testJoinProjectBad() {
+        JSONObject predefinedResultJson = new JSONObject();
+        predefinedResultJson.put("msg", "join project request existing users fail");
+
+        mockServer.expect(requestTo(properties.getJoinProject()))
+                .andExpect(method(HttpMethod.POST))
+                .andRespond(withSuccess(predefinedResultJson.toString(), MediaType.APPLICATION_JSON));
+
+        JSONObject userJoinTeamObject = Util.getTeamAdapterJSONObject();
+
+        adapterDeterLab.joinProject(userJoinTeamObject.toString());
     }
 
     @Test
