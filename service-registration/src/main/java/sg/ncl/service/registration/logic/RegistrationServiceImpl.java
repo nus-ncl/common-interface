@@ -293,13 +293,14 @@ public class RegistrationServiceImpl implements RegistrationService {
             addNclUserIdMapping(resultJSON, userId);
 
             // send notification email
-            String content = "Dear " + user.getUserDetails().getFirstName() + " " +
+/*            String content = "Dear " + user.getUserDetails().getFirstName() + " " +
                     user.getUserDetails().getLastName() + ",\n";
             content += "Please use below link to activate your user account: \n\n";
             content += "https://testbed.ncl.sg/login.php?uid=" + userId + "&key="+userId +"\n\n";
             content += "Thanks,\nNCL Testbed Operations";
 
-            //mailService.send("testbed-approval@ncl.sg", user.getUserDetails().getEmail(), "NCL.SG: User Account Activation", content);
+            mailService.send("testbed-approval@ncl.sg", user.getUserDetails().getEmail(), "NCL.SG: User Account Activation", content);
+*/
 
         } else {
             // FIXME for debug purposes
@@ -526,18 +527,24 @@ public class RegistrationServiceImpl implements RegistrationService {
         }
     }
 
+    @Override
     public void activateAccount (@NotNull final String uid, @NotNull final String key) {
-        log.info("uid '{}' ", uid);
-        log.info("key '{}'", key);
+
         User user = userService.getUser(uid);
         if (user == null) {
-            log.warn("Cannot find user '{}'", uid);
+            log.warn("Cannot find user {}", uid);
             throw new UserNotFoundException();
         }
 
-        UserEntity newUser = new UserEntity();
-        newUser.setStatus(UserStatus.APPROVED);
-        userService.updateUser(uid, newUser);
+        if(null != user.getVerificationKey() && key.equals(user.getVerificationKey())) {
+            UserEntity newUser = new UserEntity();
+            newUser.setStatus(UserStatus.APPROVED);
+            userService.updateUser(uid, newUser);
+        } else {
+            log.info("Verification key not match: expected {}, received {}. Ignore request.",
+                    user.getVerificationKey(), key);
+        }
+
     }
 
 }
