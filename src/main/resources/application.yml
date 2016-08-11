@@ -7,9 +7,6 @@ spring:
     url: ${jdbc.url}
     username: ${jdbc.username}
     password: ${jdbc.password}
-    #url: jdbc:mysql://localhost:32768/database
-    #username: root
-    #password: password
   jpa:
     hibernate:
       ddl-auto: validate
@@ -18,16 +15,6 @@ spring:
       hibernate:
         dialect: org.hibernate.dialect.MySQL5InnoDBDialect
         format-sql: true
-  mail:
-    host: smtp-relay.gmail.com
-    port: 465
-    username: testbed-ops@ncl.sg
-    password: deterinavm
-    protocol: smtps
-    properties:
-      starttls:
-        enable: true
-      auth: true
 ncl:
   authentication:
     url: "/authentication"
