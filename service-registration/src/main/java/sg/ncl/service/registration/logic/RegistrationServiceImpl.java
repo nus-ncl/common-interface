@@ -299,7 +299,7 @@ public class RegistrationServiceImpl implements RegistrationService {
             content += "https://testbed.ncl.sg/login.php?uid=" + userId + "&key="+userId +"\n\n";
             content += "Thanks,\nNCL Testbed Operations";
 
-            mailService.send("testbed-approval@ncl.sg", user.getUserDetails().getEmail(), "NCL.SG: User Account Activation", content);
+            //mailService.send("testbed-approval@ncl.sg", user.getUserDetails().getEmail(), "NCL.SG: User Account Activation", content);
 
         } else {
             // FIXME for debug purposes
