@@ -151,6 +151,7 @@ public class TeamServiceImpl implements TeamService {
         if (entity == null) {
             throw new TeamNotFoundException(id);
         }
+        log.info("Adding team member {} to Team {}", teamMember, entity);
         entity.addMember(teamMember);
         return teamRepository.save(entity);
     }
