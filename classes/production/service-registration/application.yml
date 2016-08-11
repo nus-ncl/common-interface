@@ -20,13 +20,3 @@ spring:
     properties:
       hibernate:
         dialect: org.hibernate.dialect.MySQL5InnoDBDialect
-  mail:
-    host: smtp-relay.gmail.com
-    port: 465
-    username: testbed-ops@ncl.sg
-    password: deterinavm
-    protocol: smtps
-    properties:
-      starttls:
-        enable: true
-      auth: true

@@ -1,15 +1,12 @@
 # Spring Boot Configuration
 # For more information, please read http://docs.spring.io/spring-boot/docs/current/reference/html/index.html
 server:
-  port: 80
+  port: 8080
 spring:
   datasource:
     url: ${jdbc.url}
     username: ${jdbc.username}
     password: ${jdbc.password}
-    #url: jdbc:mysql://localhost:32768/database
-    #username: root
-    #password: password
   jpa:
     hibernate:
       ddl-auto: validate
@@ -18,16 +15,6 @@ spring:
       hibernate:
         dialect: org.hibernate.dialect.MySQL5InnoDBDialect
         format-sql: true
-  mail:
-    host: smtp-relay.gmail.com
-    port: 465
-    username: testbed-ops@ncl.sg
-    password: deterinavm
-    protocol: smtps
-    properties:
-      starttls:
-        enable: true
-      auth: true
 ncl:
   authentication:
     url: "/authentication"
@@ -35,13 +22,3 @@ ncl:
     api-key: ${jwt.key}
     signing-algorithm: HS512
     expiry-duration: PT1H
-  deterlab:
-    adapter:
-      ip: test.ncl.sg
-      port: 8080
-deterurl:
-  bossurl: 172.18.178.10
-  userurl: 172.18.178.11
-  port: 80
-# temporary hack
-security.user.password: password

@@ -4,6 +4,7 @@ dependencies {
     compile project(':service-authentication')
     compile project(':service-team')
     compile project(':service-user')
+    compile project(':service-mail')
 
     runtime 'mysql:mysql-connector-java'
 
