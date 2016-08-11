@@ -1,35 +1,35 @@
 package sg.ncl.service.realization.logic;
 
+import lombok.extern.slf4j.Slf4j;
 import org.json.JSONObject;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
-import sg.ncl.adapter.deterlab.AdapterDeterlab;
+import sg.ncl.adapter.deterlab.AdapterDeterLab;
 import sg.ncl.service.realization.data.jpa.RealizationEntity;
 import sg.ncl.service.realization.data.jpa.RealizationRepository;
+import sg.ncl.service.realization.domain.RealizationService;
 import sg.ncl.service.realization.domain.RealizationState;
 
 import javax.inject.Inject;
+import javax.validation.constraints.NotNull;
 
 /**
  * Created by Desmond.
  */
 @Service
-public class RealizationService {
+@Slf4j
+public class RealizationServiceImpl implements RealizationService {
 
-    private static final Logger logger = LoggerFactory.getLogger(RealizationService.class);
     private final RealizationRepository realizationRepository;
+    private final AdapterDeterLab adapterDeterLab;
 
     @Inject
-    private AdapterDeterlab adapterDeterlab;
-
-    @Inject
-    protected RealizationService(final RealizationRepository realizationRepository) {
+    RealizationServiceImpl(@NotNull final RealizationRepository realizationRepository, @NotNull final AdapterDeterLab adapterDeterLab) {
         this.realizationRepository = realizationRepository;
+        this.adapterDeterLab = adapterDeterLab;
     }
 
     public RealizationEntity getById(final Long id) {
-        logger.info("Get realization by id");
+        log.info("Get realization by id");
 
         RealizationEntity realizationEntity = realizationRepository.findOne(id);
 
@@ -41,7 +41,7 @@ public class RealizationService {
     }
 
     public RealizationEntity getByExperimentId(final Long experimentId) {
-        logger.info("Get realization by experiment name");
+        log.info("Get realization by experiment name");
 
         RealizationEntity realizationEntity = realizationRepository.findByExperimentId(experimentId);
 
@@ -53,11 +53,11 @@ public class RealizationService {
     }
 
     public RealizationEntity save(RealizationEntity realizationEntity) {
-        logger.info("Save realization");
+        log.info("Save realization");
 
         RealizationEntity savedRealizationEntity = realizationRepository.save(realizationEntity);
 
-        logger.info("Realization saved");
+        log.info("Realization saved");
         return savedRealizationEntity;
     }
 
@@ -71,7 +71,7 @@ public class RealizationService {
 
         JSONObject jsonObject = new JSONObject();
         jsonObject.put("httpCommand", httpCommand.toString());
-        jsonObject.put("deterLogin", adapterDeterlab.getDeterUserIdByNclUserId(userId));
+        jsonObject.put("deterLogin", adapterDeterLab.getDeterUserIdByNclUserId(userId));
         jsonObject.put("pid", teamName);
         jsonObject.put("eid", experimentName);
 
@@ -79,7 +79,7 @@ public class RealizationService {
         realizationEntity.setState(RealizationState.ACTIVATING);
         realizationRepository.save(realizationEntity);
 
-        String stringFromExperiment = adapterDeterlab.startExperiment(jsonObject.toString());
+        String stringFromExperiment = adapterDeterLab.startExperiment(jsonObject.toString());
         JSONObject jsonObjectFromExperiment = new JSONObject(stringFromExperiment);
 
         String status = jsonObjectFromExperiment.getString("status");
@@ -112,7 +112,7 @@ public class RealizationService {
 
         JSONObject jsonObject = new JSONObject();
         jsonObject.put("httpCommand", httpCommand.toString());
-        jsonObject.put("deterLogin", adapterDeterlab.getDeterUserIdByNclUserId(userId));
+        jsonObject.put("deterLogin", adapterDeterLab.getDeterUserIdByNclUserId(userId));
         jsonObject.put("pid", teamName);
         jsonObject.put("eid", experimentName);
 
@@ -120,7 +120,7 @@ public class RealizationService {
         realizationEntity.setState(RealizationState.STOPPING);
         realizationRepository.save(realizationEntity);
 
-        adapterDeterlab.stopExperiment(jsonObject.toString());
+        adapterDeterLab.stopExperiment(jsonObject.toString());
 
         // FIXME may need to check if stopping experiments have error
         realizationEntity.setState(RealizationState.STOP);
@@ -129,55 +129,55 @@ public class RealizationService {
     }
 
     public void setState(final Long experimentId, final RealizationState state) {
-        logger.info("Set realization state. {} : {}", experimentId, state);
+        log.info("Set realization state. {} : {}", experimentId, state);
         RealizationEntity realizationEntity = realizationRepository.findByExperimentId(experimentId);
         realizationEntity.setState(state);
         realizationRepository.save(realizationEntity);
     }
 
     public RealizationState getState(final Long experimentId) {
-        logger.info("Get realization state. {}", experimentId);
+        log.info("Get realization state. {}", experimentId);
         return realizationRepository.findByExperimentId(experimentId).getState();
     }
 
     public void setIdleMinutes(final Long experimentId, final Long minutes) {
-        logger.info("Set realization idle minutes. {} : {}", experimentId, minutes);
+        log.info("Set realization idle minutes. {} : {}", experimentId, minutes);
         RealizationEntity realizationEntity = realizationRepository.findByExperimentId(experimentId);
         realizationEntity.setIdleMinutes(minutes);
         realizationRepository.saveAndFlush(realizationEntity);
     }
 
     public Long getIdleMinutes(final Long experimentId) {
-        logger.info("Get realization idle minutes. {}", experimentId);
+        log.info("Get realization idle minutes. {}", experimentId);
         return realizationRepository.findByExperimentId(experimentId).getIdleMinutes();
     }
 
     public void setRunningMinutes(final Long experimentId, final Long minutes) {
-        logger.info("Set realization running minutes. {} : {}", experimentId, minutes);
+        log.info("Set realization running minutes. {} : {}", experimentId, minutes);
         RealizationEntity realizationEntity = realizationRepository.findByExperimentId(experimentId);
         realizationEntity.setRunningMinutes(minutes);
         realizationRepository.saveAndFlush(realizationEntity);
     }
 
     public Long getRunningMinutes(final Long experimentId) {
-        logger.info("Get realization running minutes. {}", experimentId);
+        log.info("Get realization running minutes. {}", experimentId);
         return realizationRepository.findByExperimentId(experimentId).getRunningMinutes();
     }
 
     public void setRealizationDetails(final Long experimentId, final String details) {
-        logger.info("Set realization details. {} : {}", experimentId, details);
+        log.info("Set realization details. {} : {}", experimentId, details);
         RealizationEntity realizationEntity = realizationRepository.findByExperimentId(experimentId);
         realizationEntity.setDetails(details);
         realizationRepository.saveAndFlush(realizationEntity);
     }
 
     public String getRealizationDetails(final Long experimentId) {
-        logger.info("Get realization details. {}", experimentId);
+        log.info("Get realization details. {}", experimentId);
         return realizationRepository.findByExperimentId(experimentId).getDetails();
     }
 
     public void deleteRealization(final Long realizationId) {
-        logger.info("Delete realization. {}", realizationId);
+        log.info("Delete realization. {}", realizationId);
         realizationRepository.delete(realizationId);
     }
 }

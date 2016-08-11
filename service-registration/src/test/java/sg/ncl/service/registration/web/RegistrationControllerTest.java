@@ -17,7 +17,7 @@ import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.web.client.RestOperations;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.context.WebApplicationContext;
-import sg.ncl.adapter.deterlab.AdapterDeterlab;
+import sg.ncl.adapter.deterlab.AdapterDeterLab;
 import sg.ncl.adapter.deterlab.ConnectionProperties;
 import sg.ncl.service.authentication.data.jpa.CredentialsEntity;
 import sg.ncl.service.registration.AbstractTest;
@@ -71,7 +71,7 @@ public class RegistrationControllerTest extends AbstractTest {
     private UserService userService;
 
     @Inject
-    private AdapterDeterlab adapterDeterlab;
+    private AdapterDeterLab adapterDeterLab;
 
     @Autowired
     private RestOperations restOperations;
@@ -170,7 +170,7 @@ public class RegistrationControllerTest extends AbstractTest {
         Team teamEntity = teamService.createTeam(Util.getTeamEntity());
         User user = userService.createUser(Util.getUserEntity());
 
-        adapterDeterlab.saveDeterUserIdMapping("AAAAA", user.getId());
+        adapterDeterLab.saveDeterUserIdMapping("AAAAA", user.getId());
 
         GsonBuilder gsonBuilder = new GsonBuilder();
         gsonBuilder.registerTypeAdapter(ZonedDateTime.class, new DateTimeSerializer());
@@ -239,7 +239,7 @@ public class RegistrationControllerTest extends AbstractTest {
                 .andRespond(withSuccess(predefinedResultJson.toString(), MediaType.APPLICATION_JSON));
 
         String deterUserIdOne = RandomStringUtils.randomAlphabetic(8);
-        adapterDeterlab.saveDeterUserIdMapping(deterUserIdOne, owner.getUserId());
+        adapterDeterLab.saveDeterUserIdMapping(deterUserIdOne, owner.getUserId());
 
         mockMvc.perform(post("/registrations/teams/" + createdTeam.getId() + "/owner/" + owner.getUserId() + "?status=" + TeamStatus.APPROVED))
                 .andExpect(status().isOk());
@@ -266,8 +266,8 @@ public class RegistrationControllerTest extends AbstractTest {
 
         String deterUserIdOne = RandomStringUtils.randomAlphabetic(8);
         String deterUserIdTwo = RandomStringUtils.randomAlphabetic(8);
-        adapterDeterlab.saveDeterUserIdMapping(deterUserIdOne, createdUser.getId());
-        adapterDeterlab.saveDeterUserIdMapping(deterUserIdTwo, createdUser2.getId());
+        adapterDeterLab.saveDeterUserIdMapping(deterUserIdOne, createdUser.getId());
+        adapterDeterLab.saveDeterUserIdMapping(deterUserIdTwo, createdUser2.getId());
 
         // craft the RequestBody to remove user from team
         GsonBuilder gsonBuilder = new GsonBuilder();
@@ -290,8 +290,8 @@ public class RegistrationControllerTest extends AbstractTest {
         mockMvc.perform(delete("/registrations/teams/" + createdTeam.getId() + "/" + "members/" + member.getUserId()).contentType(MediaType.APPLICATION_JSON).content(object.toString()))
                 .andExpect(status().isAccepted());
 
-        User resultUser = userService.findUser(createdUser.getId());
-        User resultUser2 = userService.findUser(createdUser2.getId());
+        User resultUser = userService.getUser(createdUser.getId());
+        User resultUser2 = userService.getUser(createdUser2.getId());
         List<? extends TeamMember> membersList = teamService.getTeamById(createdTeam.getId()).getMembers();
 
         // owner should be in team
@@ -305,7 +305,7 @@ public class RegistrationControllerTest extends AbstractTest {
     public void testGetDeterUid() throws Exception {
         final String deterUid = RandomStringUtils.randomAlphanumeric(20);
         final String nclUid = RandomStringUtils.randomAlphanumeric(20);
-        adapterDeterlab.saveDeterUserIdMapping(deterUid, nclUid);
+        adapterDeterLab.saveDeterUserIdMapping(deterUid, nclUid);
 
         MvcResult mvcResult = mockMvc.perform(get("/registrations/user/" + nclUid))
                                         .andExpect(status().isOk())

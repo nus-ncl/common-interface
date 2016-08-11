@@ -2,8 +2,9 @@ package sg.ncl.service.authentication;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.annotation.Import;
-import sg.ncl.adapter.deterlab.DeterlabAutoConfiguration;
+import sg.ncl.adapter.deterlab.DeterLabAutoConfiguration;
 import sg.ncl.common.authentication.AuthenticationAutoConfiguration;
 import sg.ncl.common.exception.ExceptionAutoConfiguration;
 import sg.ncl.common.jpa.UseJpa;
@@ -18,12 +19,14 @@ import sg.ncl.common.jwt.JwtAutoConfiguration;
         AuthenticationAutoConfiguration.class,
         ExceptionAutoConfiguration.class,
         JwtAutoConfiguration.class,
-        DeterlabAutoConfiguration.class
+        DeterLabAutoConfiguration.class
 })
 public class AuthenticationApplication {
 
     public static void main(final String[] args) {
-        SpringApplication.run(AuthenticationApplication.class, args);
+        try (final ConfigurableApplicationContext context = SpringApplication.run(AuthenticationApplication.class, args)) {
+            // nothing to do
+        }
     }
 
 }

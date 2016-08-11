@@ -12,8 +12,8 @@ import sg.ncl.service.user.exceptions.UserNotFoundException;
 
 import javax.inject.Inject;
 import javax.transaction.Transactional;
-import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * @author Christopher Zhong
@@ -24,7 +24,7 @@ public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
 
     @Inject
-    protected UserServiceImpl(final UserRepository userRepository) {
+    UserServiceImpl(final UserRepository userRepository) {
         this.userRepository = userRepository;
     }
 
@@ -41,22 +41,17 @@ public class UserServiceImpl implements UserService {
 
     @Transactional
     public List<User> getAll() {
-        final List<User> result = new ArrayList<>();
-        for (UserEntity user : userRepository.findAll()) {
-            result.add(user);
-        }
-
-        return result;
+        return userRepository.findAll().stream().collect(Collectors.toList());
     }
 
     @Transactional
-    public User findUser(final String id) {
-        return findUserEntity(id);
+    public User getUser(final String id) {
+        return findUser(id);
     }
 
     @Transactional
     public void updateUser(final String id, final User user) {
-        final UserEntity one = findUserEntity(id);
+        final UserEntity one = findUser(id);
 
         if (user.getUserDetails().getFirstName() != null) {
             one.getUserDetails().setFirstName(user.getUserDetails().getFirstName());
@@ -124,19 +119,19 @@ public class UserServiceImpl implements UserService {
 
     @Transactional
     public void addTeam(final String userId, final String teamId) {
-        UserEntity one = findUserEntity(userId);
+        UserEntity one = findUser(userId);
         one.addTeamId(teamId);
         userRepository.save(one);
     }
 
     @Transactional
     public void removeTeam(final String userId, final String teamId) {
-        UserEntity one = findUserEntity(userId);
+        UserEntity one = findUser(userId);
         one.removeTeamId(teamId);
         userRepository.save(one);
     }
 
-    private UserEntity findUserEntity(final String userId) {
+    private UserEntity findUser(final String userId) {
         if (userId == null || userId.isEmpty()) {
             throw new UserIdNullException();
         }

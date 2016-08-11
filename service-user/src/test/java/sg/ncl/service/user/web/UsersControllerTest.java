@@ -155,7 +155,7 @@ public class UsersControllerTest extends AbstractTest {
 
         // put
         mockMvc.perform(put("/users/" + idString).contentType(contentType).content(jsonInString))
-                .andExpect(status().isAccepted());
+                .andExpect(status().isOk());
 
         // check if first name is new first name and last name is the same
         mockMvc.perform(get("/users/" + idString))
@@ -190,7 +190,7 @@ public class UsersControllerTest extends AbstractTest {
 
         // put
         mockMvc.perform(put("/users/" + idString).contentType(contentType).content(jsonInString))
-                .andExpect(status().isAccepted());
+                .andExpect(status().isOk());
     }
 
     @Test

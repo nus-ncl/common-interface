@@ -1,21 +1,17 @@
 package sg.ncl.adapter.deterlab.dtos.entities;
 
 import org.hibernate.annotations.GenericGenerator;
-import sg.ncl.adapter.deterlab.domain.DeterlabUser;
+import sg.ncl.adapter.deterlab.domain.DeterLabUser;
 import sg.ncl.common.jpa.AbstractEntity;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.persistence.Table;
+import javax.persistence.*;
 
 /**
  * Created by Te Ye on 16-Jun-16.
  */
 @Entity
 @Table(name = "deterlab_user")
-public class DeterlabUserEntity extends AbstractEntity implements DeterlabUser {
+public class DeterLabUserEntity extends AbstractEntity implements DeterLabUser {
 
     @Id
     @GeneratedValue(generator = "uuid2")

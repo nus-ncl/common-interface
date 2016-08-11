@@ -4,7 +4,7 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.annotation.Import;
-import sg.ncl.adapter.deterlab.DeterlabAutoConfiguration;
+import sg.ncl.adapter.deterlab.DeterLabAutoConfiguration;
 import sg.ncl.common.jpa.UseJpa;
 import sg.ncl.service.authentication.AuthenticationApplication;
 import sg.ncl.service.team.TeamApplication;
@@ -19,7 +19,7 @@ import sg.ncl.service.user.UserApplication;
         AuthenticationApplication.class,
         TeamApplication.class,
         UserApplication.class,
-        DeterlabAutoConfiguration.class
+        DeterLabAutoConfiguration.class
 })
 public class RegistrationApplication {
 

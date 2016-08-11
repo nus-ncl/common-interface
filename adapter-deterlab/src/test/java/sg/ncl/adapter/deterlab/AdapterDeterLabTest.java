@@ -11,15 +11,13 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.client.MockRestServiceServer;
 import org.springframework.web.client.RestOperations;
 import org.springframework.web.client.RestTemplate;
-import sg.ncl.adapter.deterlab.data.jpa.DeterlabUserRepository;
-import sg.ncl.adapter.deterlab.dtos.entities.DeterlabUserEntity;
+import sg.ncl.adapter.deterlab.data.jpa.DeterLabUserRepository;
+import sg.ncl.adapter.deterlab.dtos.entities.DeterLabUserEntity;
 import sg.ncl.adapter.deterlab.exceptions.*;
 
 import javax.inject.Inject;
 
-import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.not;
-import static org.hamcrest.Matchers.nullValue;
+import static org.hamcrest.Matchers.*;
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.method;
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.requestTo;
 import static org.springframework.test.web.client.response.MockRestResponseCreators.withSuccess;
@@ -27,16 +25,16 @@ import static org.springframework.test.web.client.response.MockRestResponseCreat
 /**
  * @author Te Ye
  */
-public class AdapterDeterlabTest extends AbstractTest {
+public class AdapterDeterLabTest extends AbstractTest {
 
     @Autowired
     private RestOperations restOperations;
 
     @Inject
-    private DeterlabUserRepository deterlabUserRepository;
+    private DeterLabUserRepository deterLabUserRepository;
 
     @Inject
-    private AdapterDeterlab adapterDeterlab;
+    private AdapterDeterLab adapterDeterLab;
 
     @Inject
     private ConnectionProperties properties;
@@ -61,7 +59,7 @@ public class AdapterDeterlabTest extends AbstractTest {
                 .andExpect(method(HttpMethod.POST))
                 .andRespond(withSuccess(predefinedResultJson.toString(), MediaType.APPLICATION_JSON));
 
-        String result = adapterDeterlab.joinProjectNewUsers(userObject.toString());
+        String result = adapterDeterLab.joinProjectNewUsers(userObject.toString());
         JSONObject resultJSONObject = new JSONObject(result);
         String msg = resultJSONObject.getString("msg");
         String uid = resultJSONObject.getString("uid");
@@ -100,7 +98,7 @@ public class AdapterDeterlabTest extends AbstractTest {
 
         JSONObject userJoinTeamObject = Util.getTeamAdapterJSONObject();
 
-        adapterDeterlab.joinProject(userJoinTeamObject.toString());
+        adapterDeterLab.joinProject(userJoinTeamObject.toString());
     }
 
     @Test
@@ -108,9 +106,9 @@ public class AdapterDeterlabTest extends AbstractTest {
         String nclUserId = RandomStringUtils.randomAlphanumeric(20);
         String deterUserId = RandomStringUtils.randomAlphanumeric(8);
 
-        adapterDeterlab.saveDeterUserIdMapping(deterUserId, nclUserId);
-        Assert.assertThat(deterlabUserRepository.findByDeterUserId(deterUserId), not(nullValue()));
-        Assert.assertThat(deterUserId, is(deterlabUserRepository.findByDeterUserId(deterUserId).getDeterUserId()));
+        adapterDeterLab.saveDeterUserIdMapping(deterUserId, nclUserId);
+        Assert.assertThat(deterLabUserRepository.findByDeterUserId(deterUserId), not(nullValue()));
+        Assert.assertThat(deterUserId, is(deterLabUserRepository.findByDeterUserId(deterUserId).getDeterUserId()));
     }
 
     @Test(expected = AdapterDeterlabConnectException.class)
@@ -124,7 +122,7 @@ public class AdapterDeterlabTest extends AbstractTest {
                 .andExpect(method(HttpMethod.POST))
                 .andRespond(withSuccess(predefinedResultJson.toString(), MediaType.APPLICATION_JSON));
 
-        adapterDeterlab.createExperiment(experimentObject.toString());
+        adapterDeterLab.createExperiment(experimentObject.toString());
     }
 
     @Test(expected = NSFileParseException.class)
@@ -138,7 +136,7 @@ public class AdapterDeterlabTest extends AbstractTest {
                 .andExpect(method(HttpMethod.POST))
                 .andRespond(withSuccess(predefinedResultJson.toString(), MediaType.APPLICATION_JSON));
 
-        adapterDeterlab.createExperiment(experimentObject.toString());
+        adapterDeterLab.createExperiment(experimentObject.toString());
     }
 
     @Test(expected = ExpNameAlreadyExistsException.class)
@@ -152,20 +150,20 @@ public class AdapterDeterlabTest extends AbstractTest {
                 .andExpect(method(HttpMethod.POST))
                 .andRespond(withSuccess(predefinedResultJson.toString(), MediaType.APPLICATION_JSON));
 
-        adapterDeterlab.createExperiment(experimentObject.toString());
+        adapterDeterLab.createExperiment(experimentObject.toString());
     }
 
     @Test(expected = UserNotFoundException.class)
     public void testGetDeterUserIdBad() {
-        adapterDeterlab.getDeterUserIdByNclUserId(RandomStringUtils.randomAlphanumeric(20));
+        adapterDeterLab.getDeterUserIdByNclUserId(RandomStringUtils.randomAlphanumeric(20));
     }
 
     @Test
     public void testGetDeterUserIdGood() {
-        DeterlabUserEntity deterlabUserEntity = Util.getDeterlabUserEntity();
-        deterlabUserRepository.saveAndFlush(deterlabUserEntity);
-        String expectedDeterUserId = adapterDeterlab.getDeterUserIdByNclUserId(deterlabUserEntity.getNclUserId());
-        Assert.assertThat(deterlabUserEntity.getDeterUserId(), is(expectedDeterUserId));
+        DeterLabUserEntity deterLabUserEntity = Util.getDeterlabUserEntity();
+        deterLabUserRepository.saveAndFlush(deterLabUserEntity);
+        String expectedDeterUserId = adapterDeterLab.getDeterUserIdByNclUserId(deterLabUserEntity.getNclUserId());
+        Assert.assertThat(deterLabUserEntity.getDeterUserId(), is(expectedDeterUserId));
     }
 
     @Test
@@ -179,7 +177,7 @@ public class AdapterDeterlabTest extends AbstractTest {
                 .andExpect(method(HttpMethod.POST))
                 .andRespond(withSuccess(predefinedResultJson.toString(), MediaType.APPLICATION_JSON));
 
-        String result = adapterDeterlab.approveJoinRequest(one.toString());
+        String result = adapterDeterLab.approveJoinRequest(one.toString());
         JSONObject resultJSONObject = new JSONObject(result);
         String msg = resultJSONObject.getString("msg");
         Assert.assertThat(msg, is("join request approved"));
@@ -196,7 +194,7 @@ public class AdapterDeterlabTest extends AbstractTest {
                 .andExpect(method(HttpMethod.POST))
                 .andRespond(withSuccess(predefinedResultJson.toString(), MediaType.APPLICATION_JSON));
 
-        String result = adapterDeterlab.applyProject(one.toString());
+        String result = adapterDeterLab.applyProject(one.toString());
         JSONObject resultJSONObject = new JSONObject(result);
         String msg = resultJSONObject.getString("msg");
         Assert.assertThat(msg, is("user has logged in and applied a project"));
@@ -213,7 +211,7 @@ public class AdapterDeterlabTest extends AbstractTest {
                 .andExpect(method(HttpMethod.POST))
                 .andRespond(withSuccess(predefinedResultJson.toString(), MediaType.APPLICATION_JSON));
 
-        String result = adapterDeterlab.approveProject(one.toString());
+        String result = adapterDeterLab.approveProject(one.toString());
         JSONObject resultJSONObject = new JSONObject(result);
         String msg = resultJSONObject.getString("msg");
         Assert.assertThat(msg, is("project approved"));
@@ -230,7 +228,7 @@ public class AdapterDeterlabTest extends AbstractTest {
                 .andExpect(method(HttpMethod.POST))
                 .andRespond(withSuccess(predefinedResultJson.toString(), MediaType.APPLICATION_JSON));
 
-        String result = adapterDeterlab.rejectProject(one.toString());
+        String result = adapterDeterLab.rejectProject(one.toString());
         JSONObject resultJSONObject = new JSONObject(result);
         String msg = resultJSONObject.getString("msg");
         Assert.assertThat(msg, is("project rejected"));
@@ -247,7 +245,7 @@ public class AdapterDeterlabTest extends AbstractTest {
                 .andExpect(method(HttpMethod.POST))
                 .andRespond(withSuccess(predefinedResultJson.toString(), MediaType.APPLICATION_JSON));
 
-        String result = adapterDeterlab.rejectJoinRequest(one.toString());
+        String result = adapterDeterLab.rejectJoinRequest(one.toString());
         JSONObject resultJSONObject = new JSONObject(result);
         String msg = resultJSONObject.getString("msg");
         Assert.assertThat(msg, is("join request rejected"));
