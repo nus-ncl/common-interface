@@ -1,36 +1,41 @@
 package sg.ncl.service.realization.web;
 
-import sg.ncl.service.realization.data.jpa.RealizationEntity;
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import lombok.Getter;
 import sg.ncl.service.realization.domain.Realization;
 import sg.ncl.service.realization.domain.RealizationState;
 
 /**
  * Created by Desmond.
  */
+@Getter
 public class RealizationInfo implements Realization {
 
-    private Long id;
-    private Long experimentId;
-    private String experimentName;
-    private String userId;
-    private String teamId;
-    private Integer numberOfNodes;
-    private RealizationState state;
-    private Long idleMinutes;
-    private Long runningMinutes;
-    private String details;
+    private final Long id;
+    private final Long experimentId;
+    private final String experimentName;
+    private final String userId;
+    private final String teamId;
+    private final Integer numberOfNodes;
+    private final RealizationState state;
+    private final Long idleMinutes;
+    private final Long runningMinutes;
+    private final String details;
 
-    public RealizationInfo(final Long id,
-                           final Long experimentId,
-                           final String experimentName,
-                           final String userId,
-                           final String teamId,
-                           final Integer numberOfNodes,
-                           final RealizationState state,
-                           final Long idleMinutes,
-                           final Long runningMinutes,
-                           final String details) {
-
+    @JsonCreator
+    public RealizationInfo(
+            @JsonProperty("id") final Long id,
+            @JsonProperty("experimentId") final Long experimentId,
+            @JsonProperty("experimentName") final String experimentName,
+            @JsonProperty("userId") final String userId,
+            @JsonProperty("teamId") final String teamId,
+            @JsonProperty("numberOfNodes") final Integer numberOfNodes,
+            @JsonProperty("state") final RealizationState state,
+            @JsonProperty("idleMinutes") final Long idleMinutes,
+            @JsonProperty("runningMinutes") final Long runningMinutes,
+            @JsonProperty("details") final String details
+    ) {
         this.id = id;
         this.experimentId = experimentId;
         this.experimentName = experimentName;
@@ -43,21 +48,9 @@ public class RealizationInfo implements Realization {
         this.details = details;
     }
 
-    public RealizationInfo(final RealizationEntity realizationEntity) {
-        this(realizationEntity.getId(),
-                realizationEntity.getExperimentId(),
-                realizationEntity.getExperimentName(),
-                realizationEntity.getUserId(),
-                realizationEntity.getTeamId(),
-                realizationEntity.getNumberOfNodes(),
-                realizationEntity.getState(),
-                realizationEntity.getIdleMinutes(),
-                realizationEntity.getRunningMinutes(),
-                realizationEntity.getDetails());
-    }
-
     public RealizationInfo(final Realization realization) {
-        this(realization.getId(),
+        this(
+                realization.getId(),
                 realization.getExperimentId(),
                 realization.getExperimentName(),
                 realization.getUserId(),
@@ -66,56 +59,8 @@ public class RealizationInfo implements Realization {
                 realization.getState(),
                 realization.getIdleMinutes(),
                 realization.getRunningMinutes(),
-                realization.getDetails());
+                realization.getDetails()
+        );
     }
 
-    @Override
-    public Long getId() {
-        return id;
-    }
-
-    @Override
-    public Long getExperimentId() {
-        return experimentId;
-    }
-
-    @Override
-    public String getExperimentName() {
-        return experimentName;
-    }
-
-    @Override
-    public String getUserId() {
-        return userId;
-    }
-
-    @Override
-    public String getTeamId() {
-        return teamId;
-    }
-
-    @Override
-    public Integer getNumberOfNodes() {
-        return numberOfNodes;
-    }
-
-    @Override
-    public RealizationState getState() {
-        return state;
-    }
-
-    @Override
-    public Long getIdleMinutes() {
-        return idleMinutes;
-    }
-
-    @Override
-    public Long getRunningMinutes() {
-        return runningMinutes;
-    }
-
-    @Override
-    public String getDetails() {
-        return details;
-    }
 }

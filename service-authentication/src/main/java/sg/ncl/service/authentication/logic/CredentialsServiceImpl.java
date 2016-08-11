@@ -4,7 +4,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.json.JSONObject;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import sg.ncl.adapter.deterlab.AdapterDeterlab;
+import sg.ncl.adapter.deterlab.AdapterDeterLab;
 import sg.ncl.service.authentication.data.jpa.CredentialsEntity;
 import sg.ncl.service.authentication.data.jpa.CredentialsRepository;
 import sg.ncl.service.authentication.domain.Credentials;
@@ -32,13 +32,13 @@ public class CredentialsServiceImpl implements CredentialsService {
 
     private final CredentialsRepository credentialsRepository;
     private final PasswordEncoder passwordEncoder;
-    private final AdapterDeterlab adapterDeterlab;
+    private final AdapterDeterLab adapterDeterLab;
 
     @Inject
-    protected CredentialsServiceImpl(@NotNull final CredentialsRepository credentialsRepository, @NotNull final PasswordEncoder passwordEncoder, @NotNull final AdapterDeterlab adapterDeterlab) {
+    protected CredentialsServiceImpl(@NotNull final CredentialsRepository credentialsRepository, @NotNull final PasswordEncoder passwordEncoder, @NotNull final AdapterDeterLab adapterDeterLab) {
         this.credentialsRepository = credentialsRepository;
         this.passwordEncoder = passwordEncoder;
-        this.adapterDeterlab = adapterDeterlab;
+        this.adapterDeterLab = adapterDeterLab;
     }
 
     @Transactional
@@ -98,13 +98,13 @@ public class CredentialsServiceImpl implements CredentialsService {
     private void changePassword(String nclUserId, String password) {
         JSONObject adapterObject = new JSONObject();
         // FIXME: need to handle error when getDeterUserIdByNclUserId() returns nothing
-        adapterObject.put("uid", adapterDeterlab.getDeterUserIdByNclUserId(nclUserId));
+        adapterObject.put("uid", adapterDeterLab.getDeterUserIdByNclUserId(nclUserId));
         adapterObject.put("password1", password);
         adapterObject.put("password2", password);
 
         log.info("Credentials to be updated on Deter: {}", adapterObject.toString());
 
-        adapterDeterlab.updateCredentials(adapterObject.toString());
+        adapterDeterLab.updateCredentials(adapterObject.toString());
     }
 
 }

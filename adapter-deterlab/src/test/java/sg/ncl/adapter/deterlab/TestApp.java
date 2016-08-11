@@ -10,7 +10,7 @@ import sg.ncl.common.jpa.UseJpa;
  */
 @SpringBootApplication
 @UseJpa
-@Import(DeterlabAutoConfiguration.class)
+@Import(DeterLabAutoConfiguration.class)
 public class TestApp {
 
     public static void main(final String[] args) {
