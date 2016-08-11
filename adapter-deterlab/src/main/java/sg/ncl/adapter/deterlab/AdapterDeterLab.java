@@ -62,15 +62,26 @@ public class AdapterDeterLab {
     }
 
     // for logged on users
-    public String applyProject(String jsonString) {
+    public void applyProject(String jsonString) {
         logger.info("Applying project as logged on user to {} at {}: {}", properties.getIp(), properties.getPort(), jsonString);
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
-        HttpEntity<String> request = new HttpEntity<String>(jsonString, headers);
+        HttpEntity<String> request = new HttpEntity<>(jsonString, headers);
 
-        ResponseEntity responseEntity = restTemplate.exchange(properties.getApplyProject(), HttpMethod.POST, request, String.class);
-        return responseEntity.getBody().toString();
+        ResponseEntity response;
+
+        try {
+            response = restTemplate.exchange(properties.getApplyProject(), HttpMethod.POST, request, String.class);
+        } catch (Exception e) {
+            throw new AdapterDeterlabConnectException();
+        }
+
+        logger.info("Apply new project request submitted to deterlab");
+        String jsonResult = new JSONObject(response.getBody().toString()).getString("msg");
+        if (!"apply project request existing users success".equals(jsonResult)) {
+            throw new ApplyNewProjectException();
+        }
     }
 
     // for logged on users
