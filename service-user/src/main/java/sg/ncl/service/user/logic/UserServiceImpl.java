@@ -1,5 +1,6 @@
 package sg.ncl.service.user.logic;
 
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.springframework.stereotype.Service;
 import sg.ncl.service.user.data.jpa.UserDetailsEntity;
@@ -8,11 +9,12 @@ import sg.ncl.service.user.data.jpa.UserRepository;
 import sg.ncl.service.user.domain.Address;
 import sg.ncl.service.user.domain.User;
 import sg.ncl.service.user.domain.UserService;
-import sg.ncl.service.user.exceptions.UserIdNullException;
-import sg.ncl.service.user.exceptions.UserNotFoundException;
+import sg.ncl.service.user.domain.UserStatus;
+import sg.ncl.service.user.exceptions.*;
 
 import javax.inject.Inject;
 import javax.transaction.Transactional;
+import javax.validation.constraints.NotNull;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -20,6 +22,7 @@ import java.util.stream.Collectors;
  * @author Christopher Zhong
  */
 @Service
+@Slf4j
 public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
@@ -50,6 +53,31 @@ public class UserServiceImpl implements UserService {
     @Transactional
     public User getUser(final String id) {
         return findUser(id);
+    }
+
+    @Transactional
+    public UserStatus verifyEmail (@NotNull String uid, @NotNull String email, @NotNull String key) {
+
+        final UserEntity user = findUser(uid);
+        if(!email.equals(user.getUserDetails().getEmail())) {
+            String err = "Email not match. Expected " + user.getUserDetails().getEmail() + ", received: " + email;
+            log.warn(err);
+            throw new EmailNotMatchException(err);
+        }
+        if(null != user.getVerificationKey() && key.equals(user.getVerificationKey())) {
+            user.setEmailVerified(true);
+            if(user.getStatus() == UserStatus.CREATED) {
+                user.setStatus(UserStatus.PENDING);
+            }
+            userRepository.save(user);
+            log.info("User {} with email {} has been verified.", uid, user.getUserDetails().getEmail());
+            return user.getStatus();
+        } else {
+            String err = "Verification key mismatch. Expected: " + user.getVerificationKey() + ", receoved: " + key;
+            log.warn(err);
+            throw new VerificationKeyNotMatchException(err);
+        }
+
     }
 
     @Transactional

@@ -24,5 +24,5 @@ public interface RegistrationService {
 
     String getDeterUid(String id);
 
-    void activateAccount(String uid, String key);
+    //void activateAccount(String uid, String key);
 }

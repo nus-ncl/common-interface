@@ -60,21 +60,22 @@ public class RegistrationServiceImpl implements RegistrationService {
     private final MailService mailService;
 
     // FIXME: what is this autowired?
-    @Autowired
+
     private final AdapterDeterLab adapterDeterLab;
 
     @Inject
     RegistrationServiceImpl(@NotNull final CredentialsService credentialsService, @NotNull final TeamService teamService,
                             @NotNull final UserService userService, @NotNull final RegistrationRepository registrationRepository,
-                            final DeterLabUserRepository deterlabUserRepository, final ConnectionProperties connectionProperties,
+                            //final DeterLabUserRepository deterlabUserRepository, final ConnectionProperties connectionProperties,
+                            @NotNull final AdapterDeterLab adapterDeterLab,
                             @NotNull final MailService mailService) {
         this.credentialsService = credentialsService;
         this.teamService = teamService;
         this.userService = userService;
         this.registrationRepository = registrationRepository;
         // FIXME: why is this getting replaced?
-        this.adapterDeterLab = new AdapterDeterLab(deterlabUserRepository, connectionProperties);
-
+        // this.adapterDeterLab = new AdapterDeterLab(deterlabUserRepository, connectionProperties);
+        this.adapterDeterLab = adapterDeterLab;
         this.mailService = mailService;
     }
 
@@ -293,14 +294,16 @@ public class RegistrationServiceImpl implements RegistrationService {
             addNclUserIdMapping(resultJSON, userId);
 
             // send notification email
-/*            String content = "Dear " + user.getUserDetails().getFirstName() + " " +
+            String userFullname = "Dear " + user.getUserDetails().getFirstName() + " " +
                     user.getUserDetails().getLastName() + ",\n";
-            content += "Please use below link to activate your user account: \n\n";
-            content += "https://testbed.ncl.sg/login.php?uid=" + userId + "&key="+userId +"\n\n";
-            content += "Thanks,\nNCL Testbed Operations";
+            String tmp = "Please use below link to verify your email account: \n\n";
+            String verificationLink = "https://test.ncl.sg:8999/emailVerification?uid=" + userId +
+                    "&email=" + user.getUserDetails().getEmail() + "&key=" + user.getVerificationKey() +"\n\n";
+            String signature = "Thanks,\nNCL Testbed Operations";
 
-            mailService.send("testbed-approval@ncl.sg", user.getUserDetails().getEmail(), "NCL.SG: User Account Activation", content);
-*/
+//            mailService.send("testbed-approval@ncl.sg", user.getUserDetails().getEmail(),
+//                    "NCL.SG: User Account Activation", userFullname + tmp + verificationLink + signature);
+
 
         } else {
             // FIXME for debug purposes
@@ -526,7 +529,7 @@ public class RegistrationServiceImpl implements RegistrationService {
             }
         }
     }
-
+/*
     @Override
     public void activateAccount (@NotNull final String uid, @NotNull final String key) {
 
@@ -546,6 +549,6 @@ public class RegistrationServiceImpl implements RegistrationService {
                     user.getVerificationKey(), key);
         }
 
-    }
+    }*/
 
 }

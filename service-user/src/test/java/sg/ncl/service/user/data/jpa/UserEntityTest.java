@@ -74,7 +74,7 @@ public class UserEntityTest {
     public void testGetStatus() throws Exception {
         final UserEntity userEntity = new UserEntity();
 
-        assertThat(userEntity.getStatus(), is(equalTo(UserStatus.PENDING)));
+        assertThat(userEntity.getStatus(), is(equalTo(UserStatus.CREATED)));
     }
 
     @Test

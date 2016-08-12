@@ -53,7 +53,7 @@ public class UserEntity extends AbstractEntity implements User {
 
     @Column(name = "status", nullable = false)
     @Enumerated(EnumType.STRING)
-    private UserStatus status = UserStatus.PENDING;
+    private UserStatus status = UserStatus.CREATED;
 
     @Column(name = "application_date", nullable = false)
     private ZonedDateTime applicationDate;
