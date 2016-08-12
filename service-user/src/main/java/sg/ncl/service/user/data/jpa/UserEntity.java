@@ -48,12 +48,12 @@ public class UserEntity extends AbstractEntity implements User {
     @Type(type = "yes_no")
     private boolean emailVerified = false;
 
+    @Column(name = "verification_key")
+    private String verificationKey;
+
     @Column(name = "status", nullable = false)
     @Enumerated(EnumType.STRING)
     private UserStatus status = UserStatus.PENDING;
-
-    @Column(name = "verification_key", nullable = false)
-    private String verificationKey;
 
     @Column(name = "application_date", nullable = false)
     private ZonedDateTime applicationDate;
@@ -93,8 +93,17 @@ public class UserEntity extends AbstractEntity implements User {
         return emailVerified;
     }
 
-    void setEmailVerified(final boolean emailVerified) {
+    public void setEmailVerified(final boolean emailVerified) {
         this.emailVerified = emailVerified;
+    }
+
+    @Override
+    public String getVerificationKey() {
+        return verificationKey;
+    }
+
+    public void setVerificationKey(String verificationKey) {
+        this.verificationKey = verificationKey;
     }
 
     @Override
@@ -104,15 +113,6 @@ public class UserEntity extends AbstractEntity implements User {
 
     public void setStatus(final UserStatus status) {
         this.status = status;
-    }
-
-    @Override
-    public String getVerificationKey() {
-        return verificationKey;
-    }
-
-    public void setVerificationKey(@NotNull String verificationKey) {
-        this.verificationKey = verificationKey;
     }
 
     @Override

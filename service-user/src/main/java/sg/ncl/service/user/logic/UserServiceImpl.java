@@ -36,7 +36,7 @@ public class UserServiceImpl implements UserService {
         userEntity.setProcessedDate(user.getProcessedDate());
         userEntity.setUserDetails((UserDetailsEntity) user.getUserDetails());
 
-        userEntity.setVerificationKey(RandomStringUtils.random(20));
+        userEntity.setVerificationKey(RandomStringUtils.randomAlphanumeric(20));
 
         UserEntity savedUserEntity = userRepository.save(userEntity);
         return savedUserEntity;
@@ -58,6 +58,10 @@ public class UserServiceImpl implements UserService {
 
         if (user.getStatus() != null) {
             one.setStatus(user.getStatus());
+        }
+
+        if(one.isEmailVerified() != user.isEmailVerified()) {
+            one.setEmailVerified(user.isEmailVerified());
         }
 
         if(user.getUserDetails() != null) {

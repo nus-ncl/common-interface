@@ -538,10 +538,11 @@ public class RegistrationServiceImpl implements RegistrationService {
 
         if(null != user.getVerificationKey() && key.equals(user.getVerificationKey())) {
             UserEntity newUser = new UserEntity();
-            newUser.setStatus(UserStatus.APPROVED);
+            newUser.setEmailVerified(true);
             userService.updateUser(uid, newUser);
+            log.info("User {} with email {} has been verified.", uid, user.getUserDetails().getEmail());
         } else {
-            log.info("Verification key not match: expected {}, received {}. Ignore request.",
+            log.info("Verification key mismatch: expected {}, received {}. Ignore request.",
                     user.getVerificationKey(), key);
         }
 

@@ -18,13 +18,6 @@ public interface User {
     String getId();
 
     /**
-     *Returns a {@link String} that represents the randomly generated key of this {@link User}.
-     *
-     * @return a {@link String} that represents the randomly generated key of this {@link User}.
-     */
-    String getVerificationKey();
-
-    /**
      * Returns the {@link UserDetails} of this {@link User}.
      *
      * @return the {@link UserDetails} of this {@link User}.
@@ -37,6 +30,13 @@ public interface User {
      * @return {@code true} if the email is verified, {@code false} otherwise.
      */
     boolean isEmailVerified();
+
+    /**
+     *Returns a {@link String} that represents the randomly generated key of this {@link User}.
+     *
+     * @return a {@link String} that represents the randomly generated key of this {@link User}.
+     */
+    String getVerificationKey();
 
     /**
      * Returns the {@link UserStatus} of this {@link User}.
