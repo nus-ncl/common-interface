@@ -18,6 +18,7 @@ import sg.ncl.adapter.deterlab.exceptions.*;
 import javax.inject.Inject;
 
 import static org.hamcrest.Matchers.*;
+import static org.mockito.Matchers.anyString;
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.method;
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.requestTo;
 import static org.springframework.test.web.client.response.MockRestResponseCreators.withSuccess;
@@ -47,7 +48,7 @@ public class AdapterDeterLabTest extends AbstractTest {
     }
 
     @Test
-    public void testJoinProjectNewUsersOnDeter() {
+    public void testJoinProjectNewUsersGood() {
         JSONObject userObject = Util.getUserAdapterJSONObject();
 
         String stubUid = RandomStringUtils.randomAlphanumeric(8);
@@ -66,6 +67,18 @@ public class AdapterDeterLabTest extends AbstractTest {
         Assert.assertThat(msg, is("user is created"));
         Assert.assertThat(uid, not(nullValue()));
         Assert.assertThat(uid, is(stubUid));
+    }
+
+    @Test(expected = JoinProjectException.class)
+    public void testJoinProjectNewUsersBad() {
+        JSONObject predefinedResultJson = new JSONObject();
+        predefinedResultJson.put("msg", "join project request new users fail");
+
+        mockServer.expect(requestTo(properties.getJoinProjectNewUsers()))
+                .andExpect(method(HttpMethod.POST))
+                .andRespond(withSuccess(predefinedResultJson.toString(), MediaType.APPLICATION_JSON));
+
+        adapterDeterLab.joinProjectNewUsers(anyString());
     }
 
     @Test

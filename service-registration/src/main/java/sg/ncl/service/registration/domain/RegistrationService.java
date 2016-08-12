@@ -14,7 +14,7 @@ public interface RegistrationService {
 
     String registerRequestToJoinTeam(String uid, Team team);
 
-    void register(Credentials credentials, User user, Team team, boolean isJoinTeam);
+    Registration register(Credentials credentials, User user, Team team, boolean isJoinTeam);
 
     void approveJoinRequest(String teamId, String userId, User user);
 
