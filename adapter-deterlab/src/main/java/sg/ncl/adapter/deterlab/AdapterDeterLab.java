@@ -77,8 +77,8 @@ public class AdapterDeterLab {
             throw new AdapterDeterlabConnectException();
         }
 
-        logger.info("Apply new project request submitted to deterlab");
         String jsonResult = new JSONObject(response.getBody().toString()).getString("msg");
+        logger.info("Apply new project request existing users submitted to deterlab: {}", jsonResult);
         if (!"apply project request existing users success".equals(jsonResult)) {
             throw new ApplyNewProjectException();
         }
