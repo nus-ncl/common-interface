@@ -197,20 +197,31 @@ public class AdapterDeterLabTest extends AbstractTest {
     }
 
     @Test
-    public void testApplyProject() {
+    public void testApplyProjectGood() {
         JSONObject one = new JSONObject();
 
         JSONObject predefinedResultJson = new JSONObject();
-        predefinedResultJson.put("msg", "user has logged in and applied a project");
+        predefinedResultJson.put("msg", "apply project request existing users success");
 
         mockServer.expect(requestTo(properties.getApplyProject()))
                 .andExpect(method(HttpMethod.POST))
                 .andRespond(withSuccess(predefinedResultJson.toString(), MediaType.APPLICATION_JSON));
 
-        String result = adapterDeterLab.applyProject(one.toString());
-        JSONObject resultJSONObject = new JSONObject(result);
-        String msg = resultJSONObject.getString("msg");
-        Assert.assertThat(msg, is("user has logged in and applied a project"));
+        adapterDeterLab.applyProject(one.toString());
+    }
+
+    @Test(expected = ApplyNewProjectException.class)
+    public void testApplyProjectBad() throws Exception {
+        JSONObject one = new JSONObject();
+
+        JSONObject predefinedResultJson = new JSONObject();
+        predefinedResultJson.put("msg", "apply project request existing users fail");
+
+        mockServer.expect(requestTo(properties.getApplyProject()))
+                .andExpect(method(HttpMethod.POST))
+                .andRespond(withSuccess(predefinedResultJson.toString(), MediaType.APPLICATION_JSON));
+
+        adapterDeterLab.applyProject(one.toString());
     }
 
     @Test

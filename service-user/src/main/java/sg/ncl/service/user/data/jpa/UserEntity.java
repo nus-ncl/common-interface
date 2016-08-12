@@ -1,5 +1,6 @@
 package sg.ncl.service.user.data.jpa;
 
+import lombok.extern.slf4j.Slf4j;
 import org.hibernate.annotations.GenericGenerator;
 import org.hibernate.annotations.Type;
 import sg.ncl.common.jpa.AbstractEntity;
@@ -31,6 +32,7 @@ import java.util.List;
  */
 @Entity
 @Table(name = "users")
+@Slf4j
 public class UserEntity extends AbstractEntity implements User {
 
     @Id
@@ -138,6 +140,7 @@ public class UserEntity extends AbstractEntity implements User {
         if (teams.contains(teamId)) {
             throw new UserAlreadyInTeamException();
         }
+        log.info("Adding team on the user side: {}", teamId);
         teams.add(teamId);
     }
 

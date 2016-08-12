@@ -303,7 +303,7 @@ public class RegistrationServiceTest extends AbstractTest {
         adapterDeterLab.saveDeterUserIdMapping(RandomStringUtils.randomAlphanumeric(8), createdUser.getId());
 
         JSONObject predefinedResultJson = new JSONObject();
-        predefinedResultJson.put("msg", "user has logged in and applied a project");
+        predefinedResultJson.put("msg", "apply project request existing users success");
 
         mockServer.expect(requestTo(properties.getApplyProject()))
                 .andExpect(method(HttpMethod.POST))

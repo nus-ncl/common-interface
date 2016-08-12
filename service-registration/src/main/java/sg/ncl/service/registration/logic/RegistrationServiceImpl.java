@@ -98,7 +98,6 @@ public class RegistrationServiceImpl implements RegistrationService {
         teamMemberEntity.setMemberType(MemberType.OWNER);
         TeamMemberInfo teamMemberInfo = new TeamMemberInfo(teamMemberEntity);
 
-        // FIXME call adapter deterlab here
         JSONObject mainObject = new JSONObject();
         mainObject.put("uid", adapterDeterLab.getDeterUserIdByNclUserId(nclUserId));
         mainObject.put("projName", team.getName());
@@ -107,10 +106,12 @@ public class RegistrationServiceImpl implements RegistrationService {
         mainObject.put("projWeb", team.getWebsite());
         mainObject.put("projOrg", team.getOrganisationType());
         mainObject.put("projPublic", team.getVisibility());
-        String resultJSON = adapterDeterLab.applyProject(mainObject.toString());
 
+        log.info("User side add team");
         userService.addTeam(nclUserId, createdTeam.getId());
         teamService.addMember(createdTeam.getId(), teamMemberInfo);
+
+        adapterDeterLab.applyProject(mainObject.toString());
     }
 
     @Transactional
@@ -499,18 +500,11 @@ public class RegistrationServiceImpl implements RegistrationService {
 
     private void checkTeamNameDuplicate(String teamName) {
         Team one = null;
-        try {
-            log.info("New team name is {}", teamName);
-            one = teamService.getTeamByName(teamName);
-        } catch (TeamNotFoundException e) {
-            // in order to continue the registration must catch instead of letting the service to throw
-            log.info("This is good, this implies team name is unique");
-        }
-        if (one != null && one.getId() != null) {
-            if (!one.getId().isEmpty()) {
-                log.warn("Team name duplicate entry found");
-                throw new RegisterTeamNameDuplicateException();
-            }
+        log.info("New team name is {}", teamName);
+        one = teamService.getTeamByName(teamName);
+        if (one != null) {
+            log.warn("Team name duplicate entry found");
+            throw new RegisterTeamNameDuplicateException();
         }
     }
 
