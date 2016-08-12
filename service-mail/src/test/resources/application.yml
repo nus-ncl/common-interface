@@ -4,8 +4,8 @@ spring:
   mail:
     host: smtp-relay.gmail.com
     port: 465
-    username: testbed-ops@ncl.sg
-    password: deterinavm
+    username: ${gmail.username}
+    password: ${gmail.password}
     protocol: smtps
     properties:
       starttls:
