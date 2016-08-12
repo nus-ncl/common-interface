@@ -95,11 +95,7 @@ public class TeamServiceImpl implements TeamService {
         if (name == null || name.isEmpty()) {
             throw new TeamNameNullOrEmptyException();
         }
-        TeamEntity one = teamRepository.findByName(name);
-        if (one == null) {
-            throw new TeamNotFoundException();
-        }
-        return one;
+        return teamRepository.findByName(name);
     }
 
     @Transactional

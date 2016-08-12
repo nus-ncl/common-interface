@@ -491,18 +491,11 @@ public class RegistrationServiceImpl implements RegistrationService {
 
     private void checkTeamNameDuplicate(String teamName) {
         Team one = null;
-        try {
-            log.info("New team name is {}", teamName);
-            one = teamService.getTeamByName(teamName);
-        } catch (TeamNotFoundException e) {
-            // in order to continue the registration must catch instead of letting the service to throw
-            log.info("This is good, this implies team name is unique");
-        }
-        if (one != null && one.getId() != null) {
-            if (!one.getId().isEmpty()) {
-                log.warn("Team name duplicate entry found");
-                throw new RegisterTeamNameDuplicateException();
-            }
+        log.info("New team name is {}", teamName);
+        one = teamService.getTeamByName(teamName);
+        if (one != null) {
+            log.warn("Team name duplicate entry found");
+            throw new RegisterTeamNameDuplicateException();
         }
     }
 
