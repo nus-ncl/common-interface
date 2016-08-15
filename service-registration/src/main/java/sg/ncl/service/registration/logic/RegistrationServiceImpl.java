@@ -60,22 +60,22 @@ public class RegistrationServiceImpl implements RegistrationService {
     private final MailService mailService;
 
     // FIXME: what is this autowired?
-
+    @Autowired
     private final AdapterDeterLab adapterDeterLab;
 
     @Inject
     RegistrationServiceImpl(@NotNull final CredentialsService credentialsService, @NotNull final TeamService teamService,
                             @NotNull final UserService userService, @NotNull final RegistrationRepository registrationRepository,
-                            //final DeterLabUserRepository deterlabUserRepository, final ConnectionProperties connectionProperties,
-                            @NotNull final AdapterDeterLab adapterDeterLab,
+                            final DeterLabUserRepository deterlabUserRepository, final ConnectionProperties connectionProperties,
+                            //@NotNull final AdapterDeterLab adapterDeterLab,
                             @NotNull final MailService mailService) {
         this.credentialsService = credentialsService;
         this.teamService = teamService;
         this.userService = userService;
         this.registrationRepository = registrationRepository;
         // FIXME: why is this getting replaced?
-        // this.adapterDeterLab = new AdapterDeterLab(deterlabUserRepository, connectionProperties);
-        this.adapterDeterLab = adapterDeterLab;
+        this.adapterDeterLab = new AdapterDeterLab(deterlabUserRepository, connectionProperties);
+        //this.adapterDeterLab = adapterDeterLab;
         this.mailService = mailService;
     }
 
@@ -110,7 +110,6 @@ public class RegistrationServiceImpl implements RegistrationService {
         teamMemberEntity.setMemberType(MemberType.OWNER);
         TeamMemberInfo teamMemberInfo = new TeamMemberInfo(teamMemberEntity);
 
-        // FIXME call adapter deterlab here
         JSONObject mainObject = new JSONObject();
         mainObject.put("uid", adapterDeterLab.getDeterUserIdByNclUserId(nclUserId));
         mainObject.put("projName", team.getName());
@@ -119,10 +118,12 @@ public class RegistrationServiceImpl implements RegistrationService {
         mainObject.put("projWeb", team.getWebsite());
         mainObject.put("projOrg", team.getOrganisationType());
         mainObject.put("projPublic", team.getVisibility());
-        String resultJSON = adapterDeterLab.applyProject(mainObject.toString());
 
+        log.info("User side add team");
         userService.addTeam(nclUserId, createdTeam.getId());
         teamService.addMember(createdTeam.getId(), teamMemberInfo);
+
+        adapterDeterLab.applyProject(mainObject.toString());
     }
 
     @Transactional
@@ -168,7 +169,7 @@ public class RegistrationServiceImpl implements RegistrationService {
     }
 
     @Transactional
-    public void register(Credentials credentials, User user, Team team, boolean isJoinTeam) {
+    public Registration register(Credentials credentials, User user, Team team, boolean isJoinTeam) {
 
         if (userFormFieldsHasErrors(user)) {
             log.warn("User form fields has errors {}", user);
@@ -212,6 +213,7 @@ public class RegistrationServiceImpl implements RegistrationService {
             // accept the team data
             teamEntity = teamService.getTeamById(team.getId());
             teamId = team.getId();
+            log.info("Register new users: join Team {}", team.getName());
         } else {
             // apply for new team
             // check if team already exists
@@ -225,6 +227,7 @@ public class RegistrationServiceImpl implements RegistrationService {
             teamEntity1.setPrivacy(team.getPrivacy());
             teamEntity = teamService.createTeam(teamEntity1);
             teamId = teamEntity.getId();
+            log.info("Register new users: apply new Team {}", team.getName());
         }
 
         // accept user data from form
@@ -233,6 +236,7 @@ public class RegistrationServiceImpl implements RegistrationService {
         // create the credentials after creating the users
         final CredentialsInfo credentialsInfo = new CredentialsInfo(userId, credentials.getUsername(), credentials.getPassword(), null);
         credentialsService.addCredentials(credentialsInfo);
+        log.info("Register new users: create new credentials", credentials.getUsername());
 
         if (isJoinTeam == true) {
             // indicate member type based on button click
@@ -247,6 +251,7 @@ public class RegistrationServiceImpl implements RegistrationService {
         teamMemberEntity.setMemberType(memberType);
         teamMemberInfo = new TeamMemberInfo(teamMemberEntity);
 
+        log.info("Register new users: adding user {} to team {}", user.getUserDetails().getEmail(), team.getName());
         userService.addTeam(userId, teamId);
         teamService.addMember(teamId, teamMemberInfo);
 
@@ -274,6 +279,7 @@ public class RegistrationServiceImpl implements RegistrationService {
             // parse in a the json string
             userObject.put("pid", teamEntity.getName());
             resultJSON = adapterDeterLab.joinProjectNewUsers(userObject.toString());
+            log.info("Register new users: invoke adapter deterlab to join team {} with data {}", teamEntity.getName(), userObject);
 
         } else {
             // call python script to apply for new project
@@ -284,31 +290,20 @@ public class RegistrationServiceImpl implements RegistrationService {
             userObject.put("projOrg", "Academic");
             userObject.put("projPublic", teamEntity.getVisibility());
             resultJSON = adapterDeterLab.applyProjectNewUsers(userObject.toString());
+            log.info("Register new users: invoke adapter deterlab to apple new team {} with data {}", teamEntity.getName(), userObject);
         }
 
         if (getUserCreationStatus(resultJSON).equals("user is created")) {
             // store form fields into registration repository for recreation when required
-            addUserToRegistrationRepository(resultJSON, user, teamEntity);
+            Registration one = addUserToRegistrationRepository(resultJSON, user, teamEntity);
 
             // call deterlab adapter to store ncluid to deteruid mapping
             addNclUserIdMapping(resultJSON, userId);
-
-            // send notification email
-            String userFullname = "Dear " + user.getUserDetails().getFirstName() + " " +
-                    user.getUserDetails().getLastName() + ",\n";
-            String tmp = "Please use below link to verify your email account: \n\n";
-            String verificationLink = "https://test.ncl.sg:8999/emailVerification?uid=" + userId +
-                    "&email=" + user.getUserDetails().getEmail() + "&key=" + user.getVerificationKey() +"\n\n";
-            String signature = "Thanks,\nNCL Testbed Operations";
-
-//            mailService.send("testbed-approval@ncl.sg", user.getUserDetails().getEmail(),
-//                    "NCL.SG: User Account Activation", userFullname + tmp + verificationLink + signature);
-
-
+            return one;
         } else {
-            // FIXME for debug purposes
-            System.out.println(resultJSON);
+            log.warn("Register new users: unreachable branch, result of registration is {}", resultJSON);
         }
+        return null;
     }
 
     @Transactional
@@ -484,10 +479,10 @@ public class RegistrationServiceImpl implements RegistrationService {
         JSONObject userObject = new JSONObject(resultJSON);
         String deterUserId = userObject.getString("uid");
         adapterDeterLab.saveDeterUserIdMapping(deterUserId, nclUserId);
+        log.info("Register new users: map and save ncl user id: {} to deter user id: {}", nclUserId, deterUserId);
     }
 
-    private void addUserToRegistrationRepository(String resultJSON, User user, Team team) {
-
+    private Registration addUserToRegistrationRepository(String resultJSON, User user, Team team) {
         JSONObject jsonObjectFromAdapter = new JSONObject(resultJSON);
         String uid = jsonObjectFromAdapter.getString("uid");
 
@@ -510,45 +505,19 @@ public class RegistrationServiceImpl implements RegistrationService {
         registrationEntity.setUsrTitle(user.getUserDetails().getJobTitle());
         registrationEntity.setUsrZip(user.getUserDetails().getAddress().getZipCode());
 
-        registrationRepository.save(registrationEntity);
+        RegistrationEntity one = registrationRepository.save(registrationEntity);
+        log.info("Register new users: saving registration entity {}", one);
+        return one;
     }
 
     private void checkTeamNameDuplicate(String teamName) {
         Team one = null;
-        try {
-            log.info("New team name is {}", teamName);
-            one = teamService.getTeamByName(teamName);
-        } catch (TeamNotFoundException e) {
-            // in order to continue the registration must catch instead of letting the service to throw
-            log.info("This is good, this implies team name is unique");
-        }
-        if (one != null && one.getId() != null) {
-            if (!one.getId().isEmpty()) {
-                log.warn("Team name duplicate entry found");
-                throw new RegisterTeamNameDuplicateException();
-            }
+        log.info("New team name is {}", teamName);
+        one = teamService.getTeamByName(teamName);
+        if (one != null) {
+            log.warn("Team name duplicate entry found");
+            throw new RegisterTeamNameDuplicateException();
         }
     }
-/*
-    @Override
-    public void activateAccount (@NotNull final String uid, @NotNull final String key) {
-
-        User user = userService.getUser(uid);
-        if (user == null) {
-            log.warn("Cannot find user {}", uid);
-            throw new UserNotFoundException();
-        }
-
-        if(null != user.getVerificationKey() && key.equals(user.getVerificationKey())) {
-            UserEntity newUser = new UserEntity();
-            newUser.setEmailVerified(true);
-            userService.updateUser(uid, newUser);
-            log.info("User {} with email {} has been verified.", uid, user.getUserDetails().getEmail());
-        } else {
-            log.info("Verification key mismatch: expected {}, received {}. Ignore request.",
-                    user.getVerificationKey(), key);
-        }
-
-    }*/
 
 }

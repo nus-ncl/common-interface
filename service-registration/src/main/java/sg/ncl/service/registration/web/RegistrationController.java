@@ -9,6 +9,8 @@ import sg.ncl.service.team.domain.TeamStatus;
 
 import javax.inject.Inject;
 import javax.validation.constraints.NotNull;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * @author Te Ye & Desmond
@@ -27,8 +29,11 @@ public class RegistrationController {
     // new user + join team
     @PostMapping
     @ResponseStatus(HttpStatus.OK)
-    public void register(@RequestBody final RegistrationInfo registrationInfo) {
-        registrationService.register(registrationInfo.getCredentials(), registrationInfo.getUser(), registrationInfo.getTeam(), registrationInfo.getIsJoinTeam());
+    public Map<String, String> register(@RequestBody final RegistrationInfo registrationInfo) {
+        Map<String, String> map = new HashMap<>();
+        Registration one = registrationService.register(registrationInfo.getCredentials(), registrationInfo.getUser(), registrationInfo.getTeam(), registrationInfo.getIsJoinTeam());
+        map.put("id", one.getId().toString());
+        return map;
     }
 
     @PostMapping(path = "/newTeam/{nclUserId}")
@@ -74,10 +79,4 @@ public class RegistrationController {
     public String getDeterUid(@PathVariable String id) {
         return registrationService.getDeterUid(id);
     }
-
-    /*@PutMapping(path = "/activation", params = {"uid", "key"})
-    @ResponseStatus(HttpStatus.OK)
-    private void activateAccount(@RequestParam("uid") final String uid, @RequestParam("key") final String key) {
-        registrationService.activateAccount(uid, key);
-    }*/
 }

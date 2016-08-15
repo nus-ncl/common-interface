@@ -95,11 +95,7 @@ public class TeamServiceImpl implements TeamService {
         if (name == null || name.isEmpty()) {
             throw new TeamNameNullOrEmptyException();
         }
-        TeamEntity one = teamRepository.findByName(name);
-        if (one == null) {
-            throw new TeamNotFoundException();
-        }
-        return one;
+        return teamRepository.findByName(name);
     }
 
     @Transactional
@@ -151,6 +147,7 @@ public class TeamServiceImpl implements TeamService {
         if (entity == null) {
             throw new TeamNotFoundException(id);
         }
+        log.info("Adding team member {} to Team {}", teamMember, entity);
         entity.addMember(teamMember);
         return teamRepository.save(entity);
     }

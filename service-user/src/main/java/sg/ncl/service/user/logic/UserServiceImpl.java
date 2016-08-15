@@ -84,18 +84,9 @@ public class UserServiceImpl implements UserService {
     public void updateUser(final String id, final User user) {
         final UserEntity one = findUser(id);
 
-        if (user.getStatus() != null) {
-            one.setStatus(user.getStatus());
+        if (user.getUserDetails().getFirstName() != null) {
+            one.getUserDetails().setFirstName(user.getUserDetails().getFirstName());
         }
-
-        if(one.isEmailVerified() != user.isEmailVerified()) {
-            one.setEmailVerified(user.isEmailVerified());
-        }
-
-        if(user.getUserDetails() != null) {
-            if (user.getUserDetails().getFirstName() != null) {
-                one.getUserDetails().setFirstName(user.getUserDetails().getFirstName());
-            }
 
             if (user.getUserDetails().getLastName() != null) {
                 one.getUserDetails().setLastName(user.getUserDetails().getLastName());
@@ -153,10 +144,9 @@ public class UserServiceImpl implements UserService {
                     one.getUserDetails().getAddress().setZipCode((userAddress.getZipCode()));
                 }
             }
+        userRepository.save(one);
         }
 
-        userRepository.save(one);
-    }
 
     @Transactional
     public void addTeam(final String userId, final String teamId) {
