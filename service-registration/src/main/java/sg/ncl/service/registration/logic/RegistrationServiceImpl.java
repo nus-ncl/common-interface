@@ -2,12 +2,9 @@ package sg.ncl.service.registration.logic;
 
 import lombok.extern.slf4j.Slf4j;
 import org.json.JSONObject;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import sg.ncl.adapter.deterlab.AdapterDeterLab;
-import sg.ncl.adapter.deterlab.ConnectionProperties;
-import sg.ncl.adapter.deterlab.data.jpa.DeterLabUserRepository;
 import sg.ncl.adapter.deterlab.exceptions.UserNotFoundException;
 import sg.ncl.service.authentication.domain.Credentials;
 import sg.ncl.service.authentication.domain.CredentialsService;
@@ -34,11 +31,8 @@ import sg.ncl.service.team.domain.TeamService;
 import sg.ncl.service.team.domain.TeamStatus;
 import sg.ncl.service.team.exceptions.TeamNotFoundException;
 import sg.ncl.service.team.web.TeamMemberInfo;
-import sg.ncl.service.user.data.jpa.UserDetailsEntity;
-import sg.ncl.service.user.data.jpa.UserEntity;
 import sg.ncl.service.user.domain.User;
 import sg.ncl.service.user.domain.UserService;
-import sg.ncl.service.user.domain.UserStatus;
 
 import javax.inject.Inject;
 import javax.validation.constraints.NotNull;
@@ -59,23 +53,18 @@ public class RegistrationServiceImpl implements RegistrationService {
 
     private final MailService mailService;
 
-    // FIXME: what is this autowired?
-    @Autowired
     private final AdapterDeterLab adapterDeterLab;
 
     @Inject
     RegistrationServiceImpl(@NotNull final CredentialsService credentialsService, @NotNull final TeamService teamService,
                             @NotNull final UserService userService, @NotNull final RegistrationRepository registrationRepository,
-                            final DeterLabUserRepository deterlabUserRepository, final ConnectionProperties connectionProperties,
-                            //@NotNull final AdapterDeterLab adapterDeterLab,
+                            @NotNull final AdapterDeterLab adapterDeterLab,
                             @NotNull final MailService mailService) {
         this.credentialsService = credentialsService;
         this.teamService = teamService;
         this.userService = userService;
         this.registrationRepository = registrationRepository;
-        // FIXME: why is this getting replaced?
-        this.adapterDeterLab = new AdapterDeterLab(deterlabUserRepository, connectionProperties);
-        //this.adapterDeterLab = adapterDeterLab;
+        this.adapterDeterLab = adapterDeterLab;
         this.mailService = mailService;
     }
 
@@ -231,7 +220,8 @@ public class RegistrationServiceImpl implements RegistrationService {
         }
 
         // accept user data from form
-        String userId = userService.createUser(user).getId();
+        user = userService.createUser(user);
+        String userId = user.getId();
 
         // create the credentials after creating the users
         final CredentialsInfo credentialsInfo = new CredentialsInfo(userId, credentials.getUsername(), credentials.getPassword(), null);
@@ -299,6 +289,10 @@ public class RegistrationServiceImpl implements RegistrationService {
 
             // call deterlab adapter to store ncluid to deteruid mapping
             addNclUserIdMapping(resultJSON, userId);
+
+            // send verification email
+            sendVerificationEmail(user);
+
             return one;
         } else {
             log.warn("Register new users: unreachable branch, result of registration is {}", resultJSON);
@@ -518,6 +512,19 @@ public class RegistrationServiceImpl implements RegistrationService {
             log.warn("Team name duplicate entry found");
             throw new RegisterTeamNameDuplicateException();
         }
+    }
+
+    private void sendVerificationEmail(User user) {
+        String userFullname = "Dear " + user.getUserDetails().getFirstName() + " " +
+                user.getUserDetails().getLastName() + ",\n";
+        String tmp = "Please use below link to verify your email account: \n\n";
+        // FIXME read configuration to get URL of service-web, rather than hardcoded one
+        String verificationLink = "https://test.ncl.sg:8999/emailVerification?uid=" + user.getId() +
+                "&email=" + user.getUserDetails().getEmail() + "&key=" + user.getVerificationKey() +"\n\n";
+        String signature = "Thanks,\nNCL Testbed Operations";
+
+        mailService.send("testbed-approval@ncl.sg", user.getUserDetails().getEmail(),
+                "NCL.SG: User Account Activation", userFullname + tmp + verificationLink + signature);
     }
 
 }

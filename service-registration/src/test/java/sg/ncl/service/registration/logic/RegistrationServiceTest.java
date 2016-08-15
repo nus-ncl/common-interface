@@ -4,7 +4,12 @@ import org.apache.commons.lang3.RandomStringUtils;
 import org.json.JSONObject;
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
+import org.mockito.Mock;
+import org.mockito.Mockito;
+import org.mockito.junit.MockitoJUnit;
+import org.mockito.junit.MockitoRule;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
@@ -14,8 +19,11 @@ import org.springframework.web.client.RestTemplate;
 import sg.ncl.adapter.deterlab.AdapterDeterLab;
 import sg.ncl.adapter.deterlab.ConnectionProperties;
 import sg.ncl.service.authentication.data.jpa.CredentialsEntity;
+import sg.ncl.service.authentication.domain.CredentialsService;
+import sg.ncl.service.mail.domain.MailService;
 import sg.ncl.service.registration.AbstractTest;
 import sg.ncl.service.registration.Util;
+import sg.ncl.service.registration.data.jpa.RegistrationRepository;
 import sg.ncl.service.registration.domain.RegistrationService;
 import sg.ncl.service.registration.exceptions.RegisterTeamIdEmptyException;
 import sg.ncl.service.registration.exceptions.RegisterTeamNameDuplicateException;
@@ -75,9 +83,23 @@ public class RegistrationServiceTest extends AbstractTest {
 
     private boolean isJoinTeam = true;
 
+    @Rule
+    public MockitoRule mockito = MockitoJUnit.rule();
+
+    @Mock
+    MailService mailService;
+
+    @Mock
+    private CredentialsService credentialsService;
+
+    @Mock
+    private RegistrationRepository registrationRepository;
+
     @Before
     public void setUp() throws Exception {
         mockServer = MockRestServiceServer.createServer((RestTemplate) restOperations);
+        registrationService = new RegistrationServiceImpl(credentialsService,
+                teamService, userService, registrationRepository, adapterDeterLab, mailService);
     }
 
     @Test
@@ -97,6 +119,8 @@ public class RegistrationServiceTest extends AbstractTest {
         mockServer.expect(requestTo(properties.getJoinProjectNewUsers()))
                 .andExpect(method(HttpMethod.POST))
                 .andRespond(withSuccess(predefinedResultJson.toString(), MediaType.APPLICATION_JSON));
+
+        Mockito.doNothing().when(mailService).send(Mockito.anyString(), Mockito.anyString(), Mockito.anyString(), Mockito.anyString());
 
         registrationService.register(credentialsEntity, user, team, isJoinTeam);
     }
@@ -118,6 +142,8 @@ public class RegistrationServiceTest extends AbstractTest {
         mockServer.expect(requestTo(properties.getApplyProjectNewUsers()))
                 .andExpect(method(HttpMethod.POST))
                 .andRespond(withSuccess(predefinedResultJson.toString(), MediaType.APPLICATION_JSON));
+
+        Mockito.doNothing().when(mailService).send(Mockito.anyString(), Mockito.anyString(), Mockito.anyString(), Mockito.anyString());
 
         registrationService.register(credentialsEntity, user, teamEntity, isJoinTeam);
     }

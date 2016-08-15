@@ -103,11 +103,8 @@ public class RegistrationServiceTestNew extends AbstractTest {
 
     @Before
     public void setUp() throws Exception {
-       // registrationService = new RegistrationServiceImpl(credentialsService,
-       //         teamService, userService, registrationRepository, adapterDeterLab, mailService);
-        registrationService = new RegistrationServiceImpl(credentialsService,
-                teamService, userService, registrationRepository, deterLabUserRepository, connectionProperties, mailService);
-        //mockServer = MockRestServiceServer.createServer((RestTemplate) restOperations);
+       registrationService = new RegistrationServiceImpl(credentialsService,
+               teamService, userService, registrationRepository, adapterDeterLab, mailService);
     }
 
     @Test(expected = RegisterTeamNameDuplicateException.class)
