@@ -120,7 +120,7 @@ public class RegistrationServiceTest extends AbstractTest {
                 .andExpect(method(HttpMethod.POST))
                 .andRespond(withSuccess(predefinedResultJson.toString(), MediaType.APPLICATION_JSON));
 
-        Mockito.doNothing().when(mailService).send(Mockito.anyString(), Mockito.anyString(), Mockito.anyString(), Mockito.anyString());
+        //Mockito.doNothing().when(mailService).send(Mockito.anyString(), Mockito.anyString(), Mockito.anyString(), Mockito.anyString());
 
         registrationService.register(credentialsEntity, user, team, isJoinTeam);
     }
@@ -143,7 +143,7 @@ public class RegistrationServiceTest extends AbstractTest {
                 .andExpect(method(HttpMethod.POST))
                 .andRespond(withSuccess(predefinedResultJson.toString(), MediaType.APPLICATION_JSON));
 
-        Mockito.doNothing().when(mailService).send(Mockito.anyString(), Mockito.anyString(), Mockito.anyString(), Mockito.anyString());
+        //Mockito.doNothing().when(mailService).send(Mockito.anyString(), Mockito.anyString(), Mockito.anyString(), Mockito.anyString());
 
         registrationService.register(credentialsEntity, user, teamEntity, isJoinTeam);
     }

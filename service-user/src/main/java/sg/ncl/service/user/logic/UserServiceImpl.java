@@ -10,7 +10,11 @@ import sg.ncl.service.user.domain.Address;
 import sg.ncl.service.user.domain.User;
 import sg.ncl.service.user.domain.UserService;
 import sg.ncl.service.user.domain.UserStatus;
-import sg.ncl.service.user.exceptions.*;
+import sg.ncl.service.user.exceptions.EmailNotMatchException;
+import sg.ncl.service.user.exceptions.UserIdNullException;
+import sg.ncl.service.user.exceptions.UserNotFoundException;
+import sg.ncl.service.user.exceptions.VerificationKeyNotMatchException;
+
 
 import javax.inject.Inject;
 import javax.transaction.Transactional;
@@ -56,13 +60,14 @@ public class UserServiceImpl implements UserService {
     }
 
     @Transactional
+    @Override
     public UserStatus verifyEmail (@NotNull String uid, @NotNull String email, @NotNull String key) {
 
         final UserEntity user = findUser(uid);
         if(!email.equals(user.getUserDetails().getEmail())) {
-            String err = "Email not match. Expected " + user.getUserDetails().getEmail() + ", received: " + email;
-            log.warn(err);
-            throw new EmailNotMatchException(err);
+            log.warn("Email not match. Expected: {}, received: {}", user.getUserDetails().getEmail(), email);
+            throw new EmailNotMatchException("expected: " + user.getUserDetails().getEmail() +
+                    ", received: " + email);
         }
         if(null != user.getVerificationKey() && key.equals(user.getVerificationKey())) {
             user.setEmailVerified(true);
@@ -73,9 +78,9 @@ public class UserServiceImpl implements UserService {
             log.info("User {} with email {} has been verified.", uid, user.getUserDetails().getEmail());
             return user.getStatus();
         } else {
-            String err = "Verification key mismatch. Expected: " + user.getVerificationKey() + ", receoved: " + key;
-            log.warn(err);
-            throw new VerificationKeyNotMatchException(err);
+            log.warn("Verification key mismatch. Expected: {}, received: {}", user.getVerificationKey(), key);
+            throw new VerificationKeyNotMatchException("expected: " + user.getVerificationKey() +
+                    ", received: " + key);
         }
 
     }
