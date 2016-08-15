@@ -10,9 +10,9 @@ import sg.ncl.service.user.domain.User;
  */
 public interface RegistrationService {
 
-    void registerRequestToApplyTeam(String uid, Team team);
+    Registration registerRequestToApplyTeam(String uid, Team team);
 
-    String registerRequestToJoinTeam(String uid, Team team);
+    Registration registerRequestToJoinTeam(String uid, Team team);
 
     Registration register(Credentials credentials, User user, Team team, boolean isJoinTeam);
 
