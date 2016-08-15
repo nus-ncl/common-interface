@@ -7,6 +7,7 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpMethod;
@@ -84,6 +85,7 @@ public class RegistrationControllerTest extends AbstractTest {
         mockServer = MockRestServiceServer.createServer((RestTemplate) restOperations);
     }
 
+    @Ignore
     @Test
     public void registerNewUserJoinExistingTeamTest() throws Exception {
         CredentialsEntity credentialsEntity = Util.getCredentialsEntity();
@@ -124,6 +126,7 @@ public class RegistrationControllerTest extends AbstractTest {
                 .andExpect(status().isOk());
     }
 
+    @Ignore
     @Test
     public void registerNewUserApplyNewTeamTest() throws Exception {
         CredentialsEntity credentialsEntity = Util.getCredentialsEntity();
