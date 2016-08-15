@@ -32,23 +32,35 @@ public class RegistrationController {
     public Map<String, String> register(@RequestBody final RegistrationInfo registrationInfo) {
         Map<String, String> map = new HashMap<>();
         Registration one = registrationService.register(registrationInfo.getCredentials(), registrationInfo.getUser(), registrationInfo.getTeam(), registrationInfo.getIsJoinTeam());
-        map.put("id", one.getId().toString());
+        if (one != null) {
+            map.put("id", one.getId().toString());
+        }
         return map;
     }
 
     @PostMapping(path = "/newTeam/{nclUserId}")
     // FIXME: the path is wrong, there should not be multiple paths for different registrations; status should be ACCEPTED
     @ResponseStatus(HttpStatus.CREATED)
-    public void registerRequestToApplyTeam(@PathVariable String nclUserId, @RequestBody RegistrationInfo registrationInfo) {
-        registrationService.registerRequestToApplyTeam(nclUserId, registrationInfo.getTeam());
+    public Map<String, String> registerRequestToApplyTeam(@PathVariable String nclUserId, @RequestBody RegistrationInfo registrationInfo) {
+        Map<String, String> map = new HashMap<>();
+        Registration one = registrationService.registerRequestToApplyTeam(nclUserId, registrationInfo.getTeam());
+        if (one != null) {
+            map.put("id", one.getId().toString());
+        }
+        return map;
     }
 
     // old user + join team
     @PostMapping(path = "/joinApplications")
     // FIXME: the path is wrong, there should not be multiple paths for different registrations; status should be ACCEPTED
     @ResponseStatus(HttpStatus.ACCEPTED)
-    public String registerRequestToJoinTeam(@RequestBody RegistrationInfo registrationInfo) {
-        return registrationService.registerRequestToJoinTeam(registrationInfo.getUser().getId(), registrationInfo.getTeam());
+    public Map<String, String> registerRequestToJoinTeam(@RequestBody RegistrationInfo registrationInfo) {
+        Map<String, String> map = new HashMap<>();
+        Registration one = registrationService.registerRequestToJoinTeam(registrationInfo.getUser().getId(), registrationInfo.getTeam());
+        if (one != null) {
+            map.put("id", one.getId().toString());
+        }
+        return map;
     }
 
     @PostMapping(path = "/teams/{teamId}/members/{userId}")

@@ -68,7 +68,8 @@ public class RegistrationServiceImpl implements RegistrationService {
     }
 
     @Transactional
-    public void registerRequestToApplyTeam(String nclUserId, Team team) {
+    // FIXME: the return type should be a proper Registration
+    public Registration registerRequestToApplyTeam(String nclUserId, Team team) {
         if (team.getName() == null || team.getName().isEmpty()) {
             log.warn("Team name is empty or null");
             throw new RegisterTeamNameEmptyException();
@@ -112,10 +113,11 @@ public class RegistrationServiceImpl implements RegistrationService {
         teamService.addMember(createdTeam.getId(), teamMemberInfo);
 
         adapterDeterLab.applyProject(mainObject.toString());
+        return null;
     }
 
     @Transactional
-    public String registerRequestToJoinTeam(String nclUserId, Team team) {
+    public Registration registerRequestToJoinTeam(String nclUserId, Team team) {
         if (team.getName() == null || team.getName().isEmpty()) {
             log.warn("Team name is not found");
             throw new RegisterTeamNameEmptyException();
@@ -153,7 +155,7 @@ public class RegistrationServiceImpl implements RegistrationService {
         adapterDeterLab.joinProject(userObject.toString());
 
         log.info("Submitted join team request");
-        return "join team request submitted";
+        return null;
     }
 
     @Transactional
