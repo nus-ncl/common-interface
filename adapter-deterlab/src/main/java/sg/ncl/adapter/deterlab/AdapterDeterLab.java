@@ -38,7 +38,7 @@ public class AdapterDeterLab {
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
-        HttpEntity<String> request = new HttpEntity<String>(jsonString, headers);
+        HttpEntity<String> request = new HttpEntity<>(jsonString, headers);
 
         ResponseEntity response;
         try {
@@ -67,7 +67,7 @@ public class AdapterDeterLab {
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
-        HttpEntity<String> request = new HttpEntity<String>(jsonString, headers);
+        HttpEntity<String> request = new HttpEntity<>(jsonString, headers);
 
         ResponseEntity responseEntity = restTemplate.exchange(properties.getApplyProjectNewUsers(), HttpMethod.POST, request, String.class);
 
@@ -210,7 +210,7 @@ public class AdapterDeterLab {
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
-        HttpEntity<String> request = new HttpEntity<String>(jsonString, headers);
+        HttpEntity<String> request = new HttpEntity<>(jsonString, headers);
 
         ResponseEntity responseEntity = restTemplate.exchange(properties.deleteExperiment(), HttpMethod.POST, request, String.class);
 
@@ -223,7 +223,7 @@ public class AdapterDeterLab {
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
-        HttpEntity<String> request = new HttpEntity<String>(jsonString, headers);
+        HttpEntity<String> request = new HttpEntity<>(jsonString, headers);
 
         ResponseEntity responseEntity = restTemplate.exchange(properties.getApproveJoinRequest(), HttpMethod.POST, request, String.class);
 
@@ -236,7 +236,7 @@ public class AdapterDeterLab {
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
-        HttpEntity<String> request = new HttpEntity<String>(jsonString, headers);
+        HttpEntity<String> request = new HttpEntity<>(jsonString, headers);
 
         ResponseEntity responseEntity = restTemplate.exchange(properties.getRejectJoinRequest(), HttpMethod.POST, request, String.class);
 
@@ -249,7 +249,7 @@ public class AdapterDeterLab {
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
-        HttpEntity<String> request = new HttpEntity<String>(jsonString, headers);
+        HttpEntity<String> request = new HttpEntity<>(jsonString, headers);
 
         ResponseEntity responseEntity = restTemplate.exchange(properties.getApproveProject(), HttpMethod.POST, request, String.class);
 
@@ -262,7 +262,7 @@ public class AdapterDeterLab {
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
-        HttpEntity<String> request = new HttpEntity<String>(jsonString, headers);
+        HttpEntity<String> request = new HttpEntity<>(jsonString, headers);
 
         ResponseEntity responseEntity = restTemplate.exchange(properties.getRejectProject(), HttpMethod.POST, request, String.class);
 
