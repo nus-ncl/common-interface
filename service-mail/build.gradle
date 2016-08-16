@@ -4,7 +4,5 @@ dependencies {
     compile project(':common')
     compile 'org.springframework.boot:spring-boot-starter-mail'
 
-    runtime 'mysql:mysql-connector-java'
-
     testCompile project(':common-test')
 }
