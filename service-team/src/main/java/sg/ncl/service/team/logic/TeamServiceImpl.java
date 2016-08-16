@@ -54,11 +54,13 @@ public class TeamServiceImpl implements TeamService {
         }
 
         TeamEntity entity = new TeamEntity();
-        entity.setName(team.getName());
-        entity.setDescription(team.getDescription());
-        entity.setWebsite(team.getWebsite());
-        entity.setOrganisationType(team.getOrganisationType());
         entity.setApplicationDate(ZonedDateTime.now());
+        entity.setDescription(team.getDescription());
+        entity.setName(team.getName());
+        entity.setOrganisationType(team.getOrganisationType());
+//        entity.setPrivacy(team.getPrivacy());
+        entity.setWebsite(team.getWebsite());
+        entity.setVisibility(team.getVisibility());
 
         return teamRepository.save(entity);
     }
