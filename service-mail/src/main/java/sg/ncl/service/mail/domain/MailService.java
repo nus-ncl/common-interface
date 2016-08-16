@@ -8,11 +8,10 @@ package sg.ncl.service.mail.domain;
 public interface MailService {
 
     /**
-     *
      * @param from
      * @param to
      * @param subject
      * @param content
      */
-    void send (String from, String to, String subject, String content);
+    void send(String from, String to, String subject, String content);
 }
