@@ -82,8 +82,37 @@ public class AdapterDeterLabTest extends AbstractTest {
     }
 
     @Test
-    public void testCreateProjectOnDeter() {
-        JSONObject teamObject = Util.getTeamAdapterJSONObject();
+    public void testCreateProjectNewUsersGood() {
+        JSONObject userObject = Util.getUserAdapterJSONObject();
+
+        String stubUid = RandomStringUtils.randomAlphanumeric(8);
+        JSONObject predefinedResultJson = new JSONObject();
+        predefinedResultJson.put("msg", "user is created");
+        predefinedResultJson.put("uid", stubUid);
+
+        mockServer.expect(requestTo(properties.getApplyProjectNewUsers()))
+                .andExpect(method(HttpMethod.POST))
+                .andRespond(withSuccess(predefinedResultJson.toString(), MediaType.APPLICATION_JSON));
+
+        String result = adapterDeterLab.applyProjectNewUsers(userObject.toString());
+        JSONObject resultJSONObject = new JSONObject(result);
+        String msg = resultJSONObject.getString("msg");
+        String uid = resultJSONObject.getString("uid");
+        Assert.assertThat(msg, is("user is created"));
+        Assert.assertThat(uid, not(nullValue()));
+        Assert.assertThat(uid, is(stubUid));
+    }
+
+    @Test(expected = ApplyNewProjectException.class)
+    public void testCreateProjectNewUsersBad() {
+        JSONObject predefinedResultJson = new JSONObject();
+        predefinedResultJson.put("msg", "apply project request new users fail");
+
+        mockServer.expect(requestTo(properties.getApplyProjectNewUsers()))
+                .andExpect(method(HttpMethod.POST))
+                .andRespond(withSuccess(predefinedResultJson.toString(), MediaType.APPLICATION_JSON));
+
+        adapterDeterLab.applyProjectNewUsers(anyString());
     }
 
     @Test
