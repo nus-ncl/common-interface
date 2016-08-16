@@ -34,6 +34,20 @@ import java.util.Map;
 @Table(name = "teams")
 public class TeamEntity extends AbstractEntity implements Team {
 
+//    public TeamEntity() {
+//
+//    }
+//
+//    public TeamEntity(Team team) {
+//        setApplicationDate(ZonedDateTime.now());
+//        setDescription(team.getDescription());
+//        setName(team.getName());
+//        setOrganisationType(team.getOrganisationType());
+//        setPrivacy(team.getPrivacy());
+//        setWebsite(team.getWebsite());
+//        setVisibility(team.getVisibility());
+//    }
+
     @Id
     @GeneratedValue(generator = "uuid2")
     @GenericGenerator(name = "uuid2", strategy = "uuid2")
