@@ -19,10 +19,9 @@ import javax.validation.constraints.NotNull;
 
 @Service
 @Slf4j
-public class MailServiceImpl implements MailService{
+public class MailServiceImpl implements MailService {
 
     private final String from = "testbed-ops@ncl.sg";
-
     private final JavaMailSender sender;
 
     @Inject
@@ -47,27 +46,10 @@ public class MailServiceImpl implements MailService{
 
         try {
             sender.send(msg);
-            log.info("Email sent. From: '{}', To: '{}', Subject: '{}'", from, to, subject);
-        }
-        catch (MailException ex) {
-            log.warn("Sending email failed. From: '{}', To: '{}', Subject: '{}'",
-                    from, to, subject);
-            throw ex;
+            log.info("Email sent: {}", msg);
+        } catch (MailException e) {
+            log.warn("{}: msg = {}", e, msg);
+            throw e;
         }
     }
-
-    @Override
-    public void send(SimpleMailMessage msg) {
-        try {
-            sender.send(msg);
-            log.info("Email sent. From: '{}', To: '{}', Subject: '{}'",
-                    msg.getFrom(), msg.getTo(), msg.getSubject());
-        }
-        catch (MailException ex) {
-            log.warn("Sending email failed. From: '{}', To: '{}', Subject: '{}'",
-                    msg.getFrom(), msg.getTo(), msg.getSubject());
-            throw ex;
-        }
-    }
-
 }
