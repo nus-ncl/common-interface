@@ -2,6 +2,7 @@ package sg.ncl.service.registration.logic;
 
 import lombok.extern.slf4j.Slf4j;
 import org.json.JSONObject;
+import org.springframework.mail.SimpleMailMessage;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import sg.ncl.adapter.deterlab.AdapterDeterLab;
@@ -37,7 +38,9 @@ import sg.ncl.service.user.domain.UserService;
 import javax.inject.Inject;
 import javax.validation.constraints.NotNull;
 import java.time.ZonedDateTime;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author Christopher Zhong
@@ -56,10 +59,14 @@ public class RegistrationServiceImpl implements RegistrationService {
     private final AdapterDeterLab adapterDeterLab;
 
     @Inject
-    RegistrationServiceImpl(@NotNull final CredentialsService credentialsService, @NotNull final TeamService teamService,
-                            @NotNull final UserService userService, @NotNull final RegistrationRepository registrationRepository,
-                            @NotNull final AdapterDeterLab adapterDeterLab,
-                            @NotNull final MailService mailService) {
+    RegistrationServiceImpl(
+            @NotNull final CredentialsService credentialsService,
+            @NotNull final TeamService teamService,
+            @NotNull final UserService userService,
+            @NotNull final RegistrationRepository registrationRepository,
+            @NotNull final AdapterDeterLab adapterDeterLab,
+            @NotNull final MailService mailService
+    ) {
         this.credentialsService = credentialsService;
         this.teamService = teamService;
         this.userService = userService;
@@ -517,16 +524,9 @@ public class RegistrationServiceImpl implements RegistrationService {
     }
 
     private void sendVerificationEmail(User user) {
-        String userFullname = "Dear " + user.getUserDetails().getFirstName() + " " +
-                user.getUserDetails().getLastName() + ",\n";
-        String tmp = "Please use below link to verify your email account: \n\n";
-        // FIXME read configuration to get URL of service-web, rather than hardcoded one
-        String verificationLink = "https://test.ncl.sg:8999/emailVerification?uid=" + user.getId() +
-                "&email=" + user.getUserDetails().getEmail() + "&key=" + user.getVerificationKey() +"\n\n";
-        String signature = "Thanks,\nNCL Testbed Operations";
+        String userFullname = user.getUserDetails().getFirstName() + " " +
+                user.getUserDetails().getLastName();
 
-        mailService.send("testbed-approval@ncl.sg", user.getUserDetails().getEmail(),
-                "NCL.SG: User Account Activation", userFullname + tmp + verificationLink + signature);
     }
 
 }

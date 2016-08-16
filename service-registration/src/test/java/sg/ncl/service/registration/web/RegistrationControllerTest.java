@@ -85,6 +85,13 @@ public class RegistrationControllerTest extends AbstractTest {
         mockServer = MockRestServiceServer.createServer((RestTemplate) restOperations);
     }
 
+    /**
+     * This test sends http request to real registration service controller,
+     * which will call MailService.send() which will fail due to lacking of
+     * email username and password for SMTP authentication
+     *
+     * TODO need to rewrite this test (the whole test class)
+     */
     @Ignore
     @Test
     public void registerNewUserJoinExistingTeamTest() throws Exception {
@@ -126,6 +133,13 @@ public class RegistrationControllerTest extends AbstractTest {
                 .andExpect(status().isOk());
     }
 
+    /**
+     * This test sends http request to real registration service controller,
+     * which will call MailService.send() which will fail due to lacking of
+     * email username and password for SMTP authentication
+     *
+     * TODO need to rewrite this test (the whole test class)
+     */
     @Ignore
     @Test
     public void registerNewUserApplyNewTeamTest() throws Exception {

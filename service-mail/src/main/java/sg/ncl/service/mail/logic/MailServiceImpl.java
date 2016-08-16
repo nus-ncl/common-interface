@@ -7,8 +7,10 @@ import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Service;
 import sg.ncl.service.mail.domain.MailService;
 
+
 import javax.inject.Inject;
 import javax.validation.constraints.NotNull;
+
 
 
 /**
@@ -19,15 +21,24 @@ import javax.validation.constraints.NotNull;
 @Slf4j
 public class MailServiceImpl implements MailService{
 
+    private final String from = "testbed-ops@ncl.sg";
+
     private final JavaMailSender sender;
 
     @Inject
-    MailServiceImpl(@NotNull final JavaMailSender sender) {
+    MailServiceImpl(
+            @NotNull final JavaMailSender sender
+    ) {
         this.sender = sender;
     }
 
     @Override
-    public void send(@NotNull final String from, @NotNull final String to, @NotNull final String subject, @NotNull final String content) {
+    public void send(
+            @NotNull final String from,
+            @NotNull final String to,
+            @NotNull final String subject,
+            @NotNull final String content
+    ) {
         SimpleMailMessage msg = new SimpleMailMessage();
         msg.setFrom(from);
         msg.setTo(to);
@@ -45,5 +56,18 @@ public class MailServiceImpl implements MailService{
         }
     }
 
+    @Override
+    public void send(SimpleMailMessage msg) {
+        try {
+            sender.send(msg);
+            log.info("Email sent. From: '{}', To: '{}', Subject: '{}'",
+                    msg.getFrom(), msg.getTo(), msg.getSubject());
+        }
+        catch (MailException ex) {
+            log.warn("Sending email failed. From: '{}', To: '{}', Subject: '{}'",
+                    msg.getFrom(), msg.getTo(), msg.getSubject());
+            throw ex;
+        }
+    }
 
 }

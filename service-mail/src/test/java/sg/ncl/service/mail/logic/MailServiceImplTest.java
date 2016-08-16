@@ -20,6 +20,9 @@ import sg.ncl.service.mail.MailApplication;
 
 import javax.inject.Inject;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import static org.hamcrest.Matchers.*;
 
 /**

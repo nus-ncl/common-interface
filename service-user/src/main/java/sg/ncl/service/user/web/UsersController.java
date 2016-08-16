@@ -64,9 +64,9 @@ public class UsersController {
         userService.addTeam(id, user.getTeams().get(0));
     }
 
-    @PutMapping(path = "/users/{uid}/emails/{emailBase64}")
-    public UserStatus verifyEmail(@PathVariable String uid, @PathVariable String emailBase64, @RequestBody VerificationKeyInfo keyInfo) {
+    @PutMapping(path = "/users/{id}/emails/{emailBase64}")
+    public UserStatus verifyEmail(@PathVariable String id, @PathVariable String emailBase64, @RequestBody VerificationKeyInfo keyInfo) {
         final String email = new String(Base64.decodeBase64(emailBase64));
-        return userService.verifyEmail(uid, email, keyInfo.getKey());
+        return userService.verifyEmail(id, email, keyInfo.getKey());
     }
 }
