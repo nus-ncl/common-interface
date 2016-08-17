@@ -224,17 +224,10 @@ public class RegistrationServiceImpl implements RegistrationService {
             teamId = team.getId();
             log.info("Register new users: join Team {}", team.getName());
         } else {
+            log.info("Creating a team: {}", team);
             // apply for new team
             // check if team already exists
-            TeamEntity teamEntity1 = new TeamEntity();
-            teamEntity1.setName(team.getName());
-            teamEntity1.setVisibility(team.getVisibility());
-            teamEntity1.setApplicationDate(ZonedDateTime.now());
-            teamEntity1.setDescription(team.getDescription());
-            teamEntity1.setWebsite(team.getWebsite());
-            teamEntity1.setOrganisationType(team.getOrganisationType());
-            teamEntity1.setPrivacy(team.getPrivacy());
-            teamEntity = teamService.createTeam(teamEntity1);
+            teamEntity = teamService.createTeam(team);
             teamId = teamEntity.getId();
             log.info("Register new users: apply new Team {}", team.getName());
         }
