@@ -27,3 +27,6 @@ install: true
 
 script:
   - ./gradlew --continue --stacktrace build sonarqube jacocoTestReport coveralls #
+
+after_success:
+  - if [[ "$TRAVIS_BRANCH" == "master" && "$TRAVIS_PULL_REQUEST" == "false" ]]; then ./gradlew bootRepackage bintrayUpload; fi;
