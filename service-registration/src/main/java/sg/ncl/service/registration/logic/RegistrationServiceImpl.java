@@ -52,8 +52,8 @@ import java.util.Map;
 @Slf4j
 public class RegistrationServiceImpl implements RegistrationService {
 
-    private static final String templateLoaderPath = "service-registration/src/main/resources";
-    private static final String verificationEmailTemplateName = "verificationEmailTemplate.ftl";
+    private static final String TEMPLATELOADERPATH = "service-registration/src/main/resources";
+    private static final String VERIFICATIONEMAILTEMPLATENAME = "verificationEmailTemplate.ftl";
 
     private final CredentialsService credentialsService;
     private final TeamService teamService;
@@ -537,12 +537,12 @@ public class RegistrationServiceImpl implements RegistrationService {
 
         String msgText = null;
         try {
-            freemarkerConfiguration.setDirectoryForTemplateLoading(new File(templateLoaderPath));
+            freemarkerConfiguration.setDirectoryForTemplateLoading(new File(TEMPLATELOADERPATH));
             msgText = FreeMarkerTemplateUtils.processTemplateIntoString(
-                    freemarkerConfiguration.getTemplate(verificationEmailTemplateName), tempMap);
+                    freemarkerConfiguration.getTemplate(VERIFICATIONEMAILTEMPLATENAME), tempMap);
         } catch (Exception e) {
-            log.warn("Cannot get email template {} from directory {}", templateLoaderPath,
-                    verificationEmailTemplateName);
+            log.warn("Cannot get email template {} from directory {}", TEMPLATELOADERPATH,
+                    VERIFICATIONEMAILTEMPLATENAME);
         }
 
         if( msgText != null) {
