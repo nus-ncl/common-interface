@@ -1,5 +1,6 @@
 package sg.ncl.service.registration.logic;
 
+import freemarker.template.Configuration;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.json.JSONObject;
 import org.junit.Assert;
@@ -18,6 +19,7 @@ import org.springframework.web.client.RestOperations;
 import org.springframework.web.client.RestTemplate;
 import sg.ncl.adapter.deterlab.AdapterDeterLab;
 import sg.ncl.adapter.deterlab.ConnectionProperties;
+import sg.ncl.common.DomainProperties;
 import sg.ncl.service.authentication.data.jpa.CredentialsEntity;
 import sg.ncl.service.authentication.domain.CredentialsService;
 import sg.ncl.service.mail.domain.MailService;
@@ -95,11 +97,17 @@ public class RegistrationServiceTest extends AbstractTest {
     @Mock
     private RegistrationRepository registrationRepository;
 
+    @Mock
+    private DomainProperties domainProperties;
+    @Mock
+    private Configuration freemarkerConfiguration;
+
     @Before
     public void setUp() throws Exception {
         mockServer = MockRestServiceServer.createServer((RestTemplate) restOperations);
         registrationService = new RegistrationServiceImpl(credentialsService,
-                teamService, userService, registrationRepository, adapterDeterLab, mailService);
+                teamService, userService, registrationRepository, adapterDeterLab, mailService,
+                domainProperties, freemarkerConfiguration);
     }
 
     @Test

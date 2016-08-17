@@ -7,7 +7,6 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 import org.junit.Assert;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpMethod;
@@ -20,20 +19,16 @@ import org.springframework.web.client.RestTemplate;
 import org.springframework.web.context.WebApplicationContext;
 import sg.ncl.adapter.deterlab.AdapterDeterLab;
 import sg.ncl.adapter.deterlab.ConnectionProperties;
-import sg.ncl.service.authentication.data.jpa.CredentialsEntity;
 import sg.ncl.service.registration.AbstractTest;
 import sg.ncl.service.registration.Util;
 import sg.ncl.service.registration.serializers.DateTimeDeserializer;
 import sg.ncl.service.registration.serializers.DateTimeSerializer;
-import sg.ncl.service.team.data.jpa.TeamEntity;
 import sg.ncl.service.team.domain.MemberType;
 import sg.ncl.service.team.domain.Team;
 import sg.ncl.service.team.domain.TeamMember;
 import sg.ncl.service.team.domain.TeamService;
 import sg.ncl.service.team.domain.TeamStatus;
-import sg.ncl.service.team.exceptions.TeamNotFoundException;
 import sg.ncl.service.team.web.TeamMemberInfo;
-import sg.ncl.service.user.data.jpa.UserEntity;
 import sg.ncl.service.user.domain.User;
 import sg.ncl.service.user.domain.UserService;
 
@@ -83,100 +78,6 @@ public class RegistrationControllerTest extends AbstractTest {
     public void setUp() throws Exception {
         mockMvc = webAppContextSetup(webApplicationContext).build();
         mockServer = MockRestServiceServer.createServer((RestTemplate) restOperations);
-    }
-
-    /**
-     * This test sends http request to real registration service controller,
-     * which will call MailService.send() which will fail due to lacking of
-     * email username and password for SMTP authentication
-     *
-     * TODO need to rewrite this test (the whole test class)
-     */
-    @Ignore
-    @Test
-    public void registerNewUserJoinExistingTeamTest() throws Exception {
-        CredentialsEntity credentialsEntity = Util.getCredentialsEntity();
-        UserEntity userEntity = Util.getUserEntity();
-
-        // apply to join team but since no teams exists yet
-        // create stub team
-        Team team = teamService.createTeam(Util.getTeamEntity());
-
-        GsonBuilder gsonBuilder = new GsonBuilder();
-        gsonBuilder.registerTypeAdapter(ZonedDateTime.class, new DateTimeSerializer());
-        gsonBuilder.registerTypeAdapter(ZonedDateTime.class, new DateTimeDeserializer());
-        Gson gson = gsonBuilder.create();
-        String credentialsJSON = gson.toJson(credentialsEntity);
-        String userJSON = gson.toJson(userEntity);
-        String teamJSON = gson.toJson(team);
-
-        JSONObject mainJSON = new JSONObject();
-        JSONObject credentialsFields = new JSONObject(credentialsJSON);
-        JSONObject userFields = new JSONObject(userJSON);
-        JSONObject teamFields = new JSONObject(teamJSON);
-
-        mainJSON.put("credentials", credentialsFields);
-        mainJSON.put("user", userFields);
-        mainJSON.put("team", teamFields);
-        mainJSON.put("isJoinTeam", true);
-
-        String stubUid = RandomStringUtils.randomAlphanumeric(8);
-        JSONObject predefinedResultJson = new JSONObject();
-        predefinedResultJson.put("msg", "user is created");
-        predefinedResultJson.put("uid", stubUid);
-
-        mockServer.expect(requestTo(properties.getJoinProjectNewUsers()))
-                .andExpect(method(HttpMethod.POST))
-                .andRespond(withSuccess(predefinedResultJson.toString(), MediaType.APPLICATION_JSON));
-
-        mockMvc.perform(post("/registrations").contentType(MediaType.APPLICATION_JSON).content(mainJSON.toString()))
-                .andExpect(status().isOk());
-    }
-
-    /**
-     * This test sends http request to real registration service controller,
-     * which will call MailService.send() which will fail due to lacking of
-     * email username and password for SMTP authentication
-     *
-     * TODO need to rewrite this test (the whole test class)
-     */
-    @Ignore
-    @Test
-    public void registerNewUserApplyNewTeamTest() throws Exception {
-        CredentialsEntity credentialsEntity = Util.getCredentialsEntity();
-        UserEntity userEntity = Util.getUserEntity();
-
-        TeamEntity teamEntity = Util.getTeamEntity();
-
-        GsonBuilder gsonBuilder = new GsonBuilder();
-        gsonBuilder.registerTypeAdapter(ZonedDateTime.class, new DateTimeSerializer());
-        gsonBuilder.registerTypeAdapter(ZonedDateTime.class, new DateTimeDeserializer());
-        Gson gson = gsonBuilder.create();
-        String credentialsJSON = gson.toJson(credentialsEntity);
-        String userJSON = gson.toJson(userEntity);
-        String teamJSON = gson.toJson(teamEntity);
-
-        JSONObject mainJSON = new JSONObject();
-        JSONObject credentialsFields = new JSONObject(credentialsJSON);
-        JSONObject userFields = new JSONObject(userJSON);
-        JSONObject teamFields = new JSONObject(teamJSON);
-
-        mainJSON.put("credentials", credentialsFields);
-        mainJSON.put("user", userFields);
-        mainJSON.put("team", teamFields);
-        mainJSON.put("isJoinTeam", false);
-
-        String stubUid = RandomStringUtils.randomAlphanumeric(8);
-        JSONObject predefinedResultJson = new JSONObject();
-        predefinedResultJson.put("msg", "user is created");
-        predefinedResultJson.put("uid", stubUid);
-
-        mockServer.expect(requestTo(properties.getApplyProjectNewUsers()))
-                .andExpect(method(HttpMethod.POST))
-                .andRespond(withSuccess(predefinedResultJson.toString(), MediaType.APPLICATION_JSON));
-
-        mockMvc.perform(post("/registrations").contentType(MediaType.APPLICATION_JSON).content(mainJSON.toString()))
-                .andExpect(status().isOk());
     }
 
     @Test

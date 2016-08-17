@@ -1,12 +1,15 @@
 package sg.ncl.service.registration.logic;
 
+import freemarker.template.Configuration;
 import lombok.extern.slf4j.Slf4j;
 import org.json.JSONObject;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.ui.freemarker.FreeMarkerTemplateUtils;
 import sg.ncl.adapter.deterlab.AdapterDeterLab;
 import sg.ncl.adapter.deterlab.exceptions.UserNotFoundException;
+import sg.ncl.common.DomainProperties;
 import sg.ncl.service.authentication.domain.Credentials;
 import sg.ncl.service.authentication.domain.CredentialsService;
 import sg.ncl.service.authentication.web.CredentialsInfo;
@@ -37,6 +40,7 @@ import sg.ncl.service.user.domain.UserService;
 
 import javax.inject.Inject;
 import javax.validation.constraints.NotNull;
+import java.io.File;
 import java.time.ZonedDateTime;
 import java.util.HashMap;
 import java.util.List;
@@ -53,10 +57,10 @@ public class RegistrationServiceImpl implements RegistrationService {
     private final TeamService teamService;
     private final UserService userService;
     private final RegistrationRepository registrationRepository;
-
     private final MailService mailService;
-
     private final AdapterDeterLab adapterDeterLab;
+    private DomainProperties domainProperties;
+    private Configuration freemarkerConfiguration;
 
     @Inject
     RegistrationServiceImpl(
@@ -65,7 +69,9 @@ public class RegistrationServiceImpl implements RegistrationService {
             @NotNull final UserService userService,
             @NotNull final RegistrationRepository registrationRepository,
             @NotNull final AdapterDeterLab adapterDeterLab,
-            @NotNull final MailService mailService
+            @NotNull final MailService mailService,
+            @NotNull final DomainProperties domainProperties,
+            @NotNull final Configuration freemarkerConfiguration
     ) {
         this.credentialsService = credentialsService;
         this.teamService = teamService;
@@ -73,6 +79,9 @@ public class RegistrationServiceImpl implements RegistrationService {
         this.registrationRepository = registrationRepository;
         this.adapterDeterLab = adapterDeterLab;
         this.mailService = mailService;
+        this.domainProperties = domainProperties;
+        this.freemarkerConfiguration = freemarkerConfiguration;
+
     }
 
     @Transactional
@@ -524,9 +533,26 @@ public class RegistrationServiceImpl implements RegistrationService {
     }
 
     private void sendVerificationEmail(User user) {
-        String userFullname = user.getUserDetails().getFirstName() + " " +
-                user.getUserDetails().getLastName();
+        Map<String, String> tempMap = new HashMap<>();
+        tempMap.put("firstname", user.getUserDetails().getFirstName());
+        tempMap.put("domain", domainProperties.getDomain());
+        tempMap.put("uid", user.getId());
+        tempMap.put("email", user.getUserDetails().getEmail());
+        tempMap.put("key", user.getVerificationKey());
 
+        String msgText = null;
+        try {
+            freemarkerConfiguration.setDirectoryForTemplateLoading(new File("service-registration/src/main/resources"));
+            msgText = FreeMarkerTemplateUtils.processTemplateIntoString(
+                    freemarkerConfiguration.getTemplate("verificationEmailTemplate.ftl"), tempMap);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        if( msgText != null) {
+            mailService.send("testbed-ops@ncl.sg", user.getUserDetails().getEmail(),
+                    "Please Verify Your Email Account", msgText);
+        }
     }
 
 }

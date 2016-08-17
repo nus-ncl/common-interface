@@ -3,7 +3,6 @@ version '1.0-SNAPSHOT'
 dependencies {
     compile project(':common')
     compile 'org.springframework.boot:spring-boot-starter-mail'
-    compile 'org.springframework.boot:spring-boot-starter-freemarker'
 
     testCompile project(':common-test')
 }
