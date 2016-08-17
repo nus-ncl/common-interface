@@ -36,6 +36,7 @@ ncl:
     adapter:
       ip: test.ncl.sg
       port: 8080
+  domain: dev.ncl.sg
 deterurl:
   bossurl: 172.18.178.10
   userurl: 172.18.178.11
