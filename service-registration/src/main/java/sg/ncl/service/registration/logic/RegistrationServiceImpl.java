@@ -1,6 +1,8 @@
 package sg.ncl.service.registration.logic;
 
 import freemarker.template.Configuration;
+import freemarker.template.TemplateException;
+import freemarker.template.TemplateNotFoundException;
 import lombok.extern.slf4j.Slf4j;
 import org.json.JSONObject;
 import org.springframework.stereotype.Service;
@@ -39,7 +41,7 @@ import sg.ncl.service.user.domain.UserService;
 
 import javax.inject.Inject;
 import javax.validation.constraints.NotNull;
-import java.io.File;
+import java.io.IOException;
 import java.time.ZonedDateTime;
 import java.util.HashMap;
 import java.util.List;
@@ -52,7 +54,6 @@ import java.util.Map;
 @Slf4j
 public class RegistrationServiceImpl implements RegistrationService {
 
-    private static final String TEMPLATELOADERPATH = "service-registration/src/main/resources";
     private static final String VERIFICATIONEMAILTEMPLATENAME = "verificationEmailTemplate.ftl";
 
     private final CredentialsService credentialsService;
@@ -63,6 +64,7 @@ public class RegistrationServiceImpl implements RegistrationService {
     private final AdapterDeterLab adapterDeterLab;
     private DomainProperties domainProperties;
     private Configuration freemarkerConfiguration;
+
 
     @Inject
     RegistrationServiceImpl(
@@ -531,24 +533,31 @@ public class RegistrationServiceImpl implements RegistrationService {
         Map<String, String> tempMap = new HashMap<>();
         tempMap.put("firstname", user.getUserDetails().getFirstName());
         tempMap.put("domain", domainProperties.getDomain());
-        tempMap.put("uid", user.getId());
+        tempMap.put("id", user.getId());
         tempMap.put("email", user.getUserDetails().getEmail());
         tempMap.put("key", user.getVerificationKey());
 
-        String msgText = null;
+        /**
+         * If sending email fails, we catch the exceptions and log them,
+         * rather than throw the exceptions. Hence, the email will not cause
+         * the main application to fail. If users cannot receive emails after
+         * a certain amount of time, they should send email to support@ncl.sg
+         *
+         * TODO long term need to have a retry mechanism for sending emails
+         */
         try {
-            freemarkerConfiguration.setDirectoryForTemplateLoading(new File(TEMPLATELOADERPATH));
-            msgText = FreeMarkerTemplateUtils.processTemplateIntoString(
+            String msgText = FreeMarkerTemplateUtils.processTemplateIntoString(
                     freemarkerConfiguration.getTemplate(VERIFICATIONEMAILTEMPLATENAME), tempMap);
-        } catch (Exception e) {
-            log.warn("Cannot get email template {} from directory {}", TEMPLATELOADERPATH,
-                    VERIFICATIONEMAILTEMPLATENAME);
-        }
-
-        if( msgText != null) {
             mailService.send("testbed-ops@ncl.sg", user.getUserDetails().getEmail(),
                     "Please Verify Your Email Account", msgText);
+        } catch (TemplateNotFoundException e) {
+            log.warn("Template {} not found", VERIFICATIONEMAILTEMPLATENAME);
+        } catch (IOException e) {
+            log.warn("Template {} cannot be read", VERIFICATIONEMAILTEMPLATENAME);
+        } catch (TemplateException e) {
+            log.warn("Rending template {} failed", VERIFICATIONEMAILTEMPLATENAME);
         }
+
     }
 
 }

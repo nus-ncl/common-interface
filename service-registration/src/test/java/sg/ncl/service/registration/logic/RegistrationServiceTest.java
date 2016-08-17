@@ -52,6 +52,7 @@ import sg.ncl.service.user.exceptions.UserNotFoundException;
 import javax.inject.Inject;
 import java.time.ZonedDateTime;
 import java.util.List;
+import java.util.Map;
 
 import static org.hamcrest.core.Is.is;
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.method;
@@ -99,7 +100,7 @@ public class RegistrationServiceTest extends AbstractTest {
 
     @Mock
     private DomainProperties domainProperties;
-    @Mock
+    @Autowired
     private Configuration freemarkerConfiguration;
 
     @Before
@@ -128,8 +129,6 @@ public class RegistrationServiceTest extends AbstractTest {
                 .andExpect(method(HttpMethod.POST))
                 .andRespond(withSuccess(predefinedResultJson.toString(), MediaType.APPLICATION_JSON));
 
-        //Mockito.doNothing().when(mailService).send(Mockito.anyString(), Mockito.anyString(), Mockito.anyString(), Mockito.anyString());
-
         registrationService.register(credentialsEntity, user, team, isJoinTeam);
     }
 
@@ -150,8 +149,6 @@ public class RegistrationServiceTest extends AbstractTest {
         mockServer.expect(requestTo(properties.getApplyProjectNewUsers()))
                 .andExpect(method(HttpMethod.POST))
                 .andRespond(withSuccess(predefinedResultJson.toString(), MediaType.APPLICATION_JSON));
-
-        //Mockito.doNothing().when(mailService).send(Mockito.anyString(), Mockito.anyString(), Mockito.anyString(), Mockito.anyString());
 
         registrationService.register(credentialsEntity, user, teamEntity, isJoinTeam);
     }

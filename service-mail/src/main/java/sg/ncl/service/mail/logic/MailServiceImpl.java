@@ -49,7 +49,6 @@ public class MailServiceImpl implements MailService {
             log.info("Email sent: {}", msg);
         } catch (MailException e) {
             log.warn("{}: msg = {}", e, msg);
-            throw e;
         }
     }
 }
