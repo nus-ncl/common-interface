@@ -3,7 +3,6 @@ package sg.ncl.service.registration.logic;
 import freemarker.template.Configuration;
 import lombok.extern.slf4j.Slf4j;
 import org.json.JSONObject;
-import org.springframework.mail.SimpleMailMessage;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.ui.freemarker.FreeMarkerTemplateUtils;
@@ -52,6 +51,9 @@ import java.util.Map;
 @Service
 @Slf4j
 public class RegistrationServiceImpl implements RegistrationService {
+
+    private static final String templateLoaderPath = "service-registration/src/main/resources";
+    private static final String verificationEmailTemplateName = "verificationEmailTemplate.ftl";
 
     private final CredentialsService credentialsService;
     private final TeamService teamService;
@@ -542,11 +544,12 @@ public class RegistrationServiceImpl implements RegistrationService {
 
         String msgText = null;
         try {
-            freemarkerConfiguration.setDirectoryForTemplateLoading(new File("service-registration/src/main/resources"));
+            freemarkerConfiguration.setDirectoryForTemplateLoading(new File(templateLoaderPath));
             msgText = FreeMarkerTemplateUtils.processTemplateIntoString(
-                    freemarkerConfiguration.getTemplate("verificationEmailTemplate.ftl"), tempMap);
+                    freemarkerConfiguration.getTemplate(verificationEmailTemplateName), tempMap);
         } catch (Exception e) {
-            e.printStackTrace();
+            log.warn("Cannot get email template {} from directory {}", templateLoaderPath,
+                    verificationEmailTemplateName);
         }
 
         if( msgText != null) {
