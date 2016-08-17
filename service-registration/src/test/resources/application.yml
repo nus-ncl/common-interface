@@ -33,3 +33,4 @@ ncl:
     adapter:
       ip: localhost
       port: 8181
+  domain: dev.ncl.sg

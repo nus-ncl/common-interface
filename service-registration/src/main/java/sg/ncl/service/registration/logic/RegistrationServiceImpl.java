@@ -235,8 +235,8 @@ public class RegistrationServiceImpl implements RegistrationService {
         }
 
         // accept user data from form
-        user = userService.createUser(user);
-        String userId = user.getId();
+        User createdUser = userService.createUser(user);
+        String userId = createdUser.getId();
 
         // create the credentials after creating the users
         final CredentialsInfo credentialsInfo = new CredentialsInfo(userId, credentials.getUsername(), credentials.getPassword(), null);
@@ -306,7 +306,7 @@ public class RegistrationServiceImpl implements RegistrationService {
             addNclUserIdMapping(resultJSON, userId);
 
             // send verification email
-            sendVerificationEmail(user);
+            sendVerificationEmail(createdUser);
 
             return one;
         } else {

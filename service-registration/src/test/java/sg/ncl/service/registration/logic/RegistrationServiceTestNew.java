@@ -1,6 +1,8 @@
 package sg.ncl.service.registration.logic;
 
 import freemarker.template.Configuration;
+import org.apache.commons.lang3.RandomStringUtils;
+import org.json.JSONObject;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -8,6 +10,7 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
+import org.springframework.beans.factory.annotation.Autowired;
 import sg.ncl.adapter.deterlab.AdapterDeterLab;
 import sg.ncl.adapter.deterlab.ConnectionProperties;
 import sg.ncl.adapter.deterlab.data.jpa.DeterLabUserRepository;
@@ -17,13 +20,22 @@ import sg.ncl.service.authentication.domain.CredentialsService;
 import sg.ncl.service.mail.domain.MailService;
 import sg.ncl.service.registration.AbstractTest;
 import sg.ncl.service.registration.Util;
+import sg.ncl.service.registration.data.jpa.RegistrationEntity;
 import sg.ncl.service.registration.data.jpa.RegistrationRepository;
+import sg.ncl.service.registration.domain.Registration;
 import sg.ncl.service.registration.domain.RegistrationService;
 import sg.ncl.service.registration.exceptions.RegisterTeamNameDuplicateException;
 import sg.ncl.service.team.data.jpa.TeamEntity;
+import sg.ncl.service.team.domain.Team;
 import sg.ncl.service.team.domain.TeamService;
+import sg.ncl.service.user.data.jpa.UserEntity;
 import sg.ncl.service.user.domain.User;
 import sg.ncl.service.user.domain.UserService;
+
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.is;
+import static org.junit.Assert.assertThat;
+
 
 public class RegistrationServiceTestNew extends AbstractTest {
 
@@ -56,9 +68,9 @@ public class RegistrationServiceTestNew extends AbstractTest {
 
     private RegistrationService registrationService;
 
-    @Mock
+    @Autowired
     private DomainProperties domainProperties;
-    @Mock
+    @Autowired
     private Configuration freemarkerConfiguration;
 
     private boolean isJoinTeam = true;
@@ -69,6 +81,32 @@ public class RegistrationServiceTestNew extends AbstractTest {
                teamService, userService, registrationRepository, adapterDeterLab, mailService,
                domainProperties, freemarkerConfiguration);
     }
+
+    @Test
+    public void registerTest() {
+        CredentialsEntity credentialsEntity = Util.getCredentialsEntity();
+        UserEntity user = Util.getUserEntity();
+        UserEntity userWithId = user;
+        userWithId.setId("12345678");
+        Team team = Util.getTeamEntity();
+        RegistrationEntity registrationEntity = Util.getRegistrationEntity();
+        registrationEntity.setId(Long.parseLong("1234567890"));
+
+        String stubUid = RandomStringUtils.randomAlphanumeric(8);
+        JSONObject predefinedResultJson = new JSONObject();
+        predefinedResultJson.put("msg", "user is created");
+        predefinedResultJson.put("uid", stubUid);
+
+        Mockito.doReturn(team).when(teamService).getTeamById(team.getId());
+        Mockito.doReturn(userWithId).when(userService).createUser(Mockito.any(User.class));
+        Mockito.doReturn(predefinedResultJson.toString()).when(adapterDeterLab).joinProjectNewUsers(Mockito.anyString());
+        Mockito.doReturn(registrationEntity).when(registrationRepository).save(Mockito.any(RegistrationEntity.class));
+
+        Registration result = registrationService.register(credentialsEntity, user, team, isJoinTeam);
+
+        assertThat(result.getId(), is(equalTo(registrationEntity.getId())));
+    }
+
 
     @Test(expected = RegisterTeamNameDuplicateException.class)
     public void registerTestApplyDuplicateTeamName() throws Exception {

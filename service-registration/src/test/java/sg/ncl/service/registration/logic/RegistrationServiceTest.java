@@ -8,7 +8,6 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -52,7 +51,6 @@ import sg.ncl.service.user.exceptions.UserNotFoundException;
 import javax.inject.Inject;
 import java.time.ZonedDateTime;
 import java.util.List;
-import java.util.Map;
 
 import static org.hamcrest.core.Is.is;
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.method;
@@ -109,27 +107,6 @@ public class RegistrationServiceTest extends AbstractTest {
         registrationService = new RegistrationServiceImpl(credentialsService,
                 teamService, userService, registrationRepository, adapterDeterLab, mailService,
                 domainProperties, freemarkerConfiguration);
-    }
-
-    @Test
-    public void registerTest() {
-        CredentialsEntity credentialsEntity = Util.getCredentialsEntity();
-        User user = Util.getUserEntity();
-
-        // apply to join team but since no teams exists yet
-        // create stub team
-        Team team = teamService.createTeam(Util.getTeamEntity());
-
-        String stubUid = RandomStringUtils.randomAlphanumeric(8);
-        JSONObject predefinedResultJson = new JSONObject();
-        predefinedResultJson.put("msg", "user is created");
-        predefinedResultJson.put("uid", stubUid);
-
-        mockServer.expect(requestTo(properties.getJoinProjectNewUsers()))
-                .andExpect(method(HttpMethod.POST))
-                .andRespond(withSuccess(predefinedResultJson.toString(), MediaType.APPLICATION_JSON));
-
-        registrationService.register(credentialsEntity, user, team, isJoinTeam);
     }
 
     @Test

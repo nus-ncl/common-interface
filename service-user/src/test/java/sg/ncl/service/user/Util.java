@@ -15,6 +15,7 @@ public class Util {
     public static UserEntity getUserEntity() throws Exception {
         final UserEntity userEntity = new UserEntity();
         userEntity.setApplicationDate(ZonedDateTime.now());
+        userEntity.setVerificationKey(RandomStringUtils.randomAlphanumeric(20));
 
         final UserDetailsEntity userDetailsEntity = new UserDetailsEntity();
         userDetailsEntity.setFirstName(RandomStringUtils.randomAlphabetic(20));
