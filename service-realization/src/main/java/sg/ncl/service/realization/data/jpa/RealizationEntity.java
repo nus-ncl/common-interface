@@ -42,7 +42,6 @@ public class RealizationEntity extends AbstractEntity implements Realization {
 
     @Column(name = "state", nullable = false)
     @Enumerated(EnumType.STRING)
-    private RealizationState state = RealizationState.NEW;
 
     @Column(name = "idle_minutes", nullable = false)
     private Long idleMinutes;
