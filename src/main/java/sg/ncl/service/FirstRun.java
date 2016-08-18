@@ -257,11 +257,6 @@ public class FirstRun {
     public void initialize() throws SQLException, ClassNotFoundException {
         log.info("Initializing first initialize");
         try (final Connection connection = getConnection()) {
-            boolean reset = true;
-            if (reset) {
-                wipeData(connection);
-            }
-
             final String teamId = createTeam("NCL", "NCL Administrative Team", "Academic", "https://www.ncl.sg", TeamPrivacy.OPEN, TeamStatus.APPROVED, TeamVisibility.PUBLIC, connection);
 
             final int addressId = createAddress("Address1", "", "City", "Country", "Region", "123456", connection);
