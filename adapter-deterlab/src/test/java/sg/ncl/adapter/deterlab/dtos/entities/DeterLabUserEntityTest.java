@@ -5,7 +5,9 @@ import org.junit.Test;
 
 import java.util.Random;
 
-import static org.hamcrest.Matchers.*;
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.nullValue;
 import static org.junit.Assert.assertThat;
 
 /**
@@ -23,7 +25,7 @@ public class DeterLabUserEntityTest {
     @Test
     public void testSetId() throws Exception {
         final DeterLabUserEntity deterLabUserEntity = new DeterLabUserEntity();
-        final String one = RandomStringUtils.randomAlphabetic(20);
+        final Long one = new Random().nextLong();
         deterLabUserEntity.setId(one);
 
         assertThat(deterLabUserEntity.getId(), is(equalTo(one)));
