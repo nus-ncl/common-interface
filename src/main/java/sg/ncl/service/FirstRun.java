@@ -85,8 +85,10 @@ public class FirstRun {
                 "user_details",
                 "addresses"
         };
-        for (String s : tables) {
-            try (final PreparedStatement statement = connection.prepareStatement("DELETE FROM " + s)) {
+        for (String table : tables) {
+            try (final PreparedStatement statement = connection.prepareStatement("DELETE FROM ?")) {
+                statement.setString(1, table);
+
                 log.info("{}", statement);
                 statement.execute();
             }
