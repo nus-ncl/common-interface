@@ -109,27 +109,6 @@ public class RegistrationServiceTest extends AbstractTest {
                 domainProperties, freemarkerConfiguration);
     }
 
-    @Test
-    public void registerTestApplyNewProject() {
-        CredentialsEntity credentialsEntity = Util.getCredentialsEntity();
-        User user = Util.getUserEntity();
-
-        // apply to join team but since no teams exists yet
-        // create stub team
-        TeamEntity teamEntity = Util.getTeamEntity();
-        isJoinTeam = false;
-        String stubUid = RandomStringUtils.randomAlphanumeric(8);
-        JSONObject predefinedResultJson = new JSONObject();
-        predefinedResultJson.put("msg", "user is created");
-        predefinedResultJson.put("uid", stubUid);
-
-        mockServer.expect(requestTo(properties.getApplyProjectNewUsers()))
-                .andExpect(method(HttpMethod.POST))
-                .andRespond(withSuccess(predefinedResultJson.toString(), MediaType.APPLICATION_JSON));
-
-        registrationService.register(credentialsEntity, user, teamEntity, isJoinTeam);
-    }
-
     @Test(expected = RegisterTeamNameDuplicateException.class)
     public void registerTestApplyDuplicateTeamName() throws Exception {
         CredentialsEntity credentialsEntity = Util.getCredentialsEntity();

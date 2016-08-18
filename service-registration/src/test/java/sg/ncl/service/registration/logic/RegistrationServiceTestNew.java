@@ -41,38 +41,27 @@ public class RegistrationServiceTestNew extends AbstractTest {
 
     @Rule
     public MockitoRule mockito = MockitoJUnit.rule();
-
     @Mock
     private UserService userService;
-
     @Mock
     private TeamService teamService;
-
     @Mock
     private CredentialsService credentialsService;
-
     @Mock
     private RegistrationRepository registrationRepository;
-
     @Mock
     private AdapterDeterLab adapterDeterLab;
-
     @Mock
     private MailService mailService;
-
     @Mock
     DeterLabUserRepository deterLabUserRepository;
-
     @Mock
     ConnectionProperties connectionProperties;
-
     private RegistrationService registrationService;
-
     @Autowired
     private DomainProperties domainProperties;
     @Autowired
     private Configuration freemarkerConfiguration;
-
     private boolean isJoinTeam = true;
 
     @Before
@@ -107,6 +96,29 @@ public class RegistrationServiceTestNew extends AbstractTest {
         assertThat(result.getId(), is(equalTo(registrationEntity.getId())));
     }
 
+    @Test
+    public void registerTestApplyNewProject() {
+        CredentialsEntity credentialsEntity = Util.getCredentialsEntity();
+        UserEntity userEntity = Util.getUserEntity();
+        userEntity.setId("12345678");
+        TeamEntity teamEntity = Util.getTeamEntity();
+        RegistrationEntity registrationEntity = Util.getRegistrationEntity();
+        registrationEntity.setId(Long.parseLong("1234567890"));
+        isJoinTeam = false;
+
+        String stubUid = RandomStringUtils.randomAlphanumeric(8);
+        JSONObject predefinedResultJson = new JSONObject();
+        predefinedResultJson.put("msg", "user is created");
+        predefinedResultJson.put("uid", stubUid);
+
+        Mockito.doReturn(teamEntity).when(teamService).createTeam(Mockito.any(Team.class));
+        Mockito.doReturn(userEntity).when(userService).createUser(Mockito.any(User.class));
+        Mockito.doReturn(predefinedResultJson.toString()).when(adapterDeterLab).applyProjectNewUsers(Mockito.anyString());
+        Mockito.doReturn(registrationEntity).when(registrationRepository).save(Mockito.any(RegistrationEntity.class));
+
+        Registration result = registrationService.register(credentialsEntity, userEntity, teamEntity, isJoinTeam);
+        assertThat(result.getId(), is(equalTo(registrationEntity.getId())));
+    }
 
     @Test(expected = RegisterTeamNameDuplicateException.class)
     public void registerTestApplyDuplicateTeamName() throws Exception {
