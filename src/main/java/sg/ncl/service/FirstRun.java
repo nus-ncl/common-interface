@@ -1,7 +1,10 @@
 package sg.ncl.service;
 
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.boot.autoconfigure.jdbc.DataSourceProperties;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.stereotype.Component;
 import sg.ncl.service.authentication.domain.CredentialsStatus;
 import sg.ncl.service.team.domain.MemberStatus;
 import sg.ncl.service.team.domain.MemberType;
@@ -10,6 +13,7 @@ import sg.ncl.service.team.domain.TeamStatus;
 import sg.ncl.service.team.domain.TeamVisibility;
 import sg.ncl.service.user.domain.UserStatus;
 
+import javax.inject.Inject;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
@@ -22,7 +26,16 @@ import static java.util.UUID.randomUUID;
 /**
  * @author Te Ye
  */
-public class Seeder {
+@Component
+@Slf4j
+public class FirstRun {
+
+    private final DataSourceProperties properties;
+
+    @Inject
+    FirstRun(DataSourceProperties properties) {
+        this.properties = properties;
+    }
 
     private static final String DB_DRIVER = "com.mysql.jdbc.Driver"; // "org.h2.Driver"
     private static final String DB_CONNECTION = "jdbc:mysql://ubuntu.mshome.net:3306/test"; // "jdbc:h2:~/test"
@@ -56,29 +69,6 @@ public class Seeder {
             + "(created_date, last_modified_date, version, joined_date, member_type, user_id, team_id, status) VALUES"
             + "(?, ?, ?, ?, ?, ?, ?, ?)";
 
-    public static void main(String[] args) throws ClassNotFoundException, SQLException {
-        try (final Connection connection = getConnection()) {
-            boolean reset = true;
-            if (reset) {
-                wipeData(connection);
-            }
-
-            final String teamId = createTeam("NCL", "NCL Administrative Team", "Academic", "https://www.ncl.sg", TeamPrivacy.OPEN, TeamStatus.APPROVED, TeamVisibility.PUBLIC, connection);
-
-            final int addressId = createAddress("Address1", "", "City", "Country", "Region", "123456", connection);
-
-            final int detailsId = createDetails("First Name", "admin@ncl.sg", addressId, connection, "Institution", "NCL", "https://www.ncl.sg", "Job Title", "Last Name", "12345678");
-
-            final String userId = createUser("Y", UserStatus.APPROVED, detailsId, connection);
-
-            createCredentials("admin@ncl.sg", "ncl", userId, CredentialsStatus.ACTIVE, connection);
-
-            addToTeam(userId, teamId, MemberType.OWNER, MemberStatus.APPROVED, connection);
-
-            createDeterLabUser("ncl", userId, connection);
-        }
-    }
-
     private static Connection getConnection() throws ClassNotFoundException, SQLException {
         Class.forName(DB_DRIVER);
         return DriverManager.getConnection(DB_CONNECTION, DB_USER, DB_PASSWORD);
@@ -103,7 +93,7 @@ public class Seeder {
         };
         for (String s : tables) {
             try (final PreparedStatement statement = connection.prepareStatement("DELETE FROM " + s)) {
-                System.out.println("Executing: " + statement);
+                log.info("{}", statement);
                 statement.execute();
             }
         }
@@ -126,7 +116,7 @@ public class Seeder {
             statement.setString(11, visibility.name());
             statement.setString(12, url);
 
-            System.out.println("Executing: " + statement);
+            log.info("{}", statement);
             statement.execute();
 
             return id;
@@ -146,7 +136,7 @@ public class Seeder {
             statement.setString(8, region);
             statement.setString(9, zip);
 
-            System.out.println("Executing: " + statement);
+            log.info("{}", statement);
             statement.execute();
 
             final ResultSet result = statement.getGeneratedKeys();
@@ -171,7 +161,7 @@ public class Seeder {
             statement.setString(11, phone);
             statement.setInt(12, addressId);
 
-            System.out.println("Executing: " + statement);
+            log.info("{}", statement);
             statement.execute();
 
             final ResultSet result = statement.getGeneratedKeys();
@@ -193,6 +183,7 @@ public class Seeder {
             statement.setString(7, userStatus.name());
             statement.setInt(8, detailsId);
 
+            log.info("{}", statement);
             statement.execute();
 
             return id;
@@ -210,6 +201,7 @@ public class Seeder {
             statement.setString(6, status.name());
             statement.setString(7, username);
 
+            log.info("{}", statement);
             statement.execute();
         }
     }
@@ -222,7 +214,7 @@ public class Seeder {
             statement.setString(1, userId);
             statement.setObject(2, teamId);
 
-            System.out.println("Executing: " + statement);
+            log.info("{}", statement);
             statement.execute();
         }
 
@@ -237,7 +229,7 @@ public class Seeder {
             statement.setString(7, teamId);
             statement.setString(8, memberStatus.name());
 
-            System.out.println("Executing: " + statement);
+            log.info("{}", statement);
             statement.execute();
         }
     }
@@ -251,9 +243,38 @@ public class Seeder {
             statement.setString(4, name);
             statement.setString(5, userId);
 
-            System.out.println("Executing: " + statement);
+            log.info("{}", statement);
             statement.execute();
         }
     }
 
+    public void wipe() throws SQLException, ClassNotFoundException {
+        try (final Connection connection = getConnection()) {
+            wipeData(connection);
+        }
+    }
+
+    public void initialize() throws SQLException, ClassNotFoundException {
+        log.info("Initializing first initialize");
+        try (final Connection connection = getConnection()) {
+            boolean reset = true;
+            if (reset) {
+                wipeData(connection);
+            }
+
+            final String teamId = createTeam("NCL", "NCL Administrative Team", "Academic", "https://www.ncl.sg", TeamPrivacy.OPEN, TeamStatus.APPROVED, TeamVisibility.PUBLIC, connection);
+
+            final int addressId = createAddress("Address1", "", "City", "Country", "Region", "123456", connection);
+
+            final int detailsId = createDetails("First Name", "admin@ncl.sg", addressId, connection, "Institution", "NCL", "https://www.ncl.sg", "Job Title", "Last Name", "12345678");
+
+            final String userId = createUser("Y", UserStatus.APPROVED, detailsId, connection);
+
+            createCredentials("admin@ncl.sg", "ncl", userId, CredentialsStatus.ACTIVE, connection);
+
+            addToTeam(userId, teamId, MemberType.OWNER, MemberStatus.APPROVED, connection);
+
+            createDeterLabUser("ncl", userId, connection);
+        }
+    }
 }
