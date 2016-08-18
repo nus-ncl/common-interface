@@ -30,6 +30,31 @@ import static java.util.UUID.randomUUID;
 @Slf4j
 public class FirstRun {
 
+    private static final String SQL_INSERT_TEAMS = "INSERT INTO teams"
+            + "(id, created_date, last_modified_date, version, application_date, description, name, organisation_type, privacy, status, visibility, website) VALUES"
+            + "(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+    private static final String SQL_INSERT_ADDRESS = "INSERT INTO addresses"
+            + "(created_date, last_modified_date, version, address_1, address_2, city, country, region, zip_code) VALUES"
+            + "(?, ?, ?, ?, ?, ?, ?, ?, ?)";
+    private static final String SQL_INSERT_USERS_DETAILS = "INSERT INTO user_details"
+            + "(created_date, last_modified_date, version, email, first_name, institution, institution_abbreviation, institution_web, job_title, last_name, phone, address_id) VALUES"
+            + "(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+    private static final String SQL_INSERT_USERS = "INSERT INTO users"
+            + "(id, created_date, last_modified_date, version, application_date, is_email_verified, status, user_details_id) VALUES"
+            + "(?, ?, ?, ?, ?, ?, ?, ?)";
+    private static final String SQL_INSERT_CREDENTIALS = "INSERT INTO credentials"
+            + "(id, created_date, last_modified_date, version, password, status, username) VALUES"
+            + "(?, ?, ?, ?, ?, ?, ?)";
+    private static final String SQL_INSERT_DETERLAB_USER = "INSERT INTO deterlab_user"
+            + "(created_date, last_modified_date, version, deter_user_id, ncl_user_id) VALUES"
+            + "(?, ?, ?, ?, ?)";
+    private static final String SQL_INSERT_USERS_TEAMS = "INSERT INTO users_teams"
+            + "(user_id, team_id) VALUES"
+            + "(?, ?)";
+    private static final String SQL_INSERT_TEAM_MEMBERS = "INSERT INTO team_members"
+            + "(created_date, last_modified_date, version, joined_date, member_type, user_id, team_id, status) VALUES"
+            + "(?, ?, ?, ?, ?, ?, ?, ?)";
+
     private final DataSourceProperties properties;
     private final PasswordEncoder passwordEncoder;
 
@@ -39,30 +64,6 @@ public class FirstRun {
         this.passwordEncoder = passwordEncoder;
     }
 
-    private static final String SQL_INSERT_TEAMS = "INSERT INTO teams"
-            + "(id, created_date, last_modified_date, version, application_date, description, name, organisation_type, privacy, status, visibility, website) VALUES"
-            + "(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
-    private static final String SQL_INSERT_ADDRESS = "INSERT INTO addresses"
-            + "(created_date, last_modified_date, version, address_1, address_2, city, country, region, zip_code) VALUES"
-            + "(?, ?, ?, ?, ?, ?, ?, ?, ?)";
-    public static final String SQL_INSERT_USERS_DETAILS = "INSERT INTO user_details"
-            + "(created_date, last_modified_date, version, email, first_name, institution, institution_abbreviation, institution_web, job_title, last_name, phone, address_id) VALUES"
-            + "(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
-    public static final String SQL_INSERT_USERS = "INSERT INTO users"
-            + "(id, created_date, last_modified_date, version, application_date, is_email_verified, status, user_details_id) VALUES"
-            + "(?, ?, ?, ?, ?, ?, ?, ?)";
-    public static final String SQL_INSERT_CREDENTIALS = "INSERT INTO credentials"
-            + "(id, created_date, last_modified_date, version, password, status, username) VALUES"
-            + "(?, ?, ?, ?, ?, ?, ?)";
-    public static final String SQL_INSERT_DETERLAB_USER = "INSERT INTO deterlab_user"
-            + "(created_date, last_modified_date, version, deter_user_id, ncl_user_id) VALUES"
-            + "(?, ?, ?, ?, ?)";
-    public static final String SQL_INSERT_USERS_TEAMS = "INSERT INTO users_teams"
-            + "(user_id, team_id) VALUES"
-            + "(?, ?)";
-    public static final String SQL_INSERT_TEAM_MEMBERS = "INSERT INTO team_members"
-            + "(created_date, last_modified_date, version, joined_date, member_type, user_id, team_id, status) VALUES"
-            + "(?, ?, ?, ?, ?, ?, ?, ?)";
 
     private Connection getConnection() throws SQLException {
         return DriverManager.getConnection(properties.getUrl(), properties.getUsername(), properties.getPassword());
