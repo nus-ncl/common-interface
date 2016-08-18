@@ -2,7 +2,6 @@ package sg.ncl.service;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceProperties;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 import sg.ncl.service.authentication.domain.CredentialsStatus;
@@ -14,6 +13,7 @@ import sg.ncl.service.team.domain.TeamVisibility;
 import sg.ncl.service.user.domain.UserStatus;
 
 import javax.inject.Inject;
+import javax.validation.constraints.NotNull;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
@@ -31,18 +31,13 @@ import static java.util.UUID.randomUUID;
 public class FirstRun {
 
     private final DataSourceProperties properties;
+    private final PasswordEncoder passwordEncoder;
 
     @Inject
-    FirstRun(DataSourceProperties properties) {
+    FirstRun(@NotNull final DataSourceProperties properties, @NotNull final PasswordEncoder passwordEncoder) {
         this.properties = properties;
+        this.passwordEncoder = passwordEncoder;
     }
-
-    private static final String DB_DRIVER = "com.mysql.jdbc.Driver"; // "org.h2.Driver"
-    private static final String DB_CONNECTION = "jdbc:mysql://ubuntu.mshome.net:3306/test"; // "jdbc:h2:~/test"
-    private static final String DB_USER = "root"; // use username: sa, password = "" if H2 database
-    private static final String DB_PASSWORD = "root";
-
-    private static final PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
 
     private static final String SQL_INSERT_TEAMS = "INSERT INTO teams"
             + "(id, created_date, last_modified_date, version, application_date, description, name, organisation_type, privacy, status, visibility, website) VALUES"
@@ -69,13 +64,11 @@ public class FirstRun {
             + "(created_date, last_modified_date, version, joined_date, member_type, user_id, team_id, status) VALUES"
             + "(?, ?, ?, ?, ?, ?, ?, ?)";
 
-    private static Connection getConnection() throws ClassNotFoundException, SQLException {
-        Class.forName(DB_DRIVER);
-        return DriverManager.getConnection(DB_CONNECTION, DB_USER, DB_PASSWORD);
+    private Connection getConnection() throws SQLException {
+        return DriverManager.getConnection(properties.getUrl(), properties.getUsername(), properties.getPassword());
     }
 
-
-    private static void wipeData(final Connection connection) throws SQLException {
+    private void wipeData(final Connection connection) throws SQLException {
         final String[] tables = {
                 "credentials",
                 "deterlab_project",
@@ -99,7 +92,7 @@ public class FirstRun {
         }
     }
 
-    private static String createTeam(String teamName, String description, String organizationType, String url, final TeamPrivacy privacy, final TeamStatus status, final TeamVisibility visibility, final Connection connection) throws SQLException {
+    private String createTeam(String teamName, String description, String organizationType, String url, final TeamPrivacy privacy, final TeamStatus status, final TeamVisibility visibility, final Connection connection) throws SQLException {
         try (final PreparedStatement statement = connection.prepareStatement(SQL_INSERT_TEAMS)) {
             // insert the team
             final String id = randomUUID().toString();
@@ -145,7 +138,7 @@ public class FirstRun {
         }
     }
 
-    private static int createDetails(String firstName, String email, int addressId, Connection connection, final String institution, final String abbreviation, final String url, final String jobTitle, final String lastName, final String phone) throws SQLException {
+    private int createDetails(String firstName, String email, int addressId, Connection connection, final String institution, final String abbreviation, final String url, final String jobTitle, final String lastName, final String phone) throws SQLException {
         try (PreparedStatement statement = connection.prepareStatement(SQL_INSERT_USERS_DETAILS, new String[]{"id"})) {
             // insert the userDetails
             statement.setObject(1, ZonedDateTime.now());
@@ -170,7 +163,7 @@ public class FirstRun {
         }
     }
 
-    private static String createUser(final String isEmailVerified, final UserStatus userStatus, final int detailsId, final Connection connection) throws SQLException {
+    private String createUser(final String isEmailVerified, final UserStatus userStatus, final int detailsId, final Connection connection) throws SQLException {
         // insert the users
         try (PreparedStatement statement = connection.prepareStatement(SQL_INSERT_USERS)) {
             final String id = randomUUID().toString();
@@ -190,7 +183,7 @@ public class FirstRun {
         }
     }
 
-    private static void createCredentials(final String username, final String password, final String userId, final CredentialsStatus status, final Connection connection) throws SQLException {
+    private void createCredentials(final String username, final String password, final String userId, final CredentialsStatus status, final Connection connection) throws SQLException {
         // insert the credentials
         try (final PreparedStatement statement = connection.prepareStatement(SQL_INSERT_CREDENTIALS)) {
             statement.setString(1, userId);
@@ -208,7 +201,7 @@ public class FirstRun {
 
 
     // add user to team for both user side and team side
-    private static void addToTeam(String userId, String teamId, MemberType memberType, MemberStatus memberStatus, final Connection connection) throws SQLException, ClassNotFoundException {
+    private void addToTeam(String userId, String teamId, MemberType memberType, MemberStatus memberStatus, final Connection connection) throws SQLException {
         // insert into user side
         try (final PreparedStatement statement = connection.prepareStatement(SQL_INSERT_USERS_TEAMS)) {
             statement.setString(1, userId);
@@ -234,7 +227,7 @@ public class FirstRun {
         }
     }
 
-    private static void createDeterLabUser(final String name, final String userId, final Connection connection) throws SQLException {
+    private void createDeterLabUser(final String name, final String userId, final Connection connection) throws SQLException {
         // insert into deterlab_user
         try (final PreparedStatement statement = connection.prepareStatement(SQL_INSERT_DETERLAB_USER)) {
             statement.setObject(1, ZonedDateTime.now());
@@ -248,13 +241,13 @@ public class FirstRun {
         }
     }
 
-    public void wipe() throws SQLException, ClassNotFoundException {
+    public void wipe() throws SQLException {
         try (final Connection connection = getConnection()) {
             wipeData(connection);
         }
     }
 
-    public void initialize() throws SQLException, ClassNotFoundException {
+    public void initialize() throws SQLException {
         log.info("Initializing first initialize");
         try (final Connection connection = getConnection()) {
             final String teamId = createTeam("NCL", "NCL Administrative Team", "Academic", "https://www.ncl.sg", TeamPrivacy.OPEN, TeamStatus.APPROVED, TeamVisibility.PUBLIC, connection);
