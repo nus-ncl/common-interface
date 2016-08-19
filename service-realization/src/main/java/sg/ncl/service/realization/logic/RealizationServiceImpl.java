@@ -76,7 +76,7 @@ public class RealizationServiceImpl implements RealizationService {
         jsonObject.put("eid", experimentName);
 
         RealizationEntity realizationEntity = realizationRepository.findByExperimentName(experimentName);
-        realizationEntity.setState(RealizationState.ACTIVATING);
+        realizationEntity.setState(RealizationState.STARTING);
         realizationRepository.save(realizationEntity);
 
         String stringFromExperiment = adapterDeterLab.startExperiment(jsonObject.toString());
@@ -88,13 +88,13 @@ public class RealizationServiceImpl implements RealizationService {
 
         switch (status) {
             case "active":
-                realizationState = RealizationState.ACTIVE;
+                realizationState = RealizationState.RUNNING;
                 break;
             case "activating":
-                realizationState = RealizationState.ACTIVATING;
+                realizationState = RealizationState.STARTING;
                 break;
             default:
-                realizationState = RealizationState.STOP;
+                realizationState = RealizationState.NOT_RUNNING;
                 break;
         }
         realizationEntity.setState(realizationState);
@@ -123,7 +123,7 @@ public class RealizationServiceImpl implements RealizationService {
         adapterDeterLab.stopExperiment(jsonObject.toString());
 
         // FIXME may need to check if stopping experiments have error
-        realizationEntity.setState(RealizationState.STOP);
+        realizationEntity.setState(RealizationState.NOT_RUNNING);
         realizationEntity.setDetails("");
         return realizationRepository.save(realizationEntity);
     }
