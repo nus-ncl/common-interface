@@ -1,7 +1,9 @@
 package sg.ncl.service;
 
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.boot.autoconfigure.jdbc.DataSourceProperties;
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.support.GeneratedKeyHolder;
+import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 import sg.ncl.service.authentication.domain.CredentialsStatus;
@@ -14,10 +16,7 @@ import sg.ncl.service.user.domain.UserStatus;
 
 import javax.inject.Inject;
 import javax.validation.constraints.NotNull;
-import java.sql.Connection;
-import java.sql.DriverManager;
 import java.sql.PreparedStatement;
-import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.time.ZonedDateTime;
 
@@ -55,21 +54,109 @@ public class FirstRun {
             + "(created_date, last_modified_date, version, joined_date, member_type, user_id, team_id, status) VALUES"
             + "(?, ?, ?, ?, ?, ?, ?, ?)";
 
-    private final DataSourceProperties properties;
+    private final JdbcTemplate jdbcTemplate;
     private final PasswordEncoder passwordEncoder;
 
     @Inject
-    FirstRun(@NotNull final DataSourceProperties properties, @NotNull final PasswordEncoder passwordEncoder) {
-        this.properties = properties;
+    FirstRun(@NotNull final JdbcTemplate jdbcTemplate, @NotNull final PasswordEncoder passwordEncoder) {
+        this.jdbcTemplate = jdbcTemplate;
         this.passwordEncoder = passwordEncoder;
     }
 
 
-    private Connection getConnection() throws SQLException {
-        return DriverManager.getConnection(properties.getUrl(), properties.getUsername(), properties.getPassword());
+    private String createTeam(String teamName, String description, String organizationType, String url, final TeamPrivacy privacy, final TeamStatus status, final TeamVisibility visibility) throws SQLException {
+        // insert the team
+        final String id = randomUUID().toString();
+        final ZonedDateTime time = ZonedDateTime.now();
+        final int i = jdbcTemplate.update(SQL_INSERT_TEAMS, id, time, time, 0, time, description, teamName, organizationType, privacy.name(), status.name(), visibility.name(), url);
+        log.info("Insert {} team entry", i);
+        return id;
     }
 
-    private void wipeData(final Connection connection) throws SQLException {
+    private int createAddress(final String address1, final String address2, final String city, final String country, final String region, final String zip) throws SQLException {
+        // insert the address
+        final KeyHolder keyHolder = new GeneratedKeyHolder();
+        final int i = jdbcTemplate.update(c -> {
+            final ZonedDateTime now = ZonedDateTime.now();
+            final PreparedStatement statement = c.prepareStatement(SQL_INSERT_ADDRESS, new String[]{"id"});
+            statement.setObject(1, now);
+            statement.setObject(2, now);
+            statement.setInt(3, 0);
+            statement.setString(4, address1);
+            statement.setString(5, address2);
+            statement.setString(6, city);
+            statement.setString(7, country);
+            statement.setString(8, region);
+            statement.setString(9, zip);
+            return statement;
+        }, keyHolder);
+        final int id = keyHolder.getKey().intValue();
+        log.info("Insert {} address entry with id = {}", i, id);
+        return id;
+    }
+
+    private int createDetails(String firstName, String email, int addressId, final String institution, final String abbreviation, final String url, final String jobTitle, final String lastName, final String phone) throws SQLException {
+        // insert the userDetails
+        final KeyHolder keyHolder = new GeneratedKeyHolder();
+        final int i = jdbcTemplate.update(c -> {
+            final ZonedDateTime now = ZonedDateTime.now();
+            final PreparedStatement statement = c.prepareStatement(SQL_INSERT_USERS_DETAILS, new String[]{"id"});
+            statement.setObject(1, now);
+            statement.setObject(2, now);
+            statement.setInt(3, 0);
+            statement.setString(4, email);
+            statement.setString(5, firstName);
+            statement.setString(6, institution);
+            statement.setString(7, abbreviation);
+            statement.setString(8, url);
+            statement.setString(9, jobTitle);
+            statement.setString(10, lastName);
+            statement.setString(11, phone);
+            statement.setInt(12, addressId);
+            return statement;
+        }, keyHolder);
+        final int id = keyHolder.getKey().intValue();
+        log.info("Insert {} details entry with id = {}", i, id);
+        return id;
+    }
+
+    private String createUser(final String isEmailVerified, final UserStatus userStatus, final int detailsId) throws SQLException {
+        // insert the users
+        final String id = randomUUID().toString();
+        final ZonedDateTime now = ZonedDateTime.now();
+        final int i = jdbcTemplate.update(SQL_INSERT_USERS, id, now, now, 0, now, isEmailVerified, userStatus.name(), detailsId);
+        log.info("Insert {} user entry", i);
+        return id;
+    }
+
+    private void createCredentials(final String username, final String password, final String userId, final CredentialsStatus status) throws SQLException {
+        // insert the credentials
+        final ZonedDateTime now = ZonedDateTime.now();
+        final int i = jdbcTemplate.update(SQL_INSERT_CREDENTIALS, userId, now, now, 0, passwordEncoder.encode(password), status.name(), username);
+        log.info("Insert {} credentials entry", i);
+    }
+
+
+    // add user to team for both user side and team side
+    private void addToTeam(String userId, String teamId, MemberType memberType, MemberStatus memberStatus) throws SQLException {
+        // insert into user side
+        final int i = jdbcTemplate.update(SQL_INSERT_USERS_TEAMS, userId, teamId);
+        log.info("Insert {} user_team entry", i);
+
+        // insert into team side (team members)
+        final ZonedDateTime now = ZonedDateTime.now();
+        final int j = jdbcTemplate.update(SQL_INSERT_TEAM_MEMBERS, now, now, 0, now, memberType.name(), userId, teamId, memberStatus.name());
+        log.info("Insert {} team_member entry", i);
+    }
+
+    private void createDeterLabUser(final String name, final String userId) throws SQLException {
+        // insert into deterlab_user
+        final ZonedDateTime now = ZonedDateTime.now();
+        final int i = jdbcTemplate.update(SQL_INSERT_DETERLAB_USER, now, now, 0, name, userId);
+        log.info("Insert {} deter user entry", i);
+    }
+
+    public void wipe() throws SQLException {
         final String[] tables = {
                 "credentials",
                 "deterlab_project",
@@ -87,184 +174,25 @@ public class FirstRun {
         };
         for (String table : tables) {
             final String sql = "DELETE FROM " + table;
-            try (final PreparedStatement statement = connection.prepareStatement(sql)) {
-                log.info("{}", statement);
-                statement.execute();
-            }
-        }
-    }
-
-    private String createTeam(String teamName, String description, String organizationType, String url, final TeamPrivacy privacy, final TeamStatus status, final TeamVisibility visibility, final Connection connection) throws SQLException {
-        try (final PreparedStatement statement = connection.prepareStatement(SQL_INSERT_TEAMS)) {
-            // insert the team
-            final String id = randomUUID().toString();
-            statement.setString(1, id);
-            statement.setObject(2, ZonedDateTime.now());
-            statement.setObject(3, ZonedDateTime.now());
-            statement.setInt(4, 0);
-            statement.setObject(5, ZonedDateTime.now());
-            statement.setString(6, description);
-            statement.setString(7, teamName);
-            statement.setString(8, organizationType);
-            statement.setString(9, privacy.name());
-            statement.setString(10, status.name());
-            statement.setString(11, visibility.name());
-            statement.setString(12, url);
-
-            log.info("{}", statement);
-            statement.execute();
-
-            return id;
-        }
-    }
-
-    private static int createAddress(final String address1, final String address2, final String city, final String country, final String region, final String zip, Connection connection) throws SQLException {
-        // insert the address
-        try (final PreparedStatement statement = connection.prepareStatement(SQL_INSERT_ADDRESS, new String[]{"id"})) {
-            statement.setObject(1, ZonedDateTime.now());
-            statement.setObject(2, ZonedDateTime.now());
-            statement.setInt(3, 0);
-            statement.setString(4, address1);
-            statement.setString(5, address2);
-            statement.setString(6, city);
-            statement.setString(7, country);
-            statement.setString(8, region);
-            statement.setString(9, zip);
-
-            log.info("{}", statement);
-            statement.execute();
-
-            final ResultSet result = statement.getGeneratedKeys();
-            result.next();
-            return result.getInt(1);
-        }
-    }
-
-    private int createDetails(String firstName, String email, int addressId, Connection connection, final String institution, final String abbreviation, final String url, final String jobTitle, final String lastName, final String phone) throws SQLException {
-        try (PreparedStatement statement = connection.prepareStatement(SQL_INSERT_USERS_DETAILS, new String[]{"id"})) {
-            // insert the userDetails
-            statement.setObject(1, ZonedDateTime.now());
-            statement.setObject(2, ZonedDateTime.now());
-            statement.setString(3, "0");
-            statement.setString(4, email);
-            statement.setString(5, firstName);
-            statement.setString(6, institution);
-            statement.setString(7, abbreviation);
-            statement.setString(8, url);
-            statement.setString(9, jobTitle);
-            statement.setString(10, lastName);
-            statement.setString(11, phone);
-            statement.setInt(12, addressId);
-
-            log.info("{}", statement);
-            statement.execute();
-
-            final ResultSet result = statement.getGeneratedKeys();
-            result.next();
-            return result.getInt(1);
-        }
-    }
-
-    private String createUser(final String isEmailVerified, final UserStatus userStatus, final int detailsId, final Connection connection) throws SQLException {
-        // insert the users
-        try (PreparedStatement statement = connection.prepareStatement(SQL_INSERT_USERS)) {
-            final String id = randomUUID().toString();
-            statement.setString(1, id);
-            statement.setObject(2, ZonedDateTime.now());
-            statement.setObject(3, ZonedDateTime.now());
-            statement.setInt(4, 0);
-            statement.setObject(5, ZonedDateTime.now());
-            statement.setString(6, isEmailVerified);
-            statement.setString(7, userStatus.name());
-            statement.setInt(8, detailsId);
-
-            log.info("{}", statement);
-            statement.execute();
-
-            return id;
-        }
-    }
-
-    private void createCredentials(final String username, final String password, final String userId, final CredentialsStatus status, final Connection connection) throws SQLException {
-        // insert the credentials
-        try (final PreparedStatement statement = connection.prepareStatement(SQL_INSERT_CREDENTIALS)) {
-            statement.setString(1, userId);
-            statement.setObject(2, ZonedDateTime.now());
-            statement.setObject(3, ZonedDateTime.now());
-            statement.setInt(4, 0);
-            statement.setString(5, passwordEncoder.encode(password));
-            statement.setString(6, status.name());
-            statement.setString(7, username);
-
-            log.info("{}", statement);
-            statement.execute();
-        }
-    }
-
-
-    // add user to team for both user side and team side
-    private void addToTeam(String userId, String teamId, MemberType memberType, MemberStatus memberStatus, final Connection connection) throws SQLException {
-        // insert into user side
-        try (final PreparedStatement statement = connection.prepareStatement(SQL_INSERT_USERS_TEAMS)) {
-            statement.setString(1, userId);
-            statement.setObject(2, teamId);
-
-            log.info("{}", statement);
-            statement.execute();
-        }
-
-        // insert into team side (team members)
-        try (final PreparedStatement statement = connection.prepareStatement(SQL_INSERT_TEAM_MEMBERS)) {
-            statement.setObject(1, ZonedDateTime.now());
-            statement.setObject(2, ZonedDateTime.now());
-            statement.setInt(3, 0);
-            statement.setObject(4, ZonedDateTime.now());
-            statement.setString(5, memberType.name());
-            statement.setString(6, userId);
-            statement.setString(7, teamId);
-            statement.setString(8, memberStatus.name());
-
-            log.info("{}", statement);
-            statement.execute();
-        }
-    }
-
-    private void createDeterLabUser(final String name, final String userId, final Connection connection) throws SQLException {
-        // insert into deterlab_user
-        try (final PreparedStatement statement = connection.prepareStatement(SQL_INSERT_DETERLAB_USER)) {
-            statement.setObject(1, ZonedDateTime.now());
-            statement.setObject(2, ZonedDateTime.now());
-            statement.setInt(3, 0);
-            statement.setString(4, name);
-            statement.setString(5, userId);
-
-            log.info("{}", statement);
-            statement.execute();
-        }
-    }
-
-    public void wipe() throws SQLException {
-        try (final Connection connection = getConnection()) {
-            wipeData(connection);
+            int i = jdbcTemplate.update(sql);
+            log.info("Deleted {} from {}", i, table);
         }
     }
 
     public void initialize() throws SQLException {
-        log.info("Initializing first initialize");
-        try (final Connection connection = getConnection()) {
-            final String teamId = createTeam("NCL", "NCL Administrative Team", "Academic", "https://www.ncl.sg", TeamPrivacy.OPEN, TeamStatus.APPROVED, TeamVisibility.PUBLIC, connection);
+        log.info("Initializing database on first run");
+        final String teamId = createTeam("NCL", "NCL Administrative Team", "Academic", "https://www.ncl.sg", TeamPrivacy.OPEN, TeamStatus.APPROVED, TeamVisibility.PUBLIC);
 
-            final int addressId = createAddress("Address1", "", "City", "Country", "Region", "123456", connection);
+        final int addressId = createAddress("Address1", "", "City", "Country", "Region", "123456");
 
-            final int detailsId = createDetails("First Name", "admin@ncl.sg", addressId, connection, "Institution", "NCL", "https://www.ncl.sg", "Job Title", "Last Name", "12345678");
+        final int detailsId = createDetails("First Name", "admin@ncl.sg", addressId, "Institution", "NCL", "https://www.ncl.sg", "Job Title", "Last Name", "12345678");
 
-            final String userId = createUser("Y", UserStatus.APPROVED, detailsId, connection);
+        final String userId = createUser("Y", UserStatus.APPROVED, detailsId);
 
-            createCredentials("admin@ncl.sg", "ncl", userId, CredentialsStatus.ACTIVE, connection);
+        createCredentials("admin@ncl.sg", "ncl", userId, CredentialsStatus.ACTIVE);
 
-            addToTeam(userId, teamId, MemberType.OWNER, MemberStatus.APPROVED, connection);
+        addToTeam(userId, teamId, MemberType.OWNER, MemberStatus.APPROVED);
 
-            createDeterLabUser("ncl", userId, connection);
-        }
+        createDeterLabUser("ncl", userId);
     }
 }
