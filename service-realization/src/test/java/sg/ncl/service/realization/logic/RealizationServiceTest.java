@@ -118,7 +118,7 @@ public class RealizationServiceTest extends AbstractTest {
         RealizationEntity realizationEntity = Util.getRealizationEntity();
         RealizationEntity savedRealizationEntity = realizationRepository.save(realizationEntity);
 
-        Assert.assertEquals(savedRealizationEntity.getState(), RealizationState.NEW);
+        Assert.assertEquals(savedRealizationEntity.getState(), RealizationState.NOT_RUNNING);
     }
 
     @Test
@@ -252,7 +252,7 @@ public class RealizationServiceTest extends AbstractTest {
         adapterDeterLab.saveDeterUserIdMapping(RandomStringUtils.randomAlphanumeric(20), userId);
         RealizationEntity result = realizationService.stopExperimentInDeter(teamName, experimentName, userId);
 
-        Assert.assertThat(result.getState(), is(RealizationState.STOP));
+        Assert.assertThat(result.getState(), is(RealizationState.NOT_RUNNING));
         Assert.assertThat(result.getDetails(), is(""));
     }
 }
