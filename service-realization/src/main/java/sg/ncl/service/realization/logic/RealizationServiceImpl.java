@@ -7,6 +7,7 @@ import org.springframework.transaction.annotation.Transactional;
 import sg.ncl.adapter.deterlab.AdapterDeterLab;
 import sg.ncl.service.realization.data.jpa.RealizationEntity;
 import sg.ncl.service.realization.data.jpa.RealizationRepository;
+import sg.ncl.service.realization.domain.Realization;
 import sg.ncl.service.realization.domain.RealizationService;
 import sg.ncl.service.realization.domain.RealizationState;
 
@@ -78,8 +79,7 @@ public class RealizationServiceImpl implements RealizationService {
         jsonObject.put("eid", experimentName);
 
         RealizationEntity realizationEntity = realizationRepository.findByExperimentName(experimentName);
-        realizationEntity.setState(RealizationState.STARTING);
-        realizationRepository.save(realizationEntity);
+        updateStatus(realizationEntity, RealizationState.STARTING);
 
         String stringFromExperiment = adapterDeterLab.startExperiment(jsonObject.toString());
         JSONObject jsonObjectFromExperiment = new JSONObject(stringFromExperiment);
@@ -181,5 +181,10 @@ public class RealizationServiceImpl implements RealizationService {
     public void deleteRealization(final Long realizationId) {
         log.info("Delete realization. {}", realizationId);
         realizationRepository.delete(realizationId);
+    }
+
+    private void updateStatus(RealizationEntity realizationEntity, RealizationState realizationState) {
+        realizationEntity.setState(realizationState);
+        realizationRepository.save(realizationEntity);
     }
 }
