@@ -211,7 +211,7 @@ public class RealizationServiceTest extends AbstractTest {
     @Test
     public void testStartExperiment() {
         JSONObject predefinedResultJson = new JSONObject();
-        predefinedResultJson.put("msg", "Experiment started");
+        predefinedResultJson.put("msg", "experiment start success");
         predefinedResultJson.put("status", "active");
         predefinedResultJson.put("report", "this is a report");
 

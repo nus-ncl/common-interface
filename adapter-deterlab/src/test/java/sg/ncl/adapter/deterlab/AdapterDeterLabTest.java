@@ -334,6 +334,8 @@ public class AdapterDeterLabTest extends AbstractTest {
                 .andRespond(withSuccess(predefinedResultJson.toString(), MediaType.APPLICATION_JSON));
 
         String result = adapterDeterLab.startExperiment(one.toString());
-        Assert.assertThat(result, is("experiment start success"));
+        JSONObject resultJSONObject = new JSONObject(result);
+        String msg = resultJSONObject.getString("msg");
+        Assert.assertThat(msg, is("experiment start success"));
     }
 }
