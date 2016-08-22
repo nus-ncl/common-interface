@@ -3,6 +3,7 @@ package sg.ncl.service.realization.logic;
 import lombok.extern.slf4j.Slf4j;
 import org.json.JSONObject;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import sg.ncl.adapter.deterlab.AdapterDeterLab;
 import sg.ncl.service.realization.data.jpa.RealizationEntity;
 import sg.ncl.service.realization.data.jpa.RealizationRepository;
@@ -61,6 +62,7 @@ public class RealizationServiceImpl implements RealizationService {
         return savedRealizationEntity;
     }
 
+    @Transactional
     public RealizationEntity startExperimentInDeter(final String teamName, final String experimentName, final String userId) {
         StringBuilder httpCommand = new StringBuilder();
         httpCommand.append("?inout=in");

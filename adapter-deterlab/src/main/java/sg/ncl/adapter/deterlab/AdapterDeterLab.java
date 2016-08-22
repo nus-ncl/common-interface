@@ -221,6 +221,13 @@ public class AdapterDeterLab {
         }
     }
 
+    /**
+     * Creates a start experiment request to Deterlab
+     * @implNote must return the entire response body as realization service needs to store the experiment report to transmit back to UI
+     * @param jsonString Contains pid, eid, and deterlab userId
+     * @return a experiment report if the experiment is started successfully and active, otherwise a "experiment start fail" is return
+     * @see startExperimentInDeter()
+     */
     public String startExperiment(String jsonString) {
         logger.info("Start experiment - {} at {}: {}", properties.getIp(), properties.getPort(), jsonString);
 
@@ -228,9 +235,27 @@ public class AdapterDeterLab {
         headers.setContentType(MediaType.APPLICATION_JSON);
         HttpEntity<String> request = new HttpEntity<>(jsonString, headers);
 
-        ResponseEntity responseEntity = restTemplate.exchange(properties.startExperiment(), HttpMethod.POST, request, String.class);
+        ResponseEntity response;
 
-        return responseEntity.getBody().toString();
+        try {
+            response = restTemplate.exchange(properties.startExperiment(), HttpMethod.POST, request, String.class);
+        } catch (Exception e) {
+            throw new AdapterDeterlabConnectException(e.getMessage());
+        }
+
+        logger.info("Start experiment request submitted to deterlab");
+        String jsonResult = new JSONObject(response.getBody().toString()).getString("msg");
+
+        if ("experiment start fail".equals(jsonResult)) {
+            logger.warn("Fail to start experiment at deterlab {}", jsonString);
+            throw new ExpStartException();
+        } else if (!"experiment start success".equals(jsonResult)) {
+            logger.warn("Start experiment connection error {}", jsonString);
+            throw new AdapterDeterlabConnectException();
+        }
+
+        logger.info("Start experiment request success at deterlab", response.getBody().toString());
+        return response.getBody().toString();
     }
 
     public String stopExperiment(String jsonString) {
