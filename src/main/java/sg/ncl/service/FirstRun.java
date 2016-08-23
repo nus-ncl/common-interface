@@ -29,28 +29,28 @@ import static java.util.UUID.randomUUID;
 @Slf4j
 public class FirstRun {
 
-    private static final String SQL_INSERT_TEAMS = "INSERT INTO teams"
+    static final String SQL_INSERT_TEAMS = "INSERT INTO teams"
             + "(id, created_date, last_modified_date, version, application_date, description, name, organisation_type, privacy, status, visibility, website) VALUES"
             + "(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
-    private static final String SQL_INSERT_ADDRESS = "INSERT INTO addresses"
+    static final String SQL_INSERT_ADDRESS = "INSERT INTO addresses"
             + "(created_date, last_modified_date, version, address_1, address_2, city, country, region, zip_code) VALUES"
             + "(?, ?, ?, ?, ?, ?, ?, ?, ?)";
-    private static final String SQL_INSERT_USERS_DETAILS = "INSERT INTO user_details"
+    static final String SQL_INSERT_USERS_DETAILS = "INSERT INTO user_details"
             + "(created_date, last_modified_date, version, email, first_name, institution, institution_abbreviation, institution_web, job_title, last_name, phone, address_id) VALUES"
             + "(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
-    private static final String SQL_INSERT_USERS = "INSERT INTO users"
+    static final String SQL_INSERT_USERS = "INSERT INTO users"
             + "(id, created_date, last_modified_date, version, application_date, is_email_verified, status, user_details_id) VALUES"
             + "(?, ?, ?, ?, ?, ?, ?, ?)";
-    private static final String SQL_INSERT_CREDENTIALS = "INSERT INTO credentials"
+    static final String SQL_INSERT_CREDENTIALS = "INSERT INTO credentials"
             + "(id, created_date, last_modified_date, version, password, status, username) VALUES"
             + "(?, ?, ?, ?, ?, ?, ?)";
-    private static final String SQL_INSERT_DETERLAB_USER = "INSERT INTO deterlab_user"
+    static final String SQL_INSERT_DETERLAB_USER = "INSERT INTO deterlab_user"
             + "(created_date, last_modified_date, version, deter_user_id, ncl_user_id) VALUES"
             + "(?, ?, ?, ?, ?)";
-    private static final String SQL_INSERT_USERS_TEAMS = "INSERT INTO users_teams"
+    static final String SQL_INSERT_USERS_TEAMS = "INSERT INTO users_teams"
             + "(user_id, team_id) VALUES"
             + "(?, ?)";
-    private static final String SQL_INSERT_TEAM_MEMBERS = "INSERT INTO team_members"
+    static final String SQL_INSERT_TEAM_MEMBERS = "INSERT INTO team_members"
             + "(created_date, last_modified_date, version, joined_date, member_type, user_id, team_id, status) VALUES"
             + "(?, ?, ?, ?, ?, ?, ?, ?)";
 
@@ -146,7 +146,7 @@ public class FirstRun {
         // insert into team side (team members)
         final ZonedDateTime now = ZonedDateTime.now();
         final int j = jdbcTemplate.update(SQL_INSERT_TEAM_MEMBERS, now, now, 0, now, memberType.name(), userId, teamId, memberStatus.name());
-        log.info("Insert {} team_member entry", i);
+        log.info("Insert {} team_member entry", j);
     }
 
     private void createDeterLabUser(final String name, final String userId) throws SQLException {
@@ -175,13 +175,13 @@ public class FirstRun {
         for (String table : tables) {
             final String sql = "DELETE FROM " + table;
             int i = jdbcTemplate.update(sql);
-            log.info("Deleted {} from {}", i, table);
+            log.info("Delete {} entry/entries from '{}' table", i, table);
         }
     }
 
     public void initialize() throws SQLException {
         log.info("Initializing database on first run");
-        final String teamId = createTeam("NCL", "NCL Administrative Team", "Academic", "https://www.ncl.sg", TeamPrivacy.OPEN, TeamStatus.APPROVED, TeamVisibility.PUBLIC);
+        final String teamId = createTeam("NCL", "NCL Administrative Team", "Academic", "https://www.ncl.sg", TeamPrivacy.OPEN, TeamStatus.APPROVED, TeamVisibility.PRIVATE);
 
         final int addressId = createAddress("Address1", "", "City", "Country", "Region", "123456");
 
@@ -194,5 +194,10 @@ public class FirstRun {
         addToTeam(userId, teamId, MemberType.OWNER, MemberStatus.APPROVED);
 
         createDeterLabUser("ncl", userId);
+    }
+
+    public void reset() throws SQLException {
+        wipe();
+        initialize();
     }
 }
