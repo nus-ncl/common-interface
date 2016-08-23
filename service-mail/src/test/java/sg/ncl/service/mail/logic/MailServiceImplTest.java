@@ -13,6 +13,7 @@ import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
+import sg.ncl.service.mail.data.jpa.EmailRetriesRepository;
 
 import static org.hamcrest.Matchers.arrayContaining;
 import static org.hamcrest.Matchers.equalTo;
@@ -27,6 +28,8 @@ public class MailServiceImplTest {
     public MockitoRule mockito = MockitoJUnit.rule();
     @Mock
     JavaMailSender sender;
+    @Mock
+    EmailRetriesRepository emailRetriesRepository;
 
     MailServiceImpl serviceImpl;
 
@@ -35,7 +38,7 @@ public class MailServiceImplTest {
 
     @Before
     public void before() {
-        serviceImpl = new MailServiceImpl(sender);
+        serviceImpl = new MailServiceImpl(sender, emailRetriesRepository);
     }
 
     @Test
