@@ -25,7 +25,7 @@ allprojects {
 
     group 'sg.ncl'
 
-    version "1.0-${System.getenv('TRAVIS_BUILD_NUMBER') == null ? 'SNAPSHOT' : 'b' + System.getenv('TRAVIS_BUILD_NUMBER')}"
+    version "1.0.${System.getenv('TRAVIS_COMMIT') ?: 'SNAPSHOT'}"
 
     sourceCompatibility = JavaVersion.VERSION_1_8
     targetCompatibility = JavaVersion.VERSION_1_8
