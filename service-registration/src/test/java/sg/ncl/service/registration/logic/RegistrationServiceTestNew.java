@@ -18,7 +18,6 @@ import sg.ncl.adapter.deterlab.data.jpa.DeterLabUserRepository;
 import sg.ncl.common.DomainProperties;
 import sg.ncl.service.authentication.data.jpa.CredentialsEntity;
 import sg.ncl.service.authentication.domain.CredentialsService;
-import sg.ncl.service.mail.data.jpa.EmailRetriesRepository;
 import sg.ncl.service.mail.domain.MailService;
 import sg.ncl.service.registration.AbstractTest;
 import sg.ncl.service.registration.Util;

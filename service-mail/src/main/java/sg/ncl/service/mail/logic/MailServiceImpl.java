@@ -2,15 +2,14 @@ package sg.ncl.service.mail.logic;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.mail.MailException;
-import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
-import org.springframework.mail.javamail.MimeMailMessage;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
-import sg.ncl.service.mail.data.jpa.EmailRetriesEntity;
-import sg.ncl.service.mail.data.jpa.EmailRetriesRepository;
+import org.springframework.transaction.annotation.Transactional;
+import sg.ncl.service.mail.data.jpa.EmailEntity;
+import sg.ncl.service.mail.data.jpa.EmailRepository;
+import sg.ncl.service.mail.domain.Email;
 import sg.ncl.service.mail.domain.MailService;
-
 
 import javax.inject.Inject;
 import javax.mail.MessagingException;
@@ -26,20 +25,21 @@ import java.time.ZonedDateTime;
 
 @Service
 @Slf4j
-public class MailServiceImpl implements MailService {
+class MailServiceImpl implements MailService {
 
     private final JavaMailSender sender;
-    private EmailRetriesRepository emailRetriesRepository;
+    private final EmailRepository emailRepository;
 
     @Inject
     MailServiceImpl(
             @NotNull final JavaMailSender sender,
-            @NotNull final EmailRetriesRepository emailRetriesRepository
+            @NotNull final EmailRepository emailRepository
     ) {
         this.sender = sender;
-        this.emailRetriesRepository = emailRetriesRepository;
+        this.emailRepository = emailRepository;
     }
 
+    @Transactional
     @Override
     public void send(
             @NotNull final InternetAddress from,
@@ -48,29 +48,43 @@ public class MailServiceImpl implements MailService {
             @NotNull final String content,
             @NotNull final boolean isHtml
     ) {
-        MimeMessage message = sender.createMimeMessage();
-        MimeMessageHelper helper = new MimeMessageHelper(message);
-        try {
-            helper.setFrom(from);
-            helper.setTo(to);
-            helper.setSubject(subject);
-            helper.setText(content, isHtml);
-        } catch (MessagingException e) {
-            log.warn("{}: message = {}", e, message);
-            return;
-        }
+        final EmailEntity emailEntity = new EmailEntity();
+        emailEntity.setFrom(from);
+        emailEntity.setTo(to);
+        emailEntity.setSubject(subject);
+        emailEntity.setContent(content);
+        final MimeMessage message = prepareMessage(emailEntity);
+        send(emailEntity, message);
+        emailRepository.save(emailEntity);
+    }
+
+    private void send(final EmailEntity emailEntity, final MimeMessage message) {
+        emailEntity.setLastRetryTime(ZonedDateTime.now());
         try {
             sender.send(message);
             log.info("Email sent: {}", message);
-        } catch (MailException me) {
-            log.warn("{}: message = {}", me, message);
-            EmailRetriesEntity emailRetriesEntity = new EmailRetriesEntity();
-            emailRetriesEntity.setMessage(message);
-            emailRetriesEntity.setRetriedTimes(0);
-            emailRetriesEntity.setLastRetryTime(ZonedDateTime.now());
-            emailRetriesEntity.setErrInfo(me.getMessage());
-
-            emailRetriesRepository.save(emailRetriesEntity);
+            emailEntity.setSent(true);
+            emailEntity.setErrorMessage(null);
+        } catch (MailException e) {
+            log.warn("{}: message = {}", e, message);
+            emailEntity.setErrorMessage(e.getMessage());
         }
     }
+
+    private MimeMessage prepareMessage(final Email email) {
+        final MimeMessage message = sender.createMimeMessage();
+        final MimeMessageHelper helper = new MimeMessageHelper(message);
+        try {
+            helper.setFrom(email.getFrom());
+            helper.setTo(email.getTo());
+            helper.setSubject(email.getSubject());
+            helper.setText(email.getContent(), email.isHtml());
+        } catch (MessagingException e) {
+            log.warn("{}: message = {}", e, message);
+            throw new IllegalArgumentException(e);
+        }
+        return message;
+    }
+
+
 }

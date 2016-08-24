@@ -11,16 +11,14 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
-import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
-import sg.ncl.service.mail.data.jpa.EmailRetriesRepository;
+import sg.ncl.service.mail.data.jpa.EmailRepository;
 
 import javax.mail.Address;
 import javax.mail.MessagingException;
 import javax.mail.Session;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
-
 import java.io.IOException;
 
 import static org.hamcrest.Matchers.arrayContaining;
@@ -37,7 +35,7 @@ public class MailServiceImplTest {
     @Mock
     JavaMailSender sender;
     @Mock
-    EmailRetriesRepository emailRetriesRepository;
+    EmailRepository emailRepository;
 
     MailServiceImpl serviceImpl;
 
@@ -46,7 +44,7 @@ public class MailServiceImplTest {
 
     @Before
     public void before() {
-        serviceImpl = new MailServiceImpl(sender, emailRetriesRepository);
+        serviceImpl = new MailServiceImpl(sender, emailRepository);
     }
 
     @Test
