@@ -21,6 +21,8 @@ import javax.mail.Session;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
 
+import java.io.IOException;
+
 import static org.hamcrest.Matchers.arrayContaining;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
@@ -48,24 +50,27 @@ public class MailServiceImplTest {
     }
 
     @Test
-    public void testSend() throws MessagingException {
-        Address from = new InternetAddress("alice@ncl.sg");
-        Address to = new InternetAddress("bob@ncl.sg");
+    public void testSend() throws MessagingException, IOException {
+        InternetAddress from = new InternetAddress("alice@ncl.sg");
+        InternetAddress to = new InternetAddress("bob@ncl.sg");
         String subject = RandomStringUtils.randomAlphanumeric(10);
         String content = RandomStringUtils.randomAlphanumeric(10);
         Session session = null;
         MimeMessage message = new MimeMessage(session);
         Mockito.doReturn(message).when(sender).createMimeMessage();
-        serviceImpl.send(from.toString(), to.toString(), subject, content);
+        serviceImpl.send(from, to, subject, content, false);
 
         Mockito.verify(sender).send(captor.capture());
         MimeMessage value = captor.getValue();
 
         Address[] fromArray = value.getFrom();
-        Assert.assertThat(fromArray[0].toString(), is(equalTo(from.toString())));
-        //Assert.assertThat(value.getTo().length, is(equalTo(1)));
-       // Assert.assertThat(value.getTo(), arrayContaining(to));
+        Address[] toArray = value.getAllRecipients();
+        Assert.assertThat(fromArray.length, is(equalTo(1)));
+        Assert.assertThat(toArray.length, is(equalTo(1)));
+        Assert.assertThat(fromArray, arrayContaining(from));
+        Assert.assertThat(toArray, arrayContaining(to));
         Assert.assertThat(value.getSubject(), is(equalTo(subject)));
-        //Assert.assertThat(value.getText(), is(equalTo(content)));
+        Assert.assertThat(value.getContentType(), is(equalTo("text/plain")));
+        Assert.assertThat(value.getContent().toString(), is(equalTo(content)));
     }
 }

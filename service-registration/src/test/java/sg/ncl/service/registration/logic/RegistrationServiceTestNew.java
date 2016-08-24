@@ -11,12 +11,14 @@ import org.mockito.Mockito;
 import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.context.ActiveProfiles;
 import sg.ncl.adapter.deterlab.AdapterDeterLab;
 import sg.ncl.adapter.deterlab.ConnectionProperties;
 import sg.ncl.adapter.deterlab.data.jpa.DeterLabUserRepository;
 import sg.ncl.common.DomainProperties;
 import sg.ncl.service.authentication.data.jpa.CredentialsEntity;
 import sg.ncl.service.authentication.domain.CredentialsService;
+import sg.ncl.service.mail.data.jpa.EmailRetriesRepository;
 import sg.ncl.service.mail.domain.MailService;
 import sg.ncl.service.registration.AbstractTest;
 import sg.ncl.service.registration.Util;
@@ -36,7 +38,7 @@ import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
 
-
+@ActiveProfiles("mock-registration-service")
 public class RegistrationServiceTestNew extends AbstractTest {
 
     @Rule

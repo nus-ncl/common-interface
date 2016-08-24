@@ -40,6 +40,8 @@ import sg.ncl.service.user.domain.User;
 import sg.ncl.service.user.domain.UserService;
 
 import javax.inject.Inject;
+import javax.mail.internet.AddressException;
+import javax.mail.internet.InternetAddress;
 import javax.validation.constraints.NotNull;
 import java.io.IOException;
 import java.time.ZonedDateTime;
@@ -548,14 +550,17 @@ public class RegistrationServiceImpl implements RegistrationService {
         try {
             String msgText = FreeMarkerTemplateUtils.processTemplateIntoString(
                     freemarkerConfiguration.getTemplate(VERIFICATIONEMAILTEMPLATENAME), tempMap);
-            mailService.send("testbed-ops@ncl.sg", user.getUserDetails().getEmail(),
-                    "Please Verify Your Email Account", msgText);
+            mailService.send(new InternetAddress("testbed-ops@ncl.sg"),
+                    new InternetAddress(user.getUserDetails().getEmail()),
+                    "Please Verify Your Email Account", msgText, false);
         } catch (TemplateNotFoundException e) {
             log.warn("Template {} not found", VERIFICATIONEMAILTEMPLATENAME);
         } catch (IOException e) {
             log.warn("Template {} cannot be read", VERIFICATIONEMAILTEMPLATENAME);
         } catch (TemplateException e) {
             log.warn("Rending template {} failed", VERIFICATIONEMAILTEMPLATENAME);
+        } catch (AddressException e) {
+            log.warn("Parsing user email address failed: {}", user.getUserDetails().getEmail());
         }
 
     }

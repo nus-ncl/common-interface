@@ -14,6 +14,7 @@ import sg.ncl.service.mail.domain.MailService;
 
 import javax.inject.Inject;
 import javax.mail.MessagingException;
+import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
 import javax.validation.constraints.NotNull;
 import java.time.ZonedDateTime;
@@ -27,7 +28,6 @@ import java.time.ZonedDateTime;
 @Slf4j
 public class MailServiceImpl implements MailService {
 
-    private final String from = "testbed-ops@ncl.sg";
     private final JavaMailSender sender;
     private EmailRetriesRepository emailRetriesRepository;
 
@@ -42,10 +42,11 @@ public class MailServiceImpl implements MailService {
 
     @Override
     public void send(
-            @NotNull final String from,
-            @NotNull final String to,
+            @NotNull final InternetAddress from,
+            @NotNull final InternetAddress to,
             @NotNull final String subject,
-            @NotNull final String content
+            @NotNull final String content,
+            @NotNull final boolean isHtml
     ) {
         MimeMessage message = sender.createMimeMessage();
         MimeMessageHelper helper = new MimeMessageHelper(message);
@@ -53,7 +54,7 @@ public class MailServiceImpl implements MailService {
             helper.setFrom(from);
             helper.setTo(to);
             helper.setSubject(subject);
-            helper.setText(content, true);
+            helper.setText(content, isHtml);
         } catch (MessagingException e) {
             log.warn("{}: message = {}", e, message);
             return;
@@ -69,6 +70,7 @@ public class MailServiceImpl implements MailService {
             emailRetriesEntity.setLastRetryTime(ZonedDateTime.now());
             emailRetriesEntity.setErrInfo(me.getMessage());
 
+            emailRetriesRepository.save(emailRetriesEntity);
         }
     }
 }
