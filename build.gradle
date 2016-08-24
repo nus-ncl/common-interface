@@ -115,6 +115,9 @@ bintray {
         issueTrackerUrl = 'https://github.com/nus-ncl/services-in-one/issues'
         vcsUrl = 'https://github.com/nus-ncl/services-in-one.git'
         licenses = ['Apache-2.0']
+
+        githubRepo = 'nus-ncl/services-in-one'
+
         version {
             name = "${project.version}"
             desc = "Services In One ${project.version} release"
