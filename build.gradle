@@ -25,7 +25,7 @@ allprojects {
 
     group 'sg.ncl'
 
-    version "1.0-${System.getenv('TRAVIS_BUILD_NUMBER') == null ? 'SNAPSHOT' : 'b' + System.getenv('TRAVIS_BUILD_NUMBER')}"
+    version "1-${System.getenv('TRAVIS_COMMIT') ?: 'SNAPSHOT'}"
 
     sourceCompatibility = JavaVersion.VERSION_1_8
     targetCompatibility = JavaVersion.VERSION_1_8
@@ -105,13 +105,24 @@ bintray {
     user = System.getenv('BINTRAY_USER')
     key = System.getenv('BINTRAY_KEY')
     configurations = ['archives']
+    publish = true
     pkg {
         repo = 'generic'
         name = 'services-in-one'
         userOrg = 'nus-ncl'
         desc = 'All NCL services running together'
+        websiteUrl = 'https://github.com/nus-ncl/services-in-one'
+        issueTrackerUrl = 'https://github.com/nus-ncl/services-in-one/issues'
         vcsUrl = 'https://github.com/nus-ncl/services-in-one.git'
         licenses = ['Apache-2.0']
+
+        githubRepo = 'nus-ncl/services-in-one'
+
+        version {
+            name = "${project.version}"
+            desc = "Services In One ${project.version} release"
+            released = new Date()
+        }
     }
 }
 

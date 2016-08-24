@@ -11,7 +11,7 @@ import sg.ncl.service.realization.RealizationApplication;
 import sg.ncl.service.registration.RegistrationApplication;
 import sg.ncl.service.team.TeamApplication;
 import sg.ncl.service.user.UserApplication;
-import sg.ncl.service.version.App;
+import sg.ncl.service.version.VersionApplication;
 
 import java.sql.SQLException;
 
@@ -26,7 +26,7 @@ import java.sql.SQLException;
         RegistrationApplication.class,
         TeamApplication.class,
         UserApplication.class,
-        App.class
+        VersionApplication.class
 })
 public class ServicesInOneApplication {
 
@@ -35,7 +35,7 @@ public class ServicesInOneApplication {
         final ConfigurableEnvironment environment = context.getEnvironment();
 
         final FirstRun firstRun = context.getBean(FirstRun.class);
-        if (environment.getProperty("reset") != null) {
+        if (environment.containsProperty("reset")) {
             firstRun.reset();
         }
     }
