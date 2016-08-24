@@ -4,72 +4,52 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.mail.MailException;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
+import org.springframework.scheduling.annotation.EnableScheduling;
+import org.springframework.scheduling.annotation.Scheduled;
 import sg.ncl.service.mail.data.jpa.EmailEntity;
 import sg.ncl.service.mail.data.jpa.EmailRepository;
 import sg.ncl.service.mail.domain.Email;
-import sg.ncl.service.mail.domain.MailService;
 
 import javax.inject.Inject;
 import javax.mail.MessagingException;
-import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
-import javax.validation.constraints.NotNull;
 import java.time.ZonedDateTime;
 
-
 /**
- * Created by dcszwang on 8/10/2016.
+ * Created by dcszwang on 8/24/2016.
  */
-
-@Service
 @Slf4j
-class MailServiceImpl implements MailService {
-
+@EnableScheduling
+public class EmailRetriesImpl {
     private final JavaMailSender sender;
     private final EmailRepository emailRepository;
 
     @Inject
-    MailServiceImpl(
-            @NotNull final JavaMailSender sender,
-            @NotNull final EmailRepository emailRepository
-    ) {
+    EmailRetriesImpl(final JavaMailSender sender, EmailRepository emailRepository) {
         this.sender = sender;
         this.emailRepository = emailRepository;
     }
 
-    @Transactional
-    @Override
-    public void send(
-            @NotNull final InternetAddress from,
-            @NotNull final InternetAddress to,
-            @NotNull final String subject,
-            @NotNull final String content,
-            @NotNull final boolean isHtml
-    ) {
-        final EmailEntity emailEntity = new EmailEntity();
-        emailEntity.setFrom(from);
-        emailEntity.setTo(to);
-        emailEntity.setSubject(subject);
-        emailEntity.setContent(content);
-        emailEntity.setHtml(isHtml);
-        final MimeMessage message = prepareMessage(emailEntity);
-        send(emailEntity, message);
-        emailRepository.save(emailEntity);
-    }
+    @Scheduled(fixedDelay = 5000)
+    public void retrySendEmail() {
+        EmailEntity one = findAnEmailForRetry();
+        MimeMessage message = prepareMessage(one);
+        one.setLastRetryTime(ZonedDateTime.now());
 
-    private void send(final EmailEntity emailEntity, final MimeMessage message) {
-        emailEntity.setLastRetryTime(ZonedDateTime.now());
         try {
             sender.send(message);
             log.info("Email sent: {}", message);
-            emailEntity.setSent(true);
-            emailEntity.setErrorMessage(null);
+            one.setSent(true);
+            one.setErrorMessage(null);
         } catch (MailException e) {
             log.warn("{}: message = {}", e, message);
-            emailEntity.setErrorMessage(e.getMessage());
+            one.setErrorMessage(e.getMessage());
         }
+    }
+
+
+    private EmailEntity findAnEmailForRetry() {
+        return null;
     }
 
     private MimeMessage prepareMessage(final Email email) {
@@ -86,6 +66,4 @@ class MailServiceImpl implements MailService {
         }
         return message;
     }
-
-
 }
