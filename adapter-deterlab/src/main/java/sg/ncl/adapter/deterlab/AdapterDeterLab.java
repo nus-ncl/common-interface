@@ -339,15 +339,29 @@ public class AdapterDeterLab {
 
     public String approveProject(String jsonString) {
         // for ncl admins to approve teams
-        logger.info("Approving team to {} at {}: {}", properties.getIp(), properties.getPort(), jsonString);
+        String pid = new JSONObject(jsonString).getString("pid");
+        logger.info("Approving team {} to {} at {}: {}",
+                pid, properties.getIp(), properties.getPort(), jsonString);
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
         HttpEntity<String> request = new HttpEntity<>(jsonString, headers);
+        ResponseEntity response;
 
-        ResponseEntity responseEntity = restTemplate.exchange(properties.getApproveProject(), HttpMethod.POST, request, String.class);
+        try {
+            response = restTemplate.exchange(properties.getApproveProject(), HttpMethod.POST, request, String.class);
+        } catch (Exception e) {
+            throw new AdapterDeterlabConnectException();
+        }
 
-        return responseEntity.getBody().toString();
+        String jsonResult = new JSONObject(response.getBody().toString()).getString("msg");
+        if ("project approved".equals(jsonResult)) {
+            logger.info("Approve team {} OK", pid);
+            return "OK";
+        } else {
+            logger.warn("Approve team {} FAIL", pid);
+            return "FAIL";
+        }
     }
 
     public String rejectProject(String jsonString) {
