@@ -16,13 +16,7 @@ import sg.ncl.service.registration.data.jpa.RegistrationEntity;
 import sg.ncl.service.registration.data.jpa.RegistrationRepository;
 import sg.ncl.service.registration.domain.Registration;
 import sg.ncl.service.registration.domain.RegistrationService;
-import sg.ncl.service.registration.exceptions.NoMembersInTeamException;
-import sg.ncl.service.registration.exceptions.RegisterTeamIdEmptyException;
-import sg.ncl.service.registration.exceptions.RegisterTeamNameDuplicateException;
-import sg.ncl.service.registration.exceptions.RegisterTeamNameEmptyException;
-import sg.ncl.service.registration.exceptions.RegisterUidNullException;
-import sg.ncl.service.registration.exceptions.UserFormException;
-import sg.ncl.service.registration.exceptions.UserIsNotTeamOwnerException;
+import sg.ncl.service.registration.exceptions.*;
 import sg.ncl.service.team.data.jpa.TeamEntity;
 import sg.ncl.service.team.data.jpa.TeamMemberEntity;
 import sg.ncl.service.team.domain.MemberStatus;
@@ -339,30 +333,23 @@ public class RegistrationServiceImpl implements RegistrationService {
     }
 
     @Transactional
-    public void approveTeam(String teamId, String ownerId, TeamStatus status) {
+    public void approveOrRejectNewTeam(
+            @NotNull String teamId,
+            @NotNull String ownerId,
+            @NotNull TeamStatus status
+    ) {
         // FIXME required additional parameters to validate if approver is of admin or ordinary user
-        if (teamId == null || teamId.isEmpty()) {
-            log.warn("Team Id is empty or null");
-            throw new RegisterTeamIdEmptyException();
+        if (teamId.isEmpty() || ownerId.isEmpty()) {
+            log.warn("Invalid input: TeamId {}, OwnerId {}", teamId, ownerId);
+            throw new IllegalArgumentException();
         }
-
+        if(!(status.equals(TeamStatus.APPROVED) || status.equals(TeamStatus.REJECTED))){
+            log.warn("Invalid TeamStatus {}", status);
+            throw new InvalidTeamStatusException();
+        }
         // change team status
         // invoked method already ensure there is at least a team member of type owner
         Team team = teamService.updateTeamStatus(teamId, status);
-
-        // change team owner member status
-        List<? extends TeamMember> membersList = team.getMembers();
-
-        if (membersList.isEmpty()) {
-            // paranoid check, just in case
-            throw new NoMembersInTeamException();
-        }
-
-        for (TeamMember teamMember : membersList) {
-            if (teamMember.getMemberType().equals(MemberType.OWNER)) {
-                teamService.updateMemberStatus(teamId, teamMember.getUserId(), MemberStatus.APPROVED);
-            }
-        }
 
         // FIXME adapter deterlab call here
         JSONObject one = new JSONObject();
@@ -370,6 +357,17 @@ public class RegistrationServiceImpl implements RegistrationService {
         one.put("uid", adapterDeterLab.getDeterUserIdByNclUserId(ownerId));
 
         if (status.equals(TeamStatus.APPROVED)) {
+            // change team owner member status
+            List<? extends TeamMember> membersList = team.getMembers();
+            if (membersList.isEmpty()) {
+                // paranoid check, just in case
+                throw new NoMembersInTeamException();
+            }
+            for (TeamMember teamMember : membersList) {
+                if (teamMember.getMemberType().equals(MemberType.OWNER)) {
+                    teamService.updateMemberStatus(teamId, teamMember.getUserId(), MemberStatus.APPROVED);
+                }
+            }
             adapterDeterLab.approveProject(one.toString());
         } else {
             // FIXME may need to be more specific and check if TeamStatus is REJECTED

@@ -6,6 +6,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.http.*;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 import sg.ncl.adapter.deterlab.data.jpa.DeterLabUserRepository;
 import sg.ncl.adapter.deterlab.dtos.entities.DeterLabUserEntity;
@@ -350,7 +351,7 @@ public class AdapterDeterLab {
 
         try {
             response = restTemplate.exchange(properties.getApproveProject(), HttpMethod.POST, request, String.class);
-        } catch (Exception e) {
+        } catch (RestClientException e) {
             throw new AdapterDeterlabConnectException();
         }
 

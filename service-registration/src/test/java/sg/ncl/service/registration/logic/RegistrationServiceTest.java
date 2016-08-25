@@ -324,20 +324,20 @@ public class RegistrationServiceTest extends AbstractTest {
 
     @Test(expected = RegisterTeamIdEmptyException.class)
     public void approveTeamNullTeamId() throws Exception {
-        registrationService.approveTeam(null, null, TeamStatus.APPROVED);
+        registrationService.approveOrRejectNewTeam(null, null, TeamStatus.APPROVED);
     }
 
     @Test(expected = TeamNotFoundException.class)
     public void approveTeamNoSuchTeam() throws Exception {
         final String one = RandomStringUtils.randomAlphanumeric(20);
-        registrationService.approveTeam(one, null, TeamStatus.APPROVED);
+        registrationService.approveOrRejectNewTeam(one, null, TeamStatus.APPROVED);
     }
 
     @Test(expected = NoOwnerInTeamException.class)
     public void approveTeamNoOwner() throws Exception {
         Team one = Util.getTeamEntity();
         Team createdTeam = teamService.createTeam(one);
-        registrationService.approveTeam(createdTeam.getId(), null, TeamStatus.APPROVED);
+        registrationService.approveOrRejectNewTeam(createdTeam.getId(), null, TeamStatus.APPROVED);
     }
 
     @Test
@@ -358,7 +358,7 @@ public class RegistrationServiceTest extends AbstractTest {
                 .andExpect(method(HttpMethod.POST))
                 .andRespond(withSuccess(predefinedResultJson.toString(), MediaType.APPLICATION_JSON));
 
-        registrationService.approveTeam(createdTeam.getId(), ownerId, TeamStatus.APPROVED);
+        registrationService.approveOrRejectNewTeam(createdTeam.getId(), ownerId, TeamStatus.APPROVED);
 
         Team approvedTeam = teamService.getTeamById(createdTeam.getId());
 
@@ -407,7 +407,7 @@ public class RegistrationServiceTest extends AbstractTest {
                 .andExpect(method(HttpMethod.POST))
                 .andRespond(withSuccess(predefinedResultJson.toString(), MediaType.APPLICATION_JSON));
 
-        registrationService.approveTeam(teamId, owner.getUserId(), TeamStatus.REJECTED);
+        registrationService.approveOrRejectNewTeam(teamId, owner.getUserId(), TeamStatus.REJECTED);
 
         // team should have been removed
         try {

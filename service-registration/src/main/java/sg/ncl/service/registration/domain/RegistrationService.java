@@ -20,7 +20,7 @@ public interface RegistrationService {
 
     void rejectJoinRequest(String teamId, String userId, User user);
 
-    void approveTeam(String teamId, String ownerId, TeamStatus teamStatus);
+    void approveOrRejectNewTeam(String teamId, String ownerId, TeamStatus teamStatus);
 
     String getDeterUid(String id);
 }

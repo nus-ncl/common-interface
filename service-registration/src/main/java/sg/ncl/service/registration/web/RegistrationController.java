@@ -83,7 +83,7 @@ public class RegistrationController {
     public void approveTeam(@PathVariable String teamId, @PathVariable String ownerId, @RequestParam("status") final TeamStatus teamStatus) {
         // need to specify to deterlab who is the owner so that they can set it as project_root
         // else trust level is always none
-        registrationService.approveTeam(teamId, ownerId, teamStatus);
+        registrationService.approveOrRejectNewTeam(teamId, ownerId, teamStatus);
     }
 
     @GetMapping(path = "/user/{id}")
