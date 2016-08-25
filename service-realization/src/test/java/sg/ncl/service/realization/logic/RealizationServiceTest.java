@@ -75,6 +75,7 @@ public class RealizationServiceTest extends AbstractTest {
         Assert.assertNotNull(realizationEntityDb);
     }
 
+
     @Test
     public void testRealizationWithWrongExperimentId() {
 
@@ -97,6 +98,35 @@ public class RealizationServiceTest extends AbstractTest {
 
         Assert.assertNotNull(realizationEntityDb);
     }
+
+    @Test
+    public void testGetRealizationWithTeamAndExperimentId() {
+        String teamName = RandomStringUtils.randomAlphabetic(8);
+        RealizationEntity realizationEntity = Util.getRealizationEntity();
+        realizationEntity.setState(RealizationState.NOT_RUNNING);
+        Long experimentId = realizationEntity.getExperimentId();
+
+        realizationRepository.save((realizationEntity));
+
+        JSONObject predefinedResultJson = new JSONObject();
+        predefinedResultJson.put("status", "active");
+        predefinedResultJson.put("report", "ok");
+
+        JSONObject input = new JSONObject();
+        input.put("pid", teamName);
+        input.put("eid", realizationEntity.getExperimentId());
+
+        mockServer.expect(requestTo(properties.getExpStatus()))
+                .andExpect(method(HttpMethod.POST))
+                .andRespond(withSuccess(predefinedResultJson.toString(), MediaType.APPLICATION_JSON));
+
+        RealizationEntity realizationEntityDb = realizationService.getByExperimentId(teamName, experimentId);
+
+        Assert.assertNotNull(realizationEntityDb);
+        Assert.assertThat(realizationEntityDb.getState(), is(RealizationState.RUNNING));
+        Assert.assertThat(realizationEntityDb.getDetails(), is("ok"));
+    }
+
 
     @Test
     public void testSaveRealization() {
