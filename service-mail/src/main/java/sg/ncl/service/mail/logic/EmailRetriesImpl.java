@@ -21,7 +21,10 @@ import java.util.List;
 public class EmailRetriesImpl {
     private final MailService mailService;
     private final EmailRepository emailRepository;
+    // max retry times for each email
     private static final int MAXRETRYTIMES = 3;
+    // retry interval for each email, in seconds
+    private static final int RETRYINTERVALPEREMAIL = 3600;
 
     @Inject
     EmailRetriesImpl(
@@ -49,8 +52,10 @@ public class EmailRetriesImpl {
     private EmailEntity findEmailForRetry() {
         List<EmailEntity> emailEntityList =
                 emailRepository.findBySentFalseAndRetryTimesLessThanOrderByRetryTimes(MAXRETRYTIMES);
-        if(emailEntityList.size() > 0) {
-            return emailEntityList.get(0);
+        if(!emailEntityList.isEmpty()) {
+            EmailEntity candidate = emailEntityList.get(0);
+            return (ZonedDateTime.now().toEpochSecond() - candidate.getLastRetryTime().toEpochSecond()) >= RETRYINTERVALPEREMAIL ?
+                    candidate : null;
         } else {
             return null;
         }
