@@ -288,6 +288,7 @@ public class AdapterDeterLab {
         if (!"swapped".equals(expStatus)) {
             logger.warn("Fail to stop experiment at deterlab {}", jsonString);
         }
+        logger.info("Stop experiment request success at deterlab", response.getBody().toString());
         return expStatus;
     }
 
