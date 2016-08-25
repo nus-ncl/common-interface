@@ -24,10 +24,20 @@ public class RealizationsController {
         this.realizationService = realizationService;
     }
 
+    // will be replaced by the one requiring team name
     @GetMapping(path = "/{id}")
     @ResponseStatus(HttpStatus.OK)
     public Realization get(@PathVariable String id) {
         return realizationService.getByExperimentId(Long.parseLong(id));
+    }
+
+    // Although our experiment names are unique,
+    // deterlab allows different teams but identical experiment names
+    // still must check just in case
+    @GetMapping(path = "/team/{teamName}/experiment/{expId}")
+    @ResponseStatus(HttpStatus.OK)
+    public Realization getRealization(@PathVariable String teamName, @PathVariable String expId) {
+        return realizationService.getByExperimentId(teamName, Long.parseLong(expId));
     }
 
     @PostMapping(path = "/start/team/{teamName}/experiment/{expId}")
