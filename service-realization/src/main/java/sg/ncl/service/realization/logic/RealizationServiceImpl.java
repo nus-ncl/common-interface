@@ -57,6 +57,7 @@ public class RealizationServiceImpl implements RealizationService {
 
     // for retrieving live deterlab experiment status
     @Transactional
+    @Override
     public RealizationEntity getByExperimentId(final String teamName, final Long experimentId) {
         log.info("Get realization for team: {}, expid: {}", teamName, experimentId);
 

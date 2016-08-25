@@ -242,6 +242,7 @@ public class AdapterDeterLab {
         try {
             response = restTemplate.exchange(properties.startExperiment(), HttpMethod.POST, request, String.class);
         } catch (Exception e) {
+            logger.warn("Adapter error start experiment: {}", e);
             throw new AdapterDeterlabConnectException(e.getMessage());
         }
 
@@ -301,6 +302,7 @@ public class AdapterDeterLab {
         try {
             response = restTemplate.exchange(properties.getExpStatus(), HttpMethod.POST, request, String.class);
         } catch (Exception e) {
+            logger.warn("Adapter error get experiment status: {}", e);
             throw new AdapterDeterlabConnectException(e.getMessage());
         }
 
