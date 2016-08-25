@@ -52,6 +52,17 @@ public class RealizationsControllerTest extends AbstractTest {
     }
 
     @Test
+    public void testGetRealizationWithTeamName() throws Exception {
+        final String teamName = RandomStringUtils.randomAlphabetic(8);
+        final String experimentId = RandomStringUtils.randomNumeric(5);
+
+        when(realizationService.getByExperimentId(teamName, Long.parseLong(experimentId))).thenReturn(new RealizationEntity());
+
+        mockMvc.perform(get("/realizations/team/" + teamName + "/experiment/" + experimentId))
+                .andExpect(status().isOk());
+    }
+
+    @Test
     public void testStartExperiment() throws Exception {
         final String teamName = RandomStringUtils.randomAlphanumeric(8);
         final String experimentId = RandomStringUtils.randomNumeric(5);

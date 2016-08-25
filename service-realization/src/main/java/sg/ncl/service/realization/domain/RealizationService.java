@@ -11,6 +11,8 @@ public interface RealizationService {
 
     RealizationEntity getByExperimentId(Long experimentId);
 
+    RealizationEntity getByExperimentId(String teamName, Long experimentId);
+
     RealizationEntity save(RealizationEntity realizationEntity);
 
     RealizationEntity startExperimentInDeter(String teamName, String experimentName, String userId);

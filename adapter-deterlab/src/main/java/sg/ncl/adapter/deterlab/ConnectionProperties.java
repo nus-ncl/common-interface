@@ -80,5 +80,9 @@ public class ConnectionProperties {
     public String getRejectProject() {
         return "http://" + ip + ":" + port + "/rejectProject";
     }
+
+    public String getExpStatus() {
+        return "http://" + ip + ":" + port + "/getExpStatus";
+    }
 }
 
