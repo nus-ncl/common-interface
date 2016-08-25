@@ -355,4 +355,36 @@ public class AdapterDeterLabTest extends AbstractTest {
         String msg = resultJSONObject.getString("status");
         Assert.assertThat(msg, is("active"));
     }
+
+    @Test(expected = ExpStopException.class)
+    public void testStopExpBad() {
+        JSONObject one = new JSONObject();
+
+        JSONObject predefinedResultJson = new JSONObject();
+        predefinedResultJson.put("status", "error");
+
+        mockServer.expect(requestTo(properties.stopExperiment()))
+                .andExpect(method(HttpMethod.POST))
+                .andRespond(withSuccess(predefinedResultJson.toString(), MediaType.APPLICATION_JSON));
+
+        String result = adapterDeterLab.stopExperiment(one.toString());
+        JSONObject resultJSONObject = new JSONObject(result);
+        String msg = resultJSONObject.getString("status");
+        Assert.assertThat(msg, is("error"));
+    }
+
+    @Test
+    public void testStopExpGood() {
+        JSONObject one = new JSONObject();
+
+        JSONObject predefinedResultJson = new JSONObject();
+        predefinedResultJson.put("status", "swapped");
+
+        mockServer.expect(requestTo(properties.stopExperiment()))
+                .andExpect(method(HttpMethod.POST))
+                .andRespond(withSuccess(predefinedResultJson.toString(), MediaType.APPLICATION_JSON));
+
+        String result = adapterDeterLab.stopExperiment(one.toString());
+        Assert.assertThat(result, is("swapped"));
+    }
 }
