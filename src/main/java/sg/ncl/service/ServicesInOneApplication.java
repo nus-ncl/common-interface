@@ -7,6 +7,7 @@ import org.springframework.context.annotation.Import;
 import org.springframework.core.env.ConfigurableEnvironment;
 import sg.ncl.service.authentication.AuthenticationApplication;
 import sg.ncl.service.experiment.ExperimentApplication;
+import sg.ncl.service.mail.MailApplication;
 import sg.ncl.service.realization.RealizationApplication;
 import sg.ncl.service.registration.RegistrationApplication;
 import sg.ncl.service.team.TeamApplication;
@@ -22,6 +23,7 @@ import java.sql.SQLException;
 @Import({
         AuthenticationApplication.class,
         ExperimentApplication.class,
+        MailApplication.class,
         RealizationApplication.class,
         RegistrationApplication.class,
         TeamApplication.class,

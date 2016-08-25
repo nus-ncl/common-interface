@@ -161,6 +161,7 @@ public class FirstRun {
                 "credentials",
                 "deterlab_project",
                 "deterlab_user",
+                "email_retries",
                 "experiments",
                 "login_activities",
                 "realizations",

@@ -544,14 +544,14 @@ public class RegistrationServiceImpl implements RegistrationService {
          * rather than throw the exceptions. Hence, the email will not cause
          * the main application to fail. If users cannot receive emails after
          * a certain amount of time, they should send email to support@ncl.sg
-         *
-         * TODO long term need to have a retry mechanism for sending emails
          */
         try {
             String msgText = FreeMarkerTemplateUtils.processTemplateIntoString(
                     freemarkerConfiguration.getTemplate(VERIFICATIONEMAILTEMPLATENAME), tempMap);
+            InternetAddress[] receipts = new InternetAddress[1];
+            receipts[0] = new InternetAddress(user.getUserDetails().getEmail());
             mailService.send(new InternetAddress("testbed-ops@ncl.sg"),
-                    new InternetAddress(user.getUserDetails().getEmail()),
+                    receipts, null,
                     "Please Verify Your Email Account", msgText, false);
         } catch (TemplateNotFoundException e) {
             log.warn("Template {} not found", VERIFICATIONEMAILTEMPLATENAME);

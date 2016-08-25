@@ -10,9 +10,11 @@ public interface Email {
 
     Long getId();
 
-    InternetAddress getFrom();
+    InternetAddress getSender();
 
-    InternetAddress getTo();
+    InternetAddress[] getReceipts();
+
+    InternetAddress[] getCcList();
 
     String getSubject();
 

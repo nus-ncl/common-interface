@@ -50,13 +50,15 @@ public class MailServiceImplTest {
     @Test
     public void testSend() throws MessagingException, IOException {
         InternetAddress from = new InternetAddress("alice@ncl.sg");
-        InternetAddress to = new InternetAddress("bob@ncl.sg");
+        InternetAddress receipt = new InternetAddress("bob@ncl.sg");
+        InternetAddress[] receipts = new InternetAddress[1];
+        receipts[0] = receipt;
         String subject = RandomStringUtils.randomAlphanumeric(10);
         String content = RandomStringUtils.randomAlphanumeric(10);
         Session session = null;
         MimeMessage message = new MimeMessage(session);
         Mockito.doReturn(message).when(sender).createMimeMessage();
-        serviceImpl.send(from, to, subject, content, false);
+        serviceImpl.send(from, receipts, null, subject, content, false);
 
         Mockito.verify(sender).send(captor.capture());
         MimeMessage value = captor.getValue();
@@ -66,7 +68,7 @@ public class MailServiceImplTest {
         Assert.assertThat(fromArray.length, is(equalTo(1)));
         Assert.assertThat(toArray.length, is(equalTo(1)));
         Assert.assertThat(fromArray, arrayContaining(from));
-        Assert.assertThat(toArray, arrayContaining(to));
+        Assert.assertThat(toArray, arrayContaining(receipt));
         Assert.assertThat(value.getSubject(), is(equalTo(subject)));
         Assert.assertThat(value.getContentType(), is(equalTo("text/plain")));
         Assert.assertThat(value.getContent().toString(), is(equalTo(content)));
