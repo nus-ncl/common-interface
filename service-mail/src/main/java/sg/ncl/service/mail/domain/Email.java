@@ -12,7 +12,7 @@ public interface Email {
 
     InternetAddress getSender();
 
-    InternetAddress[] getReceipts();
+    InternetAddress[] getRecipients();
 
     InternetAddress[] getCcList();
 

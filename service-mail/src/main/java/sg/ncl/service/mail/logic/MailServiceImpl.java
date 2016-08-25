@@ -51,7 +51,7 @@ class MailServiceImpl implements MailService {
     ) {
         final EmailEntity emailEntity = new EmailEntity();
         emailEntity.setSender(sender);
-        emailEntity.setReceipts(receipts);
+        emailEntity.setRecipients(receipts);
         emailEntity.setCcList(ccList);
         emailEntity.setSubject(subject);
         emailEntity.setContent(content);
@@ -79,7 +79,7 @@ class MailServiceImpl implements MailService {
         final MimeMessageHelper helper = new MimeMessageHelper(message);
         try {
             helper.setFrom(email.getSender());
-            helper.setTo(email.getReceipts());
+            helper.setTo(email.getRecipients());
             if(email.getCcList() != null) {
                 helper.setCc(email.getCcList());
             }

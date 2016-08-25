@@ -344,8 +344,24 @@ public class AdapterDeterLab {
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
         HttpEntity<String> request = new HttpEntity<>(jsonString, headers);
+        ResponseEntity response;
 
-        ResponseEntity responseEntity = restTemplate.exchange(properties.getApproveProject(), HttpMethod.POST, request, String.class);
+        try {
+            response = restTemplate.exchange(properties.getApproveProject(), HttpMethod.POST, request, String.class);
+        } catch (Exception e) {
+            throw new AdapterDeterlabConnectException();
+        }
+
+        String jsonResult = new JSONObject(response.getBody().toString()).getString("msg");
+
+        if ("project approved".equals(jsonResult)) {
+            throw new NSFileParseException();
+        } else if ("experiment create fail exp name already in use".equals(jsonResult)) {
+            throw new ExpNameAlreadyExistsException();
+        } else if (!"experiment create success".equals(jsonResult)) {
+            throw new AdapterDeterlabConnectException();
+        }
+
 
         return responseEntity.getBody().toString();
     }

@@ -30,8 +30,8 @@ public class EmailEntity extends AbstractEntity implements Email {
     @Column(name = "sender", nullable = false, updatable = false)
     private InternetAddress sender;
 
-    @Column(name = "receipts", nullable = false, updatable = false)
-    private InternetAddress[] receipts;
+    @Column(name = "recipients", nullable = false, updatable = false)
+    private InternetAddress[] recipients;
 
     @Column(name = "cc_list", updatable = false)
     private InternetAddress[] ccList;
@@ -81,7 +81,7 @@ public class EmailEntity extends AbstractEntity implements Email {
         return "EmailEntity{" +
                 "id=" + id +
                 ", sender=" + sender +
-                ", receipts=" + receipts +
+                ", recipients=" + recipients +
                 ", cc_list=" + ccList +
                 ", subject='" + subject + '\'' +
                 ", content='" + content + '\'' +
