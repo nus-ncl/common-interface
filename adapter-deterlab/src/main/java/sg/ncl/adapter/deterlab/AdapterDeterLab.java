@@ -5,6 +5,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.*;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestTemplate;
 import sg.ncl.adapter.deterlab.data.jpa.DeterLabUserRepository;
 import sg.ncl.adapter.deterlab.dtos.entities.DeterLabUserEntity;
@@ -180,6 +181,7 @@ public class AdapterDeterLab {
         }
     }
 
+    @Transactional
     public void saveDeterUserIdMapping(String deterUserId, String nclUserId) {
         DeterLabUserEntity deterLabUserEntity = new DeterLabUserEntity();
         deterLabUserEntity.setNclUserId(nclUserId);
@@ -187,6 +189,7 @@ public class AdapterDeterLab {
         deterLabUserRepository.save(deterLabUserEntity);
     }
 
+    @Transactional
     public String getDeterUserIdByNclUserId(String nclUserId) {
         DeterLabUserEntity deterLabUserEntity = deterLabUserRepository.findByNclUserId(nclUserId);
         if (deterLabUserEntity == null) {
@@ -226,7 +229,6 @@ public class AdapterDeterLab {
      * @implNote must return the entire response body as realization service needs to store the experiment report to transmit back to UI
      * @param jsonString Contains pid, eid, and deterlab userId
      * @return a experiment report if the experiment is started successfully and active, otherwise a "experiment start fail" is return
-     * @see startExperimentInDeter()
      */
     public String startExperiment(String jsonString) {
         logger.info("Start experiment - {} at {}: {}", properties.getIp(), properties.getPort(), jsonString);
@@ -280,6 +282,31 @@ public class AdapterDeterLab {
         ResponseEntity responseEntity = restTemplate.exchange(properties.deleteExperiment(), HttpMethod.POST, request, String.class);
 
         return responseEntity.getBody().toString();
+    }
+
+    /**
+     * Retrieves the experiment status from Deterlab
+     * @param jsonString Contains eid and pid
+     * @return the status of the experiment, a "no experiment found" if the request fails
+     */
+    public String getExperimentStatus(String jsonString) {
+        logger.info("Get experiment status - {} at {} : {}", properties.getIp(), properties.getPort(), jsonString);
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        HttpEntity<String> request = new HttpEntity<>(jsonString, headers);
+
+        ResponseEntity response;
+
+        try {
+            response = restTemplate.exchange(properties.getExpStatus(), HttpMethod.POST, request, String.class);
+        } catch (Exception e) {
+            throw new AdapterDeterlabConnectException(e.getMessage());
+        }
+
+        logger.info("Get experiment status request submitted to deterlab");
+
+        return response.getBody().toString();
     }
 
     public String approveJoinRequest(String jsonString) {
