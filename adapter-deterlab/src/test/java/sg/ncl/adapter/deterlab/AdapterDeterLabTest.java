@@ -356,7 +356,7 @@ public class AdapterDeterLabTest extends AbstractTest {
         Assert.assertThat(msg, is("active"));
     }
 
-    @Test(expected = ExpStopException.class)
+    @Test
     public void testStopExpBad() {
         JSONObject one = new JSONObject();
 
@@ -368,9 +368,7 @@ public class AdapterDeterLabTest extends AbstractTest {
                 .andRespond(withSuccess(predefinedResultJson.toString(), MediaType.APPLICATION_JSON));
 
         String result = adapterDeterLab.stopExperiment(one.toString());
-        JSONObject resultJSONObject = new JSONObject(result);
-        String msg = resultJSONObject.getString("status");
-        Assert.assertThat(msg, is("error"));
+        Assert.assertThat(result, is("error"));
     }
 
     @Test
