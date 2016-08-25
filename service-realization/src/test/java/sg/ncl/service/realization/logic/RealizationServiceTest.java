@@ -266,7 +266,7 @@ public class RealizationServiceTest extends AbstractTest {
     @Test
     public void testStopExperiment() {
         JSONObject predefinedResultJson = new JSONObject();
-        predefinedResultJson.put("msg", "Experiment stopped");
+        predefinedResultJson.put("status", "swapped");
 
         mockServer.expect(requestTo(properties.stopExperiment()))
                 .andExpect(method(HttpMethod.POST))
