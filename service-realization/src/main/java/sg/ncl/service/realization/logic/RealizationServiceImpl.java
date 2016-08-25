@@ -7,7 +7,6 @@ import org.springframework.transaction.annotation.Transactional;
 import sg.ncl.adapter.deterlab.AdapterDeterLab;
 import sg.ncl.service.realization.data.jpa.RealizationEntity;
 import sg.ncl.service.realization.data.jpa.RealizationRepository;
-import sg.ncl.service.realization.domain.Realization;
 import sg.ncl.service.realization.domain.RealizationService;
 import sg.ncl.service.realization.domain.RealizationState;
 
@@ -30,6 +29,7 @@ public class RealizationServiceImpl implements RealizationService {
         this.adapterDeterLab = adapterDeterLab;
     }
 
+    @Transactional
     public RealizationEntity getById(final Long id) {
         log.info("Get realization by id");
 
@@ -42,6 +42,7 @@ public class RealizationServiceImpl implements RealizationService {
         }
     }
 
+    @Transactional
     public RealizationEntity getByExperimentId(final Long experimentId) {
         log.info("Get realization by experiment name");
 
@@ -54,6 +55,57 @@ public class RealizationServiceImpl implements RealizationService {
         }
     }
 
+    // for retrieving live deterlab experiment status
+    @Transactional
+    public RealizationEntity getByExperimentId(final String teamName, final Long experimentId) {
+        log.info("Get realization for team: {}, expid: {}", teamName, experimentId);
+
+        RealizationEntity realizationEntity = realizationRepository.findByExperimentId(experimentId);
+
+        if (realizationEntity != null && realizationEntity.getId() > 0) {
+            log.info("Retrieved realization entity: {}", realizationEntity);
+            JSONObject jsonObject = new JSONObject();
+            jsonObject.put("pid", teamName);
+            jsonObject.put("eid", realizationEntity.getExperimentName());
+            String result = adapterDeterLab.getExperimentStatus(jsonObject.toString());
+
+            JSONObject jsonObjectFromExperiment = new JSONObject(result);
+            String status = jsonObjectFromExperiment.getString("status");
+            RealizationState realizationState;
+            if (status == null) {
+                realizationState = RealizationState.NOT_RUNNING;
+            } else {
+                switch (status) {
+                    case "active":
+                        realizationState = RealizationState.RUNNING;
+                        String report = jsonObjectFromExperiment.getString("report");
+                        realizationEntity.setDetails(report);
+                        break;
+                    case "activating":
+                        realizationState = RealizationState.STARTING;
+                        break;
+                    case "swapping":
+                        realizationState = RealizationState.STOPPING;
+                        realizationEntity.setDetails("");
+                        break;
+                    default:
+                        realizationState = RealizationState.NOT_RUNNING;
+                        break;
+                }
+            }
+            if (realizationEntity.getState() != realizationState) {
+                realizationEntity.setState(realizationState);
+                log.info("Realization: {} updated to state: {}", realizationEntity, realizationState);
+                return realizationRepository.save(realizationEntity);
+            }
+            return realizationEntity;
+        } else {
+            log.warn("Get realization fail for team: {}, experiment id: {}", teamName, experimentId);
+            return null;
+        }
+    }
+
+    @Transactional
     public RealizationEntity save(RealizationEntity realizationEntity) {
         log.info("Save realization");
 
@@ -79,7 +131,6 @@ public class RealizationServiceImpl implements RealizationService {
         jsonObject.put("eid", experimentName);
 
         RealizationEntity realizationEntity = realizationRepository.findByExperimentName(experimentName);
-        updateStatus(realizationEntity, RealizationState.STARTING);
 
         String stringFromExperiment = adapterDeterLab.startExperiment(jsonObject.toString());
         JSONObject jsonObjectFromExperiment = new JSONObject(stringFromExperiment);
@@ -181,10 +232,5 @@ public class RealizationServiceImpl implements RealizationService {
     public void deleteRealization(final Long realizationId) {
         log.info("Delete realization. {}", realizationId);
         realizationRepository.delete(realizationId);
-    }
-
-    private void updateStatus(RealizationEntity realizationEntity, RealizationState realizationState) {
-        realizationEntity.setState(realizationState);
-        realizationRepository.save(realizationEntity);
     }
 }
