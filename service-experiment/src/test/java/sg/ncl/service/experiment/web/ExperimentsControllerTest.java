@@ -26,6 +26,7 @@ import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.mockingDetails;
 import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
@@ -132,10 +133,11 @@ public class ExperimentsControllerTest extends AbstractTest {
     @Test
     public void testDeleteExperiment() throws Exception {
         Long experimentId = Long.parseLong(RandomStringUtils.randomNumeric(5));
+        String teamName = RandomStringUtils.randomAlphabetic(8);
 
-        when(experimentService.deleteExperiment(experimentId)).thenReturn("Experiment deleted.");
+        when(experimentService.deleteExperiment(experimentId, teamName)).thenReturn(Util.getExperimentsEntity());
 
-        mockMvc.perform(post("/experiments/delete/" + experimentId))
+        mockMvc.perform(delete("/experiments/" + experimentId + "/teams/" + teamName))
                 .andExpect(status().isOk());
     }
 }

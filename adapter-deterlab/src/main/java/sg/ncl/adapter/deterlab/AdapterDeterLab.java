@@ -293,6 +293,11 @@ public class AdapterDeterLab {
         return expStatus;
     }
 
+    /**
+     * Creates a delete experiment request to Deterlab
+     * @param jsonString Contains experiment name, team name and deterlab userid
+     * @return the experiment status
+     */
     public String deleteExperiment(String jsonString) {
         logger.info("Delete experiment - {} at {} : {}", properties.getIp(), properties.getPort(), jsonString);
 
@@ -300,9 +305,25 @@ public class AdapterDeterLab {
         headers.setContentType(MediaType.APPLICATION_JSON);
         HttpEntity<String> request = new HttpEntity<>(jsonString, headers);
 
-        ResponseEntity responseEntity = restTemplate.exchange(properties.deleteExperiment(), HttpMethod.POST, request, String.class);
+        ResponseEntity response;
 
-        return responseEntity.getBody().toString();
+        try {
+            response = restTemplate.exchange(properties.deleteExperiment(), HttpMethod.POST, request, String.class);
+        } catch (Exception e) {
+            logger.warn("Adapter error delete experiment: {}", e);
+            throw new AdapterDeterlabConnectException(e.getMessage());
+        }
+
+        logger.info("Delete experiment request submitted to deterlab");
+        String expStatus = new JSONObject(response.getBody().toString()).getString("status");
+
+        if (!"no experiment found".equals(expStatus)) {
+            logger.warn("Fail to delete experiment at deterlab {}", jsonString);
+            throw new ExpDeleteException();
+        }
+
+        logger.info("Delete experiment request success at deterlab", response.getBody().toString());
+        return expStatus;
     }
 
     /**

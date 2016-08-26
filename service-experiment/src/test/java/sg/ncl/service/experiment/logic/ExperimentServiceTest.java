@@ -183,7 +183,7 @@ public class ExperimentServiceTest extends AbstractTest {
 
         compareCounts(new Long(1L));
 
-        experimentService.deleteExperiment(savedExperiment.getId());
+        experimentService.deleteExperiment(savedExperiment.getId(), experimentEntity.getTeamName());
 
         compareCounts(new Long(0L));
     }
