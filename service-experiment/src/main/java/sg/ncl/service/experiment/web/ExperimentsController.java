@@ -60,7 +60,7 @@ public class ExperimentsController {
     }
 
     // delete experiment
-    @DeleteMapping(path = "/experiments/{expId}/teams/{teamName}")
+    @DeleteMapping(path = "/{expId}/teams/{teamName}")
     // FIXME: should be DELETE instead of POST and path should be "/experiments/{id}"
     @ResponseStatus(HttpStatus.OK)
     public void deleteExperiment(@PathVariable String expId, @PathVariable String teamName) {
