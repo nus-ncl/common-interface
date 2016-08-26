@@ -193,8 +193,9 @@ public class ExperimentServiceImpl implements ExperimentService {
         log.info("End createExperimentInDeter");
     }
 
-    @Transactional
+
     // returns the deleted entity
+    @Transactional
     public Experiment deleteExperiment(final Long id, final String teamName) {
         log.info("Deleting Experiment: {} from Team: {}", id, teamName);
         Experiment experimentEntity = null;
@@ -222,15 +223,6 @@ public class ExperimentServiceImpl implements ExperimentService {
 
         log.info("End deleteExperiment");
         return experimentEntity;
-    }
-
-    // FIXME: obsolete because we need the teamName
-    private void deleteExperimentInDeter(final String experimentName, final String nclUserId) {
-        JSONObject jsonObject = new JSONObject();
-        jsonObject.put("experimentName", experimentName);
-        jsonObject.put("deterLogin", adapterDeterLab.getDeterUserIdByNclUserId(nclUserId));
-
-        adapterDeterLab.deleteExperiment(jsonObject.toString());
     }
 
     private void deleteExperimentInDeter(final String experimentName, final String teamName, final String nclUserId) {
