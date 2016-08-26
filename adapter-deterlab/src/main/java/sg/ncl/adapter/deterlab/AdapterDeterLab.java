@@ -261,6 +261,11 @@ public class AdapterDeterLab {
         return response.getBody().toString();
     }
 
+    /**
+     * Creates a stop experiment request to Deterlab
+     * @param jsonString Contains pid, eid, and deterlab userId
+     * @return the experiment status
+     */
     public String stopExperiment(String jsonString) {
         logger.info("Stop experiment - {} at {}: {}", properties.getIp(), properties.getPort(), jsonString);
 
@@ -268,9 +273,23 @@ public class AdapterDeterLab {
         headers.setContentType(MediaType.APPLICATION_JSON);
         HttpEntity<String> request = new HttpEntity<>(jsonString, headers);
 
-        ResponseEntity responseEntity = restTemplate.exchange(properties.stopExperiment(), HttpMethod.POST, request, String.class);
+        ResponseEntity response;
 
-        return responseEntity.getBody().toString();
+        try {
+            response = restTemplate.exchange(properties.stopExperiment(), HttpMethod.POST, request, String.class);
+        } catch (Exception e) {
+            logger.warn("Adapter error start experiment: {}", e);
+            throw new AdapterDeterlabConnectException(e.getMessage());
+        }
+
+        logger.info("Stop experiment request submitted to deterlab");
+        String expStatus = new JSONObject(response.getBody().toString()).getString("status");
+
+        if (!"swapped".equals(expStatus)) {
+            logger.warn("Fail to stop experiment at deterlab {}", jsonString);
+        }
+        logger.info("Stop experiment request success at deterlab", response.getBody().toString());
+        return expStatus;
     }
 
     public String deleteExperiment(String jsonString) {

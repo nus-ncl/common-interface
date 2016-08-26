@@ -156,6 +156,7 @@ public class RealizationServiceImpl implements RealizationService {
         return realizationRepository.save(realizationEntity);
     }
 
+    @Transactional
     public RealizationEntity stopExperimentInDeter(final String teamName, final String experimentName, final String userId) {
         StringBuilder httpCommand = new StringBuilder();
         httpCommand.append("?inout=out");
@@ -171,13 +172,16 @@ public class RealizationServiceImpl implements RealizationService {
         jsonObject.put("eid", experimentName);
 
         RealizationEntity realizationEntity = realizationRepository.findByExperimentName(experimentName);
-        realizationEntity.setState(RealizationState.STOPPING);
-        realizationRepository.save(realizationEntity);
 
-        adapterDeterLab.stopExperiment(jsonObject.toString());
-
-        // FIXME may need to check if stopping experiments have error
-        realizationEntity.setState(RealizationState.NOT_RUNNING);
+        // should be 'swapped'
+        String resultState = adapterDeterLab.stopExperiment(jsonObject.toString());
+        RealizationState realizationState;
+        if (resultState.equals("swapped")) {
+            realizationState = RealizationState.NOT_RUNNING;
+        } else {
+            realizationState = RealizationState.ERROR;
+        }
+        realizationEntity.setState(realizationState);
         realizationEntity.setDetails("");
         return realizationRepository.save(realizationEntity);
     }
