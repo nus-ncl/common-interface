@@ -135,7 +135,7 @@ public class ExperimentsControllerTest extends AbstractTest {
         Long experimentId = Long.parseLong(RandomStringUtils.randomNumeric(5));
         String teamName = RandomStringUtils.randomAlphabetic(8);
 
-        when(experimentService.deleteExperiment(experimentId, teamName)).thenReturn("Experiment deleted.");
+        when(experimentService.deleteExperiment(experimentId, teamName)).thenReturn(Util.getExperimentsEntity());
 
         mockMvc.perform(delete("/experiments/" + experimentId + "/teams/" + teamName))
                 .andExpect(status().isOk());
