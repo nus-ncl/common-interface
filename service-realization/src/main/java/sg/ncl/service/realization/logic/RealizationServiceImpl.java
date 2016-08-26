@@ -70,6 +70,8 @@ public class RealizationServiceImpl implements RealizationService {
             jsonObject.put("eid", realizationEntity.getExperimentName());
             String result = adapterDeterLab.getExperimentStatus(jsonObject.toString());
 
+            log.info("Retrieved deterlab exp status...Exp: {} State: {}", realizationEntity.getExperimentName(), result);
+
             JSONObject jsonObjectFromExperiment = new JSONObject(result);
             String status = jsonObjectFromExperiment.getString("status");
             RealizationState realizationState;
@@ -89,6 +91,9 @@ public class RealizationServiceImpl implements RealizationService {
                         realizationState = RealizationState.STOPPING;
                         realizationEntity.setDetails("");
                         break;
+                    case "error":
+                        realizationState = RealizationState.ERROR;
+                        break;
                     default:
                         realizationState = RealizationState.NOT_RUNNING;
                         break;
@@ -102,7 +107,7 @@ public class RealizationServiceImpl implements RealizationService {
             return realizationEntity;
         } else {
             log.warn("Get realization fail for team: {}, experiment id: {}", teamName, experimentId);
-            return null;
+            return new RealizationEntity();
         }
     }
 

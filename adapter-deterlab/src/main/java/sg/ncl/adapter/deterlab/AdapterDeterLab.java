@@ -263,6 +263,7 @@ public class AdapterDeterLab {
 
     /**
      * Creates a stop experiment request to Deterlab
+     * @implNote we don't throw any exception if the result returned from deterlab is not "swapped" since there may be other types of experiment status unknown to us
      * @param jsonString Contains pid, eid, and deterlab userId
      * @return the experiment status
      */
@@ -306,8 +307,9 @@ public class AdapterDeterLab {
 
     /**
      * Retrieves the experiment status from Deterlab
+     * @implNote cannot throw exception for this method
      * @param jsonString Contains eid and pid
-     * @return the status of the experiment, a "no experiment found" if the request fails
+     * @return the status of the experiment, a "error" if the request fails
      */
     public String getExperimentStatus(String jsonString) {
         logger.info("Get experiment status - {} at {} : {}", properties.getIp(), properties.getPort(), jsonString);
@@ -321,8 +323,8 @@ public class AdapterDeterLab {
         try {
             response = restTemplate.exchange(properties.getExpStatus(), HttpMethod.POST, request, String.class);
         } catch (Exception e) {
-            logger.warn("Adapter error get experiment status: {}", e);
-            throw new AdapterDeterlabConnectException(e.getMessage());
+            logger.warn("Adapter connection error get experiment status: {}", e);
+            return "{\"status\": \"error\"}";
         }
 
         logger.info("Get experiment status request submitted to deterlab");
