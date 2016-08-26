@@ -257,9 +257,10 @@ public class AdapterDeterLabTest extends AbstractTest {
     @Test
     public void testApproveProject() {
         JSONObject one = new JSONObject();
-
+        one.put("pid", "11111111");
+        one.put("uid", "22222222");
         JSONObject predefinedResultJson = new JSONObject();
-        predefinedResultJson.put("msg", "project approved");
+        predefinedResultJson.put("msg", "approve project OK");
 
         mockServer.expect(requestTo(properties.getApproveProject()))
                 .andExpect(method(HttpMethod.POST))
@@ -268,15 +269,16 @@ public class AdapterDeterLabTest extends AbstractTest {
         String result = adapterDeterLab.approveProject(one.toString());
         JSONObject resultJSONObject = new JSONObject(result);
         String msg = resultJSONObject.getString("msg");
-        Assert.assertThat(msg, is("project approved"));
+        Assert.assertThat(msg, is("approve project OK"));
     }
 
     @Test
     public void testRejectProject() {
         JSONObject one = new JSONObject();
-
+        one.put("pid", "11111111");
+        one.put("uid", "22222222");
         JSONObject predefinedResultJson = new JSONObject();
-        predefinedResultJson.put("msg", "project rejected");
+        predefinedResultJson.put("msg", "reject project OK");
 
         mockServer.expect(requestTo(properties.getRejectProject()))
                 .andExpect(method(HttpMethod.POST))
@@ -285,7 +287,7 @@ public class AdapterDeterLabTest extends AbstractTest {
         String result = adapterDeterLab.rejectProject(one.toString());
         JSONObject resultJSONObject = new JSONObject(result);
         String msg = resultJSONObject.getString("msg");
-        Assert.assertThat(msg, is("project rejected"));
+        Assert.assertThat(msg, is("reject project OK"));
     }
 
     @Test

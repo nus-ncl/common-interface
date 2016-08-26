@@ -17,6 +17,7 @@ import sg.ncl.service.authentication.data.jpa.CredentialsEntity;
 import sg.ncl.service.registration.AbstractTest;
 import sg.ncl.service.registration.Util;
 import sg.ncl.service.registration.domain.RegistrationService;
+import sg.ncl.service.registration.exceptions.IdNullOrEmptyException;
 import sg.ncl.service.registration.exceptions.RegisterTeamIdEmptyException;
 import sg.ncl.service.registration.exceptions.RegisterTeamNameDuplicateException;
 import sg.ncl.service.registration.exceptions.RegisterTeamNameEmptyException;
@@ -322,7 +323,7 @@ public class RegistrationServiceTest extends AbstractTest {
         }
     }
 
-    @Test(expected = RegisterTeamIdEmptyException.class)
+    @Test(expected = IdNullOrEmptyException.class)
     public void approveTeamNullTeamId() throws Exception {
         registrationService.approveOrRejectNewTeam(null, null, TeamStatus.APPROVED);
     }
@@ -330,14 +331,16 @@ public class RegistrationServiceTest extends AbstractTest {
     @Test(expected = TeamNotFoundException.class)
     public void approveTeamNoSuchTeam() throws Exception {
         final String one = RandomStringUtils.randomAlphanumeric(20);
-        registrationService.approveOrRejectNewTeam(one, null, TeamStatus.APPROVED);
+        final String userId = RandomStringUtils.randomAlphanumeric(20);
+        registrationService.approveOrRejectNewTeam(one, userId, TeamStatus.APPROVED);
     }
 
     @Test(expected = NoOwnerInTeamException.class)
     public void approveTeamNoOwner() throws Exception {
         Team one = Util.getTeamEntity();
         Team createdTeam = teamService.createTeam(one);
-        registrationService.approveOrRejectNewTeam(createdTeam.getId(), null, TeamStatus.APPROVED);
+        final String userId = RandomStringUtils.randomAlphanumeric(20);
+        registrationService.approveOrRejectNewTeam(createdTeam.getId(), userId, TeamStatus.APPROVED);
     }
 
     @Test

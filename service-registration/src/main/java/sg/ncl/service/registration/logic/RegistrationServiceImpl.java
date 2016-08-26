@@ -333,17 +333,19 @@ public class RegistrationServiceImpl implements RegistrationService {
     }
 
     @Transactional
-    public void approveOrRejectNewTeam(
-            @NotNull String teamId,
-            @NotNull String ownerId,
-            @NotNull TeamStatus status
+    public String approveOrRejectNewTeam(
+            final String teamId,
+            final String ownerId,
+            final TeamStatus status
     ) {
         // FIXME required additional parameters to validate if approver is of admin or ordinary user
-        if (teamId.isEmpty() || ownerId.isEmpty()) {
-            log.warn("Invalid input: TeamId {}, OwnerId {}", teamId, ownerId);
-            throw new IllegalArgumentException();
+
+        if(teamId == null || teamId.isEmpty() || ownerId == null || ownerId.isEmpty()) {
+            log.warn("Id null or empty exception. TeamId: {}, UserId: {}", teamId, ownerId);
+            throw new IdNullOrEmptyException();
         }
-        if(!(status.equals(TeamStatus.APPROVED) || status.equals(TeamStatus.REJECTED))){
+        if(status == null ||
+                !(status.equals(TeamStatus.APPROVED) || status.equals(TeamStatus.REJECTED))){
             log.warn("Invalid TeamStatus {}", status);
             throw new InvalidTeamStatusException();
         }
@@ -368,7 +370,7 @@ public class RegistrationServiceImpl implements RegistrationService {
                     teamService.updateMemberStatus(teamId, teamMember.getUserId(), MemberStatus.APPROVED);
                 }
             }
-            adapterDeterLab.approveProject(one.toString());
+            return adapterDeterLab.approveProject(one.toString());
         } else {
             // FIXME may need to be more specific and check if TeamStatus is REJECTED
             Team existingTeam = teamService.getTeamById(teamId);
@@ -379,7 +381,7 @@ public class RegistrationServiceImpl implements RegistrationService {
             }
             // remove from team side
             teamService.removeTeam(teamId);
-            adapterDeterLab.rejectProject(one.toString());
+            return adapterDeterLab.rejectProject(one.toString());
         }
     }
 
