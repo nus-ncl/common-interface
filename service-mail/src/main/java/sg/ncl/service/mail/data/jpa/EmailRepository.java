@@ -7,6 +7,6 @@ import java.util.List;
 /**
  * Created by dcszwang on 8/23/2016.
  */
-public interface EmailRepository extends JpaRepository<EmailEntity, String> {
+public interface EmailRepository extends JpaRepository<EmailEntity, Long> {
     List<EmailEntity> findBySentFalseAndRetryTimesLessThanOrderByRetryTimes(int retryTimes);
 }
