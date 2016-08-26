@@ -103,11 +103,13 @@ public class ExperimentServiceImpl implements ExperimentService {
         return experimentEntity;
     }
 
+    @Transactional
     public List<Experiment> getAll() {
         log.info("Get all experiments");
         return experimentRepository.findAll().stream().collect(Collectors.toList());
     }
 
+    @Transactional
     public List<Experiment> findByUser(String userId) {
         log.info("Find user by user id");
 
@@ -119,6 +121,7 @@ public class ExperimentServiceImpl implements ExperimentService {
         return experimentRepository.findByUserId(userId).stream().collect(Collectors.toList());
     }
 
+    @Transactional
     public List<Experiment> findByTeam(String teamId) {
         log.info("Find teams by team id");
 
@@ -190,8 +193,11 @@ public class ExperimentServiceImpl implements ExperimentService {
         log.info("End createExperimentInDeter");
     }
 
-    public String deleteExperiment(final Long id, final String teamName) {
-        log.info("Start deleteExperiment");
+    @Transactional
+    // returns the deleted entity
+    public Experiment deleteExperiment(final Long id, final String teamName) {
+        log.info("Deleting Experiment: {} from Team: {}", id, teamName);
+        Experiment experimentEntity = null;
         String returnString = "experiment deleted";
 
         RealizationEntity realizationEntity = realizationService.getByExperimentId(id);
@@ -201,23 +207,24 @@ public class ExperimentServiceImpl implements ExperimentService {
             realizationService.deleteRealization(realizationId);
             log.info("Realization deleted");
 
-            ExperimentEntity experimentEntity = experimentRepository.getOne(id);
+            experimentEntity = experimentRepository.getOne(id);
             // TODO: use other deleteExperimentInDeter(teamName, experimentName) if using script_wrapper.py
-            deleteExperimentInDeter(experimentEntity.getName(), realizationEntity.getUserId());
-            log.info("Experiment deleted in deter");
+//            deleteExperimentInDeter(experimentEntity.getName(), realizationEntity.getUserId());
+            deleteExperimentInDeter(experimentEntity.getName(), teamName, realizationEntity.getUserId());
+            log.info("Experiment deleted in deter: {} from Team: {}", experimentEntity.getName(), teamName);
 
             experimentRepository.delete(id);
-            log.info("Experiment deleted");
+            log.info("Experiment deleted from experiment repository: {} from Team: {}", experimentEntity.getName(), teamName);
         } else {
             log.warn("Experiment not deleted");
             returnString = "experiment not deleted";
         }
 
         log.info("End deleteExperiment");
-
-        return returnString;
+        return experimentEntity;
     }
 
+    // FIXME: obsolete because we need the teamName
     private void deleteExperimentInDeter(final String experimentName, final String nclUserId) {
         JSONObject jsonObject = new JSONObject();
         jsonObject.put("experimentName", experimentName);
@@ -226,12 +233,12 @@ public class ExperimentServiceImpl implements ExperimentService {
         adapterDeterLab.deleteExperiment(jsonObject.toString());
     }
 
-    // TODO: Use this if using script_wrapper.py
-//    private void deleteExperimentInDeter(final String teamName, final String experimentName) {
-//        JSONObject jsonObject = new JSONObject();
-//        jsonObject.put("teamName", teamName);
-//        jsonObject.put("experimentName", experimentName);
-//
-//        adapterDeterlab.deleteExperiment(jsonObject.toString());
-//    }
+    private void deleteExperimentInDeter(final String experimentName, final String teamName, final String nclUserId) {
+        JSONObject jsonObject = new JSONObject();
+        jsonObject.put("teamName", teamName);
+        jsonObject.put("experimentName", experimentName);
+        jsonObject.put("deterLogin", adapterDeterLab.getDeterUserIdByNclUserId(nclUserId));
+
+        adapterDeterLab.deleteExperiment(jsonObject.toString());
+    }
 }
