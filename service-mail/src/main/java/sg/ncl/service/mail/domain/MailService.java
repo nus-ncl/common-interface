@@ -11,7 +11,9 @@ import javax.mail.internet.MimeMessage;
 public interface MailService {
 
     void send(InternetAddress from, InternetAddress[] to, InternetAddress[] ccList, String subject, String content, boolean isHtml);
+
     void send(EmailEntity entity, MimeMessage message);
+
     MimeMessage prepareMessage(Email email);
 
 }

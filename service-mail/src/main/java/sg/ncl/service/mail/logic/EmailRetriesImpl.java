@@ -41,7 +41,7 @@ public class EmailRetriesImpl {
     @Transactional
     public void resend() {
         EmailEntity one = findEmailForRetry();
-        if(one != null) {
+        if (one != null) {
             MimeMessage message = mailService.prepareMessage(one);
             one.setLastRetryTime(ZonedDateTime.now());
             one.setRetryTimes(one.getRetryTimes() + 1);
@@ -50,11 +50,10 @@ public class EmailRetriesImpl {
         }
     }
 
-
     private EmailEntity findEmailForRetry() {
         List<EmailEntity> emailEntityList =
                 emailRepository.findBySentFalseAndRetryTimesLessThanOrderByRetryTimes(MAX_RETRY_TIMES);
-        if(!emailEntityList.isEmpty()) {
+        if (!emailEntityList.isEmpty()) {
             EmailEntity candidate = emailEntityList.get(0);
             return (ZonedDateTime.now().toEpochSecond() - candidate.getLastRetryTime().toEpochSecond()) >= RETRY_INTERVAL_PER_EMAIL ?
                     candidate : null;

@@ -18,7 +18,6 @@ import javax.mail.internet.MimeMessage;
 import javax.validation.constraints.NotNull;
 import java.time.ZonedDateTime;
 
-
 /**
  * Created by dcszwang on 8/10/2016.
  */
@@ -80,7 +79,7 @@ class MailServiceImpl implements MailService {
         try {
             helper.setFrom(email.getSender());
             helper.setTo(email.getRecipients());
-            if(email.getCcList() != null) {
+            if (email.getCcList() != null) {
                 helper.setCc(email.getCcList());
             }
             helper.setSubject(email.getSubject());
