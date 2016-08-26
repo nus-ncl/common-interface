@@ -199,7 +199,6 @@ public class ExperimentServiceImpl implements ExperimentService {
     public Experiment deleteExperiment(final Long id, final String teamName) {
         log.info("Deleting Experiment: {} from Team: {}", id, teamName);
         Experiment experimentEntity = null;
-        String returnString = "experiment deleted";
 
         RealizationEntity realizationEntity = realizationService.getByExperimentId(id);
         Long realizationId = realizationEntity.getId();
@@ -218,7 +217,6 @@ public class ExperimentServiceImpl implements ExperimentService {
             log.info("Experiment deleted from experiment repository: {} from Team: {}", experimentEntity.getName(), teamName);
         } else {
             log.warn("Experiment not deleted");
-            returnString = "experiment not deleted";
         }
 
         log.info("End deleteExperiment");
