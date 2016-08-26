@@ -19,6 +19,6 @@ public interface ExperimentService {
 
     void createExperimentInDeter(Experiment experiment);
 
-    String deleteExperiment(final Long id);
+    String deleteExperiment(final Long id, final String teamName);
 
 }

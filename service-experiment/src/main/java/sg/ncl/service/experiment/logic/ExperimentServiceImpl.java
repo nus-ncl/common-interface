@@ -190,7 +190,7 @@ public class ExperimentServiceImpl implements ExperimentService {
         log.info("End createExperimentInDeter");
     }
 
-    public String deleteExperiment(final Long id) {
+    public String deleteExperiment(final Long id, final String teamName) {
         log.info("Start deleteExperiment");
         String returnString = "experiment deleted";
 
