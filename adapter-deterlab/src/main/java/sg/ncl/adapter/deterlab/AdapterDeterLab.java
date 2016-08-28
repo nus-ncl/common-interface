@@ -3,12 +3,24 @@ package sg.ncl.adapter.deterlab;
 import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.http.*;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestTemplate;
 import sg.ncl.adapter.deterlab.data.jpa.DeterLabUserRepository;
 import sg.ncl.adapter.deterlab.dtos.entities.DeterLabUserEntity;
-import sg.ncl.adapter.deterlab.exceptions.*;
+import sg.ncl.adapter.deterlab.exceptions.AdapterDeterlabConnectException;
+import sg.ncl.adapter.deterlab.exceptions.ApplyNewProjectException;
+import sg.ncl.adapter.deterlab.exceptions.CredentialsUpdateException;
+import sg.ncl.adapter.deterlab.exceptions.ExpNameAlreadyExistsException;
+import sg.ncl.adapter.deterlab.exceptions.ExpStartException;
+import sg.ncl.adapter.deterlab.exceptions.JoinProjectException;
+import sg.ncl.adapter.deterlab.exceptions.NSFileParseException;
+import sg.ncl.adapter.deterlab.exceptions.UserNotFoundException;
 
 import javax.inject.Inject;
 
@@ -180,6 +192,7 @@ public class AdapterDeterLab {
         }
     }
 
+    @Transactional
     public void saveDeterUserIdMapping(String deterUserId, String nclUserId) {
         DeterLabUserEntity deterLabUserEntity = new DeterLabUserEntity();
         deterLabUserEntity.setNclUserId(nclUserId);
@@ -187,6 +200,7 @@ public class AdapterDeterLab {
         deterLabUserRepository.save(deterLabUserEntity);
     }
 
+    @Transactional
     public String getDeterUserIdByNclUserId(String nclUserId) {
         DeterLabUserEntity deterLabUserEntity = deterLabUserRepository.findByNclUserId(nclUserId);
         if (deterLabUserEntity == null) {
@@ -221,6 +235,12 @@ public class AdapterDeterLab {
         }
     }
 
+    /**
+     * Creates a start experiment request to Deterlab
+     * @implNote must return the entire response body as realization service needs to store the experiment report to transmit back to UI
+     * @param jsonString Contains pid, eid, and deterlab userId
+     * @return a experiment report if the experiment is started successfully and active, otherwise a "experiment start fail" is return
+     */
     public String startExperiment(String jsonString) {
         logger.info("Start experiment - {} at {}: {}", properties.getIp(), properties.getPort(), jsonString);
 
@@ -228,9 +248,28 @@ public class AdapterDeterLab {
         headers.setContentType(MediaType.APPLICATION_JSON);
         HttpEntity<String> request = new HttpEntity<>(jsonString, headers);
 
-        ResponseEntity responseEntity = restTemplate.exchange(properties.startExperiment(), HttpMethod.POST, request, String.class);
+        ResponseEntity response;
 
-        return responseEntity.getBody().toString();
+        try {
+            response = restTemplate.exchange(properties.startExperiment(), HttpMethod.POST, request, String.class);
+        } catch (Exception e) {
+            logger.warn("Adapter error start experiment: {}", e);
+            throw new AdapterDeterlabConnectException(e.getMessage());
+        }
+
+        logger.info("Start experiment request submitted to deterlab");
+        String jsonResult = new JSONObject(response.getBody().toString()).getString("msg");
+
+        if ("experiment start fail".equals(jsonResult)) {
+            logger.warn("Fail to start experiment at deterlab {}", jsonString);
+            throw new ExpStartException();
+        } else if (!"experiment start success".equals(jsonResult)) {
+            logger.warn("Start experiment connection error {}", jsonString);
+            throw new AdapterDeterlabConnectException();
+        }
+
+        logger.info("Start experiment request success at deterlab", response.getBody().toString());
+        return response.getBody().toString();
     }
 
     public String stopExperiment(String jsonString) {
@@ -255,6 +294,32 @@ public class AdapterDeterLab {
         ResponseEntity responseEntity = restTemplate.exchange(properties.deleteExperiment(), HttpMethod.POST, request, String.class);
 
         return responseEntity.getBody().toString();
+    }
+
+    /**
+     * Retrieves the experiment status from Deterlab
+     * @param jsonString Contains eid and pid
+     * @return the status of the experiment, a "no experiment found" if the request fails
+     */
+    public String getExperimentStatus(String jsonString) {
+        logger.info("Get experiment status - {} at {} : {}", properties.getIp(), properties.getPort(), jsonString);
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        HttpEntity<String> request = new HttpEntity<>(jsonString, headers);
+
+        ResponseEntity response;
+
+        try {
+            response = restTemplate.exchange(properties.getExpStatus(), HttpMethod.POST, request, String.class);
+        } catch (Exception e) {
+            logger.warn("Adapter error get experiment status: {}", e);
+            throw new AdapterDeterlabConnectException(e.getMessage());
+        }
+
+        logger.info("Get experiment status request submitted to deterlab");
+
+        return response.getBody().toString();
     }
 
     public String approveJoinRequest(String jsonString) {
@@ -290,10 +355,25 @@ public class AdapterDeterLab {
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
         HttpEntity<String> request = new HttpEntity<>(jsonString, headers);
+        ResponseEntity response;
 
-        ResponseEntity responseEntity = restTemplate.exchange(properties.getApproveProject(), HttpMethod.POST, request, String.class);
+        try {
+            response = restTemplate.exchange(properties.getApproveProject(), HttpMethod.POST, request, String.class);
+        } catch (Exception e) {
+            throw new AdapterDeterlabConnectException();
+        }
 
-        return responseEntity.getBody().toString();
+        String jsonResult = new JSONObject(response.getBody().toString()).getString("msg");
+
+        if ("project approved".equals(jsonResult)) {
+            throw new NSFileParseException();
+        } else if ("experiment create fail exp name already in use".equals(jsonResult)) {
+            throw new ExpNameAlreadyExistsException();
+        } else if (!"experiment create success".equals(jsonResult)) {
+            throw new AdapterDeterlabConnectException();
+        }
+
+        return response.getBody().toString();
     }
 
     public String rejectProject(String jsonString) {

@@ -27,11 +27,14 @@ public class EmailEntity extends AbstractEntity implements Email {
     @Column(name = "id", nullable = false, unique = true, updatable = false)
     private Long id;
 
-    @Column(name = "from", nullable = false, updatable = false)
-    private InternetAddress from;
+    @Column(name = "sender", nullable = false, updatable = false)
+    private InternetAddress sender;
 
-    @Column(name = "to", nullable = false, updatable = false)
-    private InternetAddress to;
+    @Column(name = "recipients", nullable = false, updatable = false)
+    private InternetAddress[] recipients;
+
+    @Column(name = "cc_list", updatable = false)
+    private InternetAddress[] ccList;
 
     @Column(name = "subject", nullable = false, updatable = false)
     private String subject;
@@ -46,7 +49,7 @@ public class EmailEntity extends AbstractEntity implements Email {
     private int retryTimes = 0;
 
     @Column(name = "last_retry_time", nullable = false)
-    private ZonedDateTime lastRetryTime = null;
+    private ZonedDateTime lastRetryTime;
 
     @Column(name = "error_message")
     private String errorMessage = null;
@@ -77,8 +80,9 @@ public class EmailEntity extends AbstractEntity implements Email {
     public String toString() {
         return "EmailEntity{" +
                 "id=" + id +
-                ", from=" + from +
-                ", to=" + to +
+                ", sender=" + sender +
+                ", recipients=" + recipients +
+                ", cc_list=" + ccList +
                 ", subject='" + subject + '\'' +
                 ", content='" + content + '\'' +
                 ", html=" + html +

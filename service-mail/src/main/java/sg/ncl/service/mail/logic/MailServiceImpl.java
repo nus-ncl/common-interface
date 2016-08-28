@@ -18,7 +18,6 @@ import javax.mail.internet.MimeMessage;
 import javax.validation.constraints.NotNull;
 import java.time.ZonedDateTime;
 
-
 /**
  * Created by dcszwang on 8/10/2016.
  */
@@ -42,23 +41,26 @@ class MailServiceImpl implements MailService {
     @Transactional
     @Override
     public void send(
-            @NotNull final InternetAddress from,
-            @NotNull final InternetAddress to,
+            @NotNull final InternetAddress sender,
+            @NotNull final InternetAddress[] receipts,
+            final InternetAddress[] ccList,
             @NotNull final String subject,
             @NotNull final String content,
             @NotNull final boolean isHtml
     ) {
         final EmailEntity emailEntity = new EmailEntity();
-        emailEntity.setFrom(from);
-        emailEntity.setTo(to);
+        emailEntity.setSender(sender);
+        emailEntity.setRecipients(receipts);
+        emailEntity.setCcList(ccList);
         emailEntity.setSubject(subject);
         emailEntity.setContent(content);
+        emailEntity.setHtml(isHtml);
         final MimeMessage message = prepareMessage(emailEntity);
         send(emailEntity, message);
         emailRepository.save(emailEntity);
     }
 
-    private void send(final EmailEntity emailEntity, final MimeMessage message) {
+    public void send(final EmailEntity emailEntity, final MimeMessage message) {
         emailEntity.setLastRetryTime(ZonedDateTime.now());
         try {
             sender.send(message);
@@ -71,12 +73,15 @@ class MailServiceImpl implements MailService {
         }
     }
 
-    private MimeMessage prepareMessage(final Email email) {
+    public MimeMessage prepareMessage(final Email email) {
         final MimeMessage message = sender.createMimeMessage();
         final MimeMessageHelper helper = new MimeMessageHelper(message);
         try {
-            helper.setFrom(email.getFrom());
-            helper.setTo(email.getTo());
+            helper.setFrom(email.getSender());
+            helper.setTo(email.getRecipients());
+            if (email.getCcList() != null) {
+                helper.setCc(email.getCcList());
+            }
             helper.setSubject(email.getSubject());
             helper.setText(email.getContent(), email.isHtml());
         } catch (MessagingException e) {
@@ -85,6 +90,5 @@ class MailServiceImpl implements MailService {
         }
         return message;
     }
-
 
 }

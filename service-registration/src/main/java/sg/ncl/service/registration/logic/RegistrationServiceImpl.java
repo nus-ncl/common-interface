@@ -56,7 +56,7 @@ import java.util.Map;
 @Slf4j
 public class RegistrationServiceImpl implements RegistrationService {
 
-    private static final String VERIFICATIONEMAILTEMPLATENAME = "verificationEmailTemplate.ftl";
+    private static final String VERIFICATION_EMAIL_TEMPLATE_NAME = "verificationEmailTemplate.ftl";
 
     private final CredentialsService credentialsService;
     private final TeamService teamService;
@@ -544,21 +544,21 @@ public class RegistrationServiceImpl implements RegistrationService {
          * rather than throw the exceptions. Hence, the email will not cause
          * the main application to fail. If users cannot receive emails after
          * a certain amount of time, they should send email to support@ncl.sg
-         *
-         * TODO long term need to have a retry mechanism for sending emails
          */
         try {
             String msgText = FreeMarkerTemplateUtils.processTemplateIntoString(
-                    freemarkerConfiguration.getTemplate(VERIFICATIONEMAILTEMPLATENAME), tempMap);
+                    freemarkerConfiguration.getTemplate(VERIFICATION_EMAIL_TEMPLATE_NAME), tempMap);
+            InternetAddress[] receipts = new InternetAddress[1];
+            receipts[0] = new InternetAddress(user.getUserDetails().getEmail());
             mailService.send(new InternetAddress("testbed-ops@ncl.sg"),
-                    new InternetAddress(user.getUserDetails().getEmail()),
+                    receipts, null,
                     "Please Verify Your Email Account", msgText, false);
         } catch (TemplateNotFoundException e) {
-            log.warn("Template {} not found", VERIFICATIONEMAILTEMPLATENAME);
+            log.warn("Template {} not found", VERIFICATION_EMAIL_TEMPLATE_NAME);
         } catch (IOException e) {
-            log.warn("Template {} cannot be read", VERIFICATIONEMAILTEMPLATENAME);
+            log.warn("Template {} cannot be read", VERIFICATION_EMAIL_TEMPLATE_NAME);
         } catch (TemplateException e) {
-            log.warn("Rending template {} failed", VERIFICATIONEMAILTEMPLATENAME);
+            log.warn("Rending template {} failed", VERIFICATION_EMAIL_TEMPLATE_NAME);
         } catch (AddressException e) {
             log.warn("Parsing user email address failed: {}", user.getUserDetails().getEmail());
         }

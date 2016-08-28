@@ -13,4 +13,8 @@ public class AdapterDeterlabConnectException extends NotFoundException {
     public AdapterDeterlabConnectException() {
         super("Connection refused to remote adapter deterlab");
     }
+
+    public AdapterDeterlabConnectException(String message) {
+        super(message);
+    }
 }
