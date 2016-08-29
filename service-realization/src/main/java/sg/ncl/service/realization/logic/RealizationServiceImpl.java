@@ -7,7 +7,6 @@ import org.springframework.transaction.annotation.Transactional;
 import sg.ncl.adapter.deterlab.AdapterDeterLab;
 import sg.ncl.service.realization.data.jpa.RealizationEntity;
 import sg.ncl.service.realization.data.jpa.RealizationRepository;
-import sg.ncl.service.realization.domain.Realization;
 import sg.ncl.service.realization.domain.RealizationService;
 import sg.ncl.service.realization.domain.RealizationState;
 
