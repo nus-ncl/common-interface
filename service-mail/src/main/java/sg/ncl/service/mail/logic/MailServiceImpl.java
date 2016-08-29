@@ -13,7 +13,6 @@ import sg.ncl.service.mail.domain.MailService;
 
 import javax.inject.Inject;
 import javax.mail.MessagingException;
-import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
 import javax.validation.constraints.NotNull;
 import java.time.ZonedDateTime;
@@ -26,69 +25,125 @@ import java.time.ZonedDateTime;
 @Slf4j
 class MailServiceImpl implements MailService {
 
-    private final JavaMailSender sender;
+    // max retry times for each email
+    private static final int MAX_RETRY_TIMES = 3;
+    // retry interval for each email, in seconds
+    private static final int RETRY_INTERVAL_PER_EMAIL = 3600;
+
+    private final JavaMailSender javaMailSender;
     private final EmailRepository emailRepository;
 
     @Inject
     MailServiceImpl(
-            @NotNull final JavaMailSender sender,
+            @NotNull final JavaMailSender javaMailSender,
             @NotNull final EmailRepository emailRepository
     ) {
-        this.sender = sender;
+        this.javaMailSender = javaMailSender;
         this.emailRepository = emailRepository;
     }
 
     @Transactional
     @Override
     public void send(
-            @NotNull final InternetAddress sender,
-            @NotNull final InternetAddress[] receipts,
-            final InternetAddress[] ccList,
+            @NotNull final String from,
+            @NotNull final String to,
             @NotNull final String subject,
             @NotNull final String content,
-            @NotNull final boolean isHtml
+            @NotNull final boolean html,
+            final String cc,
+            final String bcc
     ) {
-        final EmailEntity emailEntity = new EmailEntity();
-        emailEntity.setSender(sender);
-        emailEntity.setRecipients(receipts);
-        emailEntity.setCcList(ccList);
-        emailEntity.setSubject(subject);
-        emailEntity.setContent(content);
-        emailEntity.setHtml(isHtml);
-        final MimeMessage message = prepareMessage(emailEntity);
-        send(emailEntity, message);
-        emailRepository.save(emailEntity);
+        send(from, new String[]{to}, subject, content, html, new String[]{cc}, new String[]{bcc});
     }
 
-    public void send(final EmailEntity emailEntity, final MimeMessage message) {
-        emailEntity.setLastRetryTime(ZonedDateTime.now());
+    @Transactional
+    @Override
+    public void send(
+            @NotNull final String from,
+            @NotNull final String[] to,
+            @NotNull final String subject,
+            @NotNull final String content,
+            @NotNull final boolean html,
+            final String[] cc,
+            final String[] bcc
+    ) {
+        final EmailEntity entity = new EmailEntity();
+        entity.setFrom(from);
+        entity.setTo(to);
+        entity.setSubject(subject);
+        entity.setContent(content);
+        entity.setHtml(html);
+        entity.setCc(cc);
+        entity.setBcc(bcc);
+
+        send(entity);
+    }
+
+    @Transactional
+    @Override
+    public void send(@NotNull final Email email) {
+        send(email.getFrom(), email.getTo(), email.getSubject(), email.getContent(), email.isHtml(), email.getCc(), email.getBcc());
+    }
+
+    private void send(@NotNull final EmailEntity entity) {
+        final MimeMessage message = prepareMessage(entity);
+        entity.setLastRetryTime(ZonedDateTime.now());
         try {
-            sender.send(message);
+            javaMailSender.send(message);
             log.info("Email sent: {}", message);
-            emailEntity.setSent(true);
-            emailEntity.setErrorMessage(null);
+            entity.setSent(true);
+            entity.setErrorMessage(null);
         } catch (MailException e) {
-            log.warn("{}: message = {}", e, message);
-            emailEntity.setErrorMessage(e.getMessage());
+            log.warn("{}", e);
+            entity.setErrorMessage(e.getMessage());
         }
+        emailRepository.save(entity);
     }
 
-    public MimeMessage prepareMessage(final Email email) {
-        final MimeMessage message = sender.createMimeMessage();
+    private MimeMessage prepareMessage(final Email email) {
+        final MimeMessage message = javaMailSender.createMimeMessage();
         final MimeMessageHelper helper = new MimeMessageHelper(message);
         try {
-            helper.setFrom(email.getSender());
-            helper.setTo(email.getRecipients());
-            if (email.getCcList() != null) {
-                helper.setCc(email.getCcList());
-            }
+            helper.setFrom(email.getFrom());
+            helper.setTo(email.getTo());
             helper.setSubject(email.getSubject());
             helper.setText(email.getContent(), email.isHtml());
+            if (email.getCc() != null) {
+                helper.setCc(email.getCc());
+            }
+            if (email.getBcc() != null) {
+                helper.setBcc(email.getBcc());
+            }
         } catch (MessagingException e) {
-            log.warn("{}: message = {}", e, message);
+            log.warn("{}", e);
             throw new IllegalArgumentException(e);
         }
         return message;
     }
+
+//    @Scheduled(fixedDelay = 5000)
+//    @Transactional
+//    public void resend() {
+//        EmailEntity entity = findEmailForRetry();
+//        if (entity != null) {
+//            MimeMessage message = prepareMessage(entity);
+//            entity.setLastRetryTime(ZonedDateTime.now());
+//            entity.setRetryTimes(entity.getRetryTimes() + 1);
+//            send(entity, message);
+//            emailRepository.save(entity);
+//        }
+//    }
+//
+//    private EmailEntity findEmailForRetry() {
+//        List<EmailEntity> emailEntityList =
+//                emailRepository.findBySentFalseAndRetryTimesLessThanOrderByRetryTimes(MAX_RETRY_TIMES);
+//        if (!emailEntityList.isEmpty()) {
+//            EmailEntity candidate = emailEntityList.get(0);
+//            return (ZonedDateTime.now().toEpochSecond() - candidate.getLastRetryTime().toEpochSecond()) >= RETRY_INTERVAL_PER_EMAIL ?
+//                    candidate : null;
+//        } else {
+//            return null;
+//        }
+//    }
 
 }

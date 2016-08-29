@@ -1,6 +1,5 @@
 package sg.ncl.service.mail.domain;
 
-import javax.mail.internet.InternetAddress;
 import java.time.ZonedDateTime;
 
 /**
@@ -8,13 +7,13 @@ import java.time.ZonedDateTime;
  */
 public interface Email {
 
-    Long getId();
+    String getFrom();
 
-    InternetAddress getSender();
+    String[] getTo();
 
-    InternetAddress[] getRecipients();
+    String[] getCc();
 
-    InternetAddress[] getCcList();
+    String[] getBcc();
 
     String getSubject();
 

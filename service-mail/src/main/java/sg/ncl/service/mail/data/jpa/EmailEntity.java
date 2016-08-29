@@ -5,13 +5,13 @@ import lombok.Setter;
 import sg.ncl.common.jpa.AbstractEntity;
 import sg.ncl.service.mail.domain.Email;
 
-import javax.mail.internet.InternetAddress;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.Table;
 import java.time.ZonedDateTime;
+import java.util.Arrays;
 
 /**
  * Created by dcszwang on 8/23/2016.
@@ -27,14 +27,17 @@ public class EmailEntity extends AbstractEntity implements Email {
     @Column(name = "id", nullable = false, unique = true, updatable = false)
     private Long id;
 
-    @Column(name = "sender", nullable = false, updatable = false)
-    private InternetAddress sender;
+    @Column(name = "from", nullable = false, updatable = false)
+    private String from;
 
-    @Column(name = "recipients", nullable = false, updatable = false)
-    private InternetAddress[] recipients;
+    @Column(name = "to", nullable = false, updatable = false)
+    private String[] to;
 
-    @Column(name = "cc_list", updatable = false)
-    private InternetAddress[] ccList;
+    @Column(name = "cc", updatable = false)
+    private String[] cc;
+
+    @Column(name = "bcc", updatable = false)
+    private String[] bcc;
 
     @Column(name = "subject", nullable = false, updatable = false)
     private String subject;
@@ -66,7 +69,7 @@ public class EmailEntity extends AbstractEntity implements Email {
             return false;
         }
 
-        final Email that = (Email) o;
+        final EmailEntity that = (EmailEntity) o;
 
         return getId() == null ? that.getId() == null : getId().equals(that.getId());
     }
@@ -80,9 +83,10 @@ public class EmailEntity extends AbstractEntity implements Email {
     public String toString() {
         return "EmailEntity{" +
                 "id=" + id +
-                ", sender=" + sender +
-                ", recipients=" + recipients +
-                ", cc_list=" + ccList +
+                ", from='" + from + '\'' +
+                ", to=" + Arrays.toString(to) +
+                ", cc=" + Arrays.toString(cc) +
+                ", bcc=" + Arrays.toString(bcc) +
                 ", subject='" + subject + '\'' +
                 ", content='" + content + '\'' +
                 ", html=" + html +

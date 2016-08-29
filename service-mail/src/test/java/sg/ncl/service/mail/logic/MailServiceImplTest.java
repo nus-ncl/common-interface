@@ -1,6 +1,5 @@
 package sg.ncl.service.mail.logic;
 
-import org.apache.commons.lang3.RandomStringUtils;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Rule;
@@ -13,11 +12,11 @@ import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
 import org.springframework.mail.javamail.JavaMailSender;
 import sg.ncl.service.mail.data.jpa.EmailRepository;
+import sg.ncl.service.mail.domain.MailService;
 
 import javax.mail.Address;
 import javax.mail.MessagingException;
 import javax.mail.Session;
-import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
 import java.io.IOException;
 
@@ -33,34 +32,31 @@ public class MailServiceImplTest {
     @Rule
     public MockitoRule mockito = MockitoJUnit.rule();
     @Mock
-    JavaMailSender sender;
+    private JavaMailSender javaMailSender;
     @Mock
-    EmailRepository emailRepository;
-
-    MailServiceImpl serviceImpl;
-
+    private EmailRepository emailRepository;
     @Captor
-    ArgumentCaptor<MimeMessage> captor = ArgumentCaptor.forClass(MimeMessage.class);
+    private ArgumentCaptor<MimeMessage> captor = ArgumentCaptor.forClass(MimeMessage.class);
+
+    private MailService service;
 
     @Before
     public void before() {
-        serviceImpl = new MailServiceImpl(sender, emailRepository);
+        service = new MailServiceImpl(javaMailSender, emailRepository);
     }
 
     @Test
     public void testSend() throws MessagingException, IOException {
-        InternetAddress from = new InternetAddress("alice@ncl.sg");
-        InternetAddress receipt = new InternetAddress("bob@ncl.sg");
-        InternetAddress[] receipts = new InternetAddress[1];
-        receipts[0] = receipt;
-        String subject = RandomStringUtils.randomAlphanumeric(10);
-        String content = RandomStringUtils.randomAlphanumeric(10);
+        String from = "alice@ncl.sg";
+        String to = "bob@ncl.sg";
+        String subject = "subject";
+        String content = "content";
         Session session = null;
         MimeMessage message = new MimeMessage(session);
-        Mockito.doReturn(message).when(sender).createMimeMessage();
-        serviceImpl.send(from, receipts, null, subject, content, false);
+        Mockito.doReturn(message).when(javaMailSender).createMimeMessage();
+        service.send(from, to, subject, content, false, null, null);
 
-        Mockito.verify(sender).send(captor.capture());
+        Mockito.verify(javaMailSender).send(captor.capture());
         MimeMessage value = captor.getValue();
 
         Address[] fromArray = value.getFrom();
@@ -68,9 +64,9 @@ public class MailServiceImplTest {
         Assert.assertThat(fromArray.length, is(equalTo(1)));
         Assert.assertThat(toArray.length, is(equalTo(1)));
         Assert.assertThat(fromArray, arrayContaining(from));
-        Assert.assertThat(toArray, arrayContaining(receipt));
+        Assert.assertThat(toArray, arrayContaining(to));
         Assert.assertThat(value.getSubject(), is(equalTo(subject)));
         Assert.assertThat(value.getContentType(), is(equalTo("text/plain")));
-        Assert.assertThat(value.getContent().toString(), is(equalTo(content)));
+        Assert.assertThat(value.getContent(), is(equalTo(content)));
     }
 }

@@ -67,7 +67,6 @@ public class RegistrationServiceImpl implements RegistrationService {
     private DomainProperties domainProperties;
     private Configuration freemarkerConfiguration;
 
-
     @Inject
     RegistrationServiceImpl(
             @NotNull final CredentialsService credentialsService,
@@ -550,9 +549,9 @@ public class RegistrationServiceImpl implements RegistrationService {
                     freemarkerConfiguration.getTemplate(VERIFICATION_EMAIL_TEMPLATE_NAME), tempMap);
             InternetAddress[] receipts = new InternetAddress[1];
             receipts[0] = new InternetAddress(user.getUserDetails().getEmail());
-            mailService.send(new InternetAddress("testbed-ops@ncl.sg"),
-                    receipts, null,
-                    "Please Verify Your Email Account", msgText, false);
+            mailService.send("testbed-ops@ncl.sg",
+                    user.getUserDetails().getEmail(),
+                    "Please Verify Your Email Account", msgText, false, null, null);
         } catch (TemplateNotFoundException e) {
             log.warn("Template {} not found", VERIFICATION_EMAIL_TEMPLATE_NAME);
         } catch (IOException e) {
