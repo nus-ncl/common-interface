@@ -385,4 +385,34 @@ public class AdapterDeterLabTest extends AbstractTest {
         String result = adapterDeterLab.stopExperiment(one.toString());
         Assert.assertThat(result, is("swapped"));
     }
+
+    @Test(expected = ExpDeleteException.class)
+    public void testDeleteExpBad() {
+        JSONObject one = new JSONObject();
+
+        JSONObject predefinedResultJson = new JSONObject();
+        predefinedResultJson.put("status", "error");
+
+        mockServer.expect(requestTo(properties.deleteExperiment()))
+                .andExpect(method(HttpMethod.POST))
+                .andRespond(withSuccess(predefinedResultJson.toString(), MediaType.APPLICATION_JSON));
+
+        String result = adapterDeterLab.deleteExperiment(one.toString());
+        Assert.assertThat(result, is("error"));
+    }
+
+    @Test
+    public void testDeleteExpGood() {
+        JSONObject one = new JSONObject();
+
+        JSONObject predefinedResultJson = new JSONObject();
+        predefinedResultJson.put("status", "no experiment found");
+
+        mockServer.expect(requestTo(properties.deleteExperiment()))
+                .andExpect(method(HttpMethod.POST))
+                .andRespond(withSuccess(predefinedResultJson.toString(), MediaType.APPLICATION_JSON));
+
+        String result = adapterDeterLab.deleteExperiment(one.toString());
+        Assert.assertThat(result, is("no experiment found"));
+    }
 }
