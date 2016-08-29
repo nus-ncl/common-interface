@@ -15,9 +15,9 @@ public interface RealizationService {
 
     RealizationEntity save(RealizationEntity realizationEntity);
 
-    RealizationEntity startExperimentInDeter(String teamName, String experimentName, String userId);
+    RealizationEntity startExperimentInDeter(String teamName, String expId);
 
-    RealizationEntity stopExperimentInDeter(String teamName, String experimentName, String userId);
+    RealizationEntity stopExperimentInDeter(String teamName, String expId);
 
     void setState(Long experimentId, RealizationState state);
 

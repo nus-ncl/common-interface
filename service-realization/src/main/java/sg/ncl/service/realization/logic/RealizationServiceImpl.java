@@ -7,6 +7,7 @@ import org.springframework.transaction.annotation.Transactional;
 import sg.ncl.adapter.deterlab.AdapterDeterLab;
 import sg.ncl.service.realization.data.jpa.RealizationEntity;
 import sg.ncl.service.realization.data.jpa.RealizationRepository;
+import sg.ncl.service.realization.domain.Realization;
 import sg.ncl.service.realization.domain.RealizationService;
 import sg.ncl.service.realization.domain.RealizationState;
 
@@ -122,7 +123,12 @@ public class RealizationServiceImpl implements RealizationService {
     }
 
     @Transactional
-    public RealizationEntity startExperimentInDeter(final String teamName, final String experimentName, final String userId) {
+    public RealizationEntity startExperimentInDeter(final String teamName, final String expId) {
+        log.info("Starting experiment: {} for team: ", expId, teamName);
+        RealizationEntity realizationEntityDb = realizationRepository.findByExperimentId(Long.parseLong(expId));
+        String experimentName = realizationEntityDb.getExperimentName();
+        String userId = realizationEntityDb.getUserId();
+
         StringBuilder httpCommand = new StringBuilder();
         httpCommand.append("?inout=in");
         httpCommand.append("&");
@@ -135,8 +141,6 @@ public class RealizationServiceImpl implements RealizationService {
         jsonObject.put("deterLogin", adapterDeterLab.getDeterUserIdByNclUserId(userId));
         jsonObject.put("pid", teamName);
         jsonObject.put("eid", experimentName);
-
-        RealizationEntity realizationEntity = realizationRepository.findByExperimentName(experimentName);
 
         String stringFromExperiment = adapterDeterLab.startExperiment(jsonObject.toString());
         JSONObject jsonObjectFromExperiment = new JSONObject(stringFromExperiment);
@@ -156,13 +160,19 @@ public class RealizationServiceImpl implements RealizationService {
                 realizationState = RealizationState.NOT_RUNNING;
                 break;
         }
-        realizationEntity.setState(realizationState);
-        realizationEntity.setDetails(report);
-        return realizationRepository.save(realizationEntity);
+        log.info("Start Experiment: {}, Team: {} Status: {}", experimentName, teamName, realizationState);
+        realizationEntityDb.setState(realizationState);
+        realizationEntityDb.setDetails(report);
+        return realizationRepository.save(realizationEntityDb);
     }
 
     @Transactional
-    public RealizationEntity stopExperimentInDeter(final String teamName, final String experimentName, final String userId) {
+    public RealizationEntity stopExperimentInDeter(final String teamName, final String expId) {
+        log.info("Stopping experiment: {} for team: ", expId, teamName);
+        RealizationEntity realizationEntityDb = realizationRepository.findByExperimentId(Long.parseLong(expId));
+        String experimentName = realizationEntityDb.getExperimentName();
+        String userId = realizationEntityDb.getUserId();
+
         StringBuilder httpCommand = new StringBuilder();
         httpCommand.append("?inout=out");
         httpCommand.append("&");
@@ -176,9 +186,6 @@ public class RealizationServiceImpl implements RealizationService {
         jsonObject.put("pid", teamName);
         jsonObject.put("eid", experimentName);
 
-        RealizationEntity realizationEntity = realizationRepository.findByExperimentName(experimentName);
-
-        // should be 'swapped'
         String resultState = adapterDeterLab.stopExperiment(jsonObject.toString());
         RealizationState realizationState;
         if (resultState.equals("swapped")) {
@@ -186,9 +193,10 @@ public class RealizationServiceImpl implements RealizationService {
         } else {
             realizationState = RealizationState.ERROR;
         }
-        realizationEntity.setState(realizationState);
-        realizationEntity.setDetails("");
-        return realizationRepository.save(realizationEntity);
+        log.info("Stop Experiment: {}, Team: {} Status: {}", experimentName, teamName, realizationState);
+        realizationEntityDb.setState(realizationState);
+        realizationEntityDb.setDetails("");
+        return realizationRepository.save(realizationEntityDb);
     }
 
     public void setState(final Long experimentId, final RealizationState state) {
