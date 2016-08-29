@@ -70,6 +70,8 @@ public class RealizationServiceImpl implements RealizationService {
             jsonObject.put("eid", realizationEntity.getExperimentName());
             String result = adapterDeterLab.getExperimentStatus(jsonObject.toString());
 
+            log.info("Retrieved deterlab exp status...Exp: {} State: {}", realizationEntity.getExperimentName(), result);
+
             JSONObject jsonObjectFromExperiment = new JSONObject(result);
             String status = jsonObjectFromExperiment.getString("status");
             RealizationState realizationState;
@@ -89,6 +91,9 @@ public class RealizationServiceImpl implements RealizationService {
                         realizationState = RealizationState.STOPPING;
                         realizationEntity.setDetails("");
                         break;
+                    case "error":
+                        realizationState = RealizationState.ERROR;
+                        break;
                     default:
                         realizationState = RealizationState.NOT_RUNNING;
                         break;
@@ -102,7 +107,7 @@ public class RealizationServiceImpl implements RealizationService {
             return realizationEntity;
         } else {
             log.warn("Get realization fail for team: {}, experiment id: {}", teamName, experimentId);
-            return null;
+            return new RealizationEntity();
         }
     }
 
@@ -156,6 +161,7 @@ public class RealizationServiceImpl implements RealizationService {
         return realizationRepository.save(realizationEntity);
     }
 
+    @Transactional
     public RealizationEntity stopExperimentInDeter(final String teamName, final String experimentName, final String userId) {
         StringBuilder httpCommand = new StringBuilder();
         httpCommand.append("?inout=out");
@@ -171,13 +177,16 @@ public class RealizationServiceImpl implements RealizationService {
         jsonObject.put("eid", experimentName);
 
         RealizationEntity realizationEntity = realizationRepository.findByExperimentName(experimentName);
-        realizationEntity.setState(RealizationState.STOPPING);
-        realizationRepository.save(realizationEntity);
 
-        adapterDeterLab.stopExperiment(jsonObject.toString());
-
-        // FIXME may need to check if stopping experiments have error
-        realizationEntity.setState(RealizationState.NOT_RUNNING);
+        // should be 'swapped'
+        String resultState = adapterDeterLab.stopExperiment(jsonObject.toString());
+        RealizationState realizationState;
+        if (resultState.equals("swapped")) {
+            realizationState = RealizationState.NOT_RUNNING;
+        } else {
+            realizationState = RealizationState.ERROR;
+        }
+        realizationEntity.setState(realizationState);
         realizationEntity.setDetails("");
         return realizationRepository.save(realizationEntity);
     }

@@ -264,9 +264,9 @@ public class RealizationServiceTest extends AbstractTest {
     }
 
     @Test
-    public void testStopExperiment() {
+    public void testStopExperimentNotRunning() {
         JSONObject predefinedResultJson = new JSONObject();
-        predefinedResultJson.put("msg", "Experiment stopped");
+        predefinedResultJson.put("status", "swapped");
 
         mockServer.expect(requestTo(properties.stopExperiment()))
                 .andExpect(method(HttpMethod.POST))
@@ -283,6 +283,29 @@ public class RealizationServiceTest extends AbstractTest {
         RealizationEntity result = realizationService.stopExperimentInDeter(teamName, experimentName, userId);
 
         Assert.assertThat(result.getState(), is(RealizationState.NOT_RUNNING));
+        Assert.assertThat(result.getDetails(), is(""));
+    }
+
+    @Test
+    public void testStopExperimentError() {
+        JSONObject predefinedResultJson = new JSONObject();
+        predefinedResultJson.put("status", "error");
+
+        mockServer.expect(requestTo(properties.stopExperiment()))
+                .andExpect(method(HttpMethod.POST))
+                .andRespond(withSuccess(predefinedResultJson.toString(), MediaType.APPLICATION_JSON));
+
+        String teamName = RandomStringUtils.randomAlphanumeric(20);
+        String userId = RandomStringUtils.randomAlphanumeric(20);
+
+        RealizationEntity one = Util.getRealizationEntity();
+        String experimentName = one.getExperimentName();
+        realizationService.save(one);
+
+        adapterDeterLab.saveDeterUserIdMapping(RandomStringUtils.randomAlphanumeric(20), userId);
+        RealizationEntity result = realizationService.stopExperimentInDeter(teamName, experimentName, userId);
+
+        Assert.assertThat(result.getState(), is(RealizationState.ERROR));
         Assert.assertThat(result.getDetails(), is(""));
     }
 }

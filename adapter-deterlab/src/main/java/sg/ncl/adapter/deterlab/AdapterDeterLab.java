@@ -272,6 +272,12 @@ public class AdapterDeterLab {
         return response.getBody().toString();
     }
 
+    /**
+     * Creates a stop experiment request to Deterlab
+     * @implNote we don't throw any exception if the result returned from deterlab is not "swapped" since there may be other types of experiment status unknown to us
+     * @param jsonString Contains pid, eid, and deterlab userId
+     * @return the experiment status
+     */
     public String stopExperiment(String jsonString) {
         logger.info("Stop experiment - {} at {}: {}", properties.getIp(), properties.getPort(), jsonString);
 
@@ -279,11 +285,30 @@ public class AdapterDeterLab {
         headers.setContentType(MediaType.APPLICATION_JSON);
         HttpEntity<String> request = new HttpEntity<>(jsonString, headers);
 
-        ResponseEntity responseEntity = restTemplate.exchange(properties.stopExperiment(), HttpMethod.POST, request, String.class);
+        ResponseEntity response;
 
-        return responseEntity.getBody().toString();
+        try {
+            response = restTemplate.exchange(properties.stopExperiment(), HttpMethod.POST, request, String.class);
+        } catch (Exception e) {
+            logger.warn("Adapter error start experiment: {}", e);
+            throw new AdapterDeterlabConnectException(e.getMessage());
+        }
+
+        logger.info("Stop experiment request submitted to deterlab");
+        String expStatus = new JSONObject(response.getBody().toString()).getString("status");
+
+        if (!"swapped".equals(expStatus)) {
+            logger.warn("Fail to stop experiment at deterlab {}", jsonString);
+        }
+        logger.info("Stop experiment request success at deterlab", response.getBody().toString());
+        return expStatus;
     }
 
+    /**
+     * Creates a delete experiment request to Deterlab
+     * @param jsonString Contains experiment name, team name and deterlab userid
+     * @return the experiment status
+     */
     public String deleteExperiment(String jsonString) {
         logger.info("Delete experiment - {} at {} : {}", properties.getIp(), properties.getPort(), jsonString);
 
@@ -291,15 +316,32 @@ public class AdapterDeterLab {
         headers.setContentType(MediaType.APPLICATION_JSON);
         HttpEntity<String> request = new HttpEntity<>(jsonString, headers);
 
-        ResponseEntity responseEntity = restTemplate.exchange(properties.deleteExperiment(), HttpMethod.POST, request, String.class);
+        ResponseEntity response;
 
-        return responseEntity.getBody().toString();
+        try {
+            response = restTemplate.exchange(properties.deleteExperiment(), HttpMethod.POST, request, String.class);
+        } catch (Exception e) {
+            logger.warn("Adapter error delete experiment: {}", e);
+            throw new AdapterDeterlabConnectException(e.getMessage());
+        }
+
+        logger.info("Delete experiment request submitted to deterlab");
+        String expStatus = new JSONObject(response.getBody().toString()).getString("status");
+
+        if (!"no experiment found".equals(expStatus)) {
+            logger.warn("Fail to delete experiment at deterlab {}", jsonString);
+            throw new ExpDeleteException();
+        }
+
+        logger.info("Delete experiment request success at deterlab", response.getBody().toString());
+        return expStatus;
     }
 
     /**
      * Retrieves the experiment status from Deterlab
+     * @implNote cannot throw exception for this method
      * @param jsonString Contains eid and pid
-     * @return the status of the experiment, a "no experiment found" if the request fails
+     * @return the status of the experiment, a "error" if the request fails
      */
     public String getExperimentStatus(String jsonString) {
         logger.info("Get experiment status - {} at {} : {}", properties.getIp(), properties.getPort(), jsonString);
@@ -313,8 +355,8 @@ public class AdapterDeterLab {
         try {
             response = restTemplate.exchange(properties.getExpStatus(), HttpMethod.POST, request, String.class);
         } catch (Exception e) {
-            logger.warn("Adapter error get experiment status: {}", e);
-            throw new AdapterDeterlabConnectException(e.getMessage());
+            logger.warn("Adapter connection error get experiment status: {}", e);
+            return "{\"status\": \"error\"}";
         }
 
         logger.info("Get experiment status request submitted to deterlab");
