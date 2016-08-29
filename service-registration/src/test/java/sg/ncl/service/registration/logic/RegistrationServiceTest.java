@@ -27,7 +27,6 @@ import sg.ncl.service.registration.Util;
 import sg.ncl.service.registration.data.jpa.RegistrationRepository;
 import sg.ncl.service.registration.domain.RegistrationService;
 import sg.ncl.service.registration.exceptions.IdNullOrEmptyException;
-import sg.ncl.service.registration.exceptions.RegisterTeamIdEmptyException;
 import sg.ncl.service.registration.exceptions.RegisterTeamNameDuplicateException;
 import sg.ncl.service.registration.exceptions.RegisterTeamNameEmptyException;
 import sg.ncl.service.registration.exceptions.RegisterUidNullException;
@@ -63,34 +62,24 @@ import static org.springframework.test.web.client.response.MockRestResponseCreat
  */
 public class RegistrationServiceTest extends AbstractTest {
 
-    @Inject
-    private UserService userService;
-
-    @Inject
-    private TeamService teamService;
-
-    @Inject
-    private ConnectionProperties properties;
-
-    @Inject
-    private RegistrationService registrationService;
-
-    @Inject
-    private AdapterDeterLab adapterDeterLab;
-
-    @Autowired
-    private RestOperations restOperations;
-
-    private MockRestServiceServer mockServer;
-
-    private boolean isJoinTeam = true;
-
     @Rule
     public MockitoRule mockito = MockitoJUnit.rule();
-
     @Mock
     MailService mailService;
-
+    @Inject
+    private UserService userService;
+    @Inject
+    private TeamService teamService;
+    @Inject
+    private ConnectionProperties properties;
+    @Inject
+    private RegistrationService registrationService;
+    @Inject
+    private AdapterDeterLab adapterDeterLab;
+    @Autowired
+    private RestOperations restOperations;
+    private MockRestServiceServer mockServer;
+    private boolean isJoinTeam = true;
     @Mock
     private CredentialsService credentialsService;
 

@@ -61,8 +61,8 @@ public class RegistrationServiceImpl implements RegistrationService {
     private final RegistrationRepository registrationRepository;
     private final MailService mailService;
     private final AdapterDeterLab adapterDeterLab;
-    private DomainProperties domainProperties;
     private final Template emailValidationTemplate;
+    private DomainProperties domainProperties;
 
     @Inject
     RegistrationServiceImpl(
@@ -369,12 +369,12 @@ public class RegistrationServiceImpl implements RegistrationService {
     ) {
         // FIXME required additional parameters to validate if approver is of admin or ordinary user
 
-        if(teamId == null || teamId.isEmpty() || ownerId == null || ownerId.isEmpty()) {
+        if (teamId == null || teamId.isEmpty() || ownerId == null || ownerId.isEmpty()) {
             log.warn("Id null or empty exception. TeamId: {}, UserId: {}", teamId, ownerId);
             throw new IdNullOrEmptyException();
         }
-        if(status == null ||
-                !(status.equals(TeamStatus.APPROVED) || status.equals(TeamStatus.REJECTED))){
+        if (status == null ||
+                !(status.equals(TeamStatus.APPROVED) || status.equals(TeamStatus.REJECTED))) {
             log.warn("Invalid TeamStatus {}", status);
             throw new InvalidTeamStatusException();
         }

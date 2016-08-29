@@ -226,8 +226,8 @@ public class RegistrationControllerTest extends AbstractTest {
         adapterDeterLab.saveDeterUserIdMapping(deterUid, nclUid);
 
         MvcResult mvcResult = mockMvc.perform(get("/registrations/user/" + nclUid))
-                                        .andExpect(status().isOk())
-                                        .andReturn();
+                .andExpect(status().isOk())
+                .andReturn();
 
         Assert.assertThat(mvcResult.getResponse().getContentAsString(), is(deterUid));
     }

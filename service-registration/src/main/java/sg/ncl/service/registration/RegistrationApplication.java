@@ -34,15 +34,15 @@ public class RegistrationApplication {
 
     private static final String VERIFICATION_EMAIL_TEMPLATE_NAME = "verificationEmailTemplate.ftl";
 
-    @Bean
-    Template emailValidationTemplate(final Configuration configuration) throws IOException {
-        return configuration.getTemplate(VERIFICATION_EMAIL_TEMPLATE_NAME);
-    }
-
     public static void main(final String[] args) {
         try (final ConfigurableApplicationContext context = SpringApplication.run(RegistrationApplication.class, args)) {
             // nothing to do
         }
+    }
+
+    @Bean
+    Template emailValidationTemplate(final Configuration configuration) throws IOException {
+        return configuration.getTemplate(VERIFICATION_EMAIL_TEMPLATE_NAME);
     }
 
 }

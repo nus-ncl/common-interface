@@ -25,7 +25,7 @@ import sg.ncl.service.registration.domain.RegistrationService;
 import sg.ncl.service.registration.serializers.DateTimeDeserializer;
 import sg.ncl.service.registration.serializers.DateTimeSerializer;
 import sg.ncl.service.team.data.jpa.TeamEntity;
-import sg.ncl.service.team.domain.*;
+import sg.ncl.service.team.domain.TeamService;
 import sg.ncl.service.user.data.jpa.UserEntity;
 import sg.ncl.service.user.domain.UserService;
 
@@ -39,10 +39,10 @@ import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyBoolean;
 import static org.mockito.Mockito.mockingDetails;
 import static org.mockito.Mockito.when;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-
-
 
 @ActiveProfiles("mock-registration-service")
 public class RegistrationControllerTestNew extends AbstractTest {
@@ -79,7 +79,7 @@ public class RegistrationControllerTestNew extends AbstractTest {
     public void registerNewUserJoinExistingTeamTest() throws Exception {
         CredentialsEntity credentialsEntity = Util.getCredentialsEntity();
         UserEntity userEntity = Util.getUserEntity();
-        TeamEntity teamEntity= Util.getTeamEntity();
+        TeamEntity teamEntity = Util.getTeamEntity();
 
         GsonBuilder gsonBuilder = new GsonBuilder();
         gsonBuilder.registerTypeAdapter(ZonedDateTime.class, new DateTimeSerializer());

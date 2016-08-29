@@ -43,6 +43,10 @@ public class RegistrationServiceTestNew extends AbstractTest {
     @Rule
     public MockitoRule mockito = MockitoJUnit.rule();
     @Mock
+    DeterLabUserRepository deterLabUserRepository;
+    @Mock
+    ConnectionProperties connectionProperties;
+    @Mock
     private UserService userService;
     @Mock
     private TeamService teamService;
@@ -54,10 +58,6 @@ public class RegistrationServiceTestNew extends AbstractTest {
     private AdapterDeterLab adapterDeterLab;
     @Mock
     private MailService mailService;
-    @Mock
-    DeterLabUserRepository deterLabUserRepository;
-    @Mock
-    ConnectionProperties connectionProperties;
     private RegistrationService registrationService;
     @Autowired
     private DomainProperties domainProperties;
@@ -67,9 +67,9 @@ public class RegistrationServiceTestNew extends AbstractTest {
 
     @Before
     public void setUp() throws Exception {
-       registrationService = new RegistrationServiceImpl(credentialsService,
-               teamService, userService, registrationRepository, adapterDeterLab, mailService,
-               domainProperties, freemarkerConfiguration);
+        registrationService = new RegistrationServiceImpl(credentialsService,
+                teamService, userService, registrationRepository, adapterDeterLab, mailService,
+                domainProperties, freemarkerConfiguration);
     }
 
     @Test
