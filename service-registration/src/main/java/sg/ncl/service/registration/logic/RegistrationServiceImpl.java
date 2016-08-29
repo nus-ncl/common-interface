@@ -359,17 +359,7 @@ public class RegistrationServiceImpl implements RegistrationService {
         one.put("uid", adapterDeterLab.getDeterUserIdByNclUserId(ownerId));
 
         if (status.equals(TeamStatus.APPROVED)) {
-/*            // change team owner member status
-            List<? extends TeamMember> membersList = team.getMembers();
-            if (membersList.isEmpty()) {
-                // paranoid check, just in case
-                throw new NoMembersInTeamException();
-            }
-            for (TeamMember teamMember : membersList) {
-                if (teamMember.getMemberType().equals(MemberType.OWNER)) {
-                    teamService.updateMemberStatus(teamId, teamMember.getUserId(), MemberStatus.APPROVED);
-                }
-            }*/
+            // change team owner member status
             teamService.updateMemberStatus(teamId, ownerId, MemberStatus.APPROVED);
             return adapterDeterLab.approveProject(one.toString());
         } else {

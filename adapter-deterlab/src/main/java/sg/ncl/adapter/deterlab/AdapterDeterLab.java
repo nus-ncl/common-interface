@@ -394,7 +394,7 @@ public class AdapterDeterLab {
         try {
             response = restTemplate.exchange(properties.getApproveProject(), HttpMethod.POST, request, String.class);
         } catch (RestClientException e) {
-            logger.warn("Adapter DeterLab connection error: {}", e.getMessage());
+            logger.warn("Adapter DeterLab connection error: {}", e);
             throw new AdapterDeterlabConnectException();
         }
 
@@ -422,7 +422,7 @@ public class AdapterDeterLab {
         try {
             response = restTemplate.exchange(properties.getRejectProject(), HttpMethod.POST, request, String.class);
         } catch (RestClientException e) {
-            logger.warn("Adapter DeterLab connection error: {}", e.getMessage());
+            logger.warn("Adapter DeterLab connection error: {}", e);
             throw new AdapterDeterlabConnectException();
         }
         String jsonResult = new JSONObject(response.getBody().toString()).getString("msg");
