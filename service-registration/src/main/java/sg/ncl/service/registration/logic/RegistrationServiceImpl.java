@@ -302,7 +302,9 @@ public class RegistrationServiceImpl implements RegistrationService {
         one.put("uid", adapterDeterLab.getDeterUserIdByNclUserId(userId));
         one.put("pid", pid);
         one.put("gid", pid);
-        adapterDeterLab.approveJoinRequest(one.toString());
+        one.put("action", "approve");
+        // adapterDeterLab.approveJoinRequest(one.toString());
+        adapterDeterLab.processJoinRequest(one.toString());
         teamService.updateMemberStatus(teamId, userId, MemberStatus.APPROVED);
     }
 
@@ -333,7 +335,9 @@ public class RegistrationServiceImpl implements RegistrationService {
                 object.put("uid", adapterDeterLab.getDeterUserIdByNclUserId(userId));
                 object.put("pid", pid);
                 object.put("gid", pid);
-                adapterDeterLab.rejectJoinRequest(object.toString());
+                object.put("action", "deny");
+                // adapterDeterLab.rejectJoinRequest(object.toString());
+                adapterDeterLab.processJoinRequest(object.toString());
             }
         }
     }

@@ -6,6 +6,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.http.*;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 import sg.ncl.adapter.deterlab.data.jpa.DeterLabUserRepository;
 import sg.ncl.adapter.deterlab.dtos.entities.DeterLabUserEntity;
@@ -345,6 +346,41 @@ public class AdapterDeterLab {
         return responseEntity.getBody().toString();
     }
 
+    public String processJoinRequest(String jsonString) {
+        JSONObject request = new JSONObject(jsonString);
+        if(request.length() < 5) {
+            logger.warn("NOT enough inputs to process the request. Ignored it.");
+            return "{msg:process join request FAIL}";
+        }
+        String pid = request.getString("pid");
+        String approverUid = request.getString("approverUid");
+        String uid = request.getString("uid");
+        String action = request.getString("action");
+        String gid = request.getString("gid");
+        logger.info("Processing join request to team {}, requester {}, approver {}, group {}, action {}",
+                pid, uid, approverUid, gid, action);
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        HttpEntity<String> httpRequest = new HttpEntity<>(jsonString, headers);
+        String reqUrl = (action == "approve")? properties.getApproveJoinRequest() : properties.getRejectJoinRequest();
+
+        ResponseEntity httpResponse;
+        try {
+            httpResponse = restTemplate.exchange(reqUrl, HttpMethod.POST, httpRequest, String.class);
+        } catch (RestClientException e) {
+            logger.warn("Adapter DeterLab connection error: {}", e.getMessage());
+            throw new AdapterDeterlabConnectException();
+        }
+
+        JSONObject response = new JSONObject(httpResponse.getBody().toString());
+        if("process join request OK".equals(response.getString("msg"))) {
+            logger.info("{} join request to team {} OK", action, pid);
+        } else {
+            logger.info("{} join request to team {} FAIL", action, pid);
+        }
+        return httpResponse.getBody().toString();
+    }
     public String rejectJoinRequest(String jsonString) {
         // for team leaders to reject join request
         logger.info("Rejecting join request to {} at {}: {}", properties.getIp(), properties.getPort(), jsonString);
