@@ -359,7 +359,7 @@ public class RegistrationServiceImpl implements RegistrationService {
         one.put("uid", adapterDeterLab.getDeterUserIdByNclUserId(ownerId));
 
         if (status.equals(TeamStatus.APPROVED)) {
-            // change team owner member status
+/*            // change team owner member status
             List<? extends TeamMember> membersList = team.getMembers();
             if (membersList.isEmpty()) {
                 // paranoid check, just in case
@@ -369,7 +369,8 @@ public class RegistrationServiceImpl implements RegistrationService {
                 if (teamMember.getMemberType().equals(MemberType.OWNER)) {
                     teamService.updateMemberStatus(teamId, teamMember.getUserId(), MemberStatus.APPROVED);
                 }
-            }
+            }*/
+            teamService.updateMemberStatus(teamId, ownerId, MemberStatus.APPROVED);
             return adapterDeterLab.approveProject(one.toString());
         } else {
             // FIXME may need to be more specific and check if TeamStatus is REJECTED
