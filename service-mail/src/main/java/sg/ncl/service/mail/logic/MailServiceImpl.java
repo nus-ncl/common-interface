@@ -53,7 +53,7 @@ class MailServiceImpl implements MailService {
             final String cc,
             final String bcc
     ) {
-        send(from, new String[]{to}, subject, content, html, new String[]{cc}, new String[]{bcc});
+        send(from, new String[]{to}, subject, content, html, cc == null ? null : new String[]{cc}, bcc == null ? null : new String[]{bcc});
     }
 
     @Transactional
@@ -108,8 +108,9 @@ class MailServiceImpl implements MailService {
             helper.setTo(email.getTo());
             helper.setSubject(email.getSubject());
             helper.setText(email.getContent(), email.isHtml());
-            if (email.getCc() != null) {
-                helper.setCc(email.getCc());
+            final String[] cc = email.getCc();
+            if (cc != null) {
+                helper.setCc(cc);
             }
             if (email.getBcc() != null) {
                 helper.setBcc(email.getBcc());

@@ -34,10 +34,10 @@ public class EmailEntity extends AbstractEntity implements Email {
     private String[] to;
 
     @Column(name = "cc", updatable = false)
-    private String[] cc;
+    private String[] cc = null;
 
     @Column(name = "bcc", updatable = false)
-    private String[] bcc;
+    private String[] bcc = null;
 
     @Column(name = "subject", nullable = false, updatable = false)
     private String subject;
