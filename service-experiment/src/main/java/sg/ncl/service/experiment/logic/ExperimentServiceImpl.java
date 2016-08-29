@@ -10,6 +10,7 @@ import sg.ncl.service.experiment.data.jpa.ExperimentEntity;
 import sg.ncl.service.experiment.data.jpa.ExperimentRepository;
 import sg.ncl.service.experiment.domain.Experiment;
 import sg.ncl.service.experiment.domain.ExperimentService;
+import sg.ncl.service.experiment.exceptions.ExperimentNameInUseException;
 import sg.ncl.service.experiment.exceptions.UserIdNotFoundException;
 import sg.ncl.service.realization.data.jpa.RealizationEntity;
 import sg.ncl.service.realization.domain.RealizationService;
@@ -55,8 +56,8 @@ public class ExperimentServiceImpl implements ExperimentService {
         if (experimentEntityList != null) {
             for (ExperimentEntity one : experimentEntityList) {
                 if (one.getName().equals(experiment.getName())) {
-                    log.warn("Experiment name is in use.");
-                    return null;
+                    log.warn("Experiment name is in use: {}", experiment.getName());
+                    throw new ExperimentNameInUseException();
                 }
             }
         }
@@ -71,7 +72,7 @@ public class ExperimentServiceImpl implements ExperimentService {
 
         ExperimentEntity savedExperimentEntity = experimentRepository.save(setupEntity(experiment, fileName));
         createExperimentInDeter(savedExperimentEntity);
-        log.info("Experiment saved.");
+        log.info("Experiment saved: {}", savedExperimentEntity);
 
         RealizationEntity realizationEntity = new RealizationEntity();
         realizationEntity.setExperimentId(savedExperimentEntity.getId());
@@ -83,7 +84,7 @@ public class ExperimentServiceImpl implements ExperimentService {
         realizationEntity.setRunningMinutes(0L);
 
         realizationService.save(realizationEntity);
-        log.info("Realization saved.");
+        log.info("Realization saved: {}", realizationEntity);
 
         return savedExperimentEntity;
     }
