@@ -16,6 +16,7 @@ import sg.ncl.service.experiment.data.jpa.ExperimentEntity;
 import sg.ncl.service.experiment.data.jpa.ExperimentRepository;
 import sg.ncl.service.experiment.domain.Experiment;
 import sg.ncl.service.experiment.domain.ExperimentService;
+import sg.ncl.service.experiment.exceptions.ExperimentNameInUseException;
 import sg.ncl.service.realization.data.jpa.RealizationEntity;
 import sg.ncl.service.realization.data.jpa.RealizationRepository;
 
@@ -25,6 +26,9 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.not;
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.method;
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.requestTo;
 
@@ -72,6 +76,28 @@ public class ExperimentServiceTest extends AbstractTest {
         String craftDate = new SimpleDateFormat("yyyyMMdd").format(new Date());
         String filename = createdExperimentSave.getUserId() + "_" + createdExperimentSave.getTeamId() + "_" + craftDate + "_" + createdExperimentSave.getNsFile() + ".ns";
         Assert.assertEquals(filename, savedExperiment.getNsFile());
+    }
+
+    @Test(expected = ExperimentNameInUseException.class)
+    public void testSaveExperimentBad() throws Exception {
+        // try to create another experiment with same team name and same exp name
+        ExperimentEntity createdExperimentSave = Util.getExperimentsEntity();
+        Experiment savedExperiment = experimentService.save(createdExperimentSave);
+        experimentService.save(createdExperimentSave);
+    }
+
+    @Test
+    public void testSaveExperimentDifferentTeamSameExpName() throws Exception {
+        ExperimentEntity one = Util.getExperimentsEntity();
+        ExperimentEntity two = Util.getExperimentsEntity();
+        final String expName = RandomStringUtils.randomAlphabetic(8);
+        one.setName(expName);
+        two.setName(expName);
+        Experiment oneSaved = experimentService.save(one);
+        Experiment twoSaved = experimentService.save(two);
+
+        Assert.assertThat(oneSaved.getName(), is(equalTo(twoSaved.getName())));
+        Assert.assertThat(oneSaved.getTeamName(), is(not(equalTo(twoSaved.getTeamName()))));
     }
 
     @Test
