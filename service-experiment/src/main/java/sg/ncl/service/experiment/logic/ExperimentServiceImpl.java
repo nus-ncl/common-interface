@@ -49,12 +49,23 @@ public class ExperimentServiceImpl implements ExperimentService {
         log.info("Save experiment");
         String fileName = craftFileName(experiment);
 
-        // check experiment name is unique
-        long countName = experimentRepository.countByName(experiment.getName());
-        if (countName > 0) {
-            log.warn("Experiment name is in use.");
-            return null;
+        // check if team already has am experiment with the same name
+        List<ExperimentEntity> experimentEntityList = experimentRepository.findByTeamName(experiment.getTeamName());
+
+        if (experimentEntityList != null) {
+            for (ExperimentEntity one : experimentEntityList) {
+                if (one.getName().equals(experiment.getName())) {
+                    log.warn("Experiment name is in use.");
+                    return null;
+                }
+            }
         }
+
+//        long countName = experimentRepository.countByName(experiment.getName());
+//        if (countName > 0) {
+//            log.warn("Experiment name is in use.");
+//            return null;
+//        }
 
 //        createNsFile(fileName, experiment.getNsFileContent());
 
