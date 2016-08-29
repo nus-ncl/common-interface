@@ -417,27 +417,55 @@ public class AdapterDeterLab {
 
     public String approveProject(String jsonString) {
         // for ncl admins to approve teams
-        logger.info("Approving team to {} at {}: {}", properties.getIp(), properties.getPort(), jsonString);
+        String pid = new JSONObject(jsonString).getString("pid");
+        logger.info("Approving team {} to {} at {}: {}",
+                pid, properties.getIp(), properties.getPort(), jsonString);
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
         HttpEntity<String> request = new HttpEntity<>(jsonString, headers);
+        ResponseEntity response;
 
-        ResponseEntity responseEntity = restTemplate.exchange(properties.getApproveProject(), HttpMethod.POST, request, String.class);
+        try {
+            response = restTemplate.exchange(properties.getApproveProject(), HttpMethod.POST, request, String.class);
+        } catch (RestClientException e) {
+            logger.warn("Adapter DeterLab connection error: {}", e);
+            throw new AdapterDeterlabConnectException();
+        }
 
-        return responseEntity.getBody().toString();
+        String jsonResult = new JSONObject(response.getBody().toString()).getString("msg");
+        if ("approve project OK".equals(jsonResult)) {
+            logger.info("Approve team {} OK", pid);
+        } else {
+            logger.warn("Approve team {} FAIL", pid);
+        }
+        return response.getBody().toString();
     }
 
     public String rejectProject(String jsonString) {
         // for ncl admins to reject teams
-        logger.info("Rejecting team to {} at {}: {}", properties.getIp(), properties.getPort(), jsonString);
+        String pid = new JSONObject(jsonString).getString("pid");
+        logger.info("Rejecting team {} to {} at {}: {}",
+                pid, properties.getIp(), properties.getPort(), jsonString);
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
         HttpEntity<String> request = new HttpEntity<>(jsonString, headers);
 
-        ResponseEntity responseEntity = restTemplate.exchange(properties.getRejectProject(), HttpMethod.POST, request, String.class);
+        ResponseEntity response;
 
-        return responseEntity.getBody().toString();
+        try {
+            response = restTemplate.exchange(properties.getRejectProject(), HttpMethod.POST, request, String.class);
+        } catch (RestClientException e) {
+            logger.warn("Adapter DeterLab connection error: {}", e);
+            throw new AdapterDeterlabConnectException();
+        }
+        String jsonResult = new JSONObject(response.getBody().toString()).getString("msg");
+        if ("reject project OK".equals(jsonResult)) {
+            logger.info("Reject team {} OK", pid);
+        } else {
+            logger.warn("Reject team {} FAIL", pid);
+        }
+        return response.getBody().toString();
     }
 }

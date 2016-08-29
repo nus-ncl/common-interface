@@ -249,15 +249,15 @@ public class RealizationServiceTest extends AbstractTest {
                 .andExpect(method(HttpMethod.POST))
                 .andRespond(withSuccess(predefinedResultJson.toString(), MediaType.APPLICATION_JSON));
 
-        String teamName = RandomStringUtils.randomAlphanumeric(20);
-        String userId = RandomStringUtils.randomAlphanumeric(20);
-
         RealizationEntity one = Util.getRealizationEntity();
-        String experimentName = one.getExperimentName();
         realizationService.save(one);
 
+        String teamName = RandomStringUtils.randomAlphanumeric(20);
+        String userId = one.getUserId();
+        String expId = one.getExperimentId().toString();
+
         adapterDeterLab.saveDeterUserIdMapping(RandomStringUtils.randomAlphanumeric(20), userId);
-        RealizationEntity result = realizationService.startExperimentInDeter(teamName, experimentName, userId);
+        RealizationEntity result = realizationService.startExperimentInDeter(teamName, expId);
 
         Assert.assertNotEquals(one.getState(), result.getState());
         Assert.assertNotEquals(one.getDetails(), result.getDetails());
@@ -272,15 +272,15 @@ public class RealizationServiceTest extends AbstractTest {
                 .andExpect(method(HttpMethod.POST))
                 .andRespond(withSuccess(predefinedResultJson.toString(), MediaType.APPLICATION_JSON));
 
-        String teamName = RandomStringUtils.randomAlphanumeric(20);
-        String userId = RandomStringUtils.randomAlphanumeric(20);
-
         RealizationEntity one = Util.getRealizationEntity();
-        String experimentName = one.getExperimentName();
         realizationService.save(one);
 
+        String teamName = RandomStringUtils.randomAlphanumeric(20);
+        String userId = one.getUserId();
+        String expId = one.getExperimentId().toString();
+
         adapterDeterLab.saveDeterUserIdMapping(RandomStringUtils.randomAlphanumeric(20), userId);
-        RealizationEntity result = realizationService.stopExperimentInDeter(teamName, experimentName, userId);
+        RealizationEntity result = realizationService.stopExperimentInDeter(teamName, expId);
 
         Assert.assertThat(result.getState(), is(RealizationState.NOT_RUNNING));
         Assert.assertThat(result.getDetails(), is(""));
@@ -295,15 +295,15 @@ public class RealizationServiceTest extends AbstractTest {
                 .andExpect(method(HttpMethod.POST))
                 .andRespond(withSuccess(predefinedResultJson.toString(), MediaType.APPLICATION_JSON));
 
-        String teamName = RandomStringUtils.randomAlphanumeric(20);
-        String userId = RandomStringUtils.randomAlphanumeric(20);
-
         RealizationEntity one = Util.getRealizationEntity();
-        String experimentName = one.getExperimentName();
         realizationService.save(one);
 
+        String teamName = RandomStringUtils.randomAlphanumeric(20);
+        String userId = one.getUserId();
+        String expId = one.getExperimentId().toString();
+
         adapterDeterLab.saveDeterUserIdMapping(RandomStringUtils.randomAlphanumeric(20), userId);
-        RealizationEntity result = realizationService.stopExperimentInDeter(teamName, experimentName, userId);
+        RealizationEntity result = realizationService.stopExperimentInDeter(teamName, expId);
 
         Assert.assertThat(result.getState(), is(RealizationState.ERROR));
         Assert.assertThat(result.getDetails(), is(""));
