@@ -62,7 +62,7 @@ public class RegistrationServiceImpl implements RegistrationService {
     private final MailService mailService;
     private final AdapterDeterLab adapterDeterLab;
     private final Template emailValidationTemplate;
-    private DomainProperties domainProperties;
+    private final DomainProperties domainProperties;
 
     @Inject
     RegistrationServiceImpl(
@@ -85,6 +85,7 @@ public class RegistrationServiceImpl implements RegistrationService {
         this.emailValidationTemplate = emailValidationTemplate;
     }
 
+    @Override
     @Transactional
     // FIXME: the return type should be a proper Registration
     public Registration registerRequestToApplyTeam(String nclUserId, Team team) {
@@ -134,6 +135,7 @@ public class RegistrationServiceImpl implements RegistrationService {
         return null;
     }
 
+    @Override
     @Transactional
     public Registration registerRequestToJoinTeam(String nclUserId, Team team) {
         if (team.getName() == null || team.getName().isEmpty()) {
@@ -176,6 +178,7 @@ public class RegistrationServiceImpl implements RegistrationService {
         return null;
     }
 
+    @Override
     @Transactional
     public Registration register(Credentials credentials, User user, Team team, boolean isJoinTeam) {
 
@@ -189,12 +192,12 @@ public class RegistrationServiceImpl implements RegistrationService {
             throw new UserFormException();
         }
 
-        if (isJoinTeam == true && (team.getId() == null || team.getId().isEmpty())) {
+        if (isJoinTeam && (team.getId() == null || team.getId().isEmpty())) {
             log.warn("Team id from join existing team is empty");
             throw new UserFormException();
         }
 
-        if (isJoinTeam == false && (team.getName() != null || !team.getName().isEmpty())) {
+        if (!isJoinTeam && (team.getName() != null || !team.getName().isEmpty())) {
             Team teamEntity = new TeamEntity();
             try {
                 log.info("New team name is {}", team.getName());
@@ -217,7 +220,7 @@ public class RegistrationServiceImpl implements RegistrationService {
         Team teamEntity;
         TeamMemberInfo teamMemberInfo;
 
-        if (isJoinTeam == true) {
+        if (isJoinTeam) {
             // accept the team data
             teamEntity = teamService.getTeamById(team.getId());
             teamId = team.getId();
@@ -240,7 +243,7 @@ public class RegistrationServiceImpl implements RegistrationService {
         credentialsService.addCredentials(credentialsInfo);
         log.info("Register new users: create new credentials", credentials.getUsername());
 
-        if (isJoinTeam == true) {
+        if (isJoinTeam) {
             // indicate member type based on button click
             memberType = MemberType.MEMBER;
         } else {
@@ -275,7 +278,7 @@ public class RegistrationServiceImpl implements RegistrationService {
         userObject.put("city", user.getUserDetails().getAddress().getCity());
         userObject.put("zipCode", user.getUserDetails().getAddress().getZipCode());
 
-        if (isJoinTeam == true) {
+        if (isJoinTeam) {
 
             // call python script (create a new user in deterlab)
             // parse in a the json string
@@ -295,7 +298,7 @@ public class RegistrationServiceImpl implements RegistrationService {
             log.info("Register new users: invoke adapter deterlab to apple new team {} with data {}", teamEntity.getName(), userObject);
         }
 
-        if (getUserCreationStatus(resultJSON).equals("user is created")) {
+        if ("user is created".equals(getUserCreationStatus(resultJSON))) {
             // store form fields into registration repository for recreation when required
             Registration one = addUserToRegistrationRepository(resultJSON, user, teamEntity);
 
@@ -312,6 +315,7 @@ public class RegistrationServiceImpl implements RegistrationService {
         return null;
     }
 
+    @Override
     @Transactional
     public void approveJoinRequest(String teamId, String userId, User approver) {
         if (!teamService.isOwner(teamId, approver.getId())) {
@@ -329,6 +333,7 @@ public class RegistrationServiceImpl implements RegistrationService {
         teamService.updateMemberStatus(teamId, userId, MemberStatus.APPROVED);
     }
 
+    @Override
     @Transactional
     public void rejectJoinRequest(String teamId, String userId, User approver) {
         if (!teamService.isOwner(teamId, approver.getId())) {
@@ -361,6 +366,7 @@ public class RegistrationServiceImpl implements RegistrationService {
         }
     }
 
+    @Override
     @Transactional
     public String approveOrRejectNewTeam(
             final String teamId,
@@ -412,61 +418,62 @@ public class RegistrationServiceImpl implements RegistrationService {
             errorsFound = true;
         }
 
-        if (errorsFound == false && (user.getUserDetails().getFirstName() == null || user.getUserDetails().getFirstName().isEmpty())) {
+        if (!errorsFound && (user.getUserDetails().getFirstName() == null || user.getUserDetails().getFirstName().isEmpty())) {
             errorsFound = true;
         }
 
-        if (errorsFound == false && (user.getUserDetails().getLastName() == null || user.getUserDetails().getLastName().isEmpty())) {
+        if (!errorsFound && (user.getUserDetails().getLastName() == null || user.getUserDetails().getLastName().isEmpty())) {
             errorsFound = true;
         }
 
-        if (errorsFound == false && (user.getUserDetails().getJobTitle() == null || user.getUserDetails().getJobTitle().isEmpty())) {
+        if (!errorsFound && (user.getUserDetails().getJobTitle() == null || user.getUserDetails().getJobTitle().isEmpty())) {
             errorsFound = true;
         }
 
-        if (errorsFound == false && (user.getUserDetails().getEmail() == null || user.getUserDetails().getEmail().isEmpty())) {
+        if (!errorsFound && (user.getUserDetails().getEmail() == null || user.getUserDetails().getEmail().isEmpty())) {
             errorsFound = true;
         }
 
-        if (errorsFound == false && (user.getUserDetails().getPhone() == null || user.getUserDetails().getPhone().isEmpty())) {
+        if (!errorsFound && (user.getUserDetails().getPhone() == null || user.getUserDetails().getPhone().isEmpty())) {
             errorsFound = true;
         }
 
-        if (errorsFound == false && (user.getUserDetails().getInstitution() == null || user.getUserDetails().getInstitution().isEmpty())) {
+        if (!errorsFound && (user.getUserDetails().getInstitution() == null || user.getUserDetails().getInstitution().isEmpty())) {
             errorsFound = true;
         }
 
-        if (errorsFound == false && (user.getUserDetails().getInstitutionAbbreviation() == null || user.getUserDetails().getInstitutionAbbreviation().isEmpty())) {
+        if (!errorsFound && (user.getUserDetails().getInstitutionAbbreviation() == null || user.getUserDetails().getInstitutionAbbreviation().isEmpty())) {
             errorsFound = true;
         }
 
-        if (errorsFound == false && (user.getUserDetails().getInstitutionWeb() == null || user.getUserDetails().getInstitutionWeb().isEmpty())) {
+        if (!errorsFound && (user.getUserDetails().getInstitutionWeb() == null || user.getUserDetails().getInstitutionWeb().isEmpty())) {
             errorsFound = true;
         }
 
-        if (errorsFound == false && (user.getUserDetails().getAddress().getAddress1() == null || user.getUserDetails().getAddress().getAddress1().isEmpty())) {
+        if (!errorsFound && (user.getUserDetails().getAddress().getAddress1() == null || user.getUserDetails().getAddress().getAddress1().isEmpty())) {
             errorsFound = true;
         }
 
-        if (errorsFound == false && (user.getUserDetails().getAddress().getCountry() == null || user.getUserDetails().getAddress().getCountry().isEmpty())) {
+        if (!errorsFound && (user.getUserDetails().getAddress().getCountry() == null || user.getUserDetails().getAddress().getCountry().isEmpty())) {
             errorsFound = true;
         }
 
-        if (errorsFound == false && (user.getUserDetails().getAddress().getRegion() == null || user.getUserDetails().getAddress().getRegion().isEmpty())) {
+        if (!errorsFound && (user.getUserDetails().getAddress().getRegion() == null || user.getUserDetails().getAddress().getRegion().isEmpty())) {
             errorsFound = true;
         }
 
-        if (errorsFound == false && (user.getUserDetails().getAddress().getCity() == null || user.getUserDetails().getAddress().getCity().isEmpty())) {
+        if (!errorsFound && (user.getUserDetails().getAddress().getCity() == null || user.getUserDetails().getAddress().getCity().isEmpty())) {
             errorsFound = true;
         }
 
-        if (errorsFound == false && (user.getUserDetails().getAddress().getZipCode() == null || user.getUserDetails().getAddress().getZipCode().isEmpty())) {
+        if (!errorsFound && (user.getUserDetails().getAddress().getZipCode() == null || user.getUserDetails().getAddress().getZipCode().isEmpty())) {
             errorsFound = true;
         }
 
         return errorsFound;
     }
 
+    @Override
     @Transactional
     public String getDeterUid(String id) {
         return adapterDeterLab.getDeterUserIdByNclUserId(id);
@@ -514,9 +521,8 @@ public class RegistrationServiceImpl implements RegistrationService {
     }
 
     private void checkTeamNameDuplicate(String teamName) {
-        Team one = null;
         log.info("New team name is {}", teamName);
-        one = teamService.getTeamByName(teamName);
+        final Team one = teamService.getTeamByName(teamName);
         if (one != null) {
             log.warn("Team name duplicate entry found");
             throw new RegisterTeamNameDuplicateException();
@@ -531,7 +537,7 @@ public class RegistrationServiceImpl implements RegistrationService {
         map.put("email", user.getUserDetails().getEmail());
         map.put("key", user.getVerificationKey());
 
-        /**
+        /*
          * If sending email fails, we catch the exceptions and log them,
          * rather than throw the exceptions. Hence, the email will not cause
          * the main application to fail. If users cannot receive emails after
