@@ -284,7 +284,7 @@ public class RegistrationServiceImpl implements RegistrationService {
     }
 
     @Transactional
-    public void approveJoinRequest(String teamId, String userId, User approver) {
+    public String approveJoinRequest(String teamId, String userId, User approver) {
         if (!teamService.isOwner(teamId, approver.getId())) {
             log.warn("User {} is not a team owner of Team {}", userId, teamId);
             throw new UserIsNotTeamOwnerException();
@@ -298,12 +298,13 @@ public class RegistrationServiceImpl implements RegistrationService {
         one.put("gid", pid);
         one.put("action", "approve");
         // adapterDeterLab.approveJoinRequest(one.toString());
-        adapterDeterLab.processJoinRequest(one.toString());
         teamService.updateMemberStatus(teamId, userId, MemberStatus.APPROVED);
+        return adapterDeterLab.processJoinRequest(one.toString());
+
     }
 
     @Transactional
-    public void rejectJoinRequest(String teamId, String userId, User approver) {
+    public String rejectJoinRequest(String teamId, String userId, User approver) {
         if (!teamService.isOwner(teamId, approver.getId())) {
             log.warn("User {} is not a team owner of Team {}", userId, teamId);
             throw new UserIsNotTeamOwnerException();
@@ -331,9 +332,10 @@ public class RegistrationServiceImpl implements RegistrationService {
                 object.put("gid", pid);
                 object.put("action", "deny");
                 // adapterDeterLab.rejectJoinRequest(object.toString());
-                adapterDeterLab.processJoinRequest(object.toString());
+                return adapterDeterLab.processJoinRequest(object.toString());
             }
         }
+        throw new UserIsNotTeamMemberException();
     }
 
     @Transactional

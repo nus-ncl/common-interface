@@ -69,6 +69,7 @@ public class Util {
 
     public static JSONObject getApproveJoinRequestAdapterJsonObject() {
         JSONObject one = new JSONObject();
+        one.put("approverUid", RandomStringUtils.randomAlphabetic(8));
         one.put("uid", RandomStringUtils.randomAlphabetic(8));
         one.put("pid", "ncl");
         one.put("gid", "ncl");
