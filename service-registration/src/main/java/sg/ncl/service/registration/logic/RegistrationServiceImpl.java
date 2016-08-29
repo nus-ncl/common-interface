@@ -1,8 +1,7 @@
 package sg.ncl.service.registration.logic;
 
-import freemarker.template.Configuration;
+import freemarker.template.Template;
 import freemarker.template.TemplateException;
-import freemarker.template.TemplateNotFoundException;
 import lombok.extern.slf4j.Slf4j;
 import org.json.JSONObject;
 import org.springframework.stereotype.Service;
@@ -19,7 +18,14 @@ import sg.ncl.service.registration.data.jpa.RegistrationEntity;
 import sg.ncl.service.registration.data.jpa.RegistrationRepository;
 import sg.ncl.service.registration.domain.Registration;
 import sg.ncl.service.registration.domain.RegistrationService;
-import sg.ncl.service.registration.exceptions.*;
+import sg.ncl.service.registration.exceptions.IdNullOrEmptyException;
+import sg.ncl.service.registration.exceptions.InvalidTeamStatusException;
+import sg.ncl.service.registration.exceptions.NoMembersInTeamException;
+import sg.ncl.service.registration.exceptions.RegisterTeamNameDuplicateException;
+import sg.ncl.service.registration.exceptions.RegisterTeamNameEmptyException;
+import sg.ncl.service.registration.exceptions.RegisterUidNullException;
+import sg.ncl.service.registration.exceptions.UserFormException;
+import sg.ncl.service.registration.exceptions.UserIsNotTeamOwnerException;
 import sg.ncl.service.team.data.jpa.TeamEntity;
 import sg.ncl.service.team.data.jpa.TeamMemberEntity;
 import sg.ncl.service.team.domain.MemberStatus;
@@ -34,8 +40,7 @@ import sg.ncl.service.user.domain.User;
 import sg.ncl.service.user.domain.UserService;
 
 import javax.inject.Inject;
-import javax.mail.internet.AddressException;
-import javax.mail.internet.InternetAddress;
+import javax.inject.Named;
 import javax.validation.constraints.NotNull;
 import java.io.IOException;
 import java.time.ZonedDateTime;
@@ -50,8 +55,6 @@ import java.util.Map;
 @Slf4j
 public class RegistrationServiceImpl implements RegistrationService {
 
-    private static final String VERIFICATION_EMAIL_TEMPLATE_NAME = "verificationEmailTemplate.ftl";
-
     private final CredentialsService credentialsService;
     private final TeamService teamService;
     private final UserService userService;
@@ -59,7 +62,7 @@ public class RegistrationServiceImpl implements RegistrationService {
     private final MailService mailService;
     private final AdapterDeterLab adapterDeterLab;
     private DomainProperties domainProperties;
-    private Configuration freemarkerConfiguration;
+    private final Template emailValidationTemplate;
 
     @Inject
     RegistrationServiceImpl(
@@ -70,7 +73,7 @@ public class RegistrationServiceImpl implements RegistrationService {
             @NotNull final AdapterDeterLab adapterDeterLab,
             @NotNull final MailService mailService,
             @NotNull final DomainProperties domainProperties,
-            @NotNull final Configuration freemarkerConfiguration
+            @NotNull @Named("emailValidationTemplate") final Template emailValidationTemplate
     ) {
         this.credentialsService = credentialsService;
         this.teamService = teamService;
@@ -79,8 +82,7 @@ public class RegistrationServiceImpl implements RegistrationService {
         this.adapterDeterLab = adapterDeterLab;
         this.mailService = mailService;
         this.domainProperties = domainProperties;
-        this.freemarkerConfiguration = freemarkerConfiguration;
-
+        this.emailValidationTemplate = emailValidationTemplate;
     }
 
     @Transactional
@@ -522,12 +524,12 @@ public class RegistrationServiceImpl implements RegistrationService {
     }
 
     private void sendVerificationEmail(User user) {
-        Map<String, String> tempMap = new HashMap<>();
-        tempMap.put("firstname", user.getUserDetails().getFirstName());
-        tempMap.put("domain", domainProperties.getDomain());
-        tempMap.put("id", user.getId());
-        tempMap.put("email", user.getUserDetails().getEmail());
-        tempMap.put("key", user.getVerificationKey());
+        final Map<String, String> map = new HashMap<>();
+        map.put("firstname", user.getUserDetails().getFirstName());
+        map.put("domain", domainProperties.getDomain());
+        map.put("id", user.getId());
+        map.put("email", user.getUserDetails().getEmail());
+        map.put("key", user.getVerificationKey());
 
         /**
          * If sending email fails, we catch the exceptions and log them,
@@ -537,20 +539,12 @@ public class RegistrationServiceImpl implements RegistrationService {
          */
         try {
             String msgText = FreeMarkerTemplateUtils.processTemplateIntoString(
-                    freemarkerConfiguration.getTemplate(VERIFICATION_EMAIL_TEMPLATE_NAME), tempMap);
-            InternetAddress[] receipts = new InternetAddress[1];
-            receipts[0] = new InternetAddress(user.getUserDetails().getEmail());
+                    emailValidationTemplate, map);
             mailService.send("testbed-ops@ncl.sg",
                     user.getUserDetails().getEmail(),
                     "Please Verify Your Email Account", msgText, false, null, null);
-        } catch (TemplateNotFoundException e) {
-            log.warn("Template {} not found", VERIFICATION_EMAIL_TEMPLATE_NAME);
-        } catch (IOException e) {
-            log.warn("Template {} cannot be read", VERIFICATION_EMAIL_TEMPLATE_NAME);
-        } catch (TemplateException e) {
-            log.warn("Rending template {} failed", VERIFICATION_EMAIL_TEMPLATE_NAME);
-        } catch (AddressException e) {
-            log.warn("Parsing user email address failed: {}", user.getUserDetails().getEmail());
+        } catch (IOException | TemplateException e) {
+            log.warn("{}", e);
         }
 
     }
