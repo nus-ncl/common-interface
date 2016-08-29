@@ -26,20 +26,6 @@ public class Util {
         return entity;
     }
 
-    public static RealizationEntity getRealizationEntity(String expId) {
-        final RealizationEntity entity = new RealizationEntity();
-        entity.setId(Long.parseLong(RandomStringUtils.randomNumeric(10)));
-        entity.setExperimentId(Long.parseLong(expId));
-        entity.setExperimentName(RandomStringUtils.randomAlphanumeric(19));
-        entity.setUserId(RandomStringUtils.randomAlphanumeric(20));
-        entity.setTeamId(RandomStringUtils.randomAlphanumeric(20));
-        entity.setNumberOfNodes(Integer.parseInt(RandomStringUtils.randomNumeric(5)));
-        entity.setIdleMinutes(Long.parseLong(RandomStringUtils.randomNumeric(10)));
-        entity.setRunningMinutes(Long.parseLong(RandomStringUtils.randomNumeric(10)));
-        entity.setDetails(RandomStringUtils.randomAlphanumeric(20));
-        return entity;
-    }
-
     public static boolean isListEqual(List<RealizationEntity> one, List<RealizationEntity> two) {
         ArrayList<RealizationEntity> cp = new ArrayList<>(one);
         for (RealizationEntity twoIterator : two) {

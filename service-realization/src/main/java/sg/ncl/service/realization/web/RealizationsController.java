@@ -44,7 +44,6 @@ public class RealizationsController {
     // FIXME: path should be blank
     @ResponseStatus(HttpStatus.ACCEPTED)
     public Realization startExperiment(@PathVariable String teamName, @PathVariable String expId) {
-//        RealizationEntity realizationEntityDb = realizationService.getByExperimentId(Long.parseLong(expId));
         return realizationService.startExperimentInDeter(teamName, expId);
     }
 
@@ -53,7 +52,6 @@ public class RealizationsController {
     @RequestMapping(path = "/stop/team/{teamName}/experiment/{expId}", method = RequestMethod.POST)
     @ResponseStatus(HttpStatus.ACCEPTED)
     public Realization stopExperiment(@PathVariable String teamName, @PathVariable String expId) {
-//        RealizationEntity realizationEntityDb = realizationService.getByExperimentId(Long.parseLong(expId));
         return realizationService.stopExperimentInDeter(teamName, expId);
     }
 }

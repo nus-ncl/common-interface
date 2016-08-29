@@ -62,12 +62,6 @@ public class ExperimentServiceImpl implements ExperimentService {
             }
         }
 
-//        long countName = experimentRepository.countByName(experiment.getName());
-//        if (countName > 0) {
-//            log.warn("Experiment name is in use.");
-//            return null;
-//        }
-
 //        createNsFile(fileName, experiment.getNsFileContent());
 
         ExperimentEntity savedExperimentEntity = experimentRepository.save(setupEntity(experiment, fileName));
