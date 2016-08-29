@@ -16,6 +16,7 @@ import sg.ncl.adapter.deterlab.dtos.entities.DeterLabUserEntity;
 import sg.ncl.adapter.deterlab.exceptions.AdapterDeterlabConnectException;
 import sg.ncl.adapter.deterlab.exceptions.ApplyNewProjectException;
 import sg.ncl.adapter.deterlab.exceptions.CredentialsUpdateException;
+import sg.ncl.adapter.deterlab.exceptions.ExpDeleteException;
 import sg.ncl.adapter.deterlab.exceptions.ExpNameAlreadyExistsException;
 import sg.ncl.adapter.deterlab.exceptions.ExpStartException;
 import sg.ncl.adapter.deterlab.exceptions.JoinProjectException;
