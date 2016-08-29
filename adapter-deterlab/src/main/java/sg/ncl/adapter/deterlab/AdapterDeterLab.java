@@ -3,25 +3,14 @@ package sg.ncl.adapter.deterlab;
 import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpMethod;
-import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.*;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 import sg.ncl.adapter.deterlab.data.jpa.DeterLabUserRepository;
 import sg.ncl.adapter.deterlab.dtos.entities.DeterLabUserEntity;
-import sg.ncl.adapter.deterlab.exceptions.AdapterDeterlabConnectException;
-import sg.ncl.adapter.deterlab.exceptions.ApplyNewProjectException;
-import sg.ncl.adapter.deterlab.exceptions.CredentialsUpdateException;
-import sg.ncl.adapter.deterlab.exceptions.ExpDeleteException;
-import sg.ncl.adapter.deterlab.exceptions.ExpNameAlreadyExistsException;
-import sg.ncl.adapter.deterlab.exceptions.ExpStartException;
-import sg.ncl.adapter.deterlab.exceptions.JoinProjectException;
-import sg.ncl.adapter.deterlab.exceptions.NSFileParseException;
-import sg.ncl.adapter.deterlab.exceptions.UserNotFoundException;
+import sg.ncl.adapter.deterlab.exceptions.*;
 
 import javax.inject.Inject;
 
@@ -393,7 +382,9 @@ public class AdapterDeterLab {
 
     public String approveProject(String jsonString) {
         // for ncl admins to approve teams
-        logger.info("Approving team to {} at {}: {}", properties.getIp(), properties.getPort(), jsonString);
+        String pid = new JSONObject(jsonString).getString("pid");
+        logger.info("Approving team {} to {} at {}: {}",
+                pid, properties.getIp(), properties.getPort(), jsonString);
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
@@ -402,33 +393,44 @@ public class AdapterDeterLab {
 
         try {
             response = restTemplate.exchange(properties.getApproveProject(), HttpMethod.POST, request, String.class);
-        } catch (Exception e) {
+        } catch (RestClientException e) {
+            logger.warn("Adapter DeterLab connection error: {}", e);
             throw new AdapterDeterlabConnectException();
         }
 
         String jsonResult = new JSONObject(response.getBody().toString()).getString("msg");
-
-        if ("project approved".equals(jsonResult)) {
-            throw new NSFileParseException();
-        } else if ("experiment create fail exp name already in use".equals(jsonResult)) {
-            throw new ExpNameAlreadyExistsException();
-        } else if (!"experiment create success".equals(jsonResult)) {
-            throw new AdapterDeterlabConnectException();
+        if ("approve project OK".equals(jsonResult)) {
+            logger.info("Approve team {} OK", pid);
+        } else {
+            logger.warn("Approve team {} FAIL", pid);
         }
-
         return response.getBody().toString();
     }
 
     public String rejectProject(String jsonString) {
         // for ncl admins to reject teams
-        logger.info("Rejecting team to {} at {}: {}", properties.getIp(), properties.getPort(), jsonString);
+        String pid = new JSONObject(jsonString).getString("pid");
+        logger.info("Rejecting team {} to {} at {}: {}",
+                pid, properties.getIp(), properties.getPort(), jsonString);
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
         HttpEntity<String> request = new HttpEntity<>(jsonString, headers);
 
-        ResponseEntity responseEntity = restTemplate.exchange(properties.getRejectProject(), HttpMethod.POST, request, String.class);
+        ResponseEntity response;
 
-        return responseEntity.getBody().toString();
+        try {
+            response = restTemplate.exchange(properties.getRejectProject(), HttpMethod.POST, request, String.class);
+        } catch (RestClientException e) {
+            logger.warn("Adapter DeterLab connection error: {}", e);
+            throw new AdapterDeterlabConnectException();
+        }
+        String jsonResult = new JSONObject(response.getBody().toString()).getString("msg");
+        if ("reject project OK".equals(jsonResult)) {
+            logger.info("Reject team {} OK", pid);
+        } else {
+            logger.warn("Reject team {} FAIL", pid);
+        }
+        return response.getBody().toString();
     }
 }

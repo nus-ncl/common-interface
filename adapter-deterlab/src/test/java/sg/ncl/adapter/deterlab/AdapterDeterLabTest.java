@@ -13,15 +13,23 @@ import org.springframework.web.client.RestOperations;
 import org.springframework.web.client.RestTemplate;
 import sg.ncl.adapter.deterlab.data.jpa.DeterLabUserRepository;
 import sg.ncl.adapter.deterlab.dtos.entities.DeterLabUserEntity;
-import sg.ncl.adapter.deterlab.exceptions.*;
+import sg.ncl.adapter.deterlab.exceptions.AdapterDeterlabConnectException;
+import sg.ncl.adapter.deterlab.exceptions.ApplyNewProjectException;
+import sg.ncl.adapter.deterlab.exceptions.ExpDeleteException;
+import sg.ncl.adapter.deterlab.exceptions.ExpNameAlreadyExistsException;
+import sg.ncl.adapter.deterlab.exceptions.ExpStartException;
+import sg.ncl.adapter.deterlab.exceptions.JoinProjectException;
+import sg.ncl.adapter.deterlab.exceptions.NSFileParseException;
+import sg.ncl.adapter.deterlab.exceptions.UserNotFoundException;
 
 import javax.inject.Inject;
 
-import static org.hamcrest.Matchers.*;
+import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.not;
+import static org.hamcrest.Matchers.nullValue;
 import static org.mockito.Matchers.anyString;
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.method;
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.requestTo;
-import static org.springframework.test.web.client.response.MockRestResponseCreators.withBadRequest;
 import static org.springframework.test.web.client.response.MockRestResponseCreators.withSuccess;
 
 /**
@@ -257,9 +265,10 @@ public class AdapterDeterLabTest extends AbstractTest {
     @Test
     public void testApproveProject() {
         JSONObject one = new JSONObject();
-
+        one.put("pid", "11111111");
+        one.put("uid", "22222222");
         JSONObject predefinedResultJson = new JSONObject();
-        predefinedResultJson.put("msg", "project approved");
+        predefinedResultJson.put("msg", "approve project OK");
 
         mockServer.expect(requestTo(properties.getApproveProject()))
                 .andExpect(method(HttpMethod.POST))
@@ -268,15 +277,16 @@ public class AdapterDeterLabTest extends AbstractTest {
         String result = adapterDeterLab.approveProject(one.toString());
         JSONObject resultJSONObject = new JSONObject(result);
         String msg = resultJSONObject.getString("msg");
-        Assert.assertThat(msg, is("project approved"));
+        Assert.assertThat(msg, is("approve project OK"));
     }
 
     @Test
     public void testRejectProject() {
         JSONObject one = new JSONObject();
-
+        one.put("pid", "11111111");
+        one.put("uid", "22222222");
         JSONObject predefinedResultJson = new JSONObject();
-        predefinedResultJson.put("msg", "project rejected");
+        predefinedResultJson.put("msg", "reject project OK");
 
         mockServer.expect(requestTo(properties.getRejectProject()))
                 .andExpect(method(HttpMethod.POST))
@@ -285,7 +295,7 @@ public class AdapterDeterLabTest extends AbstractTest {
         String result = adapterDeterLab.rejectProject(one.toString());
         JSONObject resultJSONObject = new JSONObject(result);
         String msg = resultJSONObject.getString("msg");
-        Assert.assertThat(msg, is("project rejected"));
+        Assert.assertThat(msg, is("reject project OK"));
     }
 
     @Test
