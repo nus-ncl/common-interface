@@ -17,6 +17,7 @@ import sg.ncl.service.authentication.data.jpa.CredentialsEntity;
 import sg.ncl.service.registration.AbstractTest;
 import sg.ncl.service.registration.Util;
 import sg.ncl.service.registration.domain.RegistrationService;
+import sg.ncl.service.registration.exceptions.IdNullOrEmptyException;
 import sg.ncl.service.registration.exceptions.RegisterTeamIdEmptyException;
 import sg.ncl.service.registration.exceptions.RegisterTeamNameDuplicateException;
 import sg.ncl.service.registration.exceptions.RegisterTeamNameEmptyException;
@@ -322,27 +323,28 @@ public class RegistrationServiceTest extends AbstractTest {
         }
     }
 
-    @Test(expected = RegisterTeamIdEmptyException.class)
+    @Test(expected = IdNullOrEmptyException.class)
     public void approveTeamNullTeamId() throws Exception {
-        registrationService.approveTeam(null, null, TeamStatus.APPROVED);
+        registrationService.approveOrRejectNewTeam(null, null, TeamStatus.APPROVED);
     }
 
     @Test(expected = TeamNotFoundException.class)
     public void approveTeamNoSuchTeam() throws Exception {
         final String one = RandomStringUtils.randomAlphanumeric(20);
-        registrationService.approveTeam(one, null, TeamStatus.APPROVED);
+        final String userId = RandomStringUtils.randomAlphanumeric(20);
+        registrationService.approveOrRejectNewTeam(one, userId, TeamStatus.APPROVED);
     }
 
     @Test(expected = NoOwnerInTeamException.class)
     public void approveTeamNoOwner() throws Exception {
         Team one = Util.getTeamEntity();
         Team createdTeam = teamService.createTeam(one);
-        registrationService.approveTeam(createdTeam.getId(), null, TeamStatus.APPROVED);
+        final String userId = RandomStringUtils.randomAlphanumeric(20);
+        registrationService.approveOrRejectNewTeam(createdTeam.getId(), userId, TeamStatus.APPROVED);
     }
 
     @Test
     public void approveTeamGood() throws Exception {
-        final String ownerId = RandomStringUtils.randomAlphanumeric(20);
         final String deterUserId = RandomStringUtils.randomAlphabetic(8);
         Team one = Util.getTeamEntity();
         Team createdTeam = teamService.createTeam(one);
@@ -352,13 +354,13 @@ public class RegistrationServiceTest extends AbstractTest {
         JSONObject predefinedResultJson = new JSONObject();
         predefinedResultJson.put("msg", "project approved");
 
-        adapterDeterLab.saveDeterUserIdMapping(deterUserId, ownerId);
+        adapterDeterLab.saveDeterUserIdMapping(deterUserId, owner.getUserId());
 
         mockServer.expect(requestTo(properties.getApproveProject()))
                 .andExpect(method(HttpMethod.POST))
                 .andRespond(withSuccess(predefinedResultJson.toString(), MediaType.APPLICATION_JSON));
 
-        registrationService.approveTeam(createdTeam.getId(), ownerId, TeamStatus.APPROVED);
+        registrationService.approveOrRejectNewTeam(createdTeam.getId(), owner.getUserId(), TeamStatus.APPROVED);
 
         Team approvedTeam = teamService.getTeamById(createdTeam.getId());
 
@@ -407,7 +409,7 @@ public class RegistrationServiceTest extends AbstractTest {
                 .andExpect(method(HttpMethod.POST))
                 .andRespond(withSuccess(predefinedResultJson.toString(), MediaType.APPLICATION_JSON));
 
-        registrationService.approveTeam(teamId, owner.getUserId(), TeamStatus.REJECTED);
+        registrationService.approveOrRejectNewTeam(teamId, owner.getUserId(), TeamStatus.REJECTED);
 
         // team should have been removed
         try {
