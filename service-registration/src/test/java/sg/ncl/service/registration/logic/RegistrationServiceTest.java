@@ -478,10 +478,18 @@ public class RegistrationServiceTest extends AbstractTest {
         User resultUser = userService.getUser(user2.getId());
         Assert.assertThat(resultUser.getTeams().isEmpty(), is(true));
 
-        // teamService should remove team member
+        // teamService should change team member status
         List<? extends TeamMember> membersList = teamService.getTeamById(team.getId()).getMembers();
-        Assert.assertThat(membersList.size(), is(1));
-        Assert.assertThat(membersList.get(0).getUserId(), is(user.getId()));
+        Assert.assertThat(membersList.size(), is(2));
+        for (TeamMember member : membersList) {
+            if (member.getUserId().equals(user.getId())) {
+                Assert.assertThat(member.getMemberStatus(), is(MemberStatus.PENDING));
+            } else if (member.getUserId().equals(user2.getId())) {
+                Assert.assertThat(member.getMemberStatus(), is(MemberStatus.REJECTED));
+            } else {
+                Assert.fail();
+            }
+        }
     }
 
     @Test(expected = sg.ncl.adapter.deterlab.exceptions.UserNotFoundException.class)
