@@ -11,6 +11,15 @@ import java.util.List;
 public interface User {
 
     /**
+     * The {@link Role} enumerates all the roles that a {@link User} can play.
+     *
+     * @author Te Ye
+     */
+    enum Role {
+        ADMIN, USER
+    }
+
+    /**
      * Returns a {@link String} that represents the unique identifier of this {@link User}.
      *
      * @return a {@link String} that represents the unique identifier of this {@link User}.
@@ -39,11 +48,11 @@ public interface User {
     UserStatus getStatus();
 
     /**
-     * Returns the {@link UserType} of this {@link User}.
+     * Returns a set {@link Role}s that this {@link User} plays.
      *
-     * @return the {@link UserType} of this {@link User}.
+     * @return a set {@link Role}s that this {@link User} plays.
      */
-    UserType getUserType();
+    Role getRoles();
 
     /**
      * Returns the {@link ZonedDateTime} of when this {@link User} applied for an account.
@@ -72,4 +81,5 @@ public interface User {
      * @return a list of teams for this {@link User}.
      */
     List<String> getTeams();
+
 }

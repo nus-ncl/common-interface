@@ -4,8 +4,8 @@ import org.apache.commons.lang3.RandomStringUtils;
 import org.junit.Assert;
 import org.junit.Test;
 import sg.ncl.service.user.Util;
+import sg.ncl.service.user.domain.User;
 import sg.ncl.service.user.domain.UserStatus;
-import sg.ncl.service.user.domain.UserType;
 
 import java.time.ZonedDateTime;
 import java.util.List;
@@ -90,15 +90,15 @@ public class UserEntityTest {
     public void testGetUserType() throws Exception {
         final UserEntity userEntity = new UserEntity();
 
-        assertThat(userEntity.getUserType(), is(equalTo(UserType.NORMAL)));
+        assertThat(userEntity.getRoles(), is(equalTo(User.Role.NORMAL)));
     }
 
     @Test
     public void testSetUserType() throws Exception {
         final UserEntity userEntity = new UserEntity();
-        userEntity.setUserType(UserType.ADMIN);
+        userEntity.setUserType(User.Role.ADMIN);
 
-        assertThat(userEntity.getUserType(), is(equalTo(UserType.ADMIN)));
+        assertThat(userEntity.getRoles(), is(equalTo(User.Role.ADMIN)));
     }
 
     @Test

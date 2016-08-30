@@ -7,7 +7,6 @@ import sg.ncl.service.user.data.jpa.UserRepository;
 import sg.ncl.service.user.domain.Address;
 import sg.ncl.service.user.domain.User;
 import sg.ncl.service.user.domain.UserService;
-import sg.ncl.service.user.domain.UserType;
 import sg.ncl.service.user.exceptions.UserIdNullException;
 import sg.ncl.service.user.exceptions.UserNotFoundException;
 
@@ -35,7 +34,7 @@ public class UserServiceImpl implements UserService {
         userEntity.setApplicationDate(user.getApplicationDate());
         userEntity.setProcessedDate(user.getProcessedDate());
         userEntity.setUserDetails((UserDetailsEntity) user.getUserDetails());
-        userEntity.setUserType(UserType.NORMAL);
+        userEntity.setUserType(User.Role.NORMAL);
         UserEntity savedUserEntity = userRepository.save(userEntity);
         return savedUserEntity;
     }
