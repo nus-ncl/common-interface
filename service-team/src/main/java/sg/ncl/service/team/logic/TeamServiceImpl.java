@@ -5,6 +5,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import sg.ncl.service.team.data.jpa.TeamEntity;
 import sg.ncl.service.team.data.jpa.TeamMemberEntity;
+import sg.ncl.service.team.data.jpa.TeamMemberRepository;
 import sg.ncl.service.team.data.jpa.TeamRepository;
 import sg.ncl.service.team.domain.MemberStatus;
 import sg.ncl.service.team.domain.MemberType;
@@ -34,10 +35,12 @@ import java.util.stream.Collectors;
 public class TeamServiceImpl implements TeamService {
 
     private final TeamRepository teamRepository;
+    private final TeamMemberRepository teamMemberRepository;
 
     @Inject
-    TeamServiceImpl(final TeamRepository teamRepository) {
+    TeamServiceImpl(final TeamRepository teamRepository, final TeamMemberRepository teamMemberRepository) {
         this.teamRepository = teamRepository;
+        this.teamMemberRepository = teamMemberRepository;
     }
 
     @Transactional
@@ -166,7 +169,7 @@ public class TeamServiceImpl implements TeamService {
         if (entity == null) {
             throw new TeamNotFoundException(id);
         }
-        entity.removeMember(teamMember);
+        entity.changeMemberStatus(teamMember, MemberStatus.REJECTED);
         return teamRepository.save(entity);
     }
 
