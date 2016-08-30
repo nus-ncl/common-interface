@@ -13,6 +13,7 @@ import sg.ncl.service.user.exceptions.InvalidStatusTransitionException;
 import sg.ncl.service.user.exceptions.InvalidUserStatusException;
 import sg.ncl.service.user.exceptions.UserIdNullException;
 import sg.ncl.service.user.exceptions.UserNotFoundException;
+import sg.ncl.service.user.exceptions.UsernameAlreadyExistsException;
 
 import javax.inject.Inject;
 import javax.transaction.Transactional;
@@ -35,6 +36,10 @@ public class UserServiceImpl implements UserService {
 
     @Transactional
     public User createUser(User user) {
+        if (userRepository.findByUserDetailsEmail(user.getUserDetails().getEmail()) != null) {
+            log.warn("Username '{}' is already associated with a credentials", user.getUserDetails().getEmail());
+            throw new UsernameAlreadyExistsException(user.getUserDetails().getEmail());
+        }
         final UserEntity userEntity = new UserEntity();
         userEntity.setApplicationDate(user.getApplicationDate());
         userEntity.setProcessedDate(user.getProcessedDate());
