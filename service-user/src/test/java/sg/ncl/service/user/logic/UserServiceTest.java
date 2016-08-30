@@ -16,6 +16,7 @@ import sg.ncl.service.user.domain.UserDetails;
 import sg.ncl.service.user.domain.UserService;
 import sg.ncl.service.user.exceptions.UserIdNullException;
 import sg.ncl.service.user.exceptions.UserNotFoundException;
+import sg.ncl.service.user.exceptions.UsernameAlreadyExistsException;
 
 import javax.inject.Inject;
 import java.util.List;
@@ -178,6 +179,15 @@ public class UserServiceTest extends AbstractTest {
 
         User userFromDb = userService.getUser(user.getId());
         Assert.assertEquals(userEntity.getUserDetails().getFirstName(), userFromDb.getUserDetails().getFirstName());
+    }
+
+    @Test(expected = UsernameAlreadyExistsException.class)
+    public void addUserTestUsernameExists() throws Exception {
+        // try to create a user again with the same email
+        UserService userService = new UserServiceImpl(userRepository);
+        UserEntity userEntity = Util.getUserEntity();
+        userService.createUser(userEntity);
+        userService.createUser(userEntity);
     }
 
     @Test(expected = UserIdNullException.class)

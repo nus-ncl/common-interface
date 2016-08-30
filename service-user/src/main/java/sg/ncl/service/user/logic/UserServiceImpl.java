@@ -1,5 +1,6 @@
 package sg.ncl.service.user.logic;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import sg.ncl.service.user.data.jpa.UserDetailsEntity;
 import sg.ncl.service.user.data.jpa.UserEntity;
@@ -9,6 +10,7 @@ import sg.ncl.service.user.domain.User;
 import sg.ncl.service.user.domain.UserService;
 import sg.ncl.service.user.exceptions.UserIdNullException;
 import sg.ncl.service.user.exceptions.UserNotFoundException;
+import sg.ncl.service.user.exceptions.UsernameAlreadyExistsException;
 
 import javax.inject.Inject;
 import javax.transaction.Transactional;
@@ -19,6 +21,7 @@ import java.util.stream.Collectors;
  * @author Christopher Zhong
  */
 @Service
+@Slf4j
 public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
@@ -30,6 +33,10 @@ public class UserServiceImpl implements UserService {
 
     @Transactional
     public User createUser(User user) {
+        if (userRepository.findByUserDetailsEmail(user.getUserDetails().getEmail()) != null) {
+            log.warn("Username '{}' is already associated with a credentials", user.getUserDetails().getEmail());
+            throw new UsernameAlreadyExistsException(user.getUserDetails().getEmail());
+        }
         final UserEntity userEntity = new UserEntity();
         userEntity.setApplicationDate(user.getApplicationDate());
         userEntity.setProcessedDate(user.getProcessedDate());
