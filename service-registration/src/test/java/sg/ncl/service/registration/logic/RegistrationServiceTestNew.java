@@ -1,6 +1,6 @@
 package sg.ncl.service.registration.logic;
 
-import freemarker.template.Configuration;
+import freemarker.template.Template;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.json.JSONObject;
 import org.junit.Before;
@@ -62,7 +62,7 @@ public class RegistrationServiceTestNew extends AbstractTest {
     @Autowired
     private DomainProperties domainProperties;
     @Autowired
-    private Configuration freemarkerConfiguration;
+    private Template freemarkerConfiguration;
     private boolean isJoinTeam = true;
 
     @Before

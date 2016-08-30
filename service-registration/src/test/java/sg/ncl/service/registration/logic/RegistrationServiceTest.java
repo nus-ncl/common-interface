@@ -1,6 +1,6 @@
 package sg.ncl.service.registration.logic;
 
-import freemarker.template.Configuration;
+import freemarker.template.Template;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.json.JSONObject;
 import org.junit.Assert;
@@ -89,7 +89,7 @@ public class RegistrationServiceTest extends AbstractTest {
     @Mock
     private DomainProperties domainProperties;
     @Autowired
-    private Configuration freemarkerConfiguration;
+    private Template freemarkerConfiguration;
 
     @Before
     public void setUp() throws Exception {
