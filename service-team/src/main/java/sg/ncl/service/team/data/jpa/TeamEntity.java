@@ -24,7 +24,6 @@ import javax.persistence.Table;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -187,8 +186,18 @@ public class TeamEntity extends AbstractEntity implements Team {
 
     public void addMember(final TeamMember member) {
         final String userId = member.getUserId();
+        // member maybe resubmitting another request
+        // so member status may be REJECTED
         if (members.containsKey(userId)) {
-            return;
+            TeamMemberEntity teamMemberEntity = members.get(userId);
+            if (teamMemberEntity.getMemberStatus() == MemberStatus.REJECTED) {
+                teamMemberEntity.setMemberStatus(MemberStatus.PENDING);
+                teamMemberEntity.setJoinedDate(ZonedDateTime.now());
+                members.put(userId, teamMemberEntity);
+                return;
+            } else {
+                return;
+            }
         }
         TeamMemberEntity entity = new TeamMemberEntity();
         entity.setUserId(userId);
@@ -201,16 +210,6 @@ public class TeamEntity extends AbstractEntity implements Team {
         }
 
         members.put(userId, entity);
-    }
-
-    public void removeMember(final TeamMember member) {
-        for (Iterator<Map.Entry<String, TeamMemberEntity>> it = members.entrySet().iterator(); it.hasNext(); ) {
-            Map.Entry<String, TeamMemberEntity> entry = it.next();
-            if (entry.getKey().equals(member.getUserId())) {
-                it.remove();
-                log.info("User {} removed from Team {}", member.getUserId(), this.getId());
-            }
-        }
     }
 
     public TeamMember getMember(final String userId) {

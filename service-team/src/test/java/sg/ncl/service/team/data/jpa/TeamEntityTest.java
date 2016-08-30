@@ -227,33 +227,6 @@ public class TeamEntityTest {
     }
 
     @Test
-    public void testRemoveMemberBad() throws Exception {
-        final TeamEntity entity = new TeamEntity();
-        final TeamMemberInfo teamMemberOne = Util.getTeamMemberInfo(MemberType.MEMBER);
-        final TeamMemberInfo teamMemberTwo = Util.getTeamMemberInfo(MemberType.MEMBER);
-
-        // purposely add team member one but try and remove two
-        entity.addMember(teamMemberOne);
-        entity.removeMember(teamMemberTwo);
-
-        assertThat(entity.getMembers().get(0).getUserId(), is(teamMemberOne.getUserId()));
-    }
-
-    @Test
-    public void testRemoveMemberGood() throws Exception {
-        final TeamEntity entity = new TeamEntity();
-        final TeamMemberInfo teamMemberOne = Util.getTeamMemberInfo(MemberType.MEMBER);
-        final TeamMemberInfo teamMemberTwo = Util.getTeamMemberInfo(MemberType.MEMBER);
-
-        entity.addMember(teamMemberOne);
-        entity.addMember(teamMemberTwo);
-        entity.removeMember(teamMemberOne);
-        entity.removeMember(teamMemberTwo);
-
-        assertThat(entity.getMembers().isEmpty(), is(true));
-    }
-
-    @Test
     public void testEqual() throws Exception {
         final TeamEntity entity1 = Util.getTeamEntityWithId();
         final TeamEntity entity2 = Util.getTeamEntityWithId();
