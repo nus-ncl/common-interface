@@ -9,6 +9,7 @@ import sg.ncl.common.authentication.AuthenticationAutoConfiguration;
 import sg.ncl.common.exception.ExceptionAutoConfiguration;
 import sg.ncl.common.jpa.UseJpa;
 import sg.ncl.common.jwt.JwtAutoConfiguration;
+import sg.ncl.service.user.UserApplication;
 
 /**
  * @author Christopher Zhong
@@ -19,7 +20,8 @@ import sg.ncl.common.jwt.JwtAutoConfiguration;
         AuthenticationAutoConfiguration.class,
         ExceptionAutoConfiguration.class,
         JwtAutoConfiguration.class,
-        DeterLabAutoConfiguration.class
+        DeterLabAutoConfiguration.class,
+        UserApplication.class
 })
 public class AuthenticationApplication {
 
