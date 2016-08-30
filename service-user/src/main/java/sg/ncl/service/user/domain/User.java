@@ -39,6 +39,13 @@ public interface User {
     UserStatus getStatus();
 
     /**
+     * Returns the {@link UserType} of this {@link User}.
+     *
+     * @return the {@link UserType} of this {@link User}.
+     */
+    UserType getUserType();
+
+    /**
      * Returns the {@link ZonedDateTime} of when this {@link User} applied for an account.
      *
      * @return the {@link ZonedDateTime} of when this {@link User} applied for an account.

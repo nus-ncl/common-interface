@@ -6,6 +6,7 @@ import org.hibernate.annotations.Type;
 import sg.ncl.common.jpa.AbstractEntity;
 import sg.ncl.service.user.domain.User;
 import sg.ncl.service.user.domain.UserStatus;
+import sg.ncl.service.user.domain.UserType;
 import sg.ncl.service.user.exceptions.UserAlreadyInTeamException;
 
 import javax.persistence.CascadeType;
@@ -52,6 +53,10 @@ public class UserEntity extends AbstractEntity implements User {
     @Column(name = "status", nullable = false)
     @Enumerated(EnumType.STRING)
     private UserStatus status = UserStatus.PENDING;
+
+    @Column(name="user_type", nullable = false)
+    @Enumerated(EnumType.STRING)
+    private UserType userType = UserType.NORMAL;
 
     @Column(name = "application_date", nullable = false)
     private ZonedDateTime applicationDate;
@@ -102,6 +107,15 @@ public class UserEntity extends AbstractEntity implements User {
 
     void setStatus(final UserStatus status) {
         this.status = status;
+    }
+
+    @Override
+    public UserType getUserType() {
+        return userType;
+    }
+
+    public void setUserType(UserType userType) {
+        this.userType = userType;
     }
 
     @Override
@@ -182,5 +196,4 @@ public class UserEntity extends AbstractEntity implements User {
                 ", teams=" + teams +
                 "} " + super.toString();
     }
-
 }

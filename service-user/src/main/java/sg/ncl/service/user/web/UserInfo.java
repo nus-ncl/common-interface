@@ -6,6 +6,7 @@ import lombok.Getter;
 import sg.ncl.service.user.domain.LoginActivity;
 import sg.ncl.service.user.domain.User;
 import sg.ncl.service.user.domain.UserStatus;
+import sg.ncl.service.user.domain.UserType;
 
 import java.time.ZonedDateTime;
 import java.util.List;
@@ -20,6 +21,7 @@ public class UserInfo implements User {
     private final UserDetailsInfo userDetails;
     private final boolean emailVerified;
     private final UserStatus status;
+    private final UserType userType;
     private final ZonedDateTime applicationDate;
     private final ZonedDateTime processedDate;
     private final List<? extends LoginActivity> loginActivities;
@@ -31,7 +33,8 @@ public class UserInfo implements User {
             @JsonProperty("userDetails") final UserDetailsInfo userDetails,
             @JsonProperty("emailVerified") final boolean emailVerified,
             @JsonProperty("status") final UserStatus status,
-            @JsonProperty("applicationDate") final ZonedDateTime applicationDate,
+            @JsonProperty("userType") final UserType userType,
+            @JsonProperty("applicationDate")final ZonedDateTime applicationDate,
             @JsonProperty("processedDate") final ZonedDateTime processedDate,
             @JsonProperty("loginActivities") final List<? extends LoginActivity> loginActivities,
             @JsonProperty("teams") final List<String> teams
@@ -40,6 +43,7 @@ public class UserInfo implements User {
         this.userDetails = userDetails;
         this.emailVerified = emailVerified;
         this.status = status;
+        this.userType = userType;
         this.applicationDate = applicationDate;
         this.processedDate = processedDate;
         this.loginActivities = loginActivities;
@@ -52,6 +56,7 @@ public class UserInfo implements User {
                 new UserDetailsInfo(user.getUserDetails()),
                 user.isEmailVerified(),
                 user.getStatus(),
+                user.getUserType(),
                 user.getApplicationDate(),
                 user.getProcessedDate(),
                 user.getLoginActivities(),
