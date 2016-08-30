@@ -5,6 +5,7 @@ import org.junit.Assert;
 import org.junit.Test;
 import sg.ncl.service.user.Util;
 import sg.ncl.service.user.domain.UserStatus;
+import sg.ncl.service.user.domain.UserType;
 
 import java.time.ZonedDateTime;
 import java.util.List;
@@ -83,6 +84,21 @@ public class UserEntityTest {
         userEntity.setStatus(UserStatus.APPROVED);
 
         assertThat(userEntity.getStatus(), is(equalTo(UserStatus.APPROVED)));
+    }
+
+    @Test
+    public void testGetUserType() throws Exception {
+        final UserEntity userEntity = new UserEntity();
+
+        assertThat(userEntity.getUserType(), is(equalTo(UserType.NORMAL)));
+    }
+
+    @Test
+    public void testSetUserType() throws Exception {
+        final UserEntity userEntity = new UserEntity();
+        userEntity.setUserType(UserType.ADMIN);
+
+        assertThat(userEntity.getUserType(), is(equalTo(UserType.ADMIN)));
     }
 
     @Test
