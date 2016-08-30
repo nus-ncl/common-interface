@@ -18,7 +18,4 @@ spring:
 ncl:
   authentication:
     url: "/authentication"
-  jwt:
-    api-key: 123
-    signing-algorithm: HS256
-    expiry-duration: PT1H
+
