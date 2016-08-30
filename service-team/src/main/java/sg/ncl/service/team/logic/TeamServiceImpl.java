@@ -35,12 +35,10 @@ import java.util.stream.Collectors;
 public class TeamServiceImpl implements TeamService {
 
     private final TeamRepository teamRepository;
-    private final TeamMemberRepository teamMemberRepository;
 
     @Inject
-    TeamServiceImpl(final TeamRepository teamRepository, final TeamMemberRepository teamMemberRepository) {
+    TeamServiceImpl(final TeamRepository teamRepository) {
         this.teamRepository = teamRepository;
-        this.teamMemberRepository = teamMemberRepository;
     }
 
     @Transactional
