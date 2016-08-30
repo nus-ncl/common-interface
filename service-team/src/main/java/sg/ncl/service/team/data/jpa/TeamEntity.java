@@ -1,5 +1,6 @@
 package sg.ncl.service.team.data.jpa;
 
+import lombok.extern.slf4j.Slf4j;
 import org.hibernate.annotations.GenericGenerator;
 import sg.ncl.common.jpa.AbstractEntity;
 import sg.ncl.service.team.domain.MemberStatus;
@@ -31,6 +32,7 @@ import java.util.Map;
  * @author Christopher Zhong
  */
 @Entity
+@Slf4j
 @Table(name = "teams")
 public class TeamEntity extends AbstractEntity implements Team {
 
@@ -206,6 +208,7 @@ public class TeamEntity extends AbstractEntity implements Team {
             Map.Entry<String, TeamMemberEntity> entry = it.next();
             if (entry.getKey().equals(member.getUserId())) {
                 it.remove();
+                log.info("User {} removed from Team {}", member.getUserId(), this.getId());
             }
         }
     }
