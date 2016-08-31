@@ -87,16 +87,15 @@ public class UserEntityTest {
     }
 
     @Test
-    public void testGetUserType() throws Exception {
+    public void testGetRoles() throws Exception {
         final UserEntity userEntity = new UserEntity();
-
         assertThat(userEntity.getRoles(), is(equalTo(User.Role.USER)));
     }
 
     @Test
-    public void testSetUserType() throws Exception {
+    public void testSetRoles() throws Exception {
         final UserEntity userEntity = new UserEntity();
-        userEntity.setUserType(User.Role.ADMIN);
+        userEntity.setRoles(User.Role.ADMIN);
 
         assertThat(userEntity.getRoles(), is(equalTo(User.Role.ADMIN)));
     }

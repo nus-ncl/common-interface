@@ -55,7 +55,7 @@ public class UserEntity extends AbstractEntity implements User {
 
     @Column(name="user_type", nullable = false)
     @Enumerated(EnumType.STRING)
-    private Role userType = Role.USER;
+    private Role roles = Role.USER;
 
     @Column(name = "application_date", nullable = false)
     private ZonedDateTime applicationDate;
@@ -110,11 +110,11 @@ public class UserEntity extends AbstractEntity implements User {
 
     @Override
     public Role getRoles() {
-        return userType;
+        return roles;
     }
 
-    public void setRoles(Role userType) {
-        this.userType = userType;
+    public void setRoles(Role roles) {
+        this.roles = roles;
     }
 
     @Override
@@ -189,7 +189,6 @@ public class UserEntity extends AbstractEntity implements User {
                 ", userDetails=" + userDetails +
                 ", emailVerified=" + emailVerified +
                 ", status=" + status +
-                ", role=" + userType +
                 ", applicationDate=" + applicationDate +
                 ", processedDate=" + processedDate +
                 ", loginActivities=" + loginActivities +

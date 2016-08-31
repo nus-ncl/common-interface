@@ -4,6 +4,7 @@ import org.apache.commons.lang3.RandomStringUtils;
 import sg.ncl.service.user.data.jpa.AddressEntity;
 import sg.ncl.service.user.data.jpa.UserDetailsEntity;
 import sg.ncl.service.user.data.jpa.UserEntity;
+import sg.ncl.service.user.domain.User;
 
 import java.time.ZonedDateTime;
 
@@ -15,6 +16,7 @@ public class Util {
     public static UserEntity getUserEntity() throws Exception {
         final UserEntity userEntity = new UserEntity();
         userEntity.setApplicationDate(ZonedDateTime.now());
+        userEntity.setRoles(User.Role.USER);
 
         final UserDetailsEntity userDetailsEntity = new UserDetailsEntity();
         userDetailsEntity.setFirstName(RandomStringUtils.randomAlphabetic(20));
