@@ -10,6 +10,7 @@ import sg.ncl.service.user.domain.User;
 import sg.ncl.service.user.domain.UserService;
 import sg.ncl.service.user.domain.UserStatus;
 import sg.ncl.service.user.exceptions.InvalidStatusTransitionException;
+import sg.ncl.service.user.exceptions.InvalidUserStatusException;
 import sg.ncl.service.user.exceptions.UserIdNullException;
 import sg.ncl.service.user.exceptions.UserNotFoundException;
 
@@ -147,6 +148,7 @@ public class UserServiceImpl implements UserService {
         return one;
     }
 
+    @Override
     @Transactional
     public void updateUserStatus(final String id, final UserStatus status) {
         UserEntity one = findUser(id);
@@ -155,10 +157,7 @@ public class UserServiceImpl implements UserService {
                 log.warn("Update status failed for {}: {} -> {}", id, one.getStatus(), status);
                 throw new InvalidStatusTransitionException(one.getStatus() + " -> " + status);
             case PENDING:
-                if(one.getStatus().equals(UserStatus.PENDING)) {
-                    log.info("Status unchanged for {}: {} -> {}", id, one.getStatus(), status);
-                }
-                else if(one.getStatus().equals(UserStatus.CREATED)) {
+                if(one.getStatus().equals(UserStatus.CREATED)) {
                     one.setStatus(UserStatus.PENDING);
                     userRepository.save(one);
                     log.info("Status updated for {}: {} -> {}", id, UserStatus.CREATED, one.getStatus());
@@ -169,10 +168,7 @@ public class UserServiceImpl implements UserService {
                 }
                 break;
             case APPROVED:
-                if(one.getStatus().equals(UserStatus.APPROVED)) {
-                    log.info("Status unchanged for {}: {} -> {}", id, one.getStatus(), status);
-                }
-                else if(one.getStatus().equals(UserStatus.PENDING)) {
+                if(one.getStatus().equals(UserStatus.PENDING)) {
                     one.setStatus(UserStatus.APPROVED);
                     userRepository.save(one);
                     log.info("Status updated for {}: {} -> {}", id, UserStatus.PENDING, one.getStatus());
@@ -183,10 +179,7 @@ public class UserServiceImpl implements UserService {
                 }
                 break;
             case REJECTED:
-                if(one.getStatus().equals(UserStatus.REJECTED)) {
-                    log.info("Status unchanged for {}: {} -> {}", id, one.getStatus(), status);
-                }
-                else if(one.getStatus().equals(UserStatus.PENDING)) {
+                if(one.getStatus().equals(UserStatus.PENDING)) {
                     one.setStatus(UserStatus.REJECTED);
                     userRepository.save(one);
                     log.info("Status updated for {}: {} -> {}", id, UserStatus.PENDING, one.getStatus());
@@ -202,6 +195,9 @@ public class UserServiceImpl implements UserService {
                 userRepository.save(one);
                 log.info("Status updated for {}: {} -> {}", id, oldStatus, one.getStatus());
                 break;
+            default:
+                log.warn("Update status failed for {}: unknown status {}", id, status);
+                throw new InvalidUserStatusException(status.toString());
         }
     }
 }
