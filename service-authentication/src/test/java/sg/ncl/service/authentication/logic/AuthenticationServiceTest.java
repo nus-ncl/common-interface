@@ -117,7 +117,7 @@ public class AuthenticationServiceTest extends AbstractTest {
     public void testLoginInvalidCredentials() {
         final CredentialsEntity entity = getCredentialsEntity();
         final UserEntity user = getUserEntity();
-        
+
         when(credentialsRepository.findByUsername(eq(entity.getUsername()))).thenReturn(entity);
         when(passwordEncoder.matches(eq(entity.getPassword()), anyString())).thenReturn(false);
         when(userService.getUser(entity.getId())).thenReturn(user);
