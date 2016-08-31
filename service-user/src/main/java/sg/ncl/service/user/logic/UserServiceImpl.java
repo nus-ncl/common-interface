@@ -12,6 +12,8 @@ import sg.ncl.service.user.exceptions.UserNotFoundException;
 
 import javax.inject.Inject;
 import javax.transaction.Transactional;
+import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -34,7 +36,7 @@ public class UserServiceImpl implements UserService {
         userEntity.setApplicationDate(user.getApplicationDate());
         userEntity.setProcessedDate(user.getProcessedDate());
         userEntity.setUserDetails((UserDetailsEntity) user.getUserDetails());
-        userEntity.setRoles(User.Role.USER);
+        userEntity.setRoles(new HashSet<>(Arrays.asList(User.Role.USER)));
         UserEntity savedUserEntity = userRepository.save(userEntity);
         return savedUserEntity;
     }

@@ -24,8 +24,7 @@ import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import javax.persistence.UniqueConstraint;
 import java.time.ZonedDateTime;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 /**
  * @author Christopher Zhong
@@ -53,9 +52,11 @@ public class UserEntity extends AbstractEntity implements User {
     @Enumerated(EnumType.STRING)
     private UserStatus status = UserStatus.PENDING;
 
-    @Column(name="roles", nullable = false)
+    @ElementCollection(targetClass = Role.class)
+    @CollectionTable(name = "users_roles", joinColumns = @JoinColumn(name = "user_id", nullable = false, updatable = false), indexes = {@Index(columnList = "user_id"), @Index(columnList = "roles")}, uniqueConstraints = @UniqueConstraint(columnNames = {"user_id", "roles"}))
+    @Column(name="roles", nullable = false, updatable = false)
     @Enumerated(EnumType.STRING)
-    private Role roles = Role.USER;
+    private Set<Role> roles = new HashSet<>(Arrays.asList(Role.USER));
 
     @Column(name = "application_date", nullable = false)
     private ZonedDateTime applicationDate;
@@ -109,11 +110,11 @@ public class UserEntity extends AbstractEntity implements User {
     }
 
     @Override
-    public Role getRoles() {
+    public Set<Role> getRoles() {
         return roles;
     }
 
-    public void setRoles(Role roles) {
+    public void setRoles(Set<Role> roles) {
         this.roles = roles;
     }
 

@@ -2,6 +2,7 @@ package sg.ncl.service.user.domain;
 
 import java.time.ZonedDateTime;
 import java.util.List;
+import java.util.Set;
 
 /**
  * The {@link User} interface represents a user.
@@ -52,7 +53,7 @@ public interface User {
      *
      * @return a set {@link Role}s that this {@link User} plays.
      */
-    Role getRoles();
+    Set<Role> getRoles();
 
     /**
      * Returns the {@link ZonedDateTime} of when this {@link User} applied for an account.

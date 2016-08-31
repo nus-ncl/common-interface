@@ -8,7 +8,10 @@ import sg.ncl.service.user.domain.User;
 import sg.ncl.service.user.domain.UserStatus;
 
 import java.time.ZonedDateTime;
+import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.containsString;
@@ -89,15 +92,17 @@ public class UserEntityTest {
     @Test
     public void testGetRoles() throws Exception {
         final UserEntity userEntity = new UserEntity();
-        assertThat(userEntity.getRoles(), is(equalTo(User.Role.USER)));
+        Set<User.Role> one = new HashSet<>(Arrays.asList(User.Role.USER));
+        assertThat(userEntity.getRoles(), is(equalTo(one)));
     }
 
     @Test
     public void testSetRoles() throws Exception {
         final UserEntity userEntity = new UserEntity();
-        userEntity.setRoles(User.Role.ADMIN);
+        Set<User.Role> one = new HashSet<>(Arrays.asList(User.Role.ADMIN));
+        userEntity.setRoles(one);
 
-        assertThat(userEntity.getRoles(), is(equalTo(User.Role.ADMIN)));
+        assertThat(userEntity.getRoles(), is(equalTo(one)));
     }
 
     @Test
