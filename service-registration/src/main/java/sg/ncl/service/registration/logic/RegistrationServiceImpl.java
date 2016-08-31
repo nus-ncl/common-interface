@@ -29,6 +29,7 @@ import sg.ncl.service.team.exceptions.TeamNotFoundException;
 import sg.ncl.service.team.web.TeamMemberInfo;
 import sg.ncl.service.user.domain.User;
 import sg.ncl.service.user.domain.UserService;
+import sg.ncl.service.user.domain.UserStatus;
 
 import javax.inject.Inject;
 import javax.validation.constraints.NotNull;
@@ -296,8 +297,13 @@ public class RegistrationServiceImpl implements RegistrationService {
         one.put("uid", adapterDeterLab.getDeterUserIdByNclUserId(userId));
         one.put("pid", pid);
         one.put("gid", pid);
-        adapterDeterLab.approveJoinRequest(one.toString());
+        User user = userService.getUser(userId);
+        if((UserStatus.PENDING).equals(user.getStatus())) {
+            userService.updateUserStatus(userId, UserStatus.APPROVED);
+        }
         teamService.updateMemberStatus(teamId, userId, MemberStatus.APPROVED);
+        adapterDeterLab.approveJoinRequest(one.toString());
+
     }
 
     @Transactional
@@ -359,6 +365,10 @@ public class RegistrationServiceImpl implements RegistrationService {
         one.put("uid", adapterDeterLab.getDeterUserIdByNclUserId(ownerId));
 
         if (status.equals(TeamStatus.APPROVED)) {
+            User user = userService.getUser(ownerId);
+            if((UserStatus.PENDING).equals(user.getStatus())) {
+                userService.updateUserStatus(ownerId, UserStatus.APPROVED);
+            }
             // change team owner member status
             teamService.updateMemberStatus(teamId, ownerId, MemberStatus.APPROVED);
             return adapterDeterLab.approveProject(one.toString());

@@ -1,5 +1,6 @@
 package sg.ncl.service.user.logic;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import sg.ncl.service.user.data.jpa.UserDetailsEntity;
 import sg.ncl.service.user.data.jpa.UserEntity;
@@ -7,6 +8,8 @@ import sg.ncl.service.user.data.jpa.UserRepository;
 import sg.ncl.service.user.domain.Address;
 import sg.ncl.service.user.domain.User;
 import sg.ncl.service.user.domain.UserService;
+import sg.ncl.service.user.domain.UserStatus;
+import sg.ncl.service.user.exceptions.InvalidStatusTransitionException;
 import sg.ncl.service.user.exceptions.UserIdNullException;
 import sg.ncl.service.user.exceptions.UserNotFoundException;
 
@@ -19,6 +22,7 @@ import java.util.stream.Collectors;
  * @author Christopher Zhong
  */
 @Service
+@Slf4j
 public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
@@ -141,5 +145,63 @@ public class UserServiceImpl implements UserService {
             throw new UserNotFoundException();
         }
         return one;
+    }
+
+    @Transactional
+    public void updateUserStatus(final String id, final UserStatus status) {
+        UserEntity one = findUser(id);
+        switch(status) {
+            case CREATED:
+                log.warn("Update status failed for {}: {} -> {}", id, one.getStatus(), status);
+                throw new InvalidStatusTransitionException(one.getStatus() + " -> " + status);
+            case PENDING:
+                if(one.getStatus().equals(UserStatus.PENDING)) {
+                    log.info("Status unchanged for {}: {} -> {}", id, one.getStatus(), status);
+                }
+                else if(one.getStatus().equals(UserStatus.CREATED)) {
+                    one.setStatus(UserStatus.PENDING);
+                    userRepository.save(one);
+                    log.info("Status updated for {}: {} -> {}", id, UserStatus.CREATED, one.getStatus());
+                }
+                else {
+                    log.warn("Update status failed for {}: {} -> {}", id, one.getStatus(), status);
+                    throw new InvalidStatusTransitionException(one.getStatus() + " -> " + status);
+                }
+                break;
+            case APPROVED:
+                if(one.getStatus().equals(UserStatus.APPROVED)) {
+                    log.info("Status unchanged for {}: {} -> {}", id, one.getStatus(), status);
+                }
+                else if(one.getStatus().equals(UserStatus.PENDING)) {
+                    one.setStatus(UserStatus.APPROVED);
+                    userRepository.save(one);
+                    log.info("Status updated for {}: {} -> {}", id, UserStatus.PENDING, one.getStatus());
+                }
+                else {
+                    log.warn("Update status failed for {}: {} -> {}", id, one.getStatus(), status);
+                    throw new InvalidStatusTransitionException(one.getStatus() + " -> " + status);
+                }
+                break;
+            case REJECTED:
+                if(one.getStatus().equals(UserStatus.REJECTED)) {
+                    log.info("Status unchanged for {}: {} -> {}", id, one.getStatus(), status);
+                }
+                else if(one.getStatus().equals(UserStatus.PENDING)) {
+                    one.setStatus(UserStatus.REJECTED);
+                    userRepository.save(one);
+                    log.info("Status updated for {}: {} -> {}", id, UserStatus.PENDING, one.getStatus());
+                }
+                else {
+                    log.warn("Update status failed for {}: {} -> {}", id, one.getStatus(), status);
+                    throw new InvalidStatusTransitionException(one.getStatus() + " -> " + status);
+                }
+                break;
+            case CLOSED:
+                UserStatus oldStatus = one.getStatus();
+                one.setStatus(UserStatus.CLOSED);
+                userRepository.save(one);
+                log.info("Status updated for {}: {} -> {}", id, oldStatus, one.getStatus());
+                break;
+        }
     }
 }

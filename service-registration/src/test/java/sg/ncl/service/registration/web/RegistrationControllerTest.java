@@ -227,8 +227,9 @@ public class RegistrationControllerTest extends AbstractTest {
     @Test
     public void approveTeam() throws Exception {
         Team one = Util.getTeamEntity();
+        User user = userService.createUser(Util.getUserEntity());
         Team createdTeam = teamService.createTeam(one);
-        TeamMemberInfo owner = Util.getTeamMemberInfo(MemberType.OWNER);
+        TeamMemberInfo owner = Util.getTeamMemberInfo(user.getId(), MemberType.OWNER);
         teamService.addMember(createdTeam.getId(), owner);
 
         JSONObject predefinedResultJson = new JSONObject();
