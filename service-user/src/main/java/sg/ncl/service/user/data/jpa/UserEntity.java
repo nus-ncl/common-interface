@@ -53,7 +53,7 @@ public class UserEntity extends AbstractEntity implements User {
     @Enumerated(EnumType.STRING)
     private UserStatus status = UserStatus.PENDING;
 
-    @Column(name="user_type", nullable = false)
+    @Column(name="roles", nullable = false)
     @Enumerated(EnumType.STRING)
     private Role roles = Role.USER;
 

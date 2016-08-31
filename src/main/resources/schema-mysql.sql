@@ -240,7 +240,7 @@ CREATE TABLE IF NOT EXISTS `users` (
   `is_email_verified`  CHAR(1)      NOT NULL,
   `processed_date`     TINYBLOB,
   `status`             VARCHAR(255) NOT NULL,
-  `user_type`          VARCHAR(255) NOT NULL,
+  `roles`              VARCHAR(255) NOT NULL,
   `user_details_id`    BIGINT(20)   NOT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `UK_4ai7rrtrvwtgtqavv8okpxrul` (`user_details_id`),
