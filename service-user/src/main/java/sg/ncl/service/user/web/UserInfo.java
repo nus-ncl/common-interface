@@ -62,5 +62,4 @@ public class UserInfo implements User {
                 user.getTeams()
         );
     }
-
 }

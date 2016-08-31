@@ -90,7 +90,7 @@ public class UserEntityTest {
     public void testGetUserType() throws Exception {
         final UserEntity userEntity = new UserEntity();
 
-        assertThat(userEntity.getRoles(), is(equalTo(User.Role.NORMAL)));
+        assertThat(userEntity.getRoles(), is(equalTo(User.Role.USER)));
     }
 
     @Test
