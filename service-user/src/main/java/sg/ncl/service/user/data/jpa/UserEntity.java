@@ -113,7 +113,7 @@ public class UserEntity extends AbstractEntity implements User {
         return userType;
     }
 
-    public void setUserType(Role userType) {
+    public void setRoles(Role userType) {
         this.userType = userType;
     }
 
@@ -189,6 +189,7 @@ public class UserEntity extends AbstractEntity implements User {
                 ", userDetails=" + userDetails +
                 ", emailVerified=" + emailVerified +
                 ", status=" + status +
+                ", role=" + userType +
                 ", applicationDate=" + applicationDate +
                 ", processedDate=" + processedDate +
                 ", loginActivities=" + loginActivities +
