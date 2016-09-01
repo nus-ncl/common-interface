@@ -371,13 +371,13 @@ public class AdapterDeterLab {
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
         HttpEntity<String> httpRequest = new HttpEntity<>(jsonString, headers);
-        String reqUrl = ("approve".equals(action))? properties.getApproveJoinRequest() : properties.getRejectJoinRequest();
+        String reqUrl = "approve".equals(action)? properties.getApproveJoinRequest() : properties.getRejectJoinRequest();
 
         ResponseEntity httpResponse;
         try {
             httpResponse = restTemplate.exchange(reqUrl, HttpMethod.POST, httpRequest, String.class);
         } catch (RestClientException e) {
-            logger.warn("Adapter DeterLab connection error: {}", e);
+            logger.warn("DeterLab connection error process join request: {}", e);
             throw new AdapterDeterlabConnectException();
         }
 
@@ -404,7 +404,7 @@ public class AdapterDeterLab {
         try {
             response = restTemplate.exchange(properties.getApproveProject(), HttpMethod.POST, request, String.class);
         } catch (RestClientException e) {
-            logger.warn("Adapter DeterLab connection error: {}", e);
+            logger.warn("DeterLab connection error approve project: {}", e);
             throw new AdapterDeterlabConnectException();
         }
 
@@ -432,7 +432,7 @@ public class AdapterDeterLab {
         try {
             response = restTemplate.exchange(properties.getRejectProject(), HttpMethod.POST, request, String.class);
         } catch (RestClientException e) {
-            logger.warn("Adapter DeterLab connection error: {}", e);
+            logger.warn("DeterLab connection error reject project: {}", e);
             throw new AdapterDeterlabConnectException();
         }
         String jsonResult = new JSONObject(response.getBody().toString()).getString("msg");

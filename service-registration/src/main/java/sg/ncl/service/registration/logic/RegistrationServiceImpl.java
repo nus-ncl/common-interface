@@ -287,12 +287,12 @@ public class RegistrationServiceImpl implements RegistrationService {
     public String approveJoinRequest(String teamId, String userId, User approver) {
         if (!teamService.isOwner(teamId, approver.getId())) {
             log.warn("User {} is not a team owner of Team {}", approver.getId(), teamId);
-            return "{msg:Error! Only team owner can process join request.}";
+            throw new UserIsNotTeamOwnerException();
         }
         Team team = teamService.getTeamById(teamId);
         if(team == null) {
             log.warn("Team NOT found, TeamId {}", teamId);
-            return "{msg:Error! Team NOT found.}";
+            throw new TeamNotFoundException(teamId);
         }
         String pid = team.getName();
         // already add to user side when request to join
@@ -310,12 +310,12 @@ public class RegistrationServiceImpl implements RegistrationService {
     public String rejectJoinRequest(String teamId, String userId, User approver) {
         if (!teamService.isOwner(teamId, approver.getId())) {
             log.warn("User {} is not a team owner of Team {}", approver.getId(), teamId);
-            return "{msg:Error! Only team owner can process join request.}";
+            throw new UserIsNotTeamOwnerException();
         }
         Team one = teamService.getTeamById(teamId);
         if(one == null) {
             log.warn("Team NOT found, TeamId {}", teamId);
-            return "{msg:Error! Team NOT found.}";
+            throw new TeamNotFoundException(teamId);
         }
         String pid = one.getName();
 
@@ -340,7 +340,7 @@ public class RegistrationServiceImpl implements RegistrationService {
             }
         }
         log.warn("Cannot process join request from User {} to Team {}: User is NOT a member of the team.", userId, teamId);
-        return "{msg:Error! User is NOT a member of the team.}";
+        throw new UserIsNotTeamMemberException();
     }
 
     @Transactional
