@@ -36,7 +36,7 @@ public class UserServiceImpl implements UserService {
         userEntity.setApplicationDate(user.getApplicationDate());
         userEntity.setProcessedDate(user.getProcessedDate());
         userEntity.setUserDetails((UserDetailsEntity) user.getUserDetails());
-        userEntity.setRoles(new HashSet<>(Arrays.asList(User.Role.USER)));
+        userEntity.addRole(User.Role.USER);
         UserEntity savedUserEntity = userRepository.save(userEntity);
         return savedUserEntity;
     }

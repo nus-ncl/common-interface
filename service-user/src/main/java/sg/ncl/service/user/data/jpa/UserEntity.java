@@ -56,7 +56,7 @@ public class UserEntity extends AbstractEntity implements User {
     @CollectionTable(name = "users_roles", joinColumns = @JoinColumn(name = "user_id", nullable = false, updatable = false))
     @Column(name="roles", nullable = false, updatable = false)
     @Enumerated(EnumType.STRING)
-    private Set<Role> roles;
+    private Set<Role> roles = new HashSet<>();
 
     @Column(name = "application_date", nullable = false)
     private ZonedDateTime applicationDate;
@@ -114,10 +114,6 @@ public class UserEntity extends AbstractEntity implements User {
         return roles;
     }
 
-    public void setRoles(Set<Role> roles) {
-        this.roles = roles;
-    }
-
     @Override
     public ZonedDateTime getApplicationDate() {
         return applicationDate;
@@ -161,6 +157,18 @@ public class UserEntity extends AbstractEntity implements User {
     public void removeTeamId(final String teamId) {
         if (teams.contains(teamId)) {
             teams.remove(teamId);
+        }
+    }
+
+    public void addRole(final Role role) {
+        if (roles.add(role)) {
+            log.info("Add role: {}", role);
+        }
+    }
+
+    public void removeRole(final Role role) {
+        if (roles.remove(role)) {
+            log.info("Remove role: {}", role);
         }
     }
 
