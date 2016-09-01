@@ -20,8 +20,6 @@ import sg.ncl.service.authentication.domain.AuthenticationService;
 import sg.ncl.service.authentication.domain.Authorization;
 import sg.ncl.service.authentication.exceptions.CredentialsNotFoundException;
 import sg.ncl.service.authentication.exceptions.InvalidCredentialsException;
-import sg.ncl.service.user.data.jpa.UserEntity;
-import sg.ncl.service.user.domain.UserService;
 
 import javax.inject.Inject;
 import java.security.Key;
@@ -38,7 +36,6 @@ import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mockingDetails;
 import static org.mockito.Mockito.when;
 import static sg.ncl.service.authentication.util.TestUtil.getCredentialsEntity;
-import static sg.ncl.service.authentication.util.TestUtil.getUserEntity;
 
 /**
  * @author Christopher Zhong
@@ -65,14 +62,12 @@ public class AuthenticationServiceTest extends AbstractTest {
     private Duration expiryDuration;
     //    @Inject
     private AuthenticationService authenticationService;
-    @Mock
-    private UserService userService;
 
     @Before
     public void before() {
         assertThat(mockingDetails(credentialsRepository).isMock(), is(true));
         assertThat(mockingDetails(passwordEncoder).isMock(), is(true));
-        authenticationService = new AuthenticationServiceImpl(credentialsRepository, passwordEncoder, signatureAlgorithm, apiKey, expiryDuration, userService);
+        authenticationService = new AuthenticationServiceImpl(credentialsRepository, passwordEncoder, signatureAlgorithm, apiKey, expiryDuration);
     }
 
     @Test
@@ -83,11 +78,9 @@ public class AuthenticationServiceTest extends AbstractTest {
     @Test
     public void testLoginGood() {
         final CredentialsEntity entity = getCredentialsEntity();
-        final UserEntity user = getUserEntity();
 
         when(credentialsRepository.findByUsername(eq(entity.getUsername()))).thenReturn(entity);
         when(passwordEncoder.matches(eq(entity.getPassword()), eq(entity.getPassword()))).thenReturn(true);
-        when(userService.getUser(entity.getId())).thenReturn(user);
 
         final Authorization authorization = authenticationService.login(entity.getUsername(), entity.getPassword());
 
@@ -116,11 +109,9 @@ public class AuthenticationServiceTest extends AbstractTest {
     @Test
     public void testLoginInvalidCredentials() {
         final CredentialsEntity entity = getCredentialsEntity();
-        final UserEntity user = getUserEntity();
-        
+
         when(credentialsRepository.findByUsername(eq(entity.getUsername()))).thenReturn(entity);
         when(passwordEncoder.matches(eq(entity.getPassword()), anyString())).thenReturn(false);
-        when(userService.getUser(entity.getId())).thenReturn(user);
 
         exception.expect(InvalidCredentialsException.class);
         exception.expectMessage(entity.getUsername());

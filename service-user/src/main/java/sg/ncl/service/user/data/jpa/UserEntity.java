@@ -91,7 +91,7 @@ public class UserEntity extends AbstractEntity implements User {
         return emailVerified;
     }
 
-    public void setEmailVerified(final boolean emailVerified) {
+    void setEmailVerified(final boolean emailVerified) {
         this.emailVerified = emailVerified;
     }
 
@@ -100,7 +100,7 @@ public class UserEntity extends AbstractEntity implements User {
         return status;
     }
 
-    public void setStatus(final UserStatus status) {
+    void setStatus(final UserStatus status) {
         this.status = status;
     }
 
