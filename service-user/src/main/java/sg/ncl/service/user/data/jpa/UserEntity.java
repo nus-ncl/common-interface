@@ -53,7 +53,7 @@ public class UserEntity extends AbstractEntity implements User {
     private UserStatus status = UserStatus.PENDING;
 
     @ElementCollection(targetClass = Role.class)
-    @CollectionTable(name = "users_roles", joinColumns = @JoinColumn(name = "user_id", nullable = false, updatable = false), indexes = {@Index(columnList = "user_id"), @Index(columnList = "roles")}, uniqueConstraints = @UniqueConstraint(columnNames = {"user_id", "roles"}))
+    @CollectionTable(name = "users_roles", joinColumns = @JoinColumn(name = "user_id", nullable = false, updatable = false))
     @Column(name="roles", nullable = false, updatable = false)
     @Enumerated(EnumType.STRING)
     private Set<Role> roles = new HashSet<>(Arrays.asList(Role.USER));
