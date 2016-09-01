@@ -6,5 +6,5 @@ package sg.ncl.service.user.domain;
  * @author Christopher Zhong
  */
 public enum UserStatus {
-    PENDING, APPROVED, REJECTED, CLOSED
+    CREATED, PENDING, APPROVED, REJECTED, CLOSED
 }
