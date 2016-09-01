@@ -227,7 +227,7 @@ public class RegistrationServiceTest extends AbstractTest {
 
         /*==== start mock the adapter deterlab call ===*/
         JSONObject predefinedResultJson = new JSONObject();
-        predefinedResultJson.put("msg", "join request approved");
+        predefinedResultJson.put("msg", "process join request OK");
 
         mockServer.expect(requestTo(properties.getApproveJoinRequest()))
                 .andExpect(method(HttpMethod.POST))
@@ -467,7 +467,7 @@ public class RegistrationServiceTest extends AbstractTest {
         teamService.addMember(team.getId(), Util.getTeamMemberInfo(user2.getId(), MemberType.MEMBER));
 
         JSONObject predefinedResultJson = new JSONObject();
-        predefinedResultJson.put("msg", "join request rejected");
+        predefinedResultJson.put("msg", "process join request OK");
 
         mockServer.expect(requestTo(properties.getRejectJoinRequest()))
                 .andExpect(method(HttpMethod.POST))

@@ -285,43 +285,50 @@ public class RegistrationServiceImpl implements RegistrationService {
     }
 
     @Transactional
-    public void approveJoinRequest(String teamId, String userId, User approver) {
+    public String approveJoinRequest(String teamId, String userId, User approver) {
         if (!teamService.isOwner(teamId, approver.getId())) {
-            log.warn("User {} is not a team owner of Team {}", userId, teamId);
+            log.warn("User {} is not a team owner of Team {}", approver.getId(), teamId);
             throw new UserIsNotTeamOwnerException();
         }
-        String pid = teamService.getTeamById(teamId).getName();
+        Team team = teamService.getTeamById(teamId);
+        if(team == null) {
+            log.warn("Team NOT found, TeamId {}", teamId);
+            throw new TeamNotFoundException(teamId);
+        }
+        String pid = team.getName();
         // already add to user side when request to join
         JSONObject one = new JSONObject();
         one.put("approverUid", adapterDeterLab.getDeterUserIdByNclUserId(approver.getId()));
         one.put("uid", adapterDeterLab.getDeterUserIdByNclUserId(userId));
         one.put("pid", pid);
         one.put("gid", pid);
+        one.put("action", "approve");
         User user = userService.getUser(userId);
         if((UserStatus.PENDING).equals(user.getStatus())) {
             userService.updateUserStatus(userId, UserStatus.APPROVED);
         }
         teamService.updateMemberStatus(teamId, userId, MemberStatus.APPROVED);
-        adapterDeterLab.approveJoinRequest(one.toString());
-
+        return adapterDeterLab.processJoinRequest(one.toString());
     }
 
     @Transactional
-    public void rejectJoinRequest(String teamId, String userId, User approver) {
+    public String rejectJoinRequest(String teamId, String userId, User approver) {
         if (!teamService.isOwner(teamId, approver.getId())) {
-            log.warn("User {} is not a team owner of Team {}", userId, teamId);
+            log.warn("User {} is not a team owner of Team {}", approver.getId(), teamId);
             throw new UserIsNotTeamOwnerException();
         }
-
         Team one = teamService.getTeamById(teamId);
+        if(one == null) {
+            log.warn("Team NOT found, TeamId {}", teamId);
+            throw new TeamNotFoundException(teamId);
+        }
         String pid = one.getName();
-        List<? extends TeamMember> membersList = one.getMembers();
 
+        List<? extends TeamMember> membersList = one.getMembers();
         if (membersList.isEmpty()) {
             // by right not possible to be empty since isOwner ensures there exists at least one member of type owner
             throw new NoMembersInTeamException();
         }
-
         for (TeamMember member : membersList) {
             if (member.getUserId().equals(userId)) {
                 log.info("Reject join request from User {}, Team {}", member.getUserId(), teamId);
@@ -333,9 +340,12 @@ public class RegistrationServiceImpl implements RegistrationService {
                 object.put("uid", adapterDeterLab.getDeterUserIdByNclUserId(userId));
                 object.put("pid", pid);
                 object.put("gid", pid);
-                adapterDeterLab.rejectJoinRequest(object.toString());
+                object.put("action", "deny");
+                return adapterDeterLab.processJoinRequest(object.toString());
             }
         }
+        log.warn("Cannot process join request from User {} to Team {}: User is NOT a member of the team.", userId, teamId);
+        throw new UserIsNotTeamMemberException();
     }
 
     @Transactional

@@ -24,8 +24,7 @@ import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import javax.persistence.UniqueConstraint;
 import java.time.ZonedDateTime;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 /**
  * @author Christopher Zhong
@@ -52,6 +51,12 @@ public class UserEntity extends AbstractEntity implements User {
     @Column(name = "status", nullable = false)
     @Enumerated(EnumType.STRING)
     private UserStatus status = UserStatus.CREATED;
+
+    @ElementCollection(targetClass = Role.class)
+    @CollectionTable(name = "users_roles", joinColumns = @JoinColumn(name = "user_id", nullable = false, updatable = false))
+    @Column(name="roles", nullable = false, updatable = false)
+    @Enumerated(EnumType.STRING)
+    private Set<Role> roles = new HashSet<>();
 
     @Column(name = "application_date", nullable = false)
     private ZonedDateTime applicationDate;
@@ -105,6 +110,11 @@ public class UserEntity extends AbstractEntity implements User {
     }
 
     @Override
+    public Set<Role> getRoles() {
+        return roles;
+    }
+
+    @Override
     public ZonedDateTime getApplicationDate() {
         return applicationDate;
     }
@@ -150,6 +160,18 @@ public class UserEntity extends AbstractEntity implements User {
         }
     }
 
+    public void addRole(final Role role) {
+        if (roles.add(role)) {
+            log.info("Add role: {}", role);
+        }
+    }
+
+    public void removeRole(final Role role) {
+        if (roles.remove(role)) {
+            log.info("Remove role: {}", role);
+        }
+    }
+
     @Override
     public boolean equals(final Object o) {
         if (this == o) {
@@ -182,5 +204,4 @@ public class UserEntity extends AbstractEntity implements User {
                 ", teams=" + teams +
                 "} " + super.toString();
     }
-
 }
