@@ -29,6 +29,8 @@ import static java.util.UUID.randomUUID;
 @Slf4j
 public class FirstRun {
 
+    // FIXME: need to include users_roles
+
     static final String SQL_INSERT_TEAMS = "INSERT INTO teams"
             + "(id, created_date, last_modified_date, version, application_date, description, name, organisation_type, privacy, status, visibility, website) VALUES"
             + "(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
