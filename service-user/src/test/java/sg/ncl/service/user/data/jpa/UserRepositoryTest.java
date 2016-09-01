@@ -6,6 +6,7 @@ import org.junit.rules.ExpectedException;
 import org.springframework.dao.DataIntegrityViolationException;
 import sg.ncl.service.user.AbstractTest;
 import sg.ncl.service.user.Util;
+import sg.ncl.service.user.domain.User;
 
 import javax.inject.Inject;
 
@@ -65,6 +66,28 @@ public class UserRepositoryTest extends AbstractTest {
             repository.saveAndFlush(entity);
         } catch (Exception e) {
             checkException(e, "NULL not allowed for column \"APPLICATION_DATE\"");
+            return;
+        }
+        exception.expect(DataIntegrityViolationException.class);
+    }
+
+    @Test
+    public void testGoodRole() throws Exception {
+        final UserEntity entity = Util.getUserEntity();
+        UserEntity savedEntity = repository.saveAndFlush(entity);
+        assertThat(savedEntity.getRoles().size(), is(1));
+        assertThat(savedEntity.getRoles().contains(User.Role.USER), is(true));
+        assertThat(savedEntity.getRoles().contains(User.Role.ADMIN), is(false));
+    }
+
+    @Test
+    public void testNullRole() throws Exception {
+        final UserEntity entity = Util.getUserEntity();
+        entity.addRole(null);
+        try {
+            repository.saveAndFlush(entity);
+        } catch (Exception e) {
+            checkException(e, "NULL not allowed for column \"ROLES\"");
             return;
         }
         exception.expect(DataIntegrityViolationException.class);
