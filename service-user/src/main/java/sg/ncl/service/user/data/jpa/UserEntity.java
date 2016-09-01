@@ -56,7 +56,7 @@ public class UserEntity extends AbstractEntity implements User {
     @CollectionTable(name = "users_roles", joinColumns = @JoinColumn(name = "user_id", nullable = false, updatable = false))
     @Column(name="roles", nullable = false, updatable = false)
     @Enumerated(EnumType.STRING)
-    private Set<Role> roles = new HashSet<>(Arrays.asList(Role.USER));
+    private Set<Role> roles;
 
     @Column(name = "application_date", nullable = false)
     private ZonedDateTime applicationDate;
