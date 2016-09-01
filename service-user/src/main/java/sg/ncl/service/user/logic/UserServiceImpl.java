@@ -12,8 +12,6 @@ import sg.ncl.service.user.exceptions.UserNotFoundException;
 
 import javax.inject.Inject;
 import javax.transaction.Transactional;
-import java.util.Arrays;
-import java.util.HashSet;
 import java.util.List;
 import java.util.stream.Collectors;
 
