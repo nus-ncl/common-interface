@@ -92,17 +92,31 @@ public class UserEntityTest {
     @Test
     public void testGetRoles() throws Exception {
         final UserEntity userEntity = new UserEntity();
-        Set<User.Role> one = new HashSet<>(Arrays.asList(User.Role.USER));
-        assertThat(userEntity.getRoles(), is(equalTo(one)));
+        Set<User.Role> result = new HashSet<>();
+        assertThat(userEntity.getRoles().isEmpty(), is(true));
+        assertThat(userEntity.getRoles(), is(equalTo(result)));
     }
 
     @Test
-    public void testSetRoles() throws Exception {
+    public void testAddRoles() throws Exception {
         final UserEntity userEntity = new UserEntity();
-        Set<User.Role> one = new HashSet<>(Arrays.asList(User.Role.ADMIN));
-        userEntity.setRoles(one);
+        userEntity.addRole(User.Role.ADMIN);
+        Set<User.Role> result = new HashSet<>(Arrays.asList(User.Role.ADMIN));
 
-        assertThat(userEntity.getRoles(), is(equalTo(one)));
+        assertThat(userEntity.getRoles().size(), is(1));
+        assertThat(userEntity.getRoles(), is(equalTo(result)));
+    }
+
+    @Test
+    public void testRemoveRoles() throws Exception {
+        final UserEntity userEntity = new UserEntity();
+        userEntity.addRole(User.Role.ADMIN);
+        userEntity.addRole(User.Role.USER);
+        userEntity.removeRole(User.Role.USER);
+        Set<User.Role> result = new HashSet<>(Arrays.asList(User.Role.ADMIN));
+
+        assertThat(userEntity.getRoles().size(), is(1));
+        assertThat(userEntity.getRoles(), is(equalTo(result)));
     }
 
     @Test
