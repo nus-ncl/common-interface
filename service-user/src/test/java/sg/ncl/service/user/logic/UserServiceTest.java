@@ -242,8 +242,7 @@ public class UserServiceTest extends AbstractTest {
         UserService userService = new UserServiceImpl(userRepository);
         UserEntity userEntity = Util.getUserEntity();
         User user = userService.createUser(userEntity);
-        userService.updateUserStatus(user.getId(), UserStatus.PENDING);
-        User user2 = userService.getUser(user.getId());
+        User user2 = userService.updateUserStatus(user.getId(), UserStatus.PENDING);
         Assert.assertEquals(user2.getStatus(), UserStatus.PENDING);
     }
 
@@ -267,8 +266,8 @@ public class UserServiceTest extends AbstractTest {
     public void testUpdateUserStatusPendingToApproved() throws Exception {
         UserService userService = new UserServiceImpl(userRepository);
         UserEntity userEntity = Util.getUserEntity();
-        userEntity.setStatus(UserStatus.PENDING);
         User user = userService.createUser(userEntity);
+        userService.updateUserStatus(user.getId(), UserStatus.PENDING);
         userService.updateUserStatus(user.getId(), UserStatus.APPROVED);
         User user2 = userService.getUser(user.getId());
         Assert.assertEquals(user2.getStatus(), UserStatus.APPROVED);
@@ -278,8 +277,8 @@ public class UserServiceTest extends AbstractTest {
     public void testUpdateUserStatusPendingToRejected() throws Exception {
         UserService userService = new UserServiceImpl(userRepository);
         UserEntity userEntity = Util.getUserEntity();
-        userEntity.setStatus(UserStatus.PENDING);
         User user = userService.createUser(userEntity);
+        userService.updateUserStatus(user.getId(), UserStatus.PENDING);
         userService.updateUserStatus(user.getId(), UserStatus.REJECTED);
         User user2 = userService.getUser(user.getId());
         Assert.assertEquals(user2.getStatus(), UserStatus.REJECTED);
