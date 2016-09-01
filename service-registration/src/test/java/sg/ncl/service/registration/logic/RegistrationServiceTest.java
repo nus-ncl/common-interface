@@ -253,13 +253,13 @@ public class RegistrationServiceTest extends AbstractTest {
         }
     }
 
+    @Test(expected = UserIsNotTeamOwnerException.class)
     public void registerApproveJoinRequestBad() throws Exception {
         TeamEntity teamEntity = Util.getTeamEntity();
         User userEntity = Util.getUserEntity();
         User createdUser = userService.createUser(userEntity);
         String teamId = teamService.createTeam(teamEntity).getId();
-        String result = registrationService.approveJoinRequest(teamId, createdUser.getId(), createdUser);
-        Assert.assertThat(result, is(equals("{msg:Error! Only team owner can process join request.}")));
+        registrationService.approveJoinRequest(teamId, createdUser.getId(), createdUser);
     }
 
     @Test(expected = RegisterTeamNameEmptyException.class)
@@ -426,6 +426,7 @@ public class RegistrationServiceTest extends AbstractTest {
         Assert.assertThat(teamsIdList.get(0), is(teamId_Two));
     }
 
+    @Test(expected = UserIsNotTeamOwnerException.class)
     public void rejectJoinRequestUserIsNotTeamOwner() throws Exception {
         User user = userService.createUser(Util.getUserEntity());
         User user2 = userService.createUser(Util.getUserEntity());
@@ -433,8 +434,7 @@ public class RegistrationServiceTest extends AbstractTest {
 
         teamService.addMember(team.getId(), Util.getTeamMemberInfo(user.getId(), MemberType.OWNER));
         teamService.addMember(team.getId(), Util.getTeamMemberInfo(user2.getId(), MemberType.MEMBER));
-        String result = registrationService.rejectJoinRequest(team.getId(), user2.getId(), user2);
-        Assert.assertThat(result, is(equals("{msg:Error! Only team owner can process join request.}")));
+        registrationService.rejectJoinRequest(team.getId(), user2.getId(), user2);
     }
 
     @Test(expected = TeamIdNullOrEmptyException.class)
