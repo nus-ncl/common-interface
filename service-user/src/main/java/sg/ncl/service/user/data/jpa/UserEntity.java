@@ -50,7 +50,7 @@ public class UserEntity extends AbstractEntity implements User {
 
     @Column(name = "status", nullable = false)
     @Enumerated(EnumType.STRING)
-    private UserStatus status = UserStatus.PENDING;
+    private UserStatus status = UserStatus.CREATED;
 
     @ElementCollection(targetClass = Role.class)
     @CollectionTable(name = "users_roles", joinColumns = @JoinColumn(name = "user_id", nullable = false, updatable = false))
