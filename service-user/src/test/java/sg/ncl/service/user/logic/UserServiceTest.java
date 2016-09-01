@@ -14,11 +14,15 @@ import sg.ncl.service.user.domain.Address;
 import sg.ncl.service.user.domain.User;
 import sg.ncl.service.user.domain.UserDetails;
 import sg.ncl.service.user.domain.UserService;
+import sg.ncl.service.user.domain.UserStatus;
+import sg.ncl.service.user.exceptions.InvalidStatusTransitionException;
 import sg.ncl.service.user.exceptions.UserIdNullException;
 import sg.ncl.service.user.exceptions.UserNotFoundException;
 
 import javax.inject.Inject;
 import java.util.List;
+
+import static org.hamcrest.CoreMatchers.is;
 
 /**
  * @author Desmond
@@ -213,5 +217,71 @@ public class UserServiceTest extends AbstractTest {
         User userFromDb2 = userService.getUser(userId);
         List<String> teamList2 = userFromDb2.getTeams();
         Assert.assertEquals(teamList2.isEmpty(), true);
+    }
+
+    @Test(expected = InvalidStatusTransitionException.class)
+    public void testUpdateUserStatusToCreated() throws Exception {
+        UserService userService = new UserServiceImpl(userRepository);
+        UserEntity userEntity = Util.getUserEntity();
+        User user = userService.createUser(userEntity);
+        userService.updateUserStatus(user.getId(), UserStatus.CREATED);
+    }
+
+    @Test
+    public void testUpdateUserStatusCreatedToPending() throws Exception {
+        UserService userService = new UserServiceImpl(userRepository);
+        UserEntity userEntity = Util.getUserEntity();
+        User user = userService.createUser(userEntity);
+        userService.updateUserStatus(user.getId(), UserStatus.PENDING);
+        User user2 = userService.getUser(user.getId());
+        Assert.assertEquals(user2.getStatus(), UserStatus.PENDING);
+    }
+
+    @Test(expected = InvalidStatusTransitionException.class)
+    public void testUpdateUserStatusCreatedToApproved() throws Exception {
+        UserService userService = new UserServiceImpl(userRepository);
+        UserEntity userEntity = Util.getUserEntity();
+        User user = userService.createUser(userEntity);
+        userService.updateUserStatus(user.getId(), UserStatus.APPROVED);
+    }
+
+    @Test(expected = InvalidStatusTransitionException.class)
+    public void testUpdateUserStatusCreatedToRejected() throws Exception {
+        UserService userService = new UserServiceImpl(userRepository);
+        UserEntity userEntity = Util.getUserEntity();
+        User user = userService.createUser(userEntity);
+        userService.updateUserStatus(user.getId(), UserStatus.REJECTED);
+    }
+
+    @Test
+    public void testUpdateUserStatusPendingToApproved() throws Exception {
+        UserService userService = new UserServiceImpl(userRepository);
+        UserEntity userEntity = Util.getUserEntity();
+        userEntity.setStatus(UserStatus.PENDING);
+        User user = userService.createUser(userEntity);
+        userService.updateUserStatus(user.getId(), UserStatus.APPROVED);
+        User user2 = userService.getUser(user.getId());
+        Assert.assertEquals(user2.getStatus(), UserStatus.APPROVED);
+    }
+
+    @Test
+    public void testUpdateUserStatusPendingToRejected() throws Exception {
+        UserService userService = new UserServiceImpl(userRepository);
+        UserEntity userEntity = Util.getUserEntity();
+        userEntity.setStatus(UserStatus.PENDING);
+        User user = userService.createUser(userEntity);
+        userService.updateUserStatus(user.getId(), UserStatus.REJECTED);
+        User user2 = userService.getUser(user.getId());
+        Assert.assertEquals(user2.getStatus(), UserStatus.REJECTED);
+    }
+
+    @Test
+    public void testUpdateUserStatusToClosed() throws Exception {
+        UserService userService = new UserServiceImpl(userRepository);
+        UserEntity userEntity = Util.getUserEntity();
+        User user = userService.createUser(userEntity);
+        userService.updateUserStatus(user.getId(), UserStatus.CLOSED);
+        User user2 = userService.getUser(user.getId());
+        Assert.assertEquals(user2.getStatus(), UserStatus.CLOSED);
     }
 }

@@ -150,7 +150,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @Transactional
-    public void updateUserStatus(final String id, final UserStatus status) {
+    public User updateUserStatus(final String id, final UserStatus status) {
         UserEntity one = findUser(id);
         switch(status) {
             case CREATED:
@@ -159,42 +159,42 @@ public class UserServiceImpl implements UserService {
             case PENDING:
                 if(one.getStatus().equals(UserStatus.CREATED)) {
                     one.setStatus(UserStatus.PENDING);
-                    userRepository.save(one);
-                    log.info("Status updated for {}: {} -> {}", id, UserStatus.CREATED, one.getStatus());
+                    UserEntity savedUser = userRepository.save(one);
+                    log.info("Status updated for {}: {} -> {}", id, UserStatus.CREATED, savedUser.getStatus());
+                    return savedUser;
                 }
                 else {
                     log.warn("Update status failed for {}: {} -> {}", id, one.getStatus(), status);
                     throw new InvalidStatusTransitionException(one.getStatus() + " -> " + status);
                 }
-                break;
             case APPROVED:
                 if(one.getStatus().equals(UserStatus.PENDING)) {
                     one.setStatus(UserStatus.APPROVED);
-                    userRepository.save(one);
-                    log.info("Status updated for {}: {} -> {}", id, UserStatus.PENDING, one.getStatus());
+                    UserEntity savedUser = userRepository.save(one);
+                    log.info("Status updated for {}: {} -> {}", id, UserStatus.PENDING, savedUser.getStatus());
+                    return savedUser;
                 }
                 else {
                     log.warn("Update status failed for {}: {} -> {}", id, one.getStatus(), status);
                     throw new InvalidStatusTransitionException(one.getStatus() + " -> " + status);
                 }
-                break;
             case REJECTED:
                 if(one.getStatus().equals(UserStatus.PENDING)) {
                     one.setStatus(UserStatus.REJECTED);
-                    userRepository.save(one);
-                    log.info("Status updated for {}: {} -> {}", id, UserStatus.PENDING, one.getStatus());
+                    UserEntity savedUser = userRepository.save(one);
+                    log.info("Status updated for {}: {} -> {}", id, UserStatus.PENDING, savedUser.getStatus());
+                    return savedUser;
                 }
                 else {
                     log.warn("Update status failed for {}: {} -> {}", id, one.getStatus(), status);
                     throw new InvalidStatusTransitionException(one.getStatus() + " -> " + status);
                 }
-                break;
             case CLOSED:
                 UserStatus oldStatus = one.getStatus();
                 one.setStatus(UserStatus.CLOSED);
-                userRepository.save(one);
-                log.info("Status updated for {}: {} -> {}", id, oldStatus, one.getStatus());
-                break;
+                UserEntity savedUser = userRepository.save(one);
+                log.info("Status updated for {}: {} -> {}", id, oldStatus, savedUser.getStatus());
+                return savedUser;
             default:
                 log.warn("Update status failed for {}: unknown status {}", id, status);
                 throw new InvalidUserStatusException(status.toString());

@@ -19,6 +19,6 @@ public interface UserService {
 
     void removeTeam(final String userId, final String teamId);
 
-    void updateUserStatus(String id, UserStatus status);
+    User updateUserStatus(String id, UserStatus status);
 
 }
