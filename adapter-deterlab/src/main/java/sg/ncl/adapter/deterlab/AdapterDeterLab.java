@@ -354,30 +354,40 @@ public class AdapterDeterLab {
         return response.getBody().toString();
     }
 
-    public String approveJoinRequest(String jsonString) {
-        // for team leaders to accept join request
-        logger.info("Approving join request to {} at {}: {}", properties.getIp(), properties.getPort(), jsonString);
+    public String processJoinRequest(String jsonString) {
+        JSONObject request = new JSONObject(jsonString);
+        if(request.length() < 5) {
+            logger.warn("NOT enough inputs to process the request. Input: {}", jsonString);
+            throw new IllegalArgumentException();
+        }
+        String pid = request.getString("pid");
+        String approverUid = request.getString("approverUid");
+        String uid = request.getString("uid");
+        String gid = request.getString("gid");
+        String action = request.getString("action");
+        logger.info("Processing join request to team {}, requester {}, approver {}, group {}, action {}",
+                pid, uid, approverUid, gid, action);
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
-        HttpEntity<String> request = new HttpEntity<>(jsonString, headers);
+        HttpEntity<String> httpRequest = new HttpEntity<>(jsonString, headers);
+        String reqUrl = "approve".equals(action)? properties.getApproveJoinRequest() : properties.getRejectJoinRequest();
 
-        ResponseEntity responseEntity = restTemplate.exchange(properties.getApproveJoinRequest(), HttpMethod.POST, request, String.class);
+        ResponseEntity httpResponse;
+        try {
+            httpResponse = restTemplate.exchange(reqUrl, HttpMethod.POST, httpRequest, String.class);
+        } catch (RestClientException e) {
+            logger.warn("DeterLab connection error process join request: {}", e);
+            throw new AdapterDeterlabConnectException();
+        }
 
-        return responseEntity.getBody().toString();
-    }
-
-    public String rejectJoinRequest(String jsonString) {
-        // for team leaders to reject join request
-        logger.info("Rejecting join request to {} at {}: {}", properties.getIp(), properties.getPort(), jsonString);
-
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_JSON);
-        HttpEntity<String> request = new HttpEntity<>(jsonString, headers);
-
-        ResponseEntity responseEntity = restTemplate.exchange(properties.getRejectJoinRequest(), HttpMethod.POST, request, String.class);
-
-        return responseEntity.getBody().toString();
+        JSONObject response = new JSONObject(httpResponse.getBody().toString());
+        if(!"process join request OK".equals(response.getString("msg"))) {
+            logger.warn("{} join request to team {} FAIL", action, pid);
+            throw new DeterLabOperationFailedException();
+        }
+        logger.info("{} join request to team {} OK", action, pid);
+        return httpResponse.getBody().toString();
     }
 
     public String approveProject(String jsonString) {
@@ -394,7 +404,7 @@ public class AdapterDeterLab {
         try {
             response = restTemplate.exchange(properties.getApproveProject(), HttpMethod.POST, request, String.class);
         } catch (RestClientException e) {
-            logger.warn("Adapter DeterLab connection error: {}", e);
+            logger.warn("DeterLab connection error approve project: {}", e);
             throw new AdapterDeterlabConnectException();
         }
 
@@ -422,7 +432,7 @@ public class AdapterDeterLab {
         try {
             response = restTemplate.exchange(properties.getRejectProject(), HttpMethod.POST, request, String.class);
         } catch (RestClientException e) {
-            logger.warn("Adapter DeterLab connection error: {}", e);
+            logger.warn("DeterLab connection error reject project: {}", e);
             throw new AdapterDeterlabConnectException();
         }
         String jsonResult = new JSONObject(response.getBody().toString()).getString("msg");

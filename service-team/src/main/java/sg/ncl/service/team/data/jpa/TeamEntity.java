@@ -31,8 +31,8 @@ import java.util.Map;
  * @author Christopher Zhong
  */
 @Entity
-@Table(name = "teams")
 @Slf4j
+@Table(name = "teams")
 public class TeamEntity extends AbstractEntity implements Team {
 
 //    public TeamEntity() {

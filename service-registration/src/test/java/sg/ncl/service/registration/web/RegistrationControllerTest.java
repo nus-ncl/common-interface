@@ -281,7 +281,7 @@ public class RegistrationControllerTest extends AbstractTest {
         object.put("user", userFields);
 
         JSONObject predefinedResultJson = new JSONObject();
-        predefinedResultJson.put("msg", "join request rejected");
+        predefinedResultJson.put("msg", "process join request OK");
 
         mockServer.expect(requestTo(properties.getRejectJoinRequest()))
                 .andExpect(method(HttpMethod.POST))
