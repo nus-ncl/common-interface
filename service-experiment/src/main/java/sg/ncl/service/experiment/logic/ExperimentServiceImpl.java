@@ -45,6 +45,12 @@ public class ExperimentServiceImpl implements ExperimentService {
         this.experimentConnectionProperties = experimentConnectionProperties;
     }
 
+    /**
+     * Creates an experiment and realization object on DB.
+     * Also creates the experiment on Deterlab DB.
+     * @param experiment the experiment object passed from web service
+     * @return the experiment entity stored on our DB
+     */
     @Transactional
     public Experiment save(Experiment experiment) {
         log.info("Save experiment");
@@ -62,10 +68,7 @@ public class ExperimentServiceImpl implements ExperimentService {
             }
         }
 
-//        createNsFile(fileName, experiment.getNsFileContent());
-
         ExperimentEntity savedExperimentEntity = experimentRepository.save(setupEntity(experiment, fileName));
-        createExperimentInDeter(savedExperimentEntity);
         log.info("Experiment saved: {}", savedExperimentEntity);
 
         RealizationEntity realizationEntity = new RealizationEntity();
@@ -80,6 +83,8 @@ public class ExperimentServiceImpl implements ExperimentService {
         realizationService.save(realizationEntity);
         log.info("Realization saved: {}", realizationEntity);
 
+//        createNsFile(fileName, experiment.getNsFileContent());
+        createExperimentInDeter(savedExperimentEntity);
         return savedExperimentEntity;
     }
 
@@ -177,8 +182,12 @@ public class ExperimentServiceImpl implements ExperimentService {
         return filename;
     }
 
-    public void createExperimentInDeter(Experiment experiment) {
-        log.info("Start createExperimentInDeter");
+    /**
+     * Invokes the adapter to create an experiment on Deterlab DB
+     * @param experiment the experiment object
+     */
+    private void createExperimentInDeter(Experiment experiment) {
+        log.info("Begin creating experiment: {} for team: {}", experiment.getName(), experiment.getTeamName());
 
         JSONObject userObject = new JSONObject();
         userObject.put("id", experiment.getId().toString());
@@ -196,7 +205,7 @@ public class ExperimentServiceImpl implements ExperimentService {
 
         adapterDeterLab.createExperiment(userObject.toString());
 
-        log.info("End createExperimentInDeter");
+        log.info("Create experiment : {}, success", experiment);
     }
 
 
