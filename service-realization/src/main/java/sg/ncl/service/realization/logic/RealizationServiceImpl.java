@@ -206,6 +206,7 @@ public class RealizationServiceImpl implements RealizationService {
         return realizationRepository.save(realizationEntityDb);
     }
 
+    @Transactional
     public void setState(final Long experimentId, final RealizationState state) {
         log.info("Set realization state. {} : {}", experimentId, state);
         RealizationEntity realizationEntity = realizationRepository.findByExperimentId(experimentId);
@@ -213,11 +214,13 @@ public class RealizationServiceImpl implements RealizationService {
         realizationRepository.save(realizationEntity);
     }
 
+    @Transactional
     public RealizationState getState(final Long experimentId) {
         log.info("Get realization state. {}", experimentId);
         return realizationRepository.findByExperimentId(experimentId).getState();
     }
 
+    @Transactional
     public void setIdleMinutes(final Long experimentId, final Long minutes) {
         log.info("Set realization idle minutes. {} : {}", experimentId, minutes);
         RealizationEntity realizationEntity = realizationRepository.findByExperimentId(experimentId);
@@ -225,11 +228,13 @@ public class RealizationServiceImpl implements RealizationService {
         realizationRepository.saveAndFlush(realizationEntity);
     }
 
+    @Transactional
     public Long getIdleMinutes(final Long experimentId) {
         log.info("Get realization idle minutes. {}", experimentId);
         return realizationRepository.findByExperimentId(experimentId).getIdleMinutes();
     }
 
+    @Transactional
     public void setRunningMinutes(final Long experimentId, final Long minutes) {
         log.info("Set realization running minutes. {} : {}", experimentId, minutes);
         RealizationEntity realizationEntity = realizationRepository.findByExperimentId(experimentId);
@@ -237,11 +242,13 @@ public class RealizationServiceImpl implements RealizationService {
         realizationRepository.saveAndFlush(realizationEntity);
     }
 
+    @Transactional
     public Long getRunningMinutes(final Long experimentId) {
         log.info("Get realization running minutes. {}", experimentId);
         return realizationRepository.findByExperimentId(experimentId).getRunningMinutes();
     }
 
+    @Transactional
     public void setRealizationDetails(final Long experimentId, final String details) {
         log.info("Set realization details. {} : {}", experimentId, details);
         RealizationEntity realizationEntity = realizationRepository.findByExperimentId(experimentId);
@@ -249,11 +256,13 @@ public class RealizationServiceImpl implements RealizationService {
         realizationRepository.saveAndFlush(realizationEntity);
     }
 
+    @Transactional
     public String getRealizationDetails(final Long experimentId) {
         log.info("Get realization details. {}", experimentId);
         return realizationRepository.findByExperimentId(experimentId).getDetails();
     }
 
+    @Transactional
     public void deleteRealization(final Long realizationId) {
         log.info("Delete realization. {}", realizationId);
         realizationRepository.delete(realizationId);
