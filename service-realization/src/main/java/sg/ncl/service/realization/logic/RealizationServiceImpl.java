@@ -55,7 +55,12 @@ public class RealizationServiceImpl implements RealizationService {
         }
     }
 
-    // for retrieving live deterlab experiment status
+    /**
+     * Retrieves the live status of experiments' status from Deterlab
+     * @param teamName the team whose experiments that are of interest
+     * @param experimentId the experiment name to get status
+     * @return the realization entity object that contains the updated experiment status and report pulled from Deterlab. Defaults status to not running if there are any connection errors to Deterlab.
+     */
     @Transactional
     @Override
     public RealizationEntity getByExperimentId(final String teamName, final Long experimentId) {
@@ -122,11 +127,11 @@ public class RealizationServiceImpl implements RealizationService {
     }
 
     /**
-     * Starts an experiment in Deterlab (allocate resources and begin swapping-in).
+     * Starts an experiment in Deterlab (allocate resources and swapped-in).
      * The experiment from Deterlab will generate a report which states the Qualified Name, IP Address, Link Delay .etc
-     * @implNote DB sync not an issue since exeriment status and report will be re-updated when users refresh the page
+     * @implNote DB sync not an issue since experiment status and report will be re-updated when users refresh the page
      * @param teamName the team to start the exp for
-     * @param expId the experiment name to begin, e.g. demo, Identical experiment names are allow for different teams
+     * @param expId the experiment name to start, e.g. demo, Identical experiment names are allow for different teams
      * @return the realization entity object that contains the updated experiment status and report pulled from Deterlab
      */
     @Transactional
@@ -173,6 +178,14 @@ public class RealizationServiceImpl implements RealizationService {
         return realizationRepository.save(realizationEntityDb);
     }
 
+    /**
+     * Stops an experiment in Deterlab (de-allocate resources and swapped-out).
+     * The realization entity report will be clear.
+     * @implNote DB sync not an issue since experiment status and report will be re-updated when users refresh the page
+     * @param teamName the team to stop the exp
+     * @param expId the experiment name to stop
+     * @return the realization entity object that contains the updated experiment status and with empty report
+     */
     @Transactional
     public RealizationEntity stopExperimentInDeter(final String teamName, final String expId) {
         log.info("Stopping experiment: {} for team: ", expId, teamName);
