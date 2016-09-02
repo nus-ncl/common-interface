@@ -57,6 +57,7 @@ public class RealizationServiceImpl implements RealizationService {
 
     /**
      * Retrieves the live status of experiments' status from Deterlab
+     * @implNote DB Sync issue cannot be avoided due to dependency of results from Deterlab before we can update our own DB
      * @param teamName the team whose experiments that are of interest
      * @param experimentId the experiment name to get status
      * @return the realization entity object that contains the updated experiment status and report pulled from Deterlab. Defaults status to not running if there are any connection errors to Deterlab.
