@@ -63,6 +63,7 @@ public class RegistrationServiceImpl implements RegistrationService {
 
     @Transactional
     // FIXME: the return type should be a proper Registration
+    // for existing users to apply create a new team
     public Registration registerRequestToApplyTeam(String nclUserId, Team team) {
         if (team.getName() == null || team.getName().isEmpty()) {
             log.warn("Team name is empty or null");
@@ -111,6 +112,7 @@ public class RegistrationServiceImpl implements RegistrationService {
     }
 
     @Transactional
+    // for existing users to apply join an existing team
     public Registration registerRequestToJoinTeam(String nclUserId, Team team) {
         if (team.getName() == null || team.getName().isEmpty()) {
             log.warn("Team name is not found");
