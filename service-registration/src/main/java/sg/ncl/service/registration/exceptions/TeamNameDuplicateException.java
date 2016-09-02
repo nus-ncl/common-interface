@@ -8,4 +8,4 @@ import sg.ncl.common.exception.base.NotFoundException;
  * @author by Desmond / Te Ye
  */
 @ResponseStatus(code = HttpStatus.NOT_FOUND, reason = "Team name duplicate entry found")
-public class RegisterTeamNameDuplicateException extends NotFoundException {}
+public class TeamNameDuplicateException extends NotFoundException {}

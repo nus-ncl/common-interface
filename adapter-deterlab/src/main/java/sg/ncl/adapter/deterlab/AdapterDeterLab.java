@@ -194,7 +194,7 @@ public class AdapterDeterLab {
     public String getDeterUserIdByNclUserId(String nclUserId) {
         DeterLabUserEntity deterLabUserEntity = deterLabUserRepository.findByNclUserId(nclUserId);
         if (deterLabUserEntity == null) {
-            throw new UserNotFoundException();
+            throw new UserNotFoundException(nclUserId);
         }
         return deterLabUserEntity.getDeterUserId();
     }

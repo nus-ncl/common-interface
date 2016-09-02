@@ -8,7 +8,6 @@ import org.springframework.transaction.annotation.Transactional;
 import sg.ncl.adapter.deterlab.AdapterDeterLab;
 import sg.ncl.adapter.deterlab.ConnectionProperties;
 import sg.ncl.adapter.deterlab.data.jpa.DeterLabUserRepository;
-import sg.ncl.adapter.deterlab.exceptions.UserNotFoundException;
 import sg.ncl.service.authentication.domain.Credentials;
 import sg.ncl.service.authentication.domain.CredentialsService;
 import sg.ncl.service.authentication.web.CredentialsInfo;
@@ -29,6 +28,7 @@ import sg.ncl.service.team.exceptions.TeamNotFoundException;
 import sg.ncl.service.team.web.TeamMemberInfo;
 import sg.ncl.service.user.domain.User;
 import sg.ncl.service.user.domain.UserService;
+import sg.ncl.service.user.exceptions.UserNotFoundException;
 
 import javax.inject.Inject;
 import javax.validation.constraints.NotNull;
@@ -67,19 +67,17 @@ public class RegistrationServiceImpl implements RegistrationService {
     public Registration registerRequestToApplyTeam(String nclUserId, Team team) {
         if (team.getName() == null || team.getName().isEmpty()) {
             log.warn("Team name is empty or null");
-            throw new RegisterTeamNameEmptyException();
+            throw new TeamNameNullOrEmptyException();
         }
-
         if (nclUserId == null || nclUserId.isEmpty()) {
-            log.warn("Uid is empty or null");
-            throw new RegisterUidNullException();
+            log.warn("User id is empty or null");
+            throw new UserIdNullOrEmptyException();
+        }
+        if(userService.getUser(nclUserId) == null) {
+            log.warn("User not found: {}", nclUserId);
+            throw new UserNotFoundException(nclUserId);
         }
 
-        try {
-            userService.getUser(nclUserId);
-        } catch (UserNotFoundException e) {
-            log.warn("No such user, {}", e);
-        }
 
         // will throw exception if name already exists
         checkTeamNameDuplicate(team.getName());
@@ -116,12 +114,12 @@ public class RegistrationServiceImpl implements RegistrationService {
     public Registration registerRequestToJoinTeam(String nclUserId, Team team) {
         if (team.getName() == null || team.getName().isEmpty()) {
             log.warn("Team name is not found");
-            throw new RegisterTeamNameEmptyException();
+            throw new TeamNameNullOrEmptyException();
         }
 
         if (nclUserId == null || nclUserId.isEmpty()) {
             log.warn("Uid is empty or null");
-            throw new RegisterUidNullException();
+            throw new UserIdNullOrEmptyException();
         }
 
         log.info("Getting the team entity to be join");
@@ -184,7 +182,7 @@ public class RegistrationServiceImpl implements RegistrationService {
             if (teamEntity != null && teamEntity.getId() != null) {
                 if (!teamEntity.getId().isEmpty()) {
                     log.warn("Team name duplicate entry found");
-                    throw new RegisterTeamNameDuplicateException();
+                    throw new TeamNameDuplicateException();
                 }
             }
         }
@@ -503,7 +501,7 @@ public class RegistrationServiceImpl implements RegistrationService {
         one = teamService.getTeamByName(teamName);
         if (one != null) {
             log.warn("Team name duplicate entry found");
-            throw new RegisterTeamNameDuplicateException();
+            throw new TeamNameDuplicateException();
         }
     }
 
