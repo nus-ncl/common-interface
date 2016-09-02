@@ -121,6 +121,14 @@ public class RealizationServiceImpl implements RealizationService {
         return savedRealizationEntity;
     }
 
+    /**
+     * Starts an experiment in Deterlab (allocate resources and begin swapping-in).
+     * The experiment from Deterlab will generate a report which states the Qualified Name, IP Address, Link Delay .etc
+     * @implNote DB sync not an issue since exeriment status and report will be re-updated when users refresh the page
+     * @param teamName the team to start the exp for
+     * @param expId the experiment name to begin, e.g. demo, Identical experiment names are allow for different teams
+     * @return the realization entity object that contains the updated experiment status and report pulled from Deterlab
+     */
     @Transactional
     public RealizationEntity startExperimentInDeter(final String teamName, final String expId) {
         log.info("Starting experiment: {} for team: ", expId, teamName);
