@@ -122,7 +122,7 @@ public class ExperimentServiceImpl implements ExperimentService {
 
     @Transactional
     public List<Experiment> findByUser(String userId) {
-        log.info("Find user by user id");
+        log.info("Find user by user id: {}", userId);
 
         if (userId == null || userId.isEmpty()) {
             // FIXME: this is the wrong exception to throw; it should be a BadRequestException type
@@ -134,7 +134,7 @@ public class ExperimentServiceImpl implements ExperimentService {
 
     @Transactional
     public List<Experiment> findByTeam(String teamId) {
-        log.info("Find teams by team id");
+        log.info("Find teams by team id: {}", teamId);
 
         if (teamId == null || teamId.isEmpty()) {
             // FIXME: this is the wrong exception to throw; it should be a BadRequestException type
@@ -208,8 +208,14 @@ public class ExperimentServiceImpl implements ExperimentService {
         log.info("Create experiment : {}, success", experiment);
     }
 
-
-    // returns the deleted entity
+    /**
+     * Deletes the experiment and realization object from our DB.
+     * Also deletes the experiment on Deterlab DB.
+     * @implNote delete the realization object first, follow by the experiment object (the reverse process of create)
+     * @param id the experiment id (DB UUID), i.e. not the experiment name
+     * @param teamName the team where the experiment is in (required by Deterlab so that we delete the correct experiment)
+     * @return the deleted experiment object
+     */
     @Transactional
     public Experiment deleteExperiment(final Long id, final String teamName) {
         log.info("Deleting Experiment: {} from Team: {}", id, teamName);
@@ -220,16 +226,17 @@ public class ExperimentServiceImpl implements ExperimentService {
 
         if (realizationId != null && realizationId > 0) {
             realizationService.deleteRealization(realizationId);
-            log.info("Realization deleted");
+            log.info("Realization deleted: {}", realizationId);
 
             experimentEntity = experimentRepository.getOne(id);
             // TODO: use other deleteExperimentInDeter(teamName, experimentName) if using script_wrapper.py
 //            deleteExperimentInDeter(experimentEntity.getName(), realizationEntity.getUserId());
-            deleteExperimentInDeter(experimentEntity.getName(), teamName, realizationEntity.getUserId());
-            log.info("Experiment deleted in deter: {} from Team: {}", experimentEntity.getName(), teamName);
 
             experimentRepository.delete(id);
             log.info("Experiment deleted from experiment repository: {} from Team: {}", experimentEntity.getName(), teamName);
+
+            deleteExperimentInDeter(experimentEntity.getName(), teamName, realizationEntity.getUserId());
+            log.info("Experiment deleted in deter: {} from Team: {}", experimentEntity.getName(), teamName);
         } else {
             log.warn("Experiment not deleted");
         }
