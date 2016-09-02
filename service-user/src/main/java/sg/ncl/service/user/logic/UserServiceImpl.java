@@ -163,10 +163,7 @@ public class UserServiceImpl implements UserService {
                 throw new InvalidStatusTransitionException(one.getStatus() + " -> " + status);
             case PENDING:
                 if(one.getStatus().equals(UserStatus.CREATED)) {
-                    one.setStatus(UserStatus.PENDING);
-                    UserEntity savedUser = userRepository.save(one);
-                    log.info("Status updated for {}: {} -> {}", id, UserStatus.CREATED, savedUser.getStatus());
-                    return savedUser;
+                    return updateUserStatusInternal(one, UserStatus.PENDING);
                 }
                 else {
                     log.warn("Update status failed for {}: {} -> {}", id, one.getStatus(), status);
@@ -174,10 +171,7 @@ public class UserServiceImpl implements UserService {
                 }
             case APPROVED:
                 if(one.getStatus().equals(UserStatus.PENDING)) {
-                    one.setStatus(UserStatus.APPROVED);
-                    UserEntity savedUser = userRepository.save(one);
-                    log.info("Status updated for {}: {} -> {}", id, UserStatus.PENDING, savedUser.getStatus());
-                    return savedUser;
+                    return updateUserStatusInternal(one, UserStatus.APPROVED);
                 }
                 else {
                     log.warn("Update status failed for {}: {} -> {}", id, one.getStatus(), status);
@@ -185,24 +179,26 @@ public class UserServiceImpl implements UserService {
                 }
             case REJECTED:
                 if(one.getStatus().equals(UserStatus.PENDING)) {
-                    one.setStatus(UserStatus.REJECTED);
-                    UserEntity savedUser = userRepository.save(one);
-                    log.info("Status updated for {}: {} -> {}", id, UserStatus.PENDING, savedUser.getStatus());
-                    return savedUser;
+                    return updateUserStatusInternal(one, UserStatus.REJECTED);
                 }
                 else {
                     log.warn("Update status failed for {}: {} -> {}", id, one.getStatus(), status);
                     throw new InvalidStatusTransitionException(one.getStatus() + " -> " + status);
                 }
             case CLOSED:
-                UserStatus oldStatus = one.getStatus();
-                one.setStatus(UserStatus.CLOSED);
-                UserEntity savedUser = userRepository.save(one);
-                log.info("Status updated for {}: {} -> {}", id, oldStatus, savedUser.getStatus());
-                return savedUser;
+                return updateUserStatusInternal(one, UserStatus.CLOSED);
             default:
                 log.warn("Update status failed for {}: unknown status {}", id, status);
                 throw new InvalidUserStatusException(status.toString());
         }
+    }
+
+    @Transactional
+    private User updateUserStatusInternal(UserEntity user, UserStatus status) {
+        UserStatus oldStatus = user.getStatus();
+        user.setStatus(status);
+        UserEntity savedUser = userRepository.save(user);
+        log.info("Status updated for {}: {} -> {}", user.getId(), oldStatus, savedUser.getStatus());
+        return savedUser;
     }
 }
