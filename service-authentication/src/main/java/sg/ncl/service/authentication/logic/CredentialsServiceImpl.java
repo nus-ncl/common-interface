@@ -84,9 +84,9 @@ public class CredentialsServiceImpl implements CredentialsService {
         if (credentials.getPassword() != null && !credentials.getPassword().isEmpty()) {
             hashPassword(entity, credentials.getPassword());
         }
-        // FIXME: need to handle error when changePassword() failed
-        changePassword(id, credentials.getPassword());
+
         final CredentialsEntity savedEntity = credentialsRepository.save(entity);
+        changePassword(id, credentials.getPassword());
         log.info("Credentials updated: {}", savedEntity);
         return savedEntity;
     }
@@ -95,6 +95,11 @@ public class CredentialsServiceImpl implements CredentialsService {
         entity.setPassword(passwordEncoder.encode(password));
     }
 
+    /**
+     * Invokes the change password on Deterlab
+     * @param nclUserId the ncl UUID
+     * @param password the clear password
+     */
     private void changePassword(String nclUserId, String password) {
         JSONObject adapterObject = new JSONObject();
         // FIXME: need to handle error when getDeterUserIdByNclUserId() returns nothing
