@@ -2,7 +2,6 @@ package sg.ncl.service.mail;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.scheduling.annotation.EnableScheduling;
@@ -13,7 +12,6 @@ import sg.ncl.common.jpa.UseJpa;
  */
 @SpringBootApplication
 @EnableAsync
-@EnableConfigurationProperties(MailProperties.class)
 @EnableScheduling
 @UseJpa
 public class MailApplication {
