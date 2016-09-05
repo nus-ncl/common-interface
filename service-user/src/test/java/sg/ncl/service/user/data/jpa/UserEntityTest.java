@@ -4,10 +4,14 @@ import org.apache.commons.lang3.RandomStringUtils;
 import org.junit.Assert;
 import org.junit.Test;
 import sg.ncl.service.user.Util;
+import sg.ncl.service.user.domain.User;
 import sg.ncl.service.user.domain.UserStatus;
 
 import java.time.ZonedDateTime;
+import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.containsString;
@@ -83,6 +87,36 @@ public class UserEntityTest {
         userEntity.setStatus(UserStatus.APPROVED);
 
         assertThat(userEntity.getStatus(), is(equalTo(UserStatus.APPROVED)));
+    }
+
+    @Test
+    public void testGetRoles() throws Exception {
+        final UserEntity userEntity = new UserEntity();
+        Set<User.Role> result = new HashSet<>();
+        assertThat(userEntity.getRoles().isEmpty(), is(true));
+        assertThat(userEntity.getRoles(), is(equalTo(result)));
+    }
+
+    @Test
+    public void testAddRoles() throws Exception {
+        final UserEntity userEntity = new UserEntity();
+        userEntity.addRole(User.Role.ADMIN);
+        Set<User.Role> result = new HashSet<>(Arrays.asList(User.Role.ADMIN));
+
+        assertThat(userEntity.getRoles().size(), is(1));
+        assertThat(userEntity.getRoles(), is(equalTo(result)));
+    }
+
+    @Test
+    public void testRemoveRoles() throws Exception {
+        final UserEntity userEntity = new UserEntity();
+        userEntity.addRole(User.Role.ADMIN);
+        userEntity.addRole(User.Role.USER);
+        userEntity.removeRole(User.Role.USER);
+        Set<User.Role> result = new HashSet<>(Arrays.asList(User.Role.ADMIN));
+
+        assertThat(userEntity.getRoles().size(), is(1));
+        assertThat(userEntity.getRoles(), is(equalTo(result)));
     }
 
     @Test

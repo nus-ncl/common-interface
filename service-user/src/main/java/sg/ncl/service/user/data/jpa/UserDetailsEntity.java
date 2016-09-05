@@ -53,6 +53,20 @@ public class UserDetailsEntity extends AbstractEntity implements UserDetails {
     @Column(name = "institution_web", nullable = false)
     private String institutionWeb;
 
+    public static UserDetailsEntity get(final UserDetails userDetails) {
+        final UserDetailsEntity entity = new UserDetailsEntity();
+        entity.setFirstName(userDetails.getFirstName());
+        entity.setLastName(userDetails.getLastName());
+        entity.setJobTitle(userDetails.getJobTitle());
+        entity.setAddress(AddressEntity.get(userDetails.getAddress()));
+        entity.setEmail(userDetails.getEmail());
+        entity.setPhone(userDetails.getPhone());
+        entity.setInstitution(userDetails.getInstitution());
+        entity.setInstitutionAbbreviation(userDetails.getInstitutionAbbreviation());
+        entity.setInstitutionWeb(userDetails.getInstitutionWeb());
+        return entity;
+    }
+
     public Long getId() {
         return id;
     }
@@ -175,19 +189,5 @@ public class UserDetailsEntity extends AbstractEntity implements UserDetails {
                 ", institutionAbbreviation='" + institutionAbbreviation + '\'' +
                 ", institutionWeb='" + institutionWeb + '\'' +
                 "} " + super.toString();
-    }
-
-    public static UserDetailsEntity get(final UserDetails userDetails) {
-        final UserDetailsEntity entity = new UserDetailsEntity();
-        entity.setFirstName(userDetails.getFirstName());
-        entity.setLastName(userDetails.getLastName());
-        entity.setJobTitle(userDetails.getJobTitle());
-        entity.setAddress(AddressEntity.get(userDetails.getAddress()));
-        entity.setEmail(userDetails.getEmail());
-        entity.setPhone(userDetails.getPhone());
-        entity.setInstitution(userDetails.getInstitution());
-        entity.setInstitutionAbbreviation(userDetails.getInstitutionAbbreviation());
-        entity.setInstitutionWeb(userDetails.getInstitutionWeb());
-        return entity;
     }
 }

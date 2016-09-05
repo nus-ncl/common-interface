@@ -1,5 +1,6 @@
 package sg.ncl.service.user.data.jpa;
 
+import lombok.extern.slf4j.Slf4j;
 import org.hibernate.annotations.GenericGenerator;
 import org.hibernate.annotations.Type;
 import sg.ncl.common.jpa.AbstractEntity;
@@ -24,50 +25,50 @@ import javax.persistence.Table;
 import javax.persistence.UniqueConstraint;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 /**
  * @author Christopher Zhong
  */
 @Entity
 @Table(name = "users")
+@Slf4j
 public class UserEntity extends AbstractEntity implements User {
 
+    @OneToMany(cascade = CascadeType.ALL)
+    @JoinColumn(name = "user_id")
+    private final List<LoginActivityEntity> loginActivities = new ArrayList<>();
+    @ElementCollection
+    @CollectionTable(name = "users_teams", joinColumns = @JoinColumn(name = "user_id", nullable = false, updatable = false), indexes = {@Index(columnList = "user_id"), @Index(columnList = "team_id")}, uniqueConstraints = @UniqueConstraint(columnNames = {"user_id", "team_id"}))
+    @Column(name = "team_id", nullable = false, updatable = false)
+    private final List<String> teams = new ArrayList<>();
     @Id
     @GeneratedValue(generator = "uuid2")
     @GenericGenerator(name = "uuid2", strategy = "uuid2")
     @Column(name = "id", nullable = false, unique = true, updatable = false)
     private String id;
-
     @OneToOne(optional = false, cascade = CascadeType.ALL)
     @JoinColumn(name = "user_details_id", nullable = false, unique = true)
     private UserDetailsEntity userDetails;
-
     @Column(name = "is_email_verified", nullable = false)
     @Type(type = "yes_no")
     private boolean emailVerified = false;
-
     @Column(name = "verification_key")
     private String verificationKey;
-
     @Column(name = "status", nullable = false)
     @Enumerated(EnumType.STRING)
     private UserStatus status = UserStatus.CREATED;
-
+    @ElementCollection(targetClass = Role.class)
+    @CollectionTable(name = "users_roles", joinColumns = @JoinColumn(name = "user_id", nullable = false, updatable = false))
+    @Column(name = "roles", nullable = false, updatable = false)
+    @Enumerated(EnumType.STRING)
+    private Set<Role> roles = new HashSet<>();
     @Column(name = "application_date", nullable = false)
     private ZonedDateTime applicationDate;
-
     @Column(name = "processed_date")
     private ZonedDateTime processedDate;
-
-    @OneToMany(cascade = CascadeType.ALL)
-    @JoinColumn(name = "user_id")
-    private final List<LoginActivityEntity> loginActivities = new ArrayList<>();
-
-    @ElementCollection
-    @CollectionTable(name = "users_teams", joinColumns = @JoinColumn(name = "user_id", nullable = false, updatable = false), indexes = {@Index(columnList = "user_id"), @Index(columnList = "team_id")}, uniqueConstraints = @UniqueConstraint(columnNames = {"user_id", "team_id"}))
-    @Column(name = "team_id", nullable = false, updatable = false)
-    private final List<String> teams = new ArrayList<>();
 
     @Override
     public String getId() {
@@ -115,6 +116,11 @@ public class UserEntity extends AbstractEntity implements User {
     }
 
     @Override
+    public Set<Role> getRoles() {
+        return roles;
+    }
+
+    @Override
     public ZonedDateTime getApplicationDate() {
         return applicationDate;
     }
@@ -150,12 +156,25 @@ public class UserEntity extends AbstractEntity implements User {
         if (teams.contains(teamId)) {
             throw new UserAlreadyInTeamException();
         }
+        log.info("Adding team on the user side: {}", teamId);
         teams.add(teamId);
     }
 
     public void removeTeamId(final String teamId) {
         if (teams.contains(teamId)) {
             teams.remove(teamId);
+        }
+    }
+
+    public void addRole(final Role role) {
+        if (roles.add(role)) {
+            log.info("Add role: {}", role);
+        }
+    }
+
+    public void removeRole(final Role role) {
+        if (roles.remove(role)) {
+            log.info("Remove role: {}", role);
         }
     }
 

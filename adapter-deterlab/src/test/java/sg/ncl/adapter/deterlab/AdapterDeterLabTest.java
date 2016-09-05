@@ -220,18 +220,18 @@ public class AdapterDeterLabTest extends AbstractTest {
     @Test
     public void testApproveJoinRequestOnDeter() {
         JSONObject one = Util.getApproveJoinRequestAdapterJsonObject();
-
+        one.put("action", "approve");
         JSONObject predefinedResultJson = new JSONObject();
-        predefinedResultJson.put("msg", "join request approved");
+        predefinedResultJson.put("msg", "process join request OK");
 
         mockServer.expect(requestTo(properties.getApproveJoinRequest()))
                 .andExpect(method(HttpMethod.POST))
                 .andRespond(withSuccess(predefinedResultJson.toString(), MediaType.APPLICATION_JSON));
 
-        String result = adapterDeterLab.approveJoinRequest(one.toString());
+        String result = adapterDeterLab.processJoinRequest(one.toString());
         JSONObject resultJSONObject = new JSONObject(result);
         String msg = resultJSONObject.getString("msg");
-        Assert.assertThat(msg, is("join request approved"));
+        Assert.assertThat(msg, is("process join request OK"));
     }
 
     @Test
@@ -300,19 +300,19 @@ public class AdapterDeterLabTest extends AbstractTest {
 
     @Test
     public void testRejectJoinRequest() {
-        JSONObject one = new JSONObject();
-
+        JSONObject one = Util.getApproveJoinRequestAdapterJsonObject();
+        one.put("action", "deny");
         JSONObject predefinedResultJson = new JSONObject();
-        predefinedResultJson.put("msg", "join request rejected");
+        predefinedResultJson.put("msg", "process join request OK");
 
         mockServer.expect(requestTo(properties.getRejectJoinRequest()))
                 .andExpect(method(HttpMethod.POST))
                 .andRespond(withSuccess(predefinedResultJson.toString(), MediaType.APPLICATION_JSON));
 
-        String result = adapterDeterLab.rejectJoinRequest(one.toString());
+        String result = adapterDeterLab.processJoinRequest(one.toString());
         JSONObject resultJSONObject = new JSONObject(result);
         String msg = resultJSONObject.getString("msg");
-        Assert.assertThat(msg, is("join request rejected"));
+        Assert.assertThat(msg, is("process join request OK"));
     }
 
     @Test(expected = ExpStartException.class)

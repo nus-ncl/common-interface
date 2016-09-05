@@ -314,8 +314,15 @@ public class TeamServiceTest extends AbstractTest {
         Team result = teamService.removeMember(createdTeam.getId(), teamMemberTwo);
         List<? extends TeamMember> membersList = result.getMembers();
 
-        Assert.assertThat(membersList.size(), is(1));
-        Assert.assertThat(membersList.get(0).getUserId(), is(teamMemberOne.getUserId()));
+        for (TeamMember member : membersList) {
+            if (member.getUserId().equals(teamMemberOne.getUserId())) {
+                Assert.assertThat(member.getMemberStatus(), is(MemberStatus.PENDING));
+            } else if (member.getUserId().equals(teamMemberTwo.getUserId())) {
+                Assert.assertThat(member.getMemberStatus(), is(MemberStatus.REJECTED));
+            } else {
+                Assert.fail();
+            }
+        }
     }
 
     private boolean isListEqual(List<TeamEntity> one, List<TeamEntity> two) {

@@ -145,8 +145,9 @@ public class RegistrationControllerTest extends AbstractTest {
     @Test
     public void approveTeam() throws Exception {
         Team one = Util.getTeamEntity();
+        User user = userService.createUser(Util.getUserEntity());
         Team createdTeam = teamService.createTeam(one);
-        TeamMemberInfo owner = Util.getTeamMemberInfo(MemberType.OWNER);
+        TeamMemberInfo owner = Util.getTeamMemberInfo(user.getId(), MemberType.OWNER);
         teamService.addMember(createdTeam.getId(), owner);
 
         JSONObject predefinedResultJson = new JSONObject();
@@ -199,7 +200,7 @@ public class RegistrationControllerTest extends AbstractTest {
         object.put("user", userFields);
 
         JSONObject predefinedResultJson = new JSONObject();
-        predefinedResultJson.put("msg", "join request rejected");
+        predefinedResultJson.put("msg", "process join request OK");
 
         mockServer.expect(requestTo(properties.getRejectJoinRequest()))
                 .andExpect(method(HttpMethod.POST))
@@ -214,7 +215,7 @@ public class RegistrationControllerTest extends AbstractTest {
 
         // owner should be in team
         Assert.assertThat(resultUser.getTeams().get(0), is(createdTeam.getId()));
-        Assert.assertThat(membersList.get(0).getUserId(), is(createdUser.getId()));
+        Assert.assertThat(membersList.size(), is(2));
         // member should be deleted from team
         Assert.assertThat(resultUser2.getTeams().isEmpty(), is(true));
     }

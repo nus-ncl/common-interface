@@ -21,4 +21,6 @@ public interface UserService {
 
     UserStatus verifyEmail(final String uid, final String email, final String key);
 
+    User updateUserStatus(String id, UserStatus status);
+
 }

@@ -203,7 +203,7 @@ public class RegistrationServiceTest extends AbstractTest {
 
         /*==== start mock the adapter deterlab call ===*/
         JSONObject predefinedResultJson = new JSONObject();
-        predefinedResultJson.put("msg", "join request approved");
+        predefinedResultJson.put("msg", "process join request OK");
 
         mockServer.expect(requestTo(properties.getApproveJoinRequest()))
                 .andExpect(method(HttpMethod.POST))
@@ -324,7 +324,8 @@ public class RegistrationServiceTest extends AbstractTest {
         final String deterUserId = RandomStringUtils.randomAlphabetic(8);
         Team one = Util.getTeamEntity();
         Team createdTeam = teamService.createTeam(one);
-        TeamMemberInfo owner = Util.getTeamMemberInfo(MemberType.OWNER);
+        User user = userService.createUser(Util.getUserEntity());
+        TeamMemberInfo owner = Util.getTeamMemberInfo(user.getId(), MemberType.OWNER);
         teamService.addMember(createdTeam.getId(), owner);
 
         JSONObject predefinedResultJson = new JSONObject();
@@ -442,7 +443,7 @@ public class RegistrationServiceTest extends AbstractTest {
         teamService.addMember(team.getId(), Util.getTeamMemberInfo(user2.getId(), MemberType.MEMBER));
 
         JSONObject predefinedResultJson = new JSONObject();
-        predefinedResultJson.put("msg", "join request rejected");
+        predefinedResultJson.put("msg", "process join request OK");
 
         mockServer.expect(requestTo(properties.getRejectJoinRequest()))
                 .andExpect(method(HttpMethod.POST))
@@ -454,10 +455,18 @@ public class RegistrationServiceTest extends AbstractTest {
         User resultUser = userService.getUser(user2.getId());
         Assert.assertThat(resultUser.getTeams().isEmpty(), is(true));
 
-        // teamService should remove team member
+        // teamService should change team member status
         List<? extends TeamMember> membersList = teamService.getTeamById(team.getId()).getMembers();
-        Assert.assertThat(membersList.size(), is(1));
-        Assert.assertThat(membersList.get(0).getUserId(), is(user.getId()));
+        Assert.assertThat(membersList.size(), is(2));
+        for (TeamMember member : membersList) {
+            if (member.getUserId().equals(user.getId())) {
+                Assert.assertThat(member.getMemberStatus(), is(MemberStatus.PENDING));
+            } else if (member.getUserId().equals(user2.getId())) {
+                Assert.assertThat(member.getMemberStatus(), is(MemberStatus.REJECTED));
+            } else {
+                Assert.fail();
+            }
+        }
     }
 
     @Test(expected = sg.ncl.adapter.deterlab.exceptions.UserNotFoundException.class)
