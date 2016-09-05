@@ -9,6 +9,9 @@ import sg.ncl.service.user.domain.Address;
 import sg.ncl.service.user.domain.User;
 import sg.ncl.service.user.domain.UserService;
 import sg.ncl.service.user.exceptions.UserIdNullOrEmptyException;
+import sg.ncl.service.user.domain.UserStatus;
+import sg.ncl.service.user.exceptions.InvalidStatusTransitionException;
+import sg.ncl.service.user.exceptions.InvalidUserStatusException;
 import sg.ncl.service.user.exceptions.UserNotFoundException;
 import sg.ncl.service.user.exceptions.UsernameAlreadyExistsException;
 
@@ -154,5 +157,47 @@ public class UserServiceImpl implements UserService {
             throw new UserIdNullOrEmptyException();
         }
         return userRepository.findOne(id);
+    }
+
+    @Override
+    @Transactional
+    public User updateUserStatus(final String id, final UserStatus status) {
+        UserEntity one = findUser(id);
+        switch(status) {
+            case CREATED:
+                throw new InvalidStatusTransitionException(one.getStatus() + " -> " + status);
+            case PENDING:
+                if(one.getStatus().equals(UserStatus.CREATED)) {
+                    return updateUserStatusInternal(one, UserStatus.PENDING);
+                } else {
+                    throw new InvalidStatusTransitionException(one.getStatus() + " -> " + status);
+                }
+            case APPROVED:
+                if(one.getStatus().equals(UserStatus.PENDING)) {
+                    return updateUserStatusInternal(one, UserStatus.APPROVED);
+                } else {
+                    throw new InvalidStatusTransitionException(one.getStatus() + " -> " + status);
+                }
+            case REJECTED:
+                if(one.getStatus().equals(UserStatus.PENDING)) {
+                    return updateUserStatusInternal(one, UserStatus.REJECTED);
+                } else {
+                    throw new InvalidStatusTransitionException(one.getStatus() + " -> " + status);
+                }
+            case CLOSED:
+                return updateUserStatusInternal(one, UserStatus.CLOSED);
+            default:
+                log.warn("Update status failed for {}: unknown status {}", id, status);
+                throw new InvalidUserStatusException(status.toString());
+        }
+    }
+
+    @Transactional
+    private User updateUserStatusInternal(UserEntity user, UserStatus status) {
+        UserStatus oldStatus = user.getStatus();
+        user.setStatus(status);
+        UserEntity savedUser = userRepository.save(user);
+        log.info("Status updated for {}: {} -> {}", user.getId(), oldStatus, savedUser.getStatus());
+        return savedUser;
     }
 }

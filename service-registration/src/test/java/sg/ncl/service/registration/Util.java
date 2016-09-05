@@ -10,6 +10,7 @@ import sg.ncl.service.team.web.TeamMemberInfo;
 import sg.ncl.service.user.data.jpa.AddressEntity;
 import sg.ncl.service.user.data.jpa.UserDetailsEntity;
 import sg.ncl.service.user.data.jpa.UserEntity;
+import sg.ncl.service.user.domain.UserStatus;
 
 import java.time.ZonedDateTime;
 
@@ -63,7 +64,7 @@ public class Util {
     public static UserEntity getUserEntity() {
         final UserEntity userEntity = new UserEntity();
         userEntity.setApplicationDate(ZonedDateTime.now());
-
+        userEntity.setStatus(UserStatus.PENDING);
         final UserDetailsEntity userDetailsEntity = new UserDetailsEntity();
         userDetailsEntity.setFirstName(RandomStringUtils.randomAlphabetic(20));
         userDetailsEntity.setLastName(RandomStringUtils.randomAlphabetic(20));

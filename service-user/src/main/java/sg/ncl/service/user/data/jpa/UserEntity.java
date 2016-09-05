@@ -105,7 +105,7 @@ public class UserEntity extends AbstractEntity implements User {
         return status;
     }
 
-    void setStatus(final UserStatus status) {
+    public void setStatus(final UserStatus status) {
         this.status = status;
     }
 

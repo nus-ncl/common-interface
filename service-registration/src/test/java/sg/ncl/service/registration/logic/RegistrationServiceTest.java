@@ -347,7 +347,8 @@ public class RegistrationServiceTest extends AbstractTest {
         final String deterUserId = RandomStringUtils.randomAlphabetic(8);
         Team one = Util.getTeamEntity();
         Team createdTeam = teamService.createTeam(one);
-        TeamMemberInfo owner = Util.getTeamMemberInfo(MemberType.OWNER);
+        User user = userService.createUser(Util.getUserEntity());
+        TeamMemberInfo owner = Util.getTeamMemberInfo(user.getId(), MemberType.OWNER);
         teamService.addMember(createdTeam.getId(), owner);
 
         JSONObject predefinedResultJson = new JSONObject();
