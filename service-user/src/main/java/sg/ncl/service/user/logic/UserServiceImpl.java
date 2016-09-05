@@ -63,7 +63,7 @@ public class UserServiceImpl implements UserService {
     public void updateUser(final String id, final User user) {
         final UserEntity one = findUser(id);
         if(one == null) {
-            log.warn("User not found: {}", id);
+            log.warn("User not found when updating: {}", id);
             throw new UserNotFoundException(id);
         }
         if (user.getUserDetails().getFirstName() != null) {
@@ -134,7 +134,7 @@ public class UserServiceImpl implements UserService {
     public void addTeam(final String userId, final String teamId) {
         UserEntity one = findUser(userId);
         if(one == null) {
-            log.warn("User not found: {}", userId);
+            log.warn("User not found when adding team: {}", userId);
             throw new UserNotFoundException(userId);
         }
         one.addTeamId(teamId);
@@ -145,7 +145,7 @@ public class UserServiceImpl implements UserService {
     public void removeTeam(final String userId, final String teamId) {
         UserEntity one = findUser(userId);
         if(one == null) {
-            log.warn("User not found: {}", userId);
+            log.warn("User not found when removing team: {}", userId);
             throw new UserNotFoundException(userId);
         }
         one.removeTeamId(teamId);
