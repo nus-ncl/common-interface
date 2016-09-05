@@ -1,8 +1,9 @@
-package sg.ncl.service.authentication.validation;
+package sg.ncl.common.authentication;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.web.authentication.AbstractAuthenticationProcessingFilter;
 
 import javax.servlet.FilterChain;
@@ -10,6 +11,7 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.Collection;
 
 /**
  * @author Te Ye
@@ -26,15 +28,17 @@ public class JwtAuthenticationFilter extends AbstractAuthenticationProcessingFil
         return true;
     }
 
-    @Override
     public Authentication attemptAuthentication(HttpServletRequest request, HttpServletResponse response) throws AuthenticationException {
 
         String header = request.getHeader("Authorization");
 
-        if (header == null || !header.startsWith("Bearer ")) {
+        if (header != null && header.startsWith("Basic")) {
+            log.info("Do basic login without token: {}", header);
+        } else if (header == null || !header.startsWith("Bearer ")) {
             log.warn("No JWT token found in request headers");
         }
 
+        String authToken = header.substring(7);
         log.info("Header: {}", header);
         return null;
     }

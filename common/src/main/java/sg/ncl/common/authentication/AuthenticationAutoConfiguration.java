@@ -10,6 +10,7 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 import javax.inject.Inject;
 import javax.validation.constraints.NotNull;
@@ -49,8 +50,17 @@ public class AuthenticationAutoConfiguration extends WebSecurityConfigurerAdapte
         http
                 .authorizeRequests().antMatchers(getUrl()).permitAll().and();
         http
+                .authorizeRequests().antMatchers("/").permitAll()
+                .antMatchers("/favicon.ico").permitAll()
+                .antMatchers("**/*.html").permitAll()
+                .antMatchers("**/*.css").permitAll()
+                .antMatchers("**/*.js").permitAll()
+                .antMatchers("/login").permitAll().and();
+        http
                 // TODO add authentication
-                .authorizeRequests().anyRequest().permitAll();
+                .authorizeRequests().anyRequest().authenticated().and();
+        http
+                .addFilterBefore(new JwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class);
     }
 
     private String getUrl() {
