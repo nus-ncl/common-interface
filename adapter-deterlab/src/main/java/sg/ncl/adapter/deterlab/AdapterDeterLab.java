@@ -42,7 +42,6 @@ public class AdapterDeterLab {
      * @return The Deter userid (randomly generated)
      */
     public String joinProjectNewUsers(String jsonString) {
-
         logger.info("Joining project as new user: {}", jsonString);
 
         HttpHeaders headers = new HttpHeaders();
@@ -56,15 +55,15 @@ public class AdapterDeterLab {
             logger.warn("DeterLab connection error new user join project: {}", e);
             throw new AdapterDeterlabConnectException();
         }
-
+        // Will get the following JSON:
+        // msg: join project request new users fail
+        // msg: no user created, uid: xxx
+        // msg: user is created, uid: xxx
+        // msg: user not found, uid: xxx
         String responseBody = response.getBody().toString();
         try {
-            // Will return the following JSON:
-            // msg: join project request new users fail
-            // msg: no user created, uid: xxx
-            // msg: user is created, uid: xxx
-            // msg: user not found, uid: xxx
-            if (!"user is created".equals(new JSONObject(responseBody).getString("msg"))) {
+            String jsonResult = new JSONObject(responseBody).getString("msg");
+            if (!"user is created".equals(jsonResult)) {
                 logger.warn("Join project as new user failed: {}", responseBody);
                 throw new DeterLabOperationFailedException();
             }
@@ -95,7 +94,11 @@ public class AdapterDeterLab {
             logger.warn("DeterLab connection error new user apply project: {}", e);
             throw new AdapterDeterlabConnectException();
         }
-
+        // Will get the following JSON:
+        // msg: join project request new users fail
+        // msg: no user created, uid: xxx
+        // msg: user is created, uid: xxx
+        // msg: user not found, uid: xxx
         String responseBody = response.getBody().toString();
         try {
             String jsonResult = new JSONObject(responseBody).getString("msg");
@@ -103,12 +106,6 @@ public class AdapterDeterLab {
                 logger.warn("Apply project as new user failed: {}", responseBody);
                 throw new DeterLabOperationFailedException();
             }
-
-            // Will return the following JSON:
-            // msg: apply project request new users fail
-            // msg: no user created, uid: xxx
-            // msg: user is created, uid: xxx
-            // msg: user not found, uid: xxx
             logger.info("Apply project as new user to DeterLab OK");
             return responseBody;
         } catch (JSONException e) {
@@ -128,7 +125,6 @@ public class AdapterDeterLab {
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
         HttpEntity<String> request = new HttpEntity<>(jsonString, headers);
-
         ResponseEntity response;
 
         try {
@@ -168,7 +164,7 @@ public class AdapterDeterLab {
         try {
             response = restTemplate.exchange(properties.getJoinProject(), HttpMethod.POST, request, String.class);
         } catch (RestClientException e) {
-            logger.warn("DeterLab connection error join project: {}", e);
+            logger.warn("DeterLab connection error join project existing user: {}", e);
             throw new AdapterDeterlabConnectException();
         }
         String responseBody = response.getBody().toString();
@@ -191,22 +187,29 @@ public class AdapterDeterLab {
      * @param jsonString Contains uid, password, confirm password
      */
     public void updateCredentials(String jsonString) {
-        logger.info("Updating credentials to {} at {}: {}", properties.getIp(), properties.getPort(), jsonString);
+        logger.info("Updating credentials: {}", jsonString);
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
-
         HttpEntity<String> request = new HttpEntity<>(jsonString, headers);
         ResponseEntity response;
 
         try {
             response = restTemplate.exchange(properties.getUpdateCredentials(), HttpMethod.POST, request, String.class);
-        } catch (Exception e) {
+        } catch (RestClientException e) {
+            logger.warn("DeterLab connection error update credentials: {}", e);
             throw new AdapterDeterlabConnectException();
         }
 
-        String jsonResult = new JSONObject(response.getBody().toString()).getString("msg");
-        if ("password change fail".equals(jsonResult)) {
-            throw new CredentialsUpdateException();
+        try {
+            String jsonResult = new JSONObject(response.getBody().toString()).getString("msg");
+            if (!"password change success".equals(jsonResult)) {
+                logger.warn("Change password failed: {}", response.getBody().toString());
+                throw new CredentialsUpdateException();
+            }
+            logger.info("Change password OK");
+        } catch (JSONException e) {
+            logger.warn("Error parsing response code update credentials: {}", e);
+            throw new DeterLabOperationFailedException();
         }
     }
 
@@ -389,7 +392,7 @@ public class AdapterDeterLab {
     public String processJoinRequest(String jsonString) {
         JSONObject request = new JSONObject(jsonString);
         if(request.length() < 5) {
-            logger.warn("NOT enough inputs to process the request. Input: {}", jsonString);
+            logger.warn("NOT enough inputs: {}", jsonString);
             throw new IllegalArgumentException();
         }
         String pid = request.getString("pid");
@@ -397,7 +400,7 @@ public class AdapterDeterLab {
         String uid = request.getString("uid");
         String gid = request.getString("gid");
         String action = request.getString("action");
-        logger.info("Processing join request to team {}, requester {}, approver {}, group {}, action {}",
+        logger.info("Processing join request: team {}, requester {}, approver {}, group {}, action {}",
                 pid, uid, approverUid, gid, action);
 
         HttpHeaders headers = new HttpHeaders();
@@ -412,21 +415,24 @@ public class AdapterDeterLab {
             logger.warn("DeterLab connection error process join request: {}", e);
             throw new AdapterDeterlabConnectException();
         }
-
-        JSONObject response = new JSONObject(httpResponse.getBody().toString());
-        if(!"process join request OK".equals(response.getString("msg"))) {
-            logger.warn("{} join request to team {} FAIL", action, pid);
+        try {
+            String responseBody = httpResponse.getBody().toString();
+            if (!"process join request OK".equals(new JSONObject(responseBody).getString("msg"))) {
+                logger.warn("{} join request to team {} FAIL", action, pid);
+                throw new DeterLabOperationFailedException();
+            }
+            logger.info("{} join request to team {} OK", action, pid);
+            return responseBody;
+        }  catch (JSONException e) {
+            logger.warn("Error parsing response code process join request: {}", e);
             throw new DeterLabOperationFailedException();
         }
-        logger.info("{} join request to team {} OK", action, pid);
-        return httpResponse.getBody().toString();
     }
 
     public String approveProject(String jsonString) {
         // for ncl admins to approve teams
         String pid = new JSONObject(jsonString).getString("pid");
-        logger.info("Approving team {} to {} at {}: {}",
-                pid, properties.getIp(), properties.getPort(), jsonString);
+        logger.info("Approving team {}: {}", pid, jsonString);
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
@@ -439,26 +445,29 @@ public class AdapterDeterLab {
             logger.warn("DeterLab connection error approve project: {}", e);
             throw new AdapterDeterlabConnectException();
         }
-
-        String jsonResult = new JSONObject(response.getBody().toString()).getString("msg");
-        if ("approve project OK".equals(jsonResult)) {
-            logger.info("Approve team {} OK", pid);
-        } else {
-            logger.warn("Approve team {} FAIL", pid);
+        try {
+            String jsonResult = new JSONObject(response.getBody().toString()).getString("msg");
+            if ("approve project OK".equals(jsonResult)) {
+                logger.info("Approve team {} OK", pid);
+                return response.getBody().toString();
+            } else {
+                logger.warn("Approve team {} FAIL", pid);
+                throw new DeterLabOperationFailedException();
+            }
+        } catch (JSONException e) {
+            logger.warn("Error parsing response code approve project: {}", e);
+            throw new DeterLabOperationFailedException();
         }
-        return response.getBody().toString();
     }
 
     public String rejectProject(String jsonString) {
         // for ncl admins to reject teams
         String pid = new JSONObject(jsonString).getString("pid");
-        logger.info("Rejecting team {} to {} at {}: {}",
-                pid, properties.getIp(), properties.getPort(), jsonString);
+        logger.info("Rejecting team {}: {}", pid, jsonString);
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
         HttpEntity<String> request = new HttpEntity<>(jsonString, headers);
-
         ResponseEntity response;
 
         try {
@@ -467,12 +476,18 @@ public class AdapterDeterLab {
             logger.warn("DeterLab connection error reject project: {}", e);
             throw new AdapterDeterlabConnectException();
         }
-        String jsonResult = new JSONObject(response.getBody().toString()).getString("msg");
-        if ("reject project OK".equals(jsonResult)) {
-            logger.info("Reject team {} OK", pid);
-        } else {
-            logger.warn("Reject team {} FAIL", pid);
+        try {
+            String jsonResult = new JSONObject(response.getBody().toString()).getString("msg");
+            if ("reject project OK".equals(jsonResult)) {
+                logger.info("Reject team {} OK", pid);
+                return response.getBody().toString();
+            } else {
+                logger.warn("Reject team {} FAIL", pid);
+                throw new DeterLabOperationFailedException();
+            }
+        } catch (JSONException e) {
+            logger.warn("Error parsing response code reject project: {}", e);
+            throw new DeterLabOperationFailedException();
         }
-        return response.getBody().toString();
     }
 }

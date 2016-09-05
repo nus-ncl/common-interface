@@ -352,7 +352,7 @@ public class RegistrationServiceTest extends AbstractTest {
         teamService.addMember(createdTeam.getId(), owner);
 
         JSONObject predefinedResultJson = new JSONObject();
-        predefinedResultJson.put("msg", "project approved");
+        predefinedResultJson.put("msg", "approve project OK");
 
         adapterDeterLab.saveDeterUserIdMapping(deterUserId, owner.getUserId());
 
@@ -400,7 +400,7 @@ public class RegistrationServiceTest extends AbstractTest {
         userService.addTeam(createdUser.getId(), teamId_Two);
 
         JSONObject predefinedResultJson = new JSONObject();
-        predefinedResultJson.put("msg", "project rejected");
+        predefinedResultJson.put("msg", "reject project OK");
 
         final String deterUserId = RandomStringUtils.randomAlphabetic(8);
         adapterDeterLab.saveDeterUserIdMapping(deterUserId, owner.getUserId());
