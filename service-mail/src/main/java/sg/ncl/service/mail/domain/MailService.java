@@ -11,4 +11,6 @@ public interface MailService {
 
     void send(Email email);
 
+    void retry();
+
 }
