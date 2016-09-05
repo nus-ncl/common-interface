@@ -227,6 +227,10 @@ public class AdapterDeterLab {
         return deterLabUserEntity.getDeterUserId();
     }
 
+    /**
+     * Creates a create experiment request to Deterlab
+     * @param jsonString Contains id, userId, teamId, teamName, name (experiment name), description, nsFile, nsFileContent, idleSwap, maxDuration, deterLogin (deter userId), userServerUri
+     */
     public void createExperiment(String jsonString) {
         logger.info("Creating experiment to {} at {}: {}", properties.getIp(), properties.getPort(), jsonString);
 
