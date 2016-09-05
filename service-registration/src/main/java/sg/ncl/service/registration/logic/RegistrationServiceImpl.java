@@ -102,7 +102,6 @@ public class RegistrationServiceImpl implements RegistrationService {
         mainObject.put("projOrg", team.getOrganisationType());
         mainObject.put("projPublic", team.getVisibility());
 
-        log.info("User side add team");
         userService.addTeam(nclUserId, createdTeam.getId());
         teamService.addMember(createdTeam.getId(), teamMemberInfo);
 
@@ -117,20 +116,17 @@ public class RegistrationServiceImpl implements RegistrationService {
             log.warn("Team name is not found");
             throw new TeamNameNullOrEmptyException();
         }
-
         if (nclUserId == null || nclUserId.isEmpty()) {
             log.warn("Uid is empty or null");
             throw new UserIdNullOrEmptyException();
         }
 
-        log.info("Getting the team entity to be join");
         Team teamEntity = teamService.getTeamByName(team.getName());
-
         if (teamEntity == null) {
+            log.warn("Team not found: {}", team.getName());
             throw new TeamNotFoundException();
         }
 
-        log.info("Team to join: {}", teamEntity.getName());
         String teamId = teamEntity.getId();
 
         JSONObject userObject = new JSONObject();
@@ -146,50 +142,35 @@ public class RegistrationServiceImpl implements RegistrationService {
         userService.addTeam(nclUserId, teamId);
         teamService.addMember(teamId, teamMemberInfo);
 
-        log.info("Calling the adapter to join project");
         adapterDeterLab.joinProject(userObject.toString());
-
-        log.info("Submitted join team request");
         return null;
     }
 
     @Transactional
+    // for a new user to register and create a new team or join an existing team
     public Registration register(Credentials credentials, User user, Team team, boolean isJoinTeam) {
-
         if (userFormFieldsHasErrors(user)) {
             log.warn("User form fields has errors {}", user);
             throw new UserFormException();
         }
-
         if (credentials.getPassword() == null || credentials.getPassword().isEmpty()) {
             log.warn("Credentials password is empty");
             throw new UserFormException();
         }
-
-        if (isJoinTeam == true && (team.getId() == null || team.getId().isEmpty())) {
-            log.warn("Team id from join existing team is empty");
-            throw new UserFormException();
-        }
-
-        if (isJoinTeam == false && (team.getName() != null || !team.getName().isEmpty())) {
-            Team teamEntity = new TeamEntity();
-            try {
-                log.info("New team name is {}", team.getName());
-                teamEntity = teamService.getTeamByName(team.getName());
-            } catch (TeamNotFoundException e) {
-                // in order to continue the registration must catch instead of letting the service to throw
-                log.info("This is good, this implies team name is unique");
-            }
-            if (teamEntity != null && teamEntity.getId() != null) {
-                if (!teamEntity.getId().isEmpty()) {
-                    log.warn("Team name duplicate entry found");
-                    throw new TeamNameDuplicateException();
-                }
+        if (isJoinTeam == true) {
+            if (team.getId() == null || team.getId().isEmpty()) {
+                log.warn("Apply to join team: Team ID is null or empty!");
+                throw new UserFormException();
             }
         }
+        else {
+            if(team.getName() == null || team.getName().isEmpty()) {
+                log.warn("Apply to create team: Team name is null or empty!");
+                throw new UserFormException();
+            }
+            checkTeamNameDuplicate(team.getName());
+        }
 
-        MemberType memberType;
-        String resultJSON;
         String teamId;
         Team teamEntity;
         TeamMemberInfo teamMemberInfo;
@@ -198,14 +179,13 @@ public class RegistrationServiceImpl implements RegistrationService {
             // accept the team data
             teamEntity = teamService.getTeamById(team.getId());
             teamId = team.getId();
-            log.info("Register new users: join Team {}", team.getName());
+            log.info("Register new user: join Team {}", team.getName());
         } else {
-            log.info("Creating a team: {}", team);
             // apply for new team
             // check if team already exists
             teamEntity = teamService.createTeam(team);
             teamId = teamEntity.getId();
-            log.info("Register new users: apply new Team {}", team.getName());
+            log.info("Register new user: apply new Team {}", team.getName());
         }
 
         // accept user data from form
@@ -214,22 +194,15 @@ public class RegistrationServiceImpl implements RegistrationService {
         // create the credentials after creating the users
         final CredentialsInfo credentialsInfo = new CredentialsInfo(userId, credentials.getUsername(), credentials.getPassword(), null);
         credentialsService.addCredentials(credentialsInfo);
-        log.info("Register new users: create new credentials", credentials.getUsername());
-
-        if (isJoinTeam == true) {
-            // indicate member type based on button click
-            memberType = MemberType.MEMBER;
-        } else {
-            memberType = MemberType.OWNER;
-        }
+        log.info("Register new user: create new credentials", credentials.getUsername());
 
         TeamMemberEntity teamMemberEntity = new TeamMemberEntity();
         teamMemberEntity.setUserId(userId);
         teamMemberEntity.setJoinedDate(ZonedDateTime.now());
-        teamMemberEntity.setMemberType(memberType);
+        teamMemberEntity.setMemberType(isJoinTeam? MemberType.MEMBER : MemberType.OWNER);
         teamMemberInfo = new TeamMemberInfo(teamMemberEntity);
 
-        log.info("Register new users: adding user {} to team {}", user.getUserDetails().getEmail(), team.getName());
+        log.info("Register new user: adding user {} to team {}", user.getUserDetails().getEmail(), team.getName());
         userService.addTeam(userId, teamId);
         teamService.addMember(teamId, teamMemberInfo);
 
@@ -251,37 +224,32 @@ public class RegistrationServiceImpl implements RegistrationService {
         userObject.put("city", user.getUserDetails().getAddress().getCity());
         userObject.put("zipCode", user.getUserDetails().getAddress().getZipCode());
 
+        String resultJSON;
         if (isJoinTeam == true) {
-
-            // call python script (create a new user in deterlab)
-            // parse in a the json string
             userObject.put("pid", teamEntity.getName());
             resultJSON = adapterDeterLab.joinProjectNewUsers(userObject.toString());
-            log.info("Register new users: invoke adapter deterlab to join team {} with data {}", teamEntity.getName(), userObject);
-
         } else {
             // call python script to apply for new project
             userObject.put("projName", teamEntity.getName());
             userObject.put("projGoals", teamEntity.getDescription());
             userObject.put("pid", teamEntity.getName());
-            userObject.put("projWeb", "http://www.nus.edu.sg");
+            userObject.put("projWeb", "http://ncl.sg");
             userObject.put("projOrg", "Academic");
             userObject.put("projPublic", teamEntity.getVisibility());
             resultJSON = adapterDeterLab.applyProjectNewUsers(userObject.toString());
-            log.info("Register new users: invoke adapter deterlab to apple new team {} with data {}", teamEntity.getName(), userObject);
         }
 
-        if (getUserCreationStatus(resultJSON).equals("user is created")) {
+        if ("user is created".equals(getUserCreationStatus(resultJSON))) {
             // store form fields into registration repository for recreation when required
             Registration one = addUserToRegistrationRepository(resultJSON, user, teamEntity);
-
             // call deterlab adapter to store ncluid to deteruid mapping
             addNclUserIdMapping(resultJSON, userId);
+            log.info("Register new user OK: uid {}, pid {}", one.getUid(), one.getPid());
             return one;
         } else {
             log.warn("Register new users: unreachable branch, result of registration is {}", resultJSON);
+            return null;
         }
-        return null;
     }
 
     @Transactional
@@ -473,7 +441,7 @@ public class RegistrationServiceImpl implements RegistrationService {
         JSONObject userObject = new JSONObject(resultJSON);
         String deterUserId = userObject.getString("uid");
         adapterDeterLab.saveDeterUserIdMapping(deterUserId, nclUserId);
-        log.info("Register new users: map and save ncl user id: {} to deter user id: {}", nclUserId, deterUserId);
+        log.info("Register new user: map and save ncl user id: {} to deter user id: {}", nclUserId, deterUserId);
     }
 
     private Registration addUserToRegistrationRepository(String resultJSON, User user, Team team) {
@@ -500,16 +468,14 @@ public class RegistrationServiceImpl implements RegistrationService {
         registrationEntity.setUsrZip(user.getUserDetails().getAddress().getZipCode());
 
         RegistrationEntity one = registrationRepository.save(registrationEntity);
-        log.info("Register new users: saving registration entity {}", one);
+        log.info("Register new user: saved registration entity {}", one);
         return one;
     }
 
     private void checkTeamNameDuplicate(String teamName) {
-        Team one = null;
-        log.info("New team name is {}", teamName);
-        one = teamService.getTeamByName(teamName);
+        Team one = teamService.getTeamByName(teamName);
         if (one != null) {
-            log.warn("Team name duplicate entry found");
+            log.warn("Team name duplicate entry found: {}", teamName);
             throw new TeamNameDuplicateException();
         }
     }

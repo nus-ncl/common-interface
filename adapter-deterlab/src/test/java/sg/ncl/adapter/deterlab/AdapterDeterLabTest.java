@@ -70,7 +70,7 @@ public class AdapterDeterLabTest extends AbstractTest {
         Assert.assertThat(uid, is(stubUid));
     }
 
-    @Test(expected = JoinProjectException.class)
+    @Test(expected = DeterLabOperationFailedException.class)
     public void testJoinProjectNewUsersBad() {
         JSONObject predefinedResultJson = new JSONObject();
         predefinedResultJson.put("msg", "join project request new users fail");
@@ -104,7 +104,7 @@ public class AdapterDeterLabTest extends AbstractTest {
         Assert.assertThat(uid, is(stubUid));
     }
 
-    @Test(expected = ApplyNewProjectException.class)
+    @Test(expected = DeterLabOperationFailedException.class)
     public void testCreateProjectNewUsersBad() {
         JSONObject predefinedResultJson = new JSONObject();
         predefinedResultJson.put("msg", "apply project request new users fail");
@@ -130,7 +130,7 @@ public class AdapterDeterLabTest extends AbstractTest {
         adapterDeterLab.joinProject(userJoinTeamObject.toString());
     }
 
-    @Test(expected = JoinProjectException.class)
+    @Test(expected = DeterLabOperationFailedException.class)
     public void testJoinProjectBad() {
         JSONObject predefinedResultJson = new JSONObject();
         predefinedResultJson.put("msg", "join project request existing users fail");
@@ -240,7 +240,7 @@ public class AdapterDeterLabTest extends AbstractTest {
         adapterDeterLab.applyProject(one.toString());
     }
 
-    @Test(expected = ApplyNewProjectException.class)
+    @Test(expected = DeterLabOperationFailedException.class)
     public void testApplyProjectBad() throws Exception {
         JSONObject one = new JSONObject();
 

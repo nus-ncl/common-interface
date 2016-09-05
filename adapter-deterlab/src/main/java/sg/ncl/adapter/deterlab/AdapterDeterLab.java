@@ -1,5 +1,6 @@
 package sg.ncl.adapter.deterlab;
 
+import org.json.JSONException;
 import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -42,7 +43,7 @@ public class AdapterDeterLab {
      */
     public String joinProjectNewUsers(String jsonString) {
 
-        logger.info("Joining project as new user to {} at {}: {}", properties.getIp(), properties.getPort(), jsonString);
+        logger.info("Joining project as new user: {}", jsonString);
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
@@ -51,23 +52,28 @@ public class AdapterDeterLab {
         ResponseEntity response;
         try {
             response = restTemplate.exchange(properties.getJoinProjectNewUsers(), HttpMethod.POST, request, String.class);
-        } catch (Exception e) {
+        } catch (RestClientException e) {
+            logger.warn("DeterLab connection error new user join project: {}", e);
             throw new AdapterDeterlabConnectException();
         }
 
-        logger.info("Join project request (new user) submitted to deterlab");
-
-        String jsonResult = new JSONObject(response.getBody().toString()).getString("msg");
-        if ("join project request new users fail".equals(jsonResult) || !"user is created".equals(jsonResult)) {
-            throw new JoinProjectException();
+        String responseBody = response.getBody().toString();
+        try {
+            // Will return the following JSON:
+            // msg: join project request new users fail
+            // msg: no user created, uid: xxx
+            // msg: user is created, uid: xxx
+            // msg: user not found, uid: xxx
+            if (!"user is created".equals(new JSONObject(responseBody).getString("msg"))) {
+                logger.warn("Join project as new user failed: {}", responseBody);
+                throw new DeterLabOperationFailedException();
+            }
+            logger.info("Join project as new user to DeterLab OK");
+            return responseBody;
+        } catch (JSONException e) {
+            logger.warn("Error parsing response code new user join project: {}", e);
+            throw new DeterLabOperationFailedException();
         }
-
-        // Will return the following JSON:
-        // msg: join project request new users fail
-        // msg: no user created, uid: xxx
-        // msg: user is created, uid: xxx
-        // msg: user not found, uid: xxx
-        return response.getBody().toString();
     }
 
     /**
@@ -77,7 +83,7 @@ public class AdapterDeterLab {
      * @return The Deter userid (randomly generated)
      */
     public String applyProjectNewUsers(String jsonString) {
-        logger.info("Applying new project as new user to {} at {}: {}", properties.getIp(), properties.getPort(), jsonString);
+        logger.info("Applying new project as new user: {}", jsonString);
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
@@ -85,23 +91,30 @@ public class AdapterDeterLab {
         ResponseEntity response;
         try {
             response = restTemplate.exchange(properties.getApplyProjectNewUsers(), HttpMethod.POST, request, String.class);
-        } catch (Exception e) {
+        } catch (RestClientException e) {
+            logger.warn("DeterLab connection error new user apply project: {}", e);
             throw new AdapterDeterlabConnectException();
         }
 
-        logger.info("Apply project request (new user) submitted to deterlab");
+        String responseBody = response.getBody().toString();
+        try {
+            String jsonResult = new JSONObject(responseBody).getString("msg");
+            if (!"user is created".equals(jsonResult)) {
+                logger.warn("Apply project as new user failed: {}", responseBody);
+                throw new DeterLabOperationFailedException();
+            }
 
-        String jsonResult = new JSONObject(response.getBody().toString()).getString("msg");
-        if ("apply project request new users fail".equals(jsonResult) || !"user is created".equals(jsonResult)) {
-            throw new ApplyNewProjectException();
+            // Will return the following JSON:
+            // msg: apply project request new users fail
+            // msg: no user created, uid: xxx
+            // msg: user is created, uid: xxx
+            // msg: user not found, uid: xxx
+            logger.info("Apply project as new user to DeterLab OK");
+            return responseBody;
+        } catch (JSONException e) {
+            logger.warn("Error parsing response code new user apply project: {}", e);
+            throw new DeterLabOperationFailedException();
         }
-
-        // Will return the following JSON:
-        // msg: apply project request new users fail
-        // msg: no user created, uid: xxx
-        // msg: user is created, uid: xxx
-        // msg: user not found, uid: xxx
-        return response.getBody().toString();
     }
 
     /**
@@ -109,8 +122,8 @@ public class AdapterDeterLab {
      * Does not create a new user
      * @param jsonString Contains uid, project name, pid, project goals, project web, project organisation, project visibility
      */
-    public void applyProject(String jsonString) {
-        logger.info("Applying project as logged on user to {} at {}: {}", properties.getIp(), properties.getPort(), jsonString);
+    public String applyProject(String jsonString) {
+        logger.info("Applying project as existing user: {}", jsonString);
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
@@ -120,14 +133,22 @@ public class AdapterDeterLab {
 
         try {
             response = restTemplate.exchange(properties.getApplyProject(), HttpMethod.POST, request, String.class);
-        } catch (Exception e) {
+        } catch (RestClientException e) {
+            logger.warn("DeterLab connection error apply project existing user: {}", e);
             throw new AdapterDeterlabConnectException();
         }
-
-        String jsonResult = new JSONObject(response.getBody().toString()).getString("msg");
-        logger.info("Apply new project request existing users submitted to deterlab: {}", jsonResult);
-        if (!"apply project request existing users success".equals(jsonResult)) {
-            throw new ApplyNewProjectException();
+        String responseBody = response.getBody().toString();
+        try {
+            String jsonResult = new JSONObject(responseBody).getString("msg");
+            if(!"apply project request existing users success".equals(jsonResult)) {
+                logger.warn("Apply project as existing user to DeterLab failed: {}", responseBody);
+                throw new DeterLabOperationFailedException();
+            }
+            logger.info("Apply project as existing user to DeterLab OK");
+            return responseBody;
+        } catch (JSONException e) {
+            logger.warn("Error parsing response code existing user apply project: {}", e);
+            throw new DeterLabOperationFailedException();
         }
     }
 
@@ -136,8 +157,8 @@ public class AdapterDeterLab {
      * Does not create a new user
      * @param jsonString Contains uid, pid
      */
-    public void joinProject(String jsonString) {
-        logger.info("Joining project as logged on user to {} at {}: {}", properties.getIp(), properties.getPort(), jsonString);
+    public String joinProject(String jsonString) {
+        logger.info("Joining project as existing user: {}", jsonString);
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
@@ -146,15 +167,22 @@ public class AdapterDeterLab {
 
         try {
             response = restTemplate.exchange(properties.getJoinProject(), HttpMethod.POST, request, String.class);
-        } catch (Exception e) {
+        } catch (RestClientException e) {
+            logger.warn("DeterLab connection error join project: {}", e);
             throw new AdapterDeterlabConnectException();
         }
-
-        logger.info("Join project request submitted to deterlab");
-
-        String jsonResult = new JSONObject(response.getBody().toString()).getString("msg");
-        if (!"join project request existing users success".equals(jsonResult)) {
-            throw new JoinProjectException();
+        String responseBody = response.getBody().toString();
+        try {
+            String jsonResult = new JSONObject(responseBody).getString("msg");
+            if (!"join project request existing users success".equals(jsonResult)) {
+                logger.warn("Join project as existing user to DeterLab failed: {}", responseBody);
+                throw new DeterLabOperationFailedException();
+            }
+            logger.info("Join project as existing user to DeterLab OK");
+            return responseBody;
+        } catch (JSONException e) {
+            logger.warn("Error parsing response code existing user join project: {}", e);
+            throw new DeterLabOperationFailedException();
         }
     }
 
