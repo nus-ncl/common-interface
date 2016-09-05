@@ -1,17 +1,18 @@
 package sg.ncl.common.authentication;
 
+import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.Jwts;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
-import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.web.authentication.AbstractAuthenticationProcessingFilter;
+import sg.ncl.common.jwt.JwtAutoConfiguration;
 
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.util.Collection;
 
 /**
  * @author Te Ye
@@ -39,7 +40,12 @@ public class JwtAuthenticationFilter extends AbstractAuthenticationProcessingFil
         }
 
         String authToken = header.substring(7);
+        Claims claims = Jwts.parser().setSigningKey("myKey").parseClaimsJws(authToken).getBody();
         log.info("Header: {}", header);
+        log.info("Subject: {}", claims.getSubject());
+        log.info("Issuer: {}", claims.getIssuer());
+        log.info("Issued At: {}", claims.getIssuedAt());
+        log.info("Expiration: {}", claims.getExpiration());
         return null;
     }
 
