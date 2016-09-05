@@ -4,6 +4,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.task.TaskExecutor;
+import org.springframework.scheduling.TaskScheduler;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
 
 import javax.inject.Inject;
 import java.time.Duration;
@@ -30,7 +34,7 @@ public class MailAutoConfiguration {
         this.properties = properties;
     }
 
-    @Bean
+    @Bean(name = "delayDuration")
     Duration delayDuration() {
         final String value = properties.getDelay();
         if (value == null || value.isEmpty()) {
@@ -47,7 +51,7 @@ public class MailAutoConfiguration {
         }
     }
 
-    @Bean
+    @Bean(name = "intervalDuration")
     Duration intervalDuration() {
         final String interval = properties.getInterval();
         if (interval == null || interval.isEmpty()) {
@@ -62,6 +66,16 @@ public class MailAutoConfiguration {
             log.warn("{}: '{}'; using default: {}", e, value, DEFAULT_INTERVAL);
             return DEFAULT_INTERVAL;
         }
+    }
+
+    TaskExecutor taskExecutor() {
+        final ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
+        return executor;
+    }
+
+    TaskScheduler taskScheduler() {
+        final ThreadPoolTaskScheduler scheduler = new ThreadPoolTaskScheduler();
+        return scheduler;
     }
 
 }

@@ -49,7 +49,7 @@ public class EmailEntity extends AbstractEntity implements Email {
     private boolean html;
 
     @Column(name = "retry_times", nullable = false)
-    private int retryTimes = 0;
+    private int retryTimes = -1;
 
     @Column(name = "last_retry_time", nullable = false)
     private ZonedDateTime lastRetryTime;

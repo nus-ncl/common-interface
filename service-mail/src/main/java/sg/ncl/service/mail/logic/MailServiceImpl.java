@@ -1,9 +1,11 @@
 package sg.ncl.service.mail.logic;
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.MailException;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import sg.ncl.service.mail.data.jpa.EmailEntity;
@@ -16,22 +18,20 @@ import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;
 import javax.validation.constraints.NotNull;
 import java.time.ZonedDateTime;
+import java.util.List;
 
 /**
  * Created by dcszwang on 8/10/2016.
  */
-
 @Service
 @Slf4j
 class MailServiceImpl implements MailService {
 
-    // max retry times for each email
-    private static final int MAX_RETRY_TIMES = 3;
-    // retry interval for each email, in seconds
-    private static final int RETRY_INTERVAL_PER_EMAIL = 3600;
-
     private final JavaMailSender javaMailSender;
     private final EmailRepository emailRepository;
+    // FIXME should not use this format, instead should use auto configuration
+    @Value("${ncl.mail.retry:3}")
+    private int retryTimes;
 
     @Inject
     MailServiceImpl(
@@ -88,6 +88,7 @@ class MailServiceImpl implements MailService {
     private void send(@NotNull final EmailEntity entity) {
         final MimeMessage message = prepareMessage(entity);
         entity.setLastRetryTime(ZonedDateTime.now());
+        entity.setRetryTimes(entity.getRetryTimes() + 1);
         try {
             javaMailSender.send(message);
             log.info("Email sent: {}", message);
@@ -122,29 +123,15 @@ class MailServiceImpl implements MailService {
         return message;
     }
 
-//    @Scheduled(fixedDelay = 5000)
-//    @Transactional
-//    public void resend() {
-//        EmailEntity entity = findEmailForRetry();
-//        if (entity != null) {
-//            MimeMessage message = prepareMessage(entity);
-//            entity.setLastRetryTime(ZonedDateTime.now());
-//            entity.setRetryTimes(entity.getRetryTimes() + 1);
-//            send(entity, message);
-//            emailRepository.save(entity);
-//        }
-//    }
-//
-//    private EmailEntity findEmailForRetry() {
-//        List<EmailEntity> emailEntityList =
-//                emailRepository.findBySentFalseAndRetryTimesLessThanOrderByRetryTimes(MAX_RETRY_TIMES);
-//        if (!emailEntityList.isEmpty()) {
-//            EmailEntity candidate = emailEntityList.get(0);
-//            return (ZonedDateTime.now().toEpochSecond() - candidate.getLastRetryTime().toEpochSecond()) >= RETRY_INTERVAL_PER_EMAIL ?
-//                    candidate : null;
-//        } else {
-//            return null;
-//        }
-//    }
+    // FIXME should not use this format, instead should use auto configuration
+    @Scheduled(initialDelayString = "${ncl.mail.delay:300000}", fixedRateString = "${ncl.mail.interval:600000}")
+    @Transactional
+    public void retry() {
+        final List<EmailEntity> emails = emailRepository.findBySentFalseAndRetryTimesLessThanOrderByRetryTimes(3);
+        log.info("Retrying {} emails", emails.size());
+        emails.forEach(email -> {
+            send(email);
+        });
+    }
 
 }
