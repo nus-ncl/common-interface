@@ -13,8 +13,6 @@ import javax.inject.Inject;
 import java.time.Duration;
 import java.time.format.DateTimeParseException;
 
-import static com.sun.corba.se.spi.activation.IIOP_CLEAR_TEXT.value;
-
 /**
  * Created by Chris on 9/5/2016.
  */
@@ -53,8 +51,8 @@ public class MailAutoConfiguration {
 
     @Bean(name = "intervalDuration")
     Duration intervalDuration() {
-        final String interval = properties.getInterval();
-        if (interval == null || interval.isEmpty()) {
+        final String value = properties.getInterval();
+        if (value == null || value.isEmpty()) {
             log.warn("No interval was specified; using default: {}", DEFAULT_INTERVAL);
             return DEFAULT_INTERVAL;
         }
