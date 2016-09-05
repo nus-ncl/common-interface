@@ -181,14 +181,6 @@ public class ExperimentServiceTest extends AbstractTest {
     }
 
     @Test
-    public void testCreateExperimentInDeter() throws Exception {
-        ExperimentEntity experimentEntity = Util.getExperimentsEntity();
-        experimentEntity.setNsFile("nsfile.ns");
-
-        experimentService.createExperimentInDeter(experimentEntity);
-    }
-
-    @Test
     public void testDeleteExperiment() throws Exception {
 
         mockServer.expect(requestTo(properties.stopExperiment()))
