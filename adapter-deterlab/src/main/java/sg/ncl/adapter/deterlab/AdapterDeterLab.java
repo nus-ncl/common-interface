@@ -70,8 +70,8 @@ public class AdapterDeterLab {
             logger.info("Join project as new user to DeterLab OK");
             return responseBody;
         } catch (JSONException e) {
-            logger.warn("Error parsing response code new user join project: {}", e);
-            throw new DeterLabOperationFailedException();
+            logger.warn("Error parsing response code new user join project: {}", responseBody);
+            throw e;
         }
     }
 
@@ -109,8 +109,8 @@ public class AdapterDeterLab {
             logger.info("Apply project as new user to DeterLab OK");
             return responseBody;
         } catch (JSONException e) {
-            logger.warn("Error parsing response code new user apply project: {}", e);
-            throw new DeterLabOperationFailedException();
+            logger.warn("Error parsing response code new user apply project: {}", responseBody);
+            throw e;
         }
     }
 
@@ -143,8 +143,8 @@ public class AdapterDeterLab {
             logger.info("Apply project as existing user to DeterLab OK");
             return responseBody;
         } catch (JSONException e) {
-            logger.warn("Error parsing response code existing user apply project: {}", e);
-            throw new DeterLabOperationFailedException();
+            logger.warn("Error parsing response code existing user apply project: {}", responseBody);
+            throw e;
         }
     }
 
@@ -177,8 +177,8 @@ public class AdapterDeterLab {
             logger.info("Join project as existing user to DeterLab OK");
             return responseBody;
         } catch (JSONException e) {
-            logger.warn("Error parsing response code existing user join project: {}", e);
-            throw new DeterLabOperationFailedException();
+            logger.warn("Error parsing response code existing user join project: {}", responseBody);
+            throw e;
         }
     }
 
@@ -208,8 +208,8 @@ public class AdapterDeterLab {
             }
             logger.info("Change password OK");
         } catch (JSONException e) {
-            logger.warn("Error parsing response code update credentials: {}", e);
-            throw new DeterLabOperationFailedException();
+            logger.warn("Error parsing response code update credentials: {}", response.getBody().toString());
+            throw e;
         }
     }
 
@@ -415,8 +415,8 @@ public class AdapterDeterLab {
             logger.warn("DeterLab connection error process join request: {}", e);
             throw new AdapterDeterlabConnectException();
         }
+        String responseBody = httpResponse.getBody().toString();
         try {
-            String responseBody = httpResponse.getBody().toString();
             if (!"process join request OK".equals(new JSONObject(responseBody).getString("msg"))) {
                 logger.warn("{} join request to team {} FAIL", action, pid);
                 throw new DeterLabOperationFailedException();
@@ -424,8 +424,8 @@ public class AdapterDeterLab {
             logger.info("{} join request to team {} OK", action, pid);
             return responseBody;
         }  catch (JSONException e) {
-            logger.warn("Error parsing response code process join request: {}", e);
-            throw new DeterLabOperationFailedException();
+            logger.warn("Error parsing response code process join request: {}", responseBody);
+            throw e;
         }
     }
 
@@ -455,8 +455,8 @@ public class AdapterDeterLab {
                 throw new DeterLabOperationFailedException();
             }
         } catch (JSONException e) {
-            logger.warn("Error parsing response code approve project: {}", e);
-            throw new DeterLabOperationFailedException();
+            logger.warn("Error parsing response code approve project: {}", response.getBody().toString());
+            throw e;
         }
     }
 
@@ -486,8 +486,8 @@ public class AdapterDeterLab {
                 throw new DeterLabOperationFailedException();
             }
         } catch (JSONException e) {
-            logger.warn("Error parsing response code reject project: {}", e);
-            throw new DeterLabOperationFailedException();
+            logger.warn("Error parsing response code reject project: {}", response.getBody().toString());
+            throw e;
         }
     }
 }
