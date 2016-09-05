@@ -8,10 +8,10 @@ import sg.ncl.service.user.data.jpa.UserRepository;
 import sg.ncl.service.user.domain.Address;
 import sg.ncl.service.user.domain.User;
 import sg.ncl.service.user.domain.UserService;
+import sg.ncl.service.user.exceptions.UserIdNullOrEmptyException;
 import sg.ncl.service.user.domain.UserStatus;
 import sg.ncl.service.user.exceptions.InvalidStatusTransitionException;
 import sg.ncl.service.user.exceptions.InvalidUserStatusException;
-import sg.ncl.service.user.exceptions.UserIdNullException;
 import sg.ncl.service.user.exceptions.UserNotFoundException;
 import sg.ncl.service.user.exceptions.UsernameAlreadyExistsException;
 
@@ -62,7 +62,10 @@ public class UserServiceImpl implements UserService {
     @Transactional
     public void updateUser(final String id, final User user) {
         final UserEntity one = findUser(id);
-
+        if(one == null) {
+            log.warn("User not found when updating: {}", id);
+            throw new UserNotFoundException(id);
+        }
         if (user.getUserDetails().getFirstName() != null) {
             one.getUserDetails().setFirstName(user.getUserDetails().getFirstName());
         }
@@ -130,6 +133,10 @@ public class UserServiceImpl implements UserService {
     @Transactional
     public void addTeam(final String userId, final String teamId) {
         UserEntity one = findUser(userId);
+        if(one == null) {
+            log.warn("User not found when adding team: {}", userId);
+            throw new UserNotFoundException(userId);
+        }
         one.addTeamId(teamId);
         userRepository.save(one);
     }
@@ -137,20 +144,19 @@ public class UserServiceImpl implements UserService {
     @Transactional
     public void removeTeam(final String userId, final String teamId) {
         UserEntity one = findUser(userId);
+        if(one == null) {
+            log.warn("User not found when removing team: {}", userId);
+            throw new UserNotFoundException(userId);
+        }
         one.removeTeamId(teamId);
         userRepository.save(one);
     }
 
-    private UserEntity findUser(final String userId) {
-        if (userId == null || userId.isEmpty()) {
-            throw new UserIdNullException();
+    private UserEntity findUser(final String id) {
+        if (id == null || id.isEmpty()) {
+            throw new UserIdNullOrEmptyException();
         }
-
-        final UserEntity one = userRepository.findOne(userId);
-        if (one == null) {
-            throw new UserNotFoundException();
-        }
-        return one;
+        return userRepository.findOne(id);
     }
 
     @Override

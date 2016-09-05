@@ -9,4 +9,7 @@ import sg.ncl.common.exception.base.NotFoundException;
  */
 @ResponseStatus(code = HttpStatus.NOT_FOUND, reason = "User not found")
 public class UserNotFoundException extends NotFoundException {
+    public UserNotFoundException(final String message) {
+        super(message);
+    }
 }

@@ -233,7 +233,7 @@ public class RegistrationControllerTest extends AbstractTest {
         teamService.addMember(createdTeam.getId(), owner);
 
         JSONObject predefinedResultJson = new JSONObject();
-        predefinedResultJson.put("msg", "project approved");
+        predefinedResultJson.put("msg", "approve project OK");
 
         mockServer.expect(requestTo(properties.getApproveProject()))
                 .andExpect(method(HttpMethod.POST))
