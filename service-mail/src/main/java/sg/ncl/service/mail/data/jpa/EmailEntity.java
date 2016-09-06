@@ -27,11 +27,11 @@ public class EmailEntity extends AbstractEntity implements Email {
     @Column(name = "id", nullable = false, unique = true, updatable = false)
     private Long id;
 
-    @Column(name = "from", nullable = false, updatable = false)
-    private String from;
+    @Column(name = "sender", nullable = false, updatable = false)
+    private String sender;
 
-    @Column(name = "to", nullable = false, updatable = false)
-    private String[] to;
+    @Column(name = "recipients", nullable = false, updatable = false)
+    private String[] recipients;
 
     @Column(name = "cc", updatable = false)
     private String[] cc = null;
@@ -83,8 +83,8 @@ public class EmailEntity extends AbstractEntity implements Email {
     public String toString() {
         return "EmailEntity{" +
                 "id=" + id +
-                ", from='" + from + '\'' +
-                ", to=" + Arrays.toString(to) +
+                ", sender='" + sender + '\'' +
+                ", recipients=" + Arrays.toString(recipients) +
                 ", cc=" + Arrays.toString(cc) +
                 ", bcc=" + Arrays.toString(bcc) +
                 ", subject='" + subject + '\'' +

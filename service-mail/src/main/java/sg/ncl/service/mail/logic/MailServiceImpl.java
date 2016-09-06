@@ -68,8 +68,8 @@ class MailServiceImpl implements MailService {
             final String[] bcc
     ) {
         final EmailEntity entity = new EmailEntity();
-        entity.setFrom(from);
-        entity.setTo(to);
+        entity.setSender(from);
+        entity.setRecipients(to);
         entity.setSubject(subject);
         entity.setContent(content);
         entity.setHtml(html);
@@ -82,7 +82,7 @@ class MailServiceImpl implements MailService {
     @Transactional
     @Override
     public void send(@NotNull final Email email) {
-        send(email.getFrom(), email.getTo(), email.getSubject(), email.getContent(), email.isHtml(), email.getCc(), email.getBcc());
+        send(email.getSender(), email.getRecipients(), email.getSubject(), email.getContent(), email.isHtml(), email.getCc(), email.getBcc());
     }
 
     private void send(@NotNull final EmailEntity entity) {
@@ -105,8 +105,8 @@ class MailServiceImpl implements MailService {
         final MimeMessage message = javaMailSender.createMimeMessage();
         final MimeMessageHelper helper = new MimeMessageHelper(message);
         try {
-            helper.setFrom(email.getFrom());
-            helper.setTo(email.getTo());
+            helper.setFrom(email.getSender());
+            helper.setTo(email.getRecipients());
             helper.setSubject(email.getSubject());
             helper.setText(email.getContent(), email.isHtml());
             final String[] cc = email.getCc();
@@ -126,7 +126,7 @@ class MailServiceImpl implements MailService {
     // FIXME should not use this format, instead should use auto configuration
     @Scheduled(initialDelayString = "${ncl.mail.delay:300000}", fixedRateString = "${ncl.mail.interval:600000}")
     @Transactional
-    public void retry() {
+    void retry() {
         final List<EmailEntity> emails = emailRepository.findBySentFalseAndRetryTimesLessThanOrderByRetryTimes(3);
         log.info("Retrying {} emails", emails.size());
         emails.forEach(email -> {

@@ -16,6 +16,7 @@ import sg.ncl.service.user.domain.User;
 import sg.ncl.service.user.domain.UserService;
 import sg.ncl.service.user.domain.UserStatus;
 import sg.ncl.service.user.exceptions.TeamsNullOrEmptyException;
+import sg.ncl.service.user.exceptions.UserNotFoundException;
 
 import javax.inject.Inject;
 import java.util.List;
@@ -43,7 +44,12 @@ public class UsersController {
     @GetMapping(path = "/users/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
     public User getUser(@PathVariable String id) {
-        return new UserInfo(userService.getUser(id));
+        User one = userService.getUser(id);
+        if(one == null) {
+            log.warn("User not found: {}", id);
+            throw new UserNotFoundException(id);
+        }
+        return new UserInfo(one);
     }
 
     @PutMapping(path = "/users/{id}", produces = MediaType.APPLICATION_JSON_VALUE)

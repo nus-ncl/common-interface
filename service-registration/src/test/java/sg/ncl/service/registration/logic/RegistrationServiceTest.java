@@ -27,9 +27,9 @@ import sg.ncl.service.registration.Util;
 import sg.ncl.service.registration.data.jpa.RegistrationRepository;
 import sg.ncl.service.registration.domain.RegistrationService;
 import sg.ncl.service.registration.exceptions.IdNullOrEmptyException;
-import sg.ncl.service.registration.exceptions.RegisterTeamNameDuplicateException;
-import sg.ncl.service.registration.exceptions.RegisterTeamNameEmptyException;
-import sg.ncl.service.registration.exceptions.RegisterUidNullException;
+import sg.ncl.service.registration.exceptions.TeamNameDuplicateException;
+import sg.ncl.service.registration.exceptions.TeamNameNullOrEmptyException;
+import sg.ncl.service.registration.exceptions.UserIdNullOrEmptyException;
 import sg.ncl.service.registration.exceptions.UserFormException;
 import sg.ncl.service.registration.exceptions.UserIsNotTeamOwnerException;
 import sg.ncl.service.team.data.jpa.TeamEntity;
@@ -99,7 +99,7 @@ public class RegistrationServiceTest extends AbstractTest {
                 domainProperties, freemarkerConfiguration);
     }
 
-    @Test(expected = RegisterTeamNameDuplicateException.class)
+    @Test(expected = TeamNameDuplicateException.class)
     public void registerTestApplyDuplicateTeamName() throws Exception {
         CredentialsEntity credentialsEntity = Util.getCredentialsEntity();
         User user = Util.getUserEntity();
@@ -151,7 +151,7 @@ public class RegistrationServiceTest extends AbstractTest {
         registrationService.register(credentialsEntity, user, teamEntity, isJoinTeam);
     }
 
-    @Test(expected = RegisterTeamNameEmptyException.class)
+    @Test(expected = TeamNameNullOrEmptyException.class)
     public void registerJoinTeamOldUserEmptyTeam() throws Exception {
         String uid = RandomStringUtils.randomAlphabetic(8);
         TeamEntity teamEntity = Util.getTeamEntity();
@@ -160,7 +160,7 @@ public class RegistrationServiceTest extends AbstractTest {
         registrationService.registerRequestToJoinTeam(uid, teamEntity);
     }
 
-    @Test(expected = RegisterUidNullException.class)
+    @Test(expected = UserIdNullOrEmptyException.class)
     public void registerJoinTeamOldUserEmptyUser() throws Exception {
         String uid = null;
         TeamEntity teamEntity = Util.getTeamEntity();
@@ -238,14 +238,14 @@ public class RegistrationServiceTest extends AbstractTest {
         registrationService.approveJoinRequest(teamId, createdUser.getId(), createdUser);
     }
 
-    @Test(expected = RegisterTeamNameEmptyException.class)
+    @Test(expected = TeamNameNullOrEmptyException.class)
     public void registerRequestToApplyTeamNameError() throws Exception {
         TeamEntity one = Util.getTeamEntity();
         one.setName(null);
         registrationService.registerRequestToApplyTeam(RandomStringUtils.randomAlphanumeric(8), one);
     }
 
-    @Test(expected = RegisterUidNullException.class)
+    @Test(expected = UserIdNullOrEmptyException.class)
     public void registerRequestToApplyTeamUserNameError() throws Exception {
         TeamEntity one = Util.getTeamEntity();
         registrationService.registerRequestToApplyTeam("", one);
@@ -257,7 +257,7 @@ public class RegistrationServiceTest extends AbstractTest {
         registrationService.registerRequestToApplyTeam(RandomStringUtils.randomAlphanumeric(8), one);
     }
 
-    @Test(expected = RegisterTeamNameDuplicateException.class)
+    @Test(expected = TeamNameDuplicateException.class)
     public void registerRequestToApplyTeamDuplicateError() throws Exception {
         Team one = Util.getTeamEntity();
         User user = Util.getUserEntity();
@@ -329,7 +329,7 @@ public class RegistrationServiceTest extends AbstractTest {
         teamService.addMember(createdTeam.getId(), owner);
 
         JSONObject predefinedResultJson = new JSONObject();
-        predefinedResultJson.put("msg", "project approved");
+        predefinedResultJson.put("msg", "approve project OK");
 
         adapterDeterLab.saveDeterUserIdMapping(deterUserId, owner.getUserId());
 
@@ -377,7 +377,7 @@ public class RegistrationServiceTest extends AbstractTest {
         userService.addTeam(createdUser.getId(), teamId_Two);
 
         JSONObject predefinedResultJson = new JSONObject();
-        predefinedResultJson.put("msg", "project rejected");
+        predefinedResultJson.put("msg", "reject project OK");
 
         final String deterUserId = RandomStringUtils.randomAlphabetic(8);
         adapterDeterLab.saveDeterUserIdMapping(deterUserId, owner.getUserId());

@@ -25,7 +25,7 @@ import sg.ncl.service.registration.data.jpa.RegistrationEntity;
 import sg.ncl.service.registration.data.jpa.RegistrationRepository;
 import sg.ncl.service.registration.domain.Registration;
 import sg.ncl.service.registration.domain.RegistrationService;
-import sg.ncl.service.registration.exceptions.RegisterTeamNameDuplicateException;
+import sg.ncl.service.registration.exceptions.TeamNameDuplicateException;
 import sg.ncl.service.team.data.jpa.TeamEntity;
 import sg.ncl.service.team.domain.Team;
 import sg.ncl.service.team.domain.TeamService;
@@ -121,7 +121,7 @@ public class RegistrationServiceTestNew extends AbstractTest {
         assertThat(result.getId(), is(equalTo(registrationEntity.getId())));
     }
 
-    @Test(expected = RegisterTeamNameDuplicateException.class)
+    @Test(expected = TeamNameDuplicateException.class)
     public void registerTestApplyDuplicateTeamName() throws Exception {
         CredentialsEntity credentialsEntity = Util.getCredentialsEntity();
         User user = Util.getUserEntity();
