@@ -9,8 +9,6 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.ui.freemarker.FreeMarkerTemplateUtils;
 import sg.ncl.adapter.deterlab.AdapterDeterLab;
 import sg.ncl.common.DomainProperties;
-import sg.ncl.adapter.deterlab.ConnectionProperties;
-import sg.ncl.adapter.deterlab.data.jpa.DeterLabUserRepository;
 import sg.ncl.service.authentication.domain.Credentials;
 import sg.ncl.service.authentication.domain.CredentialsService;
 import sg.ncl.service.authentication.web.CredentialsInfo;
@@ -178,7 +176,7 @@ public class RegistrationServiceImpl implements RegistrationService {
             log.warn("Credentials password is empty");
             throw new UserFormException();
         }
-        if (isJoinTeam == true) {
+        if (isJoinTeam) {
             if (team.getId() == null || team.getId().isEmpty()) {
                 log.warn("Apply to join team: Team ID is null or empty!");
                 throw new UserFormException();
@@ -216,7 +214,7 @@ public class RegistrationServiceImpl implements RegistrationService {
         // create the credentials after creating the users
         final CredentialsInfo credentialsInfo = new CredentialsInfo(userId, credentials.getUsername(), credentials.getPassword(), null);
         credentialsService.addCredentials(credentialsInfo);
-        log.info("Register new user: create new credentials", credentials.getUsername());
+        log.info("Register new user: created new credentials", credentials.getUsername());
 
         TeamMemberEntity teamMemberEntity = new TeamMemberEntity();
         teamMemberEntity.setUserId(userId);
@@ -224,9 +222,9 @@ public class RegistrationServiceImpl implements RegistrationService {
         teamMemberEntity.setMemberType(isJoinTeam? MemberType.MEMBER : MemberType.OWNER);
         teamMemberInfo = new TeamMemberInfo(teamMemberEntity);
 
-        log.info("Register new user: adding user {} to team {}", user.getUserDetails().getEmail(), team.getName());
         userService.addTeam(userId, teamId);
         teamService.addMember(teamId, teamMemberInfo);
+        log.info("Register new user: added user {} to team {}", user.getUserDetails().getEmail(), team.getName());
 
         JSONObject userObject = new JSONObject();
         userObject.put("firstName", user.getUserDetails().getFirstName());
