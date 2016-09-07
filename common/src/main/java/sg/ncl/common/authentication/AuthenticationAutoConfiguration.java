@@ -54,17 +54,10 @@ public class AuthenticationAutoConfiguration extends WebSecurityConfigurerAdapte
                 .antMatchers("/favicon.ico").permitAll()
                 .antMatchers("**/*.html").permitAll()
                 .antMatchers("**/*.css").permitAll()
-                .antMatchers("**/*.js").permitAll()
-                .antMatchers("/login").permitAll().and();
-        http
-                .authorizeRequests().antMatchers("/authentication").permitAll();
-        http
-                .authorizeRequests().antMatchers("/credentials").permitAll();
+                .antMatchers("**/*.js").permitAll();
         http
                 // TODO add authentication
-                .authorizeRequests().anyRequest().authenticated().and();
-        http
-                .addFilterBefore(new JwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class);
+                .authorizeRequests().anyRequest().permitAll().and();
     }
 
     private String getUrl() {
