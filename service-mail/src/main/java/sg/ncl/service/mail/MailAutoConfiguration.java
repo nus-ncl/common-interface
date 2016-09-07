@@ -67,13 +67,11 @@ public class MailAutoConfiguration {
     }
 
     TaskExecutor taskExecutor() {
-        final ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
-        return executor;
+        return new ThreadPoolTaskExecutor();
     }
 
     TaskScheduler taskScheduler() {
-        final ThreadPoolTaskScheduler scheduler = new ThreadPoolTaskScheduler();
-        return scheduler;
+        return new ThreadPoolTaskScheduler();
     }
 
 }

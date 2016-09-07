@@ -11,3 +11,8 @@ spring:
       starttls:
         enable: true
       auth: true
+ncl:
+  mail:
+    delay: 300000
+    interval: 600000
+    retry: 3
