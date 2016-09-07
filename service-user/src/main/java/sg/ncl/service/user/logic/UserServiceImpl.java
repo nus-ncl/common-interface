@@ -71,6 +71,10 @@ public class UserServiceImpl implements UserService {
     public UserStatus verifyEmail(@NotNull String uid, @NotNull String email, @NotNull String key) {
 
         final UserEntity user = findUser(uid);
+        if(user == null) {
+            log.warn("User not found when verify email: {}", uid);
+            throw new UserNotFoundException(uid);
+        }
         if (!email.equals(user.getUserDetails().getEmail())) {
             log.warn("Email not match. Expected: {}, received: {}", user.getUserDetails().getEmail(), email);
             throw new EmailNotMatchException("expected: " + user.getUserDetails().getEmail() +
@@ -196,6 +200,10 @@ public class UserServiceImpl implements UserService {
     @Transactional
     public User updateUserStatus(final String id, final UserStatus status) {
         UserEntity one = findUser(id);
+        if(one == null) {
+            log.warn("User not found when update status: {}", id);
+            throw new UserNotFoundException(id);
+        }
         switch (status) {
             case CREATED:
                 throw new InvalidStatusTransitionException(one.getStatus() + " -> " + status);
