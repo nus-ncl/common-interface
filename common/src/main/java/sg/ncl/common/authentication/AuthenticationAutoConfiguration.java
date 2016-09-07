@@ -45,6 +45,8 @@ public class AuthenticationAutoConfiguration extends WebSecurityConfigurerAdapte
     public FilterRegistrationBean jwtFilter(JwtFilter jwtFilter) {
         final FilterRegistrationBean registrationBean = new FilterRegistrationBean();
         registrationBean.setFilter(jwtFilter);
+        // these are the endpoints that require to verify authentication header
+        registrationBean.addUrlPatterns("/teams/*");
         registrationBean.addUrlPatterns("/users/*");
         registrationBean.addUrlPatterns("/experiments/*");
         registrationBean.addUrlPatterns("/realizations/*");
