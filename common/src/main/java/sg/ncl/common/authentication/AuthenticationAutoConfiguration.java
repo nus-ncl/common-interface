@@ -4,8 +4,11 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
+import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Import;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -14,6 +17,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 
 import javax.inject.Inject;
 import javax.validation.constraints.NotNull;
+import java.security.Key;
 
 /**
  * Initializes a {@link PasswordEncoder} and configures {@link HttpSecurity}.
@@ -24,6 +28,7 @@ import javax.validation.constraints.NotNull;
 @Configuration
 @ConditionalOnClass({BCryptPasswordEncoder.class, HttpSecurity.class})
 @EnableConfigurationProperties(AuthenticationProperties.class)
+@Import(JwtFilter.class)
 @Slf4j
 public class AuthenticationAutoConfiguration extends WebSecurityConfigurerAdapter {
 
@@ -37,6 +42,16 @@ public class AuthenticationAutoConfiguration extends WebSecurityConfigurerAdapte
     }
 
     @Bean
+    public FilterRegistrationBean jwtFilter(JwtFilter jwtFilter) {
+        final FilterRegistrationBean registrationBean = new FilterRegistrationBean();
+        registrationBean.setFilter(jwtFilter);
+        registrationBean.addUrlPatterns("/users/*");
+        registrationBean.addUrlPatterns("/experiments/*");
+        registrationBean.addUrlPatterns("/realizations/*");
+        return registrationBean;
+    }
+
+    @Bean
     @ConditionalOnMissingBean(PasswordEncoder.class)
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
@@ -47,17 +62,17 @@ public class AuthenticationAutoConfiguration extends WebSecurityConfigurerAdapte
         http
                 .csrf().disable()
                 .formLogin().disable();
-        http
-                .authorizeRequests().antMatchers(getUrl()).permitAll().and();
-        http
-                .authorizeRequests().antMatchers("/").permitAll()
-                .antMatchers("/favicon.ico").permitAll()
-                .antMatchers("**/*.html").permitAll()
-                .antMatchers("**/*.css").permitAll()
-                .antMatchers("**/*.js").permitAll();
+//        http
+//                .authorizeRequests().antMatchers(getUrl()).permitAll().and();
+//        http
+//                .authorizeRequests().antMatchers("/").permitAll()
+//                .antMatchers("/favicon.ico").permitAll()
+//                .antMatchers("**/*.html").permitAll()
+//                .antMatchers("**/*.css").permitAll()
+//                .antMatchers("**/*.js").permitAll();
         http
                 // TODO add authentication
-                .authorizeRequests().anyRequest().permitAll().and();
+                .authorizeRequests().antMatchers(getUrl()).permitAll();
     }
 
     private String getUrl() {
