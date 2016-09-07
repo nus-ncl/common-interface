@@ -6,7 +6,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.authentication.AbstractAuthenticationProcessingFilter;
-import sg.ncl.common.jwt.JwtAutoConfiguration;
 
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
@@ -35,6 +34,7 @@ public class JwtAuthenticationFilter extends AbstractAuthenticationProcessingFil
 
         if (header != null && header.startsWith("Basic")) {
             log.info("Do basic login without token: {}", header);
+            return null;
         } else if (header == null || !header.startsWith("Bearer ")) {
             log.warn("No JWT token found in request headers");
         }
@@ -46,7 +46,9 @@ public class JwtAuthenticationFilter extends AbstractAuthenticationProcessingFil
         log.info("Issuer: {}", claims.getIssuer());
         log.info("Issued At: {}", claims.getIssuedAt());
         log.info("Expiration: {}", claims.getExpiration());
-        return null;
+
+        JwtAuthenticationToken token = new JwtAuthenticationToken(authToken);
+        return getAuthenticationManager().authenticate(token);
     }
 
     @Override

@@ -57,6 +57,10 @@ public class AuthenticationAutoConfiguration extends WebSecurityConfigurerAdapte
                 .antMatchers("**/*.js").permitAll()
                 .antMatchers("/login").permitAll().and();
         http
+                .authorizeRequests().antMatchers("/authentication").permitAll();
+        http
+                .authorizeRequests().antMatchers("/credentials").permitAll();
+        http
                 // TODO add authentication
                 .authorizeRequests().anyRequest().authenticated().and();
         http
