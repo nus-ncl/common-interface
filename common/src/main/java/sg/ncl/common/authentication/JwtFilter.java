@@ -24,6 +24,7 @@ public class JwtFilter extends GenericFilterBean {
 
     private Key apiKey;
     private String get = "GET";
+    private String post = "POST";
 
     @Inject
     JwtFilter(@NotNull Key apiKey) {
@@ -87,13 +88,18 @@ public class JwtFilter extends GenericFilterBean {
         chain.doFilter(req, res);
     }
 
+    /**
+     * Checks if the request URI is whitelisted, whitelisted URI do not have to be check for their Authentication Header
+     * @param req the servlet request from web service
+     * @return True if the request URI is whitelisted, returns False otherwise
+     */
     private boolean isWhitelistedUrl(ServletRequest req) {
         String requestURI = ((HttpServletRequest) req).getRequestURI();
         String requestMethod = ((HttpServletRequest) req).getMethod();
 
         if (requestURI.startsWith("/teams/") && requestMethod.equals(get)) {
             String[] param = req.getParameterValues("visibility");
-            if ( (param.length != 0) && (param[0].equals("PUBLIC"))) {
+            if ( param != null && (param.length != 0) && (param[0].equals("PUBLIC"))) {
                 log.info("Teams visibility here");
                 return true;
             }
@@ -103,7 +109,7 @@ public class JwtFilter extends GenericFilterBean {
         } else if (requestURI.startsWith("/authentication")) {
             log.info("Authentication here");
             return true;
-        } else if (requestURI.startsWith("/registrations")) {
+        } else if (requestURI.startsWith("/registrations") && requestMethod.equals(post)) {
             log.info("Registrations here");
             return true;
         }
