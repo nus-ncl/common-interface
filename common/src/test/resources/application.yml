@@ -15,7 +15,7 @@ spring:
         format-sql: true
 ncl:
   authentication:
-    url: "/authentications"
+    url: "/testAuthenticationsUrl"
   exception:
     mappings:
       mapping1: "value1"
