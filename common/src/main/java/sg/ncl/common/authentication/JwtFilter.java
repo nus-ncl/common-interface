@@ -41,15 +41,15 @@ public class JwtFilter extends GenericFilterBean {
         // perform some whitelist
         log.info(((HttpServletRequest) req).getRequestURI() + " : " + ((HttpServletRequest) req).getMethod());
 
-        String reqURI = ((HttpServletRequest) req).getRequestURI();
-        String method = ((HttpServletRequest) req).getMethod();
-
-        if (reqURI.startsWith("/teams/") && method.equals(get)) {
-            String[] param = req.getParameterValues("visibility");
-            if ( (param.length != 0) && (param[0].equals("PUBLIC"))) {
-                chain.doFilter(req, res);
-            }
-        }
+//        String reqURI = ((HttpServletRequest) req).getRequestURI();
+//        String method = ((HttpServletRequest) req).getMethod();
+//
+//        if (reqURI.startsWith("/teams/") && method.equals(get)) {
+//            String[] param = req.getParameterValues("visibility");
+//            if ( (param.length != 0) && (param[0].equals("PUBLIC"))) {
+//                chain.doFilter(req, res);
+//            }
+//        }
 
         final String authHeader = request.getHeader("Authorization");
         if (authHeader == null || !authHeader.startsWith("Bearer ")) {

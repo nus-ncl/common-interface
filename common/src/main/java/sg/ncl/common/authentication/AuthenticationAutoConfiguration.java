@@ -9,7 +9,9 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -46,10 +48,10 @@ public class AuthenticationAutoConfiguration extends WebSecurityConfigurerAdapte
         final FilterRegistrationBean registrationBean = new FilterRegistrationBean();
         registrationBean.setFilter(jwtFilter);
         // these are the endpoints that require to verify authentication header
-        registrationBean.addUrlPatterns("/teams/*");
-        registrationBean.addUrlPatterns("/users/*");
-        registrationBean.addUrlPatterns("/experiments/*");
-        registrationBean.addUrlPatterns("/realizations/*");
+//        registrationBean.addUrlPatterns("/teams/*");
+//        registrationBean.addUrlPatterns("/users/*");
+//        registrationBean.addUrlPatterns("/experiments/*");
+//        registrationBean.addUrlPatterns("/realizations/*");
         return registrationBean;
     }
 
@@ -64,17 +66,26 @@ public class AuthenticationAutoConfiguration extends WebSecurityConfigurerAdapte
         http
                 .csrf().disable()
                 .formLogin().disable();
-//        http
-//                .authorizeRequests().antMatchers(getUrl()).permitAll().and();
-//        http
-//                .authorizeRequests().antMatchers("/").permitAll()
-//                .antMatchers("/favicon.ico").permitAll()
-//                .antMatchers("**/*.html").permitAll()
-//                .antMatchers("**/*.css").permitAll()
-//                .antMatchers("**/*.js").permitAll();
+
         http
-                // TODO add authentication
                 .authorizeRequests().antMatchers(getUrl()).permitAll();
+        http
+                .authorizeRequests()
+                    .antMatchers(HttpMethod.POST, "/teams/*").authenticated()
+                    .antMatchers(HttpMethod.PUT, "/teams/*").authenticated()
+                    .antMatchers(HttpMethod.POST, "/users/*").authenticated()
+                    .antMatchers(HttpMethod.PUT, "/users/*").authenticated()
+                    .antMatchers("/experiments/*").authenticated();
+    }
+
+    @Override
+    public void configure(WebSecurity web) throws Exception {
+        web
+                .ignoring()
+                    .antMatchers(HttpMethod.GET, "/teams/?visibility=PUBLIC")
+                    .antMatchers(HttpMethod.GET, "/users/*")
+                    .antMatchers("/authentication")
+                    .antMatchers("/registrations");
     }
 
     private String getUrl() {
