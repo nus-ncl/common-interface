@@ -8,11 +8,9 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.filter.GenericFilterBean;
 
 import javax.inject.Inject;
-import javax.servlet.FilterChain;
-import javax.servlet.ServletException;
-import javax.servlet.ServletRequest;
-import javax.servlet.ServletResponse;
+import javax.servlet.*;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import javax.validation.constraints.NotNull;
 import java.io.IOException;
 import java.security.Key;
@@ -62,8 +60,14 @@ public class JwtFilter extends GenericFilterBean {
             chain.doFilter(req, res);
         }
 
+        if (reqURI.startsWith("/registrations")) {
+            log.info("Registrations here");
+            chain.doFilter(req, res);
+        }
+
         final String authHeader = request.getHeader("Authorization");
         if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+            log.warn("Missing or invalid Authorization header: {}", authHeader);
             throw new ServletException("Missing or invalid Authorization header.");
         }
 
