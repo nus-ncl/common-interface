@@ -6,20 +6,16 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
-import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 import javax.inject.Inject;
 import javax.validation.constraints.NotNull;
-import java.security.Key;
 
 /**
  * Initializes a {@link PasswordEncoder} and configures {@link HttpSecurity}.
@@ -64,29 +60,38 @@ public class AuthenticationAutoConfiguration extends WebSecurityConfigurerAdapte
     @Override
     protected void configure(final HttpSecurity http) throws Exception {
         http
-                .csrf().disable()
-                .formLogin().disable();
+                .csrf().disable() // RESTful APIs are immune to CSRF
+                .formLogin().disable() // not needed for RESTful APIs
+                .logout().disable() // not needed for RESTful APIs
+                .openidLogin().disable() // not using OpenID
+                .rememberMe().disable() // JWT do not need to remember me
+                .requestCache().disable() // RESTful APIs should not require caching
+                .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS).and() // RESTful APIs should be stateless
+                .x509().disable(); // not using x509
 
         http
-                .authorizeRequests().antMatchers(getUrl()).permitAll();
-        http
-                .authorizeRequests()
-                    .antMatchers(HttpMethod.POST, "/teams/*").authenticated()
-                    .antMatchers(HttpMethod.PUT, "/teams/*").authenticated()
-                    .antMatchers(HttpMethod.POST, "/users/*").authenticated()
-                    .antMatchers(HttpMethod.PUT, "/users/*").authenticated()
-                    .antMatchers("/experiments/*").authenticated();
+                .authorizeRequests().anyRequest().permitAll();
+
+////        http
+////                .authorizeRequests().antMatchers(getUrl()).permitAll();
+//        http
+//                .authorizeRequests()
+//                .antMatchers(HttpMethod.POST, "/teams/*").authenticated()
+//                .antMatchers(HttpMethod.PUT, "/teams/*").authenticated()
+//                .antMatchers(HttpMethod.POST, "/users/*").authenticated()
+//                .antMatchers(HttpMethod.PUT, "/users/*").authenticated()
+//                .antMatchers("/experiments/*").authenticated();
     }
 
-    @Override
-    public void configure(WebSecurity web) throws Exception {
-        web
-                .ignoring()
-                    .antMatchers(HttpMethod.GET, "/teams/?visibility=PUBLIC")
-                    .antMatchers(HttpMethod.GET, "/users/*")
-                    .antMatchers("/authentication")
-                    .antMatchers("/registrations");
-    }
+//    @Override
+//    public void configure(WebSecurity web) throws Exception {
+//        web
+//                .ignoring()
+//                .antMatchers(HttpMethod.GET, "/teams/?visibility=PUBLIC")
+//                .antMatchers(HttpMethod.GET, "/users/*")
+//                .antMatchers("/authentication")
+//                .antMatchers("/registrations");
+//    }
 
     private String getUrl() {
         final String url = properties.getUrl();
