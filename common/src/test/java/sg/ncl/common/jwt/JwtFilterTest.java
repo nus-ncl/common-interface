@@ -259,4 +259,201 @@ public class JwtFilterTest {
         }
     }
 
+    @Test
+    public void testPostRegisterRequestToApplyTeam() throws Exception {
+        HttpServletRequest request = mock(HttpServletRequest.class);
+        HttpServletResponse response = mock(HttpServletResponse.class);
+        FilterChain filterChain = mock(FilterChain.class);
+
+        String id = RandomStringUtils.randomAlphanumeric(20);
+
+        when(request.getRequestURI()).thenReturn("/registrations/newTeam/" + id);
+        when(request.getMethod()).thenReturn("POST");
+
+        try {
+            jwtFilter.doFilter(request, response, filterChain);
+        } catch (ServletException e) {
+            assertThat(e.getMessage(), is("Missing or invalid Authorization header."));
+        }
+    }
+
+    @Test
+    public void testPostRegisterRequestToJoinTeam() throws Exception {
+        HttpServletRequest request = mock(HttpServletRequest.class);
+        HttpServletResponse response = mock(HttpServletResponse.class);
+        FilterChain filterChain = mock(FilterChain.class);
+
+        String id = RandomStringUtils.randomAlphanumeric(20);
+
+        when(request.getRequestURI()).thenReturn("/registrations/joinApplications");
+        when(request.getMethod()).thenReturn("POST");
+
+        try {
+            jwtFilter.doFilter(request, response, filterChain);
+        } catch (ServletException e) {
+            assertThat(e.getMessage(), is("Missing or invalid Authorization header."));
+        }
+    }
+
+    @Test
+    public void testPostApproveJoinRequest() throws Exception {
+        HttpServletRequest request = mock(HttpServletRequest.class);
+        HttpServletResponse response = mock(HttpServletResponse.class);
+        FilterChain filterChain = mock(FilterChain.class);
+
+        String id = RandomStringUtils.randomAlphanumeric(20);
+        String userId = RandomStringUtils.randomAlphabetic(8);
+
+        when(request.getRequestURI()).thenReturn("/registrations/teams/" + id + "/members/" + userId);
+        when(request.getMethod()).thenReturn("POST");
+
+        try {
+            jwtFilter.doFilter(request, response, filterChain);
+        } catch (ServletException e) {
+            assertThat(e.getMessage(), is("Missing or invalid Authorization header."));
+        }
+    }
+
+    @Test
+    public void testDeleteApproveJoinRequest() throws Exception {
+        HttpServletRequest request = mock(HttpServletRequest.class);
+        HttpServletResponse response = mock(HttpServletResponse.class);
+        FilterChain filterChain = mock(FilterChain.class);
+
+        String id = RandomStringUtils.randomAlphanumeric(20);
+        String userId = RandomStringUtils.randomAlphabetic(8);
+
+        when(request.getRequestURI()).thenReturn("/registrations/teams/" + id + "/members/" + userId);
+        when(request.getMethod()).thenReturn("DELETE");
+
+        try {
+            jwtFilter.doFilter(request, response, filterChain);
+        } catch (ServletException e) {
+            assertThat(e.getMessage(), is("Missing or invalid Authorization header."));
+        }
+    }
+
+    @Test
+    public void testPostApproveRejectJoinTeam() throws Exception {
+        HttpServletRequest request = mock(HttpServletRequest.class);
+        HttpServletResponse response = mock(HttpServletResponse.class);
+        FilterChain filterChain = mock(FilterChain.class);
+
+        String id = RandomStringUtils.randomAlphanumeric(20);
+        String userId = RandomStringUtils.randomAlphabetic(8);
+
+        when(request.getRequestURI()).thenReturn("/registrations/teams/" + id + "/owner/" + userId + "/?status=APPROVE");
+        when(request.getMethod()).thenReturn("POST");
+
+        try {
+            jwtFilter.doFilter(request, response, filterChain);
+        } catch (ServletException e) {
+            assertThat(e.getMessage(), is("Missing or invalid Authorization header."));
+        }
+    }
+
+    @Test
+    public void testGetDeterUID() throws Exception {
+        HttpServletRequest request = mock(HttpServletRequest.class);
+        HttpServletResponse response = mock(HttpServletResponse.class);
+        FilterChain filterChain = mock(FilterChain.class);
+
+        String id = RandomStringUtils.randomAlphanumeric(20);
+
+        when(request.getRequestURI()).thenReturn("/registrations/user/" + id);
+        when(request.getMethod()).thenReturn("GET");
+
+        try {
+            jwtFilter.doFilter(request, response, filterChain);
+        } catch (ServletException e) {
+            assertThat(e.getMessage(), is("Missing or invalid Authorization header."));
+        }
+    }
+
+    @Test
+    public void testPostCreateTeam() throws Exception {
+        HttpServletRequest request = mock(HttpServletRequest.class);
+        HttpServletResponse response = mock(HttpServletResponse.class);
+        FilterChain filterChain = mock(FilterChain.class);
+
+        when(request.getRequestURI()).thenReturn("/teams/");
+        when(request.getMethod()).thenReturn("POST");
+
+        try {
+            jwtFilter.doFilter(request, response, filterChain);
+        } catch (ServletException e) {
+            assertThat(e.getMessage(), is("Missing or invalid Authorization header."));
+        }
+    }
+
+    @Test
+    public void testGetAllTeams() throws Exception {
+        HttpServletRequest request = mock(HttpServletRequest.class);
+        HttpServletResponse response = mock(HttpServletResponse.class);
+        FilterChain filterChain = mock(FilterChain.class);
+
+        when(request.getRequestURI()).thenReturn("/teams/");
+        when(request.getMethod()).thenReturn("GET");
+
+        try {
+            jwtFilter.doFilter(request, response, filterChain);
+        } catch (ServletException e) {
+            assertThat(e.getMessage(), is("Missing or invalid Authorization header."));
+        }
+    }
+
+    @Test
+    public void testGetTeamById() throws Exception {
+        HttpServletRequest request = mock(HttpServletRequest.class);
+        HttpServletResponse response = mock(HttpServletResponse.class);
+        FilterChain filterChain = mock(FilterChain.class);
+
+        String id = RandomStringUtils.randomAlphanumeric(20);
+
+        when(request.getRequestURI()).thenReturn("/teams/" + id);
+        when(request.getMethod()).thenReturn("GET");
+
+        try {
+            jwtFilter.doFilter(request, response, filterChain);
+        } catch (ServletException e) {
+            assertThat(e.getMessage(), is("Missing or invalid Authorization header."));
+        }
+    }
+
+    @Test
+    public void testPutUpdateTeam() throws Exception {
+        HttpServletRequest request = mock(HttpServletRequest.class);
+        HttpServletResponse response = mock(HttpServletResponse.class);
+        FilterChain filterChain = mock(FilterChain.class);
+
+        String id = RandomStringUtils.randomAlphanumeric(20);
+
+        when(request.getRequestURI()).thenReturn("/teams/" + id);
+        when(request.getMethod()).thenReturn("PUT");
+
+        try {
+            jwtFilter.doFilter(request, response, filterChain);
+        } catch (ServletException e) {
+            assertThat(e.getMessage(), is("Missing or invalid Authorization header."));
+        }
+    }
+
+    @Test
+    public void testPostAddTeamMember() throws Exception {
+        HttpServletRequest request = mock(HttpServletRequest.class);
+        HttpServletResponse response = mock(HttpServletResponse.class);
+        FilterChain filterChain = mock(FilterChain.class);
+
+        String id = RandomStringUtils.randomAlphanumeric(20);
+
+        when(request.getRequestURI()).thenReturn("/teams/" + id + "/members");
+        when(request.getMethod()).thenReturn("POST");
+
+        try {
+            jwtFilter.doFilter(request, response, filterChain);
+        } catch (ServletException e) {
+            assertThat(e.getMessage(), is("Missing or invalid Authorization header."));
+        }
+    }
+
 }
