@@ -456,4 +456,40 @@ public class JwtFilterTest {
         }
     }
 
+    @Test
+    public void testPutUpdateUsers() throws Exception {
+        HttpServletRequest request = mock(HttpServletRequest.class);
+        HttpServletResponse response = mock(HttpServletResponse.class);
+        FilterChain filterChain = mock(FilterChain.class);
+
+        String id = RandomStringUtils.randomAlphanumeric(20);
+
+        when(request.getRequestURI()).thenReturn("/users/" + id);
+        when(request.getMethod()).thenReturn("PUT");
+
+        try {
+            jwtFilter.doFilter(request, response, filterChain);
+        } catch (ServletException e) {
+            assertThat(e.getMessage(), is("Missing or invalid Authorization header."));
+        }
+    }
+
+    @Test
+    public void testPostUsersAddTeam() throws Exception {
+        HttpServletRequest request = mock(HttpServletRequest.class);
+        HttpServletResponse response = mock(HttpServletResponse.class);
+        FilterChain filterChain = mock(FilterChain.class);
+
+        String id = RandomStringUtils.randomAlphanumeric(20);
+
+        when(request.getRequestURI()).thenReturn("/users/" + id + "/teams");
+        when(request.getMethod()).thenReturn("POST");
+
+        try {
+            jwtFilter.doFilter(request, response, filterChain);
+        } catch (ServletException e) {
+            assertThat(e.getMessage(), is("Missing or invalid Authorization header."));
+        }
+    }
+
 }
