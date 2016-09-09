@@ -13,6 +13,16 @@ spring:
       hibernate:
         dialect: org.hibernate.dialect.H2Dialect
         format-sql: true
+  mail:
+    host: smtp-relay.gmail.com
+    port: 465
+    username: ${gmail.username}
+    password: ${gmail.password}
+    protocol: smtps
+    properties:
+      starttls:
+        enable: true
+      auth: true
 ncl:
   jwt:
     apiKey: 123
@@ -23,3 +33,4 @@ ncl:
     adapter:
       ip: localhost
       port: 8181
+  domain: dev.ncl.sg

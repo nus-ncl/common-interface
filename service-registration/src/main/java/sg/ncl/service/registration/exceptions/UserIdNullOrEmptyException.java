@@ -7,5 +7,5 @@ import sg.ncl.common.exception.base.NotFoundException;
 /**
  * @author by Desmond / Te Ye
  */
-@ResponseStatus(code = HttpStatus.NOT_FOUND, reason = "Team id is empty")
-public class RegisterTeamIdEmptyException extends NotFoundException {}
+@ResponseStatus(code = HttpStatus.NOT_FOUND, reason = "Uid is null")
+public class UserIdNullOrEmptyException extends NotFoundException {}

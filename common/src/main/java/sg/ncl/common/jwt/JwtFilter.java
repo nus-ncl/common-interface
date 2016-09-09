@@ -7,7 +7,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.filter.GenericFilterBean;
 
 import javax.inject.Inject;
-import javax.servlet.*;
+import javax.servlet.FilterChain;
+import javax.servlet.ServletException;
+import javax.servlet.ServletRequest;
+import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.constraints.NotNull;
 import java.io.IOException;
@@ -50,8 +53,7 @@ public class JwtFilter extends GenericFilterBean {
                 final Claims claims = Jwts.parser().setSigningKey(apiKey)
                         .parseClaimsJws(token).getBody();
                 request.setAttribute("claims", claims);
-            }
-            catch (final SignatureException e) {
+            } catch (final SignatureException e) {
                 log.warn("Invalid token: {}", e);
                 throw new ServletException("Invalid token.");
             }
@@ -61,6 +63,7 @@ public class JwtFilter extends GenericFilterBean {
 
     /**
      * Checks if the request URI is whitelisted, whitelisted URI do not have to be check for their Authentication Header
+     *
      * @param req the servlet request from web service
      * @return True if the request URI is whitelisted, returns False otherwise
      */
@@ -71,11 +74,11 @@ public class JwtFilter extends GenericFilterBean {
         if (requestURI.startsWith("/teams/") && requestMethod.equals(get)) {
             String[] param = req.getParameterValues("visibility");
             String[] nameParam = req.getParameterValues("name");
-            if ( param != null && (param.length != 0) && (param[0].equals("PUBLIC"))) {
+            if (param != null && (param.length != 0) && (param[0].equals("PUBLIC"))) {
                 log.info("Whitelist: {} - {}", requestURI, requestMethod);
                 return true;
             }
-            if ( nameParam != null && (nameParam.length != 0)) {
+            if (nameParam != null && (nameParam.length != 0)) {
                 log.info("Whitelist: {} - {}", requestURI, requestMethod);
                 return true;
             }

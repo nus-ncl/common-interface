@@ -85,7 +85,6 @@ public class UserEntityTest {
         assertThat(userEntity.getStatus(), is(equalTo(UserStatus.APPROVED)));
     }
 
-
     @Test
     public void testGetRegistrationDate() throws Exception {
         final UserEntity userEntity = new UserEntity();

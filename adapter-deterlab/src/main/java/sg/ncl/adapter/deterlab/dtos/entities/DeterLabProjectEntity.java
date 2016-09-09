@@ -4,7 +4,11 @@ import org.hibernate.annotations.GenericGenerator;
 import sg.ncl.adapter.deterlab.domain.DeterLabProject;
 import sg.ncl.common.jpa.AbstractEntity;
 
-import javax.persistence.*;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
+import javax.persistence.Table;
 
 /**
  * Created by Te Ye on 16-Jun-16.

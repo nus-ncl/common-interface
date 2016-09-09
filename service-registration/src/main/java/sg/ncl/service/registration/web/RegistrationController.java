@@ -1,8 +1,17 @@
 package sg.ncl.service.registration.web;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.bind.annotation.RestController;
 import sg.ncl.service.registration.domain.Registration;
 import sg.ncl.service.registration.domain.RegistrationService;
 import sg.ncl.service.team.domain.TeamStatus;
@@ -15,6 +24,7 @@ import java.util.Map;
 /**
  * @author Te Ye & Desmond
  */
+@Slf4j
 @RestController
 @RequestMapping(path = "/registrations", produces = MediaType.APPLICATION_JSON_VALUE)
 public class RegistrationController {

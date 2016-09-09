@@ -65,7 +65,6 @@ public class FirstRun {
         this.passwordEncoder = passwordEncoder;
     }
 
-
     private String createTeam(String teamName, String description, String organizationType, String url, final TeamPrivacy privacy, final TeamStatus status, final TeamVisibility visibility) throws SQLException {
         // insert the team
         final String id = randomUUID().toString();
@@ -138,7 +137,6 @@ public class FirstRun {
         log.info("Insert {} credentials entry", i);
     }
 
-
     // add user to team for both user side and team side
     private void addToTeam(String userId, String teamId, MemberType memberType, MemberStatus memberStatus) throws SQLException {
         // insert into user side
@@ -163,6 +161,7 @@ public class FirstRun {
                 "credentials",
                 "deterlab_project",
                 "deterlab_user",
+                "email_retries",
                 "experiments",
                 "login_activities",
                 "realizations",

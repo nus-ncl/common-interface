@@ -10,7 +10,6 @@ import sg.ncl.common.exception.ExceptionAutoConfiguration;
 import sg.ncl.common.jpa.UseJpa;
 import sg.ncl.common.jwt.JwtAutoConfiguration;
 
-
 /**
  * @author Christopher Zhong
  */

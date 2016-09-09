@@ -57,10 +57,11 @@ public class RealizationServiceImpl implements RealizationService {
 
     /**
      * Retrieves the live status of experiments' status from Deterlab
-     * @implNote DB Sync issue cannot be avoided due to dependency of results from Deterlab before we can update our own DB
-     * @param teamName the team whose experiments that are of interest
+     *
+     * @param teamName     the team whose experiments that are of interest
      * @param experimentId the experiment name to get status
      * @return the realization entity object that contains the updated experiment status and report pulled from Deterlab. Defaults status to not running if there are any connection errors to Deterlab.
+     * @implNote DB Sync issue cannot be avoided due to dependency of results from Deterlab before we can update our own DB
      */
     @Transactional
     @Override
@@ -130,10 +131,11 @@ public class RealizationServiceImpl implements RealizationService {
     /**
      * Starts an experiment in Deterlab (allocate resources and swapped-in).
      * The experiment from Deterlab will generate a report which states the Qualified Name, IP Address, Link Delay .etc
-     * @implNote DB sync not an issue since experiment status and report will be re-updated when users refresh the page
+     *
      * @param teamName the team to start the exp for
-     * @param expId the experiment name to start, e.g. demo, Identical experiment names are allow for different teams
+     * @param expId    the experiment name to start, e.g. demo, Identical experiment names are allow for different teams
      * @return the realization entity object that contains the updated experiment status and report pulled from Deterlab
+     * @implNote DB sync not an issue since experiment status and report will be re-updated when users refresh the page
      */
     @Transactional
     public RealizationEntity startExperimentInDeter(final String teamName, final String expId) {
@@ -182,10 +184,11 @@ public class RealizationServiceImpl implements RealizationService {
     /**
      * Stops an experiment in Deterlab (de-allocate resources and swapped-out).
      * The realization entity report will be clear.
-     * @implNote DB sync not an issue since experiment status and report will be re-updated when users refresh the page
+     *
      * @param teamName the team to stop the exp
-     * @param expId the experiment name to stop
+     * @param expId    the experiment name to stop
      * @return the realization entity object that contains the updated experiment status and with empty report
+     * @implNote DB sync not an issue since experiment status and report will be re-updated when users refresh the page
      */
     @Transactional
     public RealizationEntity stopExperimentInDeter(final String teamName, final String expId) {

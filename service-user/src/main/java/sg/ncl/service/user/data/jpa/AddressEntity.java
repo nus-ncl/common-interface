@@ -39,6 +39,17 @@ public class AddressEntity extends AbstractEntity implements Address {
     @Column(name = "zip_code", nullable = false)
     private String zipCode;
 
+    public static AddressEntity get(final Address address) {
+        final AddressEntity entity = new AddressEntity();
+        entity.setAddress1(address.getAddress1());
+        entity.setAddress2(address.getAddress2());
+        entity.setCountry(address.getCountry());
+        entity.setRegion(address.getRegion());
+        entity.setCity(address.getCity());
+        entity.setZipCode(address.getZipCode());
+        return entity;
+    }
+
     public Long getId() {
         return id;
     }
@@ -112,17 +123,6 @@ public class AddressEntity extends AbstractEntity implements Address {
                 ", city='" + city + '\'' +
                 ", zipCode='" + zipCode + '\'' +
                 "} " + super.toString();
-    }
-
-    public static AddressEntity get(final Address address) {
-        final AddressEntity entity = new AddressEntity();
-        entity.setAddress1(address.getAddress1());
-        entity.setAddress2(address.getAddress2());
-        entity.setCountry(address.getCountry());
-        entity.setRegion(address.getRegion());
-        entity.setCity(address.getCity());
-        entity.setZipCode(address.getZipCode());
-        return entity;
     }
 
 }

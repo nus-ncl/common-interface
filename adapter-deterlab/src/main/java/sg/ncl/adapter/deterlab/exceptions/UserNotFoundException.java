@@ -8,4 +8,7 @@ import sg.ncl.common.exception.base.NotFoundException;
  */
 @ResponseStatus(reason = "User not found")
 public class UserNotFoundException extends NotFoundException {
+    public UserNotFoundException(final String message) {
+        super(message);
+    }
 }

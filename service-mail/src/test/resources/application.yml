@@ -1,0 +1,18 @@
+# Spring Boot Configuration
+# For more information, please read http://docs.spring.io/spring-boot/docs/current/reference/html/index.html
+spring:
+  mail:
+    host: smtp-relay.gmail.com
+    port: 465
+    username: ${gmail.username}
+    password: ${gmail.password}
+    protocol: smtps
+    properties:
+      starttls:
+        enable: true
+      auth: true
+ncl:
+  mail:
+    delay: 300000
+    interval: 600000
+    retry: 3

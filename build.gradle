@@ -17,6 +17,9 @@ plugins {
 }
 apply plugin: 'spring-boot'
 
+ext {
+    hash = System.getenv('TRAVIS_COMMIT') == null ? 'SNAPSHOT' : "git rev-parse --short ${System.getenv('TRAVIS_COMMIT')}".execute().text.trim()
+}
 // settings for all projects
 allprojects {
     apply plugin: 'java'
@@ -25,7 +28,7 @@ allprojects {
 
     group 'sg.ncl'
 
-    version "1-${System.getenv('TRAVIS_COMMIT') ?: 'SNAPSHOT'}"
+    version "1-${hash}"
 
     sourceCompatibility = JavaVersion.VERSION_1_8
     targetCompatibility = JavaVersion.VERSION_1_8
@@ -105,7 +108,8 @@ bintray {
     user = System.getenv('BINTRAY_USER')
     key = System.getenv('BINTRAY_KEY')
     configurations = ['archives']
-    publish = true
+    dryRun = System.getenv('TRAVIS_BRANCH') != 'master' || System.getenv('TRAVIS_PULL_REQUEST') != 'false'
+    publish = System.getenv('TRAVIS_BRANCH') == 'master' && System.getenv('TRAVIS_PULL_REQUEST') == 'false'
     pkg {
         repo = 'generic'
         name = 'services-in-one'

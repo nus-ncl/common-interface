@@ -35,38 +35,48 @@ import java.util.List;
 @Slf4j
 public class UserEntity extends AbstractEntity implements User {
 
-    @OneToMany(cascade = CascadeType.ALL)
-    @JoinColumn(name = "user_id")
-    private final List<LoginActivityEntity> loginActivities = new ArrayList<>();
-    @ElementCollection
-    @CollectionTable(name = "users_teams", joinColumns = @JoinColumn(name = "user_id", nullable = false, updatable = false), indexes = {@Index(columnList = "user_id"), @Index(columnList = "team_id")}, uniqueConstraints = @UniqueConstraint(columnNames = {"user_id", "team_id"}))
-    @Column(name = "team_id", nullable = false, updatable = false)
-    private final List<String> teams = new ArrayList<>();
     @Id
     @GeneratedValue(generator = "uuid2")
     @GenericGenerator(name = "uuid2", strategy = "uuid2")
     @Column(name = "id", nullable = false, unique = true, updatable = false)
     private String id;
+
     @OneToOne(optional = false, cascade = CascadeType.ALL)
     @JoinColumn(name = "user_details_id", nullable = false, unique = true)
     private UserDetailsEntity userDetails;
+
     @Column(name = "is_email_verified", nullable = false)
     @Type(type = "yes_no")
     private boolean emailVerified = false;
+
+    @Column(name = "verification_key")
+    private String verificationKey;
+
     @Column(name = "status", nullable = false)
     @Enumerated(EnumType.STRING)
     private UserStatus status = UserStatus.CREATED;
+
     @Column(name = "application_date", nullable = false)
     private ZonedDateTime applicationDate;
+
     @Column(name = "processed_date")
     private ZonedDateTime processedDate;
+
+    @OneToMany(cascade = CascadeType.ALL)
+    @JoinColumn(name = "user_id")
+    private final List<LoginActivityEntity> loginActivities = new ArrayList<>();
+
+    @ElementCollection
+    @CollectionTable(name = "users_teams", joinColumns = @JoinColumn(name = "user_id", nullable = false, updatable = false), indexes = {@Index(columnList = "user_id"), @Index(columnList = "team_id")}, uniqueConstraints = @UniqueConstraint(columnNames = {"user_id", "team_id"}))
+    @Column(name = "team_id", nullable = false, updatable = false)
+    private final List<String> teams = new ArrayList<>();
 
     @Override
     public String getId() {
         return id;
     }
 
-    void setId(final String id) {
+    public void setId(final String id) {
         this.id = id;
     }
 
@@ -84,8 +94,17 @@ public class UserEntity extends AbstractEntity implements User {
         return emailVerified;
     }
 
-    void setEmailVerified(final boolean emailVerified) {
+    public void setEmailVerified(final boolean emailVerified) {
         this.emailVerified = emailVerified;
+    }
+
+    @Override
+    public String getVerificationKey() {
+        return verificationKey;
+    }
+
+    public void setVerificationKey(String verificationKey) {
+        this.verificationKey = verificationKey;
     }
 
     @Override
@@ -169,10 +188,12 @@ public class UserEntity extends AbstractEntity implements User {
                 ", userDetails=" + userDetails +
                 ", emailVerified=" + emailVerified +
                 ", status=" + status +
+                ", verificationKey=" + verificationKey +
                 ", applicationDate=" + applicationDate +
                 ", processedDate=" + processedDate +
                 ", loginActivities=" + loginActivities +
                 ", teams=" + teams +
                 "} " + super.toString();
     }
+
 }

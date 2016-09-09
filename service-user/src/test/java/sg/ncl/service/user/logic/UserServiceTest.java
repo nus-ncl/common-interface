@@ -16,7 +16,7 @@ import sg.ncl.service.user.domain.UserDetails;
 import sg.ncl.service.user.domain.UserService;
 import sg.ncl.service.user.domain.UserStatus;
 import sg.ncl.service.user.exceptions.InvalidStatusTransitionException;
-import sg.ncl.service.user.exceptions.UserIdNullException;
+import sg.ncl.service.user.exceptions.UserIdNullOrEmptyException;
 import sg.ncl.service.user.exceptions.UserNotFoundException;
 import sg.ncl.service.user.exceptions.UsernameAlreadyExistsException;
 
@@ -52,22 +52,23 @@ public class UserServiceTest extends AbstractTest {
         Assert.assertThat(userList2, IsIterableContainingInAnyOrder.containsInAnyOrder(userArray));
     }
 
-    @Test(expected = UserIdNullException.class)
+    @Test(expected = UserIdNullOrEmptyException.class)
     public void getUserWithNullIdTest() throws Exception {
         UserService userService = new UserServiceImpl(userRepository);
         userService.getUser(null);
     }
 
-    @Test(expected = UserIdNullException.class)
+    @Test(expected = UserIdNullOrEmptyException.class)
     public void getUserWithEmptyIdTest() throws Exception {
         UserService userService = new UserServiceImpl(userRepository);
         userService.getUser("");
     }
 
-    @Test(expected = UserNotFoundException.class)
+    @Test
     public void findUserWithNoUserInDbTest() throws Exception {
         UserService userService = new UserServiceImpl(userRepository);
-        userService.getUser(RandomStringUtils.randomAlphabetic(20));
+        User one = userService.getUser(RandomStringUtils.randomAlphabetic(20));
+        Assert.assertEquals(one, null);
     }
 
     @Test
@@ -133,14 +134,14 @@ public class UserServiceTest extends AbstractTest {
         userService.updateUser(savedUserEntity.getId(), savedUserEntity);
     }
 
-    @Test(expected = UserIdNullException.class)
+    @Test(expected = UserIdNullOrEmptyException.class)
     public void updateUserNullIdTest() throws Exception {
         UserService userService = new UserServiceImpl(userRepository);
         UserEntity userEntity = new UserEntity();
         userService.updateUser(null, userEntity);
     }
 
-    @Test(expected = UserIdNullException.class)
+    @Test(expected = UserIdNullOrEmptyException.class)
     public void updateUserEmptyIdTest() throws Exception {
         UserService userService = new UserServiceImpl(userRepository);
         UserEntity userEntity = new UserEntity();
@@ -192,7 +193,7 @@ public class UserServiceTest extends AbstractTest {
         userService.createUser(userEntity);
     }
 
-    @Test(expected = UserIdNullException.class)
+    @Test(expected = UserIdNullOrEmptyException.class)
     public void removeUserFromTeamTestUserIdNull() throws Exception {
         UserService userService = new UserServiceImpl(userRepository);
         userService.removeTeam(null, RandomStringUtils.randomAlphanumeric(20));

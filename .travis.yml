@@ -23,10 +23,12 @@ cache:
 before_install:
   - chmod +x gradlew # ensure that the gradlew script is executable
 
-install: true
+install:
+  - ./gradlew --stacktrace printInfo # output some versioning info
 
 script:
-  - ./gradlew --continue --stacktrace build sonarqube jacocoTestReport coveralls #
+  - ./gradlew --continue --stacktrace --profile build
+  - ./gradlew --stacktrace sonarqube jacocoTestReport coveralls
 
 after_success:
-  - if [[ "$TRAVIS_BRANCH" == "master" && "$TRAVIS_PULL_REQUEST" == "false" ]]; then ./gradlew bootRepackage bintrayUpload; fi;
+  - ./gradlew --stacktrace bootRepackage bintrayUpload # use bootRepackage to fix issue with Spring Boot

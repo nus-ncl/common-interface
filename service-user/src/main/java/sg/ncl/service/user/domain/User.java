@@ -32,6 +32,13 @@ public interface User {
     boolean isEmailVerified();
 
     /**
+     * Returns a {@link String} that represents the randomly generated key of this {@link User}.
+     *
+     * @return a {@link String} that represents the randomly generated key of this {@link User}.
+     */
+    String getVerificationKey();
+
+    /**
      * Returns the {@link UserStatus} of this {@link User}.
      *
      * @return the {@link UserStatus} of this {@link User}.

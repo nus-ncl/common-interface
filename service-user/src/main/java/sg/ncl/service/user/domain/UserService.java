@@ -19,6 +19,8 @@ public interface UserService {
 
     void removeTeam(final String userId, final String teamId);
 
+    UserStatus verifyEmail(final String uid, final String email, final String key);
+
     User updateUserStatus(String id, UserStatus status);
 
 }

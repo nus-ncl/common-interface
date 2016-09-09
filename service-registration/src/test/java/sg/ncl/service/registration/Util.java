@@ -64,6 +64,8 @@ public class Util {
     public static UserEntity getUserEntity() {
         final UserEntity userEntity = new UserEntity();
         userEntity.setApplicationDate(ZonedDateTime.now());
+        userEntity.setVerificationKey(RandomStringUtils.randomAlphanumeric(20));
+
         userEntity.setStatus(UserStatus.PENDING);
         final UserDetailsEntity userDetailsEntity = new UserDetailsEntity();
         userDetailsEntity.setFirstName(RandomStringUtils.randomAlphabetic(20));

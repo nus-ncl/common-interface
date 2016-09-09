@@ -75,7 +75,6 @@ public class RealizationServiceTest extends AbstractTest {
         Assert.assertNotNull(realizationEntityDb);
     }
 
-
     @Test
     public void testRealizationWithWrongExperimentId() {
 
@@ -126,7 +125,6 @@ public class RealizationServiceTest extends AbstractTest {
         Assert.assertThat(realizationEntityDb.getState(), is(RealizationState.RUNNING));
         Assert.assertThat(realizationEntityDb.getDetails(), is("ok"));
     }
-
 
     @Test
     public void testSaveRealization() {
