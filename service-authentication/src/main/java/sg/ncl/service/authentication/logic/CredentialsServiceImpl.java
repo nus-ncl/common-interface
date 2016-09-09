@@ -10,6 +10,7 @@ import sg.ncl.service.authentication.data.jpa.CredentialsRepository;
 import sg.ncl.service.authentication.domain.Credentials;
 import sg.ncl.service.authentication.domain.CredentialsService;
 import sg.ncl.service.authentication.domain.CredentialsStatus;
+import sg.ncl.service.authentication.domain.Role;
 import sg.ncl.service.authentication.exceptions.CredentialsNotFoundException;
 import sg.ncl.service.authentication.exceptions.UserIdAlreadyExistsException;
 import sg.ncl.service.authentication.exceptions.UsernameAlreadyExistsException;
@@ -20,7 +21,6 @@ import javax.validation.constraints.NotNull;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static sg.ncl.service.authentication.validation.Validator.check;
 import static sg.ncl.service.authentication.validation.Validator.checkId;
 import static sg.ncl.service.authentication.validation.Validator.checkPassword;
 import static sg.ncl.service.authentication.validation.Validator.checkRoles;
@@ -55,7 +55,9 @@ public class CredentialsServiceImpl implements CredentialsService {
     @Transactional
     @Override
     public Credentials addCredentials(@NotNull final Credentials credentials) {
-        check(credentials);
+        checkId(credentials);
+        checkUsername(credentials);
+        checkPassword(credentials);
         // check if the user id already exists
         if (credentialsRepository.findOne(credentials.getId()) == null) {
             // check if the username already exists
@@ -65,7 +67,7 @@ public class CredentialsServiceImpl implements CredentialsService {
                 entity.setUsername(credentials.getUsername());
                 hashPassword(entity, credentials.getPassword());
                 entity.setStatus(CredentialsStatus.ACTIVE);
-                credentials.getRoles().forEach(entity::addRole);
+                entity.addRole(Role.USER);
                 final CredentialsEntity saved = credentialsRepository.save(entity);
                 log.info("Credentials created: {}", saved);
                 return saved;
@@ -78,30 +80,27 @@ public class CredentialsServiceImpl implements CredentialsService {
     }
 
     @Transactional
-    @Deprecated
     @Override
-    // FIXME break into two methods, updateUsername, and updatePassword
     public Credentials updateCredentials(@NotNull final String id, @NotNull final Credentials credentials) {
         validateForUpdate(credentials);
-        final CredentialsEntity entity = findCredentials(credentials);
+        final CredentialsEntity entity = findCredentials(id);
         if (credentials.getUsername() != null && !credentials.getUsername().isEmpty()) {
             entity.setUsername(credentials.getUsername());
         }
         if (credentials.getPassword() != null && !credentials.getPassword().isEmpty()) {
             hashPassword(entity, credentials.getPassword());
+            changePassword(id, credentials.getPassword());
         }
-
-        final CredentialsEntity savedEntity = credentialsRepository.save(entity);
-        changePassword(id, credentials.getPassword());
-        log.info("Credentials updated: {}", savedEntity);
-        return savedEntity;
+        final CredentialsEntity saved = credentialsRepository.save(entity);
+        log.info("Credentials updated: {}", saved);
+        return saved;
     }
 
     @Transactional
     @Override
-    public Credentials updateUsername(@NotNull final Credentials credentials) {
+    public Credentials updateUsername(@NotNull final String id, @NotNull final Credentials credentials) {
         checkUsername(credentials);
-        final CredentialsEntity entity = findCredentials(credentials);
+        final CredentialsEntity entity = findCredentials(id);
         entity.setUsername(credentials.getUsername());
         final CredentialsEntity saved = credentialsRepository.save(entity);
         log.info("Username updated: {}", saved);
@@ -110,9 +109,9 @@ public class CredentialsServiceImpl implements CredentialsService {
 
     @Transactional
     @Override
-    public Credentials updatePassword(@NotNull final Credentials credentials) {
+    public Credentials updatePassword(@NotNull final String id, @NotNull final Credentials credentials) {
         checkPassword(credentials);
-        final CredentialsEntity entity = findCredentials(credentials);
+        final CredentialsEntity entity = findCredentials(id);
         hashPassword(entity, credentials.getPassword());
         changePassword(credentials.getId(), credentials.getPassword());
         final CredentialsEntity saved = credentialsRepository.save(entity);
@@ -122,9 +121,9 @@ public class CredentialsServiceImpl implements CredentialsService {
 
     @Transactional
     @Override
-    public Credentials updateStatus(@NotNull final Credentials credentials) {
+    public Credentials updateStatus(@NotNull final String id, @NotNull final Credentials credentials) {
         checkStatus(credentials);
-        final CredentialsEntity entity = findCredentials(credentials);
+        final CredentialsEntity entity = findCredentials(id);
         entity.setStatus(credentials.getStatus());
         final CredentialsEntity saved = credentialsRepository.save(entity);
         log.info("Status updated: {}", saved);
@@ -133,9 +132,9 @@ public class CredentialsServiceImpl implements CredentialsService {
 
     @Transactional
     @Override
-    public Credentials addRoles(@NotNull final Credentials credentials) {
+    public Credentials addRoles(@NotNull final String id, @NotNull final Credentials credentials) {
         checkRoles(credentials);
-        final CredentialsEntity entity = findCredentials(credentials);
+        final CredentialsEntity entity = findCredentials(id);
         credentials.getRoles().forEach(entity::addRole);
         final CredentialsEntity saved = credentialsRepository.save(entity);
         log.info("Roles added: {}", saved);
@@ -144,22 +143,21 @@ public class CredentialsServiceImpl implements CredentialsService {
 
     @Transactional
     @Override
-    public Credentials removeRoles(@NotNull final Credentials credentials) {
+    public Credentials removeRoles(@NotNull final String id, @NotNull final Credentials credentials) {
         checkRoles(credentials);
-        final CredentialsEntity entity = findCredentials(credentials);
+        final CredentialsEntity entity = findCredentials(id);
         credentials.getRoles().forEach(entity::removeRole);
         final CredentialsEntity saved = credentialsRepository.save(entity);
         log.info("Roles removed: {}", saved);
         return saved;
     }
 
-    private CredentialsEntity findCredentials(final Credentials credentials) {
-        checkId(credentials);
-        final CredentialsEntity entity = credentialsRepository.findOne(credentials.getId());
+    private CredentialsEntity findCredentials(final String id) {
+        final CredentialsEntity entity = credentialsRepository.findOne(id);
         // check if the username exists
         if (entity == null) {
-            log.warn("Credentials for '{}' not found", credentials.getId());
-            throw new CredentialsNotFoundException(credentials.getId());
+            log.warn("Credentials for '{}' not found", id);
+            throw new CredentialsNotFoundException(id);
         }
         return entity;
     }

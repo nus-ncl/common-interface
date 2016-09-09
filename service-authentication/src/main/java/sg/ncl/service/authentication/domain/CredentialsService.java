@@ -11,17 +11,16 @@ public interface CredentialsService {
 
     Credentials addCredentials(Credentials credentials);
 
-    @Deprecated
     Credentials updateCredentials(String id, Credentials credentials);
 
-    Credentials updateUsername(Credentials credentials);
+    Credentials updateUsername(String id, Credentials credentials);
 
-    Credentials updatePassword(Credentials credentials);
+    Credentials updatePassword(String id, Credentials credentials);
 
-    Credentials updateStatus(Credentials credentials);
+    Credentials updateStatus(String id, Credentials credentials);
 
-    Credentials addRoles(Credentials credentials);
+    Credentials addRoles(String id, Credentials credentials);
 
-    Credentials removeRoles(Credentials credentials);
+    Credentials removeRoles(String id, Credentials credentials);
 
 }
