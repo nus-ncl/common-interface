@@ -1,34 +1,23 @@
 package sg.ncl.common.jwt;
 
-import io.jsonwebtoken.SignatureAlgorithm;
 import org.apache.commons.lang3.RandomStringUtils;
-import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.http.HttpMethod;
-import org.springframework.http.HttpStatus;
-import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import javax.inject.Inject;
-import javax.servlet.Filter;
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
-import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.security.Key;
-import java.time.Duration;
 
 import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.*;
-import static sg.ncl.common.jwt.JwtAutoConfiguration.*;
 
 /**
  * @author Te Ye
@@ -187,6 +176,81 @@ public class JwtFilterTest {
 
         when(request.getRequestURI()).thenReturn("/experiments/" + expId + "/teams/" + teamName);
         when(request.getMethod()).thenReturn("DELETE");
+
+        try {
+            jwtFilter.doFilter(request, response, filterChain);
+        } catch (ServletException e) {
+            assertThat(e.getMessage(), is("Missing or invalid Authorization header."));
+        }
+    }
+
+    @Test
+    public void testGetRealization() throws Exception {
+        HttpServletRequest request = mock(HttpServletRequest.class);
+        HttpServletResponse response = mock(HttpServletResponse.class);
+        FilterChain filterChain = mock(FilterChain.class);
+
+        String id = RandomStringUtils.randomAlphanumeric(20);
+
+        when(request.getRequestURI()).thenReturn("/realizations/" + id);
+        when(request.getMethod()).thenReturn("GET");
+
+        try {
+            jwtFilter.doFilter(request, response, filterChain);
+        } catch (ServletException e) {
+            assertThat(e.getMessage(), is("Missing or invalid Authorization header."));
+        }
+    }
+
+    @Test
+    public void testGetRealizationByExperimentId() throws Exception {
+        HttpServletRequest request = mock(HttpServletRequest.class);
+        HttpServletResponse response = mock(HttpServletResponse.class);
+        FilterChain filterChain = mock(FilterChain.class);
+
+        String expId = RandomStringUtils.randomAlphanumeric(20);
+        String teamName = RandomStringUtils.randomAlphabetic(8);
+
+        when(request.getRequestURI()).thenReturn("/realizations/team" + teamName + "/experiment/" + expId);
+        when(request.getMethod()).thenReturn("GET");
+
+        try {
+            jwtFilter.doFilter(request, response, filterChain);
+        } catch (ServletException e) {
+            assertThat(e.getMessage(), is("Missing or invalid Authorization header."));
+        }
+    }
+
+    @Test
+    public void testPostStartExperiment() throws Exception {
+        HttpServletRequest request = mock(HttpServletRequest.class);
+        HttpServletResponse response = mock(HttpServletResponse.class);
+        FilterChain filterChain = mock(FilterChain.class);
+
+        String expId = RandomStringUtils.randomAlphanumeric(20);
+        String teamName = RandomStringUtils.randomAlphabetic(8);
+
+        when(request.getRequestURI()).thenReturn("/realizations/start/team/" + teamName + "/experiment/" + expId);
+        when(request.getMethod()).thenReturn("POST");
+
+        try {
+            jwtFilter.doFilter(request, response, filterChain);
+        } catch (ServletException e) {
+            assertThat(e.getMessage(), is("Missing or invalid Authorization header."));
+        }
+    }
+
+    @Test
+    public void testPostStopExperiment() throws Exception {
+        HttpServletRequest request = mock(HttpServletRequest.class);
+        HttpServletResponse response = mock(HttpServletResponse.class);
+        FilterChain filterChain = mock(FilterChain.class);
+
+        String expId = RandomStringUtils.randomAlphanumeric(20);
+        String teamName = RandomStringUtils.randomAlphabetic(8);
+
+        when(request.getRequestURI()).thenReturn("/realizations/stop/team/" + teamName + "/experiment/" + expId);
+        when(request.getMethod()).thenReturn("POST");
 
         try {
             jwtFilter.doFilter(request, response, filterChain);
