@@ -10,13 +10,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import sg.ncl.common.jwt.JwtFilter;
 
-import javax.inject.Inject;
-
-import static org.hamcrest.Matchers.instanceOf;
-import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.not;
-import static org.hamcrest.Matchers.nullValue;
-import static org.junit.Assert.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * Created by Chris on 8/6/2016.
@@ -27,23 +21,22 @@ public class AuthenticationAutoConfigurationTest {
     public MockitoRule mockito = MockitoJUnit.rule();
     @Mock
     private AuthenticationProperties properties;
-
-    @Inject
-    private JwtFilter jwtFilter;
+    @Mock
+    private JwtFilter filter;
 
     private AuthenticationAutoConfiguration configuration;
 
     @Before
     public void before() {
-        configuration = new AuthenticationAutoConfiguration(properties, jwtFilter);
+        configuration = new AuthenticationAutoConfiguration(properties, filter);
     }
 
     @Test
     public void testPasswordEncoder() throws Exception {
         final PasswordEncoder encoder = configuration.passwordEncoder();
 
-        assertThat(encoder, is(not(nullValue(PasswordEncoder.class))));
-        assertThat(encoder, is(instanceOf(BCryptPasswordEncoder.class)));
+        assertThat(encoder).isNotNull();
+        assertThat(encoder).isInstanceOf(BCryptPasswordEncoder.class);
     }
 
 }
