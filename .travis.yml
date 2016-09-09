@@ -31,4 +31,4 @@ script:
   - ./gradlew --stacktrace sonarqube jacocoTestReport coveralls
 
 after_success:
-  - ./gradlew --stacktrace bintrayUpload
+  - ./gradlew --stacktrace bootRepackage bintrayUpload # use bootRepackage to fix issue with Spring Boot
