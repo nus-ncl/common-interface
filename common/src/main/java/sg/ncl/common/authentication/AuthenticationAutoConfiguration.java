@@ -4,17 +4,16 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
-import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
-import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import sg.ncl.common.jwt.JwtFilter;
 
 import javax.inject.Inject;
 import javax.validation.constraints.NotNull;
@@ -28,30 +27,31 @@ import javax.validation.constraints.NotNull;
 @Configuration
 @ConditionalOnClass({BCryptPasswordEncoder.class, HttpSecurity.class})
 @EnableConfigurationProperties(AuthenticationProperties.class)
-@Import(JwtFilter.class)
 @Slf4j
 public class AuthenticationAutoConfiguration extends WebSecurityConfigurerAdapter {
 
     private static final String DEFAULT_URL = "/authentications";
 
     private final AuthenticationProperties properties;
+    private final JwtFilter jwtFilter;
 
     @Inject
-    AuthenticationAutoConfiguration(@NotNull final AuthenticationProperties properties) {
+    AuthenticationAutoConfiguration(@NotNull final AuthenticationProperties properties, @NotNull final JwtFilter jwtFilter) {
         this.properties = properties;
+        this.jwtFilter = jwtFilter;
     }
 
-    @Bean
-    public FilterRegistrationBean jwtFilter(JwtFilter jwtFilter) {
-        final FilterRegistrationBean registrationBean = new FilterRegistrationBean();
-        registrationBean.setFilter(jwtFilter);
-        // these are the endpoints that require to verify authentication header
-//        registrationBean.addUrlPatterns("/teams/*");
-//        registrationBean.addUrlPatterns("/users/*");
-//        registrationBean.addUrlPatterns("/experiments/*");
-//        registrationBean.addUrlPatterns("/realizations/*");
-        return registrationBean;
-    }
+//    @Bean
+//    public FilterRegistrationBean jwtFilter(JwtFilter jwtFilter) {
+//        final FilterRegistrationBean registrationBean = new FilterRegistrationBean();
+//        registrationBean.setFilter(jwtFilter);
+//        // these are the endpoints that require to verify authentication header
+////        registrationBean.addUrlPatterns("/teams/*");
+////        registrationBean.addUrlPatterns("/users/*");
+////        registrationBean.addUrlPatterns("/experiments/*");
+////        registrationBean.addUrlPatterns("/realizations/*");
+//        return registrationBean;
+//    }
 
     @Bean
     @ConditionalOnMissingBean(PasswordEncoder.class)
@@ -73,6 +73,8 @@ public class AuthenticationAutoConfiguration extends WebSecurityConfigurerAdapte
 
         http
                 .authorizeRequests().anyRequest().permitAll();
+        http
+                .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
 
 //        http
 //                .authorizeRequests().antMatchers(getUrl()).permitAll();

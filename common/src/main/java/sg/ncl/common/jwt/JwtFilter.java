@@ -1,4 +1,4 @@
-package sg.ncl.common.authentication;
+package sg.ncl.common.jwt;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
@@ -10,7 +10,6 @@ import org.springframework.web.filter.GenericFilterBean;
 import javax.inject.Inject;
 import javax.servlet.*;
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import javax.validation.constraints.NotNull;
 import java.io.IOException;
 import java.security.Key;
@@ -18,7 +17,6 @@ import java.security.Key;
 /**
  * @author Te Ye
  */
-@Component
 @Slf4j
 public class JwtFilter extends GenericFilterBean {
 
@@ -40,32 +38,6 @@ public class JwtFilter extends GenericFilterBean {
         // perform some whitelist
         log.info(((HttpServletRequest) req).getRequestURI() + " : " + ((HttpServletRequest) req).getMethod());
 
-//        String reqURI = ((HttpServletRequest) req).getRequestURI();
-//        String method = ((HttpServletRequest) req).getMethod();
-
-//        if (reqURI.startsWith("/teams/") && method.equals(get)) {
-//            String[] param = req.getParameterValues("visibility");
-//            if ( (param.length != 0) && (param[0].equals("PUBLIC"))) {
-//                log.info("Teams visibility here");
-//                chain.doFilter(req, res);
-//            }
-//        }
-//
-//        if (reqURI.startsWith("/users/") && method.equals(get)) {
-//            log.info("Users get here");
-//            chain.doFilter(req, res);
-//        }
-
-//        if (reqURI.startsWith("/authentication")) {
-//            log.info("Authentication here");
-//            chain.doFilter(req, res);
-//        }
-
-//        if (reqURI.startsWith("/registrations")) {
-//            log.info("Registrations here");
-//            chain.doFilter(req, res);
-//        }
-
         if (!isWhitelistedUrl(req)) {
             final String authHeader = request.getHeader("Authorization");
             if (authHeader == null || !authHeader.startsWith("Bearer ")) {
@@ -74,7 +46,7 @@ public class JwtFilter extends GenericFilterBean {
             }
 
             final String token = authHeader.substring(7); // The part after "Bearer "
-            log.info("Login with Authorization: {}", authHeader);
+            log.info("Send request with Authorization: {} to {}", authHeader, ((HttpServletRequest) req).getRequestURI());
             try {
                 final Claims claims = Jwts.parser().setSigningKey(apiKey)
                         .parseClaimsJws(token).getBody();
@@ -99,18 +71,23 @@ public class JwtFilter extends GenericFilterBean {
 
         if (requestURI.startsWith("/teams/") && requestMethod.equals(get)) {
             String[] param = req.getParameterValues("visibility");
+            String[] nameParam = req.getParameterValues("name");
             if ( param != null && (param.length != 0) && (param[0].equals("PUBLIC"))) {
-                log.info("Teams visibility here");
+                log.info("Whitelist: {} - {}", requestURI, requestMethod);
+                return true;
+            }
+            if ( nameParam != null && (nameParam.length != 0)) {
+                log.info("Whitelist: {} - {}", requestURI, requestMethod);
                 return true;
             }
         } else if (requestURI.startsWith("/users/") && requestMethod.equals(get)) {
-            log.info("Users get here");
+            log.info("Whitelist: {} - {}", requestURI, requestMethod);
             return true;
         } else if (requestURI.startsWith("/authentication")) {
-            log.info("Authentication here");
+            log.info("Whitelist: {} - {}", requestURI, requestMethod);
             return true;
         } else if (requestURI.startsWith("/registrations") && requestMethod.equals(post)) {
-            log.info("Registrations here");
+            log.info("Whitelist: {} - {}", requestURI, requestMethod);
             return true;
         }
         return false;
