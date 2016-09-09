@@ -4,6 +4,9 @@ dependencies {
     compile project(':service-authentication')
     compile project(':service-team')
     compile project(':service-user')
+    compile project(':service-mail')
+
+    compile 'org.springframework.boot:spring-boot-starter-freemarker'
 
     runtime 'mysql:mysql-connector-java'
 

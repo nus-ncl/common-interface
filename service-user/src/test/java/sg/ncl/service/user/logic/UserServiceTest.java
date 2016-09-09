@@ -23,8 +23,6 @@ import sg.ncl.service.user.exceptions.UsernameAlreadyExistsException;
 import javax.inject.Inject;
 import java.util.List;
 
-import static org.hamcrest.CoreMatchers.is;
-
 /**
  * @author Desmond
  */

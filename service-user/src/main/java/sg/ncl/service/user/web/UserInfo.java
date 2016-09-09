@@ -20,6 +20,7 @@ public class UserInfo implements User {
     private final String id;
     private final UserDetailsInfo userDetails;
     private final boolean emailVerified;
+    private final String verificationKey;
     private final UserStatus status;
     private final Set<Role> roles;
     private final ZonedDateTime applicationDate;
@@ -32,9 +33,10 @@ public class UserInfo implements User {
             @JsonProperty("id") final String id,
             @JsonProperty("userDetails") final UserDetailsInfo userDetails,
             @JsonProperty("emailVerified") final boolean emailVerified,
+            @JsonProperty("verificationKey") final String verificationKey,
             @JsonProperty("status") final UserStatus status,
             @JsonProperty("roles") final Set<Role> roles,
-            @JsonProperty("applicationDate")final ZonedDateTime applicationDate,
+            @JsonProperty("applicationDate") final ZonedDateTime applicationDate,
             @JsonProperty("processedDate") final ZonedDateTime processedDate,
             @JsonProperty("loginActivities") final List<? extends LoginActivity> loginActivities,
             @JsonProperty("teams") final List<String> teams
@@ -42,6 +44,7 @@ public class UserInfo implements User {
         this.id = id;
         this.userDetails = userDetails;
         this.emailVerified = emailVerified;
+        this.verificationKey = verificationKey;
         this.status = status;
         this.roles = roles;
         this.applicationDate = applicationDate;
@@ -55,6 +58,7 @@ public class UserInfo implements User {
                 user.getId(),
                 new UserDetailsInfo(user.getUserDetails()),
                 user.isEmailVerified(),
+                user.getVerificationKey(),
                 user.getStatus(),
                 user.getRoles(),
                 user.getApplicationDate(),

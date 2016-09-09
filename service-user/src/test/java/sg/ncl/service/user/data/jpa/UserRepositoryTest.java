@@ -22,11 +22,10 @@ import static sg.ncl.common.test.Checks.checkException;
  */
 public class UserRepositoryTest extends AbstractTest {
 
-    @Inject
-    private UserRepository repository;
-
     @Rule
     public final ExpectedException exception = ExpectedException.none();
+    @Inject
+    private UserRepository repository;
 
     @Test
     public void testRepositoryExists() throws Exception {

@@ -1,6 +1,7 @@
 package sg.ncl.service.user.logic;
 
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.RandomStringUtils;
 import org.springframework.stereotype.Service;
 import sg.ncl.service.user.data.jpa.UserDetailsEntity;
 import sg.ncl.service.user.data.jpa.UserEntity;
@@ -10,13 +11,16 @@ import sg.ncl.service.user.domain.User;
 import sg.ncl.service.user.domain.UserService;
 import sg.ncl.service.user.exceptions.UserIdNullOrEmptyException;
 import sg.ncl.service.user.domain.UserStatus;
+import sg.ncl.service.user.exceptions.EmailNotMatchException;
 import sg.ncl.service.user.exceptions.InvalidStatusTransitionException;
 import sg.ncl.service.user.exceptions.InvalidUserStatusException;
 import sg.ncl.service.user.exceptions.UserNotFoundException;
 import sg.ncl.service.user.exceptions.UsernameAlreadyExistsException;
+import sg.ncl.service.user.exceptions.VerificationKeyNotMatchException;
 
 import javax.inject.Inject;
 import javax.transaction.Transactional;
+import javax.validation.constraints.NotNull;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -45,6 +49,9 @@ public class UserServiceImpl implements UserService {
         userEntity.setProcessedDate(user.getProcessedDate());
         userEntity.setUserDetails((UserDetailsEntity) user.getUserDetails());
         userEntity.addRole(User.Role.USER);
+
+        userEntity.setVerificationKey(RandomStringUtils.randomAlphanumeric(20));
+
         UserEntity savedUserEntity = userRepository.save(userEntity);
         return savedUserEntity;
     }
@@ -57,6 +64,36 @@ public class UserServiceImpl implements UserService {
     @Transactional
     public User getUser(final String id) {
         return findUser(id);
+    }
+
+    @Transactional
+    @Override
+    public UserStatus verifyEmail(@NotNull String uid, @NotNull String email, @NotNull String key) {
+
+        final UserEntity user = findUser(uid);
+        if(user == null) {
+            log.warn("User not found when verify email: {}", uid);
+            throw new UserNotFoundException(uid);
+        }
+        if (!email.equals(user.getUserDetails().getEmail())) {
+            log.warn("Email not match. Expected: {}, received: {}", user.getUserDetails().getEmail(), email);
+            throw new EmailNotMatchException("expected: " + user.getUserDetails().getEmail() +
+                    ", received: " + email);
+        }
+        if (null != user.getVerificationKey() && key.equals(user.getVerificationKey())) {
+            user.setEmailVerified(true);
+            if (user.getStatus() == UserStatus.CREATED) {
+                user.setStatus(UserStatus.PENDING);
+            }
+            userRepository.save(user);
+            log.info("User {} with email {} has been verified.", uid, user.getUserDetails().getEmail());
+            return user.getStatus();
+        } else {
+            log.warn("Verification key mismatch. Expected: {}, received: {}", user.getVerificationKey(), key);
+            throw new VerificationKeyNotMatchException("expected: " + user.getVerificationKey() +
+                    ", received: " + key);
+        }
+
     }
 
     @Transactional
@@ -163,23 +200,27 @@ public class UserServiceImpl implements UserService {
     @Transactional
     public User updateUserStatus(final String id, final UserStatus status) {
         UserEntity one = findUser(id);
-        switch(status) {
+        if(one == null) {
+            log.warn("User not found when update status: {}", id);
+            throw new UserNotFoundException(id);
+        }
+        switch (status) {
             case CREATED:
                 throw new InvalidStatusTransitionException(one.getStatus() + " -> " + status);
             case PENDING:
-                if(one.getStatus().equals(UserStatus.CREATED)) {
+                if (one.getStatus().equals(UserStatus.CREATED)) {
                     return updateUserStatusInternal(one, UserStatus.PENDING);
                 } else {
                     throw new InvalidStatusTransitionException(one.getStatus() + " -> " + status);
                 }
             case APPROVED:
-                if(one.getStatus().equals(UserStatus.PENDING)) {
+                if (one.getStatus().equals(UserStatus.PENDING)) {
                     return updateUserStatusInternal(one, UserStatus.APPROVED);
                 } else {
                     throw new InvalidStatusTransitionException(one.getStatus() + " -> " + status);
                 }
             case REJECTED:
-                if(one.getStatus().equals(UserStatus.PENDING)) {
+                if (one.getStatus().equals(UserStatus.PENDING)) {
                     return updateUserStatusInternal(one, UserStatus.REJECTED);
                 } else {
                     throw new InvalidStatusTransitionException(one.getStatus() + " -> " + status);

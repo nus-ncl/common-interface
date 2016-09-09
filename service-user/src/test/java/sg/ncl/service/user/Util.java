@@ -7,8 +7,6 @@ import sg.ncl.service.user.data.jpa.UserEntity;
 import sg.ncl.service.user.domain.User;
 
 import java.time.ZonedDateTime;
-import java.util.Arrays;
-import java.util.HashSet;
 
 /**
  * Created by Te Ye on 20-Jun-16.
@@ -19,6 +17,7 @@ public class Util {
         final UserEntity userEntity = new UserEntity();
         userEntity.setApplicationDate(ZonedDateTime.now());
         userEntity.addRole(User.Role.USER);
+        userEntity.setVerificationKey(RandomStringUtils.randomAlphanumeric(20));
 
         final UserDetailsEntity userDetailsEntity = new UserDetailsEntity();
         userDetailsEntity.setFirstName(RandomStringUtils.randomAlphabetic(20));

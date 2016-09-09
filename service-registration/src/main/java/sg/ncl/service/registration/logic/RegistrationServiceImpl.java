@@ -1,16 +1,18 @@
 package sg.ncl.service.registration.logic;
 
+import freemarker.template.Template;
+import freemarker.template.TemplateException;
 import lombok.extern.slf4j.Slf4j;
 import org.json.JSONObject;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.ui.freemarker.FreeMarkerTemplateUtils;
 import sg.ncl.adapter.deterlab.AdapterDeterLab;
-import sg.ncl.adapter.deterlab.ConnectionProperties;
-import sg.ncl.adapter.deterlab.data.jpa.DeterLabUserRepository;
+import sg.ncl.common.DomainProperties;
 import sg.ncl.service.authentication.domain.Credentials;
 import sg.ncl.service.authentication.domain.CredentialsService;
 import sg.ncl.service.authentication.web.CredentialsInfo;
+import sg.ncl.service.mail.domain.MailService;
 import sg.ncl.service.registration.data.jpa.RegistrationEntity;
 import sg.ncl.service.registration.data.jpa.RegistrationRepository;
 import sg.ncl.service.registration.domain.Registration;
@@ -31,9 +33,13 @@ import sg.ncl.service.user.domain.UserStatus;
 import sg.ncl.service.user.exceptions.UserNotFoundException;
 
 import javax.inject.Inject;
+import javax.inject.Named;
 import javax.validation.constraints.NotNull;
+import java.io.IOException;
 import java.time.ZonedDateTime;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author Christopher Zhong
@@ -46,21 +52,33 @@ public class RegistrationServiceImpl implements RegistrationService {
     private final TeamService teamService;
     private final UserService userService;
     private final RegistrationRepository registrationRepository;
-
-    // FIXME: what is this autowired?
-    @Autowired
+    private final MailService mailService;
     private final AdapterDeterLab adapterDeterLab;
+    private final Template emailValidationTemplate;
+    private final DomainProperties domainProperties;
 
     @Inject
-    RegistrationServiceImpl(@NotNull final CredentialsService credentialsService, @NotNull final TeamService teamService, @NotNull final UserService userService, @NotNull final RegistrationRepository registrationRepository, final DeterLabUserRepository deterLabUserRepository, final ConnectionProperties connectionProperties) {
+    RegistrationServiceImpl(
+            @NotNull final CredentialsService credentialsService,
+            @NotNull final TeamService teamService,
+            @NotNull final UserService userService,
+            @NotNull final RegistrationRepository registrationRepository,
+            @NotNull final AdapterDeterLab adapterDeterLab,
+            @NotNull final MailService mailService,
+            @NotNull final DomainProperties domainProperties,
+            @NotNull @Named("emailValidationTemplate") final Template emailValidationTemplate
+    ) {
         this.credentialsService = credentialsService;
         this.teamService = teamService;
         this.userService = userService;
         this.registrationRepository = registrationRepository;
-        // FIXME: why is this getting replaced?
-        this.adapterDeterLab = new AdapterDeterLab(deterLabUserRepository, connectionProperties);
+        this.adapterDeterLab = adapterDeterLab;
+        this.mailService = mailService;
+        this.domainProperties = domainProperties;
+        this.emailValidationTemplate = emailValidationTemplate;
     }
 
+    @Override
     @Transactional
     // FIXME: the return type should be a proper Registration
     // for existing users to apply create a new team
@@ -108,6 +126,7 @@ public class RegistrationServiceImpl implements RegistrationService {
         return null;
     }
 
+    @Override
     @Transactional
     // for existing users to apply join an existing team
     public Registration registerRequestToJoinTeam(String nclUserId, Team team) {
@@ -145,6 +164,7 @@ public class RegistrationServiceImpl implements RegistrationService {
         return null;
     }
 
+    @Override
     @Transactional
     // for a new user to register and create a new team or join an existing team
     public Registration register(Credentials credentials, User user, Team team, boolean isJoinTeam) {
@@ -156,7 +176,7 @@ public class RegistrationServiceImpl implements RegistrationService {
             log.warn("Credentials password is empty");
             throw new UserFormException();
         }
-        if (isJoinTeam == true) {
+        if (isJoinTeam) {
             if (team.getId() == null || team.getId().isEmpty()) {
                 log.warn("Apply to join team: Team ID is null or empty!");
                 throw new UserFormException();
@@ -174,7 +194,7 @@ public class RegistrationServiceImpl implements RegistrationService {
         Team teamEntity;
         TeamMemberInfo teamMemberInfo;
 
-        if (isJoinTeam == true) {
+        if (isJoinTeam) {
             // accept the team data
             teamEntity = teamService.getTeamById(team.getId());
             teamId = team.getId();
@@ -188,12 +208,13 @@ public class RegistrationServiceImpl implements RegistrationService {
         }
 
         // accept user data from form
-        String userId = userService.createUser(user).getId();
+        User createdUser = userService.createUser(user);
+        String userId = createdUser.getId();
 
         // create the credentials after creating the users
         final CredentialsInfo credentialsInfo = new CredentialsInfo(userId, credentials.getUsername(), credentials.getPassword(), null);
         credentialsService.addCredentials(credentialsInfo);
-        log.info("Register new user: create new credentials", credentials.getUsername());
+        log.info("Register new user: created new credentials", credentials.getUsername());
 
         TeamMemberEntity teamMemberEntity = new TeamMemberEntity();
         teamMemberEntity.setUserId(userId);
@@ -201,9 +222,9 @@ public class RegistrationServiceImpl implements RegistrationService {
         teamMemberEntity.setMemberType(isJoinTeam? MemberType.MEMBER : MemberType.OWNER);
         teamMemberInfo = new TeamMemberInfo(teamMemberEntity);
 
-        log.info("Register new user: adding user {} to team {}", user.getUserDetails().getEmail(), team.getName());
         userService.addTeam(userId, teamId);
         teamService.addMember(teamId, teamMemberInfo);
+        log.info("Register new user: added user {} to team {}", user.getUserDetails().getEmail(), team.getName());
 
         JSONObject userObject = new JSONObject();
         userObject.put("firstName", user.getUserDetails().getFirstName());
@@ -222,9 +243,8 @@ public class RegistrationServiceImpl implements RegistrationService {
         userObject.put("region", user.getUserDetails().getAddress().getRegion());
         userObject.put("city", user.getUserDetails().getAddress().getCity());
         userObject.put("zipCode", user.getUserDetails().getAddress().getZipCode());
-
         String resultJSON;
-        if (isJoinTeam == true) {
+        if (isJoinTeam) {
             userObject.put("pid", teamEntity.getName());
             resultJSON = adapterDeterLab.joinProjectNewUsers(userObject.toString());
         } else {
@@ -244,6 +264,10 @@ public class RegistrationServiceImpl implements RegistrationService {
             // call deterlab adapter to store ncluid to deteruid mapping
             addNclUserIdMapping(resultJSON, userId);
             log.info("Register new user OK: uid {}, pid {}", one.getUid(), one.getPid());
+
+            // send verification email
+            sendVerificationEmail(createdUser);
+
             return one;
         } else {
             log.warn("Register new users: unreachable branch, result of registration is {}", resultJSON);
@@ -251,6 +275,7 @@ public class RegistrationServiceImpl implements RegistrationService {
         }
     }
 
+    @Override
     @Transactional
     public String approveJoinRequest(String teamId, String userId, User approver) {
         if (!teamService.isOwner(teamId, approver.getId())) {
@@ -278,6 +303,7 @@ public class RegistrationServiceImpl implements RegistrationService {
         return adapterDeterLab.processJoinRequest(one.toString());
     }
 
+    @Override
     @Transactional
     public String rejectJoinRequest(String teamId, String userId, User approver) {
         if (!teamService.isOwner(teamId, approver.getId())) {
@@ -315,6 +341,7 @@ public class RegistrationServiceImpl implements RegistrationService {
         throw new UserIsNotTeamMemberException();
     }
 
+    @Override
     @Transactional
     public String approveOrRejectNewTeam(
             final String teamId,
@@ -323,12 +350,12 @@ public class RegistrationServiceImpl implements RegistrationService {
     ) {
         // FIXME required additional parameters to validate if approver is of admin or ordinary user
 
-        if(teamId == null || teamId.isEmpty() || ownerId == null || ownerId.isEmpty()) {
+        if (teamId == null || teamId.isEmpty() || ownerId == null || ownerId.isEmpty()) {
             log.warn("Id null or empty exception. TeamId: {}, UserId: {}", teamId, ownerId);
             throw new IdNullOrEmptyException();
         }
-        if(status == null ||
-                !(status.equals(TeamStatus.APPROVED) || status.equals(TeamStatus.REJECTED))){
+        if (status == null ||
+                !(status.equals(TeamStatus.APPROVED) || status.equals(TeamStatus.REJECTED))) {
             log.warn("Invalid TeamStatus {}", status);
             throw new InvalidTeamStatusException();
         }
@@ -370,61 +397,62 @@ public class RegistrationServiceImpl implements RegistrationService {
             errorsFound = true;
         }
 
-        if (errorsFound == false && (user.getUserDetails().getFirstName() == null || user.getUserDetails().getFirstName().isEmpty())) {
+        if (!errorsFound && (user.getUserDetails().getFirstName() == null || user.getUserDetails().getFirstName().isEmpty())) {
             errorsFound = true;
         }
 
-        if (errorsFound == false && (user.getUserDetails().getLastName() == null || user.getUserDetails().getLastName().isEmpty())) {
+        if (!errorsFound && (user.getUserDetails().getLastName() == null || user.getUserDetails().getLastName().isEmpty())) {
             errorsFound = true;
         }
 
-        if (errorsFound == false && (user.getUserDetails().getJobTitle() == null || user.getUserDetails().getJobTitle().isEmpty())) {
+        if (!errorsFound && (user.getUserDetails().getJobTitle() == null || user.getUserDetails().getJobTitle().isEmpty())) {
             errorsFound = true;
         }
 
-        if (errorsFound == false && (user.getUserDetails().getEmail() == null || user.getUserDetails().getEmail().isEmpty())) {
+        if (!errorsFound && (user.getUserDetails().getEmail() == null || user.getUserDetails().getEmail().isEmpty())) {
             errorsFound = true;
         }
 
-        if (errorsFound == false && (user.getUserDetails().getPhone() == null || user.getUserDetails().getPhone().isEmpty())) {
+        if (!errorsFound && (user.getUserDetails().getPhone() == null || user.getUserDetails().getPhone().isEmpty())) {
             errorsFound = true;
         }
 
-        if (errorsFound == false && (user.getUserDetails().getInstitution() == null || user.getUserDetails().getInstitution().isEmpty())) {
+        if (!errorsFound && (user.getUserDetails().getInstitution() == null || user.getUserDetails().getInstitution().isEmpty())) {
             errorsFound = true;
         }
 
-        if (errorsFound == false && (user.getUserDetails().getInstitutionAbbreviation() == null || user.getUserDetails().getInstitutionAbbreviation().isEmpty())) {
+        if (!errorsFound && (user.getUserDetails().getInstitutionAbbreviation() == null || user.getUserDetails().getInstitutionAbbreviation().isEmpty())) {
             errorsFound = true;
         }
 
-        if (errorsFound == false && (user.getUserDetails().getInstitutionWeb() == null || user.getUserDetails().getInstitutionWeb().isEmpty())) {
+        if (!errorsFound && (user.getUserDetails().getInstitutionWeb() == null || user.getUserDetails().getInstitutionWeb().isEmpty())) {
             errorsFound = true;
         }
 
-        if (errorsFound == false && (user.getUserDetails().getAddress().getAddress1() == null || user.getUserDetails().getAddress().getAddress1().isEmpty())) {
+        if (!errorsFound && (user.getUserDetails().getAddress().getAddress1() == null || user.getUserDetails().getAddress().getAddress1().isEmpty())) {
             errorsFound = true;
         }
 
-        if (errorsFound == false && (user.getUserDetails().getAddress().getCountry() == null || user.getUserDetails().getAddress().getCountry().isEmpty())) {
+        if (!errorsFound && (user.getUserDetails().getAddress().getCountry() == null || user.getUserDetails().getAddress().getCountry().isEmpty())) {
             errorsFound = true;
         }
 
-        if (errorsFound == false && (user.getUserDetails().getAddress().getRegion() == null || user.getUserDetails().getAddress().getRegion().isEmpty())) {
+        if (!errorsFound && (user.getUserDetails().getAddress().getRegion() == null || user.getUserDetails().getAddress().getRegion().isEmpty())) {
             errorsFound = true;
         }
 
-        if (errorsFound == false && (user.getUserDetails().getAddress().getCity() == null || user.getUserDetails().getAddress().getCity().isEmpty())) {
+        if (!errorsFound && (user.getUserDetails().getAddress().getCity() == null || user.getUserDetails().getAddress().getCity().isEmpty())) {
             errorsFound = true;
         }
 
-        if (errorsFound == false && (user.getUserDetails().getAddress().getZipCode() == null || user.getUserDetails().getAddress().getZipCode().isEmpty())) {
+        if (!errorsFound && (user.getUserDetails().getAddress().getZipCode() == null || user.getUserDetails().getAddress().getZipCode().isEmpty())) {
             errorsFound = true;
         }
 
         return errorsFound;
     }
 
+    @Override
     @Transactional
     public String getDeterUid(String id) {
         return adapterDeterLab.getDeterUserIdByNclUserId(id);
@@ -477,6 +505,32 @@ public class RegistrationServiceImpl implements RegistrationService {
             log.warn("Team name duplicate entry found: {}", teamName);
             throw new TeamNameDuplicateException();
         }
+    }
+
+    private void sendVerificationEmail(User user) {
+        final Map<String, String> map = new HashMap<>();
+        map.put("firstname", user.getUserDetails().getFirstName());
+        map.put("domain", domainProperties.getDomain());
+        map.put("id", user.getId());
+        map.put("email", user.getUserDetails().getEmail());
+        map.put("key", user.getVerificationKey());
+
+        /*
+         * If sending email fails, we catch the exceptions and log them,
+         * rather than throw the exceptions. Hence, the email will not cause
+         * the main application to fail. If users cannot receive emails after
+         * a certain amount of time, they should send email to support@ncl.sg
+         */
+        try {
+            String msgText = FreeMarkerTemplateUtils.processTemplateIntoString(
+                    emailValidationTemplate, map);
+            mailService.send("testbed-ops@ncl.sg",
+                    user.getUserDetails().getEmail(),
+                    "Please Verify Your Email Account", msgText, false, null, null);
+        } catch (IOException | TemplateException e) {
+            log.warn("{}", e);
+        }
+
     }
 
 }
