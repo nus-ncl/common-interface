@@ -41,18 +41,6 @@ public class AuthenticationAutoConfiguration extends WebSecurityConfigurerAdapte
         this.jwtFilter = jwtFilter;
     }
 
-//    @Bean
-//    public FilterRegistrationBean jwtFilter(JwtFilter jwtFilter) {
-//        final FilterRegistrationBean registrationBean = new FilterRegistrationBean();
-//        registrationBean.setFilter(jwtFilter);
-//        // these are the endpoints that require to verify authentication header
-////        registrationBean.addUrlPatterns("/teams/*");
-////        registrationBean.addUrlPatterns("/users/*");
-////        registrationBean.addUrlPatterns("/experiments/*");
-////        registrationBean.addUrlPatterns("/realizations/*");
-//        return registrationBean;
-//    }
-
     @Bean
     @ConditionalOnMissingBean(PasswordEncoder.class)
     public PasswordEncoder passwordEncoder() {
@@ -75,27 +63,7 @@ public class AuthenticationAutoConfiguration extends WebSecurityConfigurerAdapte
                 .authorizeRequests().anyRequest().permitAll();
         http
                 .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
-
-//        http
-//                .authorizeRequests().antMatchers(getUrl()).permitAll();
-//        http
-//                .authorizeRequests()
-//                .antMatchers(HttpMethod.POST, "/teams/*").authenticated()
-//                .antMatchers(HttpMethod.PUT, "/teams/*").authenticated()
-//                .antMatchers(HttpMethod.POST, "/users/*").authenticated()
-//                .antMatchers(HttpMethod.PUT, "/users/*").authenticated()
-//                .antMatchers("/experiments/*").authenticated();
     }
-
-//    @Override
-//    public void configure(WebSecurity web) throws Exception {
-//        web
-//                .ignoring()
-//                .antMatchers(HttpMethod.GET, "/teams/?visibility=PUBLIC")
-//                .antMatchers(HttpMethod.GET, "/users/*")
-//                .antMatchers("/authentication")
-//                .antMatchers("/registrations");
-//    }
 
     private String getUrl() {
         final String url = properties.getUrl();
