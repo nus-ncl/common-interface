@@ -44,7 +44,6 @@ public class UserServiceImpl implements UserService {
         userEntity.setApplicationDate(user.getApplicationDate());
         userEntity.setProcessedDate(user.getProcessedDate());
         userEntity.setUserDetails((UserDetailsEntity) user.getUserDetails());
-        userEntity.addRole(User.Role.USER);
         UserEntity savedUserEntity = userRepository.save(userEntity);
         return savedUserEntity;
     }
@@ -130,14 +129,14 @@ public class UserServiceImpl implements UserService {
     @Transactional
     public void addTeam(final String userId, final String teamId) {
         UserEntity one = findUser(userId);
-        one.addTeamId(teamId);
+        one.addTeam(teamId);
         userRepository.save(one);
     }
 
     @Transactional
     public void removeTeam(final String userId, final String teamId) {
         UserEntity one = findUser(userId);
-        one.removeTeamId(teamId);
+        one.removeTeam(teamId);
         userRepository.save(one);
     }
 

@@ -11,12 +11,22 @@ import sg.ncl.adapter.deterlab.data.jpa.DeterLabUserRepository;
 import sg.ncl.adapter.deterlab.exceptions.UserNotFoundException;
 import sg.ncl.service.authentication.domain.Credentials;
 import sg.ncl.service.authentication.domain.CredentialsService;
+import sg.ncl.service.authentication.domain.CredentialsStatus;
+import sg.ncl.service.authentication.domain.Role;
 import sg.ncl.service.authentication.web.CredentialsInfo;
 import sg.ncl.service.registration.data.jpa.RegistrationEntity;
 import sg.ncl.service.registration.data.jpa.RegistrationRepository;
 import sg.ncl.service.registration.domain.Registration;
 import sg.ncl.service.registration.domain.RegistrationService;
-import sg.ncl.service.registration.exceptions.*;
+import sg.ncl.service.registration.exceptions.IdNullOrEmptyException;
+import sg.ncl.service.registration.exceptions.InvalidTeamStatusException;
+import sg.ncl.service.registration.exceptions.NoMembersInTeamException;
+import sg.ncl.service.registration.exceptions.RegisterTeamNameDuplicateException;
+import sg.ncl.service.registration.exceptions.RegisterTeamNameEmptyException;
+import sg.ncl.service.registration.exceptions.RegisterUidNullException;
+import sg.ncl.service.registration.exceptions.UserFormException;
+import sg.ncl.service.registration.exceptions.UserIsNotTeamMemberException;
+import sg.ncl.service.registration.exceptions.UserIsNotTeamOwnerException;
 import sg.ncl.service.team.data.jpa.TeamEntity;
 import sg.ncl.service.team.data.jpa.TeamMemberEntity;
 import sg.ncl.service.team.domain.MemberStatus;
@@ -34,6 +44,8 @@ import sg.ncl.service.user.domain.UserStatus;
 import javax.inject.Inject;
 import javax.validation.constraints.NotNull;
 import java.time.ZonedDateTime;
+import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
 
 /**
@@ -212,7 +224,7 @@ public class RegistrationServiceImpl implements RegistrationService {
         String userId = userService.createUser(user).getId();
 
         // create the credentials after creating the users
-        final CredentialsInfo credentialsInfo = new CredentialsInfo(userId, credentials.getUsername(), credentials.getPassword(), null);
+        final CredentialsInfo credentialsInfo = new CredentialsInfo(userId, credentials.getUsername(), credentials.getPassword(), CredentialsStatus.ACTIVE, new HashSet<>(Arrays.asList(Role.USER)));
         credentialsService.addCredentials(credentialsInfo);
         log.info("Register new users: create new credentials", credentials.getUsername());
 
@@ -291,7 +303,7 @@ public class RegistrationServiceImpl implements RegistrationService {
             throw new UserIsNotTeamOwnerException();
         }
         Team team = teamService.getTeamById(teamId);
-        if(team == null) {
+        if (team == null) {
             log.warn("Team NOT found, TeamId {}", teamId);
             throw new TeamNotFoundException(teamId);
         }
@@ -304,7 +316,7 @@ public class RegistrationServiceImpl implements RegistrationService {
         one.put("gid", pid);
         one.put("action", "approve");
         User user = userService.getUser(userId);
-        if((UserStatus.PENDING).equals(user.getStatus())) {
+        if ((UserStatus.PENDING).equals(user.getStatus())) {
             userService.updateUserStatus(userId, UserStatus.APPROVED);
         }
         teamService.updateMemberStatus(teamId, userId, MemberStatus.APPROVED);
@@ -318,7 +330,7 @@ public class RegistrationServiceImpl implements RegistrationService {
             throw new UserIsNotTeamOwnerException();
         }
         Team one = teamService.getTeamById(teamId);
-        if(one == null) {
+        if (one == null) {
             log.warn("Team NOT found, TeamId {}", teamId);
             throw new TeamNotFoundException(teamId);
         }
@@ -356,12 +368,12 @@ public class RegistrationServiceImpl implements RegistrationService {
     ) {
         // FIXME required additional parameters to validate if approver is of admin or ordinary user
 
-        if(teamId == null || teamId.isEmpty() || ownerId == null || ownerId.isEmpty()) {
+        if (teamId == null || teamId.isEmpty() || ownerId == null || ownerId.isEmpty()) {
             log.warn("Id null or empty exception. TeamId: {}, UserId: {}", teamId, ownerId);
             throw new IdNullOrEmptyException();
         }
-        if(status == null ||
-                !(status.equals(TeamStatus.APPROVED) || status.equals(TeamStatus.REJECTED))){
+        if (status == null ||
+                !(status.equals(TeamStatus.APPROVED) || status.equals(TeamStatus.REJECTED))) {
             log.warn("Invalid TeamStatus {}", status);
             throw new InvalidTeamStatusException();
         }
@@ -376,7 +388,7 @@ public class RegistrationServiceImpl implements RegistrationService {
 
         if (status.equals(TeamStatus.APPROVED)) {
             User user = userService.getUser(ownerId);
-            if((UserStatus.PENDING).equals(user.getStatus())) {
+            if ((UserStatus.PENDING).equals(user.getStatus())) {
                 userService.updateUserStatus(ownerId, UserStatus.APPROVED);
             }
             // change team owner member status

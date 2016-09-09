@@ -3,7 +3,12 @@ package sg.ncl.service.authentication.data.jpa;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.junit.Test;
 import sg.ncl.service.authentication.domain.CredentialsStatus;
+import sg.ncl.service.authentication.domain.Role;
 import sg.ncl.service.authentication.util.TestUtil;
+
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Set;
 
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.equalTo;
@@ -70,6 +75,36 @@ public class CredentialsEntityTest {
         final CredentialsEntity entity = new CredentialsEntity();
 
         assertThat(entity.getStatus(), is(equalTo(CredentialsStatus.ACTIVE)));
+    }
+
+    @Test
+    public void testGetRoles() throws Exception {
+        final CredentialsEntity entity = new CredentialsEntity();
+        Set<Role> result = new HashSet<>();
+        assertThat(entity.getRoles().isEmpty(), is(true));
+        assertThat(entity.getRoles(), is(equalTo(result)));
+    }
+
+    @Test
+    public void testAddRoles() throws Exception {
+        final CredentialsEntity entity = new CredentialsEntity();
+        entity.addRole(Role.ADMIN);
+        Set<Role> result = new HashSet<>(Arrays.asList(Role.ADMIN));
+
+        assertThat(entity.getRoles().size(), is(1));
+        assertThat(entity.getRoles(), is(equalTo(result)));
+    }
+
+    @Test
+    public void testRemoveRoles() throws Exception {
+        final CredentialsEntity entity = new CredentialsEntity();
+        entity.addRole(Role.ADMIN);
+        entity.addRole(Role.USER);
+        entity.removeRole(Role.USER);
+        Set<Role> result = new HashSet<>(Arrays.asList(Role.ADMIN));
+
+        assertThat(entity.getRoles().size(), is(1));
+        assertThat(entity.getRoles(), is(equalTo(result)));
     }
 
     @Test

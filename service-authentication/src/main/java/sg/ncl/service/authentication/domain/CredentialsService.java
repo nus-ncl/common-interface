@@ -9,8 +9,19 @@ public interface CredentialsService {
 
     List<Credentials> getAll();
 
-    Credentials addCredentials(final Credentials credentials);
+    Credentials addCredentials(Credentials credentials);
 
-    Credentials updateCredentials(final String id, final Credentials credentials);
+    @Deprecated
+    Credentials updateCredentials(String id, Credentials credentials);
+
+    Credentials updateUsername(Credentials credentials);
+
+    Credentials updatePassword(Credentials credentials);
+
+    Credentials updateStatus(Credentials credentials);
+
+    Credentials addRoles(Credentials credentials);
+
+    Credentials removeRoles(Credentials credentials);
 
 }

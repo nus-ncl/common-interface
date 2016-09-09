@@ -2,7 +2,6 @@ package sg.ncl.service.user.domain;
 
 import java.time.ZonedDateTime;
 import java.util.List;
-import java.util.Set;
 
 /**
  * The {@link User} interface represents a user.
@@ -10,15 +9,6 @@ import java.util.Set;
  * @author Christopher Zhong
  */
 public interface User {
-
-    /**
-     * The {@link Role} enumerates all the roles that a {@link User} can play.
-     *
-     * @author Te Ye
-     */
-    enum Role {
-        ADMIN, USER
-    }
 
     /**
      * Returns a {@link String} that represents the unique identifier of this {@link User}.
@@ -49,13 +39,6 @@ public interface User {
     UserStatus getStatus();
 
     /**
-     * Returns a set {@link Role}s that this {@link User} plays.
-     *
-     * @return a set {@link Role}s that this {@link User} plays.
-     */
-    Set<Role> getRoles();
-
-    /**
      * Returns the {@link ZonedDateTime} of when this {@link User} applied for an account.
      *
      * @return the {@link ZonedDateTime} of when this {@link User} applied for an account.
@@ -82,5 +65,14 @@ public interface User {
      * @return a list of teams for this {@link User}.
      */
     List<String> getTeams();
+
+    /**
+     * The {@link Role} enumerates all the roles that a {@link User} can play.
+     *
+     * @author Te Ye
+     */
+    enum Role {
+        ADMIN, USER
+    }
 
 }

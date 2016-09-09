@@ -23,8 +23,6 @@ import sg.ncl.service.user.exceptions.UsernameAlreadyExistsException;
 import javax.inject.Inject;
 import java.util.List;
 
-import static org.hamcrest.CoreMatchers.is;
-
 /**
  * @author Desmond
  */
@@ -167,7 +165,7 @@ public class UserServiceTest extends AbstractTest {
         UserEntity userEntity = userEntityArray[0];
         String userId = userEntity.getId();
         String teamId = RandomStringUtils.randomAlphabetic(20);
-        userEntity.addTeamId(teamId);
+        userEntity.addTeam(teamId);
         userService.updateUser(userId, userEntity);
 
         User userFromDb = userService.getUser(userId);

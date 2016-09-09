@@ -9,7 +9,6 @@ import sg.ncl.service.user.domain.UserStatus;
 
 import java.time.ZonedDateTime;
 import java.util.List;
-import java.util.Set;
 
 /**
  * @author Christopher Zhong
@@ -21,7 +20,6 @@ public class UserInfo implements User {
     private final UserDetailsInfo userDetails;
     private final boolean emailVerified;
     private final UserStatus status;
-    private final Set<Role> roles;
     private final ZonedDateTime applicationDate;
     private final ZonedDateTime processedDate;
     private final List<? extends LoginActivity> loginActivities;
@@ -33,7 +31,6 @@ public class UserInfo implements User {
             @JsonProperty("userDetails") final UserDetailsInfo userDetails,
             @JsonProperty("emailVerified") final boolean emailVerified,
             @JsonProperty("status") final UserStatus status,
-            @JsonProperty("roles") final Set<Role> roles,
             @JsonProperty("applicationDate")final ZonedDateTime applicationDate,
             @JsonProperty("processedDate") final ZonedDateTime processedDate,
             @JsonProperty("loginActivities") final List<? extends LoginActivity> loginActivities,
@@ -43,7 +40,6 @@ public class UserInfo implements User {
         this.userDetails = userDetails;
         this.emailVerified = emailVerified;
         this.status = status;
-        this.roles = roles;
         this.applicationDate = applicationDate;
         this.processedDate = processedDate;
         this.loginActivities = loginActivities;
@@ -56,7 +52,6 @@ public class UserInfo implements User {
                 new UserDetailsInfo(user.getUserDetails()),
                 user.isEmailVerified(),
                 user.getStatus(),
-                user.getRoles(),
                 user.getApplicationDate(),
                 user.getProcessedDate(),
                 user.getLoginActivities(),

@@ -2,6 +2,7 @@ package sg.ncl.service.authentication.util;
 
 import org.apache.commons.lang3.RandomStringUtils;
 import sg.ncl.service.authentication.data.jpa.CredentialsEntity;
+import sg.ncl.service.authentication.domain.Role;
 
 /**
  * @author Christopher Zhong
@@ -17,6 +18,7 @@ public class TestUtil {
         entity.setId(id);
         entity.setUsername(username);
         entity.setPassword(password);
+        entity.addRole(Role.USER);
         return entity;
     }
 

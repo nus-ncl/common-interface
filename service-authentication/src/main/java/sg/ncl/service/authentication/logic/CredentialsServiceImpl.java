@@ -20,7 +20,12 @@ import javax.validation.constraints.NotNull;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static sg.ncl.service.authentication.validation.Validator.validateForCreation;
+import static sg.ncl.service.authentication.validation.Validator.check;
+import static sg.ncl.service.authentication.validation.Validator.checkId;
+import static sg.ncl.service.authentication.validation.Validator.checkPassword;
+import static sg.ncl.service.authentication.validation.Validator.checkRoles;
+import static sg.ncl.service.authentication.validation.Validator.checkStatus;
+import static sg.ncl.service.authentication.validation.Validator.checkUsername;
 import static sg.ncl.service.authentication.validation.Validator.validateForUpdate;
 
 /**
@@ -35,32 +40,35 @@ public class CredentialsServiceImpl implements CredentialsService {
     private final AdapterDeterLab adapterDeterLab;
 
     @Inject
-    protected CredentialsServiceImpl(@NotNull final CredentialsRepository credentialsRepository, @NotNull final PasswordEncoder passwordEncoder, @NotNull final AdapterDeterLab adapterDeterLab) {
+    CredentialsServiceImpl(@NotNull final CredentialsRepository credentialsRepository, @NotNull final PasswordEncoder passwordEncoder, @NotNull final AdapterDeterLab adapterDeterLab) {
         this.credentialsRepository = credentialsRepository;
         this.passwordEncoder = passwordEncoder;
         this.adapterDeterLab = adapterDeterLab;
     }
 
     @Transactional
+    @Override
     public List<Credentials> getAll() {
         return credentialsRepository.findAll().stream().collect(Collectors.toList());
     }
 
     @Transactional
+    @Override
     public Credentials addCredentials(@NotNull final Credentials credentials) {
-        validateForCreation(credentials);
+        check(credentials);
         // check if the user id already exists
         if (credentialsRepository.findOne(credentials.getId()) == null) {
             // check if the username already exists
             if (credentialsRepository.findByUsername(credentials.getUsername()) == null) {
                 final CredentialsEntity entity = new CredentialsEntity();
+                entity.setId(credentials.getId());
                 entity.setUsername(credentials.getUsername());
                 hashPassword(entity, credentials.getPassword());
-                entity.setId(credentials.getId());
                 entity.setStatus(CredentialsStatus.ACTIVE);
-                final CredentialsEntity savedEntity = credentialsRepository.save(entity);
-                log.info("Credentials created: {}", savedEntity);
-                return savedEntity;
+                credentials.getRoles().forEach(entity::addRole);
+                final CredentialsEntity saved = credentialsRepository.save(entity);
+                log.info("Credentials created: {}", saved);
+                return saved;
             }
             log.warn("Username '{}' is already associated with a credentials", credentials.getUsername());
             throw new UsernameAlreadyExistsException(credentials.getUsername());
@@ -70,14 +78,12 @@ public class CredentialsServiceImpl implements CredentialsService {
     }
 
     @Transactional
+    @Deprecated
+    @Override
+    // FIXME break into two methods, updateUsername, and updatePassword
     public Credentials updateCredentials(@NotNull final String id, @NotNull final Credentials credentials) {
         validateForUpdate(credentials);
-        // check if the username exists
-        final CredentialsEntity entity = credentialsRepository.findOne(id);
-        if (entity == null) {
-            log.warn("Credentials for '{}' not found", id);
-            throw new CredentialsNotFoundException(id);
-        }
+        final CredentialsEntity entity = findCredentials(credentials);
         if (credentials.getUsername() != null && !credentials.getUsername().isEmpty()) {
             entity.setUsername(credentials.getUsername());
         }
@@ -91,14 +97,82 @@ public class CredentialsServiceImpl implements CredentialsService {
         return savedEntity;
     }
 
+    @Transactional
+    @Override
+    public Credentials updateUsername(@NotNull final Credentials credentials) {
+        checkUsername(credentials);
+        final CredentialsEntity entity = findCredentials(credentials);
+        entity.setUsername(credentials.getUsername());
+        final CredentialsEntity saved = credentialsRepository.save(entity);
+        log.info("Username updated: {}", saved);
+        return saved;
+    }
+
+    @Transactional
+    @Override
+    public Credentials updatePassword(@NotNull final Credentials credentials) {
+        checkPassword(credentials);
+        final CredentialsEntity entity = findCredentials(credentials);
+        hashPassword(entity, credentials.getPassword());
+        changePassword(credentials.getId(), credentials.getPassword());
+        final CredentialsEntity saved = credentialsRepository.save(entity);
+        log.info("Password updated: {}", saved);
+        return saved;
+    }
+
+    @Transactional
+    @Override
+    public Credentials updateStatus(@NotNull final Credentials credentials) {
+        checkStatus(credentials);
+        final CredentialsEntity entity = findCredentials(credentials);
+        entity.setStatus(credentials.getStatus());
+        final CredentialsEntity saved = credentialsRepository.save(entity);
+        log.info("Status updated: {}", saved);
+        return saved;
+    }
+
+    @Transactional
+    @Override
+    public Credentials addRoles(@NotNull final Credentials credentials) {
+        checkRoles(credentials);
+        final CredentialsEntity entity = findCredentials(credentials);
+        credentials.getRoles().forEach(entity::addRole);
+        final CredentialsEntity saved = credentialsRepository.save(entity);
+        log.info("Roles added: {}", saved);
+        return saved;
+    }
+
+    @Transactional
+    @Override
+    public Credentials removeRoles(@NotNull final Credentials credentials) {
+        checkRoles(credentials);
+        final CredentialsEntity entity = findCredentials(credentials);
+        credentials.getRoles().forEach(entity::removeRole);
+        final CredentialsEntity saved = credentialsRepository.save(entity);
+        log.info("Roles removed: {}", saved);
+        return saved;
+    }
+
+    private CredentialsEntity findCredentials(final Credentials credentials) {
+        checkId(credentials);
+        final CredentialsEntity entity = credentialsRepository.findOne(credentials.getId());
+        // check if the username exists
+        if (entity == null) {
+            log.warn("Credentials for '{}' not found", credentials.getId());
+            throw new CredentialsNotFoundException(credentials.getId());
+        }
+        return entity;
+    }
+
     private void hashPassword(final CredentialsEntity entity, final String password) {
         entity.setPassword(passwordEncoder.encode(password));
     }
 
     /**
      * Invokes the change password on Deterlab
+     *
      * @param nclUserId the ncl UUID
-     * @param password the clear password
+     * @param password  the clear password
      */
     private void changePassword(String nclUserId, String password) {
         JSONObject adapterObject = new JSONObject();

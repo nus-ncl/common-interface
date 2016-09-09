@@ -1,22 +1,32 @@
 package sg.ncl.service.authentication.data.jpa;
 
+import lombok.Getter;
+import lombok.Setter;
 import sg.ncl.common.jpa.AbstractEntity;
 import sg.ncl.service.authentication.domain.Credentials;
 import sg.ncl.service.authentication.domain.CredentialsStatus;
+import sg.ncl.service.authentication.domain.Role;
 
+import javax.persistence.CollectionTable;
 import javax.persistence.Column;
+import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
 import javax.persistence.Id;
 import javax.persistence.Index;
+import javax.persistence.JoinColumn;
 import javax.persistence.Table;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * @author Christopher Zhong
  */
 @Entity
 @Table(name = "credentials", indexes = @Index(columnList = "username"))
+@Getter
+@Setter
 public class CredentialsEntity extends AbstractEntity implements Credentials {
 
     @Id
@@ -33,40 +43,18 @@ public class CredentialsEntity extends AbstractEntity implements Credentials {
     @Enumerated(EnumType.STRING)
     private CredentialsStatus status = CredentialsStatus.ACTIVE;
 
-    @Override
-    public String getId() {
-        return id;
+    @ElementCollection(targetClass = Role.class)
+    @CollectionTable(name = "credentials_roles", joinColumns = @JoinColumn(name = "credentials_id", nullable = false, updatable = false))
+    @Column(name = "role", nullable = false, updatable = false)
+    @Enumerated(EnumType.STRING)
+    private final Set<Role> roles = new HashSet<>();
+
+    public void addRole(final Role role) {
+        roles.add(role);
     }
 
-    public void setId(final String id) {
-        this.id = id;
-    }
-
-    @Override
-    public String getUsername() {
-        return username;
-    }
-
-    public void setUsername(final String username) {
-        this.username = username;
-    }
-
-    @Override
-    public String getPassword() {
-        return password;
-    }
-
-    public void setPassword(final String password) {
-        this.password = password;
-    }
-
-    @Override
-    public CredentialsStatus getStatus() {
-        return status;
-    }
-
-    public void setStatus(final CredentialsStatus status) {
-        this.status = status;
+    public void removeRole(final Role role) {
+        roles.remove(role);
     }
 
     @Override
@@ -95,6 +83,7 @@ public class CredentialsEntity extends AbstractEntity implements Credentials {
                 ", username='" + username + '\'' +
                 ", password='" + password + '\'' +
                 ", status=" + status +
+                ", roles=" + roles +
                 "} " + super.toString();
     }
 

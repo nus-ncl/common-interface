@@ -7,19 +7,19 @@ import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
-import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 import sg.ncl.common.exception.ExceptionProperties;
 import sg.ncl.service.authentication.AbstractTest;
 import sg.ncl.service.authentication.data.jpa.CredentialsEntity;
 import sg.ncl.service.authentication.domain.Credentials;
+import sg.ncl.service.authentication.domain.CredentialsService;
 import sg.ncl.service.authentication.domain.CredentialsStatus;
 import sg.ncl.service.authentication.exceptions.CredentialsNotFoundException;
-import sg.ncl.service.authentication.domain.CredentialsService;
 
 import javax.inject.Inject;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 
 import static org.hamcrest.Matchers.equalTo;
@@ -45,10 +45,6 @@ import static sg.ncl.service.authentication.util.TestUtil.getCredentialsEntity;
  */
 @ActiveProfiles("mock-credentials-service")
 public class CredentialsControllerTest extends AbstractTest {
-
-    private final MockHttpServletRequestBuilder get = get(CredentialsController.PATH);
-    private final MockHttpServletRequestBuilder post = post(CredentialsController.PATH);
-    private final MockHttpServletRequestBuilder put = put(CredentialsController.PATH);
 
     @Inject
     private WebApplicationContext webApplicationContext;
@@ -103,7 +99,7 @@ public class CredentialsControllerTest extends AbstractTest {
 
     @Test
     public void testAddCredentialsGoodIdAndUsernameAndPassword() throws Exception {
-        final CredentialsInfo credentialsInfo = new CredentialsInfo("id", "username", "password", null);
+        final CredentialsInfo credentialsInfo = new CredentialsInfo("id", "username", "password", null, new HashSet<>());
         final byte[] content = mapper.writeValueAsBytes(credentialsInfo);
         final CredentialsEntity credentialsEntity = new CredentialsEntity();
         credentialsEntity.setId("id");
@@ -125,7 +121,7 @@ public class CredentialsControllerTest extends AbstractTest {
 
     @Test
     public void testAddCredentialsGoodIdAndUsernameAndNullPassword() throws Exception {
-        final CredentialsInfo credentialsInfo = new CredentialsInfo("id", "username", null, null);
+        final CredentialsInfo credentialsInfo = new CredentialsInfo("id", "username", null, null, new HashSet<>());
         final byte[] content = mapper.writeValueAsBytes(credentialsInfo);
 
         mockMvc.perform(post(CredentialsController.PATH).contentType(MediaType.APPLICATION_JSON).content(content))
@@ -134,7 +130,7 @@ public class CredentialsControllerTest extends AbstractTest {
 
     @Test
     public void testAddCredentialsGoodIdAndUsernameAndEmptyPassword() throws Exception {
-        final CredentialsInfo credentialsInfo = new CredentialsInfo("id", "username", "", null);
+        final CredentialsInfo credentialsInfo = new CredentialsInfo("id", "username", "", null, new HashSet<>());
         final byte[] content = mapper.writeValueAsBytes(credentialsInfo);
 
         mockMvc.perform(post(CredentialsController.PATH).contentType(MediaType.APPLICATION_JSON).content(content))
@@ -143,7 +139,7 @@ public class CredentialsControllerTest extends AbstractTest {
 
     @Test
     public void testAddCredentialsGoodIdAndNullUsernameAndGoodPassword() throws Exception {
-        final CredentialsInfo credentialsInfo = new CredentialsInfo("id", null, "password", null);
+        final CredentialsInfo credentialsInfo = new CredentialsInfo("id", null, "password", null, new HashSet<>());
         final byte[] content = mapper.writeValueAsBytes(credentialsInfo);
 
         mockMvc.perform(post(CredentialsController.PATH).contentType(MediaType.APPLICATION_JSON).content(content))
@@ -152,7 +148,7 @@ public class CredentialsControllerTest extends AbstractTest {
 
     @Test
     public void testAddCredentialsGoodIdAndEmptyUsernameAndGoodPassword() throws Exception {
-        final CredentialsInfo credentialsInfo = new CredentialsInfo("id", "", "password", null);
+        final CredentialsInfo credentialsInfo = new CredentialsInfo("id", "", "password", null, new HashSet<>());
         final byte[] content = mapper.writeValueAsBytes(credentialsInfo);
 
         mockMvc.perform(post(CredentialsController.PATH).contentType(MediaType.APPLICATION_JSON).content(content))
@@ -161,7 +157,7 @@ public class CredentialsControllerTest extends AbstractTest {
 
     @Test
     public void testAddCredentialsNullIdAndGoodUsernameAndGoodPassword() throws Exception {
-        final CredentialsInfo credentialsInfo = new CredentialsInfo(null, "username", "password", null);
+        final CredentialsInfo credentialsInfo = new CredentialsInfo(null, "username", "password", null, new HashSet<>());
         final byte[] content = mapper.writeValueAsBytes(credentialsInfo);
 
         mockMvc.perform(post(CredentialsController.PATH).contentType(MediaType.APPLICATION_JSON).content(content))
@@ -170,7 +166,7 @@ public class CredentialsControllerTest extends AbstractTest {
 
     @Test
     public void testAddCredentialsEmptyIdAndGoodUsernameAndGoodPassword() throws Exception {
-        final CredentialsInfo credentialsInfo = new CredentialsInfo("", "username", "password", null);
+        final CredentialsInfo credentialsInfo = new CredentialsInfo("", "username", "password", null, new HashSet<>());
         final byte[] content = mapper.writeValueAsBytes(credentialsInfo);
 
         mockMvc.perform(post(CredentialsController.PATH).contentType(MediaType.APPLICATION_JSON).content(content))
@@ -191,7 +187,7 @@ public class CredentialsControllerTest extends AbstractTest {
 
     @Test
     public void testAddCredentialsNullIdAndUsernameAndPassword() throws Exception {
-        final CredentialsInfo credentialsInfo = new CredentialsInfo(null, null, null, null);
+        final CredentialsInfo credentialsInfo = new CredentialsInfo(null, null, null, null, new HashSet<>());
         final byte[] content = mapper.writeValueAsBytes(credentialsInfo);
 
         mockMvc.perform(post(CredentialsController.PATH).contentType(MediaType.APPLICATION_JSON).content(content))
@@ -200,7 +196,7 @@ public class CredentialsControllerTest extends AbstractTest {
 
     @Test
     public void testAddCredentialsNullIdAndUsernameAndEmptyPassword() throws Exception {
-        final CredentialsInfo credentialsInfo = new CredentialsInfo(null, null, "", null);
+        final CredentialsInfo credentialsInfo = new CredentialsInfo(null, null, "", null, new HashSet<>());
         final byte[] content = mapper.writeValueAsBytes(credentialsInfo);
 
         mockMvc.perform(post(CredentialsController.PATH).contentType(MediaType.APPLICATION_JSON).content(content))
@@ -209,7 +205,7 @@ public class CredentialsControllerTest extends AbstractTest {
 
     @Test
     public void testAddCredentialsNullIdAndEmptyUsernameAndNullPassword() throws Exception {
-        final CredentialsInfo credentialsInfo = new CredentialsInfo(null, "", null, null);
+        final CredentialsInfo credentialsInfo = new CredentialsInfo(null, "", null, null, new HashSet<>());
         final byte[] content = mapper.writeValueAsBytes(credentialsInfo);
 
         mockMvc.perform(post(CredentialsController.PATH).contentType(MediaType.APPLICATION_JSON).content(content))
@@ -218,7 +214,7 @@ public class CredentialsControllerTest extends AbstractTest {
 
     @Test
     public void testAddCredentialsNullIdAndEmptyUsernameAndEmptyPassword() throws Exception {
-        final CredentialsInfo credentialsInfo = new CredentialsInfo(null, "", "", null);
+        final CredentialsInfo credentialsInfo = new CredentialsInfo(null, "", "", null, new HashSet<>());
         final byte[] content = mapper.writeValueAsBytes(credentialsInfo);
 
         mockMvc.perform(post(CredentialsController.PATH).contentType(MediaType.APPLICATION_JSON).content(content))
@@ -227,7 +223,7 @@ public class CredentialsControllerTest extends AbstractTest {
 
     @Test
     public void testAddCredentialsEmptyIdAndNullUsernameAndNullPassword() throws Exception {
-        final CredentialsInfo credentialsInfo = new CredentialsInfo("", null, null, null);
+        final CredentialsInfo credentialsInfo = new CredentialsInfo("", null, null, null, new HashSet<>());
         final byte[] content = mapper.writeValueAsBytes(credentialsInfo);
 
         mockMvc.perform(post(CredentialsController.PATH).contentType(MediaType.APPLICATION_JSON).content(content))
@@ -236,7 +232,7 @@ public class CredentialsControllerTest extends AbstractTest {
 
     @Test
     public void testAddCredentialsEmptyIdAndNullUsernameAndEmptyPassword() throws Exception {
-        final CredentialsInfo credentialsInfo = new CredentialsInfo("", null, "", null);
+        final CredentialsInfo credentialsInfo = new CredentialsInfo("", null, "", null, new HashSet<>());
         final byte[] content = mapper.writeValueAsBytes(credentialsInfo);
 
         mockMvc.perform(post(CredentialsController.PATH).contentType(MediaType.APPLICATION_JSON).content(content))
@@ -245,7 +241,7 @@ public class CredentialsControllerTest extends AbstractTest {
 
     @Test
     public void testAddCredentialsEmptyIdAndEmptyUsernameAndNullPassword() throws Exception {
-        final CredentialsInfo credentialsInfo = new CredentialsInfo("", "", null, null);
+        final CredentialsInfo credentialsInfo = new CredentialsInfo("", "", null, null, new HashSet<>());
         final byte[] content = mapper.writeValueAsBytes(credentialsInfo);
 
         mockMvc.perform(post(CredentialsController.PATH).contentType(MediaType.APPLICATION_JSON).content(content))
@@ -254,7 +250,7 @@ public class CredentialsControllerTest extends AbstractTest {
 
     @Test
     public void testAddCredentialsEmptyIdAndEmptyUsernameAndEmptyPassword() throws Exception {
-        final CredentialsInfo credentialsInfo = new CredentialsInfo("", "", "", null);
+        final CredentialsInfo credentialsInfo = new CredentialsInfo("", "", "", null, new HashSet<>());
         final byte[] content = mapper.writeValueAsBytes(credentialsInfo);
 
         mockMvc.perform(post(CredentialsController.PATH).contentType(MediaType.APPLICATION_JSON).content(content))
@@ -263,7 +259,7 @@ public class CredentialsControllerTest extends AbstractTest {
 
     @Test(expected = CredentialsNotFoundException.class)
     public void testUpdateCredentialsGoodUsernameAndPassword() throws Exception {
-        final CredentialsInfo credentialsInfo = new CredentialsInfo(null, "username", "password", null);
+        final CredentialsInfo credentialsInfo = new CredentialsInfo(null, "username", "password", null, new HashSet<>());
         final byte[] content = mapper.writeValueAsBytes(credentialsInfo);
 
         when(credentialsService.updateCredentials(anyString(), any(Credentials.class))).thenReturn(credentialsInfo);
@@ -274,7 +270,7 @@ public class CredentialsControllerTest extends AbstractTest {
 
     @Test
     public void testUpdateCredentialsGoodUsernameAndNullPassword() throws Exception {
-        final CredentialsInfo credentialsInfo = new CredentialsInfo(null, "username", null, null);
+        final CredentialsInfo credentialsInfo = new CredentialsInfo(null, "username", null, null, new HashSet<>());
         final byte[] content = mapper.writeValueAsBytes(credentialsInfo);
 
         when(credentialsService.updateCredentials(anyString(), any(Credentials.class))).thenReturn(credentialsInfo);
@@ -285,7 +281,7 @@ public class CredentialsControllerTest extends AbstractTest {
 
     @Test
     public void testUpdateCredentialsGoodUsernameAndEmptyPassword() throws Exception {
-        final CredentialsInfo credentialsInfo = new CredentialsInfo(null, "username", "", null);
+        final CredentialsInfo credentialsInfo = new CredentialsInfo(null, "username", "", null, new HashSet<>());
         final byte[] content = mapper.writeValueAsBytes(credentialsInfo);
 
         when(credentialsService.updateCredentials(anyString(), any(Credentials.class))).thenReturn(credentialsInfo);
@@ -296,7 +292,7 @@ public class CredentialsControllerTest extends AbstractTest {
 
     @Test(expected = CredentialsNotFoundException.class)
     public void testUpdateCredentialsNullUsernameAndGoodPassword() throws Exception {
-        final CredentialsInfo credentialsInfo = new CredentialsInfo(null, null, "password", null);
+        final CredentialsInfo credentialsInfo = new CredentialsInfo(null, null, "password", null, new HashSet<>());
         final byte[] content = mapper.writeValueAsBytes(credentialsInfo);
 
         when(credentialsService.updateCredentials(anyString(), any(Credentials.class))).thenReturn(credentialsInfo);
@@ -307,7 +303,7 @@ public class CredentialsControllerTest extends AbstractTest {
 
     @Test
     public void testUpdateCredentialsEmptyUsernameAndGoodPassword() throws Exception {
-        final CredentialsInfo credentialsInfo = new CredentialsInfo(null, "", "password", null);
+        final CredentialsInfo credentialsInfo = new CredentialsInfo(null, "", "password", null, new HashSet<>());
         final byte[] content = mapper.writeValueAsBytes(credentialsInfo);
 
         mockMvc.perform(put(CredentialsController.PATH + "/id").contentType(MediaType.APPLICATION_JSON).content(content))
@@ -316,7 +312,7 @@ public class CredentialsControllerTest extends AbstractTest {
 
     @Test
     public void testUpdateCredentialsNullUsernameAndPassword() throws Exception {
-        final Credentials credentialsInfo = new CredentialsInfo(null, null, null, null);
+        final Credentials credentialsInfo = new CredentialsInfo(null, null, null, null, new HashSet<>());
         final byte[] content = mapper.writeValueAsBytes(credentialsInfo);
 
         mockMvc.perform(put(CredentialsController.PATH + "/id").contentType(MediaType.APPLICATION_JSON).content(content))
@@ -325,7 +321,7 @@ public class CredentialsControllerTest extends AbstractTest {
 
     @Test
     public void testUpdateCredentialsNullUsernameAndEmptyPassword() throws Exception {
-        final Credentials credentialsInfo = new CredentialsInfo(null, null, "", null);
+        final Credentials credentialsInfo = new CredentialsInfo(null, null, "", null, new HashSet<>());
         final byte[] content = mapper.writeValueAsBytes(credentialsInfo);
 
         mockMvc.perform(put(CredentialsController.PATH + "/id").contentType(MediaType.APPLICATION_JSON).content(content))
@@ -334,7 +330,7 @@ public class CredentialsControllerTest extends AbstractTest {
 
     @Test
     public void testUpdateCredentialsEmptyUsernameAndNullPassword() throws Exception {
-        final Credentials credentialsInfo = new CredentialsInfo(null, "", null, null);
+        final Credentials credentialsInfo = new CredentialsInfo(null, "", null, null, new HashSet<>());
         final byte[] content = mapper.writeValueAsBytes(credentialsInfo);
 
         mockMvc.perform(put(CredentialsController.PATH + "/id").contentType(MediaType.APPLICATION_JSON).content(content))
@@ -343,7 +339,7 @@ public class CredentialsControllerTest extends AbstractTest {
 
     @Test
     public void testUpdateCredentialsEmptyUsernameAndPassword() throws Exception {
-        final Credentials credentialsInfo = new CredentialsInfo(null, "", "", null);
+        final Credentials credentialsInfo = new CredentialsInfo(null, "", "", null, new HashSet<>());
         final byte[] content = mapper.writeValueAsBytes(credentialsInfo);
 
         mockMvc.perform(put(CredentialsController.PATH + "/id").contentType(MediaType.APPLICATION_JSON).content(content))
@@ -352,7 +348,7 @@ public class CredentialsControllerTest extends AbstractTest {
 
     @Test
     public void testUpdatePasswordCredentialsNotFound() throws Exception {
-        final Credentials credentialsInfo = new CredentialsInfo("id", "username", "password", null);
+        final Credentials credentialsInfo = new CredentialsInfo("id", "username", "password", null, new HashSet<>());
         final byte[] content = mapper.writeValueAsBytes(credentialsInfo);
 
         doThrow(new CredentialsNotFoundException("id")).when(credentialsService).updateCredentials(anyString(), any(Credentials.class));
