@@ -53,6 +53,18 @@ public class JwtFilter extends GenericFilterBean {
                 final Claims claims = Jwts.parser().setSigningKey(apiKey)
                         .parseClaimsJws(token).getBody();
                 request.setAttribute("claims", claims);
+                log.info("Subject: {}", claims.getSubject());
+                log.info("Issued At: {}", claims.getIssuedAt());
+                log.info("Expiration: {}", claims.getExpiration());
+                log.info("Roles: {}", claims.get("roles"));
+
+                // check requester's roles
+                // using this way instead of comparing against Role.USER/ADMIN to prevent coupling of "service-authentication" with "common"
+                if (claims.get("roles") == null || (!claims.get("roles").toString().equals("[USER]") && !claims.get("roles").toString().equals("[ADMIN]"))) {
+                    log.warn("Invalid roles: {}", claims.get("roles"));
+                    throw new ServletException("Invalid roles.");
+                }
+
             } catch (final SignatureException e) {
                 log.warn("Invalid token: {}", e);
                 throw new ServletException("Invalid token.");
