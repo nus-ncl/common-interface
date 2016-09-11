@@ -92,6 +92,8 @@ public class AuthenticationServiceTest extends AbstractTest {
         final Claims body = parser.parseClaimsJws(authorization.getToken()).getBody();
         assertThat(body.getIssuedAt(), is(not(nullValue(Date.class))));
         assertThat(body.getExpiration(), is(not(nullValue(Date.class))));
+        assertThat(body.get("roles"), is(not(nullValue())));
+        assertThat(body.get("roles").toString().trim(), is(entity.getRoles().toString().trim()));
     }
 
     @Test
