@@ -83,27 +83,54 @@ public class JwtFilter extends GenericFilterBean {
         String requestURI = ((HttpServletRequest) req).getRequestURI();
         String requestMethod = ((HttpServletRequest) req).getMethod();
 
-        if (requestURI.startsWith("/teams/") && requestMethod.equals(get)) {
-            String[] param = req.getParameterValues("visibility");
-            String[] nameParam = req.getParameterValues("name");
-            if (param != null && (param.length != 0) && (param[0].equals("PUBLIC"))) {
-                log.info("Whitelist: {} - {}", requestURI, requestMethod);
-                return true;
-            }
-            if (nameParam != null && (nameParam.length != 0)) {
-                log.info("Whitelist: {} - {}", requestURI, requestMethod);
-                return true;
-            }
-        } else if (requestURI.startsWith("/users/") && requestMethod.equals(get)) {
+        if (requestURI.startsWith("/authentication")) {
             log.info("Whitelist: {} - {}", requestURI, requestMethod);
             return true;
-        } else if (requestURI.startsWith("/authentication")) {
-            log.info("Whitelist: {} - {}", requestURI, requestMethod);
-            return true;
-        } else if (requestURI.startsWith("/registrations") && requestMethod.equals(post)) {
+        } else if (requestMethod.equals(get)) {
+            if (requestURI.startsWith("/users/")) {
+                log.info("Whitelist: {} - {}", requestURI, requestMethod);
+                return true;
+            } else if (requestURI.startsWith("/teams/")) {
+                String[] param = req.getParameterValues("visibility");
+                String[] nameParam = req.getParameterValues("name");
+                if (param != null && (param.length > 0) && (param[0].equals("PUBLIC"))) {
+                    log.info("Whitelist: {} - {}", requestURI, requestMethod);
+                    return true;
+                } else if (nameParam != null && (nameParam.length > 0)) {
+                    log.info("Whitelist: {} - {}", requestURI, requestMethod);
+                    return true;
+                } else {
+                    return false;
+                }
+            } else {
+                return false;
+            }
+        } else if (requestMethod.equals(post) && requestURI.startsWith("/registrations")) {
             log.info("Whitelist: {} - {}", requestURI, requestMethod);
             return true;
         }
+
+//        if (requestURI.startsWith("/teams/") && requestMethod.equals(get)) {
+//            String[] param = req.getParameterValues("visibility");
+//            String[] nameParam = req.getParameterValues("name");
+//            if (param != null && (param.length != 0) && (param[0].equals("PUBLIC"))) {
+//                log.info("Whitelist: {} - {}", requestURI, requestMethod);
+//                return true;
+//            }
+//            if (nameParam != null && (nameParam.length != 0)) {
+//                log.info("Whitelist: {} - {}", requestURI, requestMethod);
+//                return true;
+//            }
+//        } else if (requestURI.startsWith("/users/") && requestMethod.equals(get)) {
+//            log.info("Whitelist: {} - {}", requestURI, requestMethod);
+//            return true;
+//        } else if (requestURI.startsWith("/authentication")) {
+//            log.info("Whitelist: {} - {}", requestURI, requestMethod);
+//            return true;
+//        } else if (requestURI.startsWith("/registrations") && requestMethod.equals(post)) {
+//            log.info("Whitelist: {} - {}", requestURI, requestMethod);
+//            return true;
+//        }
         return false;
     }
 
