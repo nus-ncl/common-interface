@@ -64,14 +64,14 @@ public class AuthenticationAutoConfiguration extends WebSecurityConfigurerAdapte
                 .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
     }
 
-    private String getUrl() {
-        final String url = properties.getUrl();
-        if (url == null || url.isEmpty()) {
-            log.warn("An authentication path was not defined; using default: '{}'", DEFAULT_URL);
-            return DEFAULT_URL;
-        }
-        log.info("Using specified authentication path: '{}'", url);
-        return url;
-    }
+//    private String getUrl() {
+//        final String url = properties.getUrl();
+//        if (url == null || url.isEmpty()) {
+//            log.warn("An authentication path was not defined; using default: '{}'", DEFAULT_URL);
+//            return DEFAULT_URL;
+//        }
+//        log.info("Using specified authentication path: '{}'", url);
+//        return url;
+//    }
 
 }
