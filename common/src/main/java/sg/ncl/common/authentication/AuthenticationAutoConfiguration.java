@@ -29,7 +29,7 @@ import javax.validation.constraints.NotNull;
 @Slf4j
 public class AuthenticationAutoConfiguration extends WebSecurityConfigurerAdapter {
 
-    private static final String DEFAULT_URL = "/authentications";
+//    private static final String DEFAULT_URL = "/authentications";
 
     private final AuthenticationProperties properties;
     private final JwtFilter jwtFilter;
