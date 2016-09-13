@@ -85,7 +85,7 @@ public class JwtFilter extends GenericFilterBean {
 
         if (requestURI.startsWith("/authentication") ||
                 (requestURI.startsWith("/users") && (requestMethod.equals(get))) ||
-                (requestURI.startsWith("registrations") && (requestMethod.equals(post))) ||
+                (requestURI.startsWith("/registrations") && (requestMethod.equals(post))) ||
                 isTeamUrlWhitelist(req)
                 ) {
             log.info("Whitelist: {} - {}", requestURI, requestMethod);
