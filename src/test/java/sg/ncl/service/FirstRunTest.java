@@ -11,6 +11,7 @@ import org.springframework.jdbc.core.PreparedStatementCreator;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import sg.ncl.common.authentication.Role;
 import sg.ncl.service.authentication.domain.CredentialsStatus;
 import sg.ncl.service.team.domain.MemberStatus;
 import sg.ncl.service.team.domain.MemberType;
@@ -29,12 +30,7 @@ import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static sg.ncl.service.FirstRun.SQL_INSERT_CREDENTIALS;
-import static sg.ncl.service.FirstRun.SQL_INSERT_DETERLAB_USER;
-import static sg.ncl.service.FirstRun.SQL_INSERT_TEAMS;
-import static sg.ncl.service.FirstRun.SQL_INSERT_TEAM_MEMBERS;
-import static sg.ncl.service.FirstRun.SQL_INSERT_USERS;
-import static sg.ncl.service.FirstRun.SQL_INSERT_USERS_TEAMS;
+import static sg.ncl.service.FirstRun.*;
 
 /**
  * Created by chris on 8/19/2016.
@@ -59,6 +55,7 @@ public class FirstRunTest {
     public void wipe() throws Exception {
         firstRun.wipe();
 
+        verify(jdbcTemplate).update("DELETE FROM credentials_roles");
         verify(jdbcTemplate).update("DELETE FROM credentials");
         verify(jdbcTemplate).update("DELETE FROM deterlab_project");
         verify(jdbcTemplate).update("DELETE FROM deterlab_user");
@@ -91,6 +88,7 @@ public class FirstRunTest {
         // verify create details
         verify(jdbcTemplate).update(eq(SQL_INSERT_USERS), anyString(), any(ZonedDateTime.class), any(ZonedDateTime.class), eq(0), any(ZonedDateTime.class), eq("Y"), eq(UserStatus.APPROVED.name()), anyInt());
         verify(jdbcTemplate).update(eq(SQL_INSERT_CREDENTIALS), anyString(), any(ZonedDateTime.class), any(ZonedDateTime.class), eq(0), anyString(), eq(CredentialsStatus.ACTIVE.name()), eq("admin@ncl.sg"));
+        verify(jdbcTemplate).update(eq(SQL_INSERT_CREDENTIALS_ROLES), anyString(), eq(Role.ADMIN.toString()));
         verify(jdbcTemplate).update(eq(SQL_INSERT_USERS_TEAMS), anyString(), anyString());
         verify(jdbcTemplate).update(eq(SQL_INSERT_TEAM_MEMBERS), any(ZonedDateTime.class), any(ZonedDateTime.class), eq(0), any(ZonedDateTime.class), eq(MemberType.OWNER.name()), anyString(), anyString(), eq(MemberStatus.APPROVED.name()));
         verify(jdbcTemplate).update(eq(SQL_INSERT_DETERLAB_USER), any(ZonedDateTime.class), any(ZonedDateTime.class), eq(0), eq("ncl"), anyString());

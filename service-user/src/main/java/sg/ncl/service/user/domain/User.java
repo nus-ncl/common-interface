@@ -73,13 +73,4 @@ public interface User {
      */
     List<String> getTeams();
 
-    /**
-     * The {@link Role} enumerates all the roles that a {@link User} can play.
-     *
-     * @author Te Ye
-     */
-    enum Role {
-        ADMIN, USER
-    }
-
 }
