@@ -83,29 +83,11 @@ public class JwtFilter extends GenericFilterBean {
         String requestURI = ((HttpServletRequest) req).getRequestURI();
         String requestMethod = ((HttpServletRequest) req).getMethod();
 
-        if (requestURI.startsWith("/authentication")) {
-            log.info("Whitelist: {} - {}", requestURI, requestMethod);
-            return true;
-        } else if (requestMethod.equals(get)) {
-            if (requestURI.startsWith("/users/")) {
-                log.info("Whitelist: {} - {}", requestURI, requestMethod);
-                return true;
-            } else if (requestURI.startsWith("/teams/")) {
-                String[] param = req.getParameterValues("visibility");
-                String[] nameParam = req.getParameterValues("name");
-                if (param != null && (param.length > 0) && (param[0].equals("PUBLIC"))) {
-                    log.info("Whitelist: {} - {}", requestURI, requestMethod);
-                    return true;
-                } else if (nameParam != null && (nameParam.length > 0)) {
-                    log.info("Whitelist: {} - {}", requestURI, requestMethod);
-                    return true;
-                } else {
-                    return false;
-                }
-            } else {
-                return false;
-            }
-        } else if (requestMethod.equals(post) && requestURI.startsWith("/registrations")) {
+        if (requestURI.startsWith("/authentication") ||
+                (requestURI.startsWith("/users") && (requestMethod.equals(get))) ||
+                (requestURI.startsWith("registrations") && (requestMethod.equals(post))) ||
+                isTeamUrlWhitelist(req)
+                ) {
             log.info("Whitelist: {} - {}", requestURI, requestMethod);
             return true;
         }
@@ -131,6 +113,26 @@ public class JwtFilter extends GenericFilterBean {
 //            log.info("Whitelist: {} - {}", requestURI, requestMethod);
 //            return true;
 //        }
+        return false;
+    }
+
+    /**
+     * Checks if the team URL requested is whitelisted, whitelisted URI do not have to be check for their Authentication Header
+     * @param req the servlet request from web service
+     * @return True if the request URI is whitelisted, returns False otherwise
+     */
+    private boolean isTeamUrlWhitelist(ServletRequest req) {
+        String requestURI = ((HttpServletRequest) req).getRequestURI();
+        if (requestURI.startsWith("/teams/")) {
+            String[] param = req.getParameterValues("visibility");
+            String[] nameParam = req.getParameterValues("name");
+
+            if ((param != null && param.length > 0 && param[0].equals("PUBLIC")) ||
+                    (nameParam != null && nameParam.length > 0)
+                    ) {
+                return true;
+            }
+        }
         return false;
     }
 
