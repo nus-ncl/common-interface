@@ -3,7 +3,7 @@ package sg.ncl.service.authentication.validation;
 import lombok.extern.slf4j.Slf4j;
 import sg.ncl.service.authentication.domain.Credentials;
 import sg.ncl.service.authentication.domain.CredentialsStatus;
-import sg.ncl.service.authentication.domain.Role;
+import sg.ncl.common.authentication.Role;
 import sg.ncl.service.authentication.exceptions.NeitherUsernameNorPasswordModifiedException;
 import sg.ncl.service.authentication.exceptions.PasswordNullOrEmptyException;
 import sg.ncl.service.authentication.exceptions.RolesIsNullOrEmptyException;

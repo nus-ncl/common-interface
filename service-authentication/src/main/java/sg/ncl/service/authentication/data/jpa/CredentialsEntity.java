@@ -5,7 +5,7 @@ import lombok.Setter;
 import sg.ncl.common.jpa.AbstractEntity;
 import sg.ncl.service.authentication.domain.Credentials;
 import sg.ncl.service.authentication.domain.CredentialsStatus;
-import sg.ncl.service.authentication.domain.Role;
+import sg.ncl.common.authentication.Role;
 
 import javax.persistence.CollectionTable;
 import javax.persistence.Column;

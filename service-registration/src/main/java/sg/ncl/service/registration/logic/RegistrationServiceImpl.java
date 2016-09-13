@@ -12,7 +12,7 @@ import sg.ncl.common.DomainProperties;
 import sg.ncl.service.authentication.domain.Credentials;
 import sg.ncl.service.authentication.domain.CredentialsService;
 import sg.ncl.service.authentication.domain.CredentialsStatus;
-import sg.ncl.service.authentication.domain.Role;
+import sg.ncl.common.authentication.Role;
 import sg.ncl.service.authentication.web.CredentialsInfo;
 import sg.ncl.service.mail.domain.MailService;
 import sg.ncl.service.registration.data.jpa.RegistrationEntity;

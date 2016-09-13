@@ -1,5 +1,7 @@
 package sg.ncl.service.authentication.domain;
 
+import sg.ncl.common.authentication.Role;
+
 import java.util.Set;
 
 /**

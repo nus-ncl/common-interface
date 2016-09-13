@@ -84,36 +84,18 @@ public class JwtFilter extends GenericFilterBean {
         String requestMethod = ((HttpServletRequest) req).getMethod();
 
         if (requestURI.startsWith("/authentication") ||
-                (requestURI.startsWith("/users") && (requestMethod.equals(get))) ||
-                (requestURI.startsWith("/registrations") && (requestMethod.equals(post))) ||
+                isUsersWhitelist(requestURI, requestMethod, "/users", get) ||
+                (isUsersWhitelist(requestURI, requestMethod, "/registrations", post)) ||
                 isTeamUrlWhitelist(req)
                 ) {
             log.info("Whitelist: {} - {}", requestURI, requestMethod);
             return true;
         }
-
-//        if (requestURI.startsWith("/teams/") && requestMethod.equals(get)) {
-//            String[] param = req.getParameterValues("visibility");
-//            String[] nameParam = req.getParameterValues("name");
-//            if (param != null && (param.length != 0) && (param[0].equals("PUBLIC"))) {
-//                log.info("Whitelist: {} - {}", requestURI, requestMethod);
-//                return true;
-//            }
-//            if (nameParam != null && (nameParam.length != 0)) {
-//                log.info("Whitelist: {} - {}", requestURI, requestMethod);
-//                return true;
-//            }
-//        } else if (requestURI.startsWith("/users/") && requestMethod.equals(get)) {
-//            log.info("Whitelist: {} - {}", requestURI, requestMethod);
-//            return true;
-//        } else if (requestURI.startsWith("/authentication")) {
-//            log.info("Whitelist: {} - {}", requestURI, requestMethod);
-//            return true;
-//        } else if (requestURI.startsWith("/registrations") && requestMethod.equals(post)) {
-//            log.info("Whitelist: {} - {}", requestURI, requestMethod);
-//            return true;
-//        }
         return false;
+    }
+
+    private boolean isUsersWhitelist(String requestURI, String requestMethod, String prefix, String get) {
+        return requestURI.startsWith(prefix) && (requestMethod.equals(get));
     }
 
     /**
@@ -135,5 +117,6 @@ public class JwtFilter extends GenericFilterBean {
         }
         return false;
     }
+
 
 }

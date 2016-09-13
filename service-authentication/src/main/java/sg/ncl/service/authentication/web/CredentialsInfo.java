@@ -5,7 +5,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Getter;
 import sg.ncl.service.authentication.domain.Credentials;
 import sg.ncl.service.authentication.domain.CredentialsStatus;
-import sg.ncl.service.authentication.domain.Role;
+import sg.ncl.common.authentication.Role;
 
 import java.util.Set;
 

@@ -6,7 +6,7 @@ import org.junit.rules.ExpectedException;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.orm.jpa.JpaSystemException;
 import sg.ncl.service.authentication.AbstractTest;
-import sg.ncl.service.authentication.domain.Role;
+import sg.ncl.common.authentication.Role;
 
 import javax.inject.Inject;
 import java.time.ZonedDateTime;

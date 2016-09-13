@@ -2,7 +2,7 @@ package sg.ncl.service.authentication.util;
 
 import org.apache.commons.lang3.RandomStringUtils;
 import sg.ncl.service.authentication.data.jpa.CredentialsEntity;
-import sg.ncl.service.authentication.domain.Role;
+import sg.ncl.common.authentication.Role;
 
 /**
  * @author Christopher Zhong

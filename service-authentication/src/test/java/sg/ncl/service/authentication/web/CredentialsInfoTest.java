@@ -3,7 +3,7 @@ package sg.ncl.service.authentication.web;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.junit.Test;
 import sg.ncl.service.authentication.domain.CredentialsStatus;
-import sg.ncl.service.authentication.domain.Role;
+import sg.ncl.common.authentication.Role;
 
 import java.util.Arrays;
 import java.util.HashSet;
