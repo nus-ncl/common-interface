@@ -16,6 +16,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.validation.constraints.NotNull;
 import java.io.IOException;
 import java.security.Key;
+import java.util.List;
 
 /**
  * @author Te Ye
@@ -64,7 +65,7 @@ public class JwtFilter extends GenericFilterBean {
         final Claims claims = Jwts.parser().setSigningKey(apiKey)
                 .parseClaimsJws(token).getBody();
         request.setAttribute("claims", claims);
-        Object claimRole = claims.get("roles");
+        List claimRole = (List) claims.get("roles");
         log.info("Subject: {}", claims.getSubject());
         log.info("Issued At: {}", claims.getIssuedAt());
         log.info("Expiration: {}", claims.getExpiration());
@@ -72,7 +73,7 @@ public class JwtFilter extends GenericFilterBean {
 
         // check requester's roles
         // using this way instead of comparing against Role.USER/ADMIN to prevent coupling of "service-authentication" with "common"
-        if (claimRole == null || (claimRole != Role.USER && claimRole != Role.ADMIN)) {
+        if (claimRole == null || (!claimRole.contains(Role.USER.toString()) && !claimRole.contains(Role.ADMIN.toString()))) {
             log.warn("Invalid roles: {}", claims.get("roles"));
             throw new ServletException("Invalid roles.");
         }

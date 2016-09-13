@@ -1,6 +1,10 @@
 package sg.ncl.common.jwt;
 
+import io.jsonwebtoken.JwtBuilder;
+import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.SignatureAlgorithm;
 import org.apache.commons.lang3.RandomStringUtils;
+import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -8,12 +12,19 @@ import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
+import sg.ncl.common.authentication.Role;
 
+import javax.crypto.spec.SecretKeySpec;
 import javax.inject.Inject;
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+
+import java.lang.reflect.Array;
+import java.security.Key;
+import java.util.Arrays;
+import java.util.Date;
 
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
@@ -24,15 +35,19 @@ import static org.mockito.Mockito.when;
  * @author Te Ye
  * @version 1.0
  */
-@RunWith(SpringRunner.class)
-@SpringBootTest(classes = TestSpringBootApp.class, webEnvironment = SpringBootTest.WebEnvironment.NONE)
 public class JwtFilterTest {
 
     @Rule
     public MockitoRule mockito = MockitoJUnit.rule();
 
-    @Inject
+    private Key apiKey;
     private JwtFilter jwtFilter;
+
+    @Before
+    public void before() {
+        apiKey = new SecretKeySpec("123".getBytes(), SignatureAlgorithm.HS256.getJcaName());
+        jwtFilter = new JwtFilter(apiKey);
+    }
 
     // -----------------------------------
     // ----- WHITELISTED ENDPOINTS -------
@@ -493,4 +508,49 @@ public class JwtFilterTest {
         }
     }
 
+    @Test
+    public void testGetTeamsInvalidRoles() throws Exception {
+        HttpServletRequest request = mock(HttpServletRequest.class);
+        HttpServletResponse response = mock(HttpServletResponse.class);
+        FilterChain filterChain = mock(FilterChain.class);
+
+        final String jwt = Jwts.builder()
+                .setSubject("john")
+                .setIssuer("Authentication")
+                .claim("roles", "rubbish")
+                // sign the JWT with the given algorithm and apiKey
+                .signWith(SignatureAlgorithm.HS256, apiKey)
+                .compact();
+
+        when(request.getRequestURI()).thenReturn("/teams/");
+        when(request.getMethod()).thenReturn("GET");
+        when(request.getHeader("Authorization")).thenReturn("Bearer " + jwt);
+
+        try {
+            jwtFilter.doFilter(request, response, filterChain);
+        } catch (ServletException e) {
+            assertThat(e.getMessage(), is("Invalid roles."));
+        }
+    }
+
+    @Test
+    public void testGetTeamsValidRoles() throws Exception {
+        HttpServletRequest request = mock(HttpServletRequest.class);
+        HttpServletResponse response = mock(HttpServletResponse.class);
+        FilterChain filterChain = mock(FilterChain.class);
+
+        final String jwt = Jwts.builder()
+                .setSubject("john")
+                .setIssuer("Authentication")
+                .claim("roles", Arrays.asList(Role.USER))
+                // sign the JWT with the given algorithm and apiKey
+                .signWith(SignatureAlgorithm.HS256, apiKey)
+                .compact();
+
+        when(request.getRequestURI()).thenReturn("/teams/");
+        when(request.getMethod()).thenReturn("GET");
+        when(request.getHeader("Authorization")).thenReturn("Bearer " + jwt);
+
+        jwtFilter.doFilter(request, response, filterChain);
+    }
 }
