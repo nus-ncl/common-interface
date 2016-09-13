@@ -4,6 +4,7 @@ import io.jsonwebtoken.JwtBuilder;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import org.apache.commons.lang3.RandomStringUtils;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -104,12 +105,23 @@ public class JwtFilterTest {
     }
 
     @Test
-    public void testPostRegistration() throws Exception {
+    public void testPostRegistrationSlash() throws Exception {
         HttpServletRequest request = mock(HttpServletRequest.class);
         HttpServletResponse response = mock(HttpServletResponse.class);
         FilterChain filterChain = mock(FilterChain.class);
 
         when(request.getRequestURI()).thenReturn("/registrations/");
+        when(request.getMethod()).thenReturn("POST");
+        jwtFilter.doFilter(request, response, filterChain);
+    }
+
+    @Test
+    public void testPostRegistration() throws Exception {
+        HttpServletRequest request = mock(HttpServletRequest.class);
+        HttpServletResponse response = mock(HttpServletResponse.class);
+        FilterChain filterChain = mock(FilterChain.class);
+
+        when(request.getRequestURI()).thenReturn("/registrations");
         when(request.getMethod()).thenReturn("POST");
         jwtFilter.doFilter(request, response, filterChain);
     }
@@ -128,6 +140,7 @@ public class JwtFilterTest {
 
         try {
             jwtFilter.doFilter(request, response, filterChain);
+            Assert.fail();
         } catch (ServletException e) {
             assertThat(e.getMessage(), is("Missing or invalid Authorization header."));
         }
@@ -144,6 +157,7 @@ public class JwtFilterTest {
 
         try {
             jwtFilter.doFilter(request, response, filterChain);
+            Assert.fail();
         } catch (ServletException e) {
             assertThat(e.getMessage(), is("Missing or invalid Authorization header."));
         }
@@ -160,6 +174,7 @@ public class JwtFilterTest {
 
         try {
             jwtFilter.doFilter(request, response, filterChain);
+            Assert.fail();
         } catch (ServletException e) {
             assertThat(e.getMessage(), is("Missing or invalid Authorization header."));
         }
@@ -176,6 +191,7 @@ public class JwtFilterTest {
 
         try {
             jwtFilter.doFilter(request, response, filterChain);
+            Assert.fail();
         } catch (ServletException e) {
             assertThat(e.getMessage(), is("Missing or invalid Authorization header."));
         }
@@ -195,6 +211,7 @@ public class JwtFilterTest {
 
         try {
             jwtFilter.doFilter(request, response, filterChain);
+            Assert.fail();
         } catch (ServletException e) {
             assertThat(e.getMessage(), is("Missing or invalid Authorization header."));
         }
@@ -213,6 +230,7 @@ public class JwtFilterTest {
 
         try {
             jwtFilter.doFilter(request, response, filterChain);
+            Assert.fail();
         } catch (ServletException e) {
             assertThat(e.getMessage(), is("Missing or invalid Authorization header."));
         }
@@ -232,6 +250,7 @@ public class JwtFilterTest {
 
         try {
             jwtFilter.doFilter(request, response, filterChain);
+            Assert.fail();
         } catch (ServletException e) {
             assertThat(e.getMessage(), is("Missing or invalid Authorization header."));
         }
@@ -251,6 +270,7 @@ public class JwtFilterTest {
 
         try {
             jwtFilter.doFilter(request, response, filterChain);
+            Assert.fail();
         } catch (ServletException e) {
             assertThat(e.getMessage(), is("Missing or invalid Authorization header."));
         }
@@ -270,6 +290,7 @@ public class JwtFilterTest {
 
         try {
             jwtFilter.doFilter(request, response, filterChain);
+            Assert.fail();
         } catch (ServletException e) {
             assertThat(e.getMessage(), is("Missing or invalid Authorization header."));
         }
@@ -288,6 +309,7 @@ public class JwtFilterTest {
 
         try {
             jwtFilter.doFilter(request, response, filterChain);
+            Assert.fail();
         } catch (ServletException e) {
             assertThat(e.getMessage(), is("Missing or invalid Authorization header."));
         }
@@ -306,6 +328,7 @@ public class JwtFilterTest {
 
         try {
             jwtFilter.doFilter(request, response, filterChain);
+            Assert.fail();
         } catch (ServletException e) {
             assertThat(e.getMessage(), is("Missing or invalid Authorization header."));
         }
@@ -325,6 +348,7 @@ public class JwtFilterTest {
 
         try {
             jwtFilter.doFilter(request, response, filterChain);
+            Assert.fail();
         } catch (ServletException e) {
             assertThat(e.getMessage(), is("Missing or invalid Authorization header."));
         }
@@ -344,6 +368,7 @@ public class JwtFilterTest {
 
         try {
             jwtFilter.doFilter(request, response, filterChain);
+            Assert.fail();
         } catch (ServletException e) {
             assertThat(e.getMessage(), is("Missing or invalid Authorization header."));
         }
@@ -363,6 +388,7 @@ public class JwtFilterTest {
 
         try {
             jwtFilter.doFilter(request, response, filterChain);
+            Assert.fail();
         } catch (ServletException e) {
             assertThat(e.getMessage(), is("Missing or invalid Authorization header."));
         }
@@ -381,6 +407,7 @@ public class JwtFilterTest {
 
         try {
             jwtFilter.doFilter(request, response, filterChain);
+            Assert.fail();
         } catch (ServletException e) {
             assertThat(e.getMessage(), is("Missing or invalid Authorization header."));
         }
@@ -397,6 +424,7 @@ public class JwtFilterTest {
 
         try {
             jwtFilter.doFilter(request, response, filterChain);
+            Assert.fail();
         } catch (ServletException e) {
             assertThat(e.getMessage(), is("Missing or invalid Authorization header."));
         }
@@ -413,6 +441,7 @@ public class JwtFilterTest {
 
         try {
             jwtFilter.doFilter(request, response, filterChain);
+            Assert.fail();
         } catch (ServletException e) {
             assertThat(e.getMessage(), is("Missing or invalid Authorization header."));
         }
@@ -431,6 +460,7 @@ public class JwtFilterTest {
 
         try {
             jwtFilter.doFilter(request, response, filterChain);
+            Assert.fail();
         } catch (ServletException e) {
             assertThat(e.getMessage(), is("Missing or invalid Authorization header."));
         }
@@ -449,6 +479,7 @@ public class JwtFilterTest {
 
         try {
             jwtFilter.doFilter(request, response, filterChain);
+            Assert.fail();
         } catch (ServletException e) {
             assertThat(e.getMessage(), is("Missing or invalid Authorization header."));
         }
@@ -467,6 +498,7 @@ public class JwtFilterTest {
 
         try {
             jwtFilter.doFilter(request, response, filterChain);
+            Assert.fail();
         } catch (ServletException e) {
             assertThat(e.getMessage(), is("Missing or invalid Authorization header."));
         }
@@ -485,6 +517,7 @@ public class JwtFilterTest {
 
         try {
             jwtFilter.doFilter(request, response, filterChain);
+            Assert.fail();
         } catch (ServletException e) {
             assertThat(e.getMessage(), is("Missing or invalid Authorization header."));
         }
@@ -503,13 +536,14 @@ public class JwtFilterTest {
 
         try {
             jwtFilter.doFilter(request, response, filterChain);
+            Assert.fail();
         } catch (ServletException e) {
             assertThat(e.getMessage(), is("Missing or invalid Authorization header."));
         }
     }
 
     @Test
-    public void testGetTeamsInvalidRoles() throws Exception {
+    public void testGetTeamsBadObject() throws Exception {
         HttpServletRequest request = mock(HttpServletRequest.class);
         HttpServletResponse response = mock(HttpServletResponse.class);
         FilterChain filterChain = mock(FilterChain.class);
@@ -528,6 +562,33 @@ public class JwtFilterTest {
 
         try {
             jwtFilter.doFilter(request, response, filterChain);
+            Assert.fail();
+        } catch (ServletException e) {
+            assertThat(e.getMessage(), is("Bad object."));
+        }
+    }
+
+    @Test
+    public void testGetTeamsInvalidRoles() throws Exception {
+        HttpServletRequest request = mock(HttpServletRequest.class);
+        HttpServletResponse response = mock(HttpServletResponse.class);
+        FilterChain filterChain = mock(FilterChain.class);
+
+        final String jwt = Jwts.builder()
+                .setSubject("john")
+                .setIssuer("Authentication")
+                .claim("roles", Arrays.asList(""))
+                // sign the JWT with the given algorithm and apiKey
+                .signWith(SignatureAlgorithm.HS256, apiKey)
+                .compact();
+
+        when(request.getRequestURI()).thenReturn("/teams/");
+        when(request.getMethod()).thenReturn("GET");
+        when(request.getHeader("Authorization")).thenReturn("Bearer " + jwt);
+
+        try {
+            jwtFilter.doFilter(request, response, filterChain);
+            Assert.fail();
         } catch (ServletException e) {
             assertThat(e.getMessage(), is("Invalid roles."));
         }
@@ -552,5 +613,49 @@ public class JwtFilterTest {
         when(request.getHeader("Authorization")).thenReturn("Bearer " + jwt);
 
         jwtFilter.doFilter(request, response, filterChain);
+    }
+
+    @Test
+    public void testMalformedJwtException() throws Exception {
+        HttpServletRequest request = mock(HttpServletRequest.class);
+        HttpServletResponse response = mock(HttpServletResponse.class);
+        FilterChain filterChain = mock(FilterChain.class);
+
+        when(request.getRequestURI()).thenReturn("/teams/");
+        when(request.getMethod()).thenReturn("GET");
+        when(request.getHeader("Authorization")).thenReturn("Bearer " + "abc");
+
+        try {
+            jwtFilter.doFilter(request, response, filterChain);
+            Assert.fail();
+        } catch (ServletException e) {
+            assertThat(e.getMessage(), is("Invalid token."));
+        }
+    }
+
+    @Test
+    public void testSignatureException() throws Exception {
+        HttpServletRequest request = mock(HttpServletRequest.class);
+        HttpServletResponse response = mock(HttpServletResponse.class);
+        FilterChain filterChain = mock(FilterChain.class);
+
+        final String jwt = Jwts.builder()
+                .setSubject("john")
+                .setIssuer("Authentication")
+                .claim("roles", Arrays.asList(Role.USER))
+                // sign the JWT with the given algorithm and apiKey
+                .signWith(SignatureAlgorithm.HS256, new SecretKeySpec("456".getBytes(), SignatureAlgorithm.HS256.getJcaName()))
+                .compact();
+
+        when(request.getRequestURI()).thenReturn("/teams/");
+        when(request.getMethod()).thenReturn("GET");
+        when(request.getHeader("Authorization")).thenReturn("Bearer " + jwt);
+
+        try {
+            jwtFilter.doFilter(request, response, filterChain);
+            Assert.fail();
+        } catch (ServletException e) {
+            assertThat(e.getMessage(), is("Invalid token."));
+        }
     }
 }

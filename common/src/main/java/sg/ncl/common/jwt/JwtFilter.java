@@ -2,6 +2,7 @@ package sg.ncl.common.jwt;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.MalformedJwtException;
 import io.jsonwebtoken.SignatureException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.filter.GenericFilterBean;
@@ -53,7 +54,7 @@ public class JwtFilter extends GenericFilterBean {
             log.info("Send request with Authorization: {} to {}", authHeader, ((HttpServletRequest) req).getRequestURI());
             try {
                 checkRoles(request, token);
-            } catch (final SignatureException e) {
+            } catch (final SignatureException | MalformedJwtException e) {
                 log.warn("Invalid token: {}", e);
                 throw new ServletException("Invalid token.");
             }
@@ -65,7 +66,7 @@ public class JwtFilter extends GenericFilterBean {
         final Claims claims = Jwts.parser().setSigningKey(apiKey)
                 .parseClaimsJws(token).getBody();
         request.setAttribute("claims", claims);
-        List claimRole = (List) claims.get("roles");
+        Object claimRole = claims.get("roles");
         log.info("Subject: {}", claims.getSubject());
         log.info("Issued At: {}", claims.getIssuedAt());
         log.info("Expiration: {}", claims.getExpiration());
@@ -73,9 +74,14 @@ public class JwtFilter extends GenericFilterBean {
 
         // check requester's roles
         // using this way instead of comparing against Role.USER/ADMIN to prevent coupling of "service-authentication" with "common"
-        if (claimRole == null || (!claimRole.contains(Role.USER.toString()) && !claimRole.contains(Role.ADMIN.toString()))) {
-            log.warn("Invalid roles: {}", claims.get("roles"));
-            throw new ServletException("Invalid roles.");
+        if (claimRole instanceof List) {
+            List roleList = (List) claimRole;
+            if (roleList == null || (!roleList.contains(Role.USER.toString()) && !roleList.contains(Role.ADMIN.toString()))) {
+                log.warn("Invalid roles: {}", claims.get("roles"));
+                throw new ServletException("Invalid roles.");
+            }
+        } else {
+            throw new ServletException("Bad object.");
         }
     }
 
@@ -90,8 +96,8 @@ public class JwtFilter extends GenericFilterBean {
         String requestMethod = ((HttpServletRequest) req).getMethod();
 
         if (requestURI.startsWith("/authentication") ||
-                isUsersWhitelist(requestURI, requestMethod, "/users", get) ||
-                (isUsersWhitelist(requestURI, requestMethod, "/registrations", post)) ||
+                isUsersWhitelist(requestURI, requestMethod) ||
+                (isRegWhitelist(requestURI, requestMethod)) ||
                 isTeamUrlWhitelist(req)
                 ) {
             log.info("Whitelist: {} - {}", requestURI, requestMethod);
@@ -124,7 +130,11 @@ public class JwtFilter extends GenericFilterBean {
         return param != null && param.length > 0 && param[0].equals("PUBLIC");
     }
 
-    private boolean isUsersWhitelist(String requestURI, String requestMethod, String prefix, String get) {
-        return requestURI.startsWith(prefix) && (requestMethod.equals(get));
+    private boolean isUsersWhitelist(String requestURI, String requestMethod) {
+        return requestURI.startsWith("/users") && (requestMethod.equals(get));
+    }
+
+    private boolean isRegWhitelist(String requestURI, String requestMethod) {
+        return (requestURI.equals("/registrations") || requestURI.equals("/registrations/"))  && (requestMethod.equals(post));
     }
 }
