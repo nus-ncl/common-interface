@@ -48,6 +48,7 @@ public class ExperimentServiceImpl implements ExperimentService {
     /**
      * Creates an experiment and realization object on DB.
      * Also creates the experiment on Deterlab DB.
+     *
      * @param experiment the experiment object passed from web service
      * @return the experiment entity stored on our DB
      */
@@ -184,6 +185,7 @@ public class ExperimentServiceImpl implements ExperimentService {
 
     /**
      * Invokes the adapter to create an experiment on Deterlab DB
+     *
      * @param experiment the experiment object
      */
     private void createExperimentInDeter(Experiment experiment) {
@@ -211,10 +213,11 @@ public class ExperimentServiceImpl implements ExperimentService {
     /**
      * Deletes the experiment and realization object from our DB.
      * Also deletes the experiment on Deterlab DB.
-     * @implNote delete the realization object first, follow by the experiment object (the reverse process of create)
-     * @param id the experiment id (DB UUID), i.e. not the experiment name
+     *
+     * @param id       the experiment id (DB UUID), i.e. not the experiment name
      * @param teamName the team where the experiment is in (required by Deterlab so that we delete the correct experiment)
      * @return the deleted experiment object
+     * @implNote delete the realization object first, follow by the experiment object (the reverse process of create)
      */
     @Transactional
     public Experiment deleteExperiment(final Long id, final String teamName) {

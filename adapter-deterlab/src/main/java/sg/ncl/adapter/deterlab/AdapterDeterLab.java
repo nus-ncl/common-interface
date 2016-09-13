@@ -4,14 +4,25 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.http.*;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 import sg.ncl.adapter.deterlab.data.jpa.DeterLabUserRepository;
 import sg.ncl.adapter.deterlab.dtos.entities.DeterLabUserEntity;
-import sg.ncl.adapter.deterlab.exceptions.*;
+import sg.ncl.adapter.deterlab.exceptions.AdapterDeterlabConnectException;
+import sg.ncl.adapter.deterlab.exceptions.CredentialsUpdateException;
+import sg.ncl.adapter.deterlab.exceptions.DeterLabOperationFailedException;
+import sg.ncl.adapter.deterlab.exceptions.ExpDeleteException;
+import sg.ncl.adapter.deterlab.exceptions.ExpNameAlreadyExistsException;
+import sg.ncl.adapter.deterlab.exceptions.ExpStartException;
+import sg.ncl.adapter.deterlab.exceptions.NSFileParseException;
+import sg.ncl.adapter.deterlab.exceptions.UserNotFoundException;
 
 import javax.inject.Inject;
 
@@ -38,6 +49,7 @@ public class AdapterDeterLab {
     /**
      * Creates a join project request to Deterlab
      * Also creates a new user
+     *
      * @param jsonString
      * @return The Deter userid (randomly generated)
      */
@@ -78,6 +90,7 @@ public class AdapterDeterLab {
     /**
      * Creates a apply project request to Deterlab
      * Also creates a new user
+     *
      * @param jsonString
      * @return The Deter userid (randomly generated)
      */
@@ -117,6 +130,7 @@ public class AdapterDeterLab {
     /**
      * Creates a apply project request to Deterlab
      * Does not create a new user
+     *
      * @param jsonString Contains uid, project name, pid, project goals, project web, project organisation, project visibility
      */
     public String applyProject(String jsonString) {
@@ -136,7 +150,7 @@ public class AdapterDeterLab {
         String responseBody = response.getBody().toString();
         try {
             String jsonResult = new JSONObject(responseBody).getString("msg");
-            if(!"apply project request existing users success".equals(jsonResult)) {
+            if (!"apply project request existing users success".equals(jsonResult)) {
                 logger.warn("Apply project as existing user to DeterLab failed: {}", responseBody);
                 throw new DeterLabOperationFailedException();
             }
@@ -151,6 +165,7 @@ public class AdapterDeterLab {
     /**
      * Creates a join project request to Deterlab
      * Does not create a new user
+     *
      * @param jsonString Contains uid, pid
      */
     public String joinProject(String jsonString) {
@@ -184,6 +199,7 @@ public class AdapterDeterLab {
 
     /**
      * Creates a edit user profile request to Deterlab
+     *
      * @param jsonString Contains uid, password, confirm password
      */
     public void updateCredentials(String jsonString) {
@@ -232,6 +248,7 @@ public class AdapterDeterLab {
 
     /**
      * Creates a create experiment request to Deterlab
+     *
      * @param jsonString Contains id, userId, teamId, teamName, name (experiment name), description, nsFile, nsFileContent, idleSwap, maxDuration, deterLogin (deter userId), userServerUri
      */
     public void createExperiment(String jsonString) {
@@ -262,9 +279,10 @@ public class AdapterDeterLab {
 
     /**
      * Creates a start experiment request to Deterlab
-     * @implNote must return the entire response body as realization service needs to store the experiment report to transmit back to UI
+     *
      * @param jsonString Contains pid, eid, and deterlab userId
      * @return a experiment report if the experiment is started successfully and active, otherwise a "experiment start fail" is return
+     * @implNote must return the entire response body as realization service needs to store the experiment report to transmit back to UI
      */
     public String startExperiment(String jsonString) {
         logger.info("Start experiment - {} at {}: {}", properties.getIp(), properties.getPort(), jsonString);
@@ -299,9 +317,10 @@ public class AdapterDeterLab {
 
     /**
      * Creates a stop experiment request to Deterlab
-     * @implNote we don't throw any exception if the result returned from deterlab is not "swapped" since there may be other types of experiment status unknown to us
+     *
      * @param jsonString Contains pid, eid, and deterlab userId
      * @return the experiment status
+     * @implNote we don't throw any exception if the result returned from deterlab is not "swapped" since there may be other types of experiment status unknown to us
      */
     public String stopExperiment(String jsonString) {
         logger.info("Stop experiment - {} at {}: {}", properties.getIp(), properties.getPort(), jsonString);
@@ -331,6 +350,7 @@ public class AdapterDeterLab {
 
     /**
      * Creates a delete experiment request to Deterlab
+     *
      * @param jsonString Contains experiment name, team name and deterlab userid
      * @return the experiment status
      */
@@ -364,9 +384,10 @@ public class AdapterDeterLab {
 
     /**
      * Retrieves the experiment status from Deterlab
-     * @implNote cannot throw exception for this method
+     *
      * @param jsonString Contains eid and pid
      * @return the status of the experiment, a "error" if the request fails
+     * @implNote cannot throw exception for this method
      */
     public String getExperimentStatus(String jsonString) {
         logger.info("Get experiment status - {} at {} : {}", properties.getIp(), properties.getPort(), jsonString);
@@ -391,7 +412,7 @@ public class AdapterDeterLab {
 
     public String processJoinRequest(String jsonString) {
         JSONObject request = new JSONObject(jsonString);
-        if(request.length() < 5) {
+        if (request.length() < 5) {
             logger.warn("NOT enough inputs: {}", jsonString);
             throw new IllegalArgumentException();
         }
@@ -406,7 +427,7 @@ public class AdapterDeterLab {
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
         HttpEntity<String> httpRequest = new HttpEntity<>(jsonString, headers);
-        String reqUrl = "approve".equals(action)? properties.getApproveJoinRequest() : properties.getRejectJoinRequest();
+        String reqUrl = "approve".equals(action) ? properties.getApproveJoinRequest() : properties.getRejectJoinRequest();
 
         ResponseEntity httpResponse;
         try {
@@ -423,7 +444,7 @@ public class AdapterDeterLab {
             }
             logger.info("{} join request to team {} OK", action, pid);
             return responseBody;
-        }  catch (JSONException e) {
+        } catch (JSONException e) {
             logger.warn("Error parsing response code process join request: {}", responseBody);
             throw e;
         }

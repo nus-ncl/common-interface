@@ -66,10 +66,11 @@ public class AuthenticationServiceImpl implements AuthenticationService {
                     .setExpiration(Date.from(expiry.toInstant()))
                     // TODO custom claims such as permissions
 //                    .claim()
+                    .claim("roles", credentials.getRoles())
                     // sign the JWT with the given algorithm and apiKey
                     .signWith(signatureAlgorithm, apiKey)
                     .compact();
-            return new AuthorizationInfo(credentials.getId(), jwt);
+            return new AuthorizationInfo(credentials.getId(), jwt, credentials.getRoles());
         }
         // TODO lockout behavior
         throw new InvalidCredentialsException(username);

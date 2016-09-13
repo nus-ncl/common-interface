@@ -14,9 +14,9 @@ import sg.ncl.service.user.domain.Address;
 import sg.ncl.service.user.domain.User;
 import sg.ncl.service.user.domain.UserDetails;
 import sg.ncl.service.user.domain.UserService;
-import sg.ncl.service.user.exceptions.UserIdNullOrEmptyException;
 import sg.ncl.service.user.domain.UserStatus;
 import sg.ncl.service.user.exceptions.InvalidStatusTransitionException;
+import sg.ncl.service.user.exceptions.UserIdNullOrEmptyException;
 import sg.ncl.service.user.exceptions.UserNotFoundException;
 import sg.ncl.service.user.exceptions.UsernameAlreadyExistsException;
 
@@ -166,7 +166,7 @@ public class UserServiceTest extends AbstractTest {
         UserEntity userEntity = userEntityArray[0];
         String userId = userEntity.getId();
         String teamId = RandomStringUtils.randomAlphabetic(20);
-        userEntity.addTeamId(teamId);
+        userEntity.addTeam(teamId);
         userService.updateUser(userId, userEntity);
 
         User userFromDb = userService.getUser(userId);

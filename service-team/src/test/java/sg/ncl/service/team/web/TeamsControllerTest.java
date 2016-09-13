@@ -93,8 +93,8 @@ public class TeamsControllerTest extends AbstractTest {
 
     @Test
     public void testGetTeamWithNoUserInDb() throws Exception {
-            mockMvc.perform(get("/teams/" + RandomStringUtils.randomAlphabetic(20)))
-                    .andExpect(status().isNotFound());
+        mockMvc.perform(get("/teams/" + RandomStringUtils.randomAlphabetic(20)))
+                .andExpect(status().isNotFound());
     }
 
     @Test

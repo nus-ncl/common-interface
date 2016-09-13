@@ -55,7 +55,7 @@ public class EmailEntityTest {
     public void testSetRecipients() {
         EmailEntity emailEntity = new EmailEntity();
         final String recipients = "alice@ncl.sg";
-        emailEntity.setRecipients(new String[] {recipients});
+        emailEntity.setRecipients(new String[]{recipients});
         final String[] to = emailEntity.getRecipients();
         assertThat(to.length, is(equalTo(1)));
         assertThat(to[0], is(equalTo(recipients)));
@@ -71,7 +71,7 @@ public class EmailEntityTest {
     public void testSetCc() {
         EmailEntity emailEntity = new EmailEntity();
         final String cc = "alice@ncl.sg";
-        emailEntity.setCc(new String[] {cc});
+        emailEntity.setCc(new String[]{cc});
         final String[] cc2 = emailEntity.getCc();
         assertThat(cc2.length, is(equalTo(1)));
         assertThat(cc2[0], is(equalTo(cc)));
@@ -87,7 +87,7 @@ public class EmailEntityTest {
     public void testSetBcc() {
         EmailEntity emailEntity = new EmailEntity();
         final String bccString = "alice@ncl.sg";
-        emailEntity.setBcc(new String[] {bccString});
+        emailEntity.setBcc(new String[]{bccString});
         final String[] bcc = emailEntity.getBcc();
         assertThat(bcc.length, is(equalTo(1)));
         assertThat(bcc[0], is(equalTo(bccString)));
@@ -217,7 +217,7 @@ public class EmailEntityTest {
         final Long id = Long.parseLong(RandomStringUtils.randomNumeric(10));
         entity.setId(id);
         entity.setSender("alice@ncl.sg");
-        entity.setRecipients(new String[] {"bob@ncl.sg"});
+        entity.setRecipients(new String[]{"bob@ncl.sg"});
         entity.setSubject("subject");
         entity.setContent("content");
         entity.setHtml(false);

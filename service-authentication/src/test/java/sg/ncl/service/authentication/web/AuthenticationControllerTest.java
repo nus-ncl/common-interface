@@ -12,8 +12,13 @@ import org.springframework.util.Base64Utils;
 import org.springframework.web.context.WebApplicationContext;
 import sg.ncl.service.authentication.AbstractTest;
 import sg.ncl.service.authentication.domain.AuthenticationService;
+import sg.ncl.common.authentication.Role;
 
 import javax.inject.Inject;
+
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Set;
 
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
@@ -49,17 +54,19 @@ public class AuthenticationControllerTest extends AbstractTest {
 
     @Test
     public void testLoginGood() throws Exception {
+        final Set<Role> roles = new HashSet<>(Arrays.asList(Role.USER));
         final String username = "username";
         final String password = "password";
         final String s = Base64Utils.encodeToString((username + ":" + password).getBytes());
 
-        when(authenticationService.login(eq(username), eq(password))).thenReturn(new AuthorizationInfo("id", "jwt token"));
+        when(authenticationService.login(eq(username), eq(password))).thenReturn(new AuthorizationInfo("id", "jwt token", roles));
 
         mockMvc.perform(post.header(HttpHeaders.AUTHORIZATION, "Basic " + s))
                 .andExpect(status().isOk())
                 .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$.id", is(equalTo("id"))))
-                .andExpect(jsonPath("$.token", is(equalTo("jwt token"))));
+                .andExpect(jsonPath("$.token", is(equalTo("jwt token"))))
+                .andExpect(jsonPath("$.roles[0]", is(equalTo("USER"))));
     }
 
     @Test

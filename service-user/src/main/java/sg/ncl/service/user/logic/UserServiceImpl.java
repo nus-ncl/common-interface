@@ -9,11 +9,11 @@ import sg.ncl.service.user.data.jpa.UserRepository;
 import sg.ncl.service.user.domain.Address;
 import sg.ncl.service.user.domain.User;
 import sg.ncl.service.user.domain.UserService;
-import sg.ncl.service.user.exceptions.UserIdNullOrEmptyException;
 import sg.ncl.service.user.domain.UserStatus;
 import sg.ncl.service.user.exceptions.EmailNotMatchException;
 import sg.ncl.service.user.exceptions.InvalidStatusTransitionException;
 import sg.ncl.service.user.exceptions.InvalidUserStatusException;
+import sg.ncl.service.user.exceptions.UserIdNullOrEmptyException;
 import sg.ncl.service.user.exceptions.UserNotFoundException;
 import sg.ncl.service.user.exceptions.UsernameAlreadyExistsException;
 import sg.ncl.service.user.exceptions.VerificationKeyNotMatchException;
@@ -48,10 +48,7 @@ public class UserServiceImpl implements UserService {
         userEntity.setApplicationDate(user.getApplicationDate());
         userEntity.setProcessedDate(user.getProcessedDate());
         userEntity.setUserDetails((UserDetailsEntity) user.getUserDetails());
-        userEntity.addRole(User.Role.USER);
-
         userEntity.setVerificationKey(RandomStringUtils.randomAlphanumeric(20));
-
         UserEntity savedUserEntity = userRepository.save(userEntity);
         return savedUserEntity;
     }
@@ -71,7 +68,7 @@ public class UserServiceImpl implements UserService {
     public UserStatus verifyEmail(@NotNull String uid, @NotNull String email, @NotNull String key) {
 
         final UserEntity user = findUser(uid);
-        if(user == null) {
+        if (user == null) {
             log.warn("User not found when verify email: {}", uid);
             throw new UserNotFoundException(uid);
         }
@@ -99,7 +96,7 @@ public class UserServiceImpl implements UserService {
     @Transactional
     public void updateUser(final String id, final User user) {
         final UserEntity one = findUser(id);
-        if(one == null) {
+        if (one == null) {
             log.warn("User not found when updating: {}", id);
             throw new UserNotFoundException(id);
         }
@@ -170,22 +167,22 @@ public class UserServiceImpl implements UserService {
     @Transactional
     public void addTeam(final String userId, final String teamId) {
         UserEntity one = findUser(userId);
-        if(one == null) {
+        if (one == null) {
             log.warn("User not found when adding team: {}", userId);
             throw new UserNotFoundException(userId);
         }
-        one.addTeamId(teamId);
+        one.addTeam(teamId);
         userRepository.save(one);
     }
 
     @Transactional
     public void removeTeam(final String userId, final String teamId) {
         UserEntity one = findUser(userId);
-        if(one == null) {
+        if (one == null) {
             log.warn("User not found when removing team: {}", userId);
             throw new UserNotFoundException(userId);
         }
-        one.removeTeamId(teamId);
+        one.removeTeam(teamId);
         userRepository.save(one);
     }
 
@@ -200,7 +197,7 @@ public class UserServiceImpl implements UserService {
     @Transactional
     public User updateUserStatus(final String id, final UserStatus status) {
         UserEntity one = findUser(id);
-        if(one == null) {
+        if (one == null) {
             log.warn("User not found when update status: {}", id);
             throw new UserNotFoundException(id);
         }

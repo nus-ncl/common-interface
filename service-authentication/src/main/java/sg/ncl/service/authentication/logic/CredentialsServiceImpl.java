@@ -10,6 +10,7 @@ import sg.ncl.service.authentication.data.jpa.CredentialsRepository;
 import sg.ncl.service.authentication.domain.Credentials;
 import sg.ncl.service.authentication.domain.CredentialsService;
 import sg.ncl.service.authentication.domain.CredentialsStatus;
+import sg.ncl.common.authentication.Role;
 import sg.ncl.service.authentication.exceptions.CredentialsNotFoundException;
 import sg.ncl.service.authentication.exceptions.UserIdAlreadyExistsException;
 import sg.ncl.service.authentication.exceptions.UsernameAlreadyExistsException;
@@ -20,7 +21,11 @@ import javax.validation.constraints.NotNull;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static sg.ncl.service.authentication.validation.Validator.validateForCreation;
+import static sg.ncl.service.authentication.validation.Validator.checkId;
+import static sg.ncl.service.authentication.validation.Validator.checkPassword;
+import static sg.ncl.service.authentication.validation.Validator.checkRoles;
+import static sg.ncl.service.authentication.validation.Validator.checkStatus;
+import static sg.ncl.service.authentication.validation.Validator.checkUsername;
 import static sg.ncl.service.authentication.validation.Validator.validateForUpdate;
 
 /**
@@ -35,32 +40,37 @@ public class CredentialsServiceImpl implements CredentialsService {
     private final AdapterDeterLab adapterDeterLab;
 
     @Inject
-    protected CredentialsServiceImpl(@NotNull final CredentialsRepository credentialsRepository, @NotNull final PasswordEncoder passwordEncoder, @NotNull final AdapterDeterLab adapterDeterLab) {
+    CredentialsServiceImpl(@NotNull final CredentialsRepository credentialsRepository, @NotNull final PasswordEncoder passwordEncoder, @NotNull final AdapterDeterLab adapterDeterLab) {
         this.credentialsRepository = credentialsRepository;
         this.passwordEncoder = passwordEncoder;
         this.adapterDeterLab = adapterDeterLab;
     }
 
     @Transactional
+    @Override
     public List<Credentials> getAll() {
         return credentialsRepository.findAll().stream().collect(Collectors.toList());
     }
 
     @Transactional
+    @Override
     public Credentials addCredentials(@NotNull final Credentials credentials) {
-        validateForCreation(credentials);
+        checkId(credentials);
+        checkUsername(credentials);
+        checkPassword(credentials);
         // check if the user id already exists
         if (credentialsRepository.findOne(credentials.getId()) == null) {
             // check if the username already exists
             if (credentialsRepository.findByUsername(credentials.getUsername()) == null) {
                 final CredentialsEntity entity = new CredentialsEntity();
+                entity.setId(credentials.getId());
                 entity.setUsername(credentials.getUsername());
                 hashPassword(entity, credentials.getPassword());
-                entity.setId(credentials.getId());
                 entity.setStatus(CredentialsStatus.ACTIVE);
-                final CredentialsEntity savedEntity = credentialsRepository.save(entity);
-                log.info("Credentials created: {}", savedEntity);
-                return savedEntity;
+                entity.addRole(Role.USER);
+                final CredentialsEntity saved = credentialsRepository.save(entity);
+                log.info("Credentials created: {}", saved);
+                return saved;
             }
             log.warn("Username '{}' is already associated with a credentials", credentials.getUsername());
             throw new UsernameAlreadyExistsException(credentials.getUsername());
@@ -70,25 +80,86 @@ public class CredentialsServiceImpl implements CredentialsService {
     }
 
     @Transactional
+    @Override
     public Credentials updateCredentials(@NotNull final String id, @NotNull final Credentials credentials) {
         validateForUpdate(credentials);
-        // check if the username exists
-        final CredentialsEntity entity = credentialsRepository.findOne(id);
-        if (entity == null) {
-            log.warn("Credentials for '{}' not found", id);
-            throw new CredentialsNotFoundException(id);
-        }
+        final CredentialsEntity entity = findCredentials(id);
         if (credentials.getUsername() != null && !credentials.getUsername().isEmpty()) {
             entity.setUsername(credentials.getUsername());
         }
         if (credentials.getPassword() != null && !credentials.getPassword().isEmpty()) {
             hashPassword(entity, credentials.getPassword());
+            changePassword(id, credentials.getPassword());
         }
+        final CredentialsEntity saved = credentialsRepository.save(entity);
+        log.info("Credentials updated: {}", saved);
+        return saved;
+    }
 
-        final CredentialsEntity savedEntity = credentialsRepository.save(entity);
-        changePassword(id, credentials.getPassword());
-        log.info("Credentials updated: {}", savedEntity);
-        return savedEntity;
+    @Transactional
+    @Override
+    public Credentials updateUsername(@NotNull final String id, @NotNull final Credentials credentials) {
+        checkUsername(credentials);
+        final CredentialsEntity entity = findCredentials(id);
+        entity.setUsername(credentials.getUsername());
+        final CredentialsEntity saved = credentialsRepository.save(entity);
+        log.info("Username updated: {}", saved);
+        return saved;
+    }
+
+    @Transactional
+    @Override
+    public Credentials updatePassword(@NotNull final String id, @NotNull final Credentials credentials) {
+        checkPassword(credentials);
+        final CredentialsEntity entity = findCredentials(id);
+        hashPassword(entity, credentials.getPassword());
+        changePassword(credentials.getId(), credentials.getPassword());
+        final CredentialsEntity saved = credentialsRepository.save(entity);
+        log.info("Password updated: {}", saved);
+        return saved;
+    }
+
+    @Transactional
+    @Override
+    public Credentials updateStatus(@NotNull final String id, @NotNull final Credentials credentials) {
+        checkStatus(credentials);
+        final CredentialsEntity entity = findCredentials(id);
+        entity.setStatus(credentials.getStatus());
+        final CredentialsEntity saved = credentialsRepository.save(entity);
+        log.info("Status updated: {}", saved);
+        return saved;
+    }
+
+    @Transactional
+    @Override
+    public Credentials addRoles(@NotNull final String id, @NotNull final Credentials credentials) {
+        checkRoles(credentials);
+        final CredentialsEntity entity = findCredentials(id);
+        credentials.getRoles().forEach(entity::addRole);
+        final CredentialsEntity saved = credentialsRepository.save(entity);
+        log.info("Roles added: {}", saved);
+        return saved;
+    }
+
+    @Transactional
+    @Override
+    public Credentials removeRoles(@NotNull final String id, @NotNull final Credentials credentials) {
+        checkRoles(credentials);
+        final CredentialsEntity entity = findCredentials(id);
+        credentials.getRoles().forEach(entity::removeRole);
+        final CredentialsEntity saved = credentialsRepository.save(entity);
+        log.info("Roles removed: {}", saved);
+        return saved;
+    }
+
+    private CredentialsEntity findCredentials(final String id) {
+        final CredentialsEntity entity = credentialsRepository.findOne(id);
+        // check if the username exists
+        if (entity == null) {
+            log.warn("Credentials for '{}' not found", id);
+            throw new CredentialsNotFoundException(id);
+        }
+        return entity;
     }
 
     private void hashPassword(final CredentialsEntity entity, final String password) {
@@ -97,8 +168,9 @@ public class CredentialsServiceImpl implements CredentialsService {
 
     /**
      * Invokes the change password on Deterlab
+     *
      * @param nclUserId the ncl UUID
-     * @param password the clear password
+     * @param password  the clear password
      */
     private void changePassword(String nclUserId, String password) {
         JSONObject adapterObject = new JSONObject();

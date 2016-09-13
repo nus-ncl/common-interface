@@ -45,7 +45,7 @@ public class UsersController {
     @ResponseStatus(HttpStatus.OK)
     public User getUser(@PathVariable String id) {
         User one = userService.getUser(id);
-        if(one == null) {
+        if (one == null) {
             log.warn("User not found: {}", id);
             throw new UserNotFoundException(id);
         }

@@ -9,8 +9,18 @@ public interface CredentialsService {
 
     List<Credentials> getAll();
 
-    Credentials addCredentials(final Credentials credentials);
+    Credentials addCredentials(Credentials credentials);
 
-    Credentials updateCredentials(final String id, final Credentials credentials);
+    Credentials updateCredentials(String id, Credentials credentials);
+
+    Credentials updateUsername(String id, Credentials credentials);
+
+    Credentials updatePassword(String id, Credentials credentials);
+
+    Credentials updateStatus(String id, Credentials credentials);
+
+    Credentials addRoles(String id, Credentials credentials);
+
+    Credentials removeRoles(String id, Credentials credentials);
 
 }

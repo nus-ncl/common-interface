@@ -1,5 +1,9 @@
 package sg.ncl.service.authentication.domain;
 
+import sg.ncl.common.authentication.Role;
+
+import java.util.Set;
+
 /**
  * Interface that represents the credentials of a user.
  *
@@ -34,5 +38,12 @@ public interface Credentials {
      * @return the status of this credentials.
      */
     CredentialsStatus getStatus();
+
+    /**
+     * Returns the set {@link Role}s associated to this credentials.
+     *
+     * @return the set {@link Role}s associated to this credentials.
+     */
+    Set<Role> getRoles();
 
 }

@@ -6,6 +6,7 @@ import org.junit.rules.ExpectedException;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.orm.jpa.JpaSystemException;
 import sg.ncl.service.authentication.AbstractTest;
+import sg.ncl.common.authentication.Role;
 
 import javax.inject.Inject;
 import java.time.ZonedDateTime;
@@ -44,7 +45,7 @@ public class CredentialsRepositoryTest extends AbstractTest {
         assertThat(entity.getId(), is(equalTo(savedEntity.getId())));
         assertThat(savedEntity.getCreatedDate(), is(not(nullValue(ZonedDateTime.class))));
         assertThat(savedEntity.getLastModifiedDate(), is(not(nullValue(ZonedDateTime.class))));
-        assertThat(savedEntity.getVersion(), is(equalTo(0L)));
+        assertThat(savedEntity.getVersion(), is(equalTo(1L)));
     }
 
     @Test
@@ -97,6 +98,28 @@ public class CredentialsRepositoryTest extends AbstractTest {
         } catch (Exception e) {
             checkException(e, "PUBLIC.CREDENTIALS(USERNAME)");
         }
+    }
+
+    @Test
+    public void testGoodRole() throws Exception {
+        final CredentialsEntity entity = getCredentialsEntity();
+        CredentialsEntity savedEntity = repository.saveAndFlush(entity);
+        assertThat(savedEntity.getRoles().size(), is(1));
+        assertThat(savedEntity.getRoles().contains(Role.USER), is(true));
+        assertThat(savedEntity.getRoles().contains(Role.ADMIN), is(false));
+    }
+
+    @Test
+    public void testNullRole() throws Exception {
+        final CredentialsEntity entity = getCredentialsEntity();
+        entity.addRole(null);
+        try {
+            repository.saveAndFlush(entity);
+        } catch (Exception e) {
+            checkException(e, "NULL not allowed for column \"ROLE\"");
+            return;
+        }
+        exception.expect(DataIntegrityViolationException.class);
     }
 
 }

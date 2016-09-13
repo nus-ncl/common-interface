@@ -15,7 +15,6 @@ import javax.mail.Message.RecipientType;
 import javax.mail.Session;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -114,7 +113,7 @@ public class MailServiceImplTest {
 
         final EmailEntity entity = new EmailEntity();
         entity.setSender(from);
-        entity.setRecipients(new String[] {to});
+        entity.setRecipients(new String[]{to});
         entity.setSubject(subject);
         entity.setContent(content);
         entity.setHtml(false);
@@ -140,14 +139,14 @@ public class MailServiceImplTest {
     public void testRetry() {
         final EmailEntity entity1 = new EmailEntity();
         entity1.setSender("alice@ncl.sg");
-        entity1.setRecipients(new String[] {"bob@ncl.sg"});
+        entity1.setRecipients(new String[]{"bob@ncl.sg"});
         entity1.setSubject("subject 1");
         entity1.setContent("content");
         entity1.setHtml(false);
 
         final EmailEntity entity2 = new EmailEntity();
         entity2.setSender("alice@ncl.sg");
-        entity2.setRecipients(new String[] {"bob@ncl.sg"});
+        entity2.setRecipients(new String[]{"bob@ncl.sg"});
         entity2.setSubject("subject 2");
         entity2.setContent("content");
         entity2.setHtml(false);

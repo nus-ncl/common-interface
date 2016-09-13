@@ -36,6 +36,19 @@ CREATE TABLE IF NOT EXISTS `credentials` (
   DEFAULT CHARSET = latin1;
 
 --
+-- Table structure for table `credentials_roles`
+--
+
+CREATE TABLE IF NOT EXISTS `credentials_roles` (
+  `credentials_id` VARCHAR(255) NOT NULL,
+  `role`           VARCHAR(255) NOT NULL,
+  PRIMARY KEY (`credentials_id`, `role`),
+  CONSTRAINT `FKguvv5t3qk4mwhefyca0l0bj3y` FOREIGN KEY (`credentials_id`) REFERENCES `credentials` (`id`)
+)
+  ENGINE = InnoDB
+  DEFAULT CHARSET = latin1;
+
+--
 -- Table structure for table `deterlab_project`
 --
 CREATE TABLE IF NOT EXISTS `deterlab_project` (
@@ -261,17 +274,3 @@ CREATE TABLE IF NOT EXISTS `users_teams` (
 )
   ENGINE = InnoDB
   DEFAULT CHARSET = latin1;
-
---
--- Table structure for table `users_roles`
---
-CREATE TABLE IF NOT EXISTS `users_roles` (
-  `user_id` varchar(255) NOT NULL,
-  `roles`   varchar(255) NOT NULL,
-  PRIMARY KEY (`user_id`,`roles`),
-  KEY `IDX1hjw31qvltj7v3wb5o31jsrd8` (`user_id`),
-  KEY `IDXakos9oduijg8ig3wqp81bafb3` (`roles`),
-  CONSTRAINT `FK2o0jvgh89lemvvo17cbqvdxaa` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`)
-)
-  ENGINE = InnoDB
-  DEFAULT CHARSET = latin1

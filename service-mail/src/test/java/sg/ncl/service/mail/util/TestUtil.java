@@ -1,6 +1,5 @@
 package sg.ncl.service.mail.util;
 
-import org.apache.commons.lang3.RandomStringUtils;
 import sg.ncl.service.mail.data.jpa.EmailEntity;
 
 import java.time.ZonedDateTime;
@@ -10,7 +9,7 @@ import java.time.ZonedDateTime;
  */
 public class TestUtil {
     public static EmailEntity getEmailEntity() {
-        return getEmailEntity("admin@ncl.sg", new String[] {"user@ncl.sg"}, "subject", "content", false);
+        return getEmailEntity("admin@ncl.sg", new String[]{"user@ncl.sg"}, "subject", "content", false);
     }
 
     public static EmailEntity getEmailEntity(final String sender, final String[] recipients,

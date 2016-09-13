@@ -6,6 +6,7 @@ import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
+import sg.ncl.common.authentication.Role;
 import sg.ncl.service.authentication.domain.CredentialsStatus;
 import sg.ncl.service.team.domain.MemberStatus;
 import sg.ncl.service.team.domain.MemberType;
@@ -19,6 +20,8 @@ import javax.validation.constraints.NotNull;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.time.ZonedDateTime;
+import java.util.Arrays;
+import java.util.List;
 
 import static java.util.UUID.randomUUID;
 
@@ -46,6 +49,9 @@ public class FirstRun {
     static final String SQL_INSERT_CREDENTIALS = "INSERT INTO credentials"
             + "(id, created_date, last_modified_date, version, password, status, username) VALUES"
             + "(?, ?, ?, ?, ?, ?, ?)";
+    static final String SQL_INSERT_CREDENTIALS_ROLES = "INSERT INTO credentials_roles"
+            + "(credentials_id, role) VALUES"
+            + "(?, ?)";
     static final String SQL_INSERT_DETERLAB_USER = "INSERT INTO deterlab_user"
             + "(created_date, last_modified_date, version, deter_user_id, ncl_user_id) VALUES"
             + "(?, ?, ?, ?, ?)";
@@ -64,7 +70,6 @@ public class FirstRun {
         this.jdbcTemplate = jdbcTemplate;
         this.passwordEncoder = passwordEncoder;
     }
-
 
     private String createTeam(String teamName, String description, String organizationType, String url, final TeamPrivacy privacy, final TeamStatus status, final TeamVisibility visibility) throws SQLException {
         // insert the team
@@ -138,6 +143,9 @@ public class FirstRun {
         log.info("Insert {} credentials entry", i);
     }
 
+    private void createRoles(final String userId, final List<Role> roles) {
+        roles.forEach(role->jdbcTemplate.update(SQL_INSERT_CREDENTIALS_ROLES, userId, role.toString()));
+    }
 
     // add user to team for both user side and team side
     private void addToTeam(String userId, String teamId, MemberType memberType, MemberStatus memberStatus) throws SQLException {
@@ -160,6 +168,7 @@ public class FirstRun {
 
     public void wipe() throws SQLException {
         final String[] tables = {
+                "credentials_roles",
                 "credentials",
                 "deterlab_project",
                 "deterlab_user",
@@ -193,6 +202,8 @@ public class FirstRun {
         final String userId = createUser("Y", UserStatus.APPROVED, detailsId);
 
         createCredentials("admin@ncl.sg", "ncl", userId, CredentialsStatus.ACTIVE);
+
+        createRoles(userId, Arrays.asList(Role.ADMIN));
 
         addToTeam(userId, teamId, MemberType.OWNER, MemberStatus.APPROVED);
 
