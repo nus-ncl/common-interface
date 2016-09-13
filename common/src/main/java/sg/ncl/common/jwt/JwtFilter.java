@@ -96,10 +96,6 @@ public class JwtFilter extends GenericFilterBean {
         return false;
     }
 
-    private boolean isUsersWhitelist(String requestURI, String requestMethod, String prefix, String get) {
-        return requestURI.startsWith(prefix) && (requestMethod.equals(get));
-    }
-
     /**
      * Checks if the team URL requested is whitelisted, whitelisted URI do not have to be check for their Authentication Header
      * @param req the servlet request from web service
@@ -111,7 +107,7 @@ public class JwtFilter extends GenericFilterBean {
             String[] param = req.getParameterValues("visibility");
             String[] nameParam = req.getParameterValues("name");
 
-            if ((param != null && param.length > 0 && param[0].equals("PUBLIC")) ||
+            if (isParamPublic(param) ||
                     (nameParam != null && nameParam.length > 0)
                     ) {
                 return true;
@@ -120,5 +116,11 @@ public class JwtFilter extends GenericFilterBean {
         return false;
     }
 
+    private boolean isParamPublic(String[] param) {
+        return param != null && param.length > 0 && param[0].equals("PUBLIC");
+    }
 
+    private boolean isUsersWhitelist(String requestURI, String requestMethod, String prefix, String get) {
+        return requestURI.startsWith(prefix) && (requestMethod.equals(get));
+    }
 }
