@@ -5,6 +5,7 @@ import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.filter.GenericFilterBean;
+import sg.ncl.common.authentication.Role;
 
 import javax.inject.Inject;
 import javax.servlet.FilterChain;
@@ -53,14 +54,15 @@ public class JwtFilter extends GenericFilterBean {
                 final Claims claims = Jwts.parser().setSigningKey(apiKey)
                         .parseClaimsJws(token).getBody();
                 request.setAttribute("claims", claims);
+                Object claimRole = claims.get("roles");
                 log.info("Subject: {}", claims.getSubject());
                 log.info("Issued At: {}", claims.getIssuedAt());
                 log.info("Expiration: {}", claims.getExpiration());
-                log.info("Roles: {}", claims.get("roles"));
+                log.info("Roles: {}", claimRole);
 
                 // check requester's roles
                 // using this way instead of comparing against Role.USER/ADMIN to prevent coupling of "service-authentication" with "common"
-                if (claims.get("roles") == null || (!claims.get("roles").toString().equals("[USER]") && !claims.get("roles").toString().equals("[ADMIN]"))) {
+                if (claimRole == null || (claimRole != Role.USER && claimRole != Role.ADMIN)) {
                     log.warn("Invalid roles: {}", claims.get("roles"));
                     throw new ServletException("Invalid roles.");
                 }
