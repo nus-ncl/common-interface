@@ -51,28 +51,31 @@ public class JwtFilter extends GenericFilterBean {
             final String token = authHeader.substring(7); // The part after "Bearer "
             log.info("Send request with Authorization: {} to {}", authHeader, ((HttpServletRequest) req).getRequestURI());
             try {
-                final Claims claims = Jwts.parser().setSigningKey(apiKey)
-                        .parseClaimsJws(token).getBody();
-                request.setAttribute("claims", claims);
-                Object claimRole = claims.get("roles");
-                log.info("Subject: {}", claims.getSubject());
-                log.info("Issued At: {}", claims.getIssuedAt());
-                log.info("Expiration: {}", claims.getExpiration());
-                log.info("Roles: {}", claimRole);
-
-                // check requester's roles
-                // using this way instead of comparing against Role.USER/ADMIN to prevent coupling of "service-authentication" with "common"
-                if (claimRole == null || (claimRole != Role.USER && claimRole != Role.ADMIN)) {
-                    log.warn("Invalid roles: {}", claims.get("roles"));
-                    throw new ServletException("Invalid roles.");
-                }
-
+                checkRoles(request, token);
             } catch (final SignatureException e) {
                 log.warn("Invalid token: {}", e);
                 throw new ServletException("Invalid token.");
             }
         }
         chain.doFilter(req, res);
+    }
+
+    private void checkRoles(HttpServletRequest request, String token) throws ServletException {
+        final Claims claims = Jwts.parser().setSigningKey(apiKey)
+                .parseClaimsJws(token).getBody();
+        request.setAttribute("claims", claims);
+        Object claimRole = claims.get("roles");
+        log.info("Subject: {}", claims.getSubject());
+        log.info("Issued At: {}", claims.getIssuedAt());
+        log.info("Expiration: {}", claims.getExpiration());
+        log.info("Roles: {}", claimRole);
+
+        // check requester's roles
+        // using this way instead of comparing against Role.USER/ADMIN to prevent coupling of "service-authentication" with "common"
+        if (claimRole == null || (claimRole != Role.USER && claimRole != Role.ADMIN)) {
+            log.warn("Invalid roles: {}", claims.get("roles"));
+            throw new ServletException("Invalid roles.");
+        }
     }
 
     /**
