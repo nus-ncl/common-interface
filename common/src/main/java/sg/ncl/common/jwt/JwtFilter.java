@@ -28,6 +28,7 @@ public class JwtFilter extends GenericFilterBean {
     private Key apiKey;
     private String get = "GET";
     private String post = "POST";
+    private String put = "PUT";
 
     @Inject
     JwtFilter(@NotNull Key apiKey) {
@@ -131,7 +132,8 @@ public class JwtFilter extends GenericFilterBean {
     }
 
     private boolean isUsersWhitelist(String requestURI, String requestMethod) {
-        return requestURI.startsWith("/users") && (requestMethod.equals(get));
+        return (requestURI.startsWith("/users") && requestMethod.equals(get)) ||
+                (requestMethod.equals(put) && requestURI.matches("\\/users\\/(.+)\\/emails\\/(.+)"));
     }
 
     private boolean isRegWhitelist(String requestURI, String requestMethod) {

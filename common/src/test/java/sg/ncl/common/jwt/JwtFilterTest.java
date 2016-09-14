@@ -126,6 +126,18 @@ public class JwtFilterTest {
         jwtFilter.doFilter(request, response, filterChain);
     }
 
+    @Test
+    public void testIsUserWhitelistEmailVerify() throws Exception {
+        HttpServletRequest request = mock(HttpServletRequest.class);
+        HttpServletResponse response = mock(HttpServletResponse.class);
+        FilterChain filterChain = mock(FilterChain.class);
+
+        when(request.getRequestURI()).thenReturn("/users/abc/emails/abc");
+        when(request.getMethod()).thenReturn("PUT");
+
+        jwtFilter.doFilter(request, response, filterChain);
+    }
+
     // -----------------------------------
     // ----- BLACKLISTED ENDPOINTS -------
     // -----------------------------------
