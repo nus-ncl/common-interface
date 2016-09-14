@@ -132,14 +132,8 @@ public class JwtFilter extends GenericFilterBean {
     }
 
     private boolean isUsersWhitelist(String requestURI, String requestMethod) {
-        if (requestURI.startsWith("/users")) {
-            if (requestMethod.equals(get)) {
-                return true;
-            } else if (requestURI.matches("\\/users\\/(.+)\\/emails\\/(.+)") && requestMethod.equals(put)) {
-                return true;
-            }
-        }
-        return false;
+        return (requestURI.startsWith("/users") && requestMethod.equals(get)) ||
+                (requestMethod.equals(put) && requestURI.matches("\\/users\\/(.+)\\/emails\\/(.+)"));
     }
 
     private boolean isRegWhitelist(String requestURI, String requestMethod) {
