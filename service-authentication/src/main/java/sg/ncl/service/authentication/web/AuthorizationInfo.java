@@ -6,6 +6,7 @@ import lombok.Getter;
 import sg.ncl.common.authentication.Role;
 import sg.ncl.service.authentication.domain.Authorization;
 
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -21,7 +22,7 @@ public class AuthorizationInfo implements Authorization {
     private final Set<Role> roles = new HashSet<>();
 
     @JsonCreator
-    public AuthorizationInfo(@JsonProperty("id") final String id, @JsonProperty("token") final String token, @JsonProperty("roles") final Set<Role> roles) {
+    public AuthorizationInfo(@JsonProperty("id") final String id, @JsonProperty("token") final String token, @JsonProperty("roles") final Collection<Role> roles) {
         this.id = id;
         this.token = token;
         this.roles.addAll(roles);
