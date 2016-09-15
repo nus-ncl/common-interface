@@ -1,12 +1,14 @@
 # Spring Boot Configuration
 # For more information, please read http://docs.spring.io/spring-boot/docs/current/reference/html/index.html
 server:
-  port: 80
+  port: 8080
 spring:
   datasource:
-    url: ${jdbc.url}
-    username: ${jdbc.username}
-    password: ${jdbc.password}
+    initialize: true
+    platform: mysql
+    url: ${jdbc.url:}
+    username: ${jdbc.username:}
+    password: ${jdbc.password:}
   jpa:
     hibernate:
       ddl-auto: validate
@@ -18,8 +20,8 @@ spring:
   mail:
     host: smtp-relay.gmail.com
     port: 465
-    username: ${gmail.username}
-    password: ${gmail.password}
+    username: ${gmail.username:}
+    password: ${gmail.password:}
     protocol: smtps
     properties:
       starttls:
@@ -27,14 +29,14 @@ spring:
       auth: true
 ncl:
   authentication:
-    url: "/authentication"
+    url: "/authentications"
   domain: dev.ncl.sg
   deterlab:
     adapter:
       ip: test.ncl.sg
       port: 8080
   jwt:
-    api-key: ${jwt.key}
+    api-key: ${jwt.key:}
     signing-algorithm: HS512
     expiry-duration: PT1H
   mail:
