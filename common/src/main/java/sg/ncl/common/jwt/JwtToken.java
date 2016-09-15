@@ -8,8 +8,10 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import sg.ncl.common.authentication.Role;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.List;
 
 /**
  * @author Te Ye
@@ -21,16 +23,27 @@ public class JwtToken implements Authentication {
     private Jwt jwt;
     private Claims claims;
     private boolean authenticated;
+    private final Collection<GrantedAuthority> authorities;
 
     public JwtToken(Jwt jwt, Claims claims) throws ParseException {
         this.jwt = jwt;
         this.claims = claims;
         this.authenticated = false;
+
+        Object roleList = claims.get("roles");
+        List<String> roles = (List) roleList;
+        List<GrantedAuthority> tmp = new ArrayList<>();
+        if (roles != null) {
+            for (String role : roles) {
+                tmp.add(new SimpleGrantedAuthority(role));
+            }
+        }
+        this.authorities = Collections.unmodifiableList(tmp);
     }
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return Collections.singletonList(new SimpleGrantedAuthority(Role.USER.toString()));
+        return authorities;
     }
 
     @Override
