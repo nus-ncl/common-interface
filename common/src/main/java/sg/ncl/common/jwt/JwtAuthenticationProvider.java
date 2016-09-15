@@ -28,15 +28,12 @@ public class JwtAuthenticationProvider implements AuthenticationProvider {
         Jwt jwt = jwtToken.getJwt();
         Claims claims = jwtToken.getClaims();
         log.info("Jwt token: {}", jwt);
-        log.info("Claims: {}", claims);
-        log.info("Subject: {}", claims.getSubject());
-        log.info("Issued At: {}", claims.getIssuedAt());
-        log.info("Expiration: {}", claims.getExpiration());
         log.info("JWTToken Name: {}", jwtToken.getName());
         log.info("JWTToken Authorities: {}", jwtToken.getAuthorities());
         log.info("JWTToken Credentials: {}", jwtToken.getCredentials());
         log.info("JWTToken Details: {}", jwtToken.getDetails());
         log.info("JWTToken Principal: {}", jwtToken.getPrincipal());
+        // TODO need to verify here
         jwtToken.setAuthenticated(true);
         return jwtToken;
     }
