@@ -1,18 +1,15 @@
 package sg.ncl.common.jwt;
 
-import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.MalformedJwtException;
-import io.jsonwebtoken.SignatureException;
+import io.jsonwebtoken.*;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.web.filter.GenericFilterBean;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.stereotype.Component;
 import sg.ncl.common.authentication.Role;
 
 import javax.inject.Inject;
-import javax.servlet.FilterChain;
-import javax.servlet.ServletException;
-import javax.servlet.ServletRequest;
-import javax.servlet.ServletResponse;
+import javax.servlet.*;
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.constraints.NotNull;
 import java.io.IOException;
@@ -22,17 +19,25 @@ import java.util.List;
 /**
  * @author Te Ye
  */
+@Component
 @Slf4j
-public class JwtFilter extends GenericFilterBean {
+public class JwtFilter implements Filter {
 
     private Key apiKey;
     private String get = "GET";
     private String post = "POST";
     private String put = "PUT";
+    private AuthenticationManager authenticationManager;
 
     @Inject
-    JwtFilter(@NotNull Key apiKey) {
+    JwtFilter(@NotNull Key apiKey, @NotNull AuthenticationManager authenticationManager) {
         this.apiKey = apiKey;
+        this.authenticationManager = authenticationManager;
+    }
+
+    @Override
+    public void init(FilterConfig filterConfig) throws ServletException {
+
     }
 
     @Override
@@ -52,6 +57,14 @@ public class JwtFilter extends GenericFilterBean {
             }
 
             final String token = authHeader.substring(7); // The part after "Bearer "
+
+            Jwt jwt = Jwts.parser().setSigningKey(apiKey).parse(token);
+            Claims claims = Jwts.parser().setSigningKey(apiKey)
+                    .parseClaimsJws(token).getBody();
+            JwtToken jwtToken = new JwtToken(jwt, claims);
+            Authentication auth = authenticationManager.authenticate(jwtToken);
+            SecurityContextHolder.getContext().setAuthentication(auth);
+
             log.info("Send request with Authorization: {} to {}", authHeader, ((HttpServletRequest) req).getRequestURI());
             try {
                 checkRoles(request, token);
@@ -61,6 +74,11 @@ public class JwtFilter extends GenericFilterBean {
             }
         }
         chain.doFilter(req, res);
+    }
+
+    @Override
+    public void destroy() {
+
     }
 
     private void checkRoles(HttpServletRequest request, String token) throws ServletException {

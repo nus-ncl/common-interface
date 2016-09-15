@@ -6,12 +6,16 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Import;
+import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import sg.ncl.common.jwt.JwtAuthenticationProvider;
+import sg.ncl.common.jwt.JwtAuthenticationEntryPoint;
 import sg.ncl.common.jwt.JwtFilter;
 
 import javax.inject.Inject;
@@ -26,6 +30,7 @@ import javax.validation.constraints.NotNull;
 @Configuration
 @ConditionalOnClass({BCryptPasswordEncoder.class, HttpSecurity.class})
 @EnableConfigurationProperties(AuthenticationProperties.class)
+@Import({JwtAuthenticationProvider.class, JwtAuthenticationEntryPoint.class})
 @Slf4j
 public class AuthenticationAutoConfiguration extends WebSecurityConfigurerAdapter {
 
@@ -33,17 +38,26 @@ public class AuthenticationAutoConfiguration extends WebSecurityConfigurerAdapte
 
     private final AuthenticationProperties properties;
     private final JwtFilter jwtFilter;
+    private final JwtAuthenticationProvider jwtAuthenticationProvider;
+    private final JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
 
     @Inject
-    AuthenticationAutoConfiguration(@NotNull final AuthenticationProperties properties, @NotNull final JwtFilter jwtFilter) {
+    AuthenticationAutoConfiguration(@NotNull final AuthenticationProperties properties, @NotNull final JwtFilter jwtFilter, @NotNull final JwtAuthenticationProvider jwtAuthenticationProvider, @NotNull final JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint) {
         this.properties = properties;
         this.jwtFilter = jwtFilter;
+        this.jwtAuthenticationProvider = jwtAuthenticationProvider;
+        this.jwtAuthenticationEntryPoint = jwtAuthenticationEntryPoint;
     }
 
     @Bean
     @ConditionalOnMissingBean(PasswordEncoder.class)
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
+    }
+
+    @Override
+    public void configure(final AuthenticationManagerBuilder auth) throws Exception {
+        auth.authenticationProvider(jwtAuthenticationProvider);
     }
 
     @Override
@@ -61,7 +75,9 @@ public class AuthenticationAutoConfiguration extends WebSecurityConfigurerAdapte
         http
                 .authorizeRequests().anyRequest().permitAll();
         http
-                .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
+                .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class)
+                .exceptionHandling()
+                .authenticationEntryPoint(jwtAuthenticationEntryPoint);
     }
 
 //    private String getUrl() {
