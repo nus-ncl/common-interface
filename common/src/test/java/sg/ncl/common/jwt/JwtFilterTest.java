@@ -9,10 +9,12 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.RememberMeAuthenticationToken;
 import org.springframework.test.context.junit4.SpringRunner;
 import sg.ncl.common.authentication.Role;
 
@@ -45,7 +47,7 @@ public class JwtFilterTest {
     private Key apiKey;
     private JwtFilter jwtFilter;
 
-    @Inject
+    @Mock
     private AuthenticationManager authenticationManager;
 
     @Before
@@ -654,6 +656,7 @@ public class JwtFilterTest {
         HttpServletRequest request = mock(HttpServletRequest.class);
         HttpServletResponse response = mock(HttpServletResponse.class);
         FilterChain filterChain = mock(FilterChain.class);
+        RememberMeAuthenticationToken rememberMeAuthenticationToken = mock(RememberMeAuthenticationToken.class);
 
         final String jwt = Jwts.builder()
                 .setSubject("john")
@@ -666,6 +669,7 @@ public class JwtFilterTest {
         when(request.getRequestURI()).thenReturn("/teams/");
         when(request.getMethod()).thenReturn("GET");
         when(request.getHeader("Authorization")).thenReturn("Bearer " + jwt);
+        when(authenticationManager.authenticate(rememberMeAuthenticationToken)).thenReturn(rememberMeAuthenticationToken);
 
         try {
             jwtFilter.doFilter(request, response, filterChain);
