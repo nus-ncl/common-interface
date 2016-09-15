@@ -7,6 +7,7 @@ import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.stereotype.Component;
 import sg.ncl.common.authentication.Role;
 
@@ -51,7 +52,9 @@ public class JwtAuthenticationProvider implements AuthenticationProvider {
 
     private boolean isRoleValid(Collection<? extends GrantedAuthority> authorities) {
         // FIXME should have a better way
-        if (!authorities.contains(Role.USER.toString()) && !authorities.contains(Role.ADMIN.toString())) {
+        SimpleGrantedAuthority user = new SimpleGrantedAuthority(Role.USER.toString());
+        SimpleGrantedAuthority admin = new SimpleGrantedAuthority(Role.ADMIN.toString());
+        if (!authorities.contains(user) && !authorities.contains(admin)) {
             return false;
         }
         return true;
