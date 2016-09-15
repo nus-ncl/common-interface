@@ -58,20 +58,23 @@ public class JwtFilter implements Filter {
 
             final String token = authHeader.substring(7); // The part after "Bearer "
 
+            // TODO need to try and catch, move check roles to JwtAuthenticationProvider?
             Jwt jwt = Jwts.parser().setSigningKey(apiKey).parse(token);
             Claims claims = Jwts.parser().setSigningKey(apiKey)
                     .parseClaimsJws(token).getBody();
             JwtToken jwtToken = new JwtToken(jwt, claims);
             Authentication auth = authenticationManager.authenticate(jwtToken);
-            SecurityContextHolder.getContext().setAuthentication(auth);
-
             log.info("Send request with Authorization: {} to {}", authHeader, ((HttpServletRequest) req).getRequestURI());
-            try {
-                checkRoles(request, token);
-            } catch (final SignatureException | MalformedJwtException e) {
-                log.warn("Invalid token: {}", e);
-                throw new ServletException("Invalid token.");
+            if (!auth.isAuthenticated()) {
+                throw new ServletException("Failed to verify token.");
             }
+            SecurityContextHolder.getContext().setAuthentication(auth);
+//            try {
+//                checkRoles(request, token);
+//            } catch (final SignatureException | MalformedJwtException e) {
+//                log.warn("Invalid token: {}", e);
+//                throw new ServletException("Invalid token.");
+//            }
         }
         chain.doFilter(req, res);
     }
