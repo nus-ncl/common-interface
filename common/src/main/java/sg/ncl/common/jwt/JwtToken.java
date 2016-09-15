@@ -20,10 +20,12 @@ public class JwtToken implements Authentication {
 
     private Jwt jwt;
     private Claims claims;
+    private boolean authenticated;
 
     public JwtToken(Jwt jwt, Claims claims) throws ParseException {
         this.jwt = jwt;
         this.claims = claims;
+        this.authenticated = false;
     }
 
     @Override
@@ -69,10 +71,11 @@ public class JwtToken implements Authentication {
 
     @Override
     public boolean isAuthenticated() {
-        return true;
+        return authenticated;
     }
 
     @Override
     public void setAuthenticated(boolean isAuthenticated) throws IllegalArgumentException {
+        this.authenticated = isAuthenticated;
     }
 }
