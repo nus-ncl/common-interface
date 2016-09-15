@@ -64,16 +64,16 @@ public class JwtFilter implements Filter {
             final String token = authHeader.substring(7); // The part after "Bearer "
 
             // TODO need to try and catch, move check roles to JwtAuthenticationProvider?
-            Jwt jwt = Jwts.parser().setSigningKey(apiKey).parse(token);
+//            Jwt jwt = Jwts.parser().setSigningKey(apiKey).parse(token);
             Claims claims = Jwts.parser().setSigningKey(apiKey)
                     .parseClaimsJws(token).getBody();
-//            JwtToken jwtToken = new JwtToken(jwt, claims);
+
             Object roleList = claims.get("roles");
-            List<String> roles = (List) roleList;
+            List roles = (List) roleList;
             List<GrantedAuthority> tmp = new ArrayList<>();
             if (roles != null) {
-                for (String role : roles) {
-                    tmp.add(new SimpleGrantedAuthority(role));
+                for (Object role : roles) {
+                    tmp.add(new SimpleGrantedAuthority((String) role));
                 }
             }
             RememberMeAuthenticationToken rememberMeAuthenticationToken = new RememberMeAuthenticationToken(claims.getSubject(), claims.getSubject(), Collections.unmodifiableList(tmp));
