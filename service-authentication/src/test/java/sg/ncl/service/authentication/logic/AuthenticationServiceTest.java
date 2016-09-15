@@ -91,8 +91,8 @@ public class AuthenticationServiceTest {
         final Claims body = parser.parseClaimsJws(authorization.getToken()).getBody();
         assertThat(body.getIssuedAt()).isNotNull();
         assertThat(body.getExpiration()).isNotNull();
-        assertThat(body.get("roles"), is(not(nullValue())));
-        assertThat(body.get("roles").toString().trim(), is(entity.getRoles().toString().trim()));
+        assertThat(body.get("roles")).isNotNull();
+        assertThat(body.get("roles").toString().trim()).isEqualTo(entity.getRoles().toString().trim());
     }
 
     @Test
