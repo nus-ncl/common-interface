@@ -3,10 +3,12 @@ package sg.ncl.service.authentication.web;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Getter;
+import sg.ncl.common.authentication.Role;
 import sg.ncl.service.authentication.domain.Credentials;
 import sg.ncl.service.authentication.domain.CredentialsStatus;
-import sg.ncl.common.authentication.Role;
 
+import java.util.Collection;
+import java.util.HashSet;
 import java.util.Set;
 
 /**
@@ -19,7 +21,7 @@ public class CredentialsInfo implements Credentials {
     private final String username;
     private final String password;
     private final CredentialsStatus status;
-    private final Set<Role> roles;
+    private final Set<Role> roles = new HashSet<>();
 
     @JsonCreator
     public CredentialsInfo(
@@ -27,13 +29,13 @@ public class CredentialsInfo implements Credentials {
             @JsonProperty("username") final String username,
             @JsonProperty("password") final String password,
             @JsonProperty("status") final CredentialsStatus status,
-            @JsonProperty("roles") final Set<Role> roles
+            @JsonProperty("roles") final Collection<Role> roles
     ) {
         this.id = id;
         this.username = username;
         this.password = password;
         this.status = status;
-        this.roles = roles;
+        this.roles.addAll(roles);
     }
 
     public CredentialsInfo(final Credentials credentials) {
