@@ -3,7 +3,10 @@ package sg.ncl.common.jwt;
 import io.jsonwebtoken.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.RememberMeAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import sg.ncl.common.authentication.Role;
@@ -14,6 +17,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.validation.constraints.NotNull;
 import java.io.IOException;
 import java.security.Key;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -62,8 +67,17 @@ public class JwtFilter implements Filter {
             Jwt jwt = Jwts.parser().setSigningKey(apiKey).parse(token);
             Claims claims = Jwts.parser().setSigningKey(apiKey)
                     .parseClaimsJws(token).getBody();
-            JwtToken jwtToken = new JwtToken(jwt, claims);
-            Authentication auth = authenticationManager.authenticate(jwtToken);
+//            JwtToken jwtToken = new JwtToken(jwt, claims);
+            Object roleList = claims.get("roles");
+            List<String> roles = (List) roleList;
+            List<GrantedAuthority> tmp = new ArrayList<>();
+            if (roles != null) {
+                for (String role : roles) {
+                    tmp.add(new SimpleGrantedAuthority(role));
+                }
+            }
+            RememberMeAuthenticationToken rememberMeAuthenticationToken = new RememberMeAuthenticationToken(claims.getSubject(), claims.getSubject(), Collections.unmodifiableList(tmp));
+            Authentication auth = authenticationManager.authenticate(rememberMeAuthenticationToken);
             log.info("Send request with Authorization: {} to {}", authHeader, ((HttpServletRequest) req).getRequestURI());
             if (!auth.isAuthenticated()) {
                 throw new ServletException("Failed to verify token.");

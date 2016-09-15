@@ -4,6 +4,7 @@ import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwt;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.AuthenticationProvider;
+import org.springframework.security.authentication.RememberMeAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.GrantedAuthority;
@@ -29,25 +30,23 @@ public class JwtAuthenticationProvider implements AuthenticationProvider {
 
     @Override
     public Authentication authenticate(Authentication authentication) throws AuthenticationException {
-        JwtToken jwtToken = (JwtToken) authentication;
-        Jwt jwt = jwtToken.getJwt();
-        Claims claims = jwtToken.getClaims();
-        log.info("Jwt token: {}", jwt);
-        log.info("Jwt Token Name: {}", jwtToken.getName());
-        log.info("Jwt Token Authorities: {}", jwtToken.getAuthorities());
-        log.info("Jwt Token Credentials: {}", jwtToken.getCredentials());
-        log.info("Jwt Token Details: {}", jwtToken.getDetails());
-        log.info("Jwt Token Principal: {}", jwtToken.getPrincipal());
+        RememberMeAuthenticationToken token = (RememberMeAuthenticationToken) authentication;
+        log.info("RememberMeAuthenticationToken token: {}", token);
+        log.info("Jwt Token Name: {}", token.getName());
+        log.info("Jwt Token Authorities: {}", token.getAuthorities());
+        log.info("Jwt Token Credentials: {}", token.getCredentials());
+        log.info("Jwt Token Details: {}", token.getDetails());
+        log.info("Jwt Token Principal: {}", token.getPrincipal());
         // TODO verify the role is valid
 
-        if (isRoleValid(jwtToken.getAuthorities()) && isTokenVerified()) {
-            log.info("Jwt Token authentication SUCCESS: {}", jwtToken.getAuthorities());
-            jwtToken.setAuthenticated(true);
+        if (isRoleValid(token.getAuthorities()) && isTokenVerified()) {
+            log.info("Jwt Token authentication SUCCESS: {}", token.getAuthorities());
+            token.setAuthenticated(true);
         } else {
-            log.warn("Jwt Token authentication FAIL: {}", jwtToken.getAuthorities());
-            jwtToken.setAuthenticated(false);
+            log.warn("Jwt Token authentication FAIL: {}", token.getAuthorities());
+            token.setAuthenticated(false);
         }
-        return jwtToken;
+        return token;
     }
 
     private boolean isRoleValid(Collection<? extends GrantedAuthority> authorities) {
@@ -67,6 +66,6 @@ public class JwtAuthenticationProvider implements AuthenticationProvider {
 
     @Override
     public boolean supports(Class<?> authentication) {
-        return JwtToken.class.isAssignableFrom(authentication);
+        return RememberMeAuthenticationToken.class.isAssignableFrom(authentication);
     }
 }
