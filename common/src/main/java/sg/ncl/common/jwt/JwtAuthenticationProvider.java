@@ -1,7 +1,5 @@
 package sg.ncl.common.jwt;
 
-import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.Jwt;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.RememberMeAuthenticationToken;
