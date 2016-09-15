@@ -84,11 +84,10 @@ public class AuthenticationServiceTest {
 
         assertThat(authorization.getId()).isEqualTo(entity.getId());
         assertThat(authorization.getToken()).isNotNull();
-        final JwtParser parser = Jwts.parser()
-                .setSigningKey(apiKey)
-                .requireSubject(entity.getId())
-                .requireIssuer(AuthenticationService.class.getName());
+        final JwtParser parser = Jwts.parser().setSigningKey(apiKey);
         final Claims body = parser.parseClaimsJws(authorization.getToken()).getBody();
+        assertThat(body.getSubject()).isNotNull().isEqualTo(entity.getId());
+        assertThat(body.getIssuer()).isNotNull().isEqualTo(AuthenticationService.class.getName());
         assertThat(body.getIssuedAt()).isNotNull();
         assertThat(body.getExpiration()).isNotNull();
         assertThat(body.get("roles")).isNotNull();
