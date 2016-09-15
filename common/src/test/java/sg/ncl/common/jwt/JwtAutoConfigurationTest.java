@@ -7,6 +7,7 @@ import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
+import org.springframework.security.authentication.AuthenticationManager;
 
 import java.security.Key;
 import java.time.Duration;
@@ -31,12 +32,14 @@ public class JwtAutoConfigurationTest {
     public MockitoRule mockito = MockitoJUnit.rule();
     @Mock
     private JwtProperties properties;
+    @Mock
+    private AuthenticationManager authenticationManager;
 
     private JwtAutoConfiguration configuration;
 
     @Before
     public void before() {
-        configuration = new JwtAutoConfiguration(properties);
+        configuration = new JwtAutoConfiguration(properties, authenticationManager);
     }
 
     @Test

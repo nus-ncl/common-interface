@@ -12,6 +12,7 @@ import org.junit.runner.RunWith;
 import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.test.context.junit4.SpringRunner;
 import sg.ncl.common.authentication.Role;
 
@@ -44,10 +45,13 @@ public class JwtFilterTest {
     private Key apiKey;
     private JwtFilter jwtFilter;
 
+    @Inject
+    private AuthenticationManager authenticationManager;
+
     @Before
     public void before() {
         apiKey = new SecretKeySpec("123".getBytes(), SignatureAlgorithm.HS256.getJcaName());
-        jwtFilter = new JwtFilter(apiKey);
+        jwtFilter = new JwtFilter(apiKey, authenticationManager);
     }
 
     // -----------------------------------

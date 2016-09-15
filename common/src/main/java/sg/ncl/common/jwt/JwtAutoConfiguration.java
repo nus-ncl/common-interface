@@ -8,6 +8,7 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.authentication.AuthenticationManager;
 
 import javax.crypto.spec.SecretKeySpec;
 import javax.inject.Inject;
@@ -36,14 +37,18 @@ public class JwtAutoConfiguration {
     private final JwtProperties properties;
 
     @Inject
-    JwtAutoConfiguration(@NotNull final JwtProperties properties) {
+    private final AuthenticationManager authenticationManager;
+
+    @Inject
+    JwtAutoConfiguration(@NotNull final JwtProperties properties, @NotNull AuthenticationManager authenticationManager) {
         this.properties = properties;
+        this.authenticationManager = authenticationManager;
     }
 
     @Bean
     @ConditionalOnMissingBean(JwtFilter.class)
     public JwtFilter jwtFilter() {
-        return new JwtFilter(apiKey(signatureAlgorithm()));
+        return new JwtFilter(apiKey(signatureAlgorithm()), authenticationManager);
     }
 
     @Bean
