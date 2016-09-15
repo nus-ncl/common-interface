@@ -15,7 +15,6 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import sg.ncl.common.jwt.JwtAuthenticationProvider;
-import sg.ncl.common.jwt.JwtAuthenticationEntryPoint;
 import sg.ncl.common.jwt.JwtFilter;
 
 import javax.inject.Inject;
@@ -30,7 +29,7 @@ import javax.validation.constraints.NotNull;
 @Configuration
 @ConditionalOnClass({BCryptPasswordEncoder.class, HttpSecurity.class})
 @EnableConfigurationProperties(AuthenticationProperties.class)
-@Import({JwtAuthenticationProvider.class, JwtAuthenticationEntryPoint.class})
+@Import(JwtAuthenticationProvider.class)
 @Slf4j
 public class AuthenticationAutoConfiguration extends WebSecurityConfigurerAdapter {
 
@@ -39,14 +38,12 @@ public class AuthenticationAutoConfiguration extends WebSecurityConfigurerAdapte
     private final AuthenticationProperties properties;
     private final JwtFilter jwtFilter;
     private final JwtAuthenticationProvider jwtAuthenticationProvider;
-    private final JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
 
     @Inject
-    AuthenticationAutoConfiguration(@NotNull final AuthenticationProperties properties, @NotNull final JwtFilter jwtFilter, @NotNull final JwtAuthenticationProvider jwtAuthenticationProvider, @NotNull final JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint) {
+    AuthenticationAutoConfiguration(@NotNull final AuthenticationProperties properties, @NotNull final JwtFilter jwtFilter, @NotNull final JwtAuthenticationProvider jwtAuthenticationProvider) {
         this.properties = properties;
         this.jwtFilter = jwtFilter;
         this.jwtAuthenticationProvider = jwtAuthenticationProvider;
-        this.jwtAuthenticationEntryPoint = jwtAuthenticationEntryPoint;
     }
 
     @Bean
@@ -76,8 +73,7 @@ public class AuthenticationAutoConfiguration extends WebSecurityConfigurerAdapte
                 .authorizeRequests().anyRequest().permitAll();
         http
                 .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class)
-                .exceptionHandling()
-                .authenticationEntryPoint(jwtAuthenticationEntryPoint);
+                .exceptionHandling();
     }
 
 //    private String getUrl() {
