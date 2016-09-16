@@ -3,6 +3,7 @@ package sg.ncl.common.jwt;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import org.apache.commons.lang3.RandomStringUtils;
+import org.assertj.core.api.Assertions;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Rule;
@@ -22,6 +23,7 @@ import java.time.Duration;
 import java.time.ZonedDateTime;
 import java.util.*;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.equalTo;
@@ -98,6 +100,10 @@ public class JwtAuthenticationProviderTest {
                 .compact();
         JwtToken jwtToken = new JwtToken(jwt);
         Authentication auth = jwtAuthenticationProvider.authenticate(jwtToken);
-        assertThat(auth.getAuthorities(), containsInAnyOrder(rolesList));
+
+        Collection<? extends GrantedAuthority> result = auth.getAuthorities();
+
+        assertThat(result).isEqualTo(rolesList);
+//        assertThat(auth.getAuthorities(), containsInAnyOrder(rolesList));
     }
 }
