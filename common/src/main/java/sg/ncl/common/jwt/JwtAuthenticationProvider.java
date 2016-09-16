@@ -25,12 +25,6 @@ import java.util.Date;
 @Slf4j
 public class JwtAuthenticationProvider implements AuthenticationProvider {
 
-//    private JwtSignatureValidator validator;
-
-//    public JWTAuthenticationProvider(@NotNull final SignatureAlgorithm signatureAlgorithm, @NotNull final Key apiKey) {
-//        this.validator = new DefaultJwtSignatureValidator(signatureAlgorithm, apiKey);
-//    }
-
     private final Key apiKey;
 
     JwtAuthenticationProvider(@NotNull final Key apiKey) {
@@ -52,21 +46,10 @@ public class JwtAuthenticationProvider implements AuthenticationProvider {
             final Claims claims = Jwts.parser().setSigningKey(apiKey).parseClaimsJws(token.getCredentials()).getBody();
             checkDates(claims);
             token.setDetails(claims);
-            // set subject as principal
-            // set granted authority
-            // set authenticated to true
-            token.setAuthenticated(true);
 
             log.info("Validation success: Principal {}", token.getPrincipal());
             log.info("Validation success: Role {}", token.getAuthorities());
 
-//            if (isRoleValid(token.getAuthorities()) && isTokenVerified()) {
-//                log.info("Jwt Token authentication SUCCESS: {}", token.getAuthorities());
-//                token.setAuthenticated(true);
-//            } else {
-//                log.warn("Jwt Token authentication FAIL: {}", token.getAuthorities());
-//                token.setAuthenticated(false);
-//            }
             return token;
         } catch (ExpiredJwtException | UnsupportedJwtException | MalformedJwtException | SignatureException e) {
             log.warn("{}", e);
@@ -104,21 +87,6 @@ public class JwtAuthenticationProvider implements AuthenticationProvider {
             log.warn("Claim is issued {} after the expiration date {}", claims.getIssuedAt(), claims.getExpiration());
             throw new BadCredentialsException("Claim is issued after the expiration date");
         }
-    }
-
-    private boolean isRoleValid(Collection<? extends GrantedAuthority> authorities) {
-        // FIXME should have a better way
-        SimpleGrantedAuthority user = new SimpleGrantedAuthority(Role.USER.toString());
-        SimpleGrantedAuthority admin = new SimpleGrantedAuthority(Role.ADMIN.toString());
-        if (!authorities.contains(user) && !authorities.contains(admin)) {
-            return false;
-        }
-        return true;
-    }
-
-    private boolean isTokenVerified() {
-        // FIXME need to check id against database?
-        return true;
     }
 
     @Override
