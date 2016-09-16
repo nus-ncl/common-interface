@@ -4,10 +4,7 @@ import org.h2.jdbc.JdbcSQLException;
 import org.hibernate.exception.ConstraintViolationException;
 import org.springframework.dao.DataIntegrityViolationException;
 
-import static org.hamcrest.Matchers.containsString;
-import static org.hamcrest.Matchers.instanceOf;
-import static org.hamcrest.Matchers.is;
-import static org.junit.Assert.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * @author Christopher Zhong
@@ -15,10 +12,10 @@ import static org.junit.Assert.assertThat;
 public class Checks {
 
     public static void checkException(final Exception e, final String message) {
-        assertThat(e, is(instanceOf(DataIntegrityViolationException.class)));
-        assertThat(e.getCause(), is(instanceOf(ConstraintViolationException.class)));
-        assertThat(e.getCause().getCause(), is(instanceOf(JdbcSQLException.class)));
-        assertThat(e.getCause().getCause().getMessage(), containsString(message));
+        assertThat(e).isInstanceOf(DataIntegrityViolationException.class);
+        assertThat(e.getCause()).isInstanceOf(ConstraintViolationException.class);
+        assertThat(e.getCause().getCause()).isInstanceOf(JdbcSQLException.class);
+        assertThat(e.getCause().getCause().getMessage()).contains(message);
     }
 
 }
