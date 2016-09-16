@@ -48,7 +48,7 @@ public class JwtAutoConfiguration {
     @Bean
     @ConditionalOnMissingBean(JwtFilter.class)
     public JwtFilter jwtFilter() {
-        return new JwtFilter(apiKey(signatureAlgorithm()), authenticationManager);
+        return new JwtFilter();
     }
 
     @Bean

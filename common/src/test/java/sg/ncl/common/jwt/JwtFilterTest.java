@@ -59,7 +59,7 @@ public class JwtFilterTest {
     @Before
     public void before() {
         apiKey = new SecretKeySpec("123".getBytes(), SignatureAlgorithm.HS256.getJcaName());
-        jwtFilter = new JwtFilter(apiKey, authenticationManager);
+        jwtFilter = new JwtFilter();
     }
 
     // -----------------------------------
