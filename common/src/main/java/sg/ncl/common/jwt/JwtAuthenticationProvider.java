@@ -51,10 +51,14 @@ public class JwtAuthenticationProvider implements AuthenticationProvider {
         try {
             final Claims claims = Jwts.parser().setSigningKey(apiKey).parseClaimsJws(token.getCredentials()).getBody();
             checkDates(claims);
-
+            token.setDetails(claims);
             // set subject as principal
             // set granted authority
             // set authenticated to true
+            token.setAuthenticated(true);
+
+            log.info("Validation success: Principal {}", token.getPrincipal());
+            log.info("Validation success: Role {}", token.getAuthorities());
 
 //            if (isRoleValid(token.getAuthorities()) && isTokenVerified()) {
 //                log.info("Jwt Token authentication SUCCESS: {}", token.getAuthorities());
