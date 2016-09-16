@@ -7,6 +7,7 @@ import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
@@ -14,6 +15,7 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.web.filter.DelegatingFilterProxy;
 import sg.ncl.common.jwt.JwtAuthenticationProvider;
 import sg.ncl.common.jwt.JwtFilter;
 
@@ -64,16 +66,20 @@ public class AuthenticationAutoConfiguration extends WebSecurityConfigurerAdapte
                 .formLogin().disable() // not needed for RESTful APIs
                 .logout().disable() // not needed for RESTful APIs
 //                .openidLogin().disable() // not using OpenID
+                .httpBasic().disable() // not using basic authentication
                 .rememberMe().disable() // JWT do not need to remember me
                 .requestCache().disable() // RESTful APIs should not require caching
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS).and() // RESTful APIs should be stateless
                 .x509().disable(); // not using x509
 
+        // add url that no need be authenticated
         http
-                .authorizeRequests().anyRequest().permitAll();
+                .authorizeRequests().antMatchers(HttpMethod.GET, "/users").permitAll().and()
+                .authorizeRequests().anyRequest().authenticated();
+//        http
+//                .authorizeRequests().anyRequest().authenticated();
         http
-                .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class)
-                .exceptionHandling();
+                .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
     }
 
 //    private String getUrl() {

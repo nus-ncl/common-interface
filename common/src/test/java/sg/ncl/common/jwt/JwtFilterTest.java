@@ -1,5 +1,6 @@
 package sg.ncl.common.jwt;
 
+import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtBuilder;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
@@ -9,12 +10,16 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.Matchers;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.RememberMeAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.test.context.junit4.SpringRunner;
 import sg.ncl.common.authentication.Role;
 
@@ -30,6 +35,7 @@ import java.security.Key;
 import java.util.Arrays;
 import java.util.Date;
 
+import static org.hamcrest.Matchers.any;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.mock;
@@ -565,11 +571,14 @@ public class JwtFilterTest {
         HttpServletRequest request = mock(HttpServletRequest.class);
         HttpServletResponse response = mock(HttpServletResponse.class);
         FilterChain filterChain = mock(FilterChain.class);
+        RememberMeAuthenticationToken rememberMeAuthenticationToken = mock(RememberMeAuthenticationToken.class);
+        rememberMeAuthenticationToken.setAuthenticated(true);
+        Authentication authentication = mock(Authentication.class);
 
         final String jwt = Jwts.builder()
                 .setSubject("john")
                 .setIssuer("Authentication")
-                .claim("roles", "rubbish")
+                .claim("roles", Arrays.asList("rubbish"))
                 // sign the JWT with the given algorithm and apiKey
                 .signWith(SignatureAlgorithm.HS256, apiKey)
                 .compact();
@@ -577,12 +586,14 @@ public class JwtFilterTest {
         when(request.getRequestURI()).thenReturn("/teams/");
         when(request.getMethod()).thenReturn("GET");
         when(request.getHeader("Authorization")).thenReturn("Bearer " + jwt);
+        when(authentication.isAuthenticated()).thenReturn(true);
+        when(authenticationManager.authenticate(Matchers.any(RememberMeAuthenticationToken.class))).thenReturn(rememberMeAuthenticationToken);
 
         try {
             jwtFilter.doFilter(request, response, filterChain);
             Assert.fail();
         } catch (ServletException e) {
-            assertThat(e.getMessage(), is("Bad object."));
+            assertThat(e.getMessage(), is("Failed to verify token."));
         }
     }
 
@@ -617,6 +628,8 @@ public class JwtFilterTest {
         HttpServletRequest request = mock(HttpServletRequest.class);
         HttpServletResponse response = mock(HttpServletResponse.class);
         FilterChain filterChain = mock(FilterChain.class);
+        RememberMeAuthenticationToken rememberMeAuthenticationToken = mock(RememberMeAuthenticationToken.class);
+        rememberMeAuthenticationToken.setAuthenticated(true);
 
         final String jwt = Jwts.builder()
                 .setSubject("john")
@@ -629,6 +642,7 @@ public class JwtFilterTest {
         when(request.getRequestURI()).thenReturn("/teams/");
         when(request.getMethod()).thenReturn("GET");
         when(request.getHeader("Authorization")).thenReturn("Bearer " + jwt);
+        when(authenticationManager.authenticate(Matchers.any(RememberMeAuthenticationToken.class))).thenReturn(rememberMeAuthenticationToken);
 
         jwtFilter.doFilter(request, response, filterChain);
     }
