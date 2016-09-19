@@ -32,14 +32,12 @@ public class JwtAutoConfigurationTest {
     public MockitoRule mockito = MockitoJUnit.rule();
     @Mock
     private JwtProperties properties;
-    @Mock
-    private AuthenticationManager authenticationManager;
 
     private JwtAutoConfiguration configuration;
 
     @Before
     public void before() {
-        configuration = new JwtAutoConfiguration(properties, authenticationManager);
+        configuration = new JwtAutoConfiguration(properties);
     }
 
     @Test
