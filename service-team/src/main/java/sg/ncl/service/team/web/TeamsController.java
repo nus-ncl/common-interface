@@ -3,6 +3,8 @@ package sg.ncl.service.team.web;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -12,6 +14,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
+import sg.ncl.common.exception.base.ForbiddenException;
+import sg.ncl.common.jwt.JwtToken;
 import sg.ncl.service.team.domain.Team;
 import sg.ncl.service.team.domain.TeamService;
 import sg.ncl.service.team.domain.TeamVisibility;
@@ -47,12 +51,23 @@ public class TeamsController {
     @GetMapping
     @ResponseStatus(HttpStatus.OK)
     public List<Team> getTeams() {
+        if (SecurityContextHolder.getContext().getAuthentication() == null) {
+            // throw forbidden
+            log.warn("Access denied for: /teams GET");
+            throw new ForbiddenException();
+        }
         return teamService.getAllTeams().stream().map(TeamInfo::new).collect(Collectors.toList());
     }
 
     @GetMapping(params = {"visibility"})
     @ResponseStatus(HttpStatus.OK)
     public List<Team> getTeamsByVisibility(@RequestParam("visibility") final TeamVisibility visibility) {
+        if ((visibility != TeamVisibility.PUBLIC) && (SecurityContextHolder.getContext().getAuthentication() == null)) {
+            // check permissions
+            // throw forbidden if check fails
+            log.warn("Access denied for: /teams/?visibility=" + visibility);
+            throw new ForbiddenException();
+        }
         return teamService.getTeamsByVisibility(visibility).stream().map(TeamInfo::new).collect(Collectors.toList());
     }
 
@@ -68,6 +83,11 @@ public class TeamsController {
 
     @GetMapping(path = "/{id}")
     public Team getTeamById(@PathVariable final String id) {
+        if (SecurityContextHolder.getContext().getAuthentication() == null) {
+            // throw forbidden
+            log.warn("Access denied for: /teams/{} GET", id);
+            throw new ForbiddenException();
+        }
         final Team team = teamService.getTeamById(id);
         if (team == null) {
             throw new TeamNotFoundException(id);
