@@ -19,8 +19,8 @@ import javax.validation.constraints.NotNull;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static sg.ncl.service.authentication.validation.Validator.validateForCreation;
-import static sg.ncl.service.authentication.validation.Validator.validateForUpdate;
+import static sg.ncl.service.authentication.validation.Validator.addCheck;
+import static sg.ncl.service.authentication.validation.Validator.updateCheck;
 import static sg.ncl.service.authentication.web.CredentialsController.PATH;
 
 /**
@@ -49,14 +49,14 @@ public class CredentialsController {
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.CREATED)
     public Credentials addCredentials(@RequestBody final CredentialsInfo credentials) {
-        validateForCreation(credentials);
+        addCheck(credentials);
         return new CredentialsInfo(credentialsService.addCredentials(credentials));
     }
 
     @PutMapping(path = "/{id}", consumes = MediaType.APPLICATION_JSON_VALUE)
-    @ResponseStatus(HttpStatus.ACCEPTED)
+    @ResponseStatus(HttpStatus.OK)
     public Credentials updateCredentials(@PathVariable final String id, @RequestBody final CredentialsInfo credentials) {
-        validateForUpdate(credentials);
+        updateCheck(credentials);
         return new CredentialsInfo(credentialsService.updateCredentials(id, credentials));
     }
 
