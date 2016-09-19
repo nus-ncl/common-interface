@@ -9,10 +9,12 @@ import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import sg.ncl.adapter.deterlab.AdapterDeterLab;
+import sg.ncl.common.authentication.Role;
 import sg.ncl.service.authentication.data.jpa.CredentialsEntity;
 import sg.ncl.service.authentication.data.jpa.CredentialsRepository;
 import sg.ncl.service.authentication.domain.Credentials;
 import sg.ncl.service.authentication.domain.CredentialsService;
+import sg.ncl.service.authentication.domain.CredentialsStatus;
 import sg.ncl.service.authentication.exceptions.CredentialsNotFoundException;
 import sg.ncl.service.authentication.exceptions.NeitherUsernameNorPasswordModifiedException;
 import sg.ncl.service.authentication.exceptions.PasswordNullOrEmptyException;
@@ -60,7 +62,7 @@ public class CredentialsServiceTest {
     }
 
     @Test
-    public void testAddCredentialsGoodIdAndUsernameAndPassword() {
+    public void testAddCredentialsGoodIdAndGoodUsernameAndGoodPassword() {
         final Credentials credentialsInfo = new CredentialsInfo("id", "username", "password", null, null);
 
         when(passwordEncoder.encode(anyString())).thenReturn(credentialsInfo.getPassword());
@@ -73,6 +75,8 @@ public class CredentialsServiceTest {
         assertThat(credentials.getId()).isEqualTo(credentialsInfo.getId());
         assertThat(credentials.getUsername()).isEqualTo(credentialsInfo.getUsername());
         assertThat(credentials.getPassword()).isEqualTo(credentialsInfo.getPassword());
+        assertThat(credentials.getStatus()).isEqualTo(CredentialsStatus.ACTIVE);
+        assertThat(credentials.getRoles()).hasSize(1).containsExactly(Role.USER);
     }
 
     @Test
@@ -240,6 +244,8 @@ public class CredentialsServiceTest {
         verify(credentialsRepository, times(1)).save(any(CredentialsEntity.class));
         assertThat(entity.getUsername()).isEqualTo(username);
         assertThat(entity.getPassword()).isEqualTo(password);
+        assertThat(entity.getStatus()).isEqualTo(CredentialsStatus.ACTIVE);
+        assertThat(entity.getRoles()).hasSize(1).containsExactly(Role.USER);
     }
 
     @Test
@@ -258,6 +264,8 @@ public class CredentialsServiceTest {
         verify(credentialsRepository, times(1)).save(any(CredentialsEntity.class));
         assertThat(entity.getUsername()).isEqualTo(username);
         assertThat(entity.getPassword()).isEqualTo(password);
+        assertThat(entity.getStatus()).isEqualTo(CredentialsStatus.ACTIVE);
+        assertThat(entity.getRoles()).hasSize(1).containsExactly(Role.USER);
     }
 
     @Test
@@ -275,6 +283,8 @@ public class CredentialsServiceTest {
         verify(credentialsRepository, times(1)).save(any(CredentialsEntity.class));
         assertThat(entity.getUsername()).isEqualTo(username);
         assertThat(entity.getPassword()).isEqualTo(password);
+        assertThat(entity.getStatus()).isEqualTo(CredentialsStatus.ACTIVE);
+        assertThat(entity.getRoles()).hasSize(1).containsExactly(Role.USER);
     }
 
     @Test
@@ -293,6 +303,8 @@ public class CredentialsServiceTest {
         verify(credentialsRepository, times(1)).save(any(CredentialsEntity.class));
         assertThat(entity.getUsername()).isEqualTo(username);
         assertThat(entity.getPassword()).isEqualTo(password);
+        assertThat(entity.getStatus()).isEqualTo(CredentialsStatus.ACTIVE);
+        assertThat(entity.getRoles()).hasSize(1).containsExactly(Role.USER);
     }
 
     @Test
@@ -311,6 +323,8 @@ public class CredentialsServiceTest {
         verify(credentialsRepository, times(1)).save(any(CredentialsEntity.class));
         assertThat(entity.getUsername()).isEqualTo(username);
         assertThat(entity.getPassword()).isEqualTo(password);
+        assertThat(entity.getStatus()).isEqualTo(CredentialsStatus.ACTIVE);
+        assertThat(entity.getRoles()).hasSize(1).containsExactly(Role.USER);
     }
 
     @Test
