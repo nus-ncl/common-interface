@@ -35,7 +35,9 @@ public class CredentialsInfo implements Credentials {
         this.username = username;
         this.password = password;
         this.status = status;
-        this.roles.addAll(roles);
+        if (roles != null) {
+            this.roles.addAll(roles);
+        }
     }
 
     public CredentialsInfo(final Credentials credentials) {

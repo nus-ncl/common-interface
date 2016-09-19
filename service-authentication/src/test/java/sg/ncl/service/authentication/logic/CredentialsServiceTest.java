@@ -55,6 +55,7 @@ public class CredentialsServiceTest {
     public void before() {
         assertThat(mockingDetails(passwordEncoder).isMock()).isTrue();
         assertThat(mockingDetails(credentialsRepository).isMock()).isTrue();
+
         credentialsService = new CredentialsServiceImpl(credentialsRepository, passwordEncoder, adapterDeterLab);
     }
 
