@@ -89,6 +89,7 @@ public class AuthenticationServiceTest {
         assertThat(body.getSubject()).isNotNull().isEqualTo(entity.getId());
         assertThat(body.getIssuer()).isNotNull().isEqualTo(AuthenticationService.class.getName());
         assertThat(body.getIssuedAt()).isNotNull();
+        assertThat(body.getNotBefore()).isNotNull();
         assertThat(body.getExpiration()).isNotNull();
         assertThat(body.get("roles")).isNotNull();
         assertThat(body.get("roles").toString().trim()).isEqualTo(entity.getRoles().toString().trim());
