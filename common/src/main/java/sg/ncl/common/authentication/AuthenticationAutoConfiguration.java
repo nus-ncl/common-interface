@@ -19,6 +19,7 @@ import sg.ncl.common.jwt.JwtAuthenticationProvider;
 import sg.ncl.common.jwt.JwtFilter;
 
 import javax.inject.Inject;
+import javax.servlet.http.HttpServletRequest;
 import javax.validation.constraints.NotNull;
 
 /**
@@ -73,10 +74,15 @@ public class AuthenticationAutoConfiguration extends WebSecurityConfigurerAdapte
 
         // add url that no need be authenticated
         http
+                .authorizeRequests().antMatchers("/authentication").permitAll().and()
                 .authorizeRequests().antMatchers(HttpMethod.GET, "/users").permitAll().and()
+//                .authorizeRequests().antMatchers(HttpMethod.GET, "/teams/{{?+}}*").permitAll().and()
+//                .authorizeRequests().antMatchers(HttpMethod.GET, "/teams").authenticated().and()
+//                .authorizeRequests().requestMatchers(request -> request.getMethod().equals("GET") && request.getRequestURI().equals("/teams") && request.getParameterValues("visibility").length > 0 && request.getParameterValues("visibility")[0].equals("PUBLIC")).permitAll().and()
+                .authorizeRequests().regexMatchers(HttpMethod.PUT, "/users/(.+)/emails/(.+)").permitAll().and() // /users/{id}/emails/{emailBase64}
+                .authorizeRequests().antMatchers(HttpMethod.POST, "/registrations").permitAll().and()
                 .authorizeRequests().anyRequest().authenticated();
-//        http
-//                .authorizeRequests().anyRequest().authenticated();
+
         http
                 .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
     }
