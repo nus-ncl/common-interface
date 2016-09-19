@@ -73,15 +73,13 @@ public class AuthenticationAutoConfiguration extends WebSecurityConfigurerAdapte
                 .x509().disable(); // not using x509
 
         // add url that no need be authenticated
-        http
-                .authorizeRequests().antMatchers("/authentication").permitAll().and()
-                .authorizeRequests().antMatchers(HttpMethod.GET, "/users").permitAll().and()
-//                .authorizeRequests().antMatchers(HttpMethod.GET, "/teams/{{?+}}*").permitAll().and()
-//                .authorizeRequests().antMatchers(HttpMethod.GET, "/teams").authenticated().and()
-//                .authorizeRequests().requestMatchers(request -> request.getMethod().equals("GET") && request.getRequestURI().equals("/teams") && request.getParameterValues("visibility").length > 0 && request.getParameterValues("visibility")[0].equals("PUBLIC")).permitAll().and()
-                .authorizeRequests().regexMatchers(HttpMethod.PUT, "/users/(.+)/emails/(.+)").permitAll().and() // /users/{id}/emails/{emailBase64}
-                .authorizeRequests().antMatchers(HttpMethod.POST, "/registrations").permitAll().and()
-                .authorizeRequests().anyRequest().authenticated();
+        http.authorizeRequests()
+                .antMatchers("/authentication").permitAll()
+                .antMatchers(HttpMethod.GET, "/users").permitAll()
+                .regexMatchers(HttpMethod.PUT, "/users/(.+)/emails/(.+)").permitAll() // /users/{id}/emails/{emailBase64}
+                .antMatchers(HttpMethod.POST, "/registrations").permitAll()
+                .antMatchers(HttpMethod.GET, "/teams").permitAll()
+                .anyRequest().authenticated();
 
         http
                 .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
