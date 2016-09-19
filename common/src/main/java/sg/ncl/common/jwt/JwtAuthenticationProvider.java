@@ -6,15 +6,11 @@ import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.stereotype.Component;
-import sg.ncl.common.authentication.Role;
 
 import javax.validation.constraints.NotNull;
 import java.security.Key;
 import java.time.ZonedDateTime;
-import java.util.Collection;
 import java.util.Date;
 
 
@@ -46,12 +42,14 @@ public class JwtAuthenticationProvider implements AuthenticationProvider {
             final Claims claims = Jwts.parser().setSigningKey(apiKey).parseClaimsJws(token.getCredentials()).getBody();
             checkDates(claims);
             token.setDetails(claims);
+//            token.setAuthenticated(true);
 
             log.info("Validation success: Principal {}", token.getPrincipal());
             log.info("Validation success: Role {}", token.getAuthorities());
 
             return token;
-        } catch (ExpiredJwtException | UnsupportedJwtException | MalformedJwtException | SignatureException e) {
+        } catch (ExpiredJwtException | UnsupportedJwtException | MalformedJwtException | SignatureException | IllegalArgumentException e) {
+            // java.lang.IllegalArgumentException: JWT String argument cannot be null or empty.
             log.warn("{}", e);
             throw new BadCredentialsException(e.getMessage(), e);
         }
