@@ -35,8 +35,7 @@ import java.security.Key;
 import java.util.Arrays;
 import java.util.Date;
 
-import static org.hamcrest.Matchers.any;
-import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -77,7 +76,10 @@ public class JwtFilterTest {
         when(request.getRequestURI()).thenReturn("/teams/");
         when(request.getParameterValues("visibility")).thenReturn(param);
         when(request.getMethod()).thenReturn("GET");
+        when(request.getHeader("Authorization")).thenReturn(null);
+
         jwtFilter.doFilter(request, response, filterChain);
+        assertThat(SecurityContextHolder.getContext().getAuthentication(), is(nullValue()));
     }
 
     @Test
@@ -91,7 +93,10 @@ public class JwtFilterTest {
         when(request.getRequestURI()).thenReturn("/teams/");
         when(request.getParameterValues("name")).thenReturn(param);
         when(request.getMethod()).thenReturn("GET");
+        when(request.getHeader("Authorization")).thenReturn(null);
+
         jwtFilter.doFilter(request, response, filterChain);
+        assertThat(SecurityContextHolder.getContext().getAuthentication(), is(nullValue()));
     }
 
     @Test
@@ -102,7 +107,10 @@ public class JwtFilterTest {
 
         when(request.getRequestURI()).thenReturn("/users/");
         when(request.getMethod()).thenReturn("GET");
+        when(request.getHeader("Authorization")).thenReturn(null);
+
         jwtFilter.doFilter(request, response, filterChain);
+        assertThat(SecurityContextHolder.getContext().getAuthentication(), is(nullValue()));
     }
 
     @Test
@@ -113,7 +121,10 @@ public class JwtFilterTest {
 
         when(request.getRequestURI()).thenReturn("/authentication/");
         when(request.getMethod()).thenReturn("GET");
+        when(request.getHeader("Authorization")).thenReturn(null);
+
         jwtFilter.doFilter(request, response, filterChain);
+        assertThat(SecurityContextHolder.getContext().getAuthentication(), is(nullValue()));
     }
 
     @Test
@@ -124,7 +135,10 @@ public class JwtFilterTest {
 
         when(request.getRequestURI()).thenReturn("/registrations/");
         when(request.getMethod()).thenReturn("POST");
+        when(request.getHeader("Authorization")).thenReturn(null);
+
         jwtFilter.doFilter(request, response, filterChain);
+        assertThat(SecurityContextHolder.getContext().getAuthentication(), is(nullValue()));
     }
 
     @Test
@@ -135,7 +149,10 @@ public class JwtFilterTest {
 
         when(request.getRequestURI()).thenReturn("/registrations");
         when(request.getMethod()).thenReturn("POST");
+        when(request.getHeader("Authorization")).thenReturn(null);
+
         jwtFilter.doFilter(request, response, filterChain);
+        assertThat(SecurityContextHolder.getContext().getAuthentication(), is(nullValue()));
     }
 
     @Test
@@ -146,8 +163,10 @@ public class JwtFilterTest {
 
         when(request.getRequestURI()).thenReturn("/users/abc/emails/abc");
         when(request.getMethod()).thenReturn("PUT");
+        when(request.getHeader("Authorization")).thenReturn(null);
 
         jwtFilter.doFilter(request, response, filterChain);
+        assertThat(SecurityContextHolder.getContext().getAuthentication(), is(nullValue()));
     }
 
     // -----------------------------------
@@ -161,13 +180,10 @@ public class JwtFilterTest {
 
         when(request.getRequestURI()).thenReturn("/experiments/experiments");
         when(request.getMethod()).thenReturn("GET");
+        when(request.getHeader("Authorization")).thenReturn("");
 
-        try {
-            jwtFilter.doFilter(request, response, filterChain);
-            Assert.fail();
-        } catch (ServletException e) {
-            assertThat(e.getMessage(), is("Missing or invalid Authorization header."));
-        }
+        jwtFilter.doFilter(request, response, filterChain);
+        assertThat(SecurityContextHolder.getContext().getAuthentication(), is(notNullValue()));
     }
 
     @Test
@@ -178,6 +194,7 @@ public class JwtFilterTest {
 
         when(request.getRequestURI()).thenReturn("/experiments/users/" + RandomStringUtils.randomAlphabetic(20));
         when(request.getMethod()).thenReturn("GET");
+        when(request.getHeader("Authorization")).thenReturn("");
 
         try {
             jwtFilter.doFilter(request, response, filterChain);
@@ -195,6 +212,7 @@ public class JwtFilterTest {
 
         when(request.getRequestURI()).thenReturn("/experiments/teams/" + RandomStringUtils.randomAlphabetic(20));
         when(request.getMethod()).thenReturn("GET");
+        when(request.getHeader("Authorization")).thenReturn("");
 
         try {
             jwtFilter.doFilter(request, response, filterChain);
@@ -212,6 +230,7 @@ public class JwtFilterTest {
 
         when(request.getRequestURI()).thenReturn("/experiments");
         when(request.getMethod()).thenReturn("POST");
+        when(request.getHeader("Authorization")).thenReturn("");
 
         try {
             jwtFilter.doFilter(request, response, filterChain);
@@ -232,6 +251,7 @@ public class JwtFilterTest {
 
         when(request.getRequestURI()).thenReturn("/experiments/" + expId + "/teams/" + teamName);
         when(request.getMethod()).thenReturn("DELETE");
+        when(request.getHeader("Authorization")).thenReturn("");
 
         try {
             jwtFilter.doFilter(request, response, filterChain);
@@ -251,6 +271,7 @@ public class JwtFilterTest {
 
         when(request.getRequestURI()).thenReturn("/realizations/" + id);
         when(request.getMethod()).thenReturn("GET");
+        when(request.getHeader("Authorization")).thenReturn("");
 
         try {
             jwtFilter.doFilter(request, response, filterChain);
@@ -271,6 +292,7 @@ public class JwtFilterTest {
 
         when(request.getRequestURI()).thenReturn("/realizations/team" + teamName + "/experiment/" + expId);
         when(request.getMethod()).thenReturn("GET");
+        when(request.getHeader("Authorization")).thenReturn("");
 
         try {
             jwtFilter.doFilter(request, response, filterChain);
