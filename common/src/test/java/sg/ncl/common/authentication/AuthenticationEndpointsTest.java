@@ -2,6 +2,7 @@ package sg.ncl.common.authentication;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
@@ -17,20 +18,21 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 /**
  * @author Te Ye
  */
-public class AuthenticationEndpointsTest {
+@ActiveProfiles("mock-authentication-auto-config-service")
+public class AuthenticationEndpointsTest extends AbstractTest {
 
-//    @Inject
-//    private WebApplicationContext webApplicationContext;
-//
-//    private MockMvc mockMvc;
-//
-//    @Before
-//    public void before() {
-//        mockMvc = MockMvcBuilders.webAppContextSetup(webApplicationContext).build();
-//    }
-//
-//    @Test
-//    public void testGetUsers() throws Exception {
-//        mockMvc.perform(post("/authentication")).andExpect(status().isOk());
-//    }
+    @Inject
+    private WebApplicationContext webApplicationContext;
+
+    private MockMvc mockMvc;
+
+    @Before
+    public void before() {
+        mockMvc = MockMvcBuilders.webAppContextSetup(webApplicationContext).build();
+    }
+
+    @Test
+    public void testGetUsers() throws Exception {
+        mockMvc.perform(post("/authentication")).andExpect(status().isOk());
+    }
 }
