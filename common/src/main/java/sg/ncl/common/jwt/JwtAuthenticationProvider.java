@@ -42,13 +42,12 @@ public class JwtAuthenticationProvider implements AuthenticationProvider {
             final Claims claims = Jwts.parser().setSigningKey(apiKey).parseClaimsJws(token.getCredentials()).getBody();
             checkDates(claims);
             token.setDetails(claims);
-//            token.setAuthenticated(true);
 
             log.info("Validation success: Principal {}", token.getPrincipal());
             log.info("Validation success: Role {}", token.getAuthorities());
 
             return token;
-        } catch (ExpiredJwtException | UnsupportedJwtException | MalformedJwtException | SignatureException | IllegalArgumentException e) {
+        } catch (ExpiredJwtException | UnsupportedJwtException | MalformedJwtException | SignatureException | IllegalArgumentException | PrematureJwtException e) {
             // java.lang.IllegalArgumentException: JWT String argument cannot be null or empty.
             log.warn("{}", e);
             throw new BadCredentialsException(e.getMessage(), e);
@@ -77,14 +76,14 @@ public class JwtAuthenticationProvider implements AuthenticationProvider {
         if (now.before(claims.getIssuedAt())) {
             // throw exception
             log.warn("Claim is before issued date {}", claims.getIssuedAt());
-            throw new BadCredentialsException("Claim is before issued date");
+            throw new BadCredentialsException("Claim is before issued date " + claims.getIssuedAt());
         }
 
-        if (claims.getIssuedAt().after(claims.getExpiration())) {
-            // throw exception
-            log.warn("Claim is issued {} after the expiration date {}", claims.getIssuedAt(), claims.getExpiration());
-            throw new BadCredentialsException("Claim is issued after the expiration date");
-        }
+//        if (claims.getIssuedAt().after(claims.getExpiration())) {
+//            // throw exception
+//            log.warn("Claim is issued {} after the expiration date {}", claims.getIssuedAt(), claims.getExpiration());
+//            throw new BadCredentialsException("Claim is issued after the expiration date");
+//        }
     }
 
     @Override
