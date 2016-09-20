@@ -23,6 +23,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
 import static org.mockito.Matchers.contains;
+import static org.mockito.Mockito.mock;
 
 /**
  * @author Te Ye
@@ -234,5 +235,10 @@ public class JwtAuthenticationProviderTest {
         exception.expect(BadCredentialsException.class);
         exception.expectMessage("Claim is before issued date " + Date.from(expiry.toInstant()));
         jwtAuthenticationProvider.authenticate(new JwtToken(jwt));
+    }
+
+    @Test
+    public void testSupports() throws Exception {
+        assertThat(jwtAuthenticationProvider.supports(JwtToken.class), is(true));
     }
 }
