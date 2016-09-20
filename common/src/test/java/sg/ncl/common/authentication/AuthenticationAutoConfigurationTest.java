@@ -1,20 +1,17 @@
 package sg.ncl.common.authentication;
 
-import org.assertj.core.api.Assertions;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
-import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import sg.ncl.common.jwt.JwtAuthenticationProvider;
 import sg.ncl.common.jwt.JwtFilter;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.mock;
 
 /**
  * Created by Chris on 8/6/2016.
@@ -43,10 +40,6 @@ public class AuthenticationAutoConfigurationTest {
 
         assertThat(encoder).isNotNull();
         assertThat(encoder).isInstanceOf(BCryptPasswordEncoder.class);
-    }
-
-    @Test
-    public void testConfigureAuth() throws Exception {
     }
 
 }
