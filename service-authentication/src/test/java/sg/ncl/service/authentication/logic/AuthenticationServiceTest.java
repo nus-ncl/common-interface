@@ -8,12 +8,15 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
+import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.test.context.ActiveProfiles;
-import sg.ncl.service.authentication.AbstractTest;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.TestPropertySource;
+import org.springframework.test.context.junit4.SpringRunner;
+import sg.ncl.common.jwt.JwtAutoConfiguration;
 import sg.ncl.service.authentication.data.jpa.CredentialsEntity;
 import sg.ncl.service.authentication.data.jpa.CredentialsRepository;
 import sg.ncl.service.authentication.domain.AuthenticationService;
@@ -24,13 +27,8 @@ import sg.ncl.service.authentication.exceptions.InvalidCredentialsException;
 import javax.inject.Inject;
 import java.security.Key;
 import java.time.Duration;
-import java.util.Date;
 
-import static org.hamcrest.Matchers.equalTo;
-import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.not;
-import static org.hamcrest.Matchers.nullValue;
-import static org.junit.Assert.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mockingDetails;
@@ -40,39 +38,39 @@ import static sg.ncl.service.authentication.util.TestUtil.getCredentialsEntity;
 /**
  * @author Christopher Zhong
  */
-@ActiveProfiles({"mock-password-encoder", "mock-credentials-repository"})
-public class AuthenticationServiceTest extends AbstractTest {
+@RunWith(SpringRunner.class)
+@ContextConfiguration(classes = JwtAutoConfiguration.class)
+@TestPropertySource(properties = {
+        "ncl.jwt.api-key=123",
+        "ncl.jwt.expiry-duration=PT1H",
+        "ncl.jwt.signing-algorithm=HS256"
+})
+public class AuthenticationServiceTest {
 
     @Rule
     public MockitoRule mockito = MockitoJUnit.rule();
     @Rule
     public ExpectedException exception = ExpectedException.none();
 
-    //    @Inject
     @Mock
     private CredentialsRepository credentialsRepository;
-    //    @Inject
     @Mock
     private PasswordEncoder passwordEncoder;
     @Inject
-    private SignatureAlgorithm signatureAlgorithm;
+    private SignatureAlgorithm signatureAlgorithm = SignatureAlgorithm.ES256;
     @Inject
     private Key apiKey;
     @Inject
-    private Duration expiryDuration;
-    //    @Inject
+    private Duration expiryDuration = Duration.ZERO;
+
     private AuthenticationService authenticationService;
 
     @Before
     public void before() {
-        assertThat(mockingDetails(credentialsRepository).isMock(), is(true));
-        assertThat(mockingDetails(passwordEncoder).isMock(), is(true));
-        authenticationService = new AuthenticationServiceImpl(credentialsRepository, passwordEncoder, signatureAlgorithm, apiKey, expiryDuration);
-    }
+        assertThat(mockingDetails(credentialsRepository).isMock()).isTrue();
+        assertThat(mockingDetails(passwordEncoder).isMock()).isTrue();
 
-    @Test
-    public void testAuthenticationServiceExists() {
-        assertThat(authenticationService, is(not(nullValue(AuthenticationService.class))));
+        authenticationService = new AuthenticationServiceImpl(credentialsRepository, passwordEncoder, signatureAlgorithm, apiKey, expiryDuration);
     }
 
     @Test
@@ -84,16 +82,17 @@ public class AuthenticationServiceTest extends AbstractTest {
 
         final Authorization authorization = authenticationService.login(entity.getUsername(), entity.getPassword());
 
-        assertThat(authorization.getId(), is(equalTo(entity.getId())));
-        final JwtParser parser = Jwts.parser()
-                .setSigningKey(apiKey)
-                .requireSubject(entity.getId())
-                .requireIssuer(AuthenticationService.class.getName());
+        assertThat(authorization.getId()).isEqualTo(entity.getId());
+        assertThat(authorization.getToken()).isNotNull();
+        final JwtParser parser = Jwts.parser().setSigningKey(apiKey);
         final Claims body = parser.parseClaimsJws(authorization.getToken()).getBody();
-        assertThat(body.getIssuedAt(), is(not(nullValue(Date.class))));
-        assertThat(body.getExpiration(), is(not(nullValue(Date.class))));
-        assertThat(body.get("roles"), is(not(nullValue())));
-        assertThat(body.get("roles").toString().trim(), is(entity.getRoles().toString().trim()));
+        assertThat(body.getSubject()).isNotNull().isEqualTo(entity.getId());
+        assertThat(body.getIssuer()).isNotNull().isEqualTo(AuthenticationService.class.getName());
+        assertThat(body.getIssuedAt()).isNotNull();
+        assertThat(body.getNotBefore()).isNotNull();
+        assertThat(body.getExpiration()).isNotNull();
+        assertThat(body.get("roles")).isNotNull();
+        assertThat(body.get("roles").toString().trim()).isEqualTo(entity.getRoles().toString().trim());
     }
 
     @Test

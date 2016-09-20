@@ -8,13 +8,13 @@ import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.test.context.ActiveProfiles;
 import sg.ncl.adapter.deterlab.AdapterDeterLab;
-import sg.ncl.service.authentication.AbstractTest;
+import sg.ncl.common.authentication.Role;
 import sg.ncl.service.authentication.data.jpa.CredentialsEntity;
 import sg.ncl.service.authentication.data.jpa.CredentialsRepository;
 import sg.ncl.service.authentication.domain.Credentials;
 import sg.ncl.service.authentication.domain.CredentialsService;
+import sg.ncl.service.authentication.domain.CredentialsStatus;
 import sg.ncl.service.authentication.exceptions.CredentialsNotFoundException;
 import sg.ncl.service.authentication.exceptions.NeitherUsernameNorPasswordModifiedException;
 import sg.ncl.service.authentication.exceptions.PasswordNullOrEmptyException;
@@ -24,9 +24,7 @@ import sg.ncl.service.authentication.exceptions.UsernameAlreadyExistsException;
 import sg.ncl.service.authentication.exceptions.UsernameNullOrEmptyException;
 import sg.ncl.service.authentication.web.CredentialsInfo;
 
-import static org.hamcrest.Matchers.equalTo;
-import static org.hamcrest.Matchers.is;
-import static org.junit.Assert.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.any;
@@ -39,35 +37,32 @@ import static sg.ncl.service.authentication.util.TestUtil.getCredentialsEntity;
 /**
  * @author Christopher Zhong
  */
-@ActiveProfiles({"mock-password-encoder", "mock-credentials-repository"})
-public class CredentialsServiceTest extends AbstractTest {
+public class CredentialsServiceTest {
 
     @Rule
     public MockitoRule mockito = MockitoJUnit.rule();
     @Rule
     public ExpectedException exception = ExpectedException.none();
 
-    //    @Inject
     @Mock
     private PasswordEncoder passwordEncoder;
-    //    @Inject
     @Mock
     private CredentialsRepository credentialsRepository;
-    //    @Inject
-    private CredentialsService credentialsService;
-
     @Mock
     private AdapterDeterLab adapterDeterLab;
 
+    private CredentialsService credentialsService;
+
     @Before
     public void before() {
-        assertThat(mockingDetails(passwordEncoder).isMock(), is(true));
-        assertThat(mockingDetails(credentialsRepository).isMock(), is(true));
+        assertThat(mockingDetails(passwordEncoder).isMock()).isTrue();
+        assertThat(mockingDetails(credentialsRepository).isMock()).isTrue();
+
         credentialsService = new CredentialsServiceImpl(credentialsRepository, passwordEncoder, adapterDeterLab);
     }
 
     @Test
-    public void testAddCredentialsGoodIdAndUsernameAndPassword() {
+    public void testAddCredentialsGoodIdAndGoodUsernameAndGoodPassword() {
         final Credentials credentialsInfo = new CredentialsInfo("id", "username", "password", null, null);
 
         when(passwordEncoder.encode(anyString())).thenReturn(credentialsInfo.getPassword());
@@ -77,9 +72,11 @@ public class CredentialsServiceTest extends AbstractTest {
 
         verify(passwordEncoder, times(1)).encode(anyString());
         verify(credentialsRepository, times(1)).save(any(CredentialsEntity.class));
-        assertThat(credentials.getId(), is(equalTo(credentialsInfo.getId())));
-        assertThat(credentials.getUsername(), is(equalTo(credentialsInfo.getUsername())));
-        assertThat(credentials.getPassword(), is(equalTo(credentialsInfo.getPassword())));
+        assertThat(credentials.getId()).isEqualTo(credentialsInfo.getId());
+        assertThat(credentials.getUsername()).isEqualTo(credentialsInfo.getUsername());
+        assertThat(credentials.getPassword()).isEqualTo(credentialsInfo.getPassword());
+        assertThat(credentials.getStatus()).isEqualTo(CredentialsStatus.ACTIVE);
+        assertThat(credentials.getRoles()).hasSize(1).containsExactly(Role.USER);
     }
 
     @Test
@@ -245,8 +242,10 @@ public class CredentialsServiceTest extends AbstractTest {
 
         verify(passwordEncoder, times(1)).encode(anyString());
         verify(credentialsRepository, times(1)).save(any(CredentialsEntity.class));
-        assertThat(entity.getUsername(), is(equalTo(username)));
-        assertThat(entity.getPassword(), is(equalTo(password)));
+        assertThat(entity.getUsername()).isEqualTo(username);
+        assertThat(entity.getPassword()).isEqualTo(password);
+        assertThat(entity.getStatus()).isEqualTo(CredentialsStatus.ACTIVE);
+        assertThat(entity.getRoles()).hasSize(1).containsExactly(Role.USER);
     }
 
     @Test
@@ -263,8 +262,10 @@ public class CredentialsServiceTest extends AbstractTest {
 
         verify(passwordEncoder, times(0)).encode(anyString());
         verify(credentialsRepository, times(1)).save(any(CredentialsEntity.class));
-        assertThat(entity.getUsername(), is(equalTo(username)));
-        assertThat(entity.getPassword(), is(equalTo(password)));
+        assertThat(entity.getUsername()).isEqualTo(username);
+        assertThat(entity.getPassword()).isEqualTo(password);
+        assertThat(entity.getStatus()).isEqualTo(CredentialsStatus.ACTIVE);
+        assertThat(entity.getRoles()).hasSize(1).containsExactly(Role.USER);
     }
 
     @Test
@@ -280,8 +281,10 @@ public class CredentialsServiceTest extends AbstractTest {
         credentialsService.updateCredentials(entity.getId(), info);
 
         verify(credentialsRepository, times(1)).save(any(CredentialsEntity.class));
-        assertThat(entity.getUsername(), is(equalTo(username)));
-        assertThat(entity.getPassword(), is(equalTo(password)));
+        assertThat(entity.getUsername()).isEqualTo(username);
+        assertThat(entity.getPassword()).isEqualTo(password);
+        assertThat(entity.getStatus()).isEqualTo(CredentialsStatus.ACTIVE);
+        assertThat(entity.getRoles()).hasSize(1).containsExactly(Role.USER);
     }
 
     @Test
@@ -298,8 +301,10 @@ public class CredentialsServiceTest extends AbstractTest {
         credentialsService.updateCredentials(entity.getId(), info);
 
         verify(credentialsRepository, times(1)).save(any(CredentialsEntity.class));
-        assertThat(entity.getUsername(), is(equalTo(username)));
-        assertThat(entity.getPassword(), is(equalTo(password)));
+        assertThat(entity.getUsername()).isEqualTo(username);
+        assertThat(entity.getPassword()).isEqualTo(password);
+        assertThat(entity.getStatus()).isEqualTo(CredentialsStatus.ACTIVE);
+        assertThat(entity.getRoles()).hasSize(1).containsExactly(Role.USER);
     }
 
     @Test
@@ -316,8 +321,10 @@ public class CredentialsServiceTest extends AbstractTest {
         credentialsService.updateCredentials(entity.getId(), info);
 
         verify(credentialsRepository, times(1)).save(any(CredentialsEntity.class));
-        assertThat(entity.getUsername(), is(equalTo(username)));
-        assertThat(entity.getPassword(), is(equalTo(password)));
+        assertThat(entity.getUsername()).isEqualTo(username);
+        assertThat(entity.getPassword()).isEqualTo(password);
+        assertThat(entity.getStatus()).isEqualTo(CredentialsStatus.ACTIVE);
+        assertThat(entity.getRoles()).hasSize(1).containsExactly(Role.USER);
     }
 
     @Test

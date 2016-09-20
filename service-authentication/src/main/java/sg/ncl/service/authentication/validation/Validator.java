@@ -1,9 +1,9 @@
 package sg.ncl.service.authentication.validation;
 
 import lombok.extern.slf4j.Slf4j;
+import sg.ncl.common.authentication.Role;
 import sg.ncl.service.authentication.domain.Credentials;
 import sg.ncl.service.authentication.domain.CredentialsStatus;
-import sg.ncl.common.authentication.Role;
 import sg.ncl.service.authentication.exceptions.NeitherUsernameNorPasswordModifiedException;
 import sg.ncl.service.authentication.exceptions.PasswordNullOrEmptyException;
 import sg.ncl.service.authentication.exceptions.RolesIsNullOrEmptyException;
@@ -20,12 +20,17 @@ import java.util.Set;
 @Slf4j
 public class Validator {
 
-    public static void check(final Credentials credentials) {
+    public static void addCheck(final Credentials credentials) {
         checkId(credentials);
         checkUsername(credentials);
         checkPassword(credentials);
-        checkStatus(credentials);
-        checkRoles(credentials);
+    }
+
+    public static void updateCheck(final Credentials credentials) {
+        if (isUsernameNullOrEmpty(credentials) && isPasswordNullOrEmpty(credentials)) {
+            log.warn("Both username and password not modified");
+            throw new NeitherUsernameNorPasswordModifiedException();
+        }
     }
 
     public static void checkId(final Credentials credentials) {
@@ -67,30 +72,6 @@ public class Validator {
             throw new RolesIsNullOrEmptyException();
         }
     }
-
-    public static void validateForCreation(final Credentials credentials) {
-        if (isIdNullOrEmpty(credentials)) {
-            log.warn("User Id is either null or empty");
-            throw new UserIdNullOrEmptyException();
-        }
-        if (isUsernameNullOrEmpty(credentials)) {
-            log.warn("Username is either null or empty");
-            throw new UsernameNullOrEmptyException();
-        }
-        if (isPasswordNullOrEmpty(credentials)) {
-            log.warn("Password is either null or empty");
-            throw new PasswordNullOrEmptyException();
-        }
-    }
-
-    public static void validateForUpdate(final Credentials credentials) {
-        if (isUsernameNullOrEmpty(credentials) && isPasswordNullOrEmpty(credentials)) {
-            log.warn("Both username and password not modified");
-            throw new NeitherUsernameNorPasswordModifiedException();
-        }
-    }
-
-    private static boolean isIdNullOrEmpty(final Credentials credentials) {return credentials.getId() == null || credentials.getId().isEmpty();}
 
     private static boolean isUsernameNullOrEmpty(final Credentials credentials) {return credentials.getUsername() == null || credentials.getUsername().isEmpty();}
 

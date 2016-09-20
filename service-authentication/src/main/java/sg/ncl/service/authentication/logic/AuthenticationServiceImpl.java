@@ -1,6 +1,5 @@
 package sg.ncl.service.authentication.logic;
 
-import io.jsonwebtoken.JwtBuilder;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import lombok.extern.slf4j.Slf4j;
@@ -57,16 +56,15 @@ public class AuthenticationServiceImpl implements AuthenticationService {
             // create and sign a JWT
             final ZonedDateTime now = ZonedDateTime.now();
             final ZonedDateTime expiry = now.plus(expiryDuration);
-            final JwtBuilder builder = Jwts.builder();
             final String jwt = Jwts.builder()
                     .setSubject(credentials.getId())
                     .setIssuer(AuthenticationService.class.getName())
                     .setIssuedAt(Date.from(now.toInstant()))
+                    .setNotBefore(Date.from(now.toInstant()))
                     // the expiry should be short; can be set through properties
                     .setExpiration(Date.from(expiry.toInstant()))
-                    // TODO custom claims such as permissions
-//                    .claim()
                     .claim("roles", credentials.getRoles())
+                    // TODO custom claims such as permissions
                     // sign the JWT with the given algorithm and apiKey
                     .signWith(signatureAlgorithm, apiKey)
                     .compact();

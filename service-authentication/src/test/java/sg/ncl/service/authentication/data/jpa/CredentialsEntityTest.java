@@ -2,19 +2,13 @@ package sg.ncl.service.authentication.data.jpa;
 
 import org.apache.commons.lang3.RandomStringUtils;
 import org.junit.Test;
-import sg.ncl.service.authentication.domain.CredentialsStatus;
 import sg.ncl.common.authentication.Role;
+import sg.ncl.service.authentication.domain.CredentialsStatus;
 import sg.ncl.service.authentication.util.TestUtil;
 
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.Set;
-
-import static org.hamcrest.Matchers.containsString;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.not;
-import static org.hamcrest.Matchers.nullValue;
 import static org.junit.Assert.assertThat;
 
 /**
@@ -26,7 +20,7 @@ public class CredentialsEntityTest {
     public void testGetId() throws Exception {
         final CredentialsEntity entity = new CredentialsEntity();
 
-        assertThat(entity.getId(), is(nullValue()));
+        assertThat(entity.getId()).isNull();
     }
 
     @Test
@@ -35,14 +29,15 @@ public class CredentialsEntityTest {
         final String id = RandomStringUtils.randomAlphanumeric(20);
         entity.setId(id);
 
-        assertThat(entity.getId(), is(equalTo(id)));
+        assertThat(entity.getId()).isEqualTo(id);
     }
 
     @Test
     public void testGetUsername() throws Exception {
         final CredentialsEntity entity = new CredentialsEntity();
 
-        assertThat(entity.getUsername(), is(nullValue()));
+        assertThat(entity.getUsername()).isNull();
+        ;
     }
 
     @Test
@@ -51,14 +46,14 @@ public class CredentialsEntityTest {
         final String username = RandomStringUtils.randomAlphanumeric(20);
         entity.setUsername(username);
 
-        assertThat(entity.getUsername(), is(equalTo(username)));
+        assertThat(entity.getUsername()).isEqualTo(username);
     }
 
     @Test
     public void testGetPassword() throws Exception {
         final CredentialsEntity entity = new CredentialsEntity();
 
-        assertThat(entity.getPassword(), is(nullValue()));
+        assertThat(entity.getPassword()).isNull();
     }
 
     @Test
@@ -67,44 +62,14 @@ public class CredentialsEntityTest {
         final String password = RandomStringUtils.randomAlphanumeric(20);
         entity.setPassword(password);
 
-        assertThat(entity.getPassword(), is(equalTo(password)));
+        assertThat(entity.getPassword()).isEqualTo(password);
     }
 
     @Test
     public void testGetStatus() throws Exception {
         final CredentialsEntity entity = new CredentialsEntity();
 
-        assertThat(entity.getStatus(), is(equalTo(CredentialsStatus.ACTIVE)));
-    }
-
-    @Test
-    public void testGetRoles() throws Exception {
-        final CredentialsEntity entity = new CredentialsEntity();
-        Set<Role> result = new HashSet<>();
-        assertThat(entity.getRoles().isEmpty(), is(true));
-        assertThat(entity.getRoles(), is(equalTo(result)));
-    }
-
-    @Test
-    public void testAddRoles() throws Exception {
-        final CredentialsEntity entity = new CredentialsEntity();
-        entity.addRole(Role.ADMIN);
-        Set<Role> result = new HashSet<>(Arrays.asList(Role.ADMIN));
-
-        assertThat(entity.getRoles().size(), is(1));
-        assertThat(entity.getRoles(), is(equalTo(result)));
-    }
-
-    @Test
-    public void testRemoveRoles() throws Exception {
-        final CredentialsEntity entity = new CredentialsEntity();
-        entity.addRole(Role.ADMIN);
-        entity.addRole(Role.USER);
-        entity.removeRole(Role.USER);
-        Set<Role> result = new HashSet<>(Arrays.asList(Role.ADMIN));
-
-        assertThat(entity.getRoles().size(), is(1));
-        assertThat(entity.getRoles(), is(equalTo(result)));
+        assertThat(entity.getStatus()).isEqualTo(CredentialsStatus.ACTIVE);
     }
 
     @Test
@@ -116,59 +81,159 @@ public class CredentialsEntityTest {
     }
 
     @Test
-    public void testEquals() throws Exception {
-        final CredentialsEntity entity1 = new CredentialsEntity();
-        final CredentialsEntity entity2 = new CredentialsEntity();
+    public void testGetRoles() throws Exception {
+        final CredentialsEntity entity = new CredentialsEntity();
 
-        assertThat(entity1, is(equalTo(entity2)));
-
-        final String id1 = RandomStringUtils.randomAlphanumeric(20);
-        entity1.setId(id1);
-
-        assertThat(entity1, is(not(equalTo(entity2))));
-
-        entity2.setId(id1);
-
-        assertThat(entity1, is(equalTo(entity2)));
-
-        final String id2 = RandomStringUtils.randomAlphanumeric(20);
-        entity2.setId(id2);
-
-        assertThat(entity1, is(not(equalTo(entity2))));
+        assertThat(entity.getRoles()).isEmpty();
     }
 
     @Test
-    public void testHashCode() throws Exception {
+    public void testAddRole() throws Exception {
+        final CredentialsEntity entity = new CredentialsEntity();
+        entity.addRole(Role.ADMIN);
+        entity.addRole(Role.ADMIN);
+
+        assertThat(entity.getRoles()).containsOnly(Role.ADMIN).hasSize(1);
+    }
+
+    @Test
+    public void testRemoveRole() throws Exception {
+        final CredentialsEntity entity = new CredentialsEntity();
+        entity.addRole(Role.ADMIN);
+        entity.addRole(Role.USER);
+
+        entity.removeRole(Role.USER);
+
+        assertThat(entity.getRoles()).containsOnly(Role.ADMIN).hasSize(1);
+    }
+
+    @Test
+    public void testRemoveRoleNotInSet() throws Exception {
+        final CredentialsEntity entity = new CredentialsEntity();
+        entity.addRole(Role.USER);
+
+        entity.removeRole(Role.ADMIN);
+
+        assertThat(entity.getRoles()).containsOnly(Role.USER).hasSize(1);
+    }
+
+    @Test
+    public void testEqualsSameInstanceNullId() throws Exception {
+        final CredentialsEntity entity1 = new CredentialsEntity();
+        final CredentialsEntity entity2 = entity1;
+
+        assertThat(entity1).isEqualTo(entity2);
+    }
+
+    @Test
+    public void testEqualsDifferentInstanceNullId() throws Exception {
         final CredentialsEntity entity1 = new CredentialsEntity();
         final CredentialsEntity entity2 = new CredentialsEntity();
 
-        assertThat(entity1.hashCode(), is(equalTo(entity2.hashCode())));
+        assertThat(entity1).isEqualTo(entity2);
+    }
 
+    @Test
+    public void testEqualsDifferentInstanceNonNullIdCompareToNullId() throws Exception {
+        final CredentialsEntity entity1 = new CredentialsEntity();
+        final CredentialsEntity entity2 = new CredentialsEntity();
         final String id1 = RandomStringUtils.randomAlphanumeric(20);
         entity1.setId(id1);
 
-        assertThat(entity1.hashCode(), is(not(equalTo(entity2.hashCode()))));
+        assertThat(entity1).isNotEqualTo(entity2);
+    }
 
+    @Test
+    public void testEqualsDifferentInstanceSameNonNullId() throws Exception {
+        final CredentialsEntity entity1 = new CredentialsEntity();
+        final CredentialsEntity entity2 = new CredentialsEntity();
+        final String id1 = RandomStringUtils.randomAlphanumeric(20);
+        entity1.setId(id1);
         entity2.setId(id1);
 
-        assertThat(entity1.hashCode(), is(equalTo(entity2.hashCode())));
+        assertThat(entity1).isEqualTo(entity2);
+    }
 
+    @Test
+    public void testEqualsDifferentInstanceDifferentNonNullId() throws Exception {
+        final CredentialsEntity entity1 = new CredentialsEntity();
+        final CredentialsEntity entity2 = new CredentialsEntity();
+        final String id1 = RandomStringUtils.randomAlphanumeric(20);
+        entity1.setId(id1);
         final String id2 = RandomStringUtils.randomAlphanumeric(20);
         entity2.setId(id2);
 
-        assertThat(entity1.hashCode(), is(not(equalTo(entity2.hashCode()))));
+        assertThat(entity1).isNotEqualTo(entity2);
+    }
+
+    @Test
+    public void testEqualsNullObject() throws Exception {
+        final CredentialsEntity entity1 = new CredentialsEntity();
+
+        assertThat(entity1.equals(null)).isFalse();
+    }
+
+    @Test
+    public void testEqualsDifferentClass() throws Exception {
+        final CredentialsEntity entity1 = new CredentialsEntity();
+
+        assertThat(entity1.equals("")).isFalse();
+    }
+
+    @Test
+    public void testHashCodeSameInstanceNullId() throws Exception {
+        final CredentialsEntity entity1 = new CredentialsEntity();
+        final CredentialsEntity entity2 = entity1;
+
+        assertThat(entity1.hashCode()).isEqualTo(entity2.hashCode()).isEqualTo(0);
+    }
+
+    @Test
+    public void testHashCodeDifferentInstanceNullId() throws Exception {
+        final CredentialsEntity entity1 = new CredentialsEntity();
+        final CredentialsEntity entity2 = new CredentialsEntity();
+
+        assertThat(entity1.hashCode()).isEqualTo(entity2.hashCode()).isEqualTo(0);
+    }
+
+    @Test
+    public void testHashCodeDifferentInstanceNonNullIdCompareToNullId() throws Exception {
+        final CredentialsEntity entity1 = new CredentialsEntity();
+        final CredentialsEntity entity2 = new CredentialsEntity();
+        final String id1 = RandomStringUtils.randomAlphanumeric(20);
+        entity1.setId(id1);
+
+        assertThat(entity1.hashCode()).isNotEqualTo(entity2.hashCode());
+    }
+
+    @Test
+    public void testHashCodeDifferentInstanceSameNonNullId() throws Exception {
+        final CredentialsEntity entity1 = new CredentialsEntity();
+        final CredentialsEntity entity2 = new CredentialsEntity();
+        final String id1 = RandomStringUtils.randomAlphanumeric(20);
+        entity1.setId(id1);
+        entity2.setId(id1);
+
+        assertThat(entity1.hashCode()).isEqualTo(entity2.hashCode());
+    }
+
+    @Test
+    public void testHashCodeDifferentInstanceDifferentNonNullId() throws Exception {
+        final CredentialsEntity entity1 = new CredentialsEntity();
+        final CredentialsEntity entity2 = new CredentialsEntity();
+        final String id1 = RandomStringUtils.randomAlphanumeric(20);
+        entity1.setId(id1);
+        final String id2 = RandomStringUtils.randomAlphanumeric(20);
+        entity2.setId(id2);
+
+        assertThat(entity1.hashCode()).isNotEqualTo(entity2.hashCode());
     }
 
     @Test
     public void testToString() throws Exception {
         final CredentialsEntity entity = TestUtil.getCredentialsEntity();
 
-        final String toString = entity.toString();
-
-        assertThat(toString, containsString(entity.getId()));
-        assertThat(toString, containsString(entity.getUsername()));
-        assertThat(toString, containsString(entity.getPassword()));
-        assertThat(toString, containsString(CredentialsStatus.ACTIVE.toString()));
+        assertThat(entity.toString()).contains(entity.getId(), entity.getUsername(), entity.getPassword(), CredentialsStatus.ACTIVE.toString(), Role.USER.toString());
     }
 
 }

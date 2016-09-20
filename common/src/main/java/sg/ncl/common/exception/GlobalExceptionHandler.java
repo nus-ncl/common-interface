@@ -17,7 +17,7 @@ import javax.validation.constraints.NotNull;
  */
 @ControllerAdvice
 @Slf4j
-class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
+public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 
     private final ExceptionHttpStatusMap exceptionHttpStatusMap;
 

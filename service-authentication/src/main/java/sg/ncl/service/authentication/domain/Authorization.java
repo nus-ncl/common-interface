@@ -1,5 +1,9 @@
 package sg.ncl.service.authentication.domain;
 
+import sg.ncl.common.authentication.Role;
+
+import java.util.Set;
+
 /**
  * Interface that contains the necessary authorization for a user.
  *
@@ -21,5 +25,12 @@ public interface Authorization {
      * @return the JWT.
      */
     String getToken();
+
+    /**
+     * Returns the set of {@link Role}s.
+     *
+     * @return the set of {@link Role}s.
+     */
+    Set<Role> getRoles();
 
 }
