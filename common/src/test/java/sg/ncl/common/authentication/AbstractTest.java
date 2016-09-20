@@ -11,5 +11,4 @@ import sg.ncl.common.jwt.JwtFilter;
  */
 @SpringBootTest(classes = AuthenticationAutoConfiguration.class)
 @WebAppConfiguration
-@Import({JwtFilter.class, JwtAuthenticationProvider.class})
 public abstract class AbstractTest extends sg.ncl.common.test.AbstractTest {}
