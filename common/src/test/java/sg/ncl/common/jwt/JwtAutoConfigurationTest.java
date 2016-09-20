@@ -1,14 +1,12 @@
 package sg.ncl.common.jwt;
 
 import io.jsonwebtoken.SignatureAlgorithm;
-import org.assertj.core.api.Assertions;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
-import org.springframework.security.authentication.AuthenticationManager;
 
 import java.security.Key;
 import java.time.Duration;
