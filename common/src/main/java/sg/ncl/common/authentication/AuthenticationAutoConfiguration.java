@@ -19,7 +19,6 @@ import sg.ncl.common.jwt.JwtAuthenticationProvider;
 import sg.ncl.common.jwt.JwtFilter;
 
 import javax.inject.Inject;
-import javax.servlet.http.HttpServletRequest;
 import javax.validation.constraints.NotNull;
 
 /**
