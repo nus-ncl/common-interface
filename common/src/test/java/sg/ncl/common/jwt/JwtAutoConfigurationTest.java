@@ -1,6 +1,7 @@
 package sg.ncl.common.jwt;
 
 import io.jsonwebtoken.SignatureAlgorithm;
+import org.assertj.core.api.Assertions;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -12,10 +13,7 @@ import org.springframework.security.authentication.AuthenticationManager;
 import java.security.Key;
 import java.time.Duration;
 
-import static org.hamcrest.Matchers.equalTo;
-import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.not;
-import static org.hamcrest.Matchers.nullValue;
+import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.doReturn;
 import static sg.ncl.common.jwt.JwtAutoConfiguration.DEFAULT_API_KEY;
@@ -38,6 +36,13 @@ public class JwtAutoConfigurationTest {
     @Before
     public void before() {
         configuration = new JwtAutoConfiguration(properties);
+    }
+
+    @Test
+    public void testJwtFilter() throws Exception {
+        final JwtFilter jwtFilter = configuration.jwtFilter();
+
+        assertThat(jwtFilter, is(not(nullValue(JwtFilter.class))));
     }
 
     @Test

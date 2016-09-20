@@ -48,14 +48,6 @@ public class JwtAuthenticationProviderTest {
         jwtAuthenticationProvider = new JwtAuthenticationProvider(apiKey);
     }
 
-//    @Test
-//    public void testNotAuthenticated() throws Exception {
-//        RememberMeAuthenticationToken token = mock(RememberMeAuthenticationToken.class);
-//        when(token.isAuthenticated()).thenReturn(false);
-//        Authentication resultToken = jwtAuthenticationProvider.authenticate(token);
-//        assertThat(resultToken.isAuthenticated(), is(token.isAuthenticated()));
-//    }
-
     @Test
     public void testGetPrincipal() throws Exception {
 
@@ -104,6 +96,5 @@ public class JwtAuthenticationProviderTest {
         Collection<? extends GrantedAuthority> result = auth.getAuthorities();
 
         assertThat(result).isEqualTo(rolesList);
-//        assertThat(auth.getAuthorities(), containsInAnyOrder(rolesList));
     }
 }
