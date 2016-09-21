@@ -1,7 +1,9 @@
 package sg.ncl.service.experiment.web;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -10,6 +12,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
+import sg.ncl.common.exception.base.ForbiddenException;
 import sg.ncl.service.experiment.domain.Experiment;
 import sg.ncl.service.experiment.domain.ExperimentService;
 
@@ -24,6 +27,7 @@ import java.util.stream.Collectors;
  */
 @RestController
 @RequestMapping(path = ExperimentsController.PATH, produces = MediaType.APPLICATION_JSON_VALUE)
+@Slf4j
 public class ExperimentsController {
 
     static final String PATH = "/experiments";
@@ -71,6 +75,11 @@ public class ExperimentsController {
     // FIXME: should be DELETE instead of POST and path should be "/experiments/{id}"
     @ResponseStatus(HttpStatus.OK)
     public Experiment deleteExperiment(@PathVariable String expId, @PathVariable String teamName) {
+        if (SecurityContextHolder.getContext().getAuthentication() == null) {
+            // throw forbidden
+            log.warn("Access denied for delete experiment: expid: {} ", expId);
+            throw new ForbiddenException("Access denied for delete experiment: expid " + expId);
+        }
         return new ExperimentInfo(experimentService.deleteExperiment(Long.parseLong(expId), teamName));
     }
 }
