@@ -35,19 +35,10 @@ public class JwtAutoConfiguration {
 
     private final JwtProperties properties;
 
-//    @Inject
-//    private final AuthenticationManager authenticationManager;
-
     @Inject
     JwtAutoConfiguration(@NotNull final JwtProperties properties) {
         this.properties = properties;
     }
-
-//    @Inject
-//    JwtAutoConfiguration(@NotNull final JwtProperties properties, @NotNull AuthenticationManager authenticationManager) {
-//        this.properties = properties;
-//        this.authenticationManager = authenticationManager;
-//    }
 
     @Bean
     @ConditionalOnMissingBean(JwtFilter.class)
