@@ -1,93 +1,77 @@
 package sg.ncl.common.jwt;
 
-import io.jsonwebtoken.*;
+import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.ExpiredJwtException;
+import io.jsonwebtoken.JwtParser;
+import io.jsonwebtoken.MalformedJwtException;
+import io.jsonwebtoken.PrematureJwtException;
+import io.jsonwebtoken.SignatureException;
+import io.jsonwebtoken.UnsupportedJwtException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.AuthenticationException;
 import org.springframework.stereotype.Component;
 
 import javax.validation.constraints.NotNull;
-import java.security.Key;
 import java.time.ZonedDateTime;
 import java.util.Date;
 
-
 /**
- * @author Te Ye
+ * @author Te Ye, Christopher Zhong
  */
 @Component
 @Slf4j
 public class JwtAuthenticationProvider implements AuthenticationProvider {
 
-    private final Key apiKey;
+    private final JwtParser jwtParser;
 
-    JwtAuthenticationProvider(@NotNull final Key apiKey) {
-        this.apiKey = apiKey;
+    JwtAuthenticationProvider(@NotNull final JwtParser jwtParser) {
+        this.jwtParser = jwtParser;
     }
 
     @Override
-    public Authentication authenticate(Authentication authentication) throws AuthenticationException {
-        JwtToken token = (JwtToken) authentication;
-        log.info("JwtToken token: {}", token);
-        log.info("Jwt Token Name: {}", token.getName());
-        log.info("Jwt Token Authorities: {}", token.getAuthorities());
-        log.info("Jwt Token Credentials: {}", token.getCredentials());
-        log.info("Jwt Token Details: {}", token.getDetails());
-        log.info("Jwt Token Principal: {}", token.getPrincipal());
-
+    public Authentication authenticate(Authentication authentication) {
+        log.info("Authenticating: {}", authentication);
         try {
-            final Claims claims = Jwts.parser().setSigningKey(apiKey).parseClaimsJws(token.getCredentials()).getBody();
-            checkDates(claims);
-            token.setDetails(claims);
-
-            log.info("Validation success: Principal {}", token.getPrincipal());
-            log.info("Validation success: Role {}", token.getAuthorities());
-
-            return token;
+            final String token = authentication.getCredentials().toString();
+            final Claims claims = jwtParser.parseClaimsJws(token).getBody();
+            checkClaims(claims);
+            return new JwtToken(token, claims);
         } catch (ExpiredJwtException | UnsupportedJwtException | MalformedJwtException | SignatureException | IllegalArgumentException | PrematureJwtException e) {
-            // java.lang.IllegalArgumentException: JWT String argument cannot be null or empty.
             log.warn("{}", e);
             throw new BadCredentialsException(e.getMessage(), e);
         }
     }
 
-    private void checkDates(Claims claims) {
-        // check for expired
-        // check for issued at
-        // check for not before
-        log.info("Decrypted claims: {}", claims);
-        Date now = Date.from(ZonedDateTime.now().toInstant());
-        // has expired
-        if (now.after(claims.getExpiration())) {
-            // throw exception
-            log.warn("Claim has expired {}", claims.getExpiration());
-            throw new BadCredentialsException("Claim has expired");
+    private void checkClaims(Claims claims) {
+        final Date now = Date.from(ZonedDateTime.now().toInstant());
+        // check the issued-at date, a claims that is issued at a future date cannot be used
+        // a null issued-at date is considered a date set in the future
+        final Date issuedAt = claims.getIssuedAt();
+        if (issuedAt == null || now.before(issuedAt)) {
+            log.warn("Attempting to use a claims before it has been issued: {}", issuedAt);
+            throw new BadCredentialsException("Claims cannot be used before " + issuedAt);
         }
-
-        if (claims.getNotBefore() != null && now.before(claims.getNotBefore())) {
-            // cannot use it before certain date
-            // throw exception
-            log.warn("Claim is used before the NOT-BEFORE date {}", claims.getNotBefore());
-            throw new BadCredentialsException("Claim is used before the NOT-BEFORE date");
+        // check the expiration date, a claims that has expired cannot be used
+        // a null date is considered a date set in the past (i.e., expired)
+        final Date expiration = claims.getExpiration();
+        if (expiration == null || now.after(expiration)) {
+            log.warn("Attempting to use an expired claims: {}", expiration);
+            throw new BadCredentialsException("Claims has expired: " + expiration);
         }
-
-        if (now.before(claims.getIssuedAt())) {
-            // throw exception
-            log.warn("Claim is before issued date {}", claims.getIssuedAt());
-            throw new BadCredentialsException("Claim is before issued date " + claims.getIssuedAt());
+        // check the not-before date, a claims cannot be used until after the not-before date
+        // a null not-before date is considered a date set in the future
+        final Date notBefore = claims.getNotBefore();
+        if (notBefore == null || now.before(notBefore)) {
+            log.warn("Attempting to use a claims before usable date: {}", notBefore);
+            throw new BadCredentialsException("Claims cannot be used before " + notBefore);
         }
-
-//        if (claims.getIssuedAt().after(claims.getExpiration())) {
-//            // throw exception
-//            log.warn("Claim is issued {} after the expiration date {}", claims.getIssuedAt(), claims.getExpiration());
-//            throw new BadCredentialsException("Claim is issued after the expiration date");
-//        }
     }
 
     @Override
     public boolean supports(Class<?> authentication) {
         return JwtToken.class.isAssignableFrom(authentication);
     }
+
 }
