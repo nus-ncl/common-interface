@@ -29,7 +29,8 @@ spring:
       auth: true
 ncl:
   authentication:
-    url: "/authentications"
+    uri:
+      "/authentications": post
   domain: dev.ncl.sg
   deterlab:
     adapter:

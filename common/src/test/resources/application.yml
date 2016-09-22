@@ -15,7 +15,9 @@ spring:
         format-sql: true
 ncl:
   authentication:
-    url: "/testAuthenticationsUrl"
+    uri:
+      "/testUri1": post
+      "/testUri2": abc
   exception:
     mappings:
       mapping1: "value1"
