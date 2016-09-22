@@ -1,7 +1,11 @@
 package sg.ncl.service.realization.web;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -20,6 +24,7 @@ import javax.validation.constraints.NotNull;
  */
 @RestController
 @RequestMapping(path = "/realizations", produces = MediaType.APPLICATION_JSON_VALUE)
+@Slf4j
 public class RealizationsController {
 
     private final RealizationService realizationService;
@@ -41,7 +46,9 @@ public class RealizationsController {
     // still must check just in case
     @GetMapping(path = "/team/{teamName}/experiment/{expId}")
     @ResponseStatus(HttpStatus.OK)
-    public Realization getRealization(@PathVariable String teamName, @PathVariable String expId) {
+    public Realization getRealization(@PathVariable String teamName, @PathVariable String expId, @AuthenticationPrincipal String user) {
+        log.info("Get realization controller User Principal {}", user);
+        log.info("Get realization controller User Principal 2 {}", SecurityContextHolder.getContext().getAuthentication().getPrincipal());
         return realizationService.getByExperimentId(teamName, Long.parseLong(expId));
     }
 
