@@ -19,13 +19,17 @@ import sg.ncl.service.authentication.exceptions.UnknownAuthorizationSchemeExcept
 import javax.inject.Inject;
 import javax.validation.constraints.NotNull;
 
+import static sg.ncl.service.authentication.web.AuthenticationController.PATH;
+
 /**
  * @author Christopher Zhong
  */
 @RestController
-@RequestMapping(path = "/authentication", produces = MediaType.APPLICATION_JSON_VALUE)
+@RequestMapping(path = PATH, produces = MediaType.APPLICATION_JSON_VALUE)
 @Slf4j
 public class AuthenticationController {
+
+    static final String PATH = "/authentications";
 
     private final AuthenticationService authenticationService;
 

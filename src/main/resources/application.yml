@@ -30,7 +30,7 @@ spring:
 ncl:
   authentication:
     uri:
-      "/authentications": post
+      "/authentications": POST
   domain: dev.ncl.sg
   deterlab:
     adapter:
