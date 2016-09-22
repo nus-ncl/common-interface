@@ -36,7 +36,6 @@ public class JwtAuthenticationProvider implements AuthenticationProvider {
         log.info("Jwt Token Credentials: {}", token.getCredentials());
         log.info("Jwt Token Details: {}", token.getDetails());
         log.info("Jwt Token Principal: {}", token.getPrincipal());
-        // TODO verify the role is valid
 
         try {
             final Claims claims = Jwts.parser().setSigningKey(apiKey).parseClaimsJws(token.getCredentials()).getBody();
@@ -58,6 +57,7 @@ public class JwtAuthenticationProvider implements AuthenticationProvider {
         // check for expired
         // check for issued at
         // check for not before
+        log.info("Decrypted claims: {}", claims);
         Date now = Date.from(ZonedDateTime.now().toInstant());
         // has expired
         if (now.after(claims.getExpiration())) {

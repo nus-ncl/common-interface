@@ -21,12 +21,14 @@ public class JwtFilter extends GenericFilterBean {
                          final ServletResponse res,
                          final FilterChain chain) throws IOException, ServletException {
         final HttpServletRequest request = (HttpServletRequest) req;
-        log.info("{} {}", request.getMethod(), request.getRequestURL());
 
         final String authHeader = request.getHeader("Authorization");
-        if (authHeader == null) {
+        if (authHeader == null || authHeader.contains("Basic")) {
+            // for login and whitelisted urls
+            log.info("Don't require authorization header url: {} {}", request.getMethod(), request.getRequestURL());
             SecurityContextHolder.getContext().setAuthentication(null);
         } else {
+            log.info("Require authorization header url: {} {}", request.getMethod(), request.getRequestURL());
             authHeader.replaceAll("Bearer ", "");
             JwtToken token = new JwtToken(authHeader);
             SecurityContextHolder.getContext().setAuthentication(token);
