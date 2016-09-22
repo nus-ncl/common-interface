@@ -1,32 +1,35 @@
 package sg.ncl.common.jwt;
 
 import io.jsonwebtoken.Claims;
+import lombok.Getter;
 import org.springframework.security.authentication.AbstractAuthenticationToken;
-import org.springframework.security.core.GrantedAuthority;
 import sg.ncl.common.authentication.Role;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
+import java.util.stream.Collectors;
 
 /**
- * @author Te Ye
+ * @author Te Ye, Christopher Zhong
  */
 public class JwtToken extends AbstractAuthenticationToken {
 
-//    private final Collection<GrantedAuthority> authorities;
-//    private String principal;
     private final String token;
-    private Claims claims;
+    @Getter
+    private final Claims claims;
 
-    public JwtToken(String token) {
+    public JwtToken(final String token) {
         super(null);
         this.token = token;
+        claims = null;
+        setAuthenticated(false);
     }
 
-//    public void setPrincipal(String principal) {
-//        this.principal = principal;
-//    }
+    public JwtToken(final String token, final Claims claims) {
+        super(claims.get(Roles.KEY, Roles.class).stream().map(Role::valueOf).collect(Collectors.toList()));
+        this.token = token;
+        this.claims = claims;
+        setDetails(claims);
+        setAuthenticated(true);
+    }
 
     @Override
     public String getCredentials() {
@@ -35,36 +38,7 @@ public class JwtToken extends AbstractAuthenticationToken {
 
     @Override
     public Object getPrincipal() {
-        if (this.getClaims() != null) {
-            return getClaims();
-        }
-        return null;
+        return getClaims();
     }
 
-    @Override
-    public void setDetails(Object details) {
-        super.setDetails(details);
-        setAuthenticated(true);
-        if (details instanceof Claims) {
-            claims = (Claims) details;
-        }
-    }
-
-    @Override
-    public Collection<GrantedAuthority> getAuthorities() {
-        if (this.getClaims() != null) {
-            List<GrantedAuthority> roles = new ArrayList<>();
-            for (Object o : getClaims().get("roles", List.class)) {
-                Role r = Role.valueOf(o.toString());
-                roles.add(r);
-            }
-//            return getClaims().get("roles", List.class).stream().map(o-> Role.valueOf(o.toString())).collect(Collectors.toList());
-            return roles;
-        }
-        return null;
-    }
-
-    private Claims getClaims() {
-        return claims;
-    }
 }
