@@ -2,6 +2,7 @@ package sg.ncl.common.exception;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -26,10 +27,15 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
         this.exceptionHttpStatusMap = exceptionHttpStatusMap;
     }
 
-    @ExceptionHandler(Exception.class)
-    public ResponseEntity<Object> handleBadRequestExceptions(final Exception exception, final WebRequest request) {
-        log.warn("{}: message = '{}': localizedMessage = '{}'", exception.getClass().getName(), exception.getLocalizedMessage());
+    @ExceptionHandler(Throwable.class)
+    public ResponseEntity<Object> handleThrowable(final Exception exception, final WebRequest request) {
         return handleExceptionInternal(exception, new ExceptionInfo(exception), new HttpHeaders(), exceptionHttpStatusMap.get(exception), request);
     }
 
+    @Override
+    protected ResponseEntity<Object> handleExceptionInternal(final Exception exception, final Object body, final HttpHeaders headers, final HttpStatus status, final WebRequest request) {
+        final Object fBody = body == null ? new ExceptionInfo(exception) : body;
+        log.warn("Caught exception = {}, body = {}, fBody = {}, headers = {}, status = {}, request = {}", exception, body, fBody, headers, status, request);
+        return super.handleExceptionInternal(exception, fBody, headers, status, request);
+    }
 }
