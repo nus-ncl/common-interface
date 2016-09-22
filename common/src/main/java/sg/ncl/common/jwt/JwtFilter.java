@@ -23,10 +23,8 @@ public class JwtFilter extends OncePerRequestFilter {
     protected void doFilterInternal(final HttpServletRequest request, final HttpServletResponse response, final FilterChain filterChain) throws ServletException, IOException {
         final String authorization = request.getHeader(HttpHeaders.AUTHORIZATION);
         // extract the authorization header that is needed Jwt authentication
-        if (authorization == null || !authorization.startsWith(BEARER)) {
-            log.warn("Authorization header is missing or invalid: {} {}", request.getMethod(), request.getRequestURL());
-        } else {
-            JwtToken jwtToken = new JwtToken(authorization.replaceAll(BEARER, ""));
+        if (authorization != null && authorization.startsWith(BEARER)) {
+            final JwtToken jwtToken = new JwtToken(authorization.replaceAll(BEARER, ""));
             log.info("Using authorization header for '{} {}' with '{}'", authorization, request.getMethod(), request.getRequestURL(), jwtToken);
             SecurityContextHolder.getContext().setAuthentication(jwtToken);
         }
