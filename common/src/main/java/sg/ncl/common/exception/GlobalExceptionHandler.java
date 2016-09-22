@@ -29,12 +29,13 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 
     @ExceptionHandler(Throwable.class)
     public ResponseEntity<Object> handleThrowable(final Exception exception, final WebRequest request) {
-        return handleExceptionInternal(exception, new ExceptionInfo(exception), new HttpHeaders(), exceptionHttpStatusMap.get(exception), request);
+        final HttpStatus status = exceptionHttpStatusMap.get(exception);
+        return handleExceptionInternal(exception, new ExceptionInfo(exception, status, request), new HttpHeaders(), status, request);
     }
 
     @Override
     protected ResponseEntity<Object> handleExceptionInternal(final Exception exception, final Object body, final HttpHeaders headers, final HttpStatus status, final WebRequest request) {
-        final Object fBody = body == null ? new ExceptionInfo(exception) : body;
+        final Object fBody = body == null ? new ExceptionInfo(exception, status, request) : body;
         log.warn("Caught exception = {}, body = {}, fBody = {}, headers = {}, status = {}, request = {}", exception, body, fBody, headers, status, request);
         return super.handleExceptionInternal(exception, fBody, headers, status, request);
     }
