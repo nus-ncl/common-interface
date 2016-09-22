@@ -66,7 +66,7 @@ public class JwtAuthenticationProvider implements AuthenticationProvider {
             throw new BadCredentialsException("Claim has expired");
         }
 
-        if (now.before(claims.getNotBefore())) {
+        if (claims.getNotBefore() != null && now.before(claims.getNotBefore())) {
             // cannot use it before certain date
             // throw exception
             log.warn("Claim is used before the NOT-BEFORE date {}", claims.getNotBefore());

@@ -62,6 +62,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
                     .setSubject(credentials.getId())
                     .setIssuer(AuthenticationService.class.getName())
                     .setIssuedAt(Date.from(now.toInstant()))
+                    .setNotBefore(Date.from(now.toInstant()))
                     // the expiry should be short; can be set through properties
                     .setExpiration(Date.from(expiry.toInstant()))
                     // TODO custom claims such as permissions
