@@ -36,7 +36,7 @@ public class JwtToken extends AbstractAuthenticationToken {
     @Override
     public Object getPrincipal() {
         if (this.getClaims() != null) {
-            return getClaims().getSubject();
+            return getClaims();
         }
         return null;
     }

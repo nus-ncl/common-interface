@@ -3,7 +3,9 @@ package sg.ncl.service.experiment.web;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -74,7 +76,8 @@ public class ExperimentsController {
     @DeleteMapping(path = "/{expId}/teams/{teamName}")
     // FIXME: should be DELETE instead of POST and path should be "/experiments/{id}"
     @ResponseStatus(HttpStatus.OK)
-    public Experiment deleteExperiment(@PathVariable String expId, @PathVariable String teamName) {
+    public Experiment deleteExperiment(@PathVariable String expId, @PathVariable String teamName, @AuthenticationPrincipal String user) {
+        log.info("User principal: " + user);
         if (SecurityContextHolder.getContext().getAuthentication() == null) {
             // throw forbidden
             log.warn("Access denied for delete experiment: expid: {} ", expId);

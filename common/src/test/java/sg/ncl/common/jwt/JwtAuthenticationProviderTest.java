@@ -63,7 +63,8 @@ public class JwtAuthenticationProviderTest {
                 .compact();
         JwtToken jwtToken = new JwtToken(jwt);
         Authentication auth = jwtAuthenticationProvider.authenticate(jwtToken);
-        assertThat(auth.getPrincipal(), is(equalTo(userId)));
+        final Claims claims = Jwts.parser().setSigningKey(apiKey).parseClaimsJws(jwtToken.getCredentials()).getBody();
+        assertThat(auth.getPrincipal().toString(), is(equalTo(claims.toString())));
     }
 
     @Test

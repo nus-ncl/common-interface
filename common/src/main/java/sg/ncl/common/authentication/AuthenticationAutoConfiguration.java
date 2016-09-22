@@ -73,10 +73,10 @@ public class AuthenticationAutoConfiguration extends WebSecurityConfigurerAdapte
 
         // add url that no need be authenticated
         http.authorizeRequests()
-                .antMatchers("/authentication").permitAll()
-                .antMatchers(HttpMethod.GET, "/users").permitAll()
-                .regexMatchers(HttpMethod.PUT, "/users/(.+)/emails/(.+)").permitAll() // /users/{id}/emails/{emailBase64}
-                .antMatchers(HttpMethod.POST, "/registrations").permitAll()
+                .antMatchers("/authentication/**").permitAll()
+                .antMatchers(HttpMethod.GET, "/users/**").permitAll()
+                .antMatchers(HttpMethod.PUT, "/users/*/emails/*").permitAll() // /users/{id}/emails/{emailBase64}
+                .antMatchers(HttpMethod.POST, "/registrations/**").permitAll()
                 .antMatchers(HttpMethod.GET, "/teams").permitAll()
                 .anyRequest().authenticated();
 
