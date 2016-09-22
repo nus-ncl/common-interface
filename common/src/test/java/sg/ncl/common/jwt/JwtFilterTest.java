@@ -51,6 +51,18 @@ public class JwtFilterTest {
     }
 
     @Test
+    public void testBasicAuthHeader() throws Exception {
+        HttpServletRequest request = mock(HttpServletRequest.class);
+        HttpServletResponse response = mock(HttpServletResponse.class);
+        FilterChain filterChain = mock(FilterChain.class);
+
+        when(request.getHeader("Authorization")).thenReturn("Basic: AAA");
+
+        jwtFilter.doFilter(request, response, filterChain);
+        assertThat(SecurityContextHolder.getContext().getAuthentication()).isNull();
+    }
+
+    @Test
     public void testValidAuthHeader() throws Exception {
         HttpServletRequest request = mock(HttpServletRequest.class);
         HttpServletResponse response = mock(HttpServletResponse.class);
@@ -59,7 +71,7 @@ public class JwtFilterTest {
         when(request.getHeader("Authorization")).thenReturn("Bearer: AAA");
 
         jwtFilter.doFilter(request, response, filterChain);
-        assertThat(SecurityContextHolder.getContext().getAuthentication()).isNotNull();
+        assertThat(SecurityContextHolder.getContext().getAuthentication().getCredentials()).isEqualTo("Bearer: AAA");
     }
 
     // -----------------------------------

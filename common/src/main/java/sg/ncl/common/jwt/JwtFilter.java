@@ -29,8 +29,7 @@ public class JwtFilter extends GenericFilterBean {
             SecurityContextHolder.getContext().setAuthentication(null);
         } else {
             log.info("Require authorization header url: {} {}", request.getMethod(), request.getRequestURL());
-            authHeader.replaceAll("Bearer ", "");
-            JwtToken token = new JwtToken(authHeader);
+            JwtToken token = new JwtToken(authHeader.replaceAll("Bearer ", ""));
             SecurityContextHolder.getContext().setAuthentication(token);
         }
         chain.doFilter(req, res);
