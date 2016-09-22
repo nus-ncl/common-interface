@@ -1,37 +1,36 @@
 package sg.ncl.common.jwt;
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpHeaders;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.stereotype.Component;
-import org.springframework.web.filter.GenericFilterBean;
+import org.springframework.web.filter.OncePerRequestFilter;
 
-import javax.servlet.*;
+import javax.servlet.FilterChain;
+import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
 /**
- * @author Te Ye
+ * @author Te Ye, Christopher Zhong
  */
-@Component
 @Slf4j
-public class JwtFilter extends GenericFilterBean {
+public class JwtFilter extends OncePerRequestFilter {
+
+    static final String BEARER = "Bearer ";
 
     @Override
-    public void doFilter(final ServletRequest req,
-                         final ServletResponse res,
-                         final FilterChain chain) throws IOException, ServletException {
-        final HttpServletRequest request = (HttpServletRequest) req;
-
-        final String authHeader = request.getHeader("Authorization");
-        if (authHeader == null || authHeader.contains("Basic")) {
-            // for login and whitelisted urls
-            log.info("Don't require authorization header url: {} {}", request.getMethod(), request.getRequestURL());
-            SecurityContextHolder.getContext().setAuthentication(null);
+    protected void doFilterInternal(final HttpServletRequest request, final HttpServletResponse response, final FilterChain filterChain) throws ServletException, IOException {
+        final String authorization = request.getHeader(HttpHeaders.AUTHORIZATION);
+        // extract the authorization header that is needed Jwt authentication
+        if (authorization == null || !authorization.startsWith(BEARER)) {
+            log.warn("Authorization header is missing or invalid: {} {}", request.getMethod(), request.getRequestURL());
         } else {
-            log.info("Require authorization header url: {} {}", request.getMethod(), request.getRequestURL());
-            JwtToken token = new JwtToken(authHeader.replaceAll("Bearer ", ""));
-            SecurityContextHolder.getContext().setAuthentication(token);
+            JwtToken jwtToken = new JwtToken(authorization.replaceAll(BEARER, ""));
+            log.info("Using authorization header for '{} {}' with '{}'", authorization, request.getMethod(), request.getRequestURL(), jwtToken);
+            SecurityContextHolder.getContext().setAuthentication(jwtToken);
         }
-        chain.doFilter(req, res);
+        filterChain.doFilter(request, response);
     }
+
 }
