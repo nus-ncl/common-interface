@@ -77,7 +77,7 @@ public class AuthenticationAutoConfiguration extends WebSecurityConfigurerAdapte
                 .antMatchers(HttpMethod.GET, "/users/**").permitAll()
                 .antMatchers(HttpMethod.PUT, "/users/*/emails/*").permitAll() // /users/{id}/emails/{emailBase64}
                 .antMatchers(HttpMethod.POST, "/registrations/**").permitAll()
-                .antMatchers(HttpMethod.GET, "/teams").permitAll()
+                .antMatchers(HttpMethod.GET, "/teams/**").permitAll()
                 .anyRequest().authenticated();
 
         http
