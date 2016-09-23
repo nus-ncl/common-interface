@@ -31,6 +31,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static sg.ncl.service.authentication.web.AuthenticationController.PATH;
 
 /**
  * @author Christopher Zhong
@@ -40,11 +41,10 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @ContextConfiguration(classes = {AuthenticationController.class, ExceptionAutoConfiguration.class, GlobalExceptionHandler.class})
 public class AuthenticationControllerTest {
 
-    public static final String AUTHENTICATION = "/authentication";
-    @Inject
-    private MockMvc mockMvc;
     @MockBean
     private AuthenticationService authenticationService;
+    @Inject
+    private MockMvc mockMvc;
 
     @Before
     public void before() {
@@ -60,7 +60,7 @@ public class AuthenticationControllerTest {
 
         when(authenticationService.login(eq(username), eq(password))).thenReturn(new AuthorizationInfo("id", "jwt token", roles));
 
-        mockMvc.perform(post(AUTHENTICATION).header(HttpHeaders.AUTHORIZATION, "Basic " + s))
+        mockMvc.perform(post(PATH).header(HttpHeaders.AUTHORIZATION, "Basic " + s))
                 .andExpect(status().isOk())
                 .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$.id", is(equalTo("id"))))
@@ -71,27 +71,27 @@ public class AuthenticationControllerTest {
 
     @Test
     public void testLoginMissingAuthorization() throws Exception {
-        mockMvc.perform(post(AUTHENTICATION))
+        mockMvc.perform(post(PATH))
                 .andExpect(status().isBadRequest());
     }
 
     @Test
     public void testLoginEmptyAuthorization() throws Exception {
-        mockMvc.perform(post(AUTHENTICATION).header(HttpHeaders.AUTHORIZATION, ""))
+        mockMvc.perform(post(PATH).header(HttpHeaders.AUTHORIZATION, ""))
                 .andExpect(status().isBadRequest())
                 .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON));
     }
 
     @Test
     public void testLoginInvalidBasicAuthentication() throws Exception {
-        mockMvc.perform(post(AUTHENTICATION).header(HttpHeaders.AUTHORIZATION, "Basic authentication"))
+        mockMvc.perform(post(PATH).header(HttpHeaders.AUTHORIZATION, "Basic authentication"))
                 .andExpect(status().isBadRequest())
                 .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON));
     }
 
     @Test
     public void testLoginUnknownAuthorizationScheme() throws Exception {
-        mockMvc.perform(post(AUTHENTICATION).header(HttpHeaders.AUTHORIZATION, "Unknown scheme"))
+        mockMvc.perform(post(PATH).header(HttpHeaders.AUTHORIZATION, "Unknown scheme"))
                 .andExpect(status().isBadRequest())
                 .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON));
     }
