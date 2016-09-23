@@ -38,7 +38,7 @@ public class JwtAuthenticationProvider implements AuthenticationProvider {
             final Claims claims = jwtParser.parseClaimsJws(token).getBody();
             checkClaims(claims);
             return new JwtToken(token, claims);
-        } catch (ExpiredJwtException | UnsupportedJwtException | MalformedJwtException | SignatureException | IllegalArgumentException | PrematureJwtException e) {
+        } catch (ExpiredJwtException | MalformedJwtException | PrematureJwtException | SignatureException | UnsupportedJwtException e) {
             log.warn("{}", e);
             throw new BadCredentialsException(e.getMessage(), e);
         }
