@@ -1,5 +1,6 @@
 package sg.ncl.common.authentication;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.GrantedAuthority;
 
 /**
@@ -7,6 +8,7 @@ import org.springframework.security.core.GrantedAuthority;
  *
  * @author Te Ye
  */
+@Slf4j
 public enum Role implements GrantedAuthority {
 
     ADMIN, USER;
@@ -21,6 +23,7 @@ public enum Role implements GrantedAuthority {
             valueOf(name);
             return true;
         } catch (IllegalArgumentException e) {
+            log.warn("{}: {}", e, name);
             return false;
         }
     }
