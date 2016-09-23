@@ -1,5 +1,7 @@
 package sg.ncl.common.jwt;
 
+import io.jsonwebtoken.JwtParser;
+import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.SignatureException;
 import lombok.extern.slf4j.Slf4j;
@@ -43,7 +45,13 @@ public class JwtAutoConfiguration {
     @Bean
     @ConditionalOnMissingBean(JwtFilter.class)
     public JwtFilter jwtFilter() {
-        return new JwtFilter(apiKey(signatureAlgorithm()));
+        return new JwtFilter();
+    }
+
+    @Bean
+    @ConditionalOnMissingBean(JwtParser.class)
+    public JwtParser jwtParser(@NotNull final Key apiKey) {
+        return Jwts.parser().setSigningKey(apiKey);
     }
 
     @Bean

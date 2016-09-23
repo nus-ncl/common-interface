@@ -1,8 +1,10 @@
 package sg.ncl.common.authentication;
 
 import lombok.Getter;
-import lombok.Setter;
 import org.springframework.boot.context.properties.ConfigurationProperties;
+
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Base class for configuring authentication.
@@ -12,14 +14,16 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
  */
 @ConfigurationProperties(prefix = AuthenticationProperties.PREFIX)
 @Getter
-@Setter
 public class AuthenticationProperties {
 
     static final String PREFIX = "ncl.authentication";
 
     /**
-     * The URL endpoint for the authentication.
+     * By default, all URIs (a.k.a. endpoints) require authentication.
+     * However, the map highlights the URIs that does not require authentication.
+     * <p/>
+     * For example, "/point"="get,post" means that the GET and POST methods for the URI "/point" does not require authentication.
      */
-    private String url;
+    private final Map<String, String> uri = new HashMap<>();
 
 }

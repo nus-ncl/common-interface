@@ -12,6 +12,7 @@ import sg.ncl.common.authentication.AuthenticationPropertiesTest.TestConfig;
 import javax.inject.Inject;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.entry;
 
 /**
  * Created by Chris on 8/6/2016.
@@ -20,17 +21,19 @@ import static org.assertj.core.api.Assertions.assertThat;
 @SpringBootTest(classes = TestConfig.class, webEnvironment = WebEnvironment.NONE)
 public class AuthenticationPropertiesTest {
 
+    @Configuration
+    @EnableConfigurationProperties(AuthenticationProperties.class)
+    static class TestConfig {
+    }
+
     @Inject
     private AuthenticationProperties properties;
 
     @Test
-    public void testGetUrl() throws Exception {
-        assertThat(properties.getUrl()).isEqualTo("/testAuthenticationsUrl");
-    }
-
-    @Configuration
-    @EnableConfigurationProperties(AuthenticationProperties.class)
-    static class TestConfig {
+    public void testGetUri() throws Exception {
+        assertThat(properties.getUri())
+                .hasSize(2)
+                .containsExactly(entry("/testUri1", "post"), entry("/testUri2", "abc"));
     }
 
 }

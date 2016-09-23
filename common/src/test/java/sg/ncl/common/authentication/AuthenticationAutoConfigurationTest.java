@@ -8,6 +8,7 @@ import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import sg.ncl.common.jwt.JwtAuthenticationProvider;
 import sg.ncl.common.jwt.JwtFilter;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -23,12 +24,14 @@ public class AuthenticationAutoConfigurationTest {
     private AuthenticationProperties properties;
     @Mock
     private JwtFilter filter;
+    @Mock
+    private JwtAuthenticationProvider jwtAuthenticationProvider;
 
     private AuthenticationAutoConfiguration configuration;
 
     @Before
     public void before() {
-        configuration = new AuthenticationAutoConfiguration(properties, filter);
+        configuration = new AuthenticationAutoConfiguration(properties, filter, jwtAuthenticationProvider);
     }
 
     @Test

@@ -8,10 +8,15 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Matchers;
 import org.springframework.http.MediaType;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.web.context.WebApplicationContext;
+import sg.ncl.common.authentication.Role;
 import sg.ncl.service.experiment.AbstractTest;
 import sg.ncl.service.experiment.Util;
 import sg.ncl.service.experiment.data.jpa.ExperimentEntity;
@@ -20,10 +25,12 @@ import sg.ncl.service.experiment.domain.ExperimentService;
 
 import javax.inject.Inject;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.mockingDetails;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
@@ -134,6 +141,16 @@ public class ExperimentsControllerTest extends AbstractTest {
     public void testDeleteExperiment() throws Exception {
         Long experimentId = Long.parseLong(RandomStringUtils.randomNumeric(5));
         String teamName = RandomStringUtils.randomAlphabetic(8);
+
+        Authentication authentication = mock(Authentication.class);
+        SecurityContext securityContext = mock(SecurityContext.class);
+        String notOwnerId = RandomStringUtils.randomAlphanumeric(20);
+        Collection roleList = new ArrayList<GrantedAuthority>();
+        roleList.add(Role.USER);
+        when(securityContext.getAuthentication()).thenReturn(authentication);
+        SecurityContextHolder.setContext(securityContext);
+        when(SecurityContextHolder.getContext().getAuthentication().getPrincipal()).thenReturn(notOwnerId);
+        when(SecurityContextHolder.getContext().getAuthentication().getAuthorities()).thenReturn(roleList);
 
         when(experimentService.deleteExperiment(experimentId, teamName)).thenReturn(Util.getExperimentsEntity());
 
