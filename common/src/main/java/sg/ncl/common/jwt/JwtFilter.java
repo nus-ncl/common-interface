@@ -25,7 +25,7 @@ public class JwtFilter extends OncePerRequestFilter {
         // extract the authorization header that is needed Jwt authentication
         if (authorization != null && authorization.startsWith(BEARER)) {
             final JwtToken jwtToken = new JwtToken(authorization.replaceAll(BEARER, ""));
-            log.info("Using authorization header for '{} {}' with '{}'", authorization, request.getMethod(), request.getRequestURL(), jwtToken);
+            log.info("Using authorization = '{}', method = {}, uri = {}, token = {}", authorization, request.getMethod(), request.getRequestURI(), jwtToken);
             SecurityContextHolder.getContext().setAuthentication(jwtToken);
         }
         filterChain.doFilter(request, response);
