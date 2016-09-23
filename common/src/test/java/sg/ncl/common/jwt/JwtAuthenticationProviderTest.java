@@ -67,7 +67,7 @@ public class JwtAuthenticationProviderTest {
         doReturn(Date.from(now.plusDays(1).toInstant())).when(claims).getExpiration();
         doReturn(Date.from(now.minusDays(1).toInstant())).when(claims).getNotBefore();
         final Roles roles = new RolesImpl(Arrays.asList());
-        doReturn(roles).when(claims).get(Roles.KEY, Roles.class);
+        doReturn(roles).when(claims).get(R.KEY, Roles.class);
 
         final Authentication authenticate = jwtAuthenticationProvider.authenticate(authentication);
 

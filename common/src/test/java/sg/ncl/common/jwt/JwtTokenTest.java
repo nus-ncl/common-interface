@@ -48,7 +48,7 @@ public class JwtTokenTest {
         final String token = "token";
         final Claims claims = mock(Claims.class);
         final Roles roles = new RolesImpl(Arrays.asList(Role.ADMIN.name(), "s1", "s2", "s3", Role.USER.name()));
-        doReturn(roles).when(claims).get(Roles.KEY, Roles.class);
+        doReturn(roles).when(claims).get(R.KEY, Roles.class);
 
         final JwtToken jwtToken = new JwtToken(token, claims);
 

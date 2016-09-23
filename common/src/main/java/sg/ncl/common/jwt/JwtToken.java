@@ -24,7 +24,7 @@ public class JwtToken extends AbstractAuthenticationToken {
     }
 
     public JwtToken(final String token, final Claims claims) {
-        super(claims.get(Roles.KEY, Roles.class).stream().filter(Role::contains).map(Role::valueOf).collect(Collectors.toList()));
+        super(claims.get(R.KEY, Roles.class).stream().filter(Role::contains).map(Role::valueOf).collect(Collectors.toList()));
         this.token = token;
         this.claims = claims;
         setDetails(claims);
