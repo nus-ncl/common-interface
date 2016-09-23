@@ -16,4 +16,13 @@ public enum Role implements GrantedAuthority {
         return name();
     }
 
+    public static boolean contains(final String name) {
+        try {
+            valueOf(name);
+            return true;
+        } catch (IllegalArgumentException e) {
+            return false;
+        }
+    }
+
 }
