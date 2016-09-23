@@ -1,29 +1,34 @@
 package sg.ncl.common.jwt;
 
-import io.jsonwebtoken.*;
-import org.apache.commons.lang3.RandomStringUtils;
+import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.ExpiredJwtException;
+import io.jsonwebtoken.Jws;
+import io.jsonwebtoken.JwtParser;
+import io.jsonwebtoken.MalformedJwtException;
+import io.jsonwebtoken.PrematureJwtException;
+import io.jsonwebtoken.SignatureException;
+import io.jsonwebtoken.UnsupportedJwtException;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
+import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.GrantedAuthority;
-import sg.ncl.common.authentication.Role;
+import sg.ncl.common.jwt.JwtTokenTest.RolesImpl;
 
-import javax.crypto.spec.SecretKeySpec;
-
-import java.security.Key;
 import java.time.ZonedDateTime;
-import java.util.*;
+import java.util.Arrays;
+import java.util.Date;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.*;
-import static org.mockito.Matchers.contains;
-import static org.mockito.Mockito.mock;
+import static org.hamcrest.Matchers.instanceOf;
+import static org.hamcrest.Matchers.is;
+import static org.mockito.Matchers.anyString;
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.doThrow;
 
 /**
  * @author Te Ye
@@ -32,214 +37,109 @@ public class JwtAuthenticationProviderTest {
 
     @Rule
     public final ExpectedException exception = ExpectedException.none();
-
     @Rule
     public MockitoRule mockito = MockitoJUnit.rule();
+    @Mock
+    private JwtParser jwtParser;
+    @Mock
+    private Authentication authentication;
+    @Mock
+    private Jws<Claims> jws;
+    @Mock
+    private Claims claims;
 
-    private Key apiKey;
     private JwtAuthenticationProvider jwtAuthenticationProvider;
 
     @Before
     public void before() {
-        apiKey = new SecretKeySpec("123".getBytes(), SignatureAlgorithm.HS256.getJcaName());
-        jwtAuthenticationProvider = new JwtAuthenticationProvider(apiKey);
+        jwtAuthenticationProvider = new JwtAuthenticationProvider(jwtParser);
     }
 
     @Test
-    public void testGetPrincipal() throws Exception {
-
-        final String userId = RandomStringUtils.randomAlphanumeric(20);
+    public void testAuthenticate() throws Exception {
+        final String token = "token";
+        doReturn(token).when(authentication).getCredentials();
+        doReturn(jws).when(jwtParser).parseClaimsJws(anyString());
+        doReturn(claims).when(jws).getBody();
         final ZonedDateTime now = ZonedDateTime.now();
-        final ZonedDateTime expiry = now.plusHours(24L);
+        doReturn(Date.from(now.minusDays(1).toInstant())).when(claims).getIssuedAt();
+        doReturn(Date.from(now.plusDays(1).toInstant())).when(claims).getExpiration();
+        doReturn(Date.from(now.minusDays(1).toInstant())).when(claims).getNotBefore();
+        final Roles roles = new RolesImpl(Arrays.asList());
+        doReturn(roles).when(claims).get(Roles.KEY, Roles.class);
 
-        final String jwt = Jwts.builder()
-                .setSubject(userId)
-                .setIssuer("Authentication")
-                .setExpiration(Date.from(expiry.toInstant()))
-                .setIssuedAt(Date.from(now.toInstant()))
-                .setNotBefore(Date.from(now.toInstant()))
-                .claim("roles", Arrays.asList(Role.USER))
-                .signWith(SignatureAlgorithm.HS256, apiKey)
-                .compact();
-        JwtToken jwtToken = new JwtToken(jwt);
-        Authentication auth = jwtAuthenticationProvider.authenticate(jwtToken);
-        final Claims claims = Jwts.parser().setSigningKey(apiKey).parseClaimsJws(jwtToken.getCredentials()).getBody();
-        assertThat(auth.getPrincipal().toString(), is(equalTo(claims.toString())));
+        final Authentication authenticate = jwtAuthenticationProvider.authenticate(authentication);
+
+        assertThat(authenticate).isInstanceOf(JwtToken.class);
+        assertThat(authenticate.getCredentials()).isEqualTo(token);
+        assertThat(authenticate.getPrincipal()).isEqualTo(claims);
+        assertThat(authenticate.getAuthorities()).isEmpty();
+        assertThat(authenticate.getDetails()).isEqualTo(claims);
+        assertThat(authenticate.isAuthenticated()).isTrue();
     }
 
     @Test
-    public void testGetAuthorities() throws Exception {
-
-        final String userId = RandomStringUtils.randomAlphanumeric(20);
-        final ZonedDateTime now = ZonedDateTime.now();
-        final ZonedDateTime expiry = now.plusHours(24L);
-
-        Collection<GrantedAuthority> rolesList = new ArrayList<>();
-        rolesList.add(Role.USER);
-
-        final String jwt = Jwts.builder()
-                .setSubject(userId)
-                .setIssuer("Authentication")
-                .setExpiration(Date.from(expiry.toInstant()))
-                .setIssuedAt(Date.from(now.toInstant()))
-                .setNotBefore(Date.from(now.toInstant()))
-                .claim("roles", rolesList)
-                .signWith(SignatureAlgorithm.HS256, apiKey)
-                .compact();
-        JwtToken jwtToken = new JwtToken(jwt);
-        Authentication auth = jwtAuthenticationProvider.authenticate(jwtToken);
-
-        Collection<? extends GrantedAuthority> result = auth.getAuthorities();
-
-        assertThat(result).isEqualTo(rolesList);
-    }
-
-    @Test
-    public void testExpiredJwtException() throws Exception {
-        final String userId = RandomStringUtils.randomAlphanumeric(20);
-        final ZonedDateTime now = ZonedDateTime.now();
-        final ZonedDateTime expiry = now.minusHours(24L);
-
-        Collection<GrantedAuthority> rolesList = new ArrayList<>();
-        rolesList.add(Role.USER);
-
-        final String jwt = Jwts.builder()
-                .setSubject(userId)
-                .setIssuer("Authentication")
-                .setExpiration(Date.from(expiry.toInstant()))
-                .setIssuedAt(Date.from(now.toInstant()))
-                .setNotBefore(Date.from(now.toInstant()))
-                .claim("roles", rolesList)
-                .signWith(SignatureAlgorithm.HS256, apiKey)
-                .compact();
+    public void testAuthenticateExpiredException() throws Exception {
+        final String token = "token";
+        doReturn(token).when(authentication).getCredentials();
+        doThrow(new ExpiredJwtException(null, null, null)).when(jwtParser).parseClaimsJws(anyString());
 
         exception.expect(BadCredentialsException.class);
-        exception.expectMessage(contains("JWT expired at " + expiry.toString()));
         exception.expectCause(is(instanceOf(ExpiredJwtException.class)));
-        jwtAuthenticationProvider.authenticate(new JwtToken(jwt));
+
+        jwtAuthenticationProvider.authenticate(authentication);
     }
 
     @Test
-    public void UnsupportedJwtException() throws Exception {
-        final String userId = RandomStringUtils.randomAlphanumeric(20);
-        final ZonedDateTime now = ZonedDateTime.now();
-        final ZonedDateTime expiry = now.plusHours(24L);
-
-        Collection<GrantedAuthority> rolesList = new ArrayList<>();
-        rolesList.add(Role.USER);
-
-        final String jwt = Jwts.builder()
-                .setSubject(userId)
-                .setIssuer("Authentication")
-                .setExpiration(Date.from(expiry.toInstant()))
-                .setIssuedAt(Date.from(now.toInstant()))
-                .setNotBefore(Date.from(now.toInstant()))
-                .claim("roles", rolesList)
-                .compact();
+    public void testAuthenticateUnsupportedJwtException() throws Exception {
+        final String token = "token";
+        doReturn(token).when(authentication).getCredentials();
+        doThrow(new UnsupportedJwtException(null)).when(jwtParser).parseClaimsJws(anyString());
 
         exception.expect(BadCredentialsException.class);
-        exception.expectMessage("Unsigned Claims JWTs are not supported.");
         exception.expectCause(is(instanceOf(UnsupportedJwtException.class)));
-        jwtAuthenticationProvider.authenticate(new JwtToken(jwt));
+
+        jwtAuthenticationProvider.authenticate(authentication);
     }
 
     @Test
-    public void MalformedJwtException() throws Exception {
-        final String jwt = "abc";
+    public void testAuthenticateMalformedJwtException() throws Exception {
+        final String token = "token";
+        doReturn(token).when(authentication).getCredentials();
+        doThrow(new MalformedJwtException(null)).when(jwtParser).parseClaimsJws(anyString());
+
         exception.expect(BadCredentialsException.class);
-        exception.expectMessage("JWT strings must contain exactly 2 period characters. Found: 0");
         exception.expectCause(is(instanceOf(MalformedJwtException.class)));
-        jwtAuthenticationProvider.authenticate(new JwtToken(jwt));
+
+        jwtAuthenticationProvider.authenticate(authentication);
     }
 
     @Test
-    public void SignatureException() throws Exception {
-        final String userId = RandomStringUtils.randomAlphanumeric(20);
-        final ZonedDateTime now = ZonedDateTime.now();
-        final ZonedDateTime expiry = now.plusHours(24L);
-
-        Collection<GrantedAuthority> rolesList = new ArrayList<>();
-        rolesList.add(Role.USER);
-
-        final String jwt = Jwts.builder()
-                .setSubject(userId)
-                .setIssuer("Authentication")
-                .setExpiration(Date.from(expiry.toInstant()))
-                .setIssuedAt(Date.from(now.toInstant()))
-                .setNotBefore(Date.from(now.toInstant()))
-                .claim("roles", rolesList)
-                .signWith(SignatureAlgorithm.HS256, apiKey)
-                .compact();
+    public void testAuthenticateSignatureException() throws Exception {
+        final String token = "token";
+        doReturn(token).when(authentication).getCredentials();
+        doThrow(new SignatureException(null)).when(jwtParser).parseClaimsJws(anyString());
 
         exception.expect(BadCredentialsException.class);
-        exception.expectMessage("JWT signature does not match locally computed signature. JWT validity cannot be asserted and should not be trusted.");
         exception.expectCause(is(instanceOf(SignatureException.class)));
 
-        apiKey = new SecretKeySpec("456".getBytes(), SignatureAlgorithm.HS512.getJcaName());
-        jwtAuthenticationProvider = new JwtAuthenticationProvider(apiKey);
-        jwtAuthenticationProvider.authenticate(new JwtToken(jwt));
+        jwtAuthenticationProvider.authenticate(authentication);
     }
 
     @Test
-    public void IllegalArgumentException() throws Exception {
-        exception.expect(BadCredentialsException.class);
-        exception.expectMessage("JWT String argument cannot be null or empty.");
-        exception.expectCause(is(instanceOf(IllegalArgumentException.class)));
-        jwtAuthenticationProvider.authenticate(new JwtToken(null));
-    }
-
-    @Test
-    public void testNotBefore() throws Exception {
-        final String userId = RandomStringUtils.randomAlphanumeric(20);
-        final ZonedDateTime now = ZonedDateTime.now();
-        final ZonedDateTime expiry = now.plusHours(24L);
-        final ZonedDateTime notBefore = now.plusHours(24L);
-
-        Collection<GrantedAuthority> rolesList = new ArrayList<>();
-        rolesList.add(Role.USER);
-
-        final String jwt = Jwts.builder()
-                .setSubject(userId)
-                .setIssuer("Authentication")
-                .setExpiration(Date.from(expiry.toInstant()))
-                .setIssuedAt(Date.from(now.toInstant()))
-                .setNotBefore(Date.from(notBefore.toInstant()))
-                .claim("roles", rolesList)
-                .signWith(SignatureAlgorithm.HS256, apiKey)
-                .compact();
+    public void testAuthenticatePrematureJwtException() throws Exception {
+        final String token = "token";
+        doReturn(token).when(authentication).getCredentials();
+        doThrow(new PrematureJwtException(null, null, null)).when(jwtParser).parseClaimsJws(anyString());
 
         exception.expect(BadCredentialsException.class);
-        exception.expectMessage(contains("JWT must not be accepted before " + notBefore));
         exception.expectCause(is(instanceOf(PrematureJwtException.class)));
-        jwtAuthenticationProvider.authenticate(new JwtToken(jwt));
-    }
 
-    @Test
-    public void testClaimBeforeIssueDate() throws Exception {
-        final String userId = RandomStringUtils.randomAlphanumeric(20);
-        final ZonedDateTime now = ZonedDateTime.now();
-        final ZonedDateTime expiry = now.plusHours(24L);
-
-        Collection<GrantedAuthority> rolesList = new ArrayList<>();
-        rolesList.add(Role.USER);
-
-        final String jwt = Jwts.builder()
-                .setSubject(userId)
-                .setIssuer("Authentication")
-                .setExpiration(Date.from(expiry.toInstant()))
-                .setIssuedAt(Date.from(expiry.toInstant()))
-                .setNotBefore(Date.from(now.toInstant()))
-                .claim("roles", rolesList)
-                .signWith(SignatureAlgorithm.HS256, apiKey)
-                .compact();
-
-        exception.expect(BadCredentialsException.class);
-        exception.expectMessage("Claim is before issued date " + Date.from(expiry.toInstant()));
-        jwtAuthenticationProvider.authenticate(new JwtToken(jwt));
+        jwtAuthenticationProvider.authenticate(authentication);
     }
 
     @Test
     public void testSupports() throws Exception {
-        assertThat(jwtAuthenticationProvider.supports(JwtToken.class), is(true));
+        assertThat(jwtAuthenticationProvider.supports(JwtToken.class)).isTrue();
     }
 }
