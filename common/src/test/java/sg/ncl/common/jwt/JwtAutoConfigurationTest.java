@@ -1,5 +1,6 @@
 package sg.ncl.common.jwt;
 
+import io.jsonwebtoken.JwtParser;
 import io.jsonwebtoken.SignatureAlgorithm;
 import org.junit.Before;
 import org.junit.Rule;
@@ -11,9 +12,9 @@ import org.mockito.junit.MockitoRule;
 import java.security.Key;
 import java.time.Duration;
 
-import static org.hamcrest.Matchers.*;
-import static org.junit.Assert.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.mock;
 import static sg.ncl.common.jwt.JwtAutoConfiguration.DEFAULT_API_KEY;
 import static sg.ncl.common.jwt.JwtAutoConfiguration.DEFAULT_EXPIRY_DURATION;
 import static sg.ncl.common.jwt.JwtAutoConfiguration.DEFAULT_SIGNATURE_ALGORITHM;
@@ -40,7 +41,16 @@ public class JwtAutoConfigurationTest {
     public void testJwtFilter() throws Exception {
         final JwtFilter jwtFilter = configuration.jwtFilter();
 
-        assertThat(jwtFilter, is(not(nullValue(JwtFilter.class))));
+        assertThat(jwtFilter).isNotNull();
+    }
+
+    @Test
+    public void testJwtParser() throws Exception {
+        final Key key = mock(Key.class);
+
+        final JwtParser jwtParser = configuration.jwtParser(key);
+
+        assertThat(jwtParser).isNotNull();
     }
 
     @Test
@@ -49,8 +59,8 @@ public class JwtAutoConfigurationTest {
 
         final SignatureAlgorithm algorithm = configuration.signatureAlgorithm();
 
-        assertThat(algorithm, is(not(nullValue(SignatureAlgorithm.class))));
-        assertThat(algorithm.getValue(), is(equalTo(DEFAULT_SIGNATURE_ALGORITHM.getValue())));
+        assertThat(algorithm).isNotNull();
+        assertThat(algorithm.getValue()).isEqualTo(DEFAULT_SIGNATURE_ALGORITHM.getValue());
     }
 
     @Test
@@ -59,8 +69,8 @@ public class JwtAutoConfigurationTest {
 
         final SignatureAlgorithm algorithm = configuration.signatureAlgorithm();
 
-        assertThat(algorithm, is(not(nullValue(SignatureAlgorithm.class))));
-        assertThat(algorithm.getValue(), is(equalTo(DEFAULT_SIGNATURE_ALGORITHM.getValue())));
+        assertThat(algorithm).isNotNull();
+        assertThat(algorithm.getValue()).isEqualTo(DEFAULT_SIGNATURE_ALGORITHM.getValue());
     }
 
     @Test
@@ -69,8 +79,8 @@ public class JwtAutoConfigurationTest {
 
         final SignatureAlgorithm algorithm = configuration.signatureAlgorithm();
 
-        assertThat(algorithm, is(not(nullValue(SignatureAlgorithm.class))));
-        assertThat(algorithm.getValue(), is(equalTo(DEFAULT_SIGNATURE_ALGORITHM.getValue())));
+        assertThat(algorithm).isNotNull();
+        assertThat(algorithm.getValue()).isEqualTo(DEFAULT_SIGNATURE_ALGORITHM.getValue());
     }
 
     @Test
@@ -79,8 +89,8 @@ public class JwtAutoConfigurationTest {
 
         final SignatureAlgorithm algorithm = configuration.signatureAlgorithm();
 
-        assertThat(algorithm, is(not(nullValue(SignatureAlgorithm.class))));
-        assertThat(algorithm.getValue(), is(equalTo(DEFAULT_SIGNATURE_ALGORITHM.getValue())));
+        assertThat(algorithm).isNotNull();
+        assertThat(algorithm.getValue()).isEqualTo(DEFAULT_SIGNATURE_ALGORITHM.getValue());
     }
 
     @Test
@@ -88,41 +98,41 @@ public class JwtAutoConfigurationTest {
         final String s = "123";
         doReturn(s).when(properties).getApiKey();
 
-        final Key key = configuration.apiKey(configuration.signatureAlgorithm());
+        final Key key = configuration.apiKey(DEFAULT_SIGNATURE_ALGORITHM);
 
-        assertThat(key, is(not(nullValue(Key.class))));
-        assertThat(key.getEncoded(), is(equalTo(s.getBytes())));
+        assertThat(key).isNotNull();
+        assertThat(key.getEncoded()).isEqualTo(s.getBytes());
     }
 
     @Test
     public void testKeyWithNullApiKey() throws Exception {
         doReturn(null).when(properties).getApiKey();
 
-        final Key key = configuration.apiKey(configuration.signatureAlgorithm());
+        final Key key = configuration.apiKey(DEFAULT_SIGNATURE_ALGORITHM);
 
-        assertThat(key, is(not(nullValue(Key.class))));
-        assertThat(key.getEncoded(), is(equalTo(DEFAULT_API_KEY.toString().getBytes())));
+        assertThat(key).isNotNull();
+        assertThat(key.getEncoded()).isEqualTo(DEFAULT_API_KEY.toString().getBytes());
     }
 
     @Test
     public void testKeyWithEmptyApiKey() throws Exception {
         doReturn("").when(properties).getApiKey();
 
-        final Key key = configuration.apiKey(configuration.signatureAlgorithm());
+        final Key key = configuration.apiKey(DEFAULT_SIGNATURE_ALGORITHM);
 
-        assertThat(key, is(not(nullValue(Key.class))));
-        assertThat(key.getEncoded(), is(equalTo(DEFAULT_API_KEY.toString().getBytes())));
+        assertThat(key).isNotNull();
+        assertThat(key.getEncoded()).isEqualTo(DEFAULT_API_KEY.toString().getBytes());
     }
 
     @Test
     public void testDuration() throws Exception {
-        final String s = "PT43H";
-        doReturn(s).when(properties).getExpiryDuration();
+        final Duration d = Duration.ofHours(2);
+        doReturn(d.toString()).when(properties).getExpiryDuration();
 
         final Duration duration = configuration.expiryDuration();
 
-        assertThat(duration, is(not(nullValue(Duration.class))));
-        assertThat(duration.toString(), is(equalTo(s)));
+        assertThat(duration).isNotNull();
+        assertThat(duration).isEqualTo(d);
     }
 
     @Test
@@ -131,8 +141,8 @@ public class JwtAutoConfigurationTest {
 
         final Duration duration = configuration.expiryDuration();
 
-        assertThat(duration, is(not(nullValue(Duration.class))));
-        assertThat(duration, is(equalTo(DEFAULT_EXPIRY_DURATION)));
+        assertThat(duration).isNotNull();
+        assertThat(duration).isEqualTo(DEFAULT_EXPIRY_DURATION);
     }
 
     @Test
@@ -141,8 +151,8 @@ public class JwtAutoConfigurationTest {
 
         final Duration duration = configuration.expiryDuration();
 
-        assertThat(duration, is(not(nullValue(Duration.class))));
-        assertThat(duration, is(equalTo(DEFAULT_EXPIRY_DURATION)));
+        assertThat(duration).isNotNull();
+        assertThat(duration).isEqualTo(DEFAULT_EXPIRY_DURATION);
     }
 
     @Test
@@ -151,8 +161,8 @@ public class JwtAutoConfigurationTest {
 
         final Duration duration = configuration.expiryDuration();
 
-        assertThat(duration, is(not(nullValue(Duration.class))));
-        assertThat(duration, is(equalTo(DEFAULT_EXPIRY_DURATION)));
+        assertThat(duration).isNotNull();
+        assertThat(duration).isEqualTo(DEFAULT_EXPIRY_DURATION);
     }
 
 }
