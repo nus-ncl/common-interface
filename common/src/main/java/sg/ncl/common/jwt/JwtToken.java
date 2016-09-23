@@ -14,7 +14,7 @@ public class JwtToken extends AbstractAuthenticationToken {
 
     private final String token;
     @Getter
-    private final Claims claims;
+    private final transient Claims claims;
 
     public JwtToken(final String token) {
         super(null);
