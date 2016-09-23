@@ -8,8 +8,4 @@ ncl:
   exception:
     mappings:
       mapping1: "value1"
-  jwt:
-    api-key: 123
-    signing-algorithm: HS256
-    expiry-duration: PT1H
   domain: dev.ncl.sg
