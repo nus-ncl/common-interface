@@ -24,6 +24,7 @@ import java.util.Arrays;
 import java.util.Date;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.Matchers.is;
 import static org.mockito.Matchers.anyString;
@@ -134,6 +135,104 @@ public class JwtAuthenticationProviderTest {
 
         exception.expect(BadCredentialsException.class);
         exception.expectCause(is(instanceOf(PrematureJwtException.class)));
+
+        jwtAuthenticationProvider.authenticate(authentication);
+    }
+
+    @Test
+    public void testAuthenticateNullIssuedAt() throws Exception {
+        final String token = "token";
+        doReturn(token).when(authentication).getCredentials();
+        doReturn(jws).when(jwtParser).parseClaimsJws(anyString());
+        doReturn(claims).when(jws).getBody();
+        doReturn(null).when(claims).getIssuedAt();
+
+        exception.expect(BadCredentialsException.class);
+        exception.expectMessage(is(equalTo("Claims cannot be used before null")));
+
+        jwtAuthenticationProvider.authenticate(authentication);
+    }
+
+    @Test
+    public void testAuthenticateFutureIssuedAt() throws Exception {
+        final String token = "token";
+        doReturn(token).when(authentication).getCredentials();
+        doReturn(jws).when(jwtParser).parseClaimsJws(anyString());
+        doReturn(claims).when(jws).getBody();
+        final ZonedDateTime now = ZonedDateTime.now();
+        final Date issuedAt = Date.from(now.plusDays(1).toInstant());
+        doReturn(issuedAt).when(claims).getIssuedAt();
+
+        exception.expect(BadCredentialsException.class);
+        exception.expectMessage(is(equalTo("Claims cannot be used before " + issuedAt)));
+
+        jwtAuthenticationProvider.authenticate(authentication);
+    }
+
+    @Test
+    public void testAuthenticateNullExpiration() throws Exception {
+        final String token = "token";
+        doReturn(token).when(authentication).getCredentials();
+        doReturn(jws).when(jwtParser).parseClaimsJws(anyString());
+        doReturn(claims).when(jws).getBody();
+        final ZonedDateTime now = ZonedDateTime.now();
+        doReturn(Date.from(now.minusDays(1).toInstant())).when(claims).getIssuedAt();
+        doReturn(null).when(claims).getExpiration();
+
+        exception.expect(BadCredentialsException.class);
+        exception.expectMessage(is(equalTo("Claims has expired: null")));
+
+        jwtAuthenticationProvider.authenticate(authentication);
+    }
+
+    @Test
+    public void testAuthenticatePastExpiration() throws Exception {
+        final String token = "token";
+        doReturn(token).when(authentication).getCredentials();
+        doReturn(jws).when(jwtParser).parseClaimsJws(anyString());
+        doReturn(claims).when(jws).getBody();
+        final ZonedDateTime now = ZonedDateTime.now();
+        doReturn(Date.from(now.minusDays(1).toInstant())).when(claims).getIssuedAt();
+        final Date expiration = Date.from(now.minusDays(1).toInstant());
+        doReturn(expiration).when(claims).getExpiration();
+
+        exception.expect(BadCredentialsException.class);
+        exception.expectMessage(is(equalTo("Claims has expired: " + expiration)));
+
+        jwtAuthenticationProvider.authenticate(authentication);
+    }
+
+    @Test
+    public void testAuthenticateNullNotBefore() throws Exception {
+        final String token = "token";
+        doReturn(token).when(authentication).getCredentials();
+        doReturn(jws).when(jwtParser).parseClaimsJws(anyString());
+        doReturn(claims).when(jws).getBody();
+        final ZonedDateTime now = ZonedDateTime.now();
+        doReturn(Date.from(now.minusDays(1).toInstant())).when(claims).getIssuedAt();
+        doReturn(Date.from(now.plusDays(1).toInstant())).when(claims).getExpiration();
+        doReturn(null).when(claims).getNotBefore();
+
+        exception.expect(BadCredentialsException.class);
+        exception.expectMessage(is(equalTo("Claims cannot be used before null")));
+
+        jwtAuthenticationProvider.authenticate(authentication);
+    }
+
+    @Test
+    public void testAuthenticateFutureNotBefore() throws Exception {
+        final String token = "token";
+        doReturn(token).when(authentication).getCredentials();
+        doReturn(jws).when(jwtParser).parseClaimsJws(anyString());
+        doReturn(claims).when(jws).getBody();
+        final ZonedDateTime now = ZonedDateTime.now();
+        doReturn(Date.from(now.minusDays(1).toInstant())).when(claims).getIssuedAt();
+        doReturn(Date.from(now.plusDays(1).toInstant())).when(claims).getExpiration();
+        final Date notBefore = Date.from(now.plusDays(1).toInstant());
+        doReturn(notBefore).when(claims).getNotBefore();
+
+        exception.expect(BadCredentialsException.class);
+        exception.expectMessage(is(equalTo("Claims cannot be used before " + notBefore)));
 
         jwtAuthenticationProvider.authenticate(authentication);
     }
