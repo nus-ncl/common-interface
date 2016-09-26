@@ -68,7 +68,10 @@ public class AdapterDeterLab {
         String responseBody = response.getBody().toString();
         try {
             String jsonResult = new JSONObject(responseBody).getString("msg");
-            if (!"user is created".equals(jsonResult)) {
+            if ("email address in use".equals(jsonResult)) {
+                logger.warn("Join new project as new user failed: {}. Email address already exists.", responseBody);
+                throw new EmailAlreadyExistsException();
+            } else if (!"user is created".equals(jsonResult)) {
                 logger.warn("Join project as new user failed: {}", responseBody);
                 throw new DeterLabOperationFailedException();
             }
