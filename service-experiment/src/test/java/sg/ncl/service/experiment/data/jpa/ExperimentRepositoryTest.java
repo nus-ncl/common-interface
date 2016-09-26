@@ -5,7 +5,7 @@ import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.springframework.dao.DataIntegrityViolationException;
 import sg.ncl.service.experiment.AbstractTest;
-import sg.ncl.service.experiment.Util;
+import sg.ncl.service.experiment.util.Util;
 
 import javax.inject.Inject;
 import java.time.ZonedDateTime;
