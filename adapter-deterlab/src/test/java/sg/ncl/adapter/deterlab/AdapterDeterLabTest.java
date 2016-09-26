@@ -52,8 +52,6 @@ public class AdapterDeterLabTest extends AbstractTest {
 
     @Test
     public void testJoinProjectNewUsersGood() {
-        JSONObject userObject = Util.getUserAdapterJSONObject();
-
         String stubUid = RandomStringUtils.randomAlphanumeric(8);
         JSONObject predefinedResultJson = new JSONObject();
         predefinedResultJson.put("msg", "user is created");
@@ -63,7 +61,7 @@ public class AdapterDeterLabTest extends AbstractTest {
                 .andExpect(method(HttpMethod.POST))
                 .andRespond(withSuccess(predefinedResultJson.toString(), MediaType.APPLICATION_JSON));
 
-        String result = adapterDeterLab.joinProjectNewUsers(userObject.toString());
+        String result = adapterDeterLab.joinProjectNewUsers(anyString());
         JSONObject resultJSONObject = new JSONObject(result);
         String msg = resultJSONObject.getString("msg");
         String uid = resultJSONObject.getString("uid");
@@ -87,8 +85,6 @@ public class AdapterDeterLabTest extends AbstractTest {
 
     @Test(expected = JSONException.class)
     public void testJoinProjectNewUsersJsonError() {
-        JSONObject userObject = Util.getUserAdapterJSONObject();
-
         String stubUid = RandomStringUtils.randomAlphanumeric(8);
         JSONObject predefinedResultJson = new JSONObject();
         predefinedResultJson.put("uid", stubUid);
@@ -97,14 +93,25 @@ public class AdapterDeterLabTest extends AbstractTest {
                 .andExpect(method(HttpMethod.POST))
                 .andRespond(withSuccess(predefinedResultJson.toString(), MediaType.APPLICATION_JSON));
 
-        adapterDeterLab.joinProjectNewUsers(userObject.toString());
+        adapterDeterLab.joinProjectNewUsers(anyString());
+        Assert.fail();
+    }
+
+    @Test(expected = EmailAlreadyExistsException.class)
+    public void testJoinProjectNewUsersEmailAlreadyExists() {
+        JSONObject predefinedResultJson = new JSONObject();
+        predefinedResultJson.put("msg", "email address in use");
+
+        mockServer.expect(requestTo(properties.getJoinProjectNewUsers()))
+                .andExpect(method(HttpMethod.POST))
+                .andRespond(withSuccess(predefinedResultJson.toString(), MediaType.APPLICATION_JSON));
+
+        adapterDeterLab.joinProjectNewUsers(anyString());
         Assert.fail();
     }
 
     @Test
     public void testCreateProjectNewUsersGood() {
-        JSONObject userObject = Util.getUserAdapterJSONObject();
-
         String stubUid = RandomStringUtils.randomAlphanumeric(8);
         JSONObject predefinedResultJson = new JSONObject();
         predefinedResultJson.put("msg", "user is created");
@@ -114,7 +121,7 @@ public class AdapterDeterLabTest extends AbstractTest {
                 .andExpect(method(HttpMethod.POST))
                 .andRespond(withSuccess(predefinedResultJson.toString(), MediaType.APPLICATION_JSON));
 
-        String result = adapterDeterLab.applyProjectNewUsers(userObject.toString());
+        String result = adapterDeterLab.applyProjectNewUsers(anyString());
         JSONObject resultJSONObject = new JSONObject(result);
         String msg = resultJSONObject.getString("msg");
         String uid = resultJSONObject.getString("uid");
@@ -125,8 +132,6 @@ public class AdapterDeterLabTest extends AbstractTest {
 
     @Test(expected = JSONException.class)
     public void testCreateProjectNewUsersJsonError() {
-        JSONObject userObject = Util.getUserAdapterJSONObject();
-
         String stubUid = RandomStringUtils.randomAlphanumeric(8);
         JSONObject predefinedResultJson = new JSONObject();
         predefinedResultJson.put("uid", stubUid);
@@ -135,7 +140,7 @@ public class AdapterDeterLabTest extends AbstractTest {
                 .andExpect(method(HttpMethod.POST))
                 .andRespond(withSuccess(predefinedResultJson.toString(), MediaType.APPLICATION_JSON));
 
-        adapterDeterLab.applyProjectNewUsers(userObject.toString());
+        adapterDeterLab.applyProjectNewUsers(anyString());
         Assert.fail();
     }
 
@@ -174,9 +179,7 @@ public class AdapterDeterLabTest extends AbstractTest {
                 .andExpect(method(HttpMethod.POST))
                 .andRespond(withSuccess(predefinedResultJson.toString(), MediaType.APPLICATION_JSON));
 
-        JSONObject userJoinTeamObject = Util.getTeamAdapterJSONObject();
-
-        adapterDeterLab.joinProject(userJoinTeamObject.toString());
+        adapterDeterLab.joinProject(anyString());
     }
 
     @Test(expected = JSONException.class)
@@ -188,9 +191,7 @@ public class AdapterDeterLabTest extends AbstractTest {
                 .andExpect(method(HttpMethod.POST))
                 .andRespond(withSuccess(predefinedResultJson.toString(), MediaType.APPLICATION_JSON));
 
-        JSONObject userJoinTeamObject = Util.getTeamAdapterJSONObject();
-
-        adapterDeterLab.joinProject(userJoinTeamObject.toString());
+        adapterDeterLab.joinProject(anyString());
         Assert.fail();
     }
 
@@ -203,9 +204,7 @@ public class AdapterDeterLabTest extends AbstractTest {
                 .andExpect(method(HttpMethod.POST))
                 .andRespond(withSuccess(predefinedResultJson.toString(), MediaType.APPLICATION_JSON));
 
-        JSONObject userJoinTeamObject = Util.getTeamAdapterJSONObject();
-
-        adapterDeterLab.joinProject(userJoinTeamObject.toString());
+        adapterDeterLab.joinProject(anyString());
         Assert.fail();
     }
 
@@ -236,8 +235,6 @@ public class AdapterDeterLabTest extends AbstractTest {
 
     @Test(expected = NSFileParseException.class)
     public void testCreateExperimentNSFIleError() {
-        JSONObject experimentObject = Util.getExperimentAdapterJsonObject();
-
         JSONObject predefinedResultJson = new JSONObject();
         predefinedResultJson.put("msg", "experiment create fail ns file error");
 
@@ -245,14 +242,12 @@ public class AdapterDeterLabTest extends AbstractTest {
                 .andExpect(method(HttpMethod.POST))
                 .andRespond(withSuccess(predefinedResultJson.toString(), MediaType.APPLICATION_JSON));
 
-        adapterDeterLab.createExperiment(experimentObject.toString());
+        adapterDeterLab.createExperiment(anyString());
         Assert.fail();
     }
 
     @Test(expected = ExpNameAlreadyExistsException.class)
     public void testCreateExperimentExpNameExistsError() {
-        JSONObject experimentObject = Util.getExperimentAdapterJsonObject();
-
         JSONObject predefinedResultJson = new JSONObject();
         predefinedResultJson.put("msg", "experiment create fail exp name already in use");
 
@@ -260,7 +255,7 @@ public class AdapterDeterLabTest extends AbstractTest {
                 .andExpect(method(HttpMethod.POST))
                 .andRespond(withSuccess(predefinedResultJson.toString(), MediaType.APPLICATION_JSON));
 
-        adapterDeterLab.createExperiment(experimentObject.toString());
+        adapterDeterLab.createExperiment(anyString());
         Assert.fail();
     }
 
@@ -297,8 +292,6 @@ public class AdapterDeterLabTest extends AbstractTest {
 
     @Test(expected = JSONException.class)
     public void testApproveJoinRequestOnDeterJsonError() {
-        JSONObject one = Util.getApproveJoinRequestAdapterJsonObject();
-        one.put("action", "approve");
         JSONObject predefinedResultJson = new JSONObject();
         predefinedResultJson.put("message", "process join request OK");
 
@@ -306,14 +299,12 @@ public class AdapterDeterLabTest extends AbstractTest {
                 .andExpect(method(HttpMethod.POST))
                 .andRespond(withSuccess(predefinedResultJson.toString(), MediaType.APPLICATION_JSON));
 
-        adapterDeterLab.processJoinRequest(one.toString());
+        adapterDeterLab.processJoinRequest(anyString());
         Assert.fail();
     }
 
     @Test
     public void testApplyProjectGood() {
-        JSONObject one = new JSONObject();
-
         JSONObject predefinedResultJson = new JSONObject();
         predefinedResultJson.put("msg", "apply project request existing users success");
 
@@ -321,13 +312,11 @@ public class AdapterDeterLabTest extends AbstractTest {
                 .andExpect(method(HttpMethod.POST))
                 .andRespond(withSuccess(predefinedResultJson.toString(), MediaType.APPLICATION_JSON));
 
-        adapterDeterLab.applyProject(one.toString());
+        adapterDeterLab.applyProject(anyString());
     }
 
     @Test
     public void testUpdateCredentialsGood() {
-        JSONObject one = new JSONObject();
-
         JSONObject predefinedResultJson = new JSONObject();
         predefinedResultJson.put("msg", "password change success");
 
@@ -335,13 +324,11 @@ public class AdapterDeterLabTest extends AbstractTest {
                 .andExpect(method(HttpMethod.POST))
                 .andRespond(withSuccess(predefinedResultJson.toString(), MediaType.APPLICATION_JSON));
 
-        adapterDeterLab.updateCredentials(one.toString());
+        adapterDeterLab.updateCredentials(anyString());
     }
 
     @Test(expected = CredentialsUpdateException.class)
     public void testUpdateCredentialsFail() {
-        JSONObject one = new JSONObject();
-
         JSONObject predefinedResultJson = new JSONObject();
         predefinedResultJson.put("msg", "password change fail");
 
@@ -349,14 +336,12 @@ public class AdapterDeterLabTest extends AbstractTest {
                 .andExpect(method(HttpMethod.POST))
                 .andRespond(withSuccess(predefinedResultJson.toString(), MediaType.APPLICATION_JSON));
 
-        adapterDeterLab.updateCredentials(one.toString());
+        adapterDeterLab.updateCredentials(anyString());
         Assert.fail();
     }
 
     @Test(expected = JSONException.class)
     public void testUpdateCredentialsJsonError() {
-        JSONObject one = new JSONObject();
-
         JSONObject predefinedResultJson = new JSONObject();
         predefinedResultJson.put("message", "change password");
 
@@ -364,14 +349,12 @@ public class AdapterDeterLabTest extends AbstractTest {
                 .andExpect(method(HttpMethod.POST))
                 .andRespond(withSuccess(predefinedResultJson.toString(), MediaType.APPLICATION_JSON));
 
-        adapterDeterLab.updateCredentials(one.toString());
+        adapterDeterLab.updateCredentials(anyString());
         Assert.fail();
     }
 
     @Test(expected = JSONException.class)
     public void testApplyProjectJsonError() {
-        JSONObject one = new JSONObject();
-
         JSONObject predefinedResultJson = new JSONObject();
         predefinedResultJson.put("message", "apply project request existing users success");
 
@@ -379,14 +362,12 @@ public class AdapterDeterLabTest extends AbstractTest {
                 .andExpect(method(HttpMethod.POST))
                 .andRespond(withSuccess(predefinedResultJson.toString(), MediaType.APPLICATION_JSON));
 
-        adapterDeterLab.applyProject(one.toString());
+        adapterDeterLab.applyProject(anyString());
         Assert.fail();
     }
 
     @Test(expected = DeterLabOperationFailedException.class)
     public void testApplyProjectBad() throws Exception {
-        JSONObject one = new JSONObject();
-
         JSONObject predefinedResultJson = new JSONObject();
         predefinedResultJson.put("msg", "apply project request existing users fail");
 
@@ -394,7 +375,7 @@ public class AdapterDeterLabTest extends AbstractTest {
                 .andExpect(method(HttpMethod.POST))
                 .andRespond(withSuccess(predefinedResultJson.toString(), MediaType.APPLICATION_JSON));
 
-        adapterDeterLab.applyProject(one.toString());
+        adapterDeterLab.applyProject(anyString());
         Assert.fail();
     }
 
@@ -418,9 +399,6 @@ public class AdapterDeterLabTest extends AbstractTest {
 
     @Test(expected = JSONException.class)
     public void testApproveProjectJsonError() {
-        JSONObject one = new JSONObject();
-        one.put("pid", "11111111");
-        one.put("uid", "22222222");
         JSONObject predefinedResultJson = new JSONObject();
         predefinedResultJson.put("message", "approve project OK");
 
@@ -428,7 +406,7 @@ public class AdapterDeterLabTest extends AbstractTest {
                 .andExpect(method(HttpMethod.POST))
                 .andRespond(withSuccess(predefinedResultJson.toString(), MediaType.APPLICATION_JSON));
 
-        adapterDeterLab.approveProject(one.toString());
+        adapterDeterLab.approveProject(anyString());
         Assert.fail();
     }
 
@@ -452,9 +430,6 @@ public class AdapterDeterLabTest extends AbstractTest {
 
     @Test(expected = JSONException.class)
     public void testRejectProjectJsonError() {
-        JSONObject one = new JSONObject();
-        one.put("pid", "11111111");
-        one.put("uid", "22222222");
         JSONObject predefinedResultJson = new JSONObject();
         predefinedResultJson.put("message", "reject project OK");
 
@@ -462,7 +437,7 @@ public class AdapterDeterLabTest extends AbstractTest {
                 .andExpect(method(HttpMethod.POST))
                 .andRespond(withSuccess(predefinedResultJson.toString(), MediaType.APPLICATION_JSON));
 
-        adapterDeterLab.rejectProject(one.toString());
+        adapterDeterLab.rejectProject(anyString());
         Assert.fail();
     }
 
@@ -485,8 +460,6 @@ public class AdapterDeterLabTest extends AbstractTest {
 
     @Test(expected = JSONException.class)
     public void testRejectJoinRequestJsonError() {
-        JSONObject one = Util.getApproveJoinRequestAdapterJsonObject();
-        one.put("action", "deny");
         JSONObject predefinedResultJson = new JSONObject();
         predefinedResultJson.put("message", "process join request OK");
 
@@ -494,14 +467,12 @@ public class AdapterDeterLabTest extends AbstractTest {
                 .andExpect(method(HttpMethod.POST))
                 .andRespond(withSuccess(predefinedResultJson.toString(), MediaType.APPLICATION_JSON));
 
-        adapterDeterLab.processJoinRequest(one.toString());
+        adapterDeterLab.processJoinRequest(anyString());
         Assert.fail();
     }
 
     @Test(expected = ExpStartException.class)
     public void testStartExpBad() {
-        JSONObject one = new JSONObject();
-
         JSONObject predefinedResultJson = new JSONObject();
         predefinedResultJson.put("msg", "experiment start fail");
 
@@ -509,7 +480,7 @@ public class AdapterDeterLabTest extends AbstractTest {
                 .andExpect(method(HttpMethod.POST))
                 .andRespond(withSuccess(predefinedResultJson.toString(), MediaType.APPLICATION_JSON));
 
-        String result = adapterDeterLab.startExperiment(one.toString());
+        String result = adapterDeterLab.startExperiment(anyString());
         JSONObject resultJSONObject = new JSONObject(result);
         String msg = resultJSONObject.getString("msg");
         Assert.assertThat(msg, is("experiment start fail"));
@@ -518,8 +489,6 @@ public class AdapterDeterLabTest extends AbstractTest {
 
     @Test
     public void testStartExpGood() {
-        JSONObject one = new JSONObject();
-
         JSONObject predefinedResultJson = new JSONObject();
         predefinedResultJson.put("msg", "experiment start success");
 
@@ -527,7 +496,7 @@ public class AdapterDeterLabTest extends AbstractTest {
                 .andExpect(method(HttpMethod.POST))
                 .andRespond(withSuccess(predefinedResultJson.toString(), MediaType.APPLICATION_JSON));
 
-        String result = adapterDeterLab.startExperiment(one.toString());
+        String result = adapterDeterLab.startExperiment(anyString());
         JSONObject resultJSONObject = new JSONObject(result);
         String msg = resultJSONObject.getString("msg");
         Assert.assertThat(msg, is("experiment start success"));
@@ -535,8 +504,6 @@ public class AdapterDeterLabTest extends AbstractTest {
 
     @Test
     public void testGetExpStatusGood() {
-        JSONObject one = new JSONObject();
-
         JSONObject predefinedResultJson = new JSONObject();
         predefinedResultJson.put("status", "active");
 
@@ -544,7 +511,7 @@ public class AdapterDeterLabTest extends AbstractTest {
                 .andExpect(method(HttpMethod.POST))
                 .andRespond(withSuccess(predefinedResultJson.toString(), MediaType.APPLICATION_JSON));
 
-        String result = adapterDeterLab.getExperimentStatus(one.toString());
+        String result = adapterDeterLab.getExperimentStatus(anyString());
         JSONObject resultJSONObject = new JSONObject(result);
         String msg = resultJSONObject.getString("status");
         Assert.assertThat(msg, is("active"));
@@ -552,8 +519,6 @@ public class AdapterDeterLabTest extends AbstractTest {
 
     @Test
     public void testStopExpBad() {
-        JSONObject one = new JSONObject();
-
         JSONObject predefinedResultJson = new JSONObject();
         predefinedResultJson.put("status", "error");
 
@@ -561,14 +526,12 @@ public class AdapterDeterLabTest extends AbstractTest {
                 .andExpect(method(HttpMethod.POST))
                 .andRespond(withSuccess(predefinedResultJson.toString(), MediaType.APPLICATION_JSON));
 
-        String result = adapterDeterLab.stopExperiment(one.toString());
+        String result = adapterDeterLab.stopExperiment(anyString());
         Assert.assertThat(result, is("error"));
     }
 
     @Test
     public void testStopExpGood() {
-        JSONObject one = new JSONObject();
-
         JSONObject predefinedResultJson = new JSONObject();
         predefinedResultJson.put("status", "swapped");
 
@@ -576,14 +539,12 @@ public class AdapterDeterLabTest extends AbstractTest {
                 .andExpect(method(HttpMethod.POST))
                 .andRespond(withSuccess(predefinedResultJson.toString(), MediaType.APPLICATION_JSON));
 
-        String result = adapterDeterLab.stopExperiment(one.toString());
+        String result = adapterDeterLab.stopExperiment(anyString());
         Assert.assertThat(result, is("swapped"));
     }
 
     @Test(expected = ExpDeleteException.class)
     public void testDeleteExpBad() {
-        JSONObject one = new JSONObject();
-
         JSONObject predefinedResultJson = new JSONObject();
         predefinedResultJson.put("status", "error");
 
@@ -591,15 +552,13 @@ public class AdapterDeterLabTest extends AbstractTest {
                 .andExpect(method(HttpMethod.POST))
                 .andRespond(withSuccess(predefinedResultJson.toString(), MediaType.APPLICATION_JSON));
 
-        String result = adapterDeterLab.deleteExperiment(one.toString());
+        String result = adapterDeterLab.deleteExperiment(anyString());
         Assert.fail();
         Assert.assertThat(result, is("error"));
     }
 
     @Test
     public void testDeleteExpGood() {
-        JSONObject one = new JSONObject();
-
         JSONObject predefinedResultJson = new JSONObject();
         predefinedResultJson.put("status", "no experiment found");
 
@@ -607,7 +566,7 @@ public class AdapterDeterLabTest extends AbstractTest {
                 .andExpect(method(HttpMethod.POST))
                 .andRespond(withSuccess(predefinedResultJson.toString(), MediaType.APPLICATION_JSON));
 
-        String result = adapterDeterLab.deleteExperiment(one.toString());
+        String result = adapterDeterLab.deleteExperiment(anyString());
         Assert.assertThat(result, is("no experiment found"));
     }
 }
