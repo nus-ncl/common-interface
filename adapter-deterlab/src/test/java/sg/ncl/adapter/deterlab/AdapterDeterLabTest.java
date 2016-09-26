@@ -14,14 +14,7 @@ import org.springframework.web.client.RestOperations;
 import org.springframework.web.client.RestTemplate;
 import sg.ncl.adapter.deterlab.data.jpa.DeterLabUserRepository;
 import sg.ncl.adapter.deterlab.dtos.entities.DeterLabUserEntity;
-import sg.ncl.adapter.deterlab.exceptions.AdapterDeterlabConnectException;
-import sg.ncl.adapter.deterlab.exceptions.CredentialsUpdateException;
-import sg.ncl.adapter.deterlab.exceptions.DeterLabOperationFailedException;
-import sg.ncl.adapter.deterlab.exceptions.ExpDeleteException;
-import sg.ncl.adapter.deterlab.exceptions.ExpNameAlreadyExistsException;
-import sg.ncl.adapter.deterlab.exceptions.ExpStartException;
-import sg.ncl.adapter.deterlab.exceptions.NSFileParseException;
-import sg.ncl.adapter.deterlab.exceptions.UserNotFoundException;
+import sg.ncl.adapter.deterlab.exceptions.*;
 
 import javax.inject.Inject;
 
@@ -89,6 +82,7 @@ public class AdapterDeterLabTest extends AbstractTest {
                 .andRespond(withSuccess(predefinedResultJson.toString(), MediaType.APPLICATION_JSON));
 
         adapterDeterLab.joinProjectNewUsers(anyString());
+        Assert.fail();
     }
 
     @Test(expected = JSONException.class)
@@ -104,6 +98,7 @@ public class AdapterDeterLabTest extends AbstractTest {
                 .andRespond(withSuccess(predefinedResultJson.toString(), MediaType.APPLICATION_JSON));
 
         adapterDeterLab.joinProjectNewUsers(userObject.toString());
+        Assert.fail();
     }
 
     @Test
@@ -141,6 +136,7 @@ public class AdapterDeterLabTest extends AbstractTest {
                 .andRespond(withSuccess(predefinedResultJson.toString(), MediaType.APPLICATION_JSON));
 
         adapterDeterLab.applyProjectNewUsers(userObject.toString());
+        Assert.fail();
     }
 
     @Test(expected = DeterLabOperationFailedException.class)
@@ -153,6 +149,20 @@ public class AdapterDeterLabTest extends AbstractTest {
                 .andRespond(withSuccess(predefinedResultJson.toString(), MediaType.APPLICATION_JSON));
 
         adapterDeterLab.applyProjectNewUsers(anyString());
+        Assert.fail();
+    }
+
+    @Test(expected = EmailAlreadyExistsException.class)
+    public void testCreateProjectNewUserEmailAlreadyExists() {
+        JSONObject predefinedResultJson = new JSONObject();
+        predefinedResultJson.put("msg", "email address in use");
+
+        mockServer.expect(requestTo(properties.getApplyProjectNewUsers()))
+                .andExpect(method(HttpMethod.POST))
+                .andRespond(withSuccess(predefinedResultJson.toString(), MediaType.APPLICATION_JSON));
+
+        adapterDeterLab.applyProjectNewUsers(anyString());
+        Assert.fail();
     }
 
     @Test
@@ -181,6 +191,7 @@ public class AdapterDeterLabTest extends AbstractTest {
         JSONObject userJoinTeamObject = Util.getTeamAdapterJSONObject();
 
         adapterDeterLab.joinProject(userJoinTeamObject.toString());
+        Assert.fail();
     }
 
     @Test(expected = DeterLabOperationFailedException.class)
@@ -195,6 +206,7 @@ public class AdapterDeterLabTest extends AbstractTest {
         JSONObject userJoinTeamObject = Util.getTeamAdapterJSONObject();
 
         adapterDeterLab.joinProject(userJoinTeamObject.toString());
+        Assert.fail();
     }
 
     @Test
@@ -219,6 +231,7 @@ public class AdapterDeterLabTest extends AbstractTest {
                 .andRespond(withSuccess(predefinedResultJson.toString(), MediaType.APPLICATION_JSON));
 
         adapterDeterLab.createExperiment(experimentObject.toString());
+        Assert.fail();
     }
 
     @Test(expected = NSFileParseException.class)
@@ -233,6 +246,7 @@ public class AdapterDeterLabTest extends AbstractTest {
                 .andRespond(withSuccess(predefinedResultJson.toString(), MediaType.APPLICATION_JSON));
 
         adapterDeterLab.createExperiment(experimentObject.toString());
+        Assert.fail();
     }
 
     @Test(expected = ExpNameAlreadyExistsException.class)
@@ -247,11 +261,13 @@ public class AdapterDeterLabTest extends AbstractTest {
                 .andRespond(withSuccess(predefinedResultJson.toString(), MediaType.APPLICATION_JSON));
 
         adapterDeterLab.createExperiment(experimentObject.toString());
+        Assert.fail();
     }
 
     @Test(expected = UserNotFoundException.class)
     public void testGetDeterUserIdBad() {
         adapterDeterLab.getDeterUserIdByNclUserId(RandomStringUtils.randomAlphanumeric(20));
+        Assert.fail();
     }
 
     @Test
@@ -291,6 +307,7 @@ public class AdapterDeterLabTest extends AbstractTest {
                 .andRespond(withSuccess(predefinedResultJson.toString(), MediaType.APPLICATION_JSON));
 
         adapterDeterLab.processJoinRequest(one.toString());
+        Assert.fail();
     }
 
     @Test
@@ -333,6 +350,7 @@ public class AdapterDeterLabTest extends AbstractTest {
                 .andRespond(withSuccess(predefinedResultJson.toString(), MediaType.APPLICATION_JSON));
 
         adapterDeterLab.updateCredentials(one.toString());
+        Assert.fail();
     }
 
     @Test(expected = JSONException.class)
@@ -347,6 +365,7 @@ public class AdapterDeterLabTest extends AbstractTest {
                 .andRespond(withSuccess(predefinedResultJson.toString(), MediaType.APPLICATION_JSON));
 
         adapterDeterLab.updateCredentials(one.toString());
+        Assert.fail();
     }
 
     @Test(expected = JSONException.class)
@@ -361,6 +380,7 @@ public class AdapterDeterLabTest extends AbstractTest {
                 .andRespond(withSuccess(predefinedResultJson.toString(), MediaType.APPLICATION_JSON));
 
         adapterDeterLab.applyProject(one.toString());
+        Assert.fail();
     }
 
     @Test(expected = DeterLabOperationFailedException.class)
@@ -375,6 +395,7 @@ public class AdapterDeterLabTest extends AbstractTest {
                 .andRespond(withSuccess(predefinedResultJson.toString(), MediaType.APPLICATION_JSON));
 
         adapterDeterLab.applyProject(one.toString());
+        Assert.fail();
     }
 
     @Test
@@ -408,6 +429,7 @@ public class AdapterDeterLabTest extends AbstractTest {
                 .andRespond(withSuccess(predefinedResultJson.toString(), MediaType.APPLICATION_JSON));
 
         adapterDeterLab.approveProject(one.toString());
+        Assert.fail();
     }
 
     @Test
@@ -441,6 +463,7 @@ public class AdapterDeterLabTest extends AbstractTest {
                 .andRespond(withSuccess(predefinedResultJson.toString(), MediaType.APPLICATION_JSON));
 
         adapterDeterLab.rejectProject(one.toString());
+        Assert.fail();
     }
 
     @Test
@@ -472,6 +495,7 @@ public class AdapterDeterLabTest extends AbstractTest {
                 .andRespond(withSuccess(predefinedResultJson.toString(), MediaType.APPLICATION_JSON));
 
         adapterDeterLab.processJoinRequest(one.toString());
+        Assert.fail();
     }
 
     @Test(expected = ExpStartException.class)
@@ -489,6 +513,7 @@ public class AdapterDeterLabTest extends AbstractTest {
         JSONObject resultJSONObject = new JSONObject(result);
         String msg = resultJSONObject.getString("msg");
         Assert.assertThat(msg, is("experiment start fail"));
+        Assert.fail();
     }
 
     @Test
@@ -567,6 +592,7 @@ public class AdapterDeterLabTest extends AbstractTest {
                 .andRespond(withSuccess(predefinedResultJson.toString(), MediaType.APPLICATION_JSON));
 
         String result = adapterDeterLab.deleteExperiment(one.toString());
+        Assert.fail();
         Assert.assertThat(result, is("error"));
     }
 
