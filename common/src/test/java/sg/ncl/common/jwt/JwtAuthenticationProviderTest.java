@@ -17,11 +17,11 @@ import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.Authentication;
-import sg.ncl.common.jwt.JwtTokenTest.RolesImpl;
 
 import java.time.ZonedDateTime;
 import java.util.Arrays;
 import java.util.Date;
+import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.equalTo;
@@ -66,8 +66,8 @@ public class JwtAuthenticationProviderTest {
         doReturn(Date.from(now.minusDays(1).toInstant())).when(claims).getIssuedAt();
         doReturn(Date.from(now.plusDays(1).toInstant())).when(claims).getExpiration();
         doReturn(Date.from(now.minusDays(1).toInstant())).when(claims).getNotBefore();
-        final Roles roles = new RolesImpl(Arrays.asList());
-        doReturn(roles).when(claims).get(R.KEY, Roles.class);
+        final List<String> roles = Arrays.asList();
+        doReturn(roles).when(claims).get(JwtToken.KEY, List.class);
 
         final Authentication authenticate = jwtAuthenticationProvider.authenticate(authentication);
 
