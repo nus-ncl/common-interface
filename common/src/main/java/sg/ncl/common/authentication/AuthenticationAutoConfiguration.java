@@ -90,7 +90,7 @@ public class AuthenticationAutoConfiguration extends WebSecurityConfigurerAdapte
     private ExpressionUrlAuthorizationConfigurer<HttpSecurity>.ExpressionInterceptUrlRegistry permitUri(final ExpressionUrlAuthorizationConfigurer<HttpSecurity>.ExpressionInterceptUrlRegistry http) {
         getUri().forEach((uri, method) -> {
             log.info("Permitting {} {}", method, uri);
-            http.antMatchers(method, uri).permitAll();
+            http.regexMatchers(method, uri).permitAll();
         });
         return http;
     }

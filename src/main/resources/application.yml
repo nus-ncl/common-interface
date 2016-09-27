@@ -30,7 +30,12 @@ spring:
 ncl:
   authentication:
     uri:
-      "/authentications": POST
+      '/authentications': POST # for login
+      '/registrations': POST # for apply/join new teams
+      '/users/(\w|-)+': GET # for retrieving public teams' owner info
+      '/users/(\w|-)+/emails/\w+=*': PUT # for email verifications
+      '/teams\?visibility=PUBLIC': GET # for retrieving public teams
+      '/teams\?name=(\w| )+': GET # for retrieving teams by name
   domain: dev.ncl.sg
   deterlab:
     adapter:

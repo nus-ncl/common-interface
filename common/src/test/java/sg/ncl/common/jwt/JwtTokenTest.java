@@ -10,6 +10,7 @@ import sg.ncl.common.authentication.Role;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.doReturn;
@@ -19,12 +20,6 @@ import static org.mockito.Mockito.mock;
  * Created by Chris on 9/23/2016.
  */
 public class JwtTokenTest {
-
-    static class RolesImpl extends ArrayList<String> implements Roles {
-        RolesImpl(Collection<? extends String> c) {
-            addAll(c);
-        }
-    }
 
     @Rule
     public MockitoRule mockito = MockitoJUnit.rule();
@@ -47,8 +42,8 @@ public class JwtTokenTest {
     public void testJwtTokenStringClaims() throws Exception {
         final String token = "token";
         final Claims claims = mock(Claims.class);
-        final Roles roles = new RolesImpl(Arrays.asList(Role.ADMIN.name(), "s1", "s2", "s3", Role.USER.name()));
-        doReturn(roles).when(claims).get(R.KEY, Roles.class);
+        final List<String> roles = Arrays.asList(Role.ADMIN.name(), "s1", "s2", "s3", Role.USER.name());
+        doReturn(roles).when(claims).get(JwtToken.KEY, List.class);
 
         final JwtToken jwtToken = new JwtToken(token, claims);
 
