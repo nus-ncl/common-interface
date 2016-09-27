@@ -6,12 +6,19 @@ import org.json.JSONObject;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.client.MockRestServiceServer;
+import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestOperations;
 import org.springframework.web.client.RestTemplate;
+import sg.ncl.adapter.deterlab.AbstractTest;
+import sg.ncl.adapter.deterlab.AdapterDeterLab;
+import sg.ncl.adapter.deterlab.ConnectionProperties;
+import sg.ncl.adapter.deterlab.Util;
 import sg.ncl.adapter.deterlab.data.jpa.DeterLabUserRepository;
 import sg.ncl.adapter.deterlab.dtos.entities.DeterLabUserEntity;
 import sg.ncl.adapter.deterlab.exceptions.AdapterDeterlabConnectException;
@@ -29,12 +36,14 @@ import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.not;
 import static org.hamcrest.Matchers.nullValue;
 import static org.mockito.Matchers.anyString;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.when;
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.method;
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.requestTo;
 import static org.springframework.test.web.client.response.MockRestResponseCreators.withSuccess;
 
 /**
- * @author Te Ye
+ * @author Te Ye && Vu
  */
 public class AdapterDeterLabTest extends AbstractTest {
 
@@ -58,7 +67,7 @@ public class AdapterDeterLabTest extends AbstractTest {
     }
 
     @Test
-    public void testJoinProjectNewUsersGood() {
+    public void JoinProjectNewUsersTest1() {
         JSONObject userObject = Util.getUserAdapterJSONObject();
 
         String stubUid = RandomStringUtils.randomAlphanumeric(8);
@@ -78,6 +87,18 @@ public class AdapterDeterLabTest extends AbstractTest {
         Assert.assertThat(uid, not(nullValue()));
         Assert.assertThat(uid, is(stubUid));
     }
+
+    @Test(expected=AdapterDeterlabConnectException.class)
+    public void JoinProjectNewUsersTest2(){
+        ConnectionProperties myproperties= Mockito.mock(ConnectionProperties.class);
+        when(myproperties.getJoinProjectNewUsers()).thenReturn(anyString());
+
+        //doThrow(new RestClientException(null)).when(properties).getJoinProjectNewUsers();
+
+        JSONObject userObject = Util.getUserAdapterJSONObject();
+        adapterDeterLab.joinProjectNewUsers(userObject.toString());
+    }
+
 
     @Test(expected = DeterLabOperationFailedException.class)
     public void testJoinProjectNewUsersBad() {
@@ -220,6 +241,7 @@ public class AdapterDeterLabTest extends AbstractTest {
 
         adapterDeterLab.createExperiment(experimentObject.toString());
     }
+
 
     @Test(expected = NSFileParseException.class)
     public void testCreateExperimentNSFIleError() {
