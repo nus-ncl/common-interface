@@ -5,6 +5,7 @@ import io.jsonwebtoken.SignatureAlgorithm;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import sg.ncl.common.jwt.JwtToken;
 import sg.ncl.service.authentication.data.jpa.CredentialsEntity;
 import sg.ncl.service.authentication.data.jpa.CredentialsRepository;
 import sg.ncl.service.authentication.domain.AuthenticationService;
@@ -63,8 +64,8 @@ public class AuthenticationServiceImpl implements AuthenticationService {
                     .setNotBefore(Date.from(now.toInstant()))
                     // the expiry should be short; can be set through properties
                     .setExpiration(Date.from(expiry.toInstant()))
-                    .claim("roles", credentials.getRoles())
-                    // TODO custom claims such as permissions
+                    .claim(JwtToken.KEY, credentials.getRoles())
+                    // TODO custom claims such as permissions`
                     // sign the JWT with the given algorithm and apiKey
                     .signWith(signatureAlgorithm, apiKey)
                     .compact();
