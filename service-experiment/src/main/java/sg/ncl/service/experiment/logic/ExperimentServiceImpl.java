@@ -1,5 +1,7 @@
 package sg.ncl.service.experiment.logic;
 
+import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.impl.DefaultClaims;
 import lombok.extern.slf4j.Slf4j;
 import org.json.JSONObject;
 import org.springframework.security.core.GrantedAuthority;
@@ -9,6 +11,7 @@ import org.springframework.transaction.annotation.Transactional;
 import sg.ncl.adapter.deterlab.AdapterDeterLab;
 import sg.ncl.common.authentication.Role;
 import sg.ncl.common.exception.base.ForbiddenException;
+import sg.ncl.common.jwt.JwtToken;
 import sg.ncl.service.experiment.ExperimentConnectionProperties;
 import sg.ncl.service.experiment.data.jpa.ExperimentEntity;
 import sg.ncl.service.experiment.data.jpa.ExperimentRepository;
@@ -25,9 +28,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
-import java.util.Collection;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -221,24 +222,27 @@ public class ExperimentServiceImpl implements ExperimentService {
      *
      * @param id       the experiment id (DB UUID), i.e. not the experiment name
      * @param teamName the team where the experiment is in (required by Deterlab so that we delete the correct experiment)
+     * @param authPrincipal the decrypted claims from the jwt web token
      * @return the deleted experiment object
      * @implNote delete the realization object first, follow by the experiment object (the reverse process of create)
      * @throws ForbiddenException if user is not the experiment creator and user is not an admin
      */
     @Transactional
-    public Experiment deleteExperiment(final Long id, final String teamName) {
+    public Experiment deleteExperiment(final Long id, final String teamName, final Claims authPrincipal) {
         log.info("Deleting Experiment: {} from Team: {}", id, teamName);
         Experiment experimentEntity = null;
 
         RealizationEntity realizationEntity = realizationService.getByExperimentId(id);
         Long realizationId = realizationEntity.getId();
 
-        String contextUserId = (String) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        Collection<? extends GrantedAuthority> roleList = SecurityContextHolder.getContext().getAuthentication().getAuthorities();
+        log.info("Id of requester from web: {}", authPrincipal.getSubject());
+        log.info("Role of requester from web: {}", authPrincipal.get(JwtToken.KEY));
+        String contextUserId = authPrincipal.getSubject();
+        ArrayList<Role> roles = (ArrayList) authPrincipal.get(JwtToken.KEY);
 
-        log.info("Context user id: {}, Context role: {}", contextUserId, roleList);
+        log.info("Context user id: {}, Context role: {}", contextUserId, roles);
 
-        if (!contextUserId.equals(realizationEntity.getUserId()) && !roleList.contains(Role.ADMIN)) {
+        if (!contextUserId.equals(realizationEntity.getUserId()) && !roles.contains(Role.ADMIN)) {
             log.warn("Access denied for delete experiment: /{}/ ", id);
             throw new ForbiddenException("Access denied for delete experiment: expid " + id);
         }

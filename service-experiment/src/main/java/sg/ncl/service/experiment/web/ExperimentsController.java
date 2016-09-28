@@ -1,5 +1,6 @@
 package sg.ncl.service.experiment.web;
 
+import io.jsonwebtoken.Claims;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -76,13 +77,13 @@ public class ExperimentsController {
     @DeleteMapping(path = "/{expId}/teams/{teamName}")
     // FIXME: should be DELETE instead of POST and path should be "/experiments/{id}"
     @ResponseStatus(HttpStatus.OK)
-    public Experiment deleteExperiment(@PathVariable String expId, @PathVariable String teamName, @AuthenticationPrincipal String user) {
-        log.info("User principal: " + user);
+    public Experiment deleteExperiment(@PathVariable String expId, @PathVariable String teamName, @AuthenticationPrincipal Object authPrincipal) {
+        log.info("User principal: " + authPrincipal);
         if (SecurityContextHolder.getContext().getAuthentication() == null) {
             // throw forbidden
             log.warn("Access denied for delete experiment: expid: {} ", expId);
             throw new ForbiddenException("Access denied for delete experiment: expid " + expId);
         }
-        return new ExperimentInfo(experimentService.deleteExperiment(Long.parseLong(expId), teamName));
+        return new ExperimentInfo(experimentService.deleteExperiment(Long.parseLong(expId), teamName, (Claims) authPrincipal));
     }
 }
