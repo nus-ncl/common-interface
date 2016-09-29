@@ -6,7 +6,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -77,13 +76,13 @@ public class ExperimentsController {
     @DeleteMapping(path = "/{expId}/teams/{teamName}")
     // FIXME: should be DELETE instead of POST and path should be "/experiments/{id}"
     @ResponseStatus(HttpStatus.OK)
-    public Experiment deleteExperiment(@PathVariable String expId, @PathVariable String teamName, @AuthenticationPrincipal Object authPrincipal) {
-        log.info("User principal: " + authPrincipal);
-        if (SecurityContextHolder.getContext().getAuthentication() == null) {
+    public Experiment deleteExperiment(@PathVariable String expId, @PathVariable String teamName, @AuthenticationPrincipal Object claims) {
+        log.info("User principal: " + claims);
+        if ( !(claims instanceof Claims) || SecurityContextHolder.getContext().getAuthentication() == null) {
             // throw forbidden
-            log.warn("Access denied for delete experiment: expid: {} ", expId);
+            log.warn("Access denied for delete experiment: expid: {} claims: {} ", expId, claims);
             throw new ForbiddenException("Access denied for delete experiment: expid " + expId);
         }
-        return new ExperimentInfo(experimentService.deleteExperiment(Long.parseLong(expId), teamName, (Claims) authPrincipal));
+        return new ExperimentInfo(experimentService.deleteExperiment(Long.parseLong(expId), teamName, (Claims) claims));
     }
 }

@@ -2,11 +2,13 @@ package sg.ncl.service.experiment.web;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import io.jsonwebtoken.Claims;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
 import org.springframework.http.MediaType;
@@ -29,7 +31,7 @@ import java.util.List;
 
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
-import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.*;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.mockingDetails;
 import static org.mockito.Mockito.when;
@@ -48,6 +50,9 @@ public class ExperimentsControllerTest extends AbstractTest {
 
     @Rule
     public MockitoRule mockito = MockitoJUnit.rule();
+
+    @Rule
+    public final ExpectedException exception = ExpectedException.none();
 
     private MediaType contentType = new MediaType(MediaType.APPLICATION_JSON.getType(), MediaType.APPLICATION_JSON.getSubtype());
     private MockMvc mockMvc;
@@ -141,7 +146,25 @@ public class ExperimentsControllerTest extends AbstractTest {
     }
 
     @Test
-    public void testDeleteExperiment() throws Exception {
+    public void testDeleteExperimentGoodAuthenticationPrincipal() throws Exception {
+        Long experimentId = Long.parseLong(RandomStringUtils.randomNumeric(5));
+        String teamName = RandomStringUtils.randomAlphabetic(8);
+        final Claims claims = mock(Claims.class);
+
+        Authentication authentication = mock(Authentication.class);
+        SecurityContext securityContext = mock(SecurityContext.class);
+
+        when(securityContext.getAuthentication()).thenReturn(authentication);
+        SecurityContextHolder.setContext(securityContext);
+        when(authentication.getPrincipal()).thenReturn(claims);
+        when(experimentService.deleteExperiment(eq(experimentId), eq(teamName), any(Claims.class))).thenReturn(Util.getExperimentsEntity());
+
+        mockMvc.perform(delete("/experiments/" + experimentId + "/teams/" + teamName))
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    public void testDeleteExperimentBadAuthenticationPrincipalType() throws Exception {
         Long experimentId = Long.parseLong(RandomStringUtils.randomNumeric(5));
         String teamName = RandomStringUtils.randomAlphabetic(8);
 
@@ -150,9 +173,10 @@ public class ExperimentsControllerTest extends AbstractTest {
 
         when(securityContext.getAuthentication()).thenReturn(authentication);
         SecurityContextHolder.setContext(securityContext);
-        when(experimentService.deleteExperiment(experimentId, teamName, null)).thenReturn(Util.getExperimentsEntity());
+        when(authentication.getPrincipal()).thenReturn("");
+        when(experimentService.deleteExperiment(eq(experimentId), eq(teamName), any(Claims.class))).thenReturn(Util.getExperimentsEntity());
 
         mockMvc.perform(delete("/experiments/" + experimentId + "/teams/" + teamName))
-                .andExpect(status().isOk());
+                .andExpect(status().isForbidden());
     }
 }
