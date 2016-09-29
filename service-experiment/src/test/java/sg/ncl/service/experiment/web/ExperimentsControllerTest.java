@@ -5,18 +5,18 @@ import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
-import org.mockito.Matchers;
+import org.mockito.junit.MockitoJUnit;
+import org.mockito.junit.MockitoRule;
 import org.springframework.http.MediaType;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.web.context.WebApplicationContext;
-import sg.ncl.common.authentication.Role;
 import sg.ncl.service.experiment.AbstractTest;
 import sg.ncl.service.experiment.Util;
 import sg.ncl.service.experiment.data.jpa.ExperimentEntity;
@@ -25,11 +25,11 @@ import sg.ncl.service.experiment.domain.ExperimentService;
 
 import javax.inject.Inject;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
+import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.mockingDetails;
 import static org.mockito.Mockito.when;
@@ -45,6 +45,9 @@ import static org.springframework.test.web.servlet.setup.MockMvcBuilders.webAppC
  */
 @ActiveProfiles({"mock-experiment-service"})
 public class ExperimentsControllerTest extends AbstractTest {
+
+    @Rule
+    public MockitoRule mockito = MockitoJUnit.rule();
 
     private MediaType contentType = new MediaType(MediaType.APPLICATION_JSON.getType(), MediaType.APPLICATION_JSON.getSubtype());
     private MockMvc mockMvc;
@@ -73,7 +76,7 @@ public class ExperimentsControllerTest extends AbstractTest {
     public void testAddExperiment() throws Exception {
 
         ExperimentEntity experimentEntity = Util.getExperimentsEntity();
-        when(experimentService.save(Matchers.any())).thenReturn(experimentEntity);
+        when(experimentService.save(any())).thenReturn(experimentEntity);
 
         ExperimentEntity experimentEntity2 = Util.getExperimentsEntity();
         ObjectMapper mapper = new ObjectMapper();
@@ -144,15 +147,10 @@ public class ExperimentsControllerTest extends AbstractTest {
 
         Authentication authentication = mock(Authentication.class);
         SecurityContext securityContext = mock(SecurityContext.class);
-        String notOwnerId = RandomStringUtils.randomAlphanumeric(20);
-        Collection roleList = new ArrayList<GrantedAuthority>();
-        roleList.add(Role.USER);
+
         when(securityContext.getAuthentication()).thenReturn(authentication);
         SecurityContextHolder.setContext(securityContext);
-        when(SecurityContextHolder.getContext().getAuthentication().getPrincipal()).thenReturn(notOwnerId);
-        when(SecurityContextHolder.getContext().getAuthentication().getAuthorities()).thenReturn(roleList);
-
-        when(experimentService.deleteExperiment(experimentId, teamName)).thenReturn(Util.getExperimentsEntity());
+        when(experimentService.deleteExperiment(experimentId, teamName, null)).thenReturn(Util.getExperimentsEntity());
 
         mockMvc.perform(delete("/experiments/" + experimentId + "/teams/" + teamName))
                 .andExpect(status().isOk());
