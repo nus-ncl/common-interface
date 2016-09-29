@@ -218,15 +218,15 @@ public class ExperimentServiceImpl implements ExperimentService {
      * Also deletes the experiment on Deterlab DB.
      *
      * @param id       the experiment id (DB UUID), i.e. not the experiment name
-     * @param teamName the team where the experiment is in (required by Deterlab so that we delete the correct experiment)
+     * @param teamId the team where the experiment is in (required by Deterlab so that we delete the correct experiment)
      * @param claims the decrypted claims from the jwt web token
      * @return the deleted experiment object
      * @implNote delete the realization object first, follow by the experiment object (the reverse process of create)
      * @throws ForbiddenException if user is not the experiment creator and user is not an admin
      */
     @Transactional
-    public Experiment deleteExperiment(final Long id, final String teamName, final Claims claims) {
-        log.info("Deleting Experiment: {} from Team: {}", id, teamName);
+    public Experiment deleteExperiment(final Long id, final String teamId, final Claims claims) {
+        log.info("Deleting Experiment: {} from Team: {}", id, teamId);
         Experiment experimentEntity = null;
 
         RealizationEntity realizationEntity = realizationService.getByExperimentId(id);
@@ -255,8 +255,11 @@ public class ExperimentServiceImpl implements ExperimentService {
             log.info("Realization deleted: {}", realizationId);
 
             experimentEntity = experimentRepository.getOne(id);
+            String teamName = experimentEntity.getTeamName();
             // TODO: use other deleteExperimentInDeter(teamName, experimentName) if using script_wrapper.py
 //            deleteExperimentInDeter(experimentEntity.getName(), realizationEntity.getUserId());
+
+            // TODO: check if team name is null
 
             experimentRepository.delete(id);
             log.info("Experiment deleted from experiment repository: {} from Team: {}", experimentEntity.getName(), teamName);

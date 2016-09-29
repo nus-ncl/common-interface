@@ -19,6 +19,6 @@ public interface ExperimentService {
 
 //  String createNsFile(String filename, String contents);
 
-    Experiment deleteExperiment(Long id, String teamName, Claims claims);
+    Experiment deleteExperiment(Long id, String teamId, Claims claims);
 
 }

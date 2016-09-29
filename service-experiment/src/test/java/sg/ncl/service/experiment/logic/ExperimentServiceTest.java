@@ -256,7 +256,7 @@ public class ExperimentServiceTest extends AbstractTest {
 
         exception.expect(ForbiddenException.class);
         exception.expectMessage("Access denied for delete experiment: expid " + savedExperiment.getId());
-        experimentService.deleteExperiment(savedExperiment.getId(), experimentEntity.getTeamName(), claims);
+        experimentService.deleteExperiment(savedExperiment.getId(), experimentEntity.getTeamId(), claims);
     }
 
     @Test
@@ -281,7 +281,7 @@ public class ExperimentServiceTest extends AbstractTest {
 
         exception.expect(ForbiddenException.class);
         exception.expectMessage("Invalid permissions for delete experiment: expid " + savedExperiment.getId());
-        experimentService.deleteExperiment(savedExperiment.getId(), experimentEntity.getTeamName(), claims);
+        experimentService.deleteExperiment(savedExperiment.getId(), experimentEntity.getTeamId(), claims);
     }
 
     private void compareCounts(Long count) {

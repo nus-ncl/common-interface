@@ -73,16 +73,16 @@ public class ExperimentsController {
     }
 
     // delete experiment
-    @DeleteMapping(path = "/{expId}/teams/{teamName}")
+    @DeleteMapping(path = "/{expId}/teams/{teamId}")
     // FIXME: should be DELETE instead of POST and path should be "/experiments/{id}"
     @ResponseStatus(HttpStatus.OK)
-    public Experiment deleteExperiment(@PathVariable String expId, @PathVariable String teamName, @AuthenticationPrincipal Object claims) {
+    public Experiment deleteExperiment(@PathVariable String expId, @PathVariable String teamId, @AuthenticationPrincipal Object claims) {
         log.info("User principal: " + claims);
         if ( !(claims instanceof Claims) || SecurityContextHolder.getContext().getAuthentication() == null) {
             // throw forbidden
             log.warn("Access denied for delete experiment: expid: {} claims: {} ", expId, claims);
             throw new ForbiddenException("Access denied for delete experiment: expid " + expId);
         }
-        return new ExperimentInfo(experimentService.deleteExperiment(Long.parseLong(expId), teamName, (Claims) claims));
+        return new ExperimentInfo(experimentService.deleteExperiment(Long.parseLong(expId), teamId, (Claims) claims));
     }
 }

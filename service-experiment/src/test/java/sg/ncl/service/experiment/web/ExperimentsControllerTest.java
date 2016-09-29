@@ -148,7 +148,7 @@ public class ExperimentsControllerTest extends AbstractTest {
     @Test
     public void testDeleteExperimentGoodAuthenticationPrincipal() throws Exception {
         Long experimentId = Long.parseLong(RandomStringUtils.randomNumeric(5));
-        String teamName = RandomStringUtils.randomAlphabetic(8);
+        String teamId = RandomStringUtils.randomAlphabetic(8);
         final Claims claims = mock(Claims.class);
 
         Authentication authentication = mock(Authentication.class);
@@ -157,16 +157,16 @@ public class ExperimentsControllerTest extends AbstractTest {
         when(securityContext.getAuthentication()).thenReturn(authentication);
         SecurityContextHolder.setContext(securityContext);
         when(authentication.getPrincipal()).thenReturn(claims);
-        when(experimentService.deleteExperiment(eq(experimentId), eq(teamName), any(Claims.class))).thenReturn(Util.getExperimentsEntity());
+        when(experimentService.deleteExperiment(eq(experimentId), eq(teamId), any(Claims.class))).thenReturn(Util.getExperimentsEntity());
 
-        mockMvc.perform(delete("/experiments/" + experimentId + "/teams/" + teamName))
+        mockMvc.perform(delete("/experiments/" + experimentId + "/teams/" + teamId))
                 .andExpect(status().isOk());
     }
 
     @Test
     public void testDeleteExperimentBadAuthenticationPrincipalType() throws Exception {
         Long experimentId = Long.parseLong(RandomStringUtils.randomNumeric(5));
-        String teamName = RandomStringUtils.randomAlphabetic(8);
+        String teamId = RandomStringUtils.randomAlphabetic(8);
 
         Authentication authentication = mock(Authentication.class);
         SecurityContext securityContext = mock(SecurityContext.class);
@@ -174,9 +174,9 @@ public class ExperimentsControllerTest extends AbstractTest {
         when(securityContext.getAuthentication()).thenReturn(authentication);
         SecurityContextHolder.setContext(securityContext);
         when(authentication.getPrincipal()).thenReturn("");
-        when(experimentService.deleteExperiment(eq(experimentId), eq(teamName), any(Claims.class))).thenReturn(Util.getExperimentsEntity());
+        when(experimentService.deleteExperiment(eq(experimentId), eq(teamId), any(Claims.class))).thenReturn(Util.getExperimentsEntity());
 
-        mockMvc.perform(delete("/experiments/" + experimentId + "/teams/" + teamName))
+        mockMvc.perform(delete("/experiments/" + experimentId + "/teams/" + teamId))
                 .andExpect(status().isForbidden());
     }
 }
