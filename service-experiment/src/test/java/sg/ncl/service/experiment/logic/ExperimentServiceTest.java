@@ -1,23 +1,17 @@
 package sg.ncl.service.experiment.logic;
 
+import io.jsonwebtoken.Claims;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.junit.Assert;
-import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
-import org.springframework.http.HttpMethod;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.context.SecurityContext;
-import org.springframework.security.core.context.SecurityContextHolder;
+import org.mockito.junit.MockitoJUnit;
+import org.mockito.junit.MockitoRule;
 import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.web.client.MockRestServiceServer;
-import org.springframework.web.client.RestOperations;
-import org.springframework.web.client.RestTemplate;
-import sg.ncl.adapter.deterlab.ConnectionProperties;
 import sg.ncl.common.authentication.Role;
 import sg.ncl.common.exception.base.ForbiddenException;
+import sg.ncl.common.jwt.JwtToken;
 import sg.ncl.service.experiment.AbstractTest;
 import sg.ncl.service.experiment.Util;
 import sg.ncl.service.experiment.data.jpa.ExperimentEntity;
@@ -35,18 +29,17 @@ import java.util.*;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.not;
-import static org.mockito.Matchers.anyCollection;
-import static org.mockito.Matchers.anyCollectionOf;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-import static org.springframework.test.web.client.match.MockRestRequestMatchers.method;
-import static org.springframework.test.web.client.match.MockRestRequestMatchers.requestTo;
 
 /**
  * Created by Desmond.
  */
 @ActiveProfiles({"mock-deter-adapter"})
 public class ExperimentServiceTest extends AbstractTest {
+
+    @Rule
+    public MockitoRule mockito = MockitoJUnit.rule();
 
     @Rule
     public final ExpectedException exception = ExpectedException.none();
@@ -57,7 +50,6 @@ public class ExperimentServiceTest extends AbstractTest {
     private ExperimentService experimentService;
     @Inject
     private RealizationRepository realizationRepository;
-
 
     @Test
     public void testSaveExperiment() throws Exception {
@@ -185,9 +177,9 @@ public class ExperimentServiceTest extends AbstractTest {
 
     @Test
     public void testDeleteExperimentGood() throws Exception {
-
-        Authentication authentication = mock(Authentication.class);
-        SecurityContext securityContext = mock(SecurityContext.class);
+        final Claims claims = mock(Claims.class);
+        final ArrayList<Role> roles = new ArrayList<>();
+        roles.add(Role.USER);
 
         ExperimentEntity experimentEntity = Util.getExperimentsEntity();
         ExperimentEntity savedExperiment = experimentRepository.save(experimentEntity);
@@ -202,24 +194,23 @@ public class ExperimentServiceTest extends AbstractTest {
         realizationEntity.setRunningMinutes(Long.parseLong(RandomStringUtils.randomNumeric(5)));
         realizationRepository.save(realizationEntity);
 
-        compareCounts(new Long(1L));
+        compareCounts(1L);
 
-        when(securityContext.getAuthentication()).thenReturn(authentication);
-        SecurityContextHolder.setContext(securityContext);
-        when(SecurityContextHolder.getContext().getAuthentication().getPrincipal()).thenReturn(savedExperiment.getUserId());
+        when(claims.getSubject()).thenReturn(savedExperiment.getUserId());
+        when(claims.get(JwtToken.KEY)).thenReturn(roles);
 
-        experimentService.deleteExperiment(savedExperiment.getId(), experimentEntity.getTeamName());
 
-        compareCounts(new Long(0L));
+        experimentService.deleteExperiment(savedExperiment.getId(), experimentEntity.getTeamName(), claims);
+
+        compareCounts(0L);
     }
 
     @Test
     public void testDeleteExperimentAdmin() throws Exception {
-        Authentication authentication = mock(Authentication.class);
-        SecurityContext securityContext = mock(SecurityContext.class);
         String notOwnerId = RandomStringUtils.randomAlphanumeric(20);
-        Collection roleList = new ArrayList<GrantedAuthority>();
-        roleList.add(Role.ADMIN);
+        final Claims claims = mock(Claims.class);
+        final ArrayList<Role> roles = new ArrayList<>();
+        roles.add(Role.ADMIN);
 
         ExperimentEntity experimentEntity = Util.getExperimentsEntity();
         ExperimentEntity savedExperiment = experimentRepository.save(experimentEntity);
@@ -234,19 +225,18 @@ public class ExperimentServiceTest extends AbstractTest {
         realizationEntity.setRunningMinutes(Long.parseLong(RandomStringUtils.randomNumeric(5)));
         realizationRepository.save(realizationEntity);
 
-        when(securityContext.getAuthentication()).thenReturn(authentication);
-        SecurityContextHolder.setContext(securityContext);
-        when(SecurityContextHolder.getContext().getAuthentication().getPrincipal()).thenReturn(notOwnerId);
-        when(SecurityContextHolder.getContext().getAuthentication().getAuthorities()).thenReturn(roleList);
+        when(claims.getSubject()).thenReturn(notOwnerId);
+        when(claims.get(JwtToken.KEY)).thenReturn(roles);
 
-        experimentService.deleteExperiment(savedExperiment.getId(), experimentEntity.getTeamName());
+        experimentService.deleteExperiment(savedExperiment.getId(), experimentEntity.getTeamName(), claims);
     }
 
     @Test
     public void testDeleteExperimentNotExpCreator() throws Exception {
-        Authentication authentication = mock(Authentication.class);
-        SecurityContext securityContext = mock(SecurityContext.class);
         String notOwnerId = RandomStringUtils.randomAlphanumeric(20);
+        final Claims claims = mock(Claims.class);
+        final ArrayList<Role> roles = new ArrayList<>();
+        roles.add(Role.USER);
 
         ExperimentEntity experimentEntity = Util.getExperimentsEntity();
         ExperimentEntity savedExperiment = experimentRepository.save(experimentEntity);
@@ -261,45 +251,12 @@ public class ExperimentServiceTest extends AbstractTest {
         realizationEntity.setRunningMinutes(Long.parseLong(RandomStringUtils.randomNumeric(5)));
         realizationRepository.save(realizationEntity);
 
-
-        when(securityContext.getAuthentication()).thenReturn(authentication);
-        SecurityContextHolder.setContext(securityContext);
-        when(SecurityContextHolder.getContext().getAuthentication().getPrincipal()).thenReturn(notOwnerId);
+        when(claims.getSubject()).thenReturn(notOwnerId);
+        when(claims.get(JwtToken.KEY)).thenReturn(roles);
 
         exception.expect(ForbiddenException.class);
         exception.expectMessage("Access denied for delete experiment: expid " + savedExperiment.getId());
-        experimentService.deleteExperiment(savedExperiment.getId(), experimentEntity.getTeamName());
-    }
-
-    @Test
-    public void testDeleteExperimentNotCreatorNotAdmin() throws Exception {
-        Authentication authentication = mock(Authentication.class);
-        SecurityContext securityContext = mock(SecurityContext.class);
-        String notOwnerId = RandomStringUtils.randomAlphanumeric(20);
-        Collection roleList = new ArrayList<GrantedAuthority>();
-        roleList.add(Role.USER);
-
-        ExperimentEntity experimentEntity = Util.getExperimentsEntity();
-        ExperimentEntity savedExperiment = experimentRepository.save(experimentEntity);
-
-        RealizationEntity realizationEntity = new RealizationEntity();
-        realizationEntity.setExperimentId(savedExperiment.getId());
-        realizationEntity.setExperimentName(savedExperiment.getName());
-        realizationEntity.setUserId(savedExperiment.getUserId());
-        realizationEntity.setTeamId(savedExperiment.getTeamId());
-        realizationEntity.setNumberOfNodes(Integer.parseInt(RandomStringUtils.randomNumeric(5)));
-        realizationEntity.setIdleMinutes(Long.parseLong(RandomStringUtils.randomNumeric(5)));
-        realizationEntity.setRunningMinutes(Long.parseLong(RandomStringUtils.randomNumeric(5)));
-        realizationRepository.save(realizationEntity);
-
-        when(securityContext.getAuthentication()).thenReturn(authentication);
-        SecurityContextHolder.setContext(securityContext);
-        when(SecurityContextHolder.getContext().getAuthentication().getPrincipal()).thenReturn(notOwnerId);
-        when(SecurityContextHolder.getContext().getAuthentication().getAuthorities()).thenReturn(roleList);
-
-        exception.expect(ForbiddenException.class);
-        exception.expectMessage("Access denied for delete experiment: expid " + savedExperiment.getId());
-        experimentService.deleteExperiment(savedExperiment.getId(), experimentEntity.getTeamName());
+        experimentService.deleteExperiment(savedExperiment.getId(), experimentEntity.getTeamName(), claims);
     }
 
     private void compareCounts(Long count) {
