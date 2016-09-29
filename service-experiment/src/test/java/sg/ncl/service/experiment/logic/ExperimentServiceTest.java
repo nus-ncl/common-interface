@@ -259,6 +259,31 @@ public class ExperimentServiceTest extends AbstractTest {
         experimentService.deleteExperiment(savedExperiment.getId(), experimentEntity.getTeamName(), claims);
     }
 
+    @Test
+    public void testDeleteExperimentBadAuthoritiesDataType() throws Exception {
+        final Claims claims = mock(Claims.class);
+
+        ExperimentEntity experimentEntity = Util.getExperimentsEntity();
+        ExperimentEntity savedExperiment = experimentRepository.save(experimentEntity);
+
+        RealizationEntity realizationEntity = new RealizationEntity();
+        realizationEntity.setExperimentId(savedExperiment.getId());
+        realizationEntity.setExperimentName(savedExperiment.getName());
+        realizationEntity.setUserId(savedExperiment.getUserId());
+        realizationEntity.setTeamId(savedExperiment.getTeamId());
+        realizationEntity.setNumberOfNodes(Integer.parseInt(RandomStringUtils.randomNumeric(5)));
+        realizationEntity.setIdleMinutes(Long.parseLong(RandomStringUtils.randomNumeric(5)));
+        realizationEntity.setRunningMinutes(Long.parseLong(RandomStringUtils.randomNumeric(5)));
+        realizationRepository.save(realizationEntity);
+
+        when(claims.getSubject()).thenReturn(savedExperiment.getUserId());
+        when(claims.get(JwtToken.KEY)).thenReturn("ADMIN"); // not supposed to be a String
+
+        exception.expect(ForbiddenException.class);
+        exception.expectMessage("Invalid permissions for delete experiment: expid " + savedExperiment.getId());
+        experimentService.deleteExperiment(savedExperiment.getId(), experimentEntity.getTeamName(), claims);
+    }
+
     private void compareCounts(Long count) {
         Long experimentCount = experimentRepository.count();
         Long realizationCount = realizationRepository.count();

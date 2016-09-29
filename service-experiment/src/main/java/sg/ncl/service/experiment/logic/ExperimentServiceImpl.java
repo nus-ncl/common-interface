@@ -238,7 +238,13 @@ public class ExperimentServiceImpl implements ExperimentService {
         log.info("Id of requester from web: {}", authPrincipal.getSubject());
         log.info("Role of requester from web: {}", authPrincipal.get(JwtToken.KEY));
         String contextUserId = authPrincipal.getSubject();
-        ArrayList<Role> roles = (ArrayList) authPrincipal.get(JwtToken.KEY);
+        ArrayList<Role> roles;
+
+        if (authPrincipal.get(JwtToken.KEY) instanceof ArrayList<?>) {
+            roles = (ArrayList) authPrincipal.get(JwtToken.KEY);
+        } else {
+            throw new ForbiddenException("Invalid permissions for delete experiment: expid " + id);
+        }
 
         log.info("Context user id: {}, Context role: {}", contextUserId, roles);
 
