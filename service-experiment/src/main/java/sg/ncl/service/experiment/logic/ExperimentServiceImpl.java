@@ -219,26 +219,26 @@ public class ExperimentServiceImpl implements ExperimentService {
      *
      * @param id       the experiment id (DB UUID), i.e. not the experiment name
      * @param teamName the team where the experiment is in (required by Deterlab so that we delete the correct experiment)
-     * @param authPrincipal the decrypted claims from the jwt web token
+     * @param claims the decrypted claims from the jwt web token
      * @return the deleted experiment object
      * @implNote delete the realization object first, follow by the experiment object (the reverse process of create)
      * @throws ForbiddenException if user is not the experiment creator and user is not an admin
      */
     @Transactional
-    public Experiment deleteExperiment(final Long id, final String teamName, final Claims authPrincipal) {
+    public Experiment deleteExperiment(final Long id, final String teamName, final Claims claims) {
         log.info("Deleting Experiment: {} from Team: {}", id, teamName);
         Experiment experimentEntity = null;
 
         RealizationEntity realizationEntity = realizationService.getByExperimentId(id);
         Long realizationId = realizationEntity.getId();
 
-        log.info("Id of requester from web: {}", authPrincipal.getSubject());
-        log.info("Role of requester from web: {}", authPrincipal.get(JwtToken.KEY));
-        String contextUserId = authPrincipal.getSubject();
+        log.info("Id of requester from web: {}", claims.getSubject());
+        log.info("Role of requester from web: {}", claims.get(JwtToken.KEY));
+        String contextUserId = claims.getSubject();
         ArrayList<Role> roles;
 
-        if (authPrincipal.get(JwtToken.KEY) instanceof ArrayList<?>) {
-            roles = (ArrayList) authPrincipal.get(JwtToken.KEY);
+        if (claims.get(JwtToken.KEY) instanceof ArrayList<?>) {
+            roles = (ArrayList) claims.get(JwtToken.KEY);
         } else {
             throw new ForbiddenException("Invalid permissions for delete experiment: expid " + id);
         }
