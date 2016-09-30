@@ -16,6 +16,10 @@ import java.util.ArrayList;
 @Slf4j
 public class Validator {
 
+    private Validator() {
+
+    }
+
     public static void addCheck(final RealizationEntity realizationEntity, final Claims claims) {
         checkClaimsRolesType(realizationEntity, claims);
         checkPermissions(realizationEntity, claims);
