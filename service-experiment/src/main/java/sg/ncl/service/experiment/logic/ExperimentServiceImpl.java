@@ -6,9 +6,7 @@ import org.json.JSONObject;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import sg.ncl.adapter.deterlab.AdapterDeterLab;
-import sg.ncl.common.authentication.Role;
 import sg.ncl.common.exception.base.ForbiddenException;
-import sg.ncl.common.jwt.JwtToken;
 import sg.ncl.service.experiment.ExperimentConnectionProperties;
 import sg.ncl.service.experiment.data.jpa.ExperimentEntity;
 import sg.ncl.service.experiment.data.jpa.ExperimentRepository;
@@ -27,6 +25,8 @@ import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.stream.Collectors;
+
+import static sg.ncl.service.experiment.validation.Validator.addCheck;
 
 /**
  * Created by Desmond.
@@ -232,7 +232,7 @@ public class ExperimentServiceImpl implements ExperimentService {
         RealizationEntity realizationEntity = realizationService.getByExperimentId(id);
         Long realizationId = realizationEntity.getId();
 
-        checkPermissions(realizationEntity, claims);
+        addCheck(realizationEntity, claims);
 
         if (realizationId != null && realizationId > 0) {
             realizationService.deleteRealization(realizationId);
@@ -261,26 +261,6 @@ public class ExperimentServiceImpl implements ExperimentService {
 
         log.info("End deleteExperiment");
         return experimentEntity;
-    }
-
-    private void checkPermissions(RealizationEntity realizationEntity, Claims claims) {
-        log.info("Id of requester from web: {}", claims.getSubject());
-        log.info("Role of requester from web: {}", claims.get(JwtToken.KEY));
-        String contextUserId = claims.getSubject();
-        ArrayList<Role> roles;
-
-        if (claims.get(JwtToken.KEY) instanceof ArrayList<?>) {
-            roles = (ArrayList) claims.get(JwtToken.KEY);
-            log.info("Context user id: {}, Context role: {}", contextUserId, roles);
-
-            if (!contextUserId.equals(realizationEntity.getUserId()) && !roles.contains(Role.ADMIN)) {
-                log.warn("Access denied for delete experiment: /{}/ ", realizationEntity.getExperimentId());
-                throw new ForbiddenException("Access denied for delete experiment: expid " + realizationEntity.getExperimentId());
-            }
-        } else {
-            log.warn("Bad claims type found: {}", claims);
-            throw new ForbiddenException("Invalid permissions for delete experiment: expid " + realizationEntity.getExperimentId());
-        }
     }
 
     private void deleteExperimentInDeter(final String experimentName, final String teamName, final String nclUserId) {

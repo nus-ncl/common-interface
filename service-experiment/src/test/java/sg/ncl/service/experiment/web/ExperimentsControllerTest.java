@@ -179,4 +179,6 @@ public class ExperimentsControllerTest extends AbstractTest {
         mockMvc.perform(delete("/experiments/" + experimentId + "/teams/" + teamId))
                 .andExpect(status().isForbidden());
     }
+
+    // TODO add a test when securityContext.getAuthentication is null should be identical result as claims is not isntance of Arraylist
 }
