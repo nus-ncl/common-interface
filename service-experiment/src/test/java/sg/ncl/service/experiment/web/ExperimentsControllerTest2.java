@@ -115,4 +115,27 @@ public class ExperimentsControllerTest2 {
                 .andExpect(jsonPath("$[1].idleSwap", is(equalTo(entity2.getIdleSwap()))))
                 .andExpect(jsonPath("$[1].maxDuration", is(equalTo(entity2.getMaxDuration()))));
     }
+
+    @Test
+    public void testGetExperimentsByUserId() throws Exception {
+    }
+
+    @Test
+    public void testGetExperimentsByTeamId() throws Exception {
+    }
+
+    @Test
+    public void testDeleteExperimentGoodAuthenticationPrincipal() throws Exception {
+
+    }
+
+    @Test
+    public void testDeleteExperimentBadAuthenticationPrincipalType() throws Exception {
+
+    }
+
+    @Test
+    public void testDeleteExperimentNullAuthentication() throws Exception {
+
+    }
 }
