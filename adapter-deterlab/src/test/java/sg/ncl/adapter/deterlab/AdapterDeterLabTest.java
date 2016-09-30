@@ -5,12 +5,17 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 import org.mockito.Mock;
 import org.mockito.Mockito;
+import org.mockito.Spy;
+import org.mockito.junit.MockitoJUnit;
+import org.mockito.junit.MockitoRule;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpMethod;
-import org.springframework.http.MediaType;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.*;
 import org.springframework.test.web.client.MockRestServiceServer;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestOperations;
@@ -32,200 +37,338 @@ import sg.ncl.adapter.deterlab.exceptions.UserNotFoundException;
 
 import javax.inject.Inject;
 
-import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.not;
-import static org.hamcrest.Matchers.nullValue;
-import static org.mockito.Matchers.anyString;
-import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.when;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.hamcrest.Matchers.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertSame;
+import static org.mockito.Matchers.*;
+import static org.mockito.Mockito.*;
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.method;
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.requestTo;
 import static org.springframework.test.web.client.response.MockRestResponseCreators.withSuccess;
 
 /**
- * @author Te Ye && Vu
+ * @author Vu
  */
-public class AdapterDeterLabTest extends AbstractTest {
+public class AdapterDeterLabTest {
 
-    @Autowired
-    private RestOperations restOperations;
+    @Rule
+    public MockitoRule mockito = MockitoJUnit.rule();
 
-    @Inject
+    @Rule
+    public ExpectedException exception = ExpectedException.none();
+
+    @Mock
     private DeterLabUserRepository deterLabUserRepository;
 
-    @Inject
-    private AdapterDeterLab adapterDeterLab;
-
-    @Inject
+    @Mock
     private ConnectionProperties properties;
+
+    @Mock
+    private RestTemplate restTemplate;
+
+    @Mock
+    ResponseEntity response;
+
+    private AdapterDeterLab adapterDeterLab;
 
     private MockRestServiceServer mockServer;
 
     @Before
-    public void setUp() throws Exception {
-        mockServer = MockRestServiceServer.createServer((RestTemplate) restOperations);
+    public void setUp(){
+        assertThat(mockingDetails(deterLabUserRepository).isMock()).isTrue();
+        assertThat(mockingDetails(properties).isMock()).isTrue();
+        assertThat(mockingDetails(restTemplate).isMock()).isTrue();
+        adapterDeterLab=new AdapterDeterLab(deterLabUserRepository, properties,restTemplate);
     }
 
+
+    //no exception thrown
     @Test
     public void JoinProjectNewUsersTest1() {
-        JSONObject userObject = Util.getUserAdapterJSONObject();
-
+        JSONObject myobject = new JSONObject();
         String stubUid = RandomStringUtils.randomAlphanumeric(8);
-        JSONObject predefinedResultJson = new JSONObject();
-        predefinedResultJson.put("msg", "user is created");
-        predefinedResultJson.put("uid", stubUid);
+        myobject.put("msg", "user is created");
+        myobject.put("uid", stubUid);
 
-        mockServer.expect(requestTo(properties.getJoinProjectNewUsers()))
-                .andExpect(method(HttpMethod.POST))
-                .andRespond(withSuccess(predefinedResultJson.toString(), MediaType.APPLICATION_JSON));
+        when(restTemplate.exchange(anyString(),eq(HttpMethod.POST),anyObject(),eq(String.class))).thenReturn(response);
+        when(response.getBody()).thenReturn(myobject.toString());
+        when(response.getBody().toString()).thenReturn(myobject.toString());
+        String actual = adapterDeterLab.joinProjectNewUsers(myobject.toString());
 
-        String result = adapterDeterLab.joinProjectNewUsers(userObject.toString());
-        JSONObject resultJSONObject = new JSONObject(result);
-        String msg = resultJSONObject.getString("msg");
-        String uid = resultJSONObject.getString("uid");
-        Assert.assertThat(msg, is("user is created"));
-        Assert.assertThat(uid, not(nullValue()));
-        Assert.assertThat(uid, is(stubUid));
+        assertEquals(myobject.toString(),actual);
     }
 
-    @Test(expected=AdapterDeterlabConnectException.class)
+    //throw AdapterDeterlabConnectException
+    @Test
     public void JoinProjectNewUsersTest2(){
-        ConnectionProperties myproperties= Mockito.mock(ConnectionProperties.class);
-        when(myproperties.getJoinProjectNewUsers()).thenReturn(anyString());
+        JSONObject myobject = new JSONObject();
 
-        //doThrow(new RestClientException(null)).when(properties).getJoinProjectNewUsers();
+        exception.expect(AdapterDeterlabConnectException.class);
+        when(restTemplate.exchange(anyString(),eq(HttpMethod.POST),anyObject(),eq(String.class))).thenThrow(new RestClientException(""));
 
-        JSONObject userObject = Util.getUserAdapterJSONObject();
-        adapterDeterLab.joinProjectNewUsers(userObject.toString());
+        adapterDeterLab.joinProjectNewUsers(myobject.toString());
     }
 
-
-    @Test(expected = DeterLabOperationFailedException.class)
-    public void testJoinProjectNewUsersBad() {
-        JSONObject predefinedResultJson = new JSONObject();
-        predefinedResultJson.put("msg", "join project request new users fail");
-
-        mockServer.expect(requestTo(properties.getJoinProjectNewUsers()))
-                .andExpect(method(HttpMethod.POST))
-                .andRespond(withSuccess(predefinedResultJson.toString(), MediaType.APPLICATION_JSON));
-
-        adapterDeterLab.joinProjectNewUsers(anyString());
-    }
-
-    @Test(expected = JSONException.class)
-    public void testJoinProjectNewUsersJsonError() {
-        JSONObject userObject = Util.getUserAdapterJSONObject();
-
+    //throw DeterLabOperationFailedException
+    @Test
+    public void JoinProjectNewUsersTest3() {
+        JSONObject myobject = new JSONObject();
         String stubUid = RandomStringUtils.randomAlphanumeric(8);
-        JSONObject predefinedResultJson = new JSONObject();
-        predefinedResultJson.put("uid", stubUid);
+        myobject.put("msg", "user not found");
 
-        mockServer.expect(requestTo(properties.getJoinProjectNewUsers()))
-                .andExpect(method(HttpMethod.POST))
-                .andRespond(withSuccess(predefinedResultJson.toString(), MediaType.APPLICATION_JSON));
+        exception.expect(DeterLabOperationFailedException.class);
+        when(restTemplate.exchange(anyString(),eq(HttpMethod.POST),anyObject(),eq(String.class))).thenReturn(response);
+        when(response.getBody()).thenReturn(myobject.toString());
+        when(response.getBody().toString()).thenReturn(myobject.toString());
 
-        adapterDeterLab.joinProjectNewUsers(userObject.toString());
+        adapterDeterLab.joinProjectNewUsers(myobject.toString());
+    }
+
+    //throw JSONException
+    @Test
+    public void JoinProjectNewUsersTest4() {
+        JSONObject myobject = new JSONObject();
+        String stubUid = RandomStringUtils.randomAlphanumeric(8);
+        myobject.put("msg", "user not found");
+        myobject.put("uid", stubUid);
+
+        exception.expect(JSONException.class);
+        when(restTemplate.exchange(anyString(),eq(HttpMethod.POST),anyObject(),eq(String.class))).thenReturn(response);
+        when(response.getBody()).thenReturn(myobject.toString());
+        when(response.getBody().toString()).thenReturn("");
+
+        adapterDeterLab.joinProjectNewUsers(myobject.toString());
+    }
+
+    //no Exception thrown
+    @Test
+    public void applyProjectNewUsersTest1() {
+        JSONObject myobject = new JSONObject();
+        String stubUid = RandomStringUtils.randomAlphanumeric(8);
+        myobject.put("msg", "user is created");
+        myobject.put("uid", stubUid);
+
+        when(restTemplate.exchange(anyString(),eq(HttpMethod.POST),anyObject(),eq(String.class))).thenReturn(response);
+        when(response.getBody()).thenReturn(myobject.toString());
+        when(response.getBody().toString()).thenReturn(myobject.toString());
+        String actual = adapterDeterLab.applyProjectNewUsers(myobject.toString());
+
+        assertEquals(myobject.toString(),actual);
+    }
+
+    //throw AdapterDeterlabConnectException
+    @Test
+    public void applyProjectNewUsersTest2() {
+        JSONObject myobject = new JSONObject();
+        String stubUid = RandomStringUtils.randomAlphanumeric(8);
+
+        exception.expect(AdapterDeterlabConnectException.class);
+        when(restTemplate.exchange(anyString(),eq(HttpMethod.POST),anyObject(),eq(String.class))).thenThrow(new AdapterDeterlabConnectException());
+
+        adapterDeterLab.applyProjectNewUsers(myobject.toString());
+    }
+
+    //throw DeterLabOperationFailedException
+    @Test
+    public void applyProjectNewUsersTest3() {
+        JSONObject myobject = new JSONObject();
+        myobject.put("msg", "user is not created");
+
+        exception.expect(DeterLabOperationFailedException.class);
+        when(restTemplate.exchange(anyString(),eq(HttpMethod.POST),anyObject(),eq(String.class))).thenReturn(response);
+        when(response.getBody()).thenReturn(myobject.toString());
+        when(response.getBody().toString()).thenReturn(myobject.toString());
+
+        adapterDeterLab.applyProjectNewUsers(myobject.toString());
+    }
+
+    //throw JSONException
+    @Test
+    public void applyProjectNewUsersTest4() {
+        JSONObject myobject = new JSONObject();
+        String stubUid = RandomStringUtils.randomAlphanumeric(8);
+
+        exception.expect(JSONException.class);
+        when(restTemplate.exchange(anyString(),eq(HttpMethod.POST),anyObject(),eq(String.class))).thenReturn(response);
+        when(response.getBody()).thenReturn(myobject.toString());
+        when(response.getBody().toString()).thenReturn("");
+
+        adapterDeterLab.applyProjectNewUsers(myobject.toString());
+    }
+
+    //no exception thrown
+    @Test
+    public void ApplyProjectTest1() {
+        JSONObject myobject = new JSONObject();
+        myobject.put("msg", "apply project request existing users success");
+
+        when(restTemplate.exchange(anyString(),eq(HttpMethod.POST),anyObject(),eq(String.class))).thenReturn(response);
+        when(response.getBody()).thenReturn(myobject.toString());
+        when(response.getBody().toString()).thenReturn(myobject.toString());
+        String actual=adapterDeterLab.applyProject(myobject.toString());
+
+        assertEquals(myobject.toString(),actual);
+    }
+
+    //throw AdapterDeterlabConnectException
+    @Test
+    public void ApplyProjectTest2() {
+        JSONObject myobject = new JSONObject();
+        myobject.put("msg", "apply project request existing users success");
+
+        exception.expect(AdapterDeterlabConnectException.class);
+        when(restTemplate.exchange(anyString(),eq(HttpMethod.POST),anyObject(),eq(String.class))).thenThrow(new RestClientException(""));
+
+        adapterDeterLab.applyProject(myobject.toString());
+    }
+
+    //throw DeterLabOperationFailedException
+    @Test
+    public void ApplyProjectTest3(){
+        JSONObject myobject = new JSONObject();
+        myobject.put("msg", "apply project request existing users fail");
+
+        exception.expect(DeterLabOperationFailedException.class);
+        when(restTemplate.exchange(anyString(),eq(HttpMethod.POST),anyObject(),eq(String.class))).thenReturn(response);
+        when(response.getBody()).thenReturn(myobject.toString());
+        when(response.getBody().toString()).thenReturn(myobject.toString());
+
+        adapterDeterLab.applyProject(myobject.toString());
+    }
+
+    //throw JSONException
+    @Test
+    public void ApplyProjectTest4() {
+        JSONObject myobject = new JSONObject();
+        myobject.put("msg", "apply project request existing users fail");
+
+        exception.expect(JSONException.class);
+        when(restTemplate.exchange(anyString(),eq(HttpMethod.POST),anyObject(),eq(String.class))).thenReturn(response);
+        when(response.getBody()).thenReturn(myobject.toString());
+        when(response.getBody().toString()).thenReturn("");
+
+        adapterDeterLab.applyProject(myobject.toString());
+    }
+
+    //no exception thrown
+    @Test
+    public void joinProjectTest1() {
+        JSONObject myobject = new JSONObject();
+        myobject.put("msg", "join project request existing users success");
+
+        when(restTemplate.exchange(anyString(),eq(HttpMethod.POST),anyObject(),eq(String.class))).thenReturn(response);
+        when(response.getBody()).thenReturn(myobject.toString());
+        when(response.getBody().toString()).thenReturn(myobject.toString());
+        String actual=adapterDeterLab.joinProject(myobject.toString());
+
+        assertEquals(myobject.toString(),actual);
+    }
+
+    //throw AdapterDeterlabConnectException
+    @Test
+    public void joinProjectTest2() {
+        JSONObject myobject = new JSONObject();
+        myobject.put("msg", "join project request existing users success");
+
+        exception.expect(AdapterDeterlabConnectException.class);
+        when(restTemplate.exchange(anyString(),eq(HttpMethod.POST),anyObject(),eq(String.class))).thenThrow(new RestClientException(""));
+
+        adapterDeterLab.joinProject(myobject.toString());
+    }
+
+    //thrown DeterLabOperationFailedException
+    @Test
+    public void joinProjectTest3(){
+        JSONObject myobject = new JSONObject();
+        myobject.put("msg", "join project request existing users failure");
+
+        exception.expect(DeterLabOperationFailedException.class);
+        when(restTemplate.exchange(anyString(),eq(HttpMethod.POST),anyObject(),eq(String.class))).thenReturn(response);
+        when(response.getBody()).thenReturn(myobject.toString());
+        when(response.getBody().toString()).thenReturn(myobject.toString());
+
+        adapterDeterLab.joinProject(myobject.toString());
+    }
+
+    //throw JSONException
+    @Test
+    public void joinProjectTest4() {
+        JSONObject myobject = new JSONObject();
+        myobject.put("msg", "join project request existing users success");
+
+        exception.expect(JSONException.class);
+        when(restTemplate.exchange(anyString(),eq(HttpMethod.POST),anyObject(),eq(String.class))).thenReturn(response);
+        when(response.getBody()).thenReturn(myobject.toString());
+        when(response.getBody().toString()).thenReturn("");
+
+        adapterDeterLab.joinProject(myobject.toString());
+    }
+
+    //no exception thrown
+    @Test
+    public void updateCredentialsTest1() {
+        JSONObject myobject = new JSONObject();
+        myobject.put("msg", "password change success");
+
+        when(restTemplate.exchange(anyString(),eq(HttpMethod.POST),anyObject(),eq(String.class))).thenReturn(response);
+        when(response.getBody()).thenReturn(myobject.toString());
+        when(response.getBody().toString()).thenReturn(myobject.toString());
+        String actual=adapterDeterLab.joinProject(myobject.toString());
+
+        assertEquals(actual,myobject.toString());
+    }
+
+    //throw AdapterDeterlabConnectException
+    @Test
+    public void updateCredentialsTest2() {
+        JSONObject myobject = new JSONObject();
+        myobject.put("msg", "password change success");
+
+        exception.expect(AdapterDeterlabConnectException.class);
+        when(restTemplate.exchange(anyString(),eq(HttpMethod.POST),anyObject(),eq(String.class))).thenThrow(new RestClientException(""));
+
+        adapterDeterLab.joinProject(myobject.toString());
+    }
+
+    //throw DeterLabOperationFailedException
+    @Test
+    public void updateCredentialsTest3(){
+        JSONObject myobject = new JSONObject();
+        myobject.put("msg", "password change failure");
+
+        exception.expect(DeterLabOperationFailedException.class);
+        when(restTemplate.exchange(anyString(),eq(HttpMethod.POST),anyObject(),eq(String.class))).thenReturn(response);
+        when(response.getBody()).thenReturn(myobject.toString());
+        when(response.getBody().toString()).thenReturn(myobject.toString());
+
+        adapterDeterLab.joinProject(myobject.toString());
+    }
+
+    //throw JSONException
+    @Test
+    public void updateCredentialsTest4() {
+        JSONObject myobject = new JSONObject();
+        myobject.put("msg", "password change success");
+
+        exception.expect(JSONException.class);
+        when(restTemplate.exchange(anyString(),eq(HttpMethod.POST),anyObject(),eq(String.class))).thenReturn(response);
+        when(response.getBody()).thenReturn(myobject.toString());
+        when(response.getBody().toString()).thenReturn("");
+
+        adapterDeterLab.joinProject(myobject.toString());
     }
 
     @Test
-    public void testCreateProjectNewUsersGood() {
-        JSONObject userObject = Util.getUserAdapterJSONObject();
-
-        String stubUid = RandomStringUtils.randomAlphanumeric(8);
-        JSONObject predefinedResultJson = new JSONObject();
-        predefinedResultJson.put("msg", "user is created");
-        predefinedResultJson.put("uid", stubUid);
-
-        mockServer.expect(requestTo(properties.getApplyProjectNewUsers()))
-                .andExpect(method(HttpMethod.POST))
-                .andRespond(withSuccess(predefinedResultJson.toString(), MediaType.APPLICATION_JSON));
-
-        String result = adapterDeterLab.applyProjectNewUsers(userObject.toString());
-        JSONObject resultJSONObject = new JSONObject(result);
-        String msg = resultJSONObject.getString("msg");
-        String uid = resultJSONObject.getString("uid");
-        Assert.assertThat(msg, is("user is created"));
-        Assert.assertThat(uid, not(nullValue()));
-        Assert.assertThat(uid, is(stubUid));
-    }
-
-    @Test(expected = JSONException.class)
-    public void testCreateProjectNewUsersJsonError() {
-        JSONObject userObject = Util.getUserAdapterJSONObject();
-
-        String stubUid = RandomStringUtils.randomAlphanumeric(8);
-        JSONObject predefinedResultJson = new JSONObject();
-        predefinedResultJson.put("uid", stubUid);
-
-        mockServer.expect(requestTo(properties.getApplyProjectNewUsers()))
-                .andExpect(method(HttpMethod.POST))
-                .andRespond(withSuccess(predefinedResultJson.toString(), MediaType.APPLICATION_JSON));
-
-        adapterDeterLab.applyProjectNewUsers(userObject.toString());
-    }
-
-    @Test(expected = DeterLabOperationFailedException.class)
-    public void testCreateProjectNewUsersBad() {
-        JSONObject predefinedResultJson = new JSONObject();
-        predefinedResultJson.put("msg", "apply project request new users fail");
-
-        mockServer.expect(requestTo(properties.getApplyProjectNewUsers()))
-                .andExpect(method(HttpMethod.POST))
-                .andRespond(withSuccess(predefinedResultJson.toString(), MediaType.APPLICATION_JSON));
-
-        adapterDeterLab.applyProjectNewUsers(anyString());
-    }
-
-    @Test
-    public void testJoinProjectGood() {
-        JSONObject predefinedResultJson = new JSONObject();
-        predefinedResultJson.put("msg", "join project request existing users success");
-
-        mockServer.expect(requestTo(properties.getJoinProject()))
-                .andExpect(method(HttpMethod.POST))
-                .andRespond(withSuccess(predefinedResultJson.toString(), MediaType.APPLICATION_JSON));
-
-        JSONObject userJoinTeamObject = Util.getTeamAdapterJSONObject();
-
-        adapterDeterLab.joinProject(userJoinTeamObject.toString());
-    }
-
-    @Test(expected = JSONException.class)
-    public void testJoinProjectJsonError() {
-        JSONObject predefinedResultJson = new JSONObject();
-        predefinedResultJson.put("error", "a simple message");
-
-        mockServer.expect(requestTo(properties.getJoinProject()))
-                .andExpect(method(HttpMethod.POST))
-                .andRespond(withSuccess(predefinedResultJson.toString(), MediaType.APPLICATION_JSON));
-
-        JSONObject userJoinTeamObject = Util.getTeamAdapterJSONObject();
-
-        adapterDeterLab.joinProject(userJoinTeamObject.toString());
-    }
-
-    @Test(expected = DeterLabOperationFailedException.class)
-    public void testJoinProjectBad() {
-        JSONObject predefinedResultJson = new JSONObject();
-        predefinedResultJson.put("msg", "join project request existing users fail");
-
-        mockServer.expect(requestTo(properties.getJoinProject()))
-                .andExpect(method(HttpMethod.POST))
-                .andRespond(withSuccess(predefinedResultJson.toString(), MediaType.APPLICATION_JSON));
-
-        JSONObject userJoinTeamObject = Util.getTeamAdapterJSONObject();
-
-        adapterDeterLab.joinProject(userJoinTeamObject.toString());
-    }
-
-    @Test
-    public void testSaveUserOnDeterUserRepository() {
-        String nclUserId = RandomStringUtils.randomAlphanumeric(20);
-        String deterUserId = RandomStringUtils.randomAlphanumeric(8);
-
+    public void saveDeterUserIdMappingTest() {
+        String deterUserId = "test1";
+        String nclUserId = "test2";
         adapterDeterLab.saveDeterUserIdMapping(deterUserId, nclUserId);
-        Assert.assertThat(deterLabUserRepository.findByDeterUserId(deterUserId), not(nullValue()));
-        Assert.assertThat(deterUserId, is(deterLabUserRepository.findByDeterUserId(deterUserId).getDeterUserId()));
+        String actual1=deterLabUserRepository.findByDeterUserId(deterUserId).getDeterUserId();
+        String actual2=deterLabUserRepository.findByNclUserId(deterUserId).getNclUserId();
+
+        assertEquals("test1",actual1);
+        assertEquals("test2",actual2);
     }
 
     @Test(expected = AdapterDeterlabConnectException.class)
@@ -315,89 +458,6 @@ public class AdapterDeterLabTest extends AbstractTest {
         adapterDeterLab.processJoinRequest(one.toString());
     }
 
-    @Test
-    public void testApplyProjectGood() {
-        JSONObject one = new JSONObject();
-
-        JSONObject predefinedResultJson = new JSONObject();
-        predefinedResultJson.put("msg", "apply project request existing users success");
-
-        mockServer.expect(requestTo(properties.getApplyProject()))
-                .andExpect(method(HttpMethod.POST))
-                .andRespond(withSuccess(predefinedResultJson.toString(), MediaType.APPLICATION_JSON));
-
-        adapterDeterLab.applyProject(one.toString());
-    }
-
-    @Test
-    public void testUpdateCredentialsGood() {
-        JSONObject one = new JSONObject();
-
-        JSONObject predefinedResultJson = new JSONObject();
-        predefinedResultJson.put("msg", "password change success");
-
-        mockServer.expect(requestTo(properties.getUpdateCredentials()))
-                .andExpect(method(HttpMethod.POST))
-                .andRespond(withSuccess(predefinedResultJson.toString(), MediaType.APPLICATION_JSON));
-
-        adapterDeterLab.updateCredentials(one.toString());
-    }
-
-    @Test(expected = CredentialsUpdateException.class)
-    public void testUpdateCredentialsFail() {
-        JSONObject one = new JSONObject();
-
-        JSONObject predefinedResultJson = new JSONObject();
-        predefinedResultJson.put("msg", "password change fail");
-
-        mockServer.expect(requestTo(properties.getUpdateCredentials()))
-                .andExpect(method(HttpMethod.POST))
-                .andRespond(withSuccess(predefinedResultJson.toString(), MediaType.APPLICATION_JSON));
-
-        adapterDeterLab.updateCredentials(one.toString());
-    }
-
-    @Test(expected = JSONException.class)
-    public void testUpdateCredentialsJsonError() {
-        JSONObject one = new JSONObject();
-
-        JSONObject predefinedResultJson = new JSONObject();
-        predefinedResultJson.put("message", "change password");
-
-        mockServer.expect(requestTo(properties.getUpdateCredentials()))
-                .andExpect(method(HttpMethod.POST))
-                .andRespond(withSuccess(predefinedResultJson.toString(), MediaType.APPLICATION_JSON));
-
-        adapterDeterLab.updateCredentials(one.toString());
-    }
-
-    @Test(expected = JSONException.class)
-    public void testApplyProjectJsonError() {
-        JSONObject one = new JSONObject();
-
-        JSONObject predefinedResultJson = new JSONObject();
-        predefinedResultJson.put("message", "apply project request existing users success");
-
-        mockServer.expect(requestTo(properties.getApplyProject()))
-                .andExpect(method(HttpMethod.POST))
-                .andRespond(withSuccess(predefinedResultJson.toString(), MediaType.APPLICATION_JSON));
-
-        adapterDeterLab.applyProject(one.toString());
-    }
-
-    @Test(expected = DeterLabOperationFailedException.class)
-    public void testApplyProjectBad() throws Exception {
-        JSONObject one = new JSONObject();
-
-        JSONObject predefinedResultJson = new JSONObject();
-        predefinedResultJson.put("msg", "apply project request existing users fail");
-
-        mockServer.expect(requestTo(properties.getApplyProject()))
-                .andExpect(method(HttpMethod.POST))
-                .andRespond(withSuccess(predefinedResultJson.toString(), MediaType.APPLICATION_JSON));
-
-        adapterDeterLab.applyProject(one.toString());
-    }
 
     @Test
     public void testApproveProject() {
