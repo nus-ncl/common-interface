@@ -407,7 +407,7 @@ public class AdapterDeterLab {
             response = restTemplate.exchange(properties.getExpStatus(), HttpMethod.POST, request, String.class);
         } catch (Exception e) {
             log.warn("Adapter connection error get experiment status: {}", e);
-            return "{\"status\": \"error\"}";
+            return "{\"status\":\"error\"}";
         }
 
         log.info("Get experiment status request submitted to deterlab");
