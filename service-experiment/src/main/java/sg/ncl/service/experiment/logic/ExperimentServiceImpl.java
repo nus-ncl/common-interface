@@ -259,7 +259,12 @@ public class ExperimentServiceImpl implements ExperimentService {
             // TODO: use other deleteExperimentInDeter(teamName, experimentName) if using script_wrapper.py
 //            deleteExperimentInDeter(experimentEntity.getName(), realizationEntity.getUserId());
 
-            // TODO: check if team name is null
+            // since we get the experiment entity from the repository, the team name should not be null
+            // but check again just in case
+            if (teamName == null || teamName.isEmpty()) {
+                log.warn("Error locating team name using team id: {} ", teamId);
+                throw new ForbiddenException("Error locating team name using team id " + teamId);
+            }
 
             experimentRepository.delete(id);
             log.info("Experiment deleted from experiment repository: {} from Team: {}", experimentEntity.getName(), teamName);
