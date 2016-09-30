@@ -78,7 +78,7 @@ public class ExperimentsController {
     @ResponseStatus(HttpStatus.OK)
     public Experiment deleteExperiment(@PathVariable Long expId, @PathVariable String teamId, @AuthenticationPrincipal Object claims) {
         log.info("User principal: " + claims);
-        if ( !(claims instanceof Claims) || SecurityContextHolder.getContext().getAuthentication() == null) {
+        if ( !(claims instanceof Claims) ) {
             // throw forbidden
             log.warn("Access denied for delete experiment: expid: {} claims: {} ", expId, claims);
             throw new ForbiddenException("Access denied for delete experiment: expid " + expId);
