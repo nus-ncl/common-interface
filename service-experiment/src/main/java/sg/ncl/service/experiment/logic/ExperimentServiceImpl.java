@@ -232,7 +232,7 @@ public class ExperimentServiceImpl implements ExperimentService {
         RealizationEntity realizationEntity = realizationService.getByExperimentId(id);
         Long realizationId = realizationEntity.getId();
 
-        checkPermissions(id, realizationEntity.getUserId(), claims);
+        checkPermissions(realizationEntity, claims);
 
         if (realizationId != null && realizationId > 0) {
             realizationService.deleteRealization(realizationId);
@@ -263,7 +263,7 @@ public class ExperimentServiceImpl implements ExperimentService {
         return experimentEntity;
     }
 
-    private void checkPermissions(Long expId, String realizationUserId, Claims claims) {
+    private void checkPermissions(RealizationEntity realizationEntity, Claims claims) {
         log.info("Id of requester from web: {}", claims.getSubject());
         log.info("Role of requester from web: {}", claims.get(JwtToken.KEY));
         String contextUserId = claims.getSubject();
@@ -273,13 +273,13 @@ public class ExperimentServiceImpl implements ExperimentService {
             roles = (ArrayList) claims.get(JwtToken.KEY);
             log.info("Context user id: {}, Context role: {}", contextUserId, roles);
 
-            if (!contextUserId.equals(realizationUserId) && !roles.contains(Role.ADMIN)) {
-                log.warn("Access denied for delete experiment: /{}/ ", expId);
-                throw new ForbiddenException("Access denied for delete experiment: expid " + expId);
+            if (!contextUserId.equals(realizationEntity.getUserId()) && !roles.contains(Role.ADMIN)) {
+                log.warn("Access denied for delete experiment: /{}/ ", realizationEntity.getExperimentId());
+                throw new ForbiddenException("Access denied for delete experiment: expid " + realizationEntity.getExperimentId());
             }
         } else {
             log.warn("Bad claims type found: {}", claims);
-            throw new ForbiddenException("Invalid permissions for delete experiment: expid " + expId);
+            throw new ForbiddenException("Invalid permissions for delete experiment: expid " + realizationEntity.getExperimentId());
         }
     }
 
