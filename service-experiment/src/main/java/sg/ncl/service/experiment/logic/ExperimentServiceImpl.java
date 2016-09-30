@@ -232,23 +232,7 @@ public class ExperimentServiceImpl implements ExperimentService {
         RealizationEntity realizationEntity = realizationService.getByExperimentId(id);
         Long realizationId = realizationEntity.getId();
 
-        log.info("Id of requester from web: {}", claims.getSubject());
-        log.info("Role of requester from web: {}", claims.get(JwtToken.KEY));
-        String contextUserId = claims.getSubject();
-        ArrayList<Role> roles;
-
-        if (claims.get(JwtToken.KEY) instanceof ArrayList<?>) {
-            roles = (ArrayList) claims.get(JwtToken.KEY);
-        } else {
-            throw new ForbiddenException("Invalid permissions for delete experiment: expid " + id);
-        }
-
-        log.info("Context user id: {}, Context role: {}", contextUserId, roles);
-
-        if (!contextUserId.equals(realizationEntity.getUserId()) && !roles.contains(Role.ADMIN)) {
-            log.warn("Access denied for delete experiment: /{}/ ", id);
-            throw new ForbiddenException("Access denied for delete experiment: expid " + id);
-        }
+        checkPermissions(id, realizationEntity.getUserId(), claims);
 
         if (realizationId != null && realizationId > 0) {
             realizationService.deleteRealization(realizationId);
@@ -277,6 +261,26 @@ public class ExperimentServiceImpl implements ExperimentService {
 
         log.info("End deleteExperiment");
         return experimentEntity;
+    }
+
+    private void checkPermissions(Long expId, String realizationUserId, Claims claims) {
+        log.info("Id of requester from web: {}", claims.getSubject());
+        log.info("Role of requester from web: {}", claims.get(JwtToken.KEY));
+        String contextUserId = claims.getSubject();
+        ArrayList<Role> roles;
+
+        if (claims.get(JwtToken.KEY) instanceof ArrayList<?>) {
+            roles = (ArrayList) claims.get(JwtToken.KEY);
+            log.info("Context user id: {}, Context role: {}", contextUserId, roles);
+
+            if (!contextUserId.equals(realizationUserId) && !roles.contains(Role.ADMIN)) {
+                log.warn("Access denied for delete experiment: /{}/ ", expId);
+                throw new ForbiddenException("Access denied for delete experiment: expid " + expId);
+            }
+        } else {
+            log.warn("Bad claims type found: {}", claims);
+            throw new ForbiddenException("Invalid permissions for delete experiment: expid " + expId);
+        }
     }
 
     private void deleteExperimentInDeter(final String experimentName, final String teamName, final String nclUserId) {
