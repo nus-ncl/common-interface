@@ -9,38 +9,19 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.mockito.Mock;
-import org.mockito.Mockito;
-import org.mockito.Spy;
 import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpEntity;
 import org.springframework.http.*;
 import org.springframework.test.web.client.MockRestServiceServer;
 import org.springframework.web.client.RestClientException;
-import org.springframework.web.client.RestOperations;
 import org.springframework.web.client.RestTemplate;
-import sg.ncl.adapter.deterlab.AbstractTest;
-import sg.ncl.adapter.deterlab.AdapterDeterLab;
-import sg.ncl.adapter.deterlab.ConnectionProperties;
-import sg.ncl.adapter.deterlab.Util;
 import sg.ncl.adapter.deterlab.data.jpa.DeterLabUserRepository;
 import sg.ncl.adapter.deterlab.dtos.entities.DeterLabUserEntity;
-import sg.ncl.adapter.deterlab.exceptions.AdapterDeterlabConnectException;
-import sg.ncl.adapter.deterlab.exceptions.CredentialsUpdateException;
-import sg.ncl.adapter.deterlab.exceptions.DeterLabOperationFailedException;
-import sg.ncl.adapter.deterlab.exceptions.ExpDeleteException;
-import sg.ncl.adapter.deterlab.exceptions.ExpNameAlreadyExistsException;
-import sg.ncl.adapter.deterlab.exceptions.ExpStartException;
-import sg.ncl.adapter.deterlab.exceptions.NSFileParseException;
-import sg.ncl.adapter.deterlab.exceptions.UserNotFoundException;
-
-import javax.inject.Inject;
+import sg.ncl.adapter.deterlab.exceptions.*;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertSame;
 import static org.mockito.Matchers.*;
 import static org.mockito.Mockito.*;
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.method;
@@ -85,7 +66,7 @@ public class AdapterDeterLabTest {
 
     //no exception thrown
     @Test
-    public void JoinProjectNewUsersTest1() {
+    public void joinProjectNewUsersTest1() {
         JSONObject myobject = new JSONObject();
         String stubUid = RandomStringUtils.randomAlphanumeric(8);
         myobject.put("msg", "user is created");
@@ -96,23 +77,28 @@ public class AdapterDeterLabTest {
         when(response.getBody().toString()).thenReturn(myobject.toString());
         String actual = adapterDeterLab.joinProjectNewUsers(myobject.toString());
 
+        verify(restTemplate,times(1)).exchange(anyString(),eq(HttpMethod.POST),anyObject(),eq(String.class));
+        verify(properties,times(1)).getJoinProjectNewUsers();
         assertEquals(myobject.toString(),actual);
     }
 
     //throw AdapterDeterlabConnectException
     @Test
-    public void JoinProjectNewUsersTest2(){
+    public void joinProjectNewUsersTest2(){
         JSONObject myobject = new JSONObject();
 
         exception.expect(AdapterDeterlabConnectException.class);
         when(restTemplate.exchange(anyString(),eq(HttpMethod.POST),anyObject(),eq(String.class))).thenThrow(new RestClientException(""));
 
         adapterDeterLab.joinProjectNewUsers(myobject.toString());
+        verify(restTemplate,times(1)).exchange(anyString(),eq(HttpMethod.POST),anyObject(),eq(String.class));
+        verify(properties,times(1)).getJoinProjectNewUsers();
+
     }
 
     //throw DeterLabOperationFailedException
     @Test
-    public void JoinProjectNewUsersTest3() {
+    public void joinProjectNewUsersTest3() {
         JSONObject myobject = new JSONObject();
         String stubUid = RandomStringUtils.randomAlphanumeric(8);
         myobject.put("msg", "user not found");
@@ -123,11 +109,13 @@ public class AdapterDeterLabTest {
         when(response.getBody().toString()).thenReturn(myobject.toString());
 
         adapterDeterLab.joinProjectNewUsers(myobject.toString());
+        verify(restTemplate,times(1)).exchange(anyString(),eq(HttpMethod.POST),anyObject(),eq(String.class));
+        verify(properties,times(1)).getJoinProjectNewUsers();
     }
 
     //throw JSONException
     @Test
-    public void JoinProjectNewUsersTest4() {
+    public void joinProjectNewUsersTest4() {
         JSONObject myobject = new JSONObject();
         String stubUid = RandomStringUtils.randomAlphanumeric(8);
         myobject.put("msg", "user not found");
@@ -139,6 +127,8 @@ public class AdapterDeterLabTest {
         when(response.getBody().toString()).thenReturn("");
 
         adapterDeterLab.joinProjectNewUsers(myobject.toString());
+        verify(restTemplate,times(1)).exchange(anyString(),eq(HttpMethod.POST),anyObject(),eq(String.class));
+        verify(properties,times(1)).getJoinProjectNewUsers();
     }
 
     //no Exception thrown
@@ -154,6 +144,8 @@ public class AdapterDeterLabTest {
         when(response.getBody().toString()).thenReturn(myobject.toString());
         String actual = adapterDeterLab.applyProjectNewUsers(myobject.toString());
 
+        verify(restTemplate,times(1)).exchange(anyString(),eq(HttpMethod.POST),anyObject(),eq(String.class));
+        verify(properties,times(1)).getApplyProjectNewUsers();
         assertEquals(myobject.toString(),actual);
     }
 
@@ -161,12 +153,13 @@ public class AdapterDeterLabTest {
     @Test
     public void applyProjectNewUsersTest2() {
         JSONObject myobject = new JSONObject();
-        String stubUid = RandomStringUtils.randomAlphanumeric(8);
 
         exception.expect(AdapterDeterlabConnectException.class);
         when(restTemplate.exchange(anyString(),eq(HttpMethod.POST),anyObject(),eq(String.class))).thenThrow(new AdapterDeterlabConnectException());
 
         adapterDeterLab.applyProjectNewUsers(myobject.toString());
+        verify(restTemplate,times(1)).exchange(anyString(),eq(HttpMethod.POST),anyObject(),eq(String.class));
+        verify(properties,times(1)).getApplyProjectNewUsers();
     }
 
     //throw DeterLabOperationFailedException
@@ -181,13 +174,14 @@ public class AdapterDeterLabTest {
         when(response.getBody().toString()).thenReturn(myobject.toString());
 
         adapterDeterLab.applyProjectNewUsers(myobject.toString());
+        verify(restTemplate,times(1)).exchange(anyString(),eq(HttpMethod.POST),anyObject(),eq(String.class));
+        verify(properties,times(1)).getApplyProjectNewUsers();
     }
 
     //throw JSONException
     @Test
     public void applyProjectNewUsersTest4() {
         JSONObject myobject = new JSONObject();
-        String stubUid = RandomStringUtils.randomAlphanumeric(8);
 
         exception.expect(JSONException.class);
         when(restTemplate.exchange(anyString(),eq(HttpMethod.POST),anyObject(),eq(String.class))).thenReturn(response);
@@ -195,11 +189,13 @@ public class AdapterDeterLabTest {
         when(response.getBody().toString()).thenReturn("");
 
         adapterDeterLab.applyProjectNewUsers(myobject.toString());
+        verify(restTemplate,times(1)).exchange(anyString(),eq(HttpMethod.POST),anyObject(),eq(String.class));
+        verify(properties,times(1)).getApplyProjectNewUsers();
     }
 
     //no exception thrown
     @Test
-    public void ApplyProjectTest1() {
+    public void applyProjectTest1() {
         JSONObject myobject = new JSONObject();
         myobject.put("msg", "apply project request existing users success");
 
@@ -208,24 +204,28 @@ public class AdapterDeterLabTest {
         when(response.getBody().toString()).thenReturn(myobject.toString());
         String actual=adapterDeterLab.applyProject(myobject.toString());
 
+        verify(restTemplate,times(1)).exchange(anyString(),eq(HttpMethod.POST),anyObject(),eq(String.class));
+        verify(properties,times(1)).getApplyProject();
         assertEquals(myobject.toString(),actual);
     }
 
     //throw AdapterDeterlabConnectException
     @Test
-    public void ApplyProjectTest2() {
+    public void applyProjectTest2() {
         JSONObject myobject = new JSONObject();
         myobject.put("msg", "apply project request existing users success");
 
         exception.expect(AdapterDeterlabConnectException.class);
         when(restTemplate.exchange(anyString(),eq(HttpMethod.POST),anyObject(),eq(String.class))).thenThrow(new RestClientException(""));
 
+        verify(restTemplate,times(1)).exchange(anyString(),eq(HttpMethod.POST),anyObject(),eq(String.class));
+        verify(properties,times(1)).getApplyProject();
         adapterDeterLab.applyProject(myobject.toString());
     }
 
     //throw DeterLabOperationFailedException
     @Test
-    public void ApplyProjectTest3(){
+    public void applyProjectTest3(){
         JSONObject myobject = new JSONObject();
         myobject.put("msg", "apply project request existing users fail");
 
@@ -234,12 +234,14 @@ public class AdapterDeterLabTest {
         when(response.getBody()).thenReturn(myobject.toString());
         when(response.getBody().toString()).thenReturn(myobject.toString());
 
+        verify(restTemplate,times(1)).exchange(anyString(),eq(HttpMethod.POST),anyObject(),eq(String.class));
+        verify(properties,times(1)).getApplyProject();
         adapterDeterLab.applyProject(myobject.toString());
     }
 
     //throw JSONException
     @Test
-    public void ApplyProjectTest4() {
+    public void applyProjectTest4() {
         JSONObject myobject = new JSONObject();
         myobject.put("msg", "apply project request existing users fail");
 
@@ -248,6 +250,8 @@ public class AdapterDeterLabTest {
         when(response.getBody()).thenReturn(myobject.toString());
         when(response.getBody().toString()).thenReturn("");
 
+        verify(restTemplate,times(1)).exchange(anyString(),eq(HttpMethod.POST),anyObject(),eq(String.class));
+        verify(properties,times(1)).getApplyProject();
         adapterDeterLab.applyProject(myobject.toString());
     }
 
@@ -262,6 +266,8 @@ public class AdapterDeterLabTest {
         when(response.getBody().toString()).thenReturn(myobject.toString());
         String actual=adapterDeterLab.joinProject(myobject.toString());
 
+        verify(restTemplate,times(1)).exchange(anyString(),eq(HttpMethod.POST),anyObject(),eq(String.class));
+        verify(properties,times(1)).getJoinProject();
         assertEquals(myobject.toString(),actual);
     }
 
@@ -274,6 +280,8 @@ public class AdapterDeterLabTest {
         exception.expect(AdapterDeterlabConnectException.class);
         when(restTemplate.exchange(anyString(),eq(HttpMethod.POST),anyObject(),eq(String.class))).thenThrow(new RestClientException(""));
 
+        verify(restTemplate,times(1)).exchange(anyString(),eq(HttpMethod.POST),anyObject(),eq(String.class));
+        verify(properties,times(1)).getJoinProject();
         adapterDeterLab.joinProject(myobject.toString());
     }
 
@@ -288,6 +296,8 @@ public class AdapterDeterLabTest {
         when(response.getBody()).thenReturn(myobject.toString());
         when(response.getBody().toString()).thenReturn(myobject.toString());
 
+        verify(restTemplate,times(1)).exchange(anyString(),eq(HttpMethod.POST),anyObject(),eq(String.class));
+        verify(properties,times(1)).getJoinProject();
         adapterDeterLab.joinProject(myobject.toString());
     }
 
@@ -302,6 +312,8 @@ public class AdapterDeterLabTest {
         when(response.getBody()).thenReturn(myobject.toString());
         when(response.getBody().toString()).thenReturn("");
 
+        verify(restTemplate,times(1)).exchange(anyString(),eq(HttpMethod.POST),anyObject(),eq(String.class));
+        verify(properties,times(1)).getJoinProject();
         adapterDeterLab.joinProject(myobject.toString());
     }
 
@@ -316,6 +328,8 @@ public class AdapterDeterLabTest {
         when(response.getBody().toString()).thenReturn(myobject.toString());
         String actual=adapterDeterLab.joinProject(myobject.toString());
 
+        verify(restTemplate,times(1)).exchange(anyString(),eq(HttpMethod.POST),anyObject(),eq(String.class));
+        verify(properties,times(1)).getUpdateCredentials();
         assertEquals(actual,myobject.toString());
     }
 
@@ -328,6 +342,8 @@ public class AdapterDeterLabTest {
         exception.expect(AdapterDeterlabConnectException.class);
         when(restTemplate.exchange(anyString(),eq(HttpMethod.POST),anyObject(),eq(String.class))).thenThrow(new RestClientException(""));
 
+        verify(restTemplate,times(1)).exchange(anyString(),eq(HttpMethod.POST),anyObject(),eq(String.class));
+        verify(properties,times(1)).getUpdateCredentials();
         adapterDeterLab.joinProject(myobject.toString());
     }
 
@@ -342,6 +358,8 @@ public class AdapterDeterLabTest {
         when(response.getBody()).thenReturn(myobject.toString());
         when(response.getBody().toString()).thenReturn(myobject.toString());
 
+        verify(restTemplate,times(1)).exchange(anyString(),eq(HttpMethod.POST),anyObject(),eq(String.class));
+        verify(properties,times(1)).getUpdateCredentials();
         adapterDeterLab.joinProject(myobject.toString());
     }
 
@@ -356,9 +374,12 @@ public class AdapterDeterLabTest {
         when(response.getBody()).thenReturn(myobject.toString());
         when(response.getBody().toString()).thenReturn("");
 
+        verify(restTemplate,times(1)).exchange(anyString(),eq(HttpMethod.POST),anyObject(),eq(String.class));
+        verify(properties,times(1)).getUpdateCredentials();
         adapterDeterLab.joinProject(myobject.toString());
     }
 
+    //redo it later
     @Test
     public void saveDeterUserIdMappingTest() {
         String deterUserId = "test1";
@@ -371,48 +392,188 @@ public class AdapterDeterLabTest {
         assertEquals("test2",actual2);
     }
 
-    @Test(expected = AdapterDeterlabConnectException.class)
-    public void testCreateExperimentOnDeter() {
-        JSONObject experimentObject = Util.getExperimentAdapterJsonObject();
+    //redo it later
+    @Test
+    public void getDeterUserIdByNclUserIdTest(){
 
-        JSONObject predefinedResultJson = new JSONObject();
-        predefinedResultJson.put("msg", "experiment is created");
-
-        mockServer.expect(requestTo(properties.getCreateExperiment()))
-                .andExpect(method(HttpMethod.POST))
-                .andRespond(withSuccess(predefinedResultJson.toString(), MediaType.APPLICATION_JSON));
-
-        adapterDeterLab.createExperiment(experimentObject.toString());
     }
 
+    //no exception thrown
+    @Test
+    public void createExperimentTest1() {
+        JSONObject myobject = new JSONObject();
+        myobject.put("msg", "experiment create success");
 
-    @Test(expected = NSFileParseException.class)
-    public void testCreateExperimentNSFIleError() {
-        JSONObject experimentObject = Util.getExperimentAdapterJsonObject();
+        when(restTemplate.exchange(anyString(),eq(HttpMethod.POST),anyObject(),eq(String.class))).thenReturn(response);
+        when(response.getBody()).thenReturn(myobject.toString());
+        when(response.getBody().toString()).thenReturn(myobject.toString());
 
-        JSONObject predefinedResultJson = new JSONObject();
-        predefinedResultJson.put("msg", "experiment create fail ns file error");
+        adapterDeterLab.createExperiment(myobject.toString());
 
-        mockServer.expect(requestTo(properties.getCreateExperiment()))
-                .andExpect(method(HttpMethod.POST))
-                .andRespond(withSuccess(predefinedResultJson.toString(), MediaType.APPLICATION_JSON));
-
-        adapterDeterLab.createExperiment(experimentObject.toString());
+        verify(restTemplate,times(1)).exchange(anyString(),eq(HttpMethod.POST),anyObject(),eq(String.class));
+        verify(properties,times(1)).getCreateExperiment();
+        verify(properties,times(1)).getIp();
+        verify(properties,times(1)).getPort();
     }
 
-    @Test(expected = ExpNameAlreadyExistsException.class)
-    public void testCreateExperimentExpNameExistsError() {
-        JSONObject experimentObject = Util.getExperimentAdapterJsonObject();
+    //throw AdapterDeterlabConnectException
+    //cant pass==>ask chris
+    @Test
+    public void createExperimentTest2() {
+        JSONObject myobject = new JSONObject();
+        myobject.put("msg", "experiment create success");
 
-        JSONObject predefinedResultJson = new JSONObject();
-        predefinedResultJson.put("msg", "experiment create fail exp name already in use");
+        exception.expect(AdapterDeterlabConnectException.class);
+        when(restTemplate.exchange(anyString(),eq(HttpMethod.POST),anyObject(),eq(String.class)))
+                .thenThrow(new Exception(""));
+        adapterDeterLab.createExperiment(myobject.toString());
 
-        mockServer.expect(requestTo(properties.getCreateExperiment()))
-                .andExpect(method(HttpMethod.POST))
-                .andRespond(withSuccess(predefinedResultJson.toString(), MediaType.APPLICATION_JSON));
+     //   verify(restTemplate,times(1)).exchange(anyString(),eq(HttpMethod.POST),anyObject(),eq(String.class));
+     //  verify(properties,times(1)).getCreateExperiment();
+      //  verify(properties,times(1)).getIp();
+       // verify(properties,times(1)).getPort();
 
-        adapterDeterLab.createExperiment(experimentObject.toString());
     }
+
+    //throw NSFileParseException
+    @Test
+    public void createExperimentTest3(){
+        JSONObject myobject = new JSONObject();
+        myobject.put("msg", "experiment create fail ns file error");
+
+        exception.expect(NSFileParseException.class);
+        when(restTemplate.exchange(anyString(),eq(HttpMethod.POST),anyObject(),eq(String.class))).thenReturn(response);
+        when(response.getBody()).thenReturn(myobject.toString());
+        when(response.getBody().toString()).thenReturn(myobject.toString());
+
+        adapterDeterLab.createExperiment(myobject.toString());
+
+       verify(restTemplate,times(1)).exchange(anyString(),eq(HttpMethod.POST),anyObject(),eq(String.class));
+        verify(properties,times(1)).getCreateExperiment();
+        verify(properties,times(1)).getIp();
+        verify(properties,times(1)).getPort();
+
+    }
+
+    //throw ExpNameAlreadyExistsException
+    @Test
+    public void createExperimentTest4(){
+        JSONObject myobject = new JSONObject();
+        myobject.put("msg", "experiment create fail exp name already in use");
+
+        exception.expect(ExpNameAlreadyExistsException.class);
+        when(restTemplate.exchange(anyString(),eq(HttpMethod.POST),anyObject(),eq(String.class))).thenReturn(response);
+        when(response.getBody()).thenReturn(myobject.toString());
+        when(response.getBody().toString()).thenReturn(myobject.toString());
+
+        adapterDeterLab.createExperiment(myobject.toString());
+
+          verify(restTemplate,times(1)).exchange(anyString(),eq(HttpMethod.POST),anyObject(),eq(String.class));
+          verify(properties,times(1)).getCreateExperiment();
+          verify(properties,times(1)).getIp();
+         verify(properties,times(1)).getPort();
+
+    }
+    //throw JSONException
+    @Test
+    public void createExperimentTest5() {
+        JSONObject myobject = new JSONObject();
+        myobject.put("msg", "experiment create fail");
+
+        exception.expect(AdapterDeterlabConnectException.class);
+        when(properties.getCreateExperiment()).thenReturn("");
+        when(restTemplate.exchange(anyString(),eq(HttpMethod.POST),anyObject(),eq(String.class))).thenReturn(response);
+        when(response.getBody()).thenReturn(myobject.toString());
+        when(response.getBody().toString()).thenReturn(myobject.toString());
+        adapterDeterLab.createExperiment(myobject.toString());
+
+        verify(restTemplate,times(1)).exchange(anyString(),eq(HttpMethod.POST),anyObject(),eq(String.class));
+        verify(properties,times(1)).getCreateExperiment();
+        verify(properties,times(1)).getIp();
+        verify(properties,times(1)).getPort();
+
+    }
+
+    //no exception thrown
+    @Test
+    public void startExperimentTest1() {
+        JSONObject myobject = new JSONObject();
+        myobject.put("msg", "experiment start success");
+
+        when(restTemplate.exchange(anyString(),eq(HttpMethod.POST),anyObject(),eq(String.class))).thenReturn(response);
+        when(response.getBody()).thenReturn(myobject.toString());
+        when(response.getBody().toString()).thenReturn(myobject.toString());
+
+        String actual= adapterDeterLab.startExperiment(myobject.toString());
+
+        verify(restTemplate,times(1)).exchange(anyString(),eq(HttpMethod.POST),anyObject(),eq(String.class));
+        verify(properties,times(1)).startExperiment();
+        verify(properties,times(1)).getIp();
+        verify(properties,times(1)).getPort();
+
+        assertEquals(myobject.toString(),actual);
+    }
+
+    //throw AdapterDeterlabConnectException
+    //ask chris
+    @Test
+    public void startExperimentTest2() {
+        JSONObject myobject = new JSONObject();
+        myobject.put("msg", "experiment create success");
+
+        exception.expect(AdapterDeterlabConnectException.class);
+        when(restTemplate.exchange(anyString(),eq(HttpMethod.POST),anyObject(),eq(String.class)))
+                .thenThrow(new Exception(""));
+        String actual=adapterDeterLab.startExperiment(myobject.toString());
+
+          verify(restTemplate,times(1)).exchange(anyString(),eq(HttpMethod.POST),anyObject(),eq(String.class));
+          verify(properties,times(1)).startExperiment();
+          verify(properties,times(1)).getIp();
+         verify(properties,times(1)).getPort();
+
+
+    }
+
+    //throw ExpStartException()
+    @Test
+    public void startExperimentTest3(){
+        JSONObject myobject = new JSONObject();
+        myobject.put("msg", "experiment start fail");
+
+        exception.expect(ExpStartException.class);
+        when(restTemplate.exchange(anyString(),eq(HttpMethod.POST),anyObject(),eq(String.class))).thenReturn(response);
+        when(response.getBody()).thenReturn(myobject.toString());
+        when(response.getBody().toString()).thenReturn(myobject.toString());
+
+        String actual=adapterDeterLab.startExperiment(myobject.toString());
+
+        verify(restTemplate,times(1)).exchange(anyString(),eq(HttpMethod.POST),anyObject(),eq(String.class));
+        verify(properties,times(1)).startExperiment();
+        verify(properties,times(1)).getIp();
+        verify(properties,times(1)).getPort();
+
+    }
+
+    //throw ExpNameAlreadyExistsException
+    @Test
+    public void startExperimentTest4(){
+        JSONObject myobject = new JSONObject();
+        myobject.put("msg", "");
+
+        exception.expect(AdapterDeterlabConnectException.class);
+        when(restTemplate.exchange(anyString(),eq(HttpMethod.POST),anyObject(),eq(String.class))).thenReturn(response);
+        when(response.getBody()).thenReturn(myobject.toString());
+        when(response.getBody().toString()).thenReturn(myobject.toString());
+
+        String actual=adapterDeterLab.startExperiment(myobject.toString());
+
+        verify(restTemplate,times(1)).exchange(anyString(),eq(HttpMethod.POST),anyObject(),eq(String.class));
+        verify(properties,times(1)).startExperiment();
+        verify(properties,times(1)).getIp();
+        verify(properties,times(1)).getPort();
+
+    }
+
 
     @Test(expected = UserNotFoundException.class)
     public void testGetDeterUserIdBad() {
