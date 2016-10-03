@@ -11,6 +11,7 @@ import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
 import sg.ncl.adapter.deterlab.AdapterDeterLab;
 import sg.ncl.common.authentication.Role;
+import sg.ncl.common.exception.base.ForbiddenException;
 import sg.ncl.common.jwt.JwtToken;
 import sg.ncl.service.experiment.ExperimentConnectionProperties;
 import sg.ncl.service.experiment.Util;
@@ -27,6 +28,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.is;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.*;
@@ -228,6 +231,20 @@ public class ExperimentServiceTest2 {
 
     @Test
     public void testDeleteExperimentNotExpCreator() throws Exception {
+        // to trigger the addCheck() in deleteExperiment
+        RealizationEntity realizationEntity = Util.getRealizationEntity();
+        final ArrayList<Role> roles = new ArrayList<>();
+        roles.add(Role.USER);
+
+        when(realizationService.getByExperimentId(anyLong())).thenReturn(realizationEntity);
+        when(claims.getSubject()).thenReturn("userId"); // trigger the add check
+        when(claims.get(JwtToken.KEY)).thenReturn(roles);
+
+        exception.expect(ForbiddenException.class);
+        exception.expectMessage("Access denied for delete experiment: expid " + realizationEntity.getExperimentId());
+        experimentService.deleteExperiment(1L, "teamName", claims);
+
+        verify(experimentRepository, times(0)).delete(anyLong());
     }
 
     @Test
