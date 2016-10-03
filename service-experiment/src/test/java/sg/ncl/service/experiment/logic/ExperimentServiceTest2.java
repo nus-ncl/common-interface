@@ -172,6 +172,12 @@ public class ExperimentServiceTest2 {
 
     @Test
     public void testGetExperimentsUserHasNoExperiments() throws Exception {
+        List<ExperimentEntity> expList = new ArrayList<>();
+
+        when(experimentRepository.findByUserId(anyString())).thenReturn(expList);
+
+        List<Experiment> result = experimentService.findByUser("userid");
+        assertThat(result).isEmpty();
     }
 
     @Test
