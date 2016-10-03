@@ -127,7 +127,8 @@ public class ExperimentServiceTest2 {
         when(experimentService.getAll()).thenReturn(expList);
 
         List<Experiment> result = experimentService.getAll();
-        assertThat()
+        assertThat(result).hasSize(1);
+        assertThat(result).isEqualTo(expList);
     }
 
     @Test
