@@ -249,6 +249,17 @@ public class ExperimentServiceTest2 {
 
     @Test
     public void testDeleteExperimentBadAuthoritiesDataType() throws Exception {
+        RealizationEntity realizationEntity = Util.getRealizationEntity();
+
+        when(realizationService.getByExperimentId(anyLong())).thenReturn(realizationEntity);
+        when(claims.getSubject()).thenReturn("userId");
+        when(claims.get(JwtToken.KEY)).thenReturn("ADMIN"); // not supposed to be a String
+
+        exception.expect(ForbiddenException.class);
+        exception.expectMessage("Invalid permissions for delete experiment: expid " + realizationEntity.getExperimentId());
+        experimentService.deleteExperiment(1L, "teamName", claims);
+
+        verify(experimentRepository, times(0)).delete(anyLong());
     }
 
     @Test
