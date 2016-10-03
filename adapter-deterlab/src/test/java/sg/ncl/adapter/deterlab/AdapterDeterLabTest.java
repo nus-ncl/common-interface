@@ -1056,5 +1056,4 @@ public class AdapterDeterLabTest {
         assertEquals(myobject.toString(),actual);
     }
 
-
 }
