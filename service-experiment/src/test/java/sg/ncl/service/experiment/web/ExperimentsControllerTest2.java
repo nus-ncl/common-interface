@@ -1,21 +1,28 @@
 package sg.ncl.service.experiment.web;
 
-/**
- * @author Te Ye
- */
-
 import com.fasterxml.jackson.databind.ObjectMapper;
+import io.jsonwebtoken.Claims;
+import org.apache.commons.lang3.RandomStringUtils;
 import org.junit.Before;
+import org.junit.Ignore;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
+import org.mockito.junit.MockitoJUnit;
+import org.mockito.junit.MockitoRule;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import sg.ncl.common.exception.ExceptionAutoConfiguration;
 import sg.ncl.common.exception.GlobalExceptionHandler;
+import sg.ncl.service.experiment.Util;
 import sg.ncl.service.experiment.data.jpa.ExperimentEntity;
 import sg.ncl.service.experiment.domain.Experiment;
 import sg.ncl.service.experiment.domain.ExperimentService;
@@ -29,10 +36,11 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyString;
+import static org.mockito.Matchers.*;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.mockingDetails;
 import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
@@ -40,10 +48,19 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static sg.ncl.service.experiment.util.TestUtil.getExperimentEntity;
 
+/**
+ * @author Te Ye
+ */
 @RunWith(SpringRunner.class)
 @WebMvcTest(controllers = ExperimentsController.class, secure = false)
 @ContextConfiguration(classes = {ExperimentsController.class, ExceptionAutoConfiguration.class, GlobalExceptionHandler.class})
 public class ExperimentsControllerTest2 {
+
+    @Rule
+    public MockitoRule mockito = MockitoJUnit.rule();
+
+    @Rule
+    public final ExpectedException exception = ExpectedException.none();
 
     @Inject
     private ObjectMapper mapper;
@@ -70,12 +87,22 @@ public class ExperimentsControllerTest2 {
         final ExperimentInfo experimentInfo = new ExperimentInfo(0L,"","","","","","","",0,0);
         final byte[] content = mapper.writeValueAsBytes(experimentInfo);
 
-        ExperimentEntity experimentEntity = getExperimentEntity();
-        when(experimentService.save(any(ExperimentEntity.class))).thenReturn(experimentEntity);
+        ExperimentEntity entity1 = getExperimentEntity();
+        when(experimentService.save(any(ExperimentEntity.class))).thenReturn(entity1);
 
         mockMvc.perform(post(ExperimentsController.PATH).contentType(MediaType.APPLICATION_JSON).content(content))
                 .andExpect(status().isCreated())
-                .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON));
+                .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
+
+                .andExpect(jsonPath("$.userId", is(equalTo(entity1.getUserId()))))
+                .andExpect(jsonPath("$.teamId", is(equalTo(entity1.getTeamId()))))
+                .andExpect(jsonPath("$.teamName", is(equalTo(entity1.getTeamName()))))
+                .andExpect(jsonPath("$.name", is(equalTo(entity1.getName()))))
+                .andExpect(jsonPath("$.description", is(equalTo(entity1.getDescription()))))
+                .andExpect(jsonPath("$.nsFile", is(equalTo(entity1.getNsFile()))))
+                .andExpect(jsonPath("$.nsFileContent", is(equalTo(entity1.getNsFileContent()))))
+                .andExpect(jsonPath("$.idleSwap", is(equalTo(entity1.getIdleSwap()))))
+                .andExpect(jsonPath("$.maxDuration", is(equalTo(entity1.getMaxDuration()))));
     }
 
     @Test
@@ -94,7 +121,6 @@ public class ExperimentsControllerTest2 {
 
                 .andExpect(jsonPath("$", hasSize(2)))
 
-                .andExpect(jsonPath("$[0].id", is(equalTo(entity1.getId()))))
                 .andExpect(jsonPath("$[0].userId", is(equalTo(entity1.getUserId()))))
                 .andExpect(jsonPath("$[0].teamId", is(equalTo(entity1.getTeamId()))))
                 .andExpect(jsonPath("$[0].teamName", is(equalTo(entity1.getTeamName()))))
@@ -105,7 +131,6 @@ public class ExperimentsControllerTest2 {
                 .andExpect(jsonPath("$[0].idleSwap", is(equalTo(entity1.getIdleSwap()))))
                 .andExpect(jsonPath("$[0].maxDuration", is(equalTo(entity1.getMaxDuration()))))
 
-                .andExpect(jsonPath("$[1].id", is(equalTo(entity2.getId()))))
                 .andExpect(jsonPath("$[1].userId", is(equalTo(entity2.getUserId()))))
                 .andExpect(jsonPath("$[1].teamId", is(equalTo(entity2.getTeamId()))))
                 .andExpect(jsonPath("$[1].teamName", is(equalTo(entity2.getTeamName()))))
@@ -119,26 +144,75 @@ public class ExperimentsControllerTest2 {
 
     @Test
     public void testGetExperimentsByUserId() throws Exception {
+        final List<Experiment> list = new ArrayList<>();
+        final ExperimentEntity entity1 = getExperimentEntity();
+        list.add(entity1);
+
+        when(experimentService.findByUser(anyString())).thenReturn(list);
+
         mockMvc.perform(get(ExperimentsController.PATH + "/users/id").contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON));
+                .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
+
+                .andExpect(jsonPath("$", hasSize(1)))
+
+                .andExpect(jsonPath("$[0].userId", is(equalTo(entity1.getUserId()))))
+                .andExpect(jsonPath("$[0].teamId", is(equalTo(entity1.getTeamId()))))
+                .andExpect(jsonPath("$[0].teamName", is(equalTo(entity1.getTeamName()))))
+                .andExpect(jsonPath("$[0].name", is(equalTo(entity1.getName()))))
+                .andExpect(jsonPath("$[0].description", is(equalTo(entity1.getDescription()))))
+                .andExpect(jsonPath("$[0].nsFile", is(equalTo(entity1.getNsFile()))))
+                .andExpect(jsonPath("$[0].nsFileContent", is(equalTo(entity1.getNsFileContent()))))
+                .andExpect(jsonPath("$[0].idleSwap", is(equalTo(entity1.getIdleSwap()))))
+                .andExpect(jsonPath("$[0].maxDuration", is(equalTo(entity1.getMaxDuration()))));
     }
 
     @Test
     public void testGetExperimentsByTeamId() throws Exception {
+        final List<Experiment> list = new ArrayList<>();
+        final ExperimentEntity entity1 = getExperimentEntity();
+        list.add(entity1);
+
+        when(experimentService.findByTeam(anyString())).thenReturn(list);
+
         mockMvc.perform(get(ExperimentsController.PATH + "/teams/id").contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON));
+                .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
+
+                .andExpect(jsonPath("$", hasSize(1)))
+
+                .andExpect(jsonPath("$[0].userId", is(equalTo(entity1.getUserId()))))
+                .andExpect(jsonPath("$[0].teamId", is(equalTo(entity1.getTeamId()))))
+                .andExpect(jsonPath("$[0].teamName", is(equalTo(entity1.getTeamName()))))
+                .andExpect(jsonPath("$[0].name", is(equalTo(entity1.getName()))))
+                .andExpect(jsonPath("$[0].description", is(equalTo(entity1.getDescription()))))
+                .andExpect(jsonPath("$[0].nsFile", is(equalTo(entity1.getNsFile()))))
+                .andExpect(jsonPath("$[0].nsFileContent", is(equalTo(entity1.getNsFileContent()))))
+                .andExpect(jsonPath("$[0].idleSwap", is(equalTo(entity1.getIdleSwap()))))
+                .andExpect(jsonPath("$[0].maxDuration", is(equalTo(entity1.getMaxDuration()))));
     }
 
     @Test
+    @Ignore
     public void testDeleteExperimentGoodAuthenticationPrincipal() throws Exception {
+        Long experimentId = Long.parseLong(RandomStringUtils.randomNumeric(5));
+        String teamId = RandomStringUtils.randomAlphabetic(8);
+        final Claims claims = mock(Claims.class);
 
+        Authentication authentication = mock(Authentication.class);
+        SecurityContext securityContext = mock(SecurityContext.class);
+
+        when(securityContext.getAuthentication()).thenReturn(authentication);
+        SecurityContextHolder.setContext(securityContext);
+        when(authentication.getPrincipal()).thenReturn(claims);
+        when(experimentService.deleteExperiment(eq(experimentId), eq(teamId), any(Claims.class))).thenReturn(Util.getExperimentsEntity());
+
+        mockMvc.perform(delete(ExperimentsController.PATH + "/" + experimentId + "/teams/" + teamId))
+                .andExpect(status().isOk());
     }
 
     @Test
     public void testDeleteExperimentBadAuthenticationPrincipalType() throws Exception {
-
     }
 
     @Test
