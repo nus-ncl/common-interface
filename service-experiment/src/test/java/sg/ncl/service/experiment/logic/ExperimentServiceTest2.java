@@ -220,7 +220,7 @@ public class ExperimentServiceTest2 {
 
         when(experimentRepository.getOne(anyLong())).thenReturn(experimentEntity);
         when(realizationService.getByExperimentId(anyLong())).thenReturn(realizationEntity);
-        when(claims.getSubject()).thenReturn("userId"); // userid not matched on purpose with realizationEntity
+        when(claims.getSubject()).thenReturn("userId"); // userid not matched on purpose with realizationEntity because we want to test the role effect
         when(claims.get(JwtToken.KEY)).thenReturn(roles);
 
         Experiment result = experimentService.deleteExperiment(1L, "teamName", claims);
