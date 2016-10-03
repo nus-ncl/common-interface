@@ -7,8 +7,8 @@ import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
+import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -22,6 +22,7 @@ import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import sg.ncl.common.exception.ExceptionAutoConfiguration;
 import sg.ncl.common.exception.GlobalExceptionHandler;
+import sg.ncl.common.jwt.JwtToken;
 import sg.ncl.service.experiment.Util;
 import sg.ncl.service.experiment.data.jpa.ExperimentEntity;
 import sg.ncl.service.experiment.domain.Experiment;
@@ -59,8 +60,12 @@ public class ExperimentsControllerTest2 {
     @Rule
     public MockitoRule mockito = MockitoJUnit.rule();
 
-    @Rule
-    public final ExpectedException exception = ExpectedException.none();
+    @Mock
+    private Authentication authentication;
+    @Mock
+    private SecurityContext securityContext;
+    @Mock
+    private Claims claims;
 
     @Inject
     private ObjectMapper mapper;
@@ -72,7 +77,12 @@ public class ExperimentsControllerTest2 {
 
     @Before
     public void before() {
+//        assertThat(mockingDetails(claims).isMock()).isTrue();
+//        assertThat(mockingDetails(securityContext).isMock()).isTrue();
+//        assertThat(mockingDetails(authentication).isMock()).isTrue();
         assertThat(mockingDetails(experimentService).isMock()).isTrue();
+        SecurityContextHolder.setContext(securityContext);
+        SecurityContextHolder.getContext().setAuthentication(authentication);
     }
 
     @Test
@@ -197,15 +207,9 @@ public class ExperimentsControllerTest2 {
     public void testDeleteExperimentGoodAuthenticationPrincipal() throws Exception {
         Long experimentId = Long.parseLong(RandomStringUtils.randomNumeric(5));
         String teamId = RandomStringUtils.randomAlphabetic(8);
-        final Claims claims = mock(Claims.class);
-
-        Authentication authentication = mock(Authentication.class);
-        SecurityContext securityContext = mock(SecurityContext.class);
 
         when(securityContext.getAuthentication()).thenReturn(authentication);
-        SecurityContextHolder.setContext(securityContext);
         when(authentication.getPrincipal()).thenReturn(claims);
-        when(experimentService.deleteExperiment(eq(experimentId), eq(teamId), any(Claims.class))).thenReturn(Util.getExperimentsEntity());
 
         mockMvc.perform(delete(ExperimentsController.PATH + "/" + experimentId + "/teams/" + teamId))
                 .andExpect(status().isOk());
