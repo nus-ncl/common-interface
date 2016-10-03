@@ -114,14 +114,20 @@ public class ExperimentServiceTest2 {
 
     @Test
     public void testGetExperimentIfNoExperimentInDb() throws Exception {
-
         List<Experiment> experimentEntityList = experimentService.getAll();
         assertThat(experimentEntityList).hasSize(0);
     }
 
     @Test
     public void testGetExperiment() throws Exception {
+        ExperimentEntity createdExperimentSave = Util.getExperimentsEntity();
+        List<Experiment> expList = new ArrayList<>();
+        expList.add(createdExperimentSave);
 
+        when(experimentService.getAll()).thenReturn(expList);
+
+        List<Experiment> result = experimentService.getAll();
+        assertThat()
     }
 
     @Test
