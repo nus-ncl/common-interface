@@ -264,6 +264,22 @@ public class ExperimentServiceTest2 {
 
     @Test
     public void testDeleteExperimentEmptyTeam() throws Exception {
+        ExperimentEntity experimentEntity = Util.getExperimentsEntity();
+        experimentEntity.setTeamName("");
+        RealizationEntity realizationEntity = Util.getRealizationEntity();
+        final ArrayList<Role> roles = new ArrayList<>();
+        roles.add(Role.USER);
+
+        when(experimentRepository.getOne(anyLong())).thenReturn(experimentEntity);
+        when(realizationService.getByExperimentId(anyLong())).thenReturn(realizationEntity);
+        when(claims.getSubject()).thenReturn(realizationEntity.getUserId()); // userid not matched on purpose with realizationEntity because we want to test the role effect
+        when(claims.get(JwtToken.KEY)).thenReturn(roles);
+
+        exception.expect(ForbiddenException.class);
+        exception.expectMessage(is(equalTo("Error locating team name using team id teamName")));
+        experimentService.deleteExperiment(1L, "teamName", claims);
+
+        verify(experimentRepository, times(0)).delete(anyLong());
     }
 
 }
