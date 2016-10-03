@@ -1,6 +1,8 @@
 package sg.ncl.service.experiment.logic;
 
+import org.apache.commons.lang3.RandomStringUtils;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
@@ -97,8 +99,17 @@ public class ExperimentServiceTest2 {
     }
 
     @Test
+    @Ignore
     public void testSaveExperimentDifferentTeamSameExpName() throws Exception {
+        ExperimentEntity one = Util.getExperimentsEntity();
+        ExperimentEntity two = Util.getExperimentsEntity();
+        one.setName("AAA");
+        two.setName("BBB");
 
+        when(experimentRepository.save(any(ExperimentEntity.class))).thenAnswer(i -> i.getArgumentAt(0, ExperimentEntity.class));
+
+        Experiment oneSaved = experimentService.save(one);
+        Experiment twoSaved = experimentService.save(two);
     }
 
     @Test
