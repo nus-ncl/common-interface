@@ -1,17 +1,17 @@
 package sg.ncl.service.experiment.logic;
 
-import org.apache.commons.lang3.RandomStringUtils;
+import io.jsonwebtoken.Claims;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
-import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
-import org.springframework.test.context.junit4.SpringRunner;
 import sg.ncl.adapter.deterlab.AdapterDeterLab;
+import sg.ncl.common.authentication.Role;
+import sg.ncl.common.jwt.JwtToken;
 import sg.ncl.service.experiment.ExperimentConnectionProperties;
 import sg.ncl.service.experiment.Util;
 import sg.ncl.service.experiment.data.jpa.ExperimentEntity;
@@ -19,12 +19,11 @@ import sg.ncl.service.experiment.data.jpa.ExperimentRepository;
 import sg.ncl.service.experiment.domain.Experiment;
 import sg.ncl.service.experiment.domain.ExperimentService;
 import sg.ncl.service.experiment.exceptions.ExperimentNameInUseException;
-import sg.ncl.service.experiment.web.ExperimentInfo;
+import sg.ncl.service.experiment.exceptions.UserIdNotFoundException;
+import sg.ncl.service.realization.data.jpa.RealizationEntity;
 import sg.ncl.service.realization.domain.RealizationService;
 
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -50,6 +49,8 @@ public class ExperimentServiceTest2 {
     private RealizationService realizationService;
     @Mock
     private ExperimentConnectionProperties experimentConnectionProperties;
+    @Mock
+    private Claims claims;
 
     private ExperimentService experimentService;
 
