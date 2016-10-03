@@ -122,10 +122,10 @@ public class ExperimentServiceTest2 {
     @Test
     public void testGetExperiment() throws Exception {
         ExperimentEntity createdExperimentSave = Util.getExperimentsEntity();
-        List<Experiment> expList = new ArrayList<>();
+        List<ExperimentEntity> expList = new ArrayList<>();
         expList.add(createdExperimentSave);
 
-        when(experimentService.getAll()).thenReturn(expList);
+        when(experimentRepository.findAll()).thenReturn(expList);
 
         List<Experiment> result = experimentService.getAll();
         assertThat(result).hasSize(1);
