@@ -115,6 +115,8 @@ public class ExperimentServiceTest2 {
     @Test
     public void testGetExperimentIfNoExperimentInDb() throws Exception {
 
+        List<Experiment> experimentEntityList = experimentService.getAll();
+        assertThat(experimentEntityList).hasSize(0);
     }
 
     @Test
