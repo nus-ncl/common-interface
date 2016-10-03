@@ -210,6 +210,20 @@ public class ExperimentServiceTest2 {
 
     @Test
     public void testDeleteExperimentAdmin() throws Exception {
+        ExperimentEntity experimentEntity = Util.getExperimentsEntity();
+        RealizationEntity realizationEntity = Util.getRealizationEntity();
+        final ArrayList<Role> roles = new ArrayList<>();
+        roles.add(Role.ADMIN);
+
+        when(experimentRepository.getOne(anyLong())).thenReturn(experimentEntity);
+        when(realizationService.getByExperimentId(anyLong())).thenReturn(realizationEntity);
+        when(claims.getSubject()).thenReturn("userId"); // userid not matched on purpose with realizationEntity
+        when(claims.get(JwtToken.KEY)).thenReturn(roles);
+
+        Experiment result = experimentService.deleteExperiment(1L, "teamName", claims);
+
+        verify(experimentRepository, times(1)).delete(anyLong());
+        assertThat(experimentEntity).isEqualTo(result);
     }
 
     @Test
