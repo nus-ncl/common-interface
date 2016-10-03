@@ -1,6 +1,5 @@
 package sg.ncl.service.experiment.logic;
 
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -17,6 +16,7 @@ import sg.ncl.service.experiment.data.jpa.ExperimentEntity;
 import sg.ncl.service.experiment.data.jpa.ExperimentRepository;
 import sg.ncl.service.experiment.domain.Experiment;
 import sg.ncl.service.experiment.domain.ExperimentService;
+import sg.ncl.service.experiment.exceptions.ExperimentNameInUseException;
 import sg.ncl.service.experiment.web.ExperimentInfo;
 import sg.ncl.service.realization.domain.RealizationService;
 
@@ -70,21 +70,30 @@ public class ExperimentServiceTest2 {
         Experiment savedExperiment = experimentService.save(createdExperimentSave);
 
         verify(experimentRepository, times(1)).save(any(ExperimentEntity.class));
-        Assert.assertNotNull(savedExperiment);
-        Assert.assertEquals(createdExperimentSave.getUserId(), savedExperiment.getUserId());
-        Assert.assertEquals(createdExperimentSave.getTeamId(), savedExperiment.getTeamId());
-        Assert.assertEquals(createdExperimentSave.getTeamName(), savedExperiment.getTeamName());
-        Assert.assertEquals(createdExperimentSave.getName(), savedExperiment.getName());
-        Assert.assertEquals(createdExperimentSave.getDescription(), savedExperiment.getDescription());
-        Assert.assertEquals(createdExperimentSave.getNsFile(), savedExperiment.getNsFile());
-        Assert.assertEquals(createdExperimentSave.getNsFileContent(), savedExperiment.getNsFileContent());
-        Assert.assertEquals(createdExperimentSave.getIdleSwap(), savedExperiment.getIdleSwap());
-        Assert.assertEquals(createdExperimentSave.getMaxDuration(), savedExperiment.getMaxDuration());
+        assertThat(savedExperiment).isNotNull();
+        assertThat(createdExperimentSave.getUserId()).isEqualTo(savedExperiment.getUserId());
+        assertThat(createdExperimentSave.getTeamId()).isEqualTo(savedExperiment.getTeamId());
+        assertThat(createdExperimentSave.getTeamName()).isEqualTo(savedExperiment.getTeamName());
+        assertThat(createdExperimentSave.getName()).isEqualTo(savedExperiment.getName());
+        assertThat(createdExperimentSave.getDescription()).isEqualTo(savedExperiment.getDescription());
+        assertThat(createdExperimentSave.getNsFile()).isEqualTo(savedExperiment.getNsFile());
+        assertThat(createdExperimentSave.getNsFileContent()).isEqualTo(savedExperiment.getNsFileContent());
+        assertThat(createdExperimentSave.getIdleSwap()).isEqualTo(savedExperiment.getIdleSwap());
+        assertThat(createdExperimentSave.getMaxDuration()).isEqualTo(savedExperiment.getMaxDuration());
     }
 
     @Test
     public void testSaveExperimentBad() throws Exception {
+        // try to create another experiment with same team name and same exp name
+        ExperimentEntity createdExperimentSave = Util.getExperimentsEntity();
+        List<ExperimentEntity> expList = new ArrayList<>();
+        expList.add(createdExperimentSave);
 
+        when(experimentRepository.findByTeamName(anyString())).thenReturn(expList);
+
+        exception.expect(ExperimentNameInUseException.class);
+
+        experimentService.save(createdExperimentSave);
     }
 
     @Test
