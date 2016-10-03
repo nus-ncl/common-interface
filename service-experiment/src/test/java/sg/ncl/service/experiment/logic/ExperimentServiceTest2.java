@@ -134,6 +134,21 @@ public class ExperimentServiceTest2 {
 
     @Test
     public void testGetExperimentsByUser() throws Exception {
+        ExperimentEntity createdExperimentSave = Util.getExperimentsEntity();
+        List<ExperimentEntity> expList = new ArrayList<>();
+        expList.add(createdExperimentSave);
+
+        when(experimentRepository.findByUserId(anyString())).thenReturn(expList);
+
+        List<Experiment> result = experimentService.findByUser("userid");
+        assertThat(result).hasSize(1);
+        assertThat(result).isEqualTo(expList);
+    }
+
+    @Test
+    public void testGetExperimentsByUserNullId() throws Exception {
+        exception.expect(UserIdNotFoundException.class);
+        experimentService.findByUser("");
     }
 
     @Test
