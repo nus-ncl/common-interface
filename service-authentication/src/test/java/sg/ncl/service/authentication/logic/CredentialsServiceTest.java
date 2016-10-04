@@ -1,5 +1,6 @@
 package sg.ncl.service.authentication.logic;
 
+import io.jsonwebtoken.Claims;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -44,6 +45,8 @@ public class CredentialsServiceTest {
     @Rule
     public ExpectedException exception = ExpectedException.none();
 
+    @Mock
+    private Claims claims;
     @Mock
     private PasswordEncoder passwordEncoder;
     @Mock
@@ -238,7 +241,7 @@ public class CredentialsServiceTest {
         when(passwordEncoder.encode(anyString())).thenReturn(password);
         when(credentialsRepository.save(any(CredentialsEntity.class))).thenReturn(entity);
 
-        credentialsService.updateCredentials(entity.getId(), info);
+        credentialsService.updateCredentials(entity.getId(), info, claims);
 
         verify(passwordEncoder, times(1)).encode(anyString());
         verify(credentialsRepository, times(1)).save(any(CredentialsEntity.class));
@@ -258,7 +261,7 @@ public class CredentialsServiceTest {
         when(credentialsRepository.findOne(eq(entity.getId()))).thenReturn(entity);
         when(credentialsRepository.save(entity)).thenReturn(entity);
 
-        credentialsService.updateCredentials(entity.getId(), info);
+        credentialsService.updateCredentials(entity.getId(), info, claims);
 
         verify(passwordEncoder, times(0)).encode(anyString());
         verify(credentialsRepository, times(1)).save(any(CredentialsEntity.class));
@@ -278,7 +281,7 @@ public class CredentialsServiceTest {
         when(credentialsRepository.findOne(eq(entity.getId()))).thenReturn(entity);
         when(credentialsRepository.save(entity)).thenReturn(entity);
 
-        credentialsService.updateCredentials(entity.getId(), info);
+        credentialsService.updateCredentials(entity.getId(), info, claims);
 
         verify(credentialsRepository, times(1)).save(any(CredentialsEntity.class));
         assertThat(entity.getUsername()).isEqualTo(username);
@@ -298,7 +301,7 @@ public class CredentialsServiceTest {
         when(passwordEncoder.encode(eq(password))).thenReturn(password);
         when(credentialsRepository.save(entity)).thenReturn(entity);
 
-        credentialsService.updateCredentials(entity.getId(), info);
+        credentialsService.updateCredentials(entity.getId(), info, claims);
 
         verify(credentialsRepository, times(1)).save(any(CredentialsEntity.class));
         assertThat(entity.getUsername()).isEqualTo(username);
@@ -318,7 +321,7 @@ public class CredentialsServiceTest {
         when(passwordEncoder.encode(eq(password))).thenReturn(password);
         when(credentialsRepository.save(entity)).thenReturn(entity);
 
-        credentialsService.updateCredentials(entity.getId(), info);
+        credentialsService.updateCredentials(entity.getId(), info, claims);
 
         verify(credentialsRepository, times(1)).save(any(CredentialsEntity.class));
         assertThat(entity.getUsername()).isEqualTo(username);
@@ -333,7 +336,7 @@ public class CredentialsServiceTest {
 
         exception.expect(NeitherUsernameNorPasswordModifiedException.class);
 
-        credentialsService.updateCredentials("id", credentials);
+        credentialsService.updateCredentials("id", credentials, claims);
     }
 
     @Test
@@ -342,7 +345,7 @@ public class CredentialsServiceTest {
 
         exception.expect(NeitherUsernameNorPasswordModifiedException.class);
 
-        credentialsService.updateCredentials("id", credentials);
+        credentialsService.updateCredentials("id", credentials, claims);
     }
 
     @Test
@@ -351,7 +354,7 @@ public class CredentialsServiceTest {
 
         exception.expect(NeitherUsernameNorPasswordModifiedException.class);
 
-        credentialsService.updateCredentials("id", credentials);
+        credentialsService.updateCredentials("id", credentials, claims);
     }
 
     @Test
@@ -360,7 +363,7 @@ public class CredentialsServiceTest {
 
         exception.expect(NeitherUsernameNorPasswordModifiedException.class);
 
-        credentialsService.updateCredentials("id", credentials);
+        credentialsService.updateCredentials("id", credentials, claims);
     }
 
     @Test
@@ -371,7 +374,7 @@ public class CredentialsServiceTest {
 
         exception.expect(CredentialsNotFoundException.class);
 
-        credentialsService.updateCredentials(credentials.getId(), credentials);
+        credentialsService.updateCredentials(credentials.getId(), credentials, claims);
     }
 
 }
