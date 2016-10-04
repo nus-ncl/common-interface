@@ -58,6 +58,7 @@ public class CredentialsServiceTest {
 
     @Before
     public void before() {
+        assertThat(mockingDetails(claims).isMock()).isTrue();
         assertThat(mockingDetails(passwordEncoder).isMock()).isTrue();
         assertThat(mockingDetails(credentialsRepository).isMock()).isTrue();
 
@@ -235,11 +236,12 @@ public class CredentialsServiceTest {
         final CredentialsEntity entity = getCredentialsEntity();
         final String username = "username";
         final String password = "password";
-        final CredentialsInfo info = new CredentialsInfo(null, username, password, null, null);
+        final CredentialsInfo info = new CredentialsInfo("id", username, password, null, null);
 
         when(credentialsRepository.findOne(anyString())).thenReturn(entity);
         when(passwordEncoder.encode(anyString())).thenReturn(password);
         when(credentialsRepository.save(any(CredentialsEntity.class))).thenReturn(entity);
+        when(claims.getSubject()).thenReturn("id");
 
         credentialsService.updateCredentials(entity.getId(), info, claims);
 
@@ -256,10 +258,11 @@ public class CredentialsServiceTest {
         final CredentialsEntity entity = getCredentialsEntity();
         final String username = "username";
         final String password = entity.getPassword();
-        final CredentialsInfo info = new CredentialsInfo(null, username, null, null, null);
+        final CredentialsInfo info = new CredentialsInfo("id", username, null, null, null);
 
         when(credentialsRepository.findOne(eq(entity.getId()))).thenReturn(entity);
         when(credentialsRepository.save(entity)).thenReturn(entity);
+        when(claims.getSubject()).thenReturn("id");
 
         credentialsService.updateCredentials(entity.getId(), info, claims);
 
@@ -276,10 +279,11 @@ public class CredentialsServiceTest {
         final CredentialsEntity entity = getCredentialsEntity();
         final String username = "username";
         final String password = entity.getPassword();
-        final CredentialsInfo info = new CredentialsInfo(null, username, "", null, null);
+        final CredentialsInfo info = new CredentialsInfo("id", username, "", null, null);
 
         when(credentialsRepository.findOne(eq(entity.getId()))).thenReturn(entity);
         when(credentialsRepository.save(entity)).thenReturn(entity);
+        when(claims.getSubject()).thenReturn("id");
 
         credentialsService.updateCredentials(entity.getId(), info, claims);
 
@@ -295,11 +299,12 @@ public class CredentialsServiceTest {
         final CredentialsEntity entity = getCredentialsEntity();
         final String username = entity.getUsername();
         final String password = "password";
-        final CredentialsInfo info = new CredentialsInfo(null, null, password, null, null);
+        final CredentialsInfo info = new CredentialsInfo("id", null, password, null, null);
 
         when(credentialsRepository.findOne(eq(entity.getId()))).thenReturn(entity);
         when(passwordEncoder.encode(eq(password))).thenReturn(password);
         when(credentialsRepository.save(entity)).thenReturn(entity);
+        when(claims.getSubject()).thenReturn("id");
 
         credentialsService.updateCredentials(entity.getId(), info, claims);
 
@@ -315,11 +320,12 @@ public class CredentialsServiceTest {
         final CredentialsEntity entity = getCredentialsEntity();
         final String username = entity.getUsername();
         final String password = "password";
-        final CredentialsInfo info = new CredentialsInfo(null, "", password, null, null);
+        final CredentialsInfo info = new CredentialsInfo("id", "", password, null, null);
 
         when(credentialsRepository.findOne(eq(entity.getId()))).thenReturn(entity);
         when(passwordEncoder.encode(eq(password))).thenReturn(password);
         when(credentialsRepository.save(entity)).thenReturn(entity);
+        when(claims.getSubject()).thenReturn("id");
 
         credentialsService.updateCredentials(entity.getId(), info, claims);
 
@@ -371,6 +377,7 @@ public class CredentialsServiceTest {
         final Credentials credentials = new CredentialsInfo("id", "username", "password", null, null);
 
         when(credentialsRepository.findOne(credentials.getId())).thenReturn(null);
+        when(claims.getSubject()).thenReturn("id");
 
         exception.expect(CredentialsNotFoundException.class);
 
