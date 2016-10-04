@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import sg.ncl.common.exception.base.BadRequestException;
 import sg.ncl.common.exception.base.ConflictException;
+import sg.ncl.common.exception.base.ForbiddenException;
 import sg.ncl.common.exception.base.NotFoundException;
 import sg.ncl.common.exception.base.NotModifiedException;
 import sg.ncl.common.exception.base.UnauthorizedException;
@@ -36,6 +37,7 @@ public class ExceptionHttpStatusMap {
     ExceptionHttpStatusMap() {
         put(BadRequestException.class, HttpStatus.BAD_REQUEST);
         put(ConflictException.class, HttpStatus.CONFLICT);
+        put(ForbiddenException.class, HttpStatus.FORBIDDEN);
         put(NotFoundException.class, HttpStatus.NOT_FOUND);
         put(NotModifiedException.class, HttpStatus.NOT_MODIFIED);
         put(UnauthorizedException.class, HttpStatus.UNAUTHORIZED);
