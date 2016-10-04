@@ -1,7 +1,9 @@
 package sg.ncl.service.authentication.logic;
 
+import io.jsonwebtoken.Claims;
 import lombok.extern.slf4j.Slf4j;
 import org.json.JSONObject;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import sg.ncl.adapter.deterlab.AdapterDeterLab;
@@ -21,12 +23,7 @@ import javax.validation.constraints.NotNull;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static sg.ncl.service.authentication.validation.Validator.addCheck;
-import static sg.ncl.service.authentication.validation.Validator.checkPassword;
-import static sg.ncl.service.authentication.validation.Validator.checkRoles;
-import static sg.ncl.service.authentication.validation.Validator.checkStatus;
-import static sg.ncl.service.authentication.validation.Validator.checkUsername;
-import static sg.ncl.service.authentication.validation.Validator.updateCheck;
+import static sg.ncl.service.authentication.validation.Validator.*;
 
 /**
  * @author Christopher Zhong
@@ -79,8 +76,9 @@ public class CredentialsServiceImpl implements CredentialsService {
 
     @Transactional
     @Override
-    public Credentials updateCredentials(@NotNull final String id, @NotNull final Credentials credentials) {
+    public Credentials updateCredentials(@NotNull final String id, @NotNull final Credentials credentials, @NotNull final Claims claims) {
         updateCheck(credentials);
+        checkPermissions(credentials, claims);
         final CredentialsEntity entity = findCredentials(id);
         if (credentials.getUsername() != null && !credentials.getUsername().isEmpty()) {
             entity.setUsername(credentials.getUsername());

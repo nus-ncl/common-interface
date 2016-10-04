@@ -1,6 +1,7 @@
 package sg.ncl.service.authentication.web;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import io.jsonwebtoken.Claims;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -281,7 +282,7 @@ public class CredentialsControllerTest {
         final CredentialsInfo credentialsInfo = new CredentialsInfo(null, "username", "password", null, null);
         final byte[] content = mapper.writeValueAsBytes(credentialsInfo);
 
-        when(credentialsService.updateCredentials(anyString(), any(Credentials.class))).thenReturn(credentialsInfo);
+        when(credentialsService.updateCredentials(anyString(), any(Credentials.class), any(Claims.class))).thenReturn(credentialsInfo);
 
         mockMvc.perform(put(CredentialsController.PATH + "/id").contentType(MediaType.APPLICATION_JSON).content(content))
                 .andExpect(status().isOk())
@@ -293,7 +294,7 @@ public class CredentialsControllerTest {
         final CredentialsInfo credentialsInfo = new CredentialsInfo(null, "username", null, null, null);
         final byte[] content = mapper.writeValueAsBytes(credentialsInfo);
 
-        when(credentialsService.updateCredentials(anyString(), any(Credentials.class))).thenReturn(credentialsInfo);
+        when(credentialsService.updateCredentials(anyString(), any(Credentials.class), any(Claims.class))).thenReturn(credentialsInfo);
 
         mockMvc.perform(put(CredentialsController.PATH + "/id").contentType(MediaType.APPLICATION_JSON).content(content))
                 .andExpect(status().isOk())
@@ -305,7 +306,7 @@ public class CredentialsControllerTest {
         final CredentialsInfo credentialsInfo = new CredentialsInfo(null, "username", "", null, null);
         final byte[] content = mapper.writeValueAsBytes(credentialsInfo);
 
-        when(credentialsService.updateCredentials(anyString(), any(Credentials.class))).thenReturn(credentialsInfo);
+        when(credentialsService.updateCredentials(anyString(), any(Credentials.class), any(Claims.class))).thenReturn(credentialsInfo);
 
         mockMvc.perform(put(CredentialsController.PATH + "/id").contentType(MediaType.APPLICATION_JSON).content(content))
                 .andExpect(status().isOk())
@@ -317,7 +318,7 @@ public class CredentialsControllerTest {
         final CredentialsInfo credentialsInfo = new CredentialsInfo(null, null, "password", null, null);
         final byte[] content = mapper.writeValueAsBytes(credentialsInfo);
 
-        when(credentialsService.updateCredentials(anyString(), any(Credentials.class))).thenReturn(credentialsInfo);
+        when(credentialsService.updateCredentials(anyString(), any(Credentials.class), any(Claims.class))).thenReturn(credentialsInfo);
 
         mockMvc.perform(put(CredentialsController.PATH + "/id").contentType(MediaType.APPLICATION_JSON).content(content))
                 .andExpect(status().isOk())
@@ -329,7 +330,7 @@ public class CredentialsControllerTest {
         final CredentialsInfo credentialsInfo = new CredentialsInfo(null, "", "password", null, null);
         final byte[] content = mapper.writeValueAsBytes(credentialsInfo);
 
-        when(credentialsService.updateCredentials(anyString(), any(Credentials.class))).thenReturn(credentialsInfo);
+        when(credentialsService.updateCredentials(anyString(), any(Credentials.class), any(Claims.class))).thenReturn(credentialsInfo);
 
         mockMvc.perform(put(CredentialsController.PATH + "/id").contentType(MediaType.APPLICATION_JSON).content(content))
                 .andExpect(status().isOk())
@@ -381,7 +382,7 @@ public class CredentialsControllerTest {
         final Credentials credentialsInfo = new CredentialsInfo("id", "username", "password", null, null);
         final byte[] content = mapper.writeValueAsBytes(credentialsInfo);
 
-        doThrow(new CredentialsNotFoundException("id")).when(credentialsService).updateCredentials(anyString(), any(Credentials.class));
+        doThrow(new CredentialsNotFoundException("id")).when(credentialsService).updateCredentials(anyString(), any(Credentials.class), any(Claims.class));
 
         mockMvc.perform(put(CredentialsController.PATH + "/id").contentType(MediaType.APPLICATION_JSON).content(content))
                 .andExpect(status().isNotFound())

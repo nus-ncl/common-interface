@@ -1,7 +1,9 @@
 package sg.ncl.service.authentication.validation;
 
+import io.jsonwebtoken.Claims;
 import lombok.extern.slf4j.Slf4j;
 import sg.ncl.common.authentication.Role;
+import sg.ncl.common.exception.base.ForbiddenException;
 import sg.ncl.service.authentication.domain.Credentials;
 import sg.ncl.service.authentication.domain.CredentialsStatus;
 import sg.ncl.service.authentication.exceptions.NeitherUsernameNorPasswordModifiedException;
@@ -30,6 +32,14 @@ public class Validator {
         if (isUsernameNullOrEmpty(credentials) && isPasswordNullOrEmpty(credentials)) {
             log.warn("Both username and password not modified");
             throw new NeitherUsernameNorPasswordModifiedException();
+        }
+    }
+
+    public static void checkClaimsType(final Object claims, final String message) {
+        if ( !(claims instanceof Claims) ) {
+            // throw forbidden
+            log.warn(message);
+            throw new ForbiddenException(message);
         }
     }
 
@@ -70,6 +80,14 @@ public class Validator {
         if (roles == null || roles.isEmpty()) {
             log.warn("Roles is null or empty: {}", roles);
             throw new RolesIsNullOrEmptyException();
+        }
+    }
+
+    public static void checkPermissions(final Credentials credentials, final Claims claims) {
+        // check said user id is identical
+        if (claims.getSubject() == null || claims.getSubject().isEmpty() || !(credentials.getId().equals(claims.getSubject()))) {
+            log.warn("Access denied for updating user details: {} via claims id {}", credentials.getId(), claims.getSubject());
+            throw new ForbiddenException("Access denied for updating user details: " + credentials.getId() + " via claims id " + claims.getSubject());
         }
     }
 

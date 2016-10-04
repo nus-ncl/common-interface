@@ -1,5 +1,7 @@
 package sg.ncl.service.authentication.domain;
 
+import io.jsonwebtoken.Claims;
+
 import java.util.List;
 
 /**
@@ -11,7 +13,7 @@ public interface CredentialsService {
 
     Credentials addCredentials(Credentials credentials);
 
-    Credentials updateCredentials(String id, Credentials credentials);
+    Credentials updateCredentials(String id, Credentials credentials, Claims claims);
 
     Credentials updateUsername(String id, Credentials credentials);
 
