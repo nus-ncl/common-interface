@@ -40,11 +40,11 @@ public class Validator {
         }
     }
 
-    public static void checkClaimsType(final Object claims, final String message) {
+    public static void checkClaimsType(final Object claims) {
         if ( !(claims instanceof Claims) ) {
             // throw forbidden
-            log.warn(message);
-            throw new ForbiddenException(message);
+            log.warn("Invalid authentication principal: {}", claims);
+            throw new ForbiddenException();
         }
     }
 
