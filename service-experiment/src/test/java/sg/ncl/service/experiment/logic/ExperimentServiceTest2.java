@@ -24,6 +24,7 @@ import sg.ncl.service.realization.data.jpa.RealizationEntity;
 import sg.ncl.service.realization.domain.RealizationService;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -182,8 +183,7 @@ public class ExperimentServiceTest2 {
     public void testDeleteExperimentGood() throws Exception {
         ExperimentEntity experimentEntity = Util.getExperimentsEntity();
         RealizationEntity realizationEntity = Util.getRealizationEntity();
-        final ArrayList<Role> roles = new ArrayList<>();
-        roles.add(Role.USER);
+        final List<Role> roles = Collections.singletonList(Role.USER);
 
         when(experimentRepository.getOne(anyLong())).thenReturn(experimentEntity);
         when(realizationService.getByExperimentId(anyLong())).thenReturn(realizationEntity);
@@ -200,8 +200,7 @@ public class ExperimentServiceTest2 {
     public void testDeleteExperimentAdmin() throws Exception {
         ExperimentEntity experimentEntity = Util.getExperimentsEntity();
         RealizationEntity realizationEntity = Util.getRealizationEntity();
-        final ArrayList<Role> roles = new ArrayList<>();
-        roles.add(Role.ADMIN);
+        final List<Role> roles = Collections.singletonList(Role.ADMIN);
 
         when(experimentRepository.getOne(anyLong())).thenReturn(experimentEntity);
         when(realizationService.getByExperimentId(anyLong())).thenReturn(realizationEntity);
@@ -218,8 +217,7 @@ public class ExperimentServiceTest2 {
     public void testDeleteExperimentNotExpCreator() throws Exception {
         // to trigger the addCheck() in deleteExperiment
         RealizationEntity realizationEntity = Util.getRealizationEntity();
-        final ArrayList<Role> roles = new ArrayList<>();
-        roles.add(Role.USER);
+        final List<Role> roles = Collections.singletonList(Role.USER);
 
         when(realizationService.getByExperimentId(anyLong())).thenReturn(realizationEntity);
         when(claims.getSubject()).thenReturn("userId"); // trigger the add check

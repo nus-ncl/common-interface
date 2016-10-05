@@ -7,7 +7,7 @@ import sg.ncl.common.exception.base.ForbiddenException;
 import sg.ncl.common.jwt.JwtToken;
 import sg.ncl.service.realization.data.jpa.RealizationEntity;
 
-import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @author Te Ye
@@ -21,7 +21,7 @@ public class Validator {
     }
 
     public static void checkPermissions(final RealizationEntity realizationEntity, final Claims claims) {
-        if (!(claims.get(JwtToken.KEY) instanceof ArrayList<?>)) {
+        if (!(claims.get(JwtToken.KEY) instanceof List<?>)) {
             log.warn("Bad claims type found: {}", claims);
             throw new ForbiddenException("Invalid permissions for delete experiment: expid " + realizationEntity.getExperimentId());
         }
@@ -29,8 +29,8 @@ public class Validator {
         log.info("Id of requester from web: {}", claims.getSubject());
         log.info("Role of requester from web: {}", claims.get(JwtToken.KEY));
         String contextUserId = claims.getSubject();
-        ArrayList<Role> roles;
-        roles = (ArrayList) claims.get(JwtToken.KEY);
+        List<Role> roles;
+        roles = (List) claims.get(JwtToken.KEY);
 
         log.info("Context user id: {}, Context role: {}", contextUserId, roles);
 
