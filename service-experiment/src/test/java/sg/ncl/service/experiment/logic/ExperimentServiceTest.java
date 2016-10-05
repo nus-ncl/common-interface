@@ -224,7 +224,7 @@ public class ExperimentServiceTest {
         when(claims.get(JwtToken.KEY)).thenReturn(roles);
 
         exception.expect(ForbiddenException.class);
-        exception.expectMessage("Access denied for delete experiment: expid " + realizationEntity.getExperimentId());
+        exception.expectMessage("Permission denied");
         experimentService.deleteExperiment(1L, "teamName", claims);
 
         verify(experimentRepository, times(0)).delete(anyLong());
@@ -239,7 +239,7 @@ public class ExperimentServiceTest {
         when(claims.get(JwtToken.KEY)).thenReturn("ADMIN"); // not supposed to be a String
 
         exception.expect(ForbiddenException.class);
-        exception.expectMessage("Invalid permissions for delete experiment: expid " + realizationEntity.getExperimentId());
+        exception.expectMessage("Permission denied");
         experimentService.deleteExperiment(1L, "teamName", claims);
 
         verify(experimentRepository, times(0)).delete(anyLong());

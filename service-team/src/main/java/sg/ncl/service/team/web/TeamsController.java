@@ -54,7 +54,7 @@ public class TeamsController {
         if (SecurityContextHolder.getContext().getAuthentication() == null) {
             // throw forbidden
             log.warn("Access denied for: /teams GET");
-            throw new ForbiddenException("Access denied for: /teams GET");
+            throw new ForbiddenException();
         }
         return teamService.getAllTeams().stream().map(TeamInfo::new).collect(Collectors.toList());
     }
@@ -66,7 +66,7 @@ public class TeamsController {
             // check permissions
             // throw forbidden if check fails
             log.warn("Access denied for: /teams/?visibility=" + visibility);
-            throw new ForbiddenException("Access denied for: /teams/?visibility=" + visibility);
+            throw new ForbiddenException();
         }
         return teamService.getTeamsByVisibility(visibility).stream().map(TeamInfo::new).collect(Collectors.toList());
     }
@@ -86,7 +86,7 @@ public class TeamsController {
         if (SecurityContextHolder.getContext().getAuthentication() == null) {
             // throw forbidden
             log.warn("Access denied for: /teams/{} GET", id);
-            throw new ForbiddenException("Access denied for: GET /teams/" + id);
+            throw new ForbiddenException();
         }
         final Team team = teamService.getTeamById(id);
         if (team == null) {

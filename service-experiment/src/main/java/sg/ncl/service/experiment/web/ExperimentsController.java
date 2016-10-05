@@ -82,7 +82,7 @@ public class ExperimentsController {
         if ( !(claims instanceof Claims) ) {
             // throw forbidden
             log.warn("Access denied for delete experiment: expid: {} claims: {} ", expId, claims);
-            throw new ForbiddenException("Access denied for delete experiment: expid " + expId);
+            throw new ForbiddenException();
         }
         return new ExperimentInfo(experimentService.deleteExperiment(expId, teamId, (Claims) claims));
     }
