@@ -1,312 +1,247 @@
 package sg.ncl.service.experiment.logic;
 
-import org.apache.commons.lang3.RandomStringUtils;
-import org.junit.Assert;
+import io.jsonwebtoken.Claims;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
-import org.springframework.http.HttpMethod;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.context.SecurityContext;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.web.client.MockRestServiceServer;
-import org.springframework.web.client.RestOperations;
-import org.springframework.web.client.RestTemplate;
-import sg.ncl.adapter.deterlab.ConnectionProperties;
+import org.mockito.Mock;
+import org.mockito.junit.MockitoJUnit;
+import org.mockito.junit.MockitoRule;
+import sg.ncl.adapter.deterlab.AdapterDeterLab;
 import sg.ncl.common.authentication.Role;
 import sg.ncl.common.exception.base.ForbiddenException;
-import sg.ncl.service.experiment.AbstractTest;
+import sg.ncl.common.jwt.JwtToken;
+import sg.ncl.service.experiment.ExperimentConnectionProperties;
 import sg.ncl.service.experiment.Util;
 import sg.ncl.service.experiment.data.jpa.ExperimentEntity;
 import sg.ncl.service.experiment.data.jpa.ExperimentRepository;
 import sg.ncl.service.experiment.domain.Experiment;
 import sg.ncl.service.experiment.domain.ExperimentService;
 import sg.ncl.service.experiment.exceptions.ExperimentNameInUseException;
+import sg.ncl.service.experiment.exceptions.UserIdNotFoundException;
 import sg.ncl.service.realization.data.jpa.RealizationEntity;
-import sg.ncl.service.realization.data.jpa.RealizationRepository;
+import sg.ncl.service.realization.domain.RealizationService;
 
-import javax.inject.Inject;
-import java.text.SimpleDateFormat;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
-import static org.hamcrest.Matchers.equalTo;
-import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.not;
-import static org.mockito.Matchers.anyCollection;
-import static org.mockito.Matchers.anyCollectionOf;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
-import static org.springframework.test.web.client.match.MockRestRequestMatchers.method;
-import static org.springframework.test.web.client.match.MockRestRequestMatchers.requestTo;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyString;
+import static org.mockito.Mockito.*;
 
 /**
- * Created by Desmond.
+ * @author Te Ye
  */
-@ActiveProfiles({"mock-deter-adapter"})
-public class ExperimentServiceTest extends AbstractTest {
+public class ExperimentServiceTest {
 
     @Rule
-    public final ExpectedException exception = ExpectedException.none();
+    public MockitoRule mockito = MockitoJUnit.rule();
+    @Rule
+    public ExpectedException exception = ExpectedException.none();
 
-    @Inject
+    @Mock
     private ExperimentRepository experimentRepository;
-    @Inject
-    private ExperimentService experimentService;
-    @Inject
-    private RealizationRepository realizationRepository;
+    @Mock
+    private AdapterDeterLab adapterDeterLab;
+    @Mock
+    private RealizationService realizationService;
+    @Mock
+    private ExperimentConnectionProperties experimentConnectionProperties;
+    @Mock
+    private Claims claims;
 
+    private ExperimentService experimentService;
+
+    @Before
+    public void before() {
+        assertThat(mockingDetails(experimentRepository).isMock()).isTrue();
+        assertThat(mockingDetails(adapterDeterLab).isMock()).isTrue();
+        assertThat(mockingDetails(realizationService).isMock()).isTrue();
+        assertThat(mockingDetails(experimentConnectionProperties).isMock()).isTrue();
+
+        experimentService = new ExperimentServiceImpl(experimentRepository, adapterDeterLab, realizationService, experimentConnectionProperties);
+    }
 
     @Test
     public void testSaveExperiment() throws Exception {
-
         ExperimentEntity createdExperimentSave = Util.getExperimentsEntity();
+
+        when(experimentRepository.save(any(ExperimentEntity.class))).thenReturn(createdExperimentSave);
 
         Experiment savedExperiment = experimentService.save(createdExperimentSave);
 
-        Assert.assertNotNull(savedExperiment);
-        Assert.assertEquals(createdExperimentSave.getUserId(), savedExperiment.getUserId());
-        Assert.assertEquals(createdExperimentSave.getTeamId(), savedExperiment.getTeamId());
-        Assert.assertEquals(createdExperimentSave.getTeamName(), savedExperiment.getTeamName());
-        Assert.assertEquals(createdExperimentSave.getName(), savedExperiment.getName());
-        Assert.assertEquals(createdExperimentSave.getDescription(), savedExperiment.getDescription());
-        Assert.assertEquals(createdExperimentSave.getIdleSwap(), savedExperiment.getIdleSwap());
-        Assert.assertEquals(createdExperimentSave.getMaxDuration(), savedExperiment.getMaxDuration());
-
-        // check new nsFile name
-        String craftDate = new SimpleDateFormat("yyyyMMdd").format(new Date());
-        String filename = createdExperimentSave.getUserId() + "_" + createdExperimentSave.getTeamId() + "_" + craftDate + "_" + createdExperimentSave.getNsFile() + ".ns";
-        Assert.assertEquals(filename, savedExperiment.getNsFile());
-    }
-
-    @Test(expected = ExperimentNameInUseException.class)
-    public void testSaveExperimentBad() throws Exception {
-        // try to create another experiment with same team name and same exp name
-        ExperimentEntity createdExperimentSave = Util.getExperimentsEntity();
-        Experiment savedExperiment = experimentService.save(createdExperimentSave);
-        experimentService.save(createdExperimentSave);
+        verify(experimentRepository, times(1)).save(any(ExperimentEntity.class));
+        assertThat(savedExperiment).isNotNull();
+        assertThat(createdExperimentSave.getUserId()).isEqualTo(savedExperiment.getUserId());
+        assertThat(createdExperimentSave.getTeamId()).isEqualTo(savedExperiment.getTeamId());
+        assertThat(createdExperimentSave.getTeamName()).isEqualTo(savedExperiment.getTeamName());
+        assertThat(createdExperimentSave.getName()).isEqualTo(savedExperiment.getName());
+        assertThat(createdExperimentSave.getDescription()).isEqualTo(savedExperiment.getDescription());
+        assertThat(createdExperimentSave.getNsFile()).isEqualTo(savedExperiment.getNsFile());
+        assertThat(createdExperimentSave.getNsFileContent()).isEqualTo(savedExperiment.getNsFileContent());
+        assertThat(createdExperimentSave.getIdleSwap()).isEqualTo(savedExperiment.getIdleSwap());
+        assertThat(createdExperimentSave.getMaxDuration()).isEqualTo(savedExperiment.getMaxDuration());
     }
 
     @Test
-    public void testSaveExperimentDifferentTeamSameExpName() throws Exception {
-        ExperimentEntity one = Util.getExperimentsEntity();
-        ExperimentEntity two = Util.getExperimentsEntity();
-        final String expName = RandomStringUtils.randomAlphabetic(8);
-        one.setName(expName);
-        two.setName(expName);
-        Experiment oneSaved = experimentService.save(one);
-        Experiment twoSaved = experimentService.save(two);
+    public void testSaveExperimentBad() throws Exception {
+        // try to create another experiment with same team name and same exp name
+        ExperimentEntity createdExperimentSave = Util.getExperimentsEntity();
+        List<ExperimentEntity> expList = new ArrayList<>();
+        expList.add(createdExperimentSave);
 
-        Assert.assertThat(oneSaved.getName(), is(equalTo(twoSaved.getName())));
-        Assert.assertThat(oneSaved.getTeamName(), is(not(equalTo(twoSaved.getTeamName()))));
+        when(experimentRepository.findByTeamName(anyString())).thenReturn(expList);
+
+        exception.expect(ExperimentNameInUseException.class);
+
+        experimentService.save(createdExperimentSave);
+
+        verify(experimentRepository, times(0)).save(any(ExperimentEntity.class));
     }
 
     @Test
     public void testGetExperimentIfNoExperimentInDb() throws Exception {
-
         List<Experiment> experimentEntityList = experimentService.getAll();
-
-        Assert.assertEquals(experimentEntityList.size(), 0);
+        assertThat(experimentEntityList).hasSize(0);
     }
 
     @Test
     public void testGetExperiment() throws Exception {
-        List<Experiment> list = new ArrayList<>();
+        ExperimentEntity createdExperimentSave = Util.getExperimentsEntity();
+        List<ExperimentEntity> expList = new ArrayList<>();
+        expList.add(createdExperimentSave);
 
-        for (int i = 0; i < 3; i++) {
-            list.add(experimentRepository.save(Util.getExperimentsEntity()));
-        }
+        when(experimentRepository.findAll()).thenReturn(expList);
 
-        List<Experiment> listFromDb = experimentService.getAll();
-        Assert.assertTrue(Util.isListEqual(list, listFromDb));
+        List<Experiment> result = experimentService.getAll();
+        assertThat(result).hasSize(1);
+        assertThat(result).isEqualTo(expList);
     }
 
     @Test
     public void testGetExperimentsByUser() throws Exception {
+        ExperimentEntity createdExperimentSave = Util.getExperimentsEntity();
+        List<ExperimentEntity> expList = new ArrayList<>();
+        expList.add(createdExperimentSave);
 
-        int numEntries = 6;
+        when(experimentRepository.findByUserId(anyString())).thenReturn(expList);
 
-        final String userId = RandomStringUtils.randomAlphanumeric(20);
-        Util.addExperimentsChangeUserId(numEntries, userId, experimentRepository);
+        List<Experiment> result = experimentService.findByUser("userid");
+        assertThat(result).hasSize(1);
+        assertThat(result).isEqualTo(expList);
+    }
 
-        List<Experiment> list = experimentService.findByUser(userId);
-        Assert.assertEquals(list.size(), numEntries / 2);
-
-        for (Experiment forEntity : list) {
-            Assert.assertEquals(forEntity.getUserId(), userId);
-        }
-
-        List<Experiment> allExperiments = experimentService.getAll();
-        Assert.assertEquals(allExperiments.size(), numEntries);
+    @Test
+    public void testGetExperimentsByUserNullId() throws Exception {
+        exception.expect(UserIdNotFoundException.class);
+        experimentService.findByUser("");
     }
 
     @Test
     public void testGetExperimentsByTeam() throws Exception {
+        ExperimentEntity createdExperimentSave = Util.getExperimentsEntity();
+        List<ExperimentEntity> expList = new ArrayList<>();
+        expList.add(createdExperimentSave);
 
-        int numEntries = 6;
+        when(experimentRepository.findByTeamId(anyString())).thenReturn(expList);
 
-        final String teamId = RandomStringUtils.randomAlphanumeric(20);
-        Util.addExperimentsChangeTeamId(numEntries, teamId, experimentRepository);
+        List<Experiment> result = experimentService.findByTeam("teamid");
+        assertThat(result).hasSize(1);
+        assertThat(result).isEqualTo(expList);
+    }
 
-        List<Experiment> list = experimentService.findByTeam(teamId);
-        Assert.assertEquals(list.size(), numEntries / 2);
-
-        for (Experiment forEntity : list) {
-            Assert.assertEquals(forEntity.getTeamId(), teamId);
-        }
-
-        List<Experiment> allExperiments = experimentService.getAll();
-        Assert.assertEquals(allExperiments.size(), numEntries);
+    @Test
+    public void testGetExperimentsByTeamNullId() throws Exception {
+        exception.expect(UserIdNotFoundException.class);
+        experimentService.findByTeam("");
     }
 
     @Test
     public void testGetExperimentsUserHasNoExperiments() throws Exception {
-        final String userId = RandomStringUtils.randomAlphanumeric(20);
-        for (int i = 0; i < 3; i++) {
-            experimentRepository.save(Util.getExperimentsEntity());
-        }
+        List<ExperimentEntity> expList = new ArrayList<>();
 
-        List<Experiment> list = experimentService.findByUser(userId);
-        Assert.assertEquals(list.size(), 0);
+        when(experimentRepository.findByUserId(anyString())).thenReturn(expList);
+
+        List<Experiment> result = experimentService.findByUser("userid");
+        assertThat(result).isEmpty();
     }
 
     @Test
     public void testGetExperimentsTeamHasNoExperiments() throws Exception {
-        final String teamId = RandomStringUtils.randomAlphanumeric(20);
-        for (int i = 0; i < 3; i++) {
-            experimentRepository.save(Util.getExperimentsEntity());
-        }
+        List<ExperimentEntity> expList = new ArrayList<>();
 
-        List<Experiment> list = experimentService.findByTeam(teamId);
-        Assert.assertEquals(list.size(), 0);
+        when(experimentRepository.findByTeamId(anyString())).thenReturn(expList);
+
+        List<Experiment> result = experimentService.findByTeam("teamid");
+        assertThat(result).isEmpty();
     }
 
     @Test
     public void testDeleteExperimentGood() throws Exception {
-
-        Authentication authentication = mock(Authentication.class);
-        SecurityContext securityContext = mock(SecurityContext.class);
-
         ExperimentEntity experimentEntity = Util.getExperimentsEntity();
-        ExperimentEntity savedExperiment = experimentRepository.save(experimentEntity);
+        RealizationEntity realizationEntity = Util.getRealizationEntity();
+        final List<Role> roles = Collections.singletonList(Role.USER);
 
-        RealizationEntity realizationEntity = new RealizationEntity();
-        realizationEntity.setExperimentId(savedExperiment.getId());
-        realizationEntity.setExperimentName(savedExperiment.getName());
-        realizationEntity.setUserId(savedExperiment.getUserId());
-        realizationEntity.setTeamId(savedExperiment.getTeamId());
-        realizationEntity.setNumberOfNodes(Integer.parseInt(RandomStringUtils.randomNumeric(5)));
-        realizationEntity.setIdleMinutes(Long.parseLong(RandomStringUtils.randomNumeric(5)));
-        realizationEntity.setRunningMinutes(Long.parseLong(RandomStringUtils.randomNumeric(5)));
-        realizationRepository.save(realizationEntity);
+        when(experimentRepository.getOne(anyLong())).thenReturn(experimentEntity);
+        when(realizationService.getByExperimentId(anyLong())).thenReturn(realizationEntity);
+        when(claims.getSubject()).thenReturn(realizationEntity.getUserId()); // claims user id should be identical to realizationEntity user id
+        when(claims.get(JwtToken.KEY)).thenReturn(roles);
 
-        compareCounts(new Long(1L));
+        Experiment result = experimentService.deleteExperiment(1L, "teamName", claims);
 
-        when(securityContext.getAuthentication()).thenReturn(authentication);
-        SecurityContextHolder.setContext(securityContext);
-        when(SecurityContextHolder.getContext().getAuthentication().getPrincipal()).thenReturn(savedExperiment.getUserId());
-
-        experimentService.deleteExperiment(savedExperiment.getId(), experimentEntity.getTeamName());
-
-        compareCounts(new Long(0L));
+        verify(experimentRepository, times(1)).delete(anyLong());
+        assertThat(experimentEntity).isEqualTo(result);
     }
 
     @Test
     public void testDeleteExperimentAdmin() throws Exception {
-        Authentication authentication = mock(Authentication.class);
-        SecurityContext securityContext = mock(SecurityContext.class);
-        String notOwnerId = RandomStringUtils.randomAlphanumeric(20);
-        Collection roleList = new ArrayList<GrantedAuthority>();
-        roleList.add(Role.ADMIN);
-
         ExperimentEntity experimentEntity = Util.getExperimentsEntity();
-        ExperimentEntity savedExperiment = experimentRepository.save(experimentEntity);
+        RealizationEntity realizationEntity = Util.getRealizationEntity();
+        final List<Role> roles = Collections.singletonList(Role.ADMIN);
 
-        RealizationEntity realizationEntity = new RealizationEntity();
-        realizationEntity.setExperimentId(savedExperiment.getId());
-        realizationEntity.setExperimentName(savedExperiment.getName());
-        realizationEntity.setUserId(savedExperiment.getUserId());
-        realizationEntity.setTeamId(savedExperiment.getTeamId());
-        realizationEntity.setNumberOfNodes(Integer.parseInt(RandomStringUtils.randomNumeric(5)));
-        realizationEntity.setIdleMinutes(Long.parseLong(RandomStringUtils.randomNumeric(5)));
-        realizationEntity.setRunningMinutes(Long.parseLong(RandomStringUtils.randomNumeric(5)));
-        realizationRepository.save(realizationEntity);
+        when(experimentRepository.getOne(anyLong())).thenReturn(experimentEntity);
+        when(realizationService.getByExperimentId(anyLong())).thenReturn(realizationEntity);
+        when(claims.getSubject()).thenReturn("userId"); // userid not matched on purpose with realizationEntity because we want to test the role effect
+        when(claims.get(JwtToken.KEY)).thenReturn(roles);
 
-        when(securityContext.getAuthentication()).thenReturn(authentication);
-        SecurityContextHolder.setContext(securityContext);
-        when(SecurityContextHolder.getContext().getAuthentication().getPrincipal()).thenReturn(notOwnerId);
-        when(SecurityContextHolder.getContext().getAuthentication().getAuthorities()).thenReturn(roleList);
+        Experiment result = experimentService.deleteExperiment(1L, "teamName", claims);
 
-        experimentService.deleteExperiment(savedExperiment.getId(), experimentEntity.getTeamName());
+        verify(experimentRepository, times(1)).delete(anyLong());
+        assertThat(experimentEntity).isEqualTo(result);
     }
 
     @Test
     public void testDeleteExperimentNotExpCreator() throws Exception {
-        Authentication authentication = mock(Authentication.class);
-        SecurityContext securityContext = mock(SecurityContext.class);
-        String notOwnerId = RandomStringUtils.randomAlphanumeric(20);
+        // to trigger the addCheck() in deleteExperiment
+        RealizationEntity realizationEntity = Util.getRealizationEntity();
+        final List<Role> roles = Collections.singletonList(Role.USER);
 
-        ExperimentEntity experimentEntity = Util.getExperimentsEntity();
-        ExperimentEntity savedExperiment = experimentRepository.save(experimentEntity);
-
-        RealizationEntity realizationEntity = new RealizationEntity();
-        realizationEntity.setExperimentId(savedExperiment.getId());
-        realizationEntity.setExperimentName(savedExperiment.getName());
-        realizationEntity.setUserId(savedExperiment.getUserId());
-        realizationEntity.setTeamId(savedExperiment.getTeamId());
-        realizationEntity.setNumberOfNodes(Integer.parseInt(RandomStringUtils.randomNumeric(5)));
-        realizationEntity.setIdleMinutes(Long.parseLong(RandomStringUtils.randomNumeric(5)));
-        realizationEntity.setRunningMinutes(Long.parseLong(RandomStringUtils.randomNumeric(5)));
-        realizationRepository.save(realizationEntity);
-
-
-        when(securityContext.getAuthentication()).thenReturn(authentication);
-        SecurityContextHolder.setContext(securityContext);
-        when(SecurityContextHolder.getContext().getAuthentication().getPrincipal()).thenReturn(notOwnerId);
+        when(realizationService.getByExperimentId(anyLong())).thenReturn(realizationEntity);
+        when(claims.getSubject()).thenReturn("userId"); // trigger the add check
+        when(claims.get(JwtToken.KEY)).thenReturn(roles);
 
         exception.expect(ForbiddenException.class);
-        exception.expectMessage("Access denied for delete experiment: expid " + savedExperiment.getId());
-        experimentService.deleteExperiment(savedExperiment.getId(), experimentEntity.getTeamName());
+        exception.expectMessage("Permission denied");
+        experimentService.deleteExperiment(1L, "teamName", claims);
+
+        verify(experimentRepository, times(0)).delete(anyLong());
     }
 
     @Test
-    public void testDeleteExperimentNotCreatorNotAdmin() throws Exception {
-        Authentication authentication = mock(Authentication.class);
-        SecurityContext securityContext = mock(SecurityContext.class);
-        String notOwnerId = RandomStringUtils.randomAlphanumeric(20);
-        Collection roleList = new ArrayList<GrantedAuthority>();
-        roleList.add(Role.USER);
+    public void testDeleteExperimentBadAuthoritiesDataType() throws Exception {
+        RealizationEntity realizationEntity = Util.getRealizationEntity();
 
-        ExperimentEntity experimentEntity = Util.getExperimentsEntity();
-        ExperimentEntity savedExperiment = experimentRepository.save(experimentEntity);
-
-        RealizationEntity realizationEntity = new RealizationEntity();
-        realizationEntity.setExperimentId(savedExperiment.getId());
-        realizationEntity.setExperimentName(savedExperiment.getName());
-        realizationEntity.setUserId(savedExperiment.getUserId());
-        realizationEntity.setTeamId(savedExperiment.getTeamId());
-        realizationEntity.setNumberOfNodes(Integer.parseInt(RandomStringUtils.randomNumeric(5)));
-        realizationEntity.setIdleMinutes(Long.parseLong(RandomStringUtils.randomNumeric(5)));
-        realizationEntity.setRunningMinutes(Long.parseLong(RandomStringUtils.randomNumeric(5)));
-        realizationRepository.save(realizationEntity);
-
-        when(securityContext.getAuthentication()).thenReturn(authentication);
-        SecurityContextHolder.setContext(securityContext);
-        when(SecurityContextHolder.getContext().getAuthentication().getPrincipal()).thenReturn(notOwnerId);
-        when(SecurityContextHolder.getContext().getAuthentication().getAuthorities()).thenReturn(roleList);
+        when(realizationService.getByExperimentId(anyLong())).thenReturn(realizationEntity);
+        when(claims.getSubject()).thenReturn("userId");
+        when(claims.get(JwtToken.KEY)).thenReturn("ADMIN"); // not supposed to be a String
 
         exception.expect(ForbiddenException.class);
-        exception.expectMessage("Access denied for delete experiment: expid " + savedExperiment.getId());
-        experimentService.deleteExperiment(savedExperiment.getId(), experimentEntity.getTeamName());
-    }
+        exception.expectMessage("Permission denied");
+        experimentService.deleteExperiment(1L, "teamName", claims);
 
-    private void compareCounts(Long count) {
-        Long experimentCount = experimentRepository.count();
-        Long realizationCount = realizationRepository.count();
-
-        Assert.assertEquals(experimentCount, count);
-        Assert.assertEquals(realizationCount, count);
+        verify(experimentRepository, times(0)).delete(anyLong());
     }
 }

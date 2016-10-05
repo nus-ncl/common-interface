@@ -161,4 +161,26 @@ public class ExperimentRepositoryTest extends AbstractTest {
             checkException(e, "NULL not allowed for column \"MAX_DURATION\"");
         }
     }
+
+//    @Test
+//    public void testSaveExperimentDifferentTeamSameExpName() throws Exception {
+//        ExperimentEntity one = Util.getExperimentsEntity();
+//        ExperimentEntity two = Util.getExperimentsEntity();
+//        one.setName("sameExpName");
+//        two.setName("sameExpName");
+//
+//        when(repository.save(any(ExperimentEntity.class))).thenAnswer(i -> {
+//            ExperimentEntity e = i.getArgumentAt(0, ExperimentEntity.class);
+//            e.setId(Long.parseLong(RandomStringUtils.randomNumeric(10));
+//            return e;
+//        });
+//
+//        Experiment oneSaved = experimentService.save(one);
+//        Experiment twoSaved = experimentService.save(two);
+//
+//        verify(experimentRepository, times(2)).save(any(ExperimentEntity.class));
+//        Assertions.assertThat(oneSaved.getName()).isEqualTo(twoSaved.getName());
+//        Assertions.assertThat(oneSaved.getTeamName()).isNotEqualTo(twoSaved.getTeamName());
+//        Assertions.assertThat(oneSaved.getId()).isNotEqualTo(twoSaved.getId());
+//    }
 }

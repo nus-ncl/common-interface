@@ -58,15 +58,15 @@ public class ExceptionHttpStatusMapTest {
 
     @Test
     public void testSize() throws Exception {
-        assertThat(map.size(), is(equalTo(5)));
-
-        map.put(IllegalArgumentException.class, HttpStatus.OK);
-
         assertThat(map.size(), is(equalTo(6)));
 
         map.put(IllegalArgumentException.class, HttpStatus.OK);
 
-        assertThat(map.size(), is(equalTo(6)));
+        assertThat(map.size(), is(equalTo(7)));
+
+        map.put(IllegalArgumentException.class, HttpStatus.OK);
+
+        assertThat(map.size(), is(equalTo(7)));
     }
 
 }

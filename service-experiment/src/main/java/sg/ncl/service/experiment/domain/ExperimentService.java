@@ -1,5 +1,7 @@
 package sg.ncl.service.experiment.domain;
 
+import io.jsonwebtoken.Claims;
+
 import java.util.List;
 
 /**
@@ -17,6 +19,6 @@ public interface ExperimentService {
 
 //  String createNsFile(String filename, String contents);
 
-    Experiment deleteExperiment(final Long id, final String teamName);
+    Experiment deleteExperiment(Long id, String teamId, Claims claims);
 
 }
