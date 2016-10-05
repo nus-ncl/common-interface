@@ -34,6 +34,7 @@ public class Validator {
 
         log.info("Context user id: {}, Context role: {}", contextUserId, roles);
 
+        // FIXME too strict, we might want users on the same team to remove them also
         if (!contextUserId.equals(realizationEntity.getUserId()) && !roles.contains(Role.ADMIN)) {
             log.warn("Access denied for delete experiment: /{}/ ", realizationEntity.getExperimentId());
             throw new ForbiddenException("Access denied for delete experiment: expid " + realizationEntity.getExperimentId());
