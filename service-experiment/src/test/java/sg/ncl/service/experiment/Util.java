@@ -2,12 +2,7 @@ package sg.ncl.service.experiment;
 
 import org.apache.commons.lang3.RandomStringUtils;
 import sg.ncl.service.experiment.data.jpa.ExperimentEntity;
-import sg.ncl.service.experiment.data.jpa.ExperimentRepository;
-import sg.ncl.service.experiment.domain.Experiment;
 import sg.ncl.service.realization.data.jpa.RealizationEntity;
-
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Created by Desmond.
@@ -40,40 +35,6 @@ public class Util {
         entity.setIdleMinutes(Long.parseLong(RandomStringUtils.randomNumeric(10)));
         entity.setRunningMinutes(Long.parseLong(RandomStringUtils.randomNumeric(10)));
         return entity;
-    }
-
-    public static boolean isListEqual(List<Experiment> one, List<Experiment> two) {
-        ArrayList<Experiment> cp = new ArrayList<>(one);
-        for (Experiment twoIterator : two) {
-            if (!cp.remove(twoIterator)) {
-                return false;
-            }
-        }
-        return cp.isEmpty();
-    }
-
-    public static void addExperimentsChangeUserId(int numEntries, String userId, ExperimentRepository experimentRepository) {
-        for (int i = 0; i < numEntries; i++) {
-            ExperimentEntity experimentEntity = Util.getExperimentsEntity();
-
-            if (i % 2 == 0) {
-                experimentEntity.setUserId(userId);
-            }
-
-            experimentRepository.save(experimentEntity);
-        }
-    }
-
-    public static void addExperimentsChangeTeamId(int numEntries, String teamId, ExperimentRepository experimentRepository) {
-        for (int i = 0; i < numEntries; i++) {
-            ExperimentEntity experimentEntity = Util.getExperimentsEntity();
-
-            if (i % 2 == 0) {
-                experimentEntity.setTeamId(teamId);
-            }
-
-            experimentRepository.save(experimentEntity);
-        }
     }
 
     public static String createNsFileContents() {
