@@ -3,7 +3,13 @@ package sg.ncl.service.user.logic;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.hamcrest.collection.IsIterableContainingInAnyOrder;
 import org.junit.Assert;
+import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
+import org.mockito.Mock;
+import org.mockito.junit.MockitoJUnit;
+import org.mockito.junit.MockitoRule;
 import sg.ncl.service.user.AbstractTest;
 import sg.ncl.service.user.Util;
 import sg.ncl.service.user.data.jpa.AddressEntity;
@@ -23,15 +29,73 @@ import sg.ncl.service.user.exceptions.UsernameAlreadyExistsException;
 import javax.inject.Inject;
 import java.util.List;
 
+import static org.junit.Assert.assertEquals;
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyString;
+import static org.mockito.Mockito.when;
+import static sg.ncl.service.user.Util.getUserEntity;
+
 /**
- * @author Desmond
+ * @author Tran Ly Vu
  */
-public class UserServiceTest extends AbstractTest {
-    @Inject
+public class UserServiceImplTest {
+
+    @Rule
+    public MockitoRule mockito = MockitoJUnit.rule();
+
+    @Rule
+    public ExpectedException exception = ExpectedException.none();
+
+    @Mock
     private UserRepository userRepository;
 
+    @Mock
+    private User user;
+
+    @Mock
+    private UserDetails userDetails;
+
+    private  UserService userServiceImpl;
+
+    @Before
+    public void  setup(){
+        userServiceImpl =new UserServiceImpl(userRepository);
+    }
+
+    //throw UsernameAlreadyExistsException
     @Test
-    public void getAllUserWithNoUserInDbTest() throws Exception {
+    public void createUserTest1() throws Exception {
+        UserEntity userEntity= new UserEntity();
+        userEntity=Util.getUserEntity();
+
+        exception.expect(UsernameAlreadyExistsException.class);
+        when(user.getUserDetails()).thenReturn(userDetails);
+        when(userDetails.getEmail()).thenReturn("test");
+
+        when(userRepository.findByUserDetailsEmail(anyString())).thenReturn(userEntity);
+
+        User actual=userServiceImpl.createUser(user);
+    }
+
+    //no exception thrown
+    @Test
+    public void createUserTest2() throws Exception {
+        UserEntity userEntity= new UserEntity();
+        userEntity=Util.getUserEntity();
+
+        when(user.getUserDetails()).thenReturn(userDetails);
+        when(userDetails.getEmail()).thenReturn("test");
+
+        when(userRepository.findByUserDetailsEmail(anyString())).thenReturn(null);
+
+        User actual=userServiceImpl.createUser(user);
+
+        assertEquals(user, actual);
+    }
+
+
+    @Test
+    public void getAllUserWithNoUserInDbTest() {
         UserService userService = new UserServiceImpl(userRepository);
         List<User> list = userService.getAll();
         Assert.assertTrue(list.size() == 0);
@@ -68,7 +132,7 @@ public class UserServiceTest extends AbstractTest {
     public void findUserWithNoUserInDbTest() throws Exception {
         UserService userService = new UserServiceImpl(userRepository);
         User one = userService.getUser(RandomStringUtils.randomAlphabetic(20));
-        Assert.assertEquals(one, null);
+        assertEquals(one, null);
     }
 
     @Test
@@ -82,23 +146,23 @@ public class UserServiceTest extends AbstractTest {
 
         UserDetailsEntity originalDetails = originalEntity.getUserDetails();
         UserDetails fromDbDetails = fromDbEntity.getUserDetails();
-        Assert.assertEquals(originalDetails.getFirstName(), fromDbDetails.getFirstName());
-        Assert.assertEquals(originalDetails.getLastName(), fromDbDetails.getLastName());
-        Assert.assertEquals(originalDetails.getJobTitle(), fromDbDetails.getJobTitle());
-        Assert.assertEquals(originalDetails.getEmail(), fromDbDetails.getEmail());
-        Assert.assertEquals(originalDetails.getPhone(), fromDbDetails.getPhone());
-        Assert.assertEquals(originalDetails.getInstitution(), fromDbDetails.getInstitution());
-        Assert.assertEquals(originalDetails.getInstitutionAbbreviation(), fromDbDetails.getInstitutionAbbreviation());
-        Assert.assertEquals(originalDetails.getInstitutionWeb(), fromDbDetails.getInstitutionWeb());
+        assertEquals(originalDetails.getFirstName(), fromDbDetails.getFirstName());
+        assertEquals(originalDetails.getLastName(), fromDbDetails.getLastName());
+        assertEquals(originalDetails.getJobTitle(), fromDbDetails.getJobTitle());
+        assertEquals(originalDetails.getEmail(), fromDbDetails.getEmail());
+        assertEquals(originalDetails.getPhone(), fromDbDetails.getPhone());
+        assertEquals(originalDetails.getInstitution(), fromDbDetails.getInstitution());
+        assertEquals(originalDetails.getInstitutionAbbreviation(), fromDbDetails.getInstitutionAbbreviation());
+        assertEquals(originalDetails.getInstitutionWeb(), fromDbDetails.getInstitutionWeb());
 
         AddressEntity originalAddress = originalDetails.getAddress();
         Address fromDbAddress = fromDbDetails.getAddress();
-        Assert.assertEquals(originalAddress.getAddress1(), fromDbAddress.getAddress1());
-        Assert.assertEquals(originalAddress.getAddress2(), fromDbAddress.getAddress2());
-        Assert.assertEquals(originalAddress.getCountry(), fromDbAddress.getCountry());
-        Assert.assertEquals(originalAddress.getRegion(), fromDbAddress.getRegion());
-        Assert.assertEquals(originalAddress.getCity(), fromDbAddress.getCity());
-        Assert.assertEquals(originalAddress.getZipCode(), fromDbAddress.getZipCode());
+        assertEquals(originalAddress.getAddress1(), fromDbAddress.getAddress1());
+        assertEquals(originalAddress.getAddress2(), fromDbAddress.getAddress2());
+        assertEquals(originalAddress.getCountry(), fromDbAddress.getCountry());
+        assertEquals(originalAddress.getRegion(), fromDbAddress.getRegion());
+        assertEquals(originalAddress.getCity(), fromDbAddress.getCity());
+        assertEquals(originalAddress.getZipCode(), fromDbAddress.getZipCode());
     }
 
     @Test
@@ -118,15 +182,15 @@ public class UserServiceTest extends AbstractTest {
         userService.updateUser(idString, userEntityArray[0]);
 
         user = userService.getUser(idString);
-        Assert.assertEquals(user.getUserDetails().getFirstName(), newFirstName);
-        Assert.assertEquals(user.getUserDetails().getLastName(), originalLastName);
+        assertEquals(user.getUserDetails().getFirstName(), newFirstName);
+        assertEquals(user.getUserDetails().getLastName(), originalLastName);
     }
 
     @Test
     public void updateUserNullFieldTest() throws Exception {
         UserService userService = new UserServiceImpl(userRepository);
 
-        final UserEntity userEntity = Util.getUserEntity();
+        final UserEntity userEntity = getUserEntity();
         UserEntity savedUserEntity = userRepository.save(userEntity);
 
         savedUserEntity.getUserDetails().setFirstName(null);
@@ -149,7 +213,7 @@ public class UserServiceTest extends AbstractTest {
     }
 
     private UserEntity[] addUser() throws Exception {
-        UserEntity userEntity = Util.getUserEntity();
+        UserEntity userEntity = getUserEntity();
         UserEntity saveUser = userRepository.save(userEntity);
 
         final UserEntity[] userArray = new UserEntity[2];
@@ -171,24 +235,24 @@ public class UserServiceTest extends AbstractTest {
 
         User userFromDb = userService.getUser(userId);
         List<String> teamList = userFromDb.getTeams();
-        Assert.assertEquals(teamList.get(0), teamId);
+        assertEquals(teamList.get(0), teamId);
     }
 
     @Test
     public void addUserTest() throws Exception {
         UserService userService = new UserServiceImpl(userRepository);
-        UserEntity userEntity = Util.getUserEntity();
+        UserEntity userEntity = getUserEntity();
         User user = userService.createUser(userEntity);
 
         User userFromDb = userService.getUser(user.getId());
-        Assert.assertEquals(userEntity.getUserDetails().getFirstName(), userFromDb.getUserDetails().getFirstName());
+        assertEquals(userEntity.getUserDetails().getFirstName(), userFromDb.getUserDetails().getFirstName());
     }
 
     @Test(expected = UsernameAlreadyExistsException.class)
     public void addUserTestUsernameExists() throws Exception {
         // try to create a user again with the same email
         UserService userService = new UserServiceImpl(userRepository);
-        UserEntity userEntity = Util.getUserEntity();
+        UserEntity userEntity = getUserEntity();
         userService.createUser(userEntity);
         userService.createUser(userEntity);
     }
@@ -208,7 +272,7 @@ public class UserServiceTest extends AbstractTest {
     @Test
     public void removeUserFromTeamTestGood() throws Exception {
         UserService userService = new UserServiceImpl(userRepository);
-        UserEntity userEntity = Util.getUserEntity();
+        UserEntity userEntity = getUserEntity();
         User user = userService.createUser(userEntity);
         String userId = user.getId();
         String teamId = RandomStringUtils.randomAlphabetic(20);
@@ -218,20 +282,20 @@ public class UserServiceTest extends AbstractTest {
         // ensure team is added from the user side
         User userFromDb = userService.getUser(userId);
         List<String> teamList = userFromDb.getTeams();
-        Assert.assertEquals(teamList.get(0), teamId);
+        assertEquals(teamList.get(0), teamId);
 
         // ensure team is removed from the user side
         userService.removeTeam(userId, teamId);
 
         User userFromDb2 = userService.getUser(userId);
         List<String> teamList2 = userFromDb2.getTeams();
-        Assert.assertEquals(teamList2.isEmpty(), true);
+        assertEquals(teamList2.isEmpty(), true);
     }
 
     @Test(expected = InvalidStatusTransitionException.class)
     public void testUpdateUserStatusToCreated() throws Exception {
         UserService userService = new UserServiceImpl(userRepository);
-        UserEntity userEntity = Util.getUserEntity();
+        UserEntity userEntity = getUserEntity();
         User user = userService.createUser(userEntity);
         userService.updateUserStatus(user.getId(), UserStatus.CREATED);
     }
@@ -239,16 +303,16 @@ public class UserServiceTest extends AbstractTest {
     @Test
     public void testUpdateUserStatusCreatedToPending() throws Exception {
         UserService userService = new UserServiceImpl(userRepository);
-        UserEntity userEntity = Util.getUserEntity();
+        UserEntity userEntity = getUserEntity();
         User user = userService.createUser(userEntity);
         User user2 = userService.updateUserStatus(user.getId(), UserStatus.PENDING);
-        Assert.assertEquals(user2.getStatus(), UserStatus.PENDING);
+        assertEquals(user2.getStatus(), UserStatus.PENDING);
     }
 
     @Test(expected = InvalidStatusTransitionException.class)
     public void testUpdateUserStatusCreatedToApproved() throws Exception {
         UserService userService = new UserServiceImpl(userRepository);
-        UserEntity userEntity = Util.getUserEntity();
+        UserEntity userEntity = getUserEntity();
         User user = userService.createUser(userEntity);
         userService.updateUserStatus(user.getId(), UserStatus.APPROVED);
     }
@@ -256,7 +320,7 @@ public class UserServiceTest extends AbstractTest {
     @Test(expected = InvalidStatusTransitionException.class)
     public void testUpdateUserStatusCreatedToRejected() throws Exception {
         UserService userService = new UserServiceImpl(userRepository);
-        UserEntity userEntity = Util.getUserEntity();
+        UserEntity userEntity = getUserEntity();
         User user = userService.createUser(userEntity);
         userService.updateUserStatus(user.getId(), UserStatus.REJECTED);
     }
@@ -264,32 +328,32 @@ public class UserServiceTest extends AbstractTest {
     @Test
     public void testUpdateUserStatusPendingToApproved() throws Exception {
         UserService userService = new UserServiceImpl(userRepository);
-        UserEntity userEntity = Util.getUserEntity();
+        UserEntity userEntity = getUserEntity();
         User user = userService.createUser(userEntity);
         userService.updateUserStatus(user.getId(), UserStatus.PENDING);
         userService.updateUserStatus(user.getId(), UserStatus.APPROVED);
         User user2 = userService.getUser(user.getId());
-        Assert.assertEquals(user2.getStatus(), UserStatus.APPROVED);
+        assertEquals(user2.getStatus(), UserStatus.APPROVED);
     }
 
     @Test
     public void testUpdateUserStatusPendingToRejected() throws Exception {
         UserService userService = new UserServiceImpl(userRepository);
-        UserEntity userEntity = Util.getUserEntity();
+        UserEntity userEntity = getUserEntity();
         User user = userService.createUser(userEntity);
         userService.updateUserStatus(user.getId(), UserStatus.PENDING);
         userService.updateUserStatus(user.getId(), UserStatus.REJECTED);
         User user2 = userService.getUser(user.getId());
-        Assert.assertEquals(user2.getStatus(), UserStatus.REJECTED);
+        assertEquals(user2.getStatus(), UserStatus.REJECTED);
     }
 
     @Test
     public void testUpdateUserStatusToClosed() throws Exception {
         UserService userService = new UserServiceImpl(userRepository);
-        UserEntity userEntity = Util.getUserEntity();
+        UserEntity userEntity = getUserEntity();
         User user = userService.createUser(userEntity);
         userService.updateUserStatus(user.getId(), UserStatus.CLOSED);
         User user2 = userService.getUser(user.getId());
-        Assert.assertEquals(user2.getStatus(), UserStatus.CLOSED);
+        assertEquals(user2.getStatus(), UserStatus.CLOSED);
     }
 }
