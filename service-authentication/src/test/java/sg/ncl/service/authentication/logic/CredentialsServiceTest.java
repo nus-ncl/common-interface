@@ -11,6 +11,7 @@ import org.mockito.junit.MockitoRule;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import sg.ncl.adapter.deterlab.AdapterDeterLab;
 import sg.ncl.common.authentication.Role;
+import sg.ncl.common.exception.base.ForbiddenException;
 import sg.ncl.service.authentication.data.jpa.CredentialsEntity;
 import sg.ncl.service.authentication.data.jpa.CredentialsRepository;
 import sg.ncl.service.authentication.domain.Credentials;
@@ -382,6 +383,19 @@ public class CredentialsServiceTest {
         exception.expect(CredentialsNotFoundException.class);
 
         credentialsService.updateCredentials(credentials.getId(), credentials, claims);
+    }
+
+    @Test
+    public void testUpdatePasswordCredentialsNotRightUser() {
+        final CredentialsEntity entity = getCredentialsEntity();
+
+        when(credentialsRepository.findOne(eq(entity.getId()))).thenReturn(entity);
+        when(claims.getSubject()).thenReturn("id");
+
+        exception.expect(ForbiddenException.class);
+        exception.expectMessage("Permission denied");
+
+        credentialsService.updateCredentials(entity.getId(), entity , claims);
     }
 
 }
