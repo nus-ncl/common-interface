@@ -1,7 +1,9 @@
 package sg.ncl.service.authentication.validation;
 
+import io.jsonwebtoken.Claims;
 import lombok.extern.slf4j.Slf4j;
 import sg.ncl.common.authentication.Role;
+import sg.ncl.common.exception.base.ForbiddenException;
 import sg.ncl.service.authentication.domain.Credentials;
 import sg.ncl.service.authentication.domain.CredentialsStatus;
 import sg.ncl.service.authentication.exceptions.NeitherUsernameNorPasswordModifiedException;
@@ -26,10 +28,23 @@ public class Validator {
         checkPassword(credentials);
     }
 
-    public static void updateCheck(final Credentials credentials) {
+    public static void updateCheck(final String id, final Credentials credentials, final Claims claims) {
         if (isUsernameNullOrEmpty(credentials) && isPasswordNullOrEmpty(credentials)) {
             log.warn("Both username and password not modified");
             throw new NeitherUsernameNorPasswordModifiedException();
+        }
+        // check said user id is identical
+        if (claims.getSubject() == null || claims.getSubject().isEmpty() || !(id.equals(claims.getSubject()))) {
+            log.warn("A user (id='{}') attempted to update the credentials of another user (id='{}')", claims.getSubject(), id);
+            throw new ForbiddenException();
+        }
+    }
+
+    public static void checkClaimsType(final Object claims) {
+        if ( !(claims instanceof Claims) ) {
+            // throw forbidden
+            log.warn("Invalid authentication principal: {}", claims);
+            throw new ForbiddenException();
         }
     }
 

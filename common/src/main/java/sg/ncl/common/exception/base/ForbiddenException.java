@@ -12,16 +12,4 @@ public class ForbiddenException extends RuntimeException {
     public ForbiddenException() {
         super("Permission denied");
     }
-
-    public ForbiddenException(final String message, final Throwable cause) {
-        super(message, cause);
-    }
-
-    public ForbiddenException(final Throwable cause) {
-        super(cause);
-    }
-
-    protected ForbiddenException(final String message, final Throwable cause, final boolean enableSuppression, final boolean writableStackTrace) {
-        super(message, cause, enableSuppression, writableStackTrace);
-    }
 }
