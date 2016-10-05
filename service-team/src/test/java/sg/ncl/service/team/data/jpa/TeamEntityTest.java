@@ -3,23 +3,16 @@ package sg.ncl.service.team.data.jpa;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.junit.Test;
 import sg.ncl.service.team.Util;
-import sg.ncl.service.team.domain.MemberStatus;
-import sg.ncl.service.team.domain.MemberType;
-import sg.ncl.service.team.domain.TeamMember;
-import sg.ncl.service.team.domain.TeamPrivacy;
-import sg.ncl.service.team.domain.TeamStatus;
-import sg.ncl.service.team.domain.TeamVisibility;
+import sg.ncl.service.team.domain.*;
 import sg.ncl.service.team.web.TeamMemberInfo;
 
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 
-import static org.hamcrest.Matchers.containsString;
-import static org.hamcrest.Matchers.equalTo;
-import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.not;
-import static org.hamcrest.Matchers.nullValue;
+import static org.hamcrest.Matchers.*;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertTrue;
 
 /**
  * @author Desmond Lim
@@ -205,6 +198,18 @@ public class TeamEntityTest {
     }
 
     @Test
+    public void testGetMemberByUnknownId() {
+        TeamEntity teamEntity = Util.getTeamEntity();
+        TeamMember teamMember = Util.getTeamMemberInfo(MemberType.MEMBER);
+        teamEntity.addMember(teamMember);
+        String userId = teamMember.getUserId() + "0";
+
+        TeamMember result = teamEntity.getMember(userId);
+
+        assertThat(result, is(nullValue()));
+    }
+
+    @Test
     public void testChangeMemberStatus() throws Exception {
         TeamEntity teamEntity = Util.getTeamEntity();
         TeamMember teamMember = Util.getTeamMemberInfo(MemberType.MEMBER);
@@ -218,6 +223,18 @@ public class TeamEntityTest {
     }
 
     @Test
+    public void testChangeMemberStatusUnknownId() {
+        TeamEntity teamEntity = Util.getTeamEntity();
+        TeamMember teamMember1 = Util.getTeamMemberInfo(MemberType.MEMBER);
+        TeamMember teamMember2 = Util.getTeamMemberInfo(MemberType.MEMBER);
+        teamEntity.addMember(teamMember1);
+
+        TeamMember result = teamEntity.changeMemberStatus(teamMember2, MemberStatus.APPROVED);
+
+        assertThat(result, is(nullValue()));
+    }
+
+    @Test
     public void testAddMember() throws Exception {
         final TeamEntity entity = new TeamEntity();
         final TeamMemberInfo teamMemberInfo = Util.getTeamMemberInfo(MemberType.MEMBER);
@@ -227,11 +244,54 @@ public class TeamEntityTest {
     }
 
     @Test
+    public void testAddMemberExistingMemberRejectedStatus() {
+        final TeamEntity entity = new TeamEntity();
+        final TeamMemberInfo teamMemberInfo = Util.getTeamMemberInfo(MemberType.MEMBER, MemberStatus.REJECTED);
+        entity.addMember(teamMemberInfo);
+        entity.addMember(teamMemberInfo);
+
+        assertThat(entity.getMembers().get(0).getUserId(), is(teamMemberInfo.getUserId()));
+        assertThat(entity.getMembers().get(0).getMemberStatus(), is(MemberStatus.PENDING));
+    }
+
+    @Test
+    public void testAddMemberExistingMemberNonRejectedStatus() {
+        final TeamEntity entity = new TeamEntity();
+        final TeamMemberInfo teamMemberInfo = Util.getTeamMemberInfo(MemberType.MEMBER, MemberStatus.APPROVED);
+        entity.addMember(teamMemberInfo);
+        entity.addMember(teamMemberInfo);
+
+        assertThat(entity.getMembers().get(0).getUserId(), is(teamMemberInfo.getUserId()));
+        assertThat(entity.getMembers().get(0).getMemberStatus(), is(MemberStatus.APPROVED));
+    }
+
+    @Test
     public void testEqual() throws Exception {
         final TeamEntity entity1 = Util.getTeamEntityWithId();
         final TeamEntity entity2 = Util.getTeamEntityWithId();
 
         assertThat(entity1, not(entity2));
+    }
+
+    @Test
+    public void testEqualThis() {
+        final TeamEntity entity1 = Util.getTeamEntityWithId();
+        final TeamEntity entity2 = entity1;
+        assertTrue(entity1.equals(entity2));
+    }
+
+    @Test
+    public void testEqualNull() {
+        final TeamEntity entity1 = Util.getTeamEntityWithId();
+        final TeamEntity entity2 = null;
+        assertFalse(entity1.equals(entity2));
+    }
+
+    @Test
+    public void testEqualDifferent() {
+        final TeamEntity entity1 = Util.getTeamEntityWithId();
+        final TeamEntity entity2 = Util.getTeamEntityWithId();
+        assertFalse(entity1.equals(entity2));
     }
 
     @Test
