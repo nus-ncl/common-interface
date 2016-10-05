@@ -22,26 +22,37 @@ public class DeterLabUserEntityTest {
     }
 
     @Test
-    public void getterAndSetterTest() {
-        final Long firstRandom = new Random().nextLong();
-        deterLabUserEntity.setId(firstRandom);
+    public void testGetId(){
+        final Long expected = new Random().nextLong();
+        deterLabUserEntity.setId(expected);
 
-        final String secondRandom = RandomStringUtils.randomAlphabetic(20);
-        deterLabUserEntity.setNclUserId(secondRandom);
+        Long actual=deterLabUserEntity.getId();
 
-        final String thirdRandom = RandomStringUtils.randomAlphabetic(20);
-        deterLabUserEntity.setDeterUserId(thirdRandom);
-
-        Long actual1=deterLabUserEntity.getId();
-        String actual2=deterLabUserEntity.getNclUserId();
-        String actual3=deterLabUserEntity.getDeterUserId();
-
-        assertThat(actual1).isNotNull();
-        assertThat(actual2).isNotNull();
-        assertThat(actual3).isNotNull();
-
-        assertEquals(firstRandom,actual1);
-        assertEquals(secondRandom,actual2);
-        assertEquals(thirdRandom,actual3);
+        assertThat(actual).isNotNull();
+        assertEquals(expected,actual);
     }
+
+    @Test
+    public void testGetNclUserId(){
+        final String expected = RandomStringUtils.randomAlphabetic(20);
+        deterLabUserEntity.setNclUserId(expected);
+
+        String actual=deterLabUserEntity.getNclUserId();
+
+        assertThat(actual).isNotNull();
+        assertEquals(expected,actual);
+    }
+
+    @Test
+    public void testGetDeterUserId(){
+        final String expected = RandomStringUtils.randomAlphabetic(20);
+        deterLabUserEntity.setDeterUserId(expected);
+
+        String actual=deterLabUserEntity.getDeterUserId();
+
+        assertThat(actual).isNotNull();
+        assertEquals(expected,actual);
+    }
+
+
 }
