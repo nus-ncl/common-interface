@@ -1,7 +1,7 @@
 # Spring Boot Configuration
 # For more information, please read http://docs.spring.io/spring-boot/docs/current/reference/html/index.html
 server:
-  port: 80
+  port: 8080
 spring:
   datasource:
     initialize: true
