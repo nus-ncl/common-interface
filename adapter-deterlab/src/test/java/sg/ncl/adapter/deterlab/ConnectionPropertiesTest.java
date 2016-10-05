@@ -1,41 +1,54 @@
 
 package sg.ncl.adapter.deterlab;
 
-import org.junit.Before;
 import org.junit.Test;
-import org.springframework.test.web.client.MockRestServiceServer;
-import org.springframework.web.client.RestTemplate;
-
+import org.junit.runner.RunWith;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.test.context.TestPropertySource;
+import org.springframework.test.context.junit4.SpringRunner;
+import sg.ncl.adapter.deterlab.ConnectionPropertiesTest.TestConfig;
+import javax.inject.Inject;
+import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
 
 /**
- * Created by Tran Ly Vu on 10/3/2016.
+ * @Author Tran Ly Vu on 10/3/2016.
+ * @Version 1.0
  */
-public class ConnectionPropertiesTest {
-    private ConnectionProperties connectionProperties;
+@RunWith(SpringRunner.class)
+@SpringBootTest(classes =TestConfig.class, webEnvironment = SpringBootTest.WebEnvironment.NONE)
+@TestPropertySource(properties = {
+        "ncl.deterlab.adapter.ip=127.0.0.1",
+        "ncl.deterlab.adapter.port=22"
+})
 
-    @Before
-    public void setUp() throws Exception {
-        connectionProperties=new ConnectionProperties();
+public class ConnectionPropertiesTest {
+
+
+    @Configuration
+    @EnableConfigurationProperties(ConnectionProperties.class)
+    static class TestConfig {
     }
+
+    @Inject
+    private ConnectionProperties connectionProperties;
 
 
     @Test
-    public void getterAndSetterTest(){
-        connectionProperties.setIp("test1");
-        connectionProperties.setPort("test2");
+    public void testIp() throws Exception {
+        assertThat(connectionProperties.getIp()).isEqualTo("127.0.0.1");
+    }
 
-        String actual1=connectionProperties.getIp();
-        String actual2=connectionProperties.getPort();
-
-        assertEquals("test1",actual1);
-        assertEquals("test2",actual2);
+    @Test
+    public void testPort() throws Exception {
+        assertThat(connectionProperties.getPort()).isEqualTo("22");
     }
 
     @Test
     public void othersTest(){
-        connectionProperties.setIp("test1");
-        connectionProperties.setPort("test2");
 
         String actual1= connectionProperties.getJoinProjectNewUsers();
         String actual2= connectionProperties.getJoinProject();
@@ -53,20 +66,20 @@ public class ConnectionPropertiesTest {
         String actual14= connectionProperties.getExpStatus();
 
 
-        String expected1="http://test1:test2/joinProjectNewUsers";
-        String expected2="http://test1:test2/joinProject";
-        String expected3="http://test1:test2/applyProjectNewUsers";
-        String expected4="http://test1:test2/createExperiment";
-        String expected5="http://test1:test2/startExperiment";
-        String expected6="http://test1:test2/stopExperiment";
-        String expected7="http://test1:test2/deleteExperiment";
-        String expected8="http://test1:test2/changePassword";
-        String expected9="http://test1:test2/approveJoinRequest";
-        String expected10="http://test1:test2/rejectJoinRequest";
-        String expected11="http://test1:test2/applyProject";
-        String expected12="http://test1:test2/approveProject";
-        String expected13="http://test1:test2/rejectProject";
-        String expected14="http://test1:test2/getExpStatus";
+        String expected1="http://127.0.0.1:22/joinProjectNewUsers";
+        String expected2="http://127.0.0.1:22/joinProject";
+        String expected3="http://127.0.0.1:22/applyProjectNewUsers";
+        String expected4="http://127.0.0.1:22/createExperiment";
+        String expected5="http://127.0.0.1:22/startExperiment";
+        String expected6="http://127.0.0.1:22/stopExperiment";
+        String expected7="http://127.0.0.1:22/deleteExperiment";
+        String expected8="http://127.0.0.1:22/changePassword";
+        String expected9="http://127.0.0.1:22/approveJoinRequest";
+        String expected10="http://127.0.0.1:22/rejectJoinRequest";
+        String expected11="http://127.0.0.1:22/applyProject";
+        String expected12="http://127.0.0.1:22/approveProject";
+        String expected13="http://127.0.0.1:22/rejectProject";
+        String expected14="http://127.0.0.1:22/getExpStatus";
 
 
         assertEquals(expected1,actual1);
