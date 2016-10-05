@@ -57,7 +57,7 @@ public class CredentialsController {
     @PutMapping(path = "/{id}", consumes = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
     public Credentials updateCredentials(@PathVariable final String id, @RequestBody final CredentialsInfo credentials, @AuthenticationPrincipal Object claims) {
-        checkClaimsType(claims, "Access denied for update credentials " + claims);
+        checkClaimsType(claims);
         updateCheck(credentials, (Claims) claims);
         return new CredentialsInfo(credentialsService.updateCredentials(id, credentials, (Claims) claims));
     }
