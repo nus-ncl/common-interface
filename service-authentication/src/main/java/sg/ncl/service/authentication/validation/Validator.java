@@ -28,14 +28,14 @@ public class Validator {
         checkPassword(credentials);
     }
 
-    public static void updateCheck(final Credentials credentials, final Claims claims) {
+    public static void updateCheck(final String id, final Credentials credentials, final Claims claims) {
         if (isUsernameNullOrEmpty(credentials) && isPasswordNullOrEmpty(credentials)) {
             log.warn("Both username and password not modified");
             throw new NeitherUsernameNorPasswordModifiedException();
         }
         // check said user id is identical
-        if (claims.getSubject() == null || claims.getSubject().isEmpty() || !(credentials.getId().equals(claims.getSubject()))) {
-            log.warn("A user (id='{}') attempted to update the credentials of another user (id='{}')", claims.getSubject(), credentials.getId());
+        if (claims.getSubject() == null || claims.getSubject().isEmpty() || !(id.equals(claims.getSubject()))) {
+            log.warn("A user (id='{}') attempted to update the credentials of another user (id='{}')", claims.getSubject(), id);
             throw new ForbiddenException();
         }
     }
