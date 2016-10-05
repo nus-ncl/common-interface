@@ -26,7 +26,7 @@ import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static sg.ncl.service.experiment.validation.Validator.addCheck;
+import static sg.ncl.service.experiment.validation.Validator.checkPermissions;
 
 /**
  * Created by Desmond.
@@ -232,7 +232,7 @@ public class ExperimentServiceImpl implements ExperimentService {
         RealizationEntity realizationEntity = realizationService.getByExperimentId(id);
         Long realizationId = realizationEntity.getId();
 
-        addCheck(realizationEntity, claims);
+        checkPermissions(realizationEntity, claims);
 
         if (realizationId != null && realizationId > 0) {
             realizationService.deleteRealization(realizationId);

@@ -20,10 +20,6 @@ public class Validator {
 
     }
 
-    public static void addCheck(final RealizationEntity realizationEntity, final Claims claims) {
-        checkPermissions(realizationEntity, claims);
-    }
-
     public static void checkPermissions(final RealizationEntity realizationEntity, final Claims claims) {
         if (!(claims.get(JwtToken.KEY) instanceof ArrayList<?>)) {
             log.warn("Bad claims type found: {}", claims);
