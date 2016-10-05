@@ -28,10 +28,15 @@ public class Validator {
         checkPassword(credentials);
     }
 
-    public static void updateCheck(final Credentials credentials) {
+    public static void updateCheck(final Credentials credentials, final Claims claims) {
         if (isUsernameNullOrEmpty(credentials) && isPasswordNullOrEmpty(credentials)) {
             log.warn("Both username and password not modified");
             throw new NeitherUsernameNorPasswordModifiedException();
+        }
+        // check said user id is identical
+        if (claims.getSubject() == null || claims.getSubject().isEmpty() || !(credentials.getId().equals(claims.getSubject()))) {
+            log.warn("Access denied for updating user details: {} via claims id {}", credentials.getId(), claims.getSubject());
+            throw new ForbiddenException("Access denied for updating user details: " + credentials.getId() + " via claims id " + claims.getSubject());
         }
     }
 
@@ -80,14 +85,6 @@ public class Validator {
         if (roles == null || roles.isEmpty()) {
             log.warn("Roles is null or empty: {}", roles);
             throw new RolesIsNullOrEmptyException();
-        }
-    }
-
-    public static void checkPermissions(final Credentials credentials, final Claims claims) {
-        // check said user id is identical
-        if (claims.getSubject() == null || claims.getSubject().isEmpty() || !(credentials.getId().equals(claims.getSubject()))) {
-            log.warn("Access denied for updating user details: {} via claims id {}", credentials.getId(), claims.getSubject());
-            throw new ForbiddenException("Access denied for updating user details: " + credentials.getId() + " via claims id " + claims.getSubject());
         }
     }
 
