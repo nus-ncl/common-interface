@@ -30,13 +30,13 @@ public class AdapterDeterLab {
     private ConnectionProperties properties;
     private static final Logger logger = LoggerFactory.getLogger(AdapterDeterLab.class);
 
-    @Inject
     private RestTemplate restTemplate;
 
     @Inject
-    public AdapterDeterLab(DeterLabUserRepository repository, ConnectionProperties connectionProperties) {
+    public AdapterDeterLab(DeterLabUserRepository repository, ConnectionProperties connectionProperties, RestTemplate restTemplate) {
         this.deterLabUserRepository = repository;
         this.properties = connectionProperties;
+        this.restTemplate=restTemplate;
     }
 
     /**
