@@ -208,7 +208,7 @@ public class ExperimentsControllerTest {
 
         when(experimentService.deleteExperiment(anyLong(), anyString(), any(Claims.class))).thenReturn(entity);
 
-        mockMvc.perform(delete("/experiments/" + experimentId + "/teams/" + teamId))
+        mockMvc.perform(delete(ExperimentsController.PATH + "/teams/" + teamId + "/experiments/" + experimentId))
                 .andExpect(status().isOk())
                 .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
 
@@ -231,7 +231,7 @@ public class ExperimentsControllerTest {
 
         when(experimentService.deleteExperiment(anyLong(), anyString(), any(Claims.class))).thenReturn(null);
 
-        mockMvc.perform(delete("/experiments/" + 1L + "/teams/" + "teamId"))
+        mockMvc.perform(delete(ExperimentsController.PATH + "/teams/" + "teamId" + "/experiments/" + 1L))
                 .andExpect(status().isForbidden())
                 .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON));
     }
@@ -244,7 +244,7 @@ public class ExperimentsControllerTest {
 
         when(experimentService.deleteExperiment(anyLong(), anyString(), any(Claims.class))).thenReturn(null);
 
-        mockMvc.perform(delete("/experiments/" + 1L + "/teams/" + "teamId"))
+        mockMvc.perform(delete(ExperimentsController.PATH + "/teams/" + "teamId" + "/experiments/" + 1L))
                 .andExpect(status().isForbidden())
                 .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON));
     }
