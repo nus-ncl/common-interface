@@ -2,6 +2,7 @@ package sg.ncl.service.user.data.jpa;
 
 import org.apache.commons.lang3.RandomStringUtils;
 import org.junit.Test;
+import sg.ncl.service.user.Util;
 
 import java.util.Random;
 
@@ -126,6 +127,19 @@ public class AddressEntityTest {
         addressEntity.setZipCode(zipCode);
 
         assertThat(addressEntity.getZipCode(), is(equalTo(zipCode)));
+    }
+
+    @Test
+    public void testStaticGetAddress() {
+        final AddressEntity addressEntity = Util.getAddressEntity();
+        AddressEntity returnAddressEntity = AddressEntity.get(addressEntity);
+
+        assertThat(returnAddressEntity.getAddress1(), is(equalTo(addressEntity.getAddress1())));
+        assertThat(returnAddressEntity.getAddress2(), is(equalTo(addressEntity.getAddress2())));
+        assertThat(returnAddressEntity.getCountry(), is(equalTo(addressEntity.getCountry())));
+        assertThat(returnAddressEntity.getRegion(), is(equalTo(addressEntity.getRegion())));
+        assertThat(returnAddressEntity.getCity(), is(equalTo(addressEntity.getCity())));
+        assertThat(returnAddressEntity.getZipCode(), is(equalTo(addressEntity.getZipCode())));
     }
 
     @Test
