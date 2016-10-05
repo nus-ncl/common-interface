@@ -7,9 +7,7 @@ import sg.ncl.service.team.domain.MemberType;
 
 import java.time.ZonedDateTime;
 
-import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.notNullValue;
-import static org.hamcrest.Matchers.nullValue;
+import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.assertThat;
 
 /**
@@ -34,10 +32,21 @@ public class TeamMemberEntityTest {
     }
 
     @Test
-    public void testGetTeam() throws Exception {
+    public void testGetTeamNull() throws Exception {
         final TeamMemberEntity entity = new TeamMemberEntity();
 
         assertThat(entity.getTeam(), is(nullValue()));
+    }
+
+    @Test
+    public void testGetTeamAvailable() {
+        final TeamMemberEntity entity = new TeamMemberEntity();
+        final TeamEntity teamEntity = new TeamEntity();
+        final String name = RandomStringUtils.randomAlphanumeric(20);
+        teamEntity.setName(name);
+        entity.setTeam(teamEntity);
+
+        assertThat(entity.getTeam(), is(teamEntity));
     }
 
     @Test
