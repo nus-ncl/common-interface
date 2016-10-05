@@ -10,7 +10,6 @@ import org.junit.rules.ExpectedException;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
-import sg.ncl.service.user.AbstractTest;
 import sg.ncl.service.user.Util;
 import sg.ncl.service.user.data.jpa.AddressEntity;
 import sg.ncl.service.user.data.jpa.UserDetailsEntity;
@@ -25,19 +24,23 @@ import sg.ncl.service.user.exceptions.InvalidStatusTransitionException;
 import sg.ncl.service.user.exceptions.UserIdNullOrEmptyException;
 import sg.ncl.service.user.exceptions.UserNotFoundException;
 import sg.ncl.service.user.exceptions.UsernameAlreadyExistsException;
+//import sg.ncl.service.user.logic.UserServiceImpl;
 
-import javax.inject.Inject;
 import java.util.List;
 
 import static org.junit.Assert.assertEquals;
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyString;
+import static org.junit.Assert.assertThat;
+import static org.mockito.Matchers.*;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static sg.ncl.service.user.Util.getUserEntity;
 
 /**
  * @author Tran Ly Vu
+ * @Version 1.0
  */
+
 public class UserServiceImplTest {
 
     @Rule
@@ -49,13 +52,8 @@ public class UserServiceImplTest {
     @Mock
     private UserRepository userRepository;
 
-    @Mock
-    private User user;
 
-    @Mock
-    private UserDetails userDetails;
-
-    private  UserService userServiceImpl;
+    private  UserServiceImpl userServiceImpl;
 
     @Before
     public void  setup(){
@@ -65,44 +63,44 @@ public class UserServiceImplTest {
     //throw UsernameAlreadyExistsException
     @Test
     public void createUserTest1() throws Exception {
-        UserEntity userEntity= new UserEntity();
-        userEntity=Util.getUserEntity();
+        UserEntity userEntity= Util.getUserEntity();
 
         exception.expect(UsernameAlreadyExistsException.class);
-        when(user.getUserDetails()).thenReturn(userDetails);
-        when(userDetails.getEmail()).thenReturn("test");
-
         when(userRepository.findByUserDetailsEmail(anyString())).thenReturn(userEntity);
+        User actual=userServiceImpl.createUser(userEntity);
 
-        User actual=userServiceImpl.createUser(user);
-    }
+        verify(userRepository,times(1)).findByUserDetailsEmail(anyString());
+}
 
     //no exception thrown
     @Test
     public void createUserTest2() throws Exception {
-        UserEntity userEntity= new UserEntity();
+        UserDetailsEntity userDetailsEntity=Util.getUserDetailsEntity();;
+        userDetailsEntity.setEmail(null);
+
+        User userEntity= new UserEntity();
         userEntity=Util.getUserEntity();
 
-        when(user.getUserDetails()).thenReturn(userDetails);
-        when(userDetails.getEmail()).thenReturn("test");
-
         when(userRepository.findByUserDetailsEmail(anyString())).thenReturn(null);
+        User actual=userServiceImpl.createUser(userEntity);
 
-        User actual=userServiceImpl.createUser(user);
+        verify(userRepository,times(1)).findByUserDetailsEmail(anyString());
+        verify(userRepository,times(1)).save((any(UserEntity.class)));
 
-        assertEquals(user, actual);
-    }
-
-
-    @Test
-    public void getAllUserWithNoUserInDbTest() {
-        UserService userService = new UserServiceImpl(userRepository);
-        List<User> list = userService.getAll();
-        Assert.assertTrue(list.size() == 0);
+        // assertEquals(userEntity, actual);
+        //assertEquals(userEntity.getProcessedDate(), actual.getProcessedDate());
+       // assertEquals(userEntity.getUserDetails(), actual.getUserDetails());
     }
 
     @Test
-    public void getAllUserTest() throws Exception {
+    public void testGetAll1(){
+        List<User> actual=userServiceImpl.getAll();
+        verify(userRepository,times(1)).findAll();
+        Assert.assertTrue(actual.size() == 0);
+    }
+
+    @Test
+    public void testGetAll2() throws Exception {
         UserService userService = new UserServiceImpl(userRepository);
         User[] userArray = new User[3];
 
@@ -111,12 +109,30 @@ public class UserServiceImplTest {
             userArray[i] = userEntityArray[0];
         }
 
-        List<User> userList2 = userService.getAll();
+        List<User> actual= userService.getAll();
 
-        Assert.assertThat(userList2, IsIterableContainingInAnyOrder.containsInAnyOrder(userArray));
+        verify(userRepository,times(1)).findAll();
+        assertThat(actual, IsIterableContainingInAnyOrder.containsInAnyOrder(userArray));
     }
 
-    @Test(expected = UserIdNullOrEmptyException.class)
+    //ask christ =>cant test private method
+ //  @Test
+ //  public void testGetUser(){
+  //     User actual=userServiceImpl.getUser("test");
+  //      verify(userServiceImpl,times(1)).findUser("test");
+   // }
+
+    //throw UserNotFoundException
+  //  @Test
+  //  public void testVerifyEmail1(){
+
+   //     exception.expect(UserNotFoundException.class);
+   //     when(userServiceImpl.findUser(anyString())).thenReturn(null);
+   //     UserStatus actual= userServiceImpl.verifyEmail(null,"","");
+
+   // }
+
+    @Test
     public void getUserWithNullIdTest() throws Exception {
         UserService userService = new UserServiceImpl(userRepository);
         userService.getUser(null);
