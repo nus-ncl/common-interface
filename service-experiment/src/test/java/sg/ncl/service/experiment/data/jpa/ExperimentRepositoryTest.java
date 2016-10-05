@@ -1,14 +1,11 @@
 package sg.ncl.service.experiment.data.jpa;
 
-import org.apache.commons.lang3.RandomStringUtils;
-import org.assertj.core.api.Assertions;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.springframework.dao.DataIntegrityViolationException;
 import sg.ncl.service.experiment.AbstractTest;
 import sg.ncl.service.experiment.Util;
-import sg.ncl.service.experiment.domain.Experiment;
 
 import javax.inject.Inject;
 import java.time.ZonedDateTime;
@@ -18,10 +15,6 @@ import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.not;
 import static org.hamcrest.Matchers.nullValue;
 import static org.junit.Assert.assertThat;
-import static org.mockito.Matchers.any;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 import static sg.ncl.common.test.Checks.checkException;
 
 /**
