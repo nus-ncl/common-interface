@@ -307,6 +307,7 @@ public class CredentialsControllerTest {
         final byte[] content = mapper.writeValueAsBytes(credentialsInfo);
 
         when(credentialsService.updateCredentials(anyString(), any(Credentials.class), any(Claims.class))).thenReturn(credentialsInfo);
+        when(claims.getSubject()).thenReturn("id");
 
         mockMvc.perform(put(CredentialsController.PATH + "/id").contentType(MediaType.APPLICATION_JSON).content(content))
                 .andExpect(status().isOk())
@@ -319,6 +320,7 @@ public class CredentialsControllerTest {
         final byte[] content = mapper.writeValueAsBytes(credentialsInfo);
 
         when(credentialsService.updateCredentials(anyString(), any(Credentials.class), any(Claims.class))).thenReturn(credentialsInfo);
+        when(claims.getSubject()).thenReturn("id");
 
         mockMvc.perform(put(CredentialsController.PATH + "/id").contentType(MediaType.APPLICATION_JSON).content(content))
                 .andExpect(status().isOk())
@@ -331,6 +333,7 @@ public class CredentialsControllerTest {
         final byte[] content = mapper.writeValueAsBytes(credentialsInfo);
 
         when(credentialsService.updateCredentials(anyString(), any(Credentials.class), any(Claims.class))).thenReturn(credentialsInfo);
+        when(claims.getSubject()).thenReturn("id");
 
         mockMvc.perform(put(CredentialsController.PATH + "/id").contentType(MediaType.APPLICATION_JSON).content(content))
                 .andExpect(status().isOk())
@@ -343,6 +346,7 @@ public class CredentialsControllerTest {
         final byte[] content = mapper.writeValueAsBytes(credentialsInfo);
 
         when(credentialsService.updateCredentials(anyString(), any(Credentials.class), any(Claims.class))).thenReturn(credentialsInfo);
+        when(claims.getSubject()).thenReturn("id");
 
         mockMvc.perform(put(CredentialsController.PATH + "/id").contentType(MediaType.APPLICATION_JSON).content(content))
                 .andExpect(status().isOk())
@@ -355,6 +359,7 @@ public class CredentialsControllerTest {
         final byte[] content = mapper.writeValueAsBytes(credentialsInfo);
 
         when(credentialsService.updateCredentials(anyString(), any(Credentials.class), any(Claims.class))).thenReturn(credentialsInfo);
+        when(claims.getSubject()).thenReturn("id");
 
         mockMvc.perform(put(CredentialsController.PATH + "/id").contentType(MediaType.APPLICATION_JSON).content(content))
                 .andExpect(status().isOk())
@@ -407,6 +412,7 @@ public class CredentialsControllerTest {
         final byte[] content = mapper.writeValueAsBytes(credentialsInfo);
 
         doThrow(new CredentialsNotFoundException("id")).when(credentialsService).updateCredentials(anyString(), any(Credentials.class), any(Claims.class));
+        when(claims.getSubject()).thenReturn("id");
 
         mockMvc.perform(put(CredentialsController.PATH + "/id").contentType(MediaType.APPLICATION_JSON).content(content))
                 .andExpect(status().isNotFound())
