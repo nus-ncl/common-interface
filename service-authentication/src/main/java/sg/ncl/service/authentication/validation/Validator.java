@@ -35,8 +35,8 @@ public class Validator {
         }
         // check said user id is identical
         if (claims.getSubject() == null || claims.getSubject().isEmpty() || !(credentials.getId().equals(claims.getSubject()))) {
-            log.warn("Access denied for updating user details: {} via claims id {}", credentials.getId(), claims.getSubject());
-            throw new ForbiddenException("Access denied for updating user details: " + credentials.getId() + " via claims id " + claims.getSubject());
+            log.warn("A user (id='{}') attempted to update the credentials of another user (id='{}')", claims.getSubject(), credentials.getId());
+            throw new ForbiddenException();
         }
     }
 
