@@ -58,7 +58,7 @@ public class CredentialsController {
     @ResponseStatus(HttpStatus.OK)
     public Credentials updateCredentials(@PathVariable final String id, @RequestBody final CredentialsInfo credentials, @AuthenticationPrincipal Object claims) {
         checkClaimsType(claims, "Access denied for update credentials " + claims);
-        updateCheck(credentials);
+        updateCheck(credentials, (Claims) claims);
         return new CredentialsInfo(credentialsService.updateCredentials(id, credentials, (Claims) claims));
     }
 
