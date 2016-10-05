@@ -2,26 +2,32 @@ package sg.ncl.service.user.data.jpa;
 
 import org.apache.commons.lang3.RandomStringUtils;
 import org.junit.Assert;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
+import org.mockito.junit.MockitoJUnit;
+import org.mockito.junit.MockitoRule;
 import sg.ncl.service.user.Util;
 import sg.ncl.service.user.domain.UserStatus;
+import sg.ncl.service.user.exceptions.UserAlreadyInTeamException;
 
 import java.time.ZonedDateTime;
 import java.util.List;
 
-import static org.hamcrest.Matchers.contains;
-import static org.hamcrest.Matchers.containsString;
-import static org.hamcrest.Matchers.empty;
-import static org.hamcrest.Matchers.equalTo;
-import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.not;
-import static org.hamcrest.Matchers.nullValue;
+import static org.hamcrest.Matchers.*;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertTrue;
 
 /**
  * @author Christopher Zhong
  */
 public class UserEntityTest {
+
+    @Rule
+    public MockitoRule mockito = MockitoJUnit.rule();
+    @Rule
+    public ExpectedException exception = ExpectedException.none();
 
     @Test
     public void testGetId() throws Exception {
@@ -53,6 +59,13 @@ public class UserEntityTest {
         userEntity.setUserDetails(userDetailsEntity);
 
         assertThat(userEntity.getUserDetails(), is(equalTo(userDetailsEntity)));
+    }
+
+    @Test
+    public void testGetVerificationKey() throws Exception {
+        final UserEntity userEntity = Util.getUserEntity();
+
+        assertThat(userEntity.getVerificationKey(), not(isEmptyOrNullString()));
     }
 
     @Test
@@ -169,6 +182,30 @@ public class UserEntityTest {
     }
 
     @Test
+    public void testEqualsThis() {
+        final UserEntity userEntity1 = new UserEntity();
+        final UserEntity userEntity2 = userEntity1;
+
+        assertTrue(userEntity1.equals(userEntity2));
+    }
+
+    @Test
+    public void testEqualsNull() {
+        final UserEntity userEntity1 = new UserEntity();
+        final UserEntity userEntity2 = null;
+
+        assertFalse(userEntity1.equals(userEntity2));
+    }
+
+    @Test
+    public void testEqualsWithDifferentClass() {
+        final UserEntity userEntity1 = new UserEntity();
+        final UserDetailsEntity userEntity2 = new UserDetailsEntity();
+
+        assertFalse(userEntity1.equals(userEntity2));
+    }
+
+    @Test
     public void testHashCode() throws Exception {
         final UserEntity userEntity1 = new UserEntity();
         final UserEntity userEntity2 = new UserEntity();
@@ -212,6 +249,15 @@ public class UserEntityTest {
         assertThat(toString, containsString(String.valueOf("null")));
         assertThat(toString, containsString(registrationDate.toString()));
         assertThat(toString, containsString(processedDate.toString()));
+    }
+
+    @Test
+    public void testAddTeamAlreadyExist() throws Exception {
+        final UserEntity userEntity = Util.getUserEntity();
+        String teamId = RandomStringUtils.randomAlphanumeric(20);
+        exception.expect(UserAlreadyInTeamException.class);
+        userEntity.addTeam(teamId);
+        userEntity.addTeam(teamId);
     }
 
     @Test
