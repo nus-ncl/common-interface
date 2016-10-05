@@ -58,9 +58,9 @@ public class CredentialsControllerTest {
     @Inject
     private ObjectMapper mapper;
     @Inject
-    private MockMvc mockMvc;
-    @Inject
     private WebApplicationContext webApplicationContext;
+
+    private MockMvc mockMvc;
 
     @Mock
     private Claims claims;
