@@ -58,7 +58,7 @@ public class CredentialsController {
     @ResponseStatus(HttpStatus.OK)
     public Credentials updateCredentials(@PathVariable final String id, @RequestBody final CredentialsInfo credentials, @AuthenticationPrincipal Object claims) {
         checkClaimsType(claims);
-        updateCheck(credentials, (Claims) claims);
+        updateCheck(id, credentials, (Claims) claims);
         return new CredentialsInfo(credentialsService.updateCredentials(id, credentials, (Claims) claims));
     }
 

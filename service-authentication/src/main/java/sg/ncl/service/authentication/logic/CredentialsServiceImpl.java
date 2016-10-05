@@ -81,7 +81,7 @@ public class CredentialsServiceImpl implements CredentialsService {
     @Transactional
     @Override
     public Credentials updateCredentials(@NotNull final String id, @NotNull final Credentials credentials, @NotNull final Claims claims) {
-        updateCheck(credentials, claims);
+        updateCheck(id, credentials, claims);
         final CredentialsEntity entity = findCredentials(id);
         if (credentials.getUsername() != null && !credentials.getUsername().isEmpty()) {
             entity.setUsername(credentials.getUsername());
