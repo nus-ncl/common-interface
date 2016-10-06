@@ -5,6 +5,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.system.ApplicationPidFileWriter;
 import org.springframework.context.annotation.Import;
 import sg.ncl.service.authentication.AuthenticationApplication;
+import sg.ncl.service.data.DataApplication;
 import sg.ncl.service.experiment.ExperimentApplication;
 import sg.ncl.service.mail.MailApplication;
 import sg.ncl.service.realization.RealizationApplication;
@@ -21,6 +22,7 @@ import java.sql.SQLException;
 @SpringBootApplication
 @Import({
         AuthenticationApplication.class,
+        DataApplication.class,
         ExperimentApplication.class,
         MailApplication.class,
         RealizationApplication.class,
