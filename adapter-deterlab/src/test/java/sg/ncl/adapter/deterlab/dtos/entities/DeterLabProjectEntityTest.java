@@ -1,5 +1,6 @@
 package sg.ncl.adapter.deterlab.dtos.entities;
 
+import org.apache.commons.lang3.RandomStringUtils;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -19,22 +20,34 @@ public class DeterLabProjectEntityTest {
     }
 
     @Test
-    public void getterAndSetterTest(){
-        deterLabUserEntity.setId("test1");
-        deterLabUserEntity.setNclTeamId("test2");
-        deterLabUserEntity.setDeterProjectId("test3");
+    public void testGetId(){
+        final String expected = RandomStringUtils.randomAlphabetic(20);
+        deterLabUserEntity.setId(expected);
+        String actual=deterLabUserEntity.getId();
 
-        String actual1=deterLabUserEntity.getId();
-        String actual2=deterLabUserEntity.getNclTeamId();
-        String actual3=deterLabUserEntity.getDeterProjectId();
-
-        assertThat(actual1).isNotNull();
-        assertThat(actual2).isNotNull();
-        assertThat(actual3).isNotNull();
-
-        assertEquals("test1",actual1);
-        assertEquals("test2",actual2);
-        assertEquals("test3",actual3);
+        assertThat(actual).isNotNull();
+        assertEquals(expected,actual);
     }
+
+    @Test
+    public void testGetNclTeamId(){
+        final String expected = RandomStringUtils.randomAlphabetic(20);
+        deterLabUserEntity.setNclTeamId(expected);
+        String actual=deterLabUserEntity.getNclTeamId();
+
+        assertThat(actual).isNotNull();
+        assertEquals(expected,actual);
+    }
+
+    @Test
+    public void testGetDeterProjectId(){
+        final String expected = RandomStringUtils.randomAlphabetic(20);
+        deterLabUserEntity.setDeterProjectId(expected);
+        String actual=deterLabUserEntity.getDeterProjectId();
+
+        assertThat(actual).isNotNull();
+        assertEquals(expected,actual);
+    }
+
 
 }
