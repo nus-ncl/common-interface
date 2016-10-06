@@ -15,7 +15,6 @@ import sg.ncl.service.experiment.domain.Experiment;
 
 import javax.inject.Inject;
 
-
 import static org.assertj.core.api.Assertions.assertThat;
 import static sg.ncl.common.test.Checks.checkException;
 
@@ -52,14 +51,26 @@ public class ExperimentRepositoryTest {
     }
 
     @Test
-    public void testSaveNullId() throws Exception {
+    public void testSaveWithNullId() throws Exception {
         final ExperimentEntity entity = Util.getExperimentsEntity();
         entity.setId(null);
+        final long count = repository.count();
+
+        final ExperimentEntity saved = repository.saveAndFlush(entity);
+
+        assertThat(repository.count()).isEqualTo(count + 1);
+        assertThat(saved.getId()).isNotNull();
+    }
+
+    @Test
+    public void testSaveWithExistingEntityWithNullId() throws Exception {
+        final ExperimentEntity entity = Util.getExperimentsEntity();
+        final ExperimentEntity saved = repository.saveAndFlush(entity);
+        saved.setId(null);
 
         exception.expect(JpaSystemException.class);
-//        exception.expectMessage(ExperimentEntity.class.getName());
 
-        repository.saveAndFlush(entity);
+        repository.saveAndFlush(saved);
     }
 
     @Test
