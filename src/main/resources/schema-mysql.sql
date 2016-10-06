@@ -105,24 +105,6 @@ CREATE TABLE IF NOT EXISTS `experiments` (
   DEFAULT CHARSET = latin1;
 
 --
--- Table structure for table `login_activities`
---
-CREATE TABLE IF NOT EXISTS `login_activities` (
-  `id`                 BIGINT(20)   NOT NULL AUTO_INCREMENT,
-  `created_date`       TINYBLOB     NOT NULL,
-  `last_modified_date` TINYBLOB     NOT NULL,
-  `version`            BIGINT(20)   NOT NULL,
-  `date`               TINYBLOB     NOT NULL,
-  `ip_address`         VARCHAR(255) NOT NULL,
-  `user_id`            VARCHAR(255)          DEFAULT NULL,
-  PRIMARY KEY (`id`),
-  KEY `FK8dyu3xxtaw62bm46xqi9romha` (`user_id`),
-  CONSTRAINT `FK8dyu3xxtaw62bm46xqi9romha` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`)
-)
-  ENGINE = InnoDB
-  DEFAULT CHARSET = latin1;
-
---
 -- Table structure for table `realizations`
 --
 CREATE TABLE IF NOT EXISTS `realizations` (
@@ -174,26 +156,6 @@ CREATE TABLE IF NOT EXISTS `registrations` (
   DEFAULT CHARSET = latin1;
 
 --
--- Table structure for table `team_members`
---
-CREATE TABLE IF NOT EXISTS `team_members` (
-  `id`                 BIGINT(20)   NOT NULL AUTO_INCREMENT,
-  `created_date`       TINYBLOB     NOT NULL,
-  `last_modified_date` TINYBLOB     NOT NULL,
-  `version`            BIGINT(20)   NOT NULL,
-  `joined_date`        TINYBLOB     NOT NULL,
-  `status`             VARCHAR(255) NOT NULL,
-  `member_type`        VARCHAR(255) NOT NULL,
-  `user_id`            VARCHAR(255) NOT NULL,
-  `team_id`            VARCHAR(255) NOT NULL,
-  PRIMARY KEY (`id`),
-  UNIQUE KEY `UKs8nuwsa7nvebc246ed822w68x` (`team_id`, `user_id`),
-  CONSTRAINT `FKtgca08el3ofisywcf11f0f76t` FOREIGN KEY (`team_id`) REFERENCES `teams` (`id`)
-)
-  ENGINE = InnoDB
-  DEFAULT CHARSET = latin1;
-
---
 -- Table structure for table `teams`
 --
 CREATE TABLE IF NOT EXISTS `teams` (
@@ -215,6 +177,27 @@ CREATE TABLE IF NOT EXISTS `teams` (
 )
   ENGINE = InnoDB
   DEFAULT CHARSET = latin1;
+
+--
+-- Table structure for table `team_members`
+--
+CREATE TABLE IF NOT EXISTS `team_members` (
+  `id`                 BIGINT(20)   NOT NULL AUTO_INCREMENT,
+  `created_date`       TINYBLOB     NOT NULL,
+  `last_modified_date` TINYBLOB     NOT NULL,
+  `version`            BIGINT(20)   NOT NULL,
+  `joined_date`        TINYBLOB     NOT NULL,
+  `status`             VARCHAR(255) NOT NULL,
+  `member_type`        VARCHAR(255) NOT NULL,
+  `user_id`            VARCHAR(255) NOT NULL,
+  `team_id`            VARCHAR(255) NOT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `UKs8nuwsa7nvebc246ed822w68x` (`team_id`, `user_id`),
+  CONSTRAINT `FKtgca08el3ofisywcf11f0f76t` FOREIGN KEY (`team_id`) REFERENCES `teams` (`id`)
+)
+  ENGINE = InnoDB
+  DEFAULT CHARSET = latin1;
+
 
 --
 -- Table structure for table `user_details`
@@ -253,6 +236,7 @@ CREATE TABLE IF NOT EXISTS `users` (
   `is_email_verified`  CHAR(1)      NOT NULL,
   `processed_date`     TINYBLOB,
   `status`             VARCHAR(255) NOT NULL,
+  `verification_key`   VARCHAR(255) DEFAULT NULL,
   `user_details_id`    BIGINT(20)   NOT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `UK_4ai7rrtrvwtgtqavv8okpxrul` (`user_details_id`),
@@ -271,6 +255,99 @@ CREATE TABLE IF NOT EXISTS `users_teams` (
   KEY `IDX4fw1eq004xbrrr0lh5e6nhvrv` (`user_id`),
   KEY `IDXook8yqr9dleaw16r7iusof0f9` (`team_id`),
   CONSTRAINT `FK31k9hhkcp7fiugrk2lu7vq9jo` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`)
+)
+  ENGINE = InnoDB
+  DEFAULT CHARSET = latin1;
+
+--
+-- Table structure for table `login_activities`
+--
+CREATE TABLE IF NOT EXISTS `login_activities` (
+  `id`                 BIGINT(20)   NOT NULL AUTO_INCREMENT,
+  `created_date`       TINYBLOB     NOT NULL,
+  `last_modified_date` TINYBLOB     NOT NULL,
+  `version`            BIGINT(20)   NOT NULL,
+  `date`               TINYBLOB     NOT NULL,
+  `ip_address`         VARCHAR(255) NOT NULL,
+  `user_id`            VARCHAR(255)          DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `FK8dyu3xxtaw62bm46xqi9romha` (`user_id`),
+  CONSTRAINT `FK8dyu3xxtaw62bm46xqi9romha` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`)
+)
+  ENGINE = InnoDB
+  DEFAULT CHARSET = latin1;
+
+--
+-- Table structure for table `datasets`
+--
+CREATE TABLE IF NOT EXISTS `datasets` (
+  `id`                 VARCHAR(255) NOT NULL,
+  `created_date`       TINYBLOB     NOT NULL,
+  `last_modified_date` TINYBLOB     NOT NULL,
+  `version`            BIGINT(20)   NOT NULL,
+  `name`               VARCHAR(255) NOT NULL,
+  `description`        VARCHAR(255) DEFAULT NULL,
+  `owner_id`           VARCHAR(255) NOT NULL,
+  `accessibility`      VARCHAR(255) NOT NULL,
+  `visibility`         VARCHAR(255) NOT NULL,
+  `status`             VARCHAR(255) NOT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `UK_c510no1sjcdcx153yd5sm6grr` (`name`)
+)
+  ENGINE = InnoDB
+  DEFAULT CHARSET = latin1;
+
+--
+-- Table structure for table `dataset_resources`
+--
+CREATE TABLE IF NOT EXISTS `dataset_resources` (
+  `id`                 VARCHAR(255) NOT NULL,
+  `created_date`       TINYBLOB     NOT NULL,
+  `last_modified_date` TINYBLOB     NOT NULL,
+  `version`            BIGINT(20)   NOT NULL,
+  `link`               VARCHAR(255) NOT NULL,
+  `type`               VARCHAR(255) NOT NULL,
+  `dataset_id`         VARCHAR(255) NOT NULL,
+  PRIMARY KEY (`id`),
+  CONSTRAINT `FK1dtx7xxtaw62bmngcki9romha` FOREIGN KEY (`dataset_id`) REFERENCES `datasets` (`id`)
+)
+  ENGINE = InnoDB
+  DEFAULT CHARSET = latin1;
+
+--
+-- Table structure for table `users_datasets`
+--
+CREATE TABLE IF NOT EXISTS `users_datasets` (
+  `user_id`            VARCHAR(255) NOT NULL,
+  `dataset_id`         VARCHAR(255) NOT NULL,
+  UNIQUE KEY `UKbqnkflrns6qnprt06mi87n4q` (`user_id`, `dataset_id`),
+  KEY `IDXjuy4nc2m8xbrrr0lh184fvvrv` (`user_id`),
+  KEY `IDXm885vf39dleaw16r7iusof0f9` (`dataset_id`),
+  CONSTRAINT `FK31k9hhk14b7mxhfk2lu7vq9jo` FOREIGN KEY (`dataset_id`) REFERENCES `datasets` (`id`)
+)
+  ENGINE = InnoDB
+  DEFAULT CHARSET = latin1;
+
+--
+-- Table structure for table `email_retries`
+--
+CREATE TABLE IF NOT EXISTS `email_retries` (
+  `id`                 BIGINT(20) NOT NULL,
+  `created_date`       TINYBLOB     NOT NULL,
+  `last_modified_date` TINYBLOB     NOT NULL,
+  `version`            BIGINT(20)   NOT NULL,
+  `sender`             VARCHAR(255) NOT NULL,
+  `recipients`         TINYBLOB     NOT NULL,
+  `cc`                 TINYBLOB     DEFAULT NULL,
+  `bcc`                TINYBLOB     DEFAULT NULL,
+  `subject`            VARCHAR(255) NOT NULL,
+  `content`            VARCHAR(255) NOT NULL,
+  `html`               BOOLEAN      NOT NULL,
+  `retry_times`        INT(11)      NOT NULL,
+  `last_retry_time`    TINYBLOB     NOT NULL,
+  `error_message`      VARCHAR(255) NOT NULL,
+  `sent`               BOOLEAN      NOT NULL,
+  PRIMARY KEY (`id`)
 )
   ENGINE = InnoDB
   DEFAULT CHARSET = latin1;

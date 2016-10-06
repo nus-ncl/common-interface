@@ -182,7 +182,10 @@ public class FirstRun {
                 "users_teams",
                 "users",
                 "user_details",
-                "addresses"
+                "addresses",
+                "datasets",
+                "dataset_resources",
+                "users_datasets"
         };
         for (String table : tables) {
             final String sql = "DELETE FROM " + table;
