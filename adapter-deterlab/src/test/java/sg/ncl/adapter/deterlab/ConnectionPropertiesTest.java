@@ -50,60 +50,87 @@ public class ConnectionPropertiesTest {
     }
 
     @Test
-    public void othersTest(){
-
-        String actual1= connectionProperties.getJoinProjectNewUsers();
-        String actual2= connectionProperties.getJoinProject();
-        String actual3= connectionProperties.getApplyProjectNewUsers();
-        String actual4= connectionProperties.getCreateExperiment();
-        String actual5= connectionProperties.startExperiment();
-        String actual6= connectionProperties.stopExperiment() ;
-        String actual7= connectionProperties.deleteExperiment();
-        String actual8= connectionProperties.getUpdateCredentials();
-        String actual9= connectionProperties.getApproveJoinRequest();
-        String actual10= connectionProperties.getRejectJoinRequest();
-        String actual11= connectionProperties.getApplyProject();
-        String actual12= connectionProperties.getApproveProject();
-        String actual13= connectionProperties.getRejectProject();
-        String actual14= connectionProperties.getExpStatus();
-
-
-        String expected1="http://127.0.0.1:22/joinProjectNewUsers";
-        String expected2="http://127.0.0.1:22/joinProject";
-        String expected3="http://127.0.0.1:22/applyProjectNewUsers";
-        String expected4="http://127.0.0.1:22/createExperiment";
-        String expected5="http://127.0.0.1:22/startExperiment";
-        String expected6="http://127.0.0.1:22/stopExperiment";
-        String expected7="http://127.0.0.1:22/deleteExperiment";
-        String expected8="http://127.0.0.1:22/changePassword";
-        String expected9="http://127.0.0.1:22/approveJoinRequest";
-        String expected10="http://127.0.0.1:22/rejectJoinRequest";
-        String expected11="http://127.0.0.1:22/applyProject";
-        String expected12="http://127.0.0.1:22/approveProject";
-        String expected13="http://127.0.0.1:22/rejectProject";
-        String expected14="http://127.0.0.1:22/getExpStatus";
-
-
-        assertEquals(expected1,actual1);
-        assertEquals(expected2,actual2);
-        assertEquals(expected3,actual3);
-        assertEquals(expected4,actual4);
-        assertEquals(expected5,actual5);
-        assertEquals(expected6,actual6);
-        assertEquals(expected7,actual7);
-        assertEquals(expected8,actual8);
-        assertEquals(expected9,actual9);
-        assertEquals(expected10,actual10);
-        assertEquals(expected11, actual11);
-        assertEquals(expected12,actual12);
-        assertEquals(expected13,actual13);
-        assertEquals(expected14,actual14);
-    }
-
-    @Test
     public void testGetJoinProjectNewUsers() throws Exception {
         assertThat(connectionProperties.getJoinProjectNewUsers()).isNotNull();
         assertThat(connectionProperties.getJoinProjectNewUsers()).isEqualTo("http://127.0.0.1:22/joinProjectNewUsers");
+    }
+
+    @Test
+    public void testGetJoinProject() throws Exception {
+        assertThat(connectionProperties.getJoinProject()).isNotNull();
+        assertThat(connectionProperties.getJoinProject()).isEqualTo("http://127.0.0.1:22/joinProject");
+    }
+
+    @Test
+    public void testGetApplyProjectNewUsers() throws Exception {
+        assertThat(connectionProperties.getApplyProjectNewUsers()).isNotNull();
+        assertThat(connectionProperties.getApplyProjectNewUsers()).isEqualTo("http://127.0.0.1:22/applyProjectNewUsers");
+    }
+
+    @Test
+    public void testGetCreateExperiment() throws Exception {
+        assertThat(connectionProperties.getCreateExperiment()).isNotNull();
+        assertThat(connectionProperties.getCreateExperiment()).isEqualTo("http://127.0.0.1:22/createExperiment");
+    }
+
+    @Test
+    public void testStartExperiment() throws Exception {
+        assertThat(connectionProperties.startExperiment()).isNotNull();
+        assertThat(connectionProperties.startExperiment()).isEqualTo("http://127.0.0.1:22/startExperiment");
+    }
+
+    @Test
+    public void testStopExperiment() throws Exception {
+        assertThat(connectionProperties.stopExperiment()).isNotNull();
+        assertThat(connectionProperties.stopExperiment()).isEqualTo("http://127.0.0.1:22/stopExperiment");
+    }
+
+    @Test
+    public void testDeleteExperiment() throws Exception {
+        assertThat(connectionProperties.deleteExperiment()).isNotNull();
+        assertThat(connectionProperties.deleteExperiment()).isEqualTo("http://127.0.0.1:22/deleteExperiment");
+    }
+
+    @Test
+    public void testGetUpdateCredentials() throws Exception {
+        assertThat(connectionProperties.getUpdateCredentials()).isNotNull();
+        assertThat(connectionProperties.getUpdateCredentials()).isEqualTo("http://127.0.0.1:22/changePassword");
+    }
+
+    @Test
+    public void testGetApproveJoinRequest() throws Exception {
+        assertThat(connectionProperties.getApproveJoinRequest()).isNotNull();
+        assertThat(connectionProperties.getApproveJoinRequest()).isEqualTo("http://127.0.0.1:22/approveJoinRequest");
+    }
+
+    @Test
+    public void testGetRejectJoinRequest() throws Exception {
+        assertThat(connectionProperties.getRejectJoinRequest()).isNotNull();
+        assertThat(connectionProperties.getRejectJoinRequest()).isEqualTo("http://127.0.0.1:22/rejectJoinRequest");
+    }
+
+    @Test
+    public void testGetApplyProject() throws Exception {
+        assertThat(connectionProperties.getApplyProject()).isNotNull();
+        assertThat(connectionProperties.getApplyProject()).isEqualTo("http://127.0.0.1:22/applyProject");
+    }
+
+    @Test
+    public void testGetApproveProject() throws Exception {
+        assertThat(connectionProperties.getApproveProject()).isNotNull();
+        assertThat(connectionProperties.getApproveProject()).isEqualTo("http://127.0.0.1:22/approveProject");
+    }
+
+    @Test
+    public void testGetRejectProject() throws Exception {
+        assertThat(connectionProperties.getRejectProject()).isNotNull();
+        assertThat(connectionProperties.getRejectProject()).isEqualTo("http://127.0.0.1:22/rejectProject");
+    }
+
+    @Test
+    public void testGetExpStatus() throws Exception {
+        assertThat(connectionProperties.getExpStatus()).isNotNull();
+        assertThat(connectionProperties.getExpStatus()).isEqualTo("http://127.0.0.1:22/getExpStatus");
     }
 
     @Test
