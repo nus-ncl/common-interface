@@ -22,7 +22,9 @@ import static org.junit.Assert.assertEquals;
 @SpringBootTest(classes =TestConfig.class, webEnvironment = SpringBootTest.WebEnvironment.NONE)
 @TestPropertySource(properties = {
         "ncl.deterlab.adapter.ip=127.0.0.1",
-        "ncl.deterlab.adapter.port=22"
+        "ncl.deterlab.adapter.port=22",
+        "ncl.deterlab.adapter.bossUrl=boss.ncl.sg",
+        "ncl.deterlab.adapter.userUrl=users.ncl.sg",
 })
 
 public class ConnectionPropertiesTest {
@@ -99,6 +101,16 @@ public class ConnectionPropertiesTest {
 
     }
 
+    @Test
+    public void testGetBossUrlReturnsNotNull() throws Exception {
+        assertThat(connectionProperties.getBossUrl()).isNotNull();
+        assertThat(connectionProperties.getBossUrl()).isEqualTo("boss.ncl.sg");
+    }
 
+    @Test
+    public void testGetUserUrlReturnsNotNull() throws Exception {
+        assertThat(connectionProperties.getUserUrl()).isNotNull();
+        assertThat(connectionProperties.getUserUrl()).isEqualTo("users.ncl.sg");
+    }
 
 }
