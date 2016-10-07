@@ -19,7 +19,7 @@ import static org.junit.Assert.assertEquals;
  * @Version 1.0
  */
 @RunWith(SpringRunner.class)
-@SpringBootTest(classes =TestConfig.class, webEnvironment = SpringBootTest.WebEnvironment.NONE)
+@SpringBootTest(classes = TestConfig.class, webEnvironment = WebEnvironment.NONE)
 @TestPropertySource(properties = {
         "ncl.deterlab.adapter.ip=127.0.0.1",
         "ncl.deterlab.adapter.port=22",
