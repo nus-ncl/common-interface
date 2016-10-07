@@ -20,7 +20,6 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 import sg.ncl.common.exception.ExceptionAutoConfiguration;
 import sg.ncl.common.exception.GlobalExceptionHandler;
-import sg.ncl.service.experiment.Util;
 import sg.ncl.service.experiment.data.jpa.ExperimentEntity;
 import sg.ncl.service.experiment.domain.Experiment;
 import sg.ncl.service.experiment.domain.ExperimentService;
@@ -198,7 +197,7 @@ public class ExperimentsControllerTest {
 
     @Test
     public void testDeleteExperimentGoodAuthenticationPrincipal() throws Exception {
-        final ExperimentEntity entity = Util.getExperimentsEntity();
+        final ExperimentEntity entity = getExperimentEntity();
         Long experimentId = Long.parseLong(RandomStringUtils.randomNumeric(5));
         String teamId = RandomStringUtils.randomAlphabetic(8);
 

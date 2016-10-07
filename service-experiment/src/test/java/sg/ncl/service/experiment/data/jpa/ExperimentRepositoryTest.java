@@ -10,13 +10,13 @@ import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
 import org.springframework.orm.jpa.JpaSystemException;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringRunner;
-import sg.ncl.service.experiment.Util;
 import sg.ncl.service.experiment.domain.Experiment;
 
 import javax.inject.Inject;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static sg.ncl.common.test.Checks.checkException;
+import static sg.ncl.service.experiment.util.TestUtil.getExperimentEntity;
 
 /**
  * Created by Desmond
@@ -40,7 +40,7 @@ public class ExperimentRepositoryTest {
 
     @Test
     public void testGoodSave() throws Exception {
-        final ExperimentEntity entity = Util.getExperimentsEntity();
+        final ExperimentEntity entity = getExperimentEntity();
 
         final long count = repository.count();
         final ExperimentEntity savedEntity = repository.saveAndFlush(entity);
@@ -52,7 +52,7 @@ public class ExperimentRepositoryTest {
 
     @Test
     public void testSaveWithNullId() throws Exception {
-        final ExperimentEntity entity = Util.getExperimentsEntity();
+        final ExperimentEntity entity = getExperimentEntity();
         entity.setId(null);
         final long count = repository.count();
 
@@ -64,7 +64,7 @@ public class ExperimentRepositoryTest {
 
     @Test
     public void testSaveWithExistingEntityWithNullId() throws Exception {
-        final ExperimentEntity entity = Util.getExperimentsEntity();
+        final ExperimentEntity entity = getExperimentEntity();
         final ExperimentEntity saved = repository.saveAndFlush(entity);
         saved.setId(null);
 
@@ -75,7 +75,7 @@ public class ExperimentRepositoryTest {
 
     @Test
     public void testSaveNullUserId() throws Exception {
-        final ExperimentEntity entity = Util.getExperimentsEntity();
+        final ExperimentEntity entity = getExperimentEntity();
         entity.setUserId(null);
 
         try {
@@ -88,7 +88,7 @@ public class ExperimentRepositoryTest {
 
     @Test
     public void testSaveNullTeamId() throws Exception {
-        final ExperimentEntity entity = Util.getExperimentsEntity();
+        final ExperimentEntity entity = getExperimentEntity();
         entity.setTeamId(null);
 
         try {
@@ -101,7 +101,7 @@ public class ExperimentRepositoryTest {
 
     @Test
     public void testSaveNullTeamName() throws Exception {
-        final ExperimentEntity entity = Util.getExperimentsEntity();
+        final ExperimentEntity entity = getExperimentEntity();
         entity.setTeamName(null);
 
         try {
@@ -114,7 +114,7 @@ public class ExperimentRepositoryTest {
 
     @Test
     public void testSaveNullName() throws Exception {
-        final ExperimentEntity entity = Util.getExperimentsEntity();
+        final ExperimentEntity entity = getExperimentEntity();
         entity.setName(null);
 
         try {
@@ -127,7 +127,7 @@ public class ExperimentRepositoryTest {
 
     @Test
     public void testSaveNullDescription() throws Exception {
-        final ExperimentEntity entity = Util.getExperimentsEntity();
+        final ExperimentEntity entity = getExperimentEntity();
         entity.setDescription(null);
 
         try {
@@ -140,7 +140,7 @@ public class ExperimentRepositoryTest {
 
     @Test
     public void testSaveNullNsFile() throws Exception {
-        final ExperimentEntity entity = Util.getExperimentsEntity();
+        final ExperimentEntity entity = getExperimentEntity();
         entity.setNsFile(null);
 
         try {
@@ -153,7 +153,7 @@ public class ExperimentRepositoryTest {
 
     @Test
     public void testSaveNullNsFileContent() throws Exception {
-        final ExperimentEntity entity = Util.getExperimentsEntity();
+        final ExperimentEntity entity = getExperimentEntity();
         entity.setNsFileContent(null);
 
         try {
@@ -166,7 +166,7 @@ public class ExperimentRepositoryTest {
 
     @Test
     public void testSaveNullIdleSwap() throws Exception {
-        final ExperimentEntity entity = Util.getExperimentsEntity();
+        final ExperimentEntity entity = getExperimentEntity();
         entity.setIdleSwap(null);
 
         try {
@@ -179,7 +179,7 @@ public class ExperimentRepositoryTest {
 
     @Test
     public void testSaveNullMaxDuration() throws Exception {
-        final ExperimentEntity entity = Util.getExperimentsEntity();
+        final ExperimentEntity entity = getExperimentEntity();
         entity.setMaxDuration(null);
 
         try {
@@ -192,8 +192,8 @@ public class ExperimentRepositoryTest {
 
     @Test
     public void testSaveExperimentDifferentTeamSameExpName() throws Exception {
-        ExperimentEntity one = Util.getExperimentsEntity();
-        ExperimentEntity two = Util.getExperimentsEntity();
+        ExperimentEntity one = getExperimentEntity();
+        ExperimentEntity two = getExperimentEntity();
         one.setName("sameExpName");
         two.setName("sameExpName");
 
