@@ -1,14 +1,11 @@
 package sg.ncl.service.data.util;
 
 import org.apache.commons.lang3.RandomStringUtils;
-import sg.ncl.service.data.data.jpa.DatasetDownloadEntity;
-import sg.ncl.service.data.data.jpa.DatasetEntity;
-import sg.ncl.service.data.data.jpa.DatasetResourceEntity;
-import sg.ncl.service.data.domain.DatasetAccessibility;
-import sg.ncl.service.data.domain.DatasetCategory;
-import sg.ncl.service.data.domain.DatasetResourceType;
-import sg.ncl.service.data.domain.DatasetStatus;
-import sg.ncl.service.data.domain.DatasetVisibility;
+import sg.ncl.service.data.data.jpa.DataEntity;
+import sg.ncl.service.data.data.jpa.DataResourceEntity;
+import sg.ncl.service.data.data.jpa.DataStatisticsEntity;
+import sg.ncl.service.data.domain.DataAccessibility;
+import sg.ncl.service.data.domain.DataVisibility;
 
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
@@ -18,26 +15,23 @@ import java.util.List;
  * Created by dcszwang on 9/7/2016.
  */
 public class TestUtil {
-    public static DatasetEntity getDatasetEntity() {
-        return getDatasetEntity("dataset", "description", "ncl001", DatasetAccessibility.OPEN,
-                DatasetVisibility.PUBLIC, DatasetStatus.COMPLETE, 1L, 0, DatasetCategory.DNS);
+    public static DataEntity getDataEntity() {
+        return getDataEntity("dataset", "description", "ncl001", DataAccessibility.OPEN, DataVisibility.PUBLIC);
     }
 
-    public static DatasetEntity getDatasetEntityWithResources() {
-        DatasetEntity entity = getDatasetEntity("dataset", "description", "ncl001", DatasetAccessibility.OPEN,
-                DatasetVisibility.PUBLIC, DatasetStatus.COMPLETE, 1L, 0, DatasetCategory.DNS);
+    public static DataEntity getDataEntityWithResources() {
+        DataEntity entity = getDataEntity("dataset", "description", "ncl001", DataAccessibility.OPEN, DataVisibility.PUBLIC);
 
-        DatasetResourceEntity resourceEntity = getDatasetResourceEntity();
-        List<DatasetResourceEntity> resources = new ArrayList<>();
+        DataResourceEntity resourceEntity = getDataResourceEntity();
+        List<DataResourceEntity> resources = new ArrayList<>();
         resources.add(resourceEntity);
         entity.setResources(resources);
 
         return entity;
     }
 
-    public static DatasetEntity getDatasetEntityWithApprovedUsers() {
-        DatasetEntity entity = getDatasetEntity("dataset", "description", "ncl001", DatasetAccessibility.OPEN,
-                DatasetVisibility.PUBLIC, DatasetStatus.COMPLETE, 1L, 0, DatasetCategory.DNS);
+    public static DataEntity getDataEntityWithApprovedUsers() {
+        DataEntity entity = getDataEntity("dataset", "description", "ncl001", DataAccessibility.OPEN, DataVisibility.PUBLIC);
 
         String user = "bob007";
         entity.addApprovedUser(user);
@@ -45,55 +39,45 @@ public class TestUtil {
         return entity;
     }
 
-    public static DatasetEntity getDatasetEntityWithDownloadHistory() {
-        DatasetEntity entity = getDatasetEntity("dataset", "description", "ncl001", DatasetAccessibility.OPEN,
-                DatasetVisibility.PUBLIC, DatasetStatus.COMPLETE, 1L, 0, DatasetCategory.DNS);
+    public static DataEntity getDataEntityWithStatistics() {
+        DataEntity entity = getDataEntity("dataset", "description", "ncl001", DataAccessibility.OPEN, DataVisibility.PUBLIC);
 
-        DatasetDownloadEntity downloadEntity = getDatasetDownloadEntity();
-        List<DatasetDownloadEntity> downloadHistory = new ArrayList<>();
-        downloadHistory.add(downloadEntity);
-        entity.setDownloadHistory(downloadHistory);
+        DataStatisticsEntity statisticsEntity = getDataStatisticsEntity();
+        List<DataStatisticsEntity> statistics = new ArrayList<>();
+        statistics.add(statisticsEntity);
+        entity.setStatistics(statistics);
 
         return entity;
     }
 
-    public static DatasetEntity getDatasetEntity(final String name,
-                                                 final String description,
-                                                 final String ownerId,
-                                                 final DatasetAccessibility accessibility,
-                                                 final DatasetVisibility visibility,
-                                                 final DatasetStatus status,
-                                                 final Long size,
-                                                 final int downloadTimes,
-                                                 final DatasetCategory category)
+    public static DataEntity getDataEntity(final String name,
+                                           final String description,
+                                           final String ownerId,
+                                           final DataAccessibility accessibility,
+                                           final DataVisibility visibility
+                                           )
     {
-        final DatasetEntity entity = new DatasetEntity();
+        final DataEntity entity = new DataEntity();
         entity.setName(name);
         entity.setDescription(description);
-        entity.setOwnerId(ownerId);
+        entity.setContributorId(ownerId);
         entity.setAccessibility(accessibility);
         entity.setVisibility(visibility);
-        entity.setStatus(status);
-        entity.setSize(size);
-        entity.setDownloadTimes(downloadTimes);
-        entity.setCategory(category);
 
         return entity;
     }
 
-    public static DatasetResourceEntity getDatasetResourceEntity() {
-        DatasetResourceEntity entity = new DatasetResourceEntity();
-        entity.setLink("http://" + RandomStringUtils.randomAlphanumeric(20));
-        entity.setType(DatasetResourceType.EXTERNAL);
+    public static DataResourceEntity getDataResourceEntity() {
+        DataResourceEntity entity = new DataResourceEntity();
+        entity.setUri("http://" + RandomStringUtils.randomAlphanumeric(20));
 
         return entity;
     }
 
-    public static DatasetDownloadEntity getDatasetDownloadEntity() {
-        DatasetDownloadEntity entity = new DatasetDownloadEntity();
+    public static DataStatisticsEntity getDataStatisticsEntity() {
+        DataStatisticsEntity entity = new DataStatisticsEntity();
         entity.setUserId(RandomStringUtils.randomAlphanumeric(20));
         entity.setDate(ZonedDateTime.now());
-        entity.setSuccess(true);
 
         return entity;
     }
