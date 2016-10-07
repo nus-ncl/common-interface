@@ -82,13 +82,13 @@ public class UserServiceImplTest {
         userEntity=Util.getUserEntity();
 
         when(userRepository.findByUserDetailsEmail(anyString())).thenReturn(null);
+        when(userRepository.save())
         User actual=userServiceImpl.createUser(userEntity);
 
         verify(userRepository,times(1)).findByUserDetailsEmail(anyString());
         verify(userRepository,times(1)).save((any(UserEntity.class)));
-
-        // assertEquals(userEntity, actual);
-        //assertEquals(userEntity.getProcessedDate(), actual.getProcessedDate());
+         assertEquals(userEntity, userEntity.getApplicationDate());
+        //assertEquals(userEntity.getApplicationDate(), actual.getApplicationDate());
        // assertEquals(userEntity.getUserDetails(), actual.getUserDetails());
     }
 
