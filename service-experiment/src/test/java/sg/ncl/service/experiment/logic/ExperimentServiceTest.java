@@ -9,10 +9,10 @@ import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
 import sg.ncl.adapter.deterlab.AdapterDeterLab;
+import sg.ncl.adapter.deterlab.ConnectionProperties;
 import sg.ncl.common.authentication.Role;
 import sg.ncl.common.exception.base.ForbiddenException;
 import sg.ncl.common.jwt.JwtToken;
-import sg.ncl.service.experiment.ExperimentConnectionProperties;
 import sg.ncl.service.experiment.data.jpa.ExperimentEntity;
 import sg.ncl.service.experiment.data.jpa.ExperimentRepository;
 import sg.ncl.service.experiment.domain.Experiment;
@@ -50,7 +50,7 @@ public class ExperimentServiceTest {
     @Mock
     private RealizationService realizationService;
     @Mock
-    private ExperimentConnectionProperties experimentConnectionProperties;
+    private ConnectionProperties adapterConnectionProperties;
     @Mock
     private Claims claims;
 
@@ -61,9 +61,9 @@ public class ExperimentServiceTest {
         assertThat(mockingDetails(experimentRepository).isMock()).isTrue();
         assertThat(mockingDetails(adapterDeterLab).isMock()).isTrue();
         assertThat(mockingDetails(realizationService).isMock()).isTrue();
-        assertThat(mockingDetails(experimentConnectionProperties).isMock()).isTrue();
+        assertThat(mockingDetails(adapterConnectionProperties).isMock()).isTrue();
 
-        experimentService = new ExperimentServiceImpl(experimentRepository, adapterDeterLab, realizationService, experimentConnectionProperties);
+        experimentService = new ExperimentServiceImpl(experimentRepository, adapterDeterLab, realizationService, adapterConnectionProperties);
     }
 
     @Test

@@ -6,6 +6,7 @@ import org.json.JSONObject;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import sg.ncl.adapter.deterlab.AdapterDeterLab;
+import sg.ncl.adapter.deterlab.ConnectionProperties;
 import sg.ncl.common.exception.base.ForbiddenException;
 import sg.ncl.service.experiment.ExperimentConnectionProperties;
 import sg.ncl.service.experiment.data.jpa.ExperimentEntity;
@@ -37,15 +38,17 @@ public class ExperimentServiceImpl implements ExperimentService {
 
     private final ExperimentRepository experimentRepository;
     private final AdapterDeterLab adapterDeterLab;
-    private final ExperimentConnectionProperties experimentConnectionProperties;
+//    private final ExperimentConnectionProperties experimentConnectionProperties;
     private final RealizationService realizationService;
+    private final ConnectionProperties adapterConnectionProperties;
 
     @Inject
-    ExperimentServiceImpl(@NotNull final ExperimentRepository experimentRepository, @NotNull final AdapterDeterLab adapterDeterLab, @NotNull final RealizationService realizationService, @NotNull final ExperimentConnectionProperties experimentConnectionProperties) {
+    ExperimentServiceImpl(@NotNull final ExperimentRepository experimentRepository, @NotNull final AdapterDeterLab adapterDeterLab, @NotNull final RealizationService realizationService, @NotNull final ConnectionProperties connectionProperties) {
         this.experimentRepository = experimentRepository;
         this.adapterDeterLab = adapterDeterLab;
         this.realizationService = realizationService;
-        this.experimentConnectionProperties = experimentConnectionProperties;
+//        this.experimentConnectionProperties = experimentConnectionProperties;
+        this.adapterConnectionProperties = connectionProperties;
     }
 
     /**
@@ -206,7 +209,7 @@ public class ExperimentServiceImpl implements ExperimentService {
         userObject.put("idleSwap", experiment.getIdleSwap().toString());
         userObject.put("maxDuration", experiment.getMaxDuration().toString());
         userObject.put("deterLogin", adapterDeterLab.getDeterUserIdByNclUserId(experiment.getUserId()));
-        userObject.put("userServerUri", experimentConnectionProperties.getUserurl());
+        userObject.put("userServerUri", adapterConnectionProperties.getUserUrl());
 
         adapterDeterLab.createExperiment(userObject.toString());
 
