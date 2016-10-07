@@ -3,12 +3,12 @@ package sg.ncl.service.data.data.jpa;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
-import org.hibernate.annotations.Type;
+import org.hibernate.annotations.GenericGenerator;
 import sg.ncl.common.jpa.AbstractEntity;
-import sg.ncl.service.data.domain.Data;
-import sg.ncl.service.data.domain.DataAccessibility;
-import sg.ncl.service.data.domain.DataResource;
-import sg.ncl.service.data.domain.DataVisibility;
+import sg.ncl.service.data.domain.Dataset;
+import sg.ncl.service.data.domain.DatasetAccessibility;
+import sg.ncl.service.data.domain.DatasetStatus;
+import sg.ncl.service.data.domain.DatasetVisibility;
 
 import javax.persistence.CascadeType;
 import javax.persistence.CollectionTable;
@@ -31,67 +31,64 @@ import java.util.List;
  * Created by dcszwang on 10/5/2016.
  */
 @Entity
-@Table(name = "data", indexes = @Index(columnList = "name"))
+@Table(name = "datasets", indexes = @Index(columnList = "name"))
 @Getter
 @Setter
 @Slf4j
-public class DataEntity extends AbstractEntity implements Data {
+public class DatasetEntity extends AbstractEntity implements Dataset {
 
     @Id
-    @GeneratedValue
+    @GeneratedValue(generator = "uuid2")
+    @GenericGenerator(name = "uuid2", strategy = "uuid2")
     @Column(name = "id", nullable = false, unique = true, updatable = false)
-    private Long id;
+    private String id;
 
     @Column(name = "name", nullable = false, unique = true, updatable = false)
     private String name;
 
-    @Type(type = "text")
-    @Column(name = "description")
+    @Column(name = "description", nullable = false)
     private String description;
 
-    @Column(name = "contributor_id", nullable = false, updatable = false)
-    private String contributorId;
+    @Column(name = "owner_id", nullable = false, updatable = false)
+    private String ownerId;
 
     @Column(name = "visibility", nullable = false)
     @Enumerated(EnumType.STRING)
-    private DataVisibility visibility = DataVisibility.PUBLIC;
+    private DatasetVisibility visibility = DatasetVisibility.PUBLIC;
 
     @Column(name = "accessibility", nullable = false)
     @Enumerated(EnumType.STRING)
-    private DataAccessibility accessibility = DataAccessibility.OPEN;
+    private DatasetAccessibility accessibility = DatasetAccessibility.OPEN;
+
+    @Column(name = "status", nullable = false)
+    @Enumerated(EnumType.STRING)
+    private DatasetStatus status = DatasetStatus.COMPLETE;
 
     @OneToMany(cascade = CascadeType.ALL)
-    @JoinColumn(name = "data_id")
-    private List<DataResourceEntity> resources = new ArrayList<>();
+    @JoinColumn(name = "dataset_id")
+    private List<DatasetResourceEntity> resources = new ArrayList<>();
 
     @ElementCollection
-    @CollectionTable(name = "data_users", joinColumns = @JoinColumn(name = "data_id", nullable = false, updatable = false), indexes = {@Index(columnList = "data_id"), @Index(columnList = "user_id")}, uniqueConstraints = @UniqueConstraint(columnNames = {"data_id", "user_id"}))
+    @CollectionTable(name = "users_datasets", joinColumns = @JoinColumn(name = "dataset_id", nullable = false, updatable = false), indexes = {@Index(columnList = "user_id"), @Index(columnList = "dataset_id")}, uniqueConstraints = @UniqueConstraint(columnNames = {"user_id", "dataset_id"}))
     @Column(name = "user_id", nullable = false, updatable = false)
     private final List<String> approvedUsers = new ArrayList<>();
 
     public void addApprovedUser(final String userId) {
         if(approvedUsers.contains(userId)) {
-            log.warn("User {} was already approved to access data {}", userId, name);
+            log.warn("User {} was already approved to access dataset {}", userId, name);
             return;
         }
         approvedUsers.add(userId);
-        log.info("User {} approved to access data {}", userId, name);
+        log.info("User {} approved to access dataset {}", userId, name);
     }
 
     public void removeApprovedUser(final String userId) {
         if(!approvedUsers.contains(userId)) {
-            log.warn("User {} not in the approved list for data {}", userId, name);
+            log.warn("User {} not in the approved list for dataset {}", userId, name);
             return;
         }
         approvedUsers.remove(userId);
-        log.info("User {} removed from the approved list for data {}", userId, name);
-    }
-
-    @Override
-    public List<DataResource> getResources() {
-        List<DataResource> dataResources = new ArrayList<>();
-        dataResources.addAll(resources);
-        return dataResources;
+        log.info("User {} removed from the approved list for dataset {}", userId, name);
     }
 
     @Override
@@ -103,7 +100,7 @@ public class DataEntity extends AbstractEntity implements Data {
             return false;
         }
 
-        final Data that = (Data) o;
+        final Dataset that = (Dataset) o;
 
         return getId() == null ? that.getId() == null : getId().equals(that.getId());
     }
@@ -115,13 +112,14 @@ public class DataEntity extends AbstractEntity implements Data {
 
     @Override
     public String toString() {
-        return "DataEntity{" +
+        return "DatasetEntity{" +
                 "id='" + id + '\'' +
                 ", name=" + name +
                 ", description=" + description +
-                ", contributorId=" + contributorId +
+                ", ownerId=" + ownerId +
                 ", visibility=" + visibility +
                 ", accessibility=" + accessibility +
+                ", status=" + status +
                 ", resources=" + resources +
                 ", approvedUsers=" + approvedUsers +
                 "} " + super.toString();
