@@ -9,9 +9,9 @@ import sg.ncl.common.jpa.UseJpa;
  */
 @SpringBootApplication
 @UseJpa
-public class DatasetApplication {
+public class DataApplication {
     public static void main(final String[] args) {
-        try (final ConfigurableApplicationContext context = SpringApplication.run(DatasetApplication.class, args)) {
+        try (final ConfigurableApplicationContext context = SpringApplication.run(DataApplication.class, args)) {
             // nothing to do
         }
     }
