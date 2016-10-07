@@ -9,11 +9,10 @@ import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
 import sg.ncl.adapter.deterlab.AdapterDeterLab;
+import sg.ncl.adapter.deterlab.ConnectionProperties;
 import sg.ncl.common.authentication.Role;
 import sg.ncl.common.exception.base.ForbiddenException;
 import sg.ncl.common.jwt.JwtToken;
-import sg.ncl.service.experiment.ExperimentConnectionProperties;
-import sg.ncl.service.experiment.Util;
 import sg.ncl.service.experiment.data.jpa.ExperimentEntity;
 import sg.ncl.service.experiment.data.jpa.ExperimentRepository;
 import sg.ncl.service.experiment.domain.Experiment;
@@ -31,6 +30,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.*;
+import static sg.ncl.service.experiment.util.TestUtil.getExperimentEntity;
+import static sg.ncl.service.experiment.util.TestUtil.getRealizationEntity;
 
 /**
  * @author Te Ye
@@ -49,7 +50,7 @@ public class ExperimentServiceTest {
     @Mock
     private RealizationService realizationService;
     @Mock
-    private ExperimentConnectionProperties experimentConnectionProperties;
+    private ConnectionProperties adapterConnectionProperties;
     @Mock
     private Claims claims;
 
@@ -60,14 +61,14 @@ public class ExperimentServiceTest {
         assertThat(mockingDetails(experimentRepository).isMock()).isTrue();
         assertThat(mockingDetails(adapterDeterLab).isMock()).isTrue();
         assertThat(mockingDetails(realizationService).isMock()).isTrue();
-        assertThat(mockingDetails(experimentConnectionProperties).isMock()).isTrue();
+        assertThat(mockingDetails(adapterConnectionProperties).isMock()).isTrue();
 
-        experimentService = new ExperimentServiceImpl(experimentRepository, adapterDeterLab, realizationService, experimentConnectionProperties);
+        experimentService = new ExperimentServiceImpl(experimentRepository, adapterDeterLab, realizationService, adapterConnectionProperties);
     }
 
     @Test
     public void testSaveExperiment() throws Exception {
-        ExperimentEntity createdExperimentSave = Util.getExperimentsEntity();
+        ExperimentEntity createdExperimentSave = getExperimentEntity();
 
         when(experimentRepository.save(any(ExperimentEntity.class))).thenReturn(createdExperimentSave);
 
@@ -89,7 +90,7 @@ public class ExperimentServiceTest {
     @Test
     public void testSaveExperimentBad() throws Exception {
         // try to create another experiment with same team name and same exp name
-        ExperimentEntity createdExperimentSave = Util.getExperimentsEntity();
+        ExperimentEntity createdExperimentSave = getExperimentEntity();
         List<ExperimentEntity> expList = new ArrayList<>();
         expList.add(createdExperimentSave);
 
@@ -110,7 +111,7 @@ public class ExperimentServiceTest {
 
     @Test
     public void testGetExperiment() throws Exception {
-        ExperimentEntity createdExperimentSave = Util.getExperimentsEntity();
+        ExperimentEntity createdExperimentSave = getExperimentEntity();
         List<ExperimentEntity> expList = new ArrayList<>();
         expList.add(createdExperimentSave);
 
@@ -123,7 +124,7 @@ public class ExperimentServiceTest {
 
     @Test
     public void testGetExperimentsByUser() throws Exception {
-        ExperimentEntity createdExperimentSave = Util.getExperimentsEntity();
+        ExperimentEntity createdExperimentSave = getExperimentEntity();
         List<ExperimentEntity> expList = new ArrayList<>();
         expList.add(createdExperimentSave);
 
@@ -142,7 +143,7 @@ public class ExperimentServiceTest {
 
     @Test
     public void testGetExperimentsByTeam() throws Exception {
-        ExperimentEntity createdExperimentSave = Util.getExperimentsEntity();
+        ExperimentEntity createdExperimentSave = getExperimentEntity();
         List<ExperimentEntity> expList = new ArrayList<>();
         expList.add(createdExperimentSave);
 
@@ -181,8 +182,8 @@ public class ExperimentServiceTest {
 
     @Test
     public void testDeleteExperimentGood() throws Exception {
-        ExperimentEntity experimentEntity = Util.getExperimentsEntity();
-        RealizationEntity realizationEntity = Util.getRealizationEntity();
+        ExperimentEntity experimentEntity = getExperimentEntity();
+        RealizationEntity realizationEntity = getRealizationEntity();
         final List<Role> roles = Collections.singletonList(Role.USER);
 
         when(experimentRepository.getOne(anyLong())).thenReturn(experimentEntity);
@@ -198,8 +199,8 @@ public class ExperimentServiceTest {
 
     @Test
     public void testDeleteExperimentAdmin() throws Exception {
-        ExperimentEntity experimentEntity = Util.getExperimentsEntity();
-        RealizationEntity realizationEntity = Util.getRealizationEntity();
+        ExperimentEntity experimentEntity = getExperimentEntity();
+        RealizationEntity realizationEntity = getRealizationEntity();
         final List<Role> roles = Collections.singletonList(Role.ADMIN);
 
         when(experimentRepository.getOne(anyLong())).thenReturn(experimentEntity);
@@ -216,7 +217,7 @@ public class ExperimentServiceTest {
     @Test
     public void testDeleteExperimentNotExpCreator() throws Exception {
         // to trigger the addCheck() in deleteExperiment
-        RealizationEntity realizationEntity = Util.getRealizationEntity();
+        RealizationEntity realizationEntity = getRealizationEntity();
         final List<Role> roles = Collections.singletonList(Role.USER);
 
         when(realizationService.getByExperimentId(anyLong())).thenReturn(realizationEntity);
@@ -232,7 +233,7 @@ public class ExperimentServiceTest {
 
     @Test
     public void testDeleteExperimentBadAuthoritiesDataType() throws Exception {
-        RealizationEntity realizationEntity = Util.getRealizationEntity();
+        RealizationEntity realizationEntity = getRealizationEntity();
 
         when(realizationService.getByExperimentId(anyLong())).thenReturn(realizationEntity);
         when(claims.getSubject()).thenReturn("userId");

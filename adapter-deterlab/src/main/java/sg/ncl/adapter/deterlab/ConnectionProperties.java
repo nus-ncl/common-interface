@@ -14,6 +14,8 @@ public class ConnectionProperties {
 
     private String ip;
     private String port;
+    private String bossUrl;
+    private String userUrl;
 
     public String getIp() {
         return ip;
@@ -83,6 +85,22 @@ public class ConnectionProperties {
 
     public String getExpStatus() {
         return "http://" + ip + ":" + port + "/getExpStatus";
+    }
+
+    public String getBossUrl() {
+        return bossUrl;
+    }
+
+    public void setBossUrl(String bossUrl) {
+        this.bossUrl = bossUrl;
+    }
+
+    public String getUserUrl() {
+        return userUrl;
+    }
+
+    public void setUserUrl(String userUrl) {
+        this.userUrl = userUrl;
     }
 }
 

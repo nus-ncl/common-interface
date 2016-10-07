@@ -41,6 +41,8 @@ ncl:
     adapter:
       ip: test.ncl.sg
       port: 8080
+      bossUrl: ${deterlab.boss:}
+      userUrl: ${deterlab.user:}
   jwt:
     api-key: ${jwt.key:}
     signing-algorithm: HS512

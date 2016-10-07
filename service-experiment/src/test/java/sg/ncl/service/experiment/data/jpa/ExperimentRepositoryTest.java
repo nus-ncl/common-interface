@@ -3,24 +3,29 @@ package sg.ncl.service.experiment.data.jpa;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
+import org.junit.runner.RunWith;
+import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.dao.DataIntegrityViolationException;
-import sg.ncl.service.experiment.AbstractTest;
-import sg.ncl.service.experiment.Util;
+import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
+import org.springframework.orm.jpa.JpaSystemException;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit4.SpringRunner;
+import sg.ncl.service.experiment.domain.Experiment;
 
 import javax.inject.Inject;
-import java.time.ZonedDateTime;
 
-import static org.hamcrest.Matchers.equalTo;
-import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.not;
-import static org.hamcrest.Matchers.nullValue;
-import static org.junit.Assert.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 import static sg.ncl.common.test.Checks.checkException;
+import static sg.ncl.service.experiment.util.TestUtil.getExperimentEntity;
 
 /**
  * Created by Desmond
  */
-public class ExperimentRepositoryTest extends AbstractTest {
+@RunWith(SpringRunner.class)
+@DataJpaTest
+@EnableJpaAuditing
+@ContextConfiguration(classes = ExperimentRepository.class)
+public class ExperimentRepositoryTest {
 
     @Rule
     public final ExpectedException exception = ExpectedException.none();
@@ -30,24 +35,47 @@ public class ExperimentRepositoryTest extends AbstractTest {
 
     @Test
     public void testRepositoryExists() throws Exception {
-        assertThat(repository, is(not(nullValue(ExperimentRepository.class))));
+        assertThat(repository).isNotNull();
     }
 
     @Test
     public void testGoodSave() throws Exception {
-        final ExperimentEntity entity = Util.getExperimentsEntity();
+        final ExperimentEntity entity = getExperimentEntity();
 
         final long count = repository.count();
         final ExperimentEntity savedEntity = repository.saveAndFlush(entity);
-        assertThat(repository.count(), is(equalTo(count + 1)));
-        assertThat(savedEntity.getCreatedDate(), is(not(nullValue(ZonedDateTime.class))));
-        assertThat(savedEntity.getLastModifiedDate(), is(not(nullValue(ZonedDateTime.class))));
-        assertThat(savedEntity.getVersion(), is(equalTo(0L)));
+
+        assertThat(repository.count()).isEqualTo(count + 1);
+        assertThat(savedEntity.getCreatedDate()).isNotNull();
+        assertThat(savedEntity.getLastModifiedDate()).isNotNull();
+    }
+
+    @Test
+    public void testSaveWithNullId() throws Exception {
+        final ExperimentEntity entity = getExperimentEntity();
+        entity.setId(null);
+        final long count = repository.count();
+
+        final ExperimentEntity saved = repository.saveAndFlush(entity);
+
+        assertThat(repository.count()).isEqualTo(count + 1);
+        assertThat(saved.getId()).isNotNull();
+    }
+
+    @Test
+    public void testSaveWithExistingEntityWithNullId() throws Exception {
+        final ExperimentEntity entity = getExperimentEntity();
+        final ExperimentEntity saved = repository.saveAndFlush(entity);
+        saved.setId(null);
+
+        exception.expect(JpaSystemException.class);
+
+        repository.saveAndFlush(saved);
     }
 
     @Test
     public void testSaveNullUserId() throws Exception {
-        final ExperimentEntity entity = Util.getExperimentsEntity();
+        final ExperimentEntity entity = getExperimentEntity();
         entity.setUserId(null);
 
         try {
@@ -60,7 +88,7 @@ public class ExperimentRepositoryTest extends AbstractTest {
 
     @Test
     public void testSaveNullTeamId() throws Exception {
-        final ExperimentEntity entity = Util.getExperimentsEntity();
+        final ExperimentEntity entity = getExperimentEntity();
         entity.setTeamId(null);
 
         try {
@@ -73,7 +101,7 @@ public class ExperimentRepositoryTest extends AbstractTest {
 
     @Test
     public void testSaveNullTeamName() throws Exception {
-        final ExperimentEntity entity = Util.getExperimentsEntity();
+        final ExperimentEntity entity = getExperimentEntity();
         entity.setTeamName(null);
 
         try {
@@ -86,7 +114,7 @@ public class ExperimentRepositoryTest extends AbstractTest {
 
     @Test
     public void testSaveNullName() throws Exception {
-        final ExperimentEntity entity = Util.getExperimentsEntity();
+        final ExperimentEntity entity = getExperimentEntity();
         entity.setName(null);
 
         try {
@@ -99,7 +127,7 @@ public class ExperimentRepositoryTest extends AbstractTest {
 
     @Test
     public void testSaveNullDescription() throws Exception {
-        final ExperimentEntity entity = Util.getExperimentsEntity();
+        final ExperimentEntity entity = getExperimentEntity();
         entity.setDescription(null);
 
         try {
@@ -112,7 +140,7 @@ public class ExperimentRepositoryTest extends AbstractTest {
 
     @Test
     public void testSaveNullNsFile() throws Exception {
-        final ExperimentEntity entity = Util.getExperimentsEntity();
+        final ExperimentEntity entity = getExperimentEntity();
         entity.setNsFile(null);
 
         try {
@@ -125,7 +153,7 @@ public class ExperimentRepositoryTest extends AbstractTest {
 
     @Test
     public void testSaveNullNsFileContent() throws Exception {
-        final ExperimentEntity entity = Util.getExperimentsEntity();
+        final ExperimentEntity entity = getExperimentEntity();
         entity.setNsFileContent(null);
 
         try {
@@ -138,7 +166,7 @@ public class ExperimentRepositoryTest extends AbstractTest {
 
     @Test
     public void testSaveNullIdleSwap() throws Exception {
-        final ExperimentEntity entity = Util.getExperimentsEntity();
+        final ExperimentEntity entity = getExperimentEntity();
         entity.setIdleSwap(null);
 
         try {
@@ -151,7 +179,7 @@ public class ExperimentRepositoryTest extends AbstractTest {
 
     @Test
     public void testSaveNullMaxDuration() throws Exception {
-        final ExperimentEntity entity = Util.getExperimentsEntity();
+        final ExperimentEntity entity = getExperimentEntity();
         entity.setMaxDuration(null);
 
         try {
@@ -162,25 +190,20 @@ public class ExperimentRepositoryTest extends AbstractTest {
         }
     }
 
-//    @Test
-//    public void testSaveExperimentDifferentTeamSameExpName() throws Exception {
-//        ExperimentEntity one = Util.getExperimentsEntity();
-//        ExperimentEntity two = Util.getExperimentsEntity();
-//        one.setName("sameExpName");
-//        two.setName("sameExpName");
-//
-//        when(repository.save(any(ExperimentEntity.class))).thenAnswer(i -> {
-//            ExperimentEntity e = i.getArgumentAt(0, ExperimentEntity.class);
-//            e.setId(Long.parseLong(RandomStringUtils.randomNumeric(10));
-//            return e;
-//        });
-//
-//        Experiment oneSaved = experimentService.save(one);
-//        Experiment twoSaved = experimentService.save(two);
-//
-//        verify(experimentRepository, times(2)).save(any(ExperimentEntity.class));
-//        Assertions.assertThat(oneSaved.getName()).isEqualTo(twoSaved.getName());
-//        Assertions.assertThat(oneSaved.getTeamName()).isNotEqualTo(twoSaved.getTeamName());
-//        Assertions.assertThat(oneSaved.getId()).isNotEqualTo(twoSaved.getId());
-//    }
+    @Test
+    public void testSaveExperimentDifferentTeamSameExpName() throws Exception {
+        ExperimentEntity one = getExperimentEntity();
+        ExperimentEntity two = getExperimentEntity();
+        one.setName("sameExpName");
+        two.setName("sameExpName");
+
+        final long count = repository.count();
+        Experiment oneSaved = repository.saveAndFlush(one);
+        Experiment twoSaved = repository.saveAndFlush(two);
+
+        assertThat(repository.count()).isEqualTo(count + 2);
+        assertThat(oneSaved.getName()).isEqualTo(twoSaved.getName());
+        assertThat(oneSaved.getTeamName()).isNotEqualTo(twoSaved.getTeamName());
+        assertThat(oneSaved.getId()).isNotEqualTo(twoSaved.getId());
+    }
 }
