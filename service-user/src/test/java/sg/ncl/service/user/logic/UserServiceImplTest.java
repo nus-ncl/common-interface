@@ -20,14 +20,12 @@ import sg.ncl.service.user.domain.User;
 import sg.ncl.service.user.domain.UserDetails;
 import sg.ncl.service.user.domain.UserService;
 import sg.ncl.service.user.domain.UserStatus;
-import sg.ncl.service.user.exceptions.InvalidStatusTransitionException;
-import sg.ncl.service.user.exceptions.UserIdNullOrEmptyException;
-import sg.ncl.service.user.exceptions.UserNotFoundException;
-import sg.ncl.service.user.exceptions.UsernameAlreadyExistsException;
-//import sg.ncl.service.user.logic.UserServiceImpl;
+import sg.ncl.service.user.exceptions.*;
+
 
 import java.util.List;
 
+import static org.assertj.core.api.Assertions.anyOf;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Matchers.*;
@@ -35,7 +33,7 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static sg.ncl.service.user.Util.getUserEntity;
-
+import static org.assertj.core.api.Assertions.assertThat;
 /**
  * @author Tran Ly Vu
  * @Version 1.0
@@ -53,323 +51,539 @@ public class UserServiceImplTest {
     private UserRepository userRepository;
 
 
-    private  UserServiceImpl userServiceImpl;
+    private UserServiceImpl userServiceImpl;
 
     @Before
-    public void  setup(){
-        userServiceImpl =new UserServiceImpl(userRepository);
+    public void setup() {
+        userServiceImpl = new UserServiceImpl(userRepository);
     }
 
     //throw UsernameAlreadyExistsException
     @Test
     public void createUserTest1() throws Exception {
-        UserEntity userEntity= Util.getUserEntity();
+        UserEntity userEntity = Util.getUserEntity();
 
         exception.expect(UsernameAlreadyExistsException.class);
         when(userRepository.findByUserDetailsEmail(anyString())).thenReturn(userEntity);
-        User actual=userServiceImpl.createUser(userEntity);
+        User actual = userServiceImpl.createUser(userEntity);
 
-        verify(userRepository,times(1)).findByUserDetailsEmail(anyString());
-}
+        verify(userRepository, times(1)).findByUserDetailsEmail(anyString());
+    }
 
+    //might be wrong gotta ask christ
     //no exception thrown
     @Test
     public void createUserTest2() throws Exception {
-        UserDetailsEntity userDetailsEntity=Util.getUserDetailsEntity();;
+        // UserServiceImpl userServiceImpl1=new  UserServiceImpl(userRepository);
+        UserDetailsEntity userDetailsEntity = Util.getUserDetailsEntity();
+        ;
         userDetailsEntity.setEmail(null);
 
-        User userEntity= new UserEntity();
-        userEntity=Util.getUserEntity();
+        User userEntity = new UserEntity();
+        userEntity = Util.getUserEntity();
 
         when(userRepository.findByUserDetailsEmail(anyString())).thenReturn(null);
-        when(userRepository.save())
-        User actual=userServiceImpl.createUser(userEntity);
+        when(userRepository.save(any(UserEntity.class))).thenReturn((UserEntity) userEntity);
+        User actual = userServiceImpl.createUser(userEntity);
 
-        verify(userRepository,times(1)).findByUserDetailsEmail(anyString());
-        verify(userRepository,times(1)).save((any(UserEntity.class)));
-         assertEquals(userEntity, userEntity.getApplicationDate());
-        //assertEquals(userEntity.getApplicationDate(), actual.getApplicationDate());
-       // assertEquals(userEntity.getUserDetails(), actual.getUserDetails());
+        verify(userRepository, times(1)).findByUserDetailsEmail(anyString());
+        verify(userRepository, times(1)).save((any(UserEntity.class)));
+
+        assertThat(actual.getApplicationDate()).isEqualTo(userEntity.getApplicationDate());
+        assertThat(actual.getUserDetails()).isEqualTo(userEntity.getUserDetails());
+        assertThat(actual.getProcessedDate()).isEqualTo(userEntity.getProcessedDate());
+
     }
 
     @Test
-    public void testGetAll1(){
-        List<User> actual=userServiceImpl.getAll();
-        verify(userRepository,times(1)).findAll();
+    public void testGetAllListWithSizeOfZero() {
+        List<User> actual = userServiceImpl.getAll();
+        verify(userRepository, times(1)).findAll();
         Assert.assertTrue(actual.size() == 0);
     }
 
+    //throw UserNotFoundException
     @Test
-    public void testGetAll2() throws Exception {
-        UserService userService = new UserServiceImpl(userRepository);
-        User[] userArray = new User[3];
+    public void testGetUserWhenIdIsNull() {
 
-        for (int i = 0; i < 3; i++) {
-            UserEntity[] userEntityArray = addUser();
-            userArray[i] = userEntityArray[0];
-        }
+        exception.expect(UserIdNullOrEmptyException.class);
 
-        List<User> actual= userService.getAll();
-
-        verify(userRepository,times(1)).findAll();
-        assertThat(actual, IsIterableContainingInAnyOrder.containsInAnyOrder(userArray));
+        User actual = userServiceImpl.getUser(null);
     }
-
-    //ask christ =>cant test private method
- //  @Test
- //  public void testGetUser(){
-  //     User actual=userServiceImpl.getUser("test");
-  //      verify(userServiceImpl,times(1)).findUser("test");
-   // }
 
     //throw UserNotFoundException
-  //  @Test
-  //  public void testVerifyEmail1(){
-
-   //     exception.expect(UserNotFoundException.class);
-   //     when(userServiceImpl.findUser(anyString())).thenReturn(null);
-   //     UserStatus actual= userServiceImpl.verifyEmail(null,"","");
-
-   // }
-
     @Test
-    public void getUserWithNullIdTest() throws Exception {
-        UserService userService = new UserServiceImpl(userRepository);
-        userService.getUser(null);
+    public void testGetUserWhenIdIsEmpty() {
+        exception.expect(UserIdNullOrEmptyException.class);
+
+        User actual = userServiceImpl.getUser("");
     }
 
-    @Test(expected = UserIdNullOrEmptyException.class)
-    public void getUserWithEmptyIdTest() throws Exception {
-        UserService userService = new UserServiceImpl(userRepository);
-        userService.getUser("");
-    }
-
+    //No exception thrown
     @Test
-    public void findUserWithNoUserInDbTest() throws Exception {
-        UserService userService = new UserServiceImpl(userRepository);
-        User one = userService.getUser(RandomStringUtils.randomAlphabetic(20));
-        assertEquals(one, null);
+    public void testGetUserNoExceptionThrown() {
+        String randomStringForTest = RandomStringUtils.randomAlphanumeric(20);
+
+        User actual = userServiceImpl.getUser(randomStringForTest);
+        verify(userRepository, times(1)).findOne(randomStringForTest);
     }
 
+    //throw UserNotFoundException
     @Test
-    public void findUserTest() throws Exception {
-        UserService userService = new UserServiceImpl(userRepository);
-        final UserEntity[] userArray = addUser();
-        final String idString = userArray[0].getId();
-        final UserEntity originalEntity = userArray[1];
+    public void testVerifyEmailUserNotFoundException() {
+        String randomIdStringForTest = RandomStringUtils.randomAlphanumeric(20);
+        String randomEmailStringForTest = RandomStringUtils.randomAlphanumeric(20);
+        String randomKeyStringForTest = RandomStringUtils.randomAlphanumeric(20);
 
-        User fromDbEntity = userService.getUser(idString);
+        exception.expect(UserNotFoundException.class);
+        when(userRepository.findOne(anyString())).thenReturn(null);
 
-        UserDetailsEntity originalDetails = originalEntity.getUserDetails();
-        UserDetails fromDbDetails = fromDbEntity.getUserDetails();
-        assertEquals(originalDetails.getFirstName(), fromDbDetails.getFirstName());
-        assertEquals(originalDetails.getLastName(), fromDbDetails.getLastName());
-        assertEquals(originalDetails.getJobTitle(), fromDbDetails.getJobTitle());
-        assertEquals(originalDetails.getEmail(), fromDbDetails.getEmail());
-        assertEquals(originalDetails.getPhone(), fromDbDetails.getPhone());
-        assertEquals(originalDetails.getInstitution(), fromDbDetails.getInstitution());
-        assertEquals(originalDetails.getInstitutionAbbreviation(), fromDbDetails.getInstitutionAbbreviation());
-        assertEquals(originalDetails.getInstitutionWeb(), fromDbDetails.getInstitutionWeb());
+        UserStatus actual = userServiceImpl.verifyEmail(randomIdStringForTest, randomEmailStringForTest, randomKeyStringForTest);
 
-        AddressEntity originalAddress = originalDetails.getAddress();
-        Address fromDbAddress = fromDbDetails.getAddress();
-        assertEquals(originalAddress.getAddress1(), fromDbAddress.getAddress1());
-        assertEquals(originalAddress.getAddress2(), fromDbAddress.getAddress2());
-        assertEquals(originalAddress.getCountry(), fromDbAddress.getCountry());
-        assertEquals(originalAddress.getRegion(), fromDbAddress.getRegion());
-        assertEquals(originalAddress.getCity(), fromDbAddress.getCity());
-        assertEquals(originalAddress.getZipCode(), fromDbAddress.getZipCode());
+        verify(userRepository, times(1)).findOne(anyString());
     }
 
+    //throw UserIdNullOrEmptyException
     @Test
-    public void putUserTest() throws Exception {
-        UserService userService = new UserServiceImpl(userRepository);
-        final UserEntity[] userEntityArray = addUser();
-        final String idString = userEntityArray[0].getId();
+    public void testVerifyEmailIdIsNull() {
+        String randomEmailStringForTest = RandomStringUtils.randomAlphanumeric(20);
+        String randomKeyStringForTest = RandomStringUtils.randomAlphanumeric(20);
 
-        // get user and store the original last name
-        User user = userService.getUser(idString);
-        final String originalLastName = user.getUserDetails().getLastName();
+        exception.expect(UserIdNullOrEmptyException.class);
+        UserStatus actual = userServiceImpl.verifyEmail(null, randomEmailStringForTest, randomKeyStringForTest);
 
-        // change first name and put
-        String newFirstName = RandomStringUtils.randomAlphabetic(20);
-        userEntityArray[0].getUserDetails().setFirstName(newFirstName);
-
-        userService.updateUser(idString, userEntityArray[0]);
-
-        user = userService.getUser(idString);
-        assertEquals(user.getUserDetails().getFirstName(), newFirstName);
-        assertEquals(user.getUserDetails().getLastName(), originalLastName);
+        verify(userRepository, times(1)).findOne(anyString());
     }
 
+    //throw UserNotFoundException
     @Test
-    public void updateUserNullFieldTest() throws Exception {
-        UserService userService = new UserServiceImpl(userRepository);
+    public void testVerifyEmailWhenUidIsEmpty() {
+        String randomEmailStringForTest = RandomStringUtils.randomAlphanumeric(20);
+        String randomKeyStringForTest = RandomStringUtils.randomAlphanumeric(20);
 
-        final UserEntity userEntity = getUserEntity();
-        UserEntity savedUserEntity = userRepository.save(userEntity);
+        exception.expect(UserIdNullOrEmptyException.class);
+        UserStatus actual = userServiceImpl.verifyEmail("", randomEmailStringForTest, randomKeyStringForTest);
 
-        savedUserEntity.getUserDetails().setFirstName(null);
-
-        userService.updateUser(savedUserEntity.getId(), savedUserEntity);
+        verify(userRepository, times(1)).findOne(anyString());
     }
 
-    @Test(expected = UserIdNullOrEmptyException.class)
-    public void updateUserNullIdTest() throws Exception {
-        UserService userService = new UserServiceImpl(userRepository);
-        UserEntity userEntity = new UserEntity();
-        userService.updateUser(null, userEntity);
-    }
-
-    @Test(expected = UserIdNullOrEmptyException.class)
-    public void updateUserEmptyIdTest() throws Exception {
-        UserService userService = new UserServiceImpl(userRepository);
-        UserEntity userEntity = new UserEntity();
-        userService.updateUser("", userEntity);
-    }
-
-    private UserEntity[] addUser() throws Exception {
-        UserEntity userEntity = getUserEntity();
-        UserEntity saveUser = userRepository.save(userEntity);
-
-        final UserEntity[] userArray = new UserEntity[2];
-        userArray[0] = saveUser;
-        userArray[1] = userEntity;
-
-        return userArray;
-    }
-
+    //throw EmailNotMatchException
     @Test
-    public void addUserToTeamTest() throws Exception {
-        UserService userService = new UserServiceImpl(userRepository);
-        UserEntity[] userEntityArray = addUser();
-        UserEntity userEntity = userEntityArray[0];
-        String userId = userEntity.getId();
-        String teamId = RandomStringUtils.randomAlphabetic(20);
-        userEntity.addTeam(teamId);
-        userService.updateUser(userId, userEntity);
+    public void testVerifyEmailEmailNotMatch() throws Exception {
+        String randomUidStringForTest = RandomStringUtils.randomAlphanumeric(20);
+        String randomEmailStringForTest = RandomStringUtils.randomAlphanumeric(20);
+        String randomKeyStringForTest = RandomStringUtils.randomAlphanumeric(20);
 
-        User userFromDb = userService.getUser(userId);
-        List<String> teamList = userFromDb.getTeams();
-        assertEquals(teamList.get(0), teamId);
+        UserEntity userEntity = Util.getUserEntity();
+        UserDetailsEntity userDetailsEntity = Util.getUserDetailsEntity();
+
+        exception.expect(EmailNotMatchException.class);
+        when(userRepository.findOne(anyString())).thenReturn(userEntity);
+
+        UserStatus actual = userServiceImpl.verifyEmail(randomUidStringForTest, randomEmailStringForTest, randomKeyStringForTest);
     }
 
+
+    //no exception thrown and user.getStatus() == UserStatus.CREATED
     @Test
-    public void addUserTest() throws Exception {
-        UserService userService = new UserServiceImpl(userRepository);
-        UserEntity userEntity = getUserEntity();
-        User user = userService.createUser(userEntity);
+    public void testVerifyEmailNoException1() throws Exception {
+        String randomUidForTest = RandomStringUtils.randomAlphanumeric(20);
+        String randomEmailForTest = RandomStringUtils.randomAlphanumeric(20);
+        String randomKeyForTest = RandomStringUtils.randomAlphanumeric(20);
 
-        User userFromDb = userService.getUser(user.getId());
-        assertEquals(userEntity.getUserDetails().getFirstName(), userFromDb.getUserDetails().getFirstName());
+        UserEntity userEntity = Util.getUserEntity();
+        UserDetailsEntity userDetailsEntity = Util.getUserDetailsEntity();
+        userDetailsEntity.setEmail(randomEmailForTest);               //in order to pass mailNotMatchException exception
+        userEntity.setUserDetails(userDetailsEntity);
+        userEntity.setVerificationKey(randomKeyForTest);                //verificationKey is not null
+        userEntity.setStatus(UserStatus.CREATED);                     //user.getStatus() == UserStatus.CREATED
+
+        when(userRepository.findOne(anyString())).thenReturn(userEntity);
+
+        UserStatus actual = userServiceImpl.verifyEmail(randomUidForTest, randomEmailForTest, randomKeyForTest);
+
+        verify(userRepository, times(1)).findOne(anyString());
+        verify(userRepository, times(1)).save(any(UserEntity.class));
+        assertThat(actual).isEqualTo(UserStatus.PENDING);
     }
 
-    @Test(expected = UsernameAlreadyExistsException.class)
-    public void addUserTestUsernameExists() throws Exception {
-        // try to create a user again with the same email
-        UserService userService = new UserServiceImpl(userRepository);
-        UserEntity userEntity = getUserEntity();
-        userService.createUser(userEntity);
-        userService.createUser(userEntity);
-    }
-
-    @Test(expected = UserIdNullOrEmptyException.class)
-    public void removeUserFromTeamTestUserIdNull() throws Exception {
-        UserService userService = new UserServiceImpl(userRepository);
-        userService.removeTeam(null, RandomStringUtils.randomAlphanumeric(20));
-    }
-
-    @Test(expected = UserNotFoundException.class)
-    public void removeUserFromTeamTestUserNotFound() throws Exception {
-        UserService userService = new UserServiceImpl(userRepository);
-        userService.removeTeam(RandomStringUtils.randomAlphanumeric(20), RandomStringUtils.randomAlphanumeric(20));
-    }
-
+    //no exception thrown and user.getStatus() != UserStatus.CREATED
     @Test
-    public void removeUserFromTeamTestGood() throws Exception {
-        UserService userService = new UserServiceImpl(userRepository);
-        UserEntity userEntity = getUserEntity();
-        User user = userService.createUser(userEntity);
-        String userId = user.getId();
-        String teamId = RandomStringUtils.randomAlphabetic(20);
+    public void testVerifyEmailNoException2() throws Exception {
+        String randomUidForTest = RandomStringUtils.randomAlphanumeric(20);
+        String randomEmailForTest = RandomStringUtils.randomAlphanumeric(20);
+        String randomKeyForTest = RandomStringUtils.randomAlphanumeric(20);
 
-        userService.addTeam(userId, teamId);
+        UserEntity userEntity = Util.getUserEntity();
+        UserDetailsEntity userDetailsEntity = Util.getUserDetailsEntity();
+        userDetailsEntity.setEmail(randomEmailForTest);               //in order to pass mailNotMatchException exception
+        userEntity.setUserDetails(userDetailsEntity);
+        userEntity.setVerificationKey(randomKeyForTest);                //verificationKey is not null
+        userEntity.setStatus(UserStatus.PENDING);                     //user.getStatus() == UserStatus.CREATED
 
-        // ensure team is added from the user side
-        User userFromDb = userService.getUser(userId);
-        List<String> teamList = userFromDb.getTeams();
-        assertEquals(teamList.get(0), teamId);
+        when(userRepository.findOne(anyString())).thenReturn(userEntity);
 
-        // ensure team is removed from the user side
-        userService.removeTeam(userId, teamId);
+        UserStatus actual = userServiceImpl.verifyEmail(randomUidForTest, randomEmailForTest, randomKeyForTest);
 
-        User userFromDb2 = userService.getUser(userId);
-        List<String> teamList2 = userFromDb2.getTeams();
-        assertEquals(teamList2.isEmpty(), true);
+        verify(userRepository, times(1)).findOne(anyString());
+        verify(userRepository, times(1)).save(any(UserEntity.class));
+        assertThat(actual).isEqualTo(UserStatus.PENDING);
     }
 
-    @Test(expected = InvalidStatusTransitionException.class)
-    public void testUpdateUserStatusToCreated() throws Exception {
-        UserService userService = new UserServiceImpl(userRepository);
-        UserEntity userEntity = getUserEntity();
-        User user = userService.createUser(userEntity);
-        userService.updateUserStatus(user.getId(), UserStatus.CREATED);
-    }
-
+    //throw VerificationKeyNotMatchException when user.getVerificationKey()==null
     @Test
-    public void testUpdateUserStatusCreatedToPending() throws Exception {
-        UserService userService = new UserServiceImpl(userRepository);
-        UserEntity userEntity = getUserEntity();
-        User user = userService.createUser(userEntity);
-        User user2 = userService.updateUserStatus(user.getId(), UserStatus.PENDING);
-        assertEquals(user2.getStatus(), UserStatus.PENDING);
+    public void testVerifyEmailKeyIsNull() throws Exception {
+        String randomUidForTest = RandomStringUtils.randomAlphanumeric(20);
+        String randomEmailForTest = RandomStringUtils.randomAlphanumeric(20);
+        String randomKeyForTest = RandomStringUtils.randomAlphanumeric(20);
+
+        UserEntity userEntity = Util.getUserEntity();
+        UserDetailsEntity userDetailsEntity = Util.getUserDetailsEntity();
+        userDetailsEntity.setEmail(randomEmailForTest);               //in order to pass mailNotMatchException exception
+        userEntity.setUserDetails(userDetailsEntity);
+        userEntity.setVerificationKey(null);                //verificationKey null
+
+        exception.expect(VerificationKeyNotMatchException.class);
+        when(userRepository.findOne(anyString())).thenReturn(userEntity);
+
+        UserStatus actual = userServiceImpl.verifyEmail(randomUidForTest, randomEmailForTest, randomKeyForTest);
+
+        verify(userRepository, times(1)).findOne(anyString());
     }
 
-    @Test(expected = InvalidStatusTransitionException.class)
-    public void testUpdateUserStatusCreatedToApproved() throws Exception {
-        UserService userService = new UserServiceImpl(userRepository);
-        UserEntity userEntity = getUserEntity();
-        User user = userService.createUser(userEntity);
-        userService.updateUserStatus(user.getId(), UserStatus.APPROVED);
-    }
-
-    @Test(expected = InvalidStatusTransitionException.class)
-    public void testUpdateUserStatusCreatedToRejected() throws Exception {
-        UserService userService = new UserServiceImpl(userRepository);
-        UserEntity userEntity = getUserEntity();
-        User user = userService.createUser(userEntity);
-        userService.updateUserStatus(user.getId(), UserStatus.REJECTED);
-    }
-
+    //throw VerificationKeyNotMatchException when !key.equals(user.getVerificationKey())
     @Test
-    public void testUpdateUserStatusPendingToApproved() throws Exception {
-        UserService userService = new UserServiceImpl(userRepository);
-        UserEntity userEntity = getUserEntity();
-        User user = userService.createUser(userEntity);
-        userService.updateUserStatus(user.getId(), UserStatus.PENDING);
-        userService.updateUserStatus(user.getId(), UserStatus.APPROVED);
-        User user2 = userService.getUser(user.getId());
-        assertEquals(user2.getStatus(), UserStatus.APPROVED);
+    public void testVerifyEmailKeyIsNOtEqualVerificationKey() throws Exception {
+        String randomUidForTest = RandomStringUtils.randomAlphanumeric(20);
+        String randomEmailForTest = RandomStringUtils.randomAlphanumeric(20);
+        String randomKeyForTest = RandomStringUtils.randomAlphanumeric(20);
+        String randomVerificationKeyForTest = RandomStringUtils.randomAlphanumeric(25);
+
+        UserEntity userEntity = Util.getUserEntity();
+        UserDetailsEntity userDetailsEntity = Util.getUserDetailsEntity();
+        userDetailsEntity.setEmail(randomEmailForTest);               //in order to pass mailNotMatchException exception
+        userEntity.setUserDetails(userDetailsEntity);
+        userEntity.setVerificationKey(randomVerificationKeyForTest);             //verificationKey is not equal key
+
+        exception.expect(VerificationKeyNotMatchException.class);
+        when(userRepository.findOne(anyString())).thenReturn(userEntity);
+
+        UserStatus actual = userServiceImpl.verifyEmail(randomUidForTest, randomEmailForTest, randomKeyForTest);
+
+        verify(userRepository, times(1)).findOne(anyString());
     }
 
+    //throw UserNotFoundException
     @Test
-    public void testUpdateUserStatusPendingToRejected() throws Exception {
-        UserService userService = new UserServiceImpl(userRepository);
-        UserEntity userEntity = getUserEntity();
-        User user = userService.createUser(userEntity);
-        userService.updateUserStatus(user.getId(), UserStatus.PENDING);
-        userService.updateUserStatus(user.getId(), UserStatus.REJECTED);
-        User user2 = userService.getUser(user.getId());
-        assertEquals(user2.getStatus(), UserStatus.REJECTED);
+    public void testUpdateUserUserNotFoundException() throws Exception {
+        String randomIdForTest = RandomStringUtils.randomAlphanumeric(20);
+        UserEntity userEntity = Util.getUserEntity();
+
+        when(userRepository.findOne(anyString())).thenReturn(null);
+        exception.expect(UserNotFoundException.class);
+
+        userServiceImpl.updateUser(randomIdForTest, (User) userEntity);
+
+        verify(userRepository, times(1)).findOne(anyString());
     }
 
+    //throw UserIdNullOrEmptyException
     @Test
-    public void testUpdateUserStatusToClosed() throws Exception {
-        UserService userService = new UserServiceImpl(userRepository);
-        UserEntity userEntity = getUserEntity();
-        User user = userService.createUser(userEntity);
-        userService.updateUserStatus(user.getId(), UserStatus.CLOSED);
-        User user2 = userService.getUser(user.getId());
-        assertEquals(user2.getStatus(), UserStatus.CLOSED);
+    public void testUpdateUserIdIsNull() throws Exception {
+        UserEntity userEntity = Util.getUserEntity();
+
+        exception.expect(UserIdNullOrEmptyException.class);
+
+        userServiceImpl.updateUser(null, (User) userEntity);
+
+        verify(userRepository, times(1)).findOne(anyString());
     }
+
+    //throw UserIdNullOrEmptyException
+    @Test
+    public void testUpdateUserIdIsEmpty() throws Exception {
+        UserEntity userEntity = Util.getUserEntity();
+
+        exception.expect(UserIdNullOrEmptyException.class);
+
+        userServiceImpl.updateUser("", (User) userEntity);
+
+        verify(userRepository, times(1)).findOne(anyString());
+    }
+
+    //no exception thrown
+    @Test
+    public void testUpdateUserNoException() throws Exception {
+        String randomIdForTest = RandomStringUtils.randomAlphanumeric(20);
+        UserEntity userEntity = Util.getUserEntity();
+        UserDetailsEntity userDetailsEntity = Util.getUserDetailsEntity();
+
+        when(userRepository.findOne(anyString())).thenReturn(userEntity);
+        userServiceImpl.updateUser(randomIdForTest, (User) userEntity);
+
+        verify(userRepository, times(1)).findOne(anyString());
+        verify(userRepository, times(1)).save(any(UserEntity.class));
+    }
+
+
+    //thrown UserNotFoundException
+    @Test
+    public void testAddTeamUserNotFoundException() throws Exception {
+        String randomUserIdForTest = RandomStringUtils.randomAlphanumeric(20);
+        String randomTeamIdForTest = RandomStringUtils.randomAlphanumeric(20);
+
+        when(userRepository.findOne(anyString())).thenReturn(null);
+        exception.expect(UserNotFoundException.class);
+
+        userServiceImpl.addTeam(randomUserIdForTest, randomTeamIdForTest);
+
+        verify(userRepository, times(1)).findOne(anyString());
+
+    }
+
+    //throw UserIdNullOrEmptyException
+    @Test
+    public void testAddTeamIdIsNull() {
+        String randomTeamIdForTest = RandomStringUtils.randomAlphanumeric(20);
+
+        exception.expect(UserIdNullOrEmptyException.class);
+        userServiceImpl.addTeam(null, randomTeamIdForTest);
+
+        verify(userRepository, times(1)).findOne(anyString());
+    }
+
+    //throw UserIdNullOrEmptyException
+    public void testAddTeamIdIsEmpty() {
+        String randomTeamIdForTest = RandomStringUtils.randomAlphanumeric(20);
+
+        exception.expect(UserIdNullOrEmptyException.class);
+        userServiceImpl.addTeam("", randomTeamIdForTest);
+
+        verify(userRepository, times(1)).findOne(anyString());
+    }
+
+    //no exception thrown
+    @Test
+    public void testAddTeamNoException() throws Exception {
+        String randomUserIdForTest = RandomStringUtils.randomAlphanumeric(20);
+        String randomTeamIdForTest = RandomStringUtils.randomAlphanumeric(20);
+        UserEntity userEntity = Util.getUserEntity();
+
+        when(userRepository.findOne(anyString())).thenReturn(userEntity);
+        userServiceImpl.addTeam(randomUserIdForTest, randomTeamIdForTest);
+
+        verify(userRepository, times(1)).save(any(UserEntity.class));
+
+    }
+
+    //throw UserIdNullOrEmptyException
+    @Test
+    public void testRemoveTeamIdIsNull() {
+        String randomTeamIdForTest = RandomStringUtils.randomAlphanumeric(20);
+
+        exception.expect(UserIdNullOrEmptyException.class);
+        userServiceImpl.removeTeam(null, randomTeamIdForTest);
+
+        verify(userRepository, times(1)).findOne(anyString());
+    }
+
+    //throw UserIdNullOrEmptyException
+    public void testRemoveTeamIdIsEmpty() {
+        String randomTeamIdForTest = RandomStringUtils.randomAlphanumeric(20);
+
+        exception.expect(UserIdNullOrEmptyException.class);
+        userServiceImpl.removeTeam("", randomTeamIdForTest);
+
+        verify(userRepository, times(1)).findOne(anyString());
+    }
+
+    //thrown UserNotFoundException
+    @Test
+    public void testRemoveTeamUserNotFoundException() throws Exception {
+        String randomUserIdForTest = RandomStringUtils.randomAlphanumeric(20);
+        String randomTeamIdForTest = RandomStringUtils.randomAlphanumeric(20);
+
+        when(userRepository.findOne(anyString())).thenReturn(null);
+        exception.expect(UserNotFoundException.class);
+
+        userServiceImpl.removeTeam(randomUserIdForTest, randomTeamIdForTest);
+
+        verify(userRepository, times(1)).findOne(anyString());
+
+    }
+
+    //no Exception thrown
+    @Test
+    public void testRemoveTeamNoException() throws Exception {
+        String randomUserIdForTest = RandomStringUtils.randomAlphanumeric(20);
+        String randomTeamIdForTest = RandomStringUtils.randomAlphanumeric(20);
+        UserEntity userEntity = Util.getUserEntity();
+
+        when(userRepository.findOne(anyString())).thenReturn(userEntity);
+        userServiceImpl.addTeam(randomUserIdForTest, randomTeamIdForTest);
+
+        verify(userRepository, times(1)).save(any(UserEntity.class));
+    }
+
+    //throw UserNotFoundException
+    @Test
+    public void testUpdateUserStatusUserNotFoundException() {
+        String randomIdForTest = RandomStringUtils.randomAlphanumeric(20);
+
+        when(userRepository.findOne(anyString())).thenReturn(null);
+        exception.expect(UserNotFoundException.class);
+        User actual = userServiceImpl.updateUserStatus(randomIdForTest, UserStatus.APPROVED);
+
+        verify(userRepository, times(1)).findOne(anyString());
+    }
+
+    //throw UserIdNullOrEmptyException
+    @Test
+    public void testUpdateUserStatusIdIsNull() {
+        exception.expect(UserIdNullOrEmptyException.class);
+        User actual = userServiceImpl.updateUserStatus(null, UserStatus.APPROVED);
+
+        verify(userRepository, times(1)).findOne(anyString());
+    }
+
+    //throw UserIdNullOrEmptyException
+    @Test
+    public void testUpdateUserStatusIdIsEmpty() {
+        exception.expect(UserIdNullOrEmptyException.class);
+        User actual = userServiceImpl.updateUserStatus("", UserStatus.APPROVED);
+
+        verify(userRepository, times(1)).findOne(anyString());
+    }
+
+    //throw InvalidStatusTransitionException
+    @Test
+    public void testUpdateUserStatusCaseCreated() throws Exception {
+        String randomIdForTest = RandomStringUtils.randomAlphanumeric(20);
+        UserEntity userEntity=Util.getUserEntity();
+
+        exception.expect(InvalidStatusTransitionException.class);
+        when(userRepository.findOne(anyString())).thenReturn(userEntity);
+        User actual = userServiceImpl.updateUserStatus(randomIdForTest, UserStatus.CREATED);
+
+        verify(userRepository, times(1)).findOne(anyString());
+    }
+
+    //case PENDING- If branch
+    @Test
+    public void testUpdateUserStatusCasePendingIfBranch() throws Exception {
+        String randomIdForTest = RandomStringUtils.randomAlphanumeric(20);
+        UserEntity userEntity = Util.getUserEntity();
+        userEntity.setStatus(UserStatus.CREATED);
+        User expected = new UserEntity();
+        expected = userEntity;
+
+        when(userRepository.findOne(anyString())).thenReturn(userEntity);
+        when(userRepository.save(any(UserEntity.class))).thenReturn(userEntity);
+        User actual = userServiceImpl.updateUserStatus(randomIdForTest, UserStatus.PENDING);
+
+
+        assertThat(actual).isEqualTo(expected);
+        verify(userRepository, times(1)).findOne(anyString());
+        verify(userRepository, times(1)).save(any(UserEntity.class));
+    }
+
+    //case PENDING- else branch , throw InvalidStatusTransitionException
+    @Test
+    public void testUpdateUserStatusCasePendingElseBranch() throws Exception {
+        String randomIdForTest = RandomStringUtils.randomAlphanumeric(20);
+        UserEntity userEntity = Util.getUserEntity();
+        userEntity.setStatus(UserStatus.PENDING);
+
+        exception.expect(InvalidStatusTransitionException.class);
+        when(userRepository.findOne(anyString())).thenReturn(userEntity);
+        User actual = userServiceImpl.updateUserStatus(randomIdForTest, UserStatus.PENDING);
+
+        verify(userRepository, times(1)).findOne(anyString());
+    }
+
+    //case APPROVED- If branch
+    @Test
+    public void testUpdateUserStatusCaseApprove() throws Exception {
+        String randomIdForTest = RandomStringUtils.randomAlphanumeric(20);
+        UserEntity userEntity = Util.getUserEntity();
+        userEntity.setStatus(UserStatus.PENDING);
+
+        when(userRepository.findOne(anyString())).thenReturn(userEntity);
+        when(userRepository.save(any(UserEntity.class))).thenReturn(userEntity);
+        User actual = userServiceImpl.updateUserStatus(randomIdForTest, UserStatus.APPROVED);
+        User expected = new UserEntity();
+        expected = userEntity;
+
+        assertThat(actual).isEqualTo(expected);
+        verify(userRepository, times(1)).findOne(anyString());
+        verify(userRepository, times(1)).save(any(UserEntity.class));
+    }
+
+    //case APPROVED- else branch, throw InvalidStatusTransitionException
+    @Test
+    public void testUpdateUserStatusCaseApprovedElseBranch() throws Exception {
+        String randomIdForTest = RandomStringUtils.randomAlphanumeric(20);
+        UserEntity userEntity = Util.getUserEntity();
+        userEntity.setStatus(UserStatus.APPROVED);
+
+        exception.expect(InvalidStatusTransitionException.class);
+        when(userRepository.findOne(anyString())).thenReturn(userEntity);
+        User actual = userServiceImpl.updateUserStatus(randomIdForTest, UserStatus.APPROVED);
+
+        verify(userRepository, times(1)).findOne(anyString());
+    }
+
+    //case REJECTED- If branch
+    @Test
+    public void testUpdateUserStatusCaseRejected() throws Exception {
+        String randomIdForTest = RandomStringUtils.randomAlphanumeric(20);
+        UserEntity userEntity = Util.getUserEntity();
+        userEntity.setStatus(UserStatus.PENDING);
+
+        when(userRepository.findOne(anyString())).thenReturn(userEntity);
+        when(userRepository.save(any(UserEntity.class))).thenReturn(userEntity);
+        User actual = userServiceImpl.updateUserStatus(randomIdForTest, UserStatus.REJECTED);
+        User expected = new UserEntity();
+        expected = userEntity;
+
+        assertThat(actual).isEqualTo(expected);
+        verify(userRepository, times(1)).findOne(anyString());
+        verify(userRepository, times(1)).save(any(UserEntity.class));
+    }
+
+    //case REJECTEDD- else branch, throw InvalidStatusTransitionException
+    @Test
+    public void testUpdateUserStatusCaseRejectedElseBranch() throws Exception {
+        String randomIdForTest = RandomStringUtils.randomAlphanumeric(20);
+        UserEntity userEntity = Util.getUserEntity();
+        userEntity.setStatus(UserStatus.APPROVED);
+
+        exception.expect(InvalidStatusTransitionException.class);
+        when(userRepository.findOne(anyString())).thenReturn(userEntity);
+        User actual = userServiceImpl.updateUserStatus(randomIdForTest, UserStatus.REJECTED);
+
+        verify(userRepository, times(1)).findOne(anyString());
+    }
+
+    //case CLOSED- else branch, throw InvalidStatusTransitionException
+    @Test
+    public void testUpdateUserStatusCaseClosed() throws Exception {
+        String randomIdForTest = RandomStringUtils.randomAlphanumeric(20);
+        UserEntity userEntity = Util.getUserEntity();
+        userEntity.setStatus(UserStatus.CLOSED);
+
+        when(userRepository.findOne(anyString())).thenReturn(userEntity);
+        when(userRepository.save(any(UserEntity.class))).thenReturn(userEntity);
+        User actual = userServiceImpl.updateUserStatus(randomIdForTest, UserStatus.CLOSED);
+        User expected = new UserEntity();
+        expected = userEntity;
+
+        assertThat(actual).isEqualTo(expected);
+        verify(userRepository, times(1)).findOne(anyString());
+        verify(userRepository, times(1)).save(any(UserEntity.class));
+    }
+
 }
+
+
+
