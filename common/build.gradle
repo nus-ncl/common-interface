@@ -7,6 +7,7 @@ dependencies {
     compile 'javax.inject:javax.inject'
     compile 'io.jsonwebtoken:jjwt'
     compile 'org.projectlombok:lombok'
+    compile 'org.hibernate:hibernate-java8'
 
     compileOnly 'org.springframework.boot:spring-boot-configuration-processor'
 
