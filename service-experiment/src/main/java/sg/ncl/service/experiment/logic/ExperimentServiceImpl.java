@@ -37,7 +37,6 @@ public class ExperimentServiceImpl implements ExperimentService {
 
     private final ExperimentRepository experimentRepository;
     private final AdapterDeterLab adapterDeterLab;
-//    private final ExperimentConnectionProperties experimentConnectionProperties;
     private final RealizationService realizationService;
     private final ConnectionProperties adapterConnectionProperties;
 
@@ -46,7 +45,6 @@ public class ExperimentServiceImpl implements ExperimentService {
         this.experimentRepository = experimentRepository;
         this.adapterDeterLab = adapterDeterLab;
         this.realizationService = realizationService;
-//        this.experimentConnectionProperties = experimentConnectionProperties;
         this.adapterConnectionProperties = connectionProperties;
     }
 
