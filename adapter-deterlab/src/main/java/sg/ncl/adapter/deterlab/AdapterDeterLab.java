@@ -250,7 +250,7 @@ public class AdapterDeterLab {
             String jsonResult = new JSONObject(response.getBody().toString()).getString("msg");
             if (!"user is logged in".equals(jsonResult)) {
                 logger.warn("login failed: {}", response.getBody().toString());
-                throw new CredentialsUpdateException();
+                throw new DeterLabOperationFailedException();
             }
             logger.info("login success");
         } catch (JSONException e) {

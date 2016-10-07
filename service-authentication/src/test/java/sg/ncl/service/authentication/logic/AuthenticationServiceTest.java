@@ -16,6 +16,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringRunner;
+import sg.ncl.adapter.deterlab.AdapterDeterLab;
 import sg.ncl.common.jwt.JwtAutoConfiguration;
 import sg.ncl.service.authentication.data.jpa.CredentialsEntity;
 import sg.ncl.service.authentication.data.jpa.CredentialsRepository;
@@ -56,6 +57,8 @@ public class AuthenticationServiceTest {
     private CredentialsRepository credentialsRepository;
     @Mock
     private PasswordEncoder passwordEncoder;
+    @Mock
+    private AdapterDeterLab adapterDeterLab;
     @Inject
     private SignatureAlgorithm signatureAlgorithm = SignatureAlgorithm.ES256;
     @Inject
@@ -70,7 +73,7 @@ public class AuthenticationServiceTest {
         assertThat(mockingDetails(credentialsRepository).isMock()).isTrue();
         assertThat(mockingDetails(passwordEncoder).isMock()).isTrue();
 
-        authenticationService = new AuthenticationServiceImpl(credentialsRepository, passwordEncoder, signatureAlgorithm, apiKey, expiryDuration);
+        authenticationService = new AuthenticationServiceImpl(credentialsRepository, passwordEncoder, signatureAlgorithm, apiKey, expiryDuration, adapterDeterLab);
     }
 
     @Test
