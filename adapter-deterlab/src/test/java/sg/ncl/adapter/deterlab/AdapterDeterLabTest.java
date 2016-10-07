@@ -1070,4 +1070,63 @@ public class AdapterDeterLabTest {
         assertEquals(myobject.toString(),actual);
     }
 
+    @Test
+    public void loginSuccess() throws Exception {
+        JSONObject myobject = new JSONObject();
+        myobject.put("msg", "user is logged in");
+
+        when(restTemplate.exchange(anyString(),eq(HttpMethod.POST),anyObject(),eq(String.class)))
+                .thenReturn(response);
+        when(response.getBody()).thenReturn(myobject.toString());
+        when(response.getBody().toString()).thenReturn(myobject.toString());
+        adapterDeterLab.login(myobject.toString());
+
+        verify(restTemplate,times(1)).exchange(anyString(),eq(HttpMethod.POST),anyObject(),eq(String.class));
+        verify(properties,times(1)).login();
+    }
+
+    @Test
+    public void loginFail() throws Exception {
+        JSONObject myobject = new JSONObject();
+        myobject.put("msg", "user is logged in error");
+
+        when(restTemplate.exchange(anyString(),eq(HttpMethod.POST),anyObject(),eq(String.class)))
+                .thenReturn(response);
+        when(response.getBody()).thenReturn(myobject.toString());
+        when(response.getBody().toString()).thenReturn(myobject.toString());
+
+        exception.expect(DeterLabOperationFailedException.class);
+
+        adapterDeterLab.login(myobject.toString());
+
+        verify(restTemplate,times(1)).exchange(anyString(),eq(HttpMethod.POST),anyObject(),eq(String.class));
+        verify(properties,times(1)).login();
+    }
+
+    @Test
+    public void loginAdapterDeterlabConnectionException() throws Exception {
+        when(restTemplate.exchange(anyString(),eq(HttpMethod.POST),anyObject(),eq(String.class))).
+                thenThrow(new RestClientException(""));
+
+        exception.expect(AdapterDeterlabConnectException.class);
+
+        adapterDeterLab.login("jsonString");
+
+        verify(restTemplate,times(1)).exchange(anyString(),eq(HttpMethod.POST),anyObject(),eq(String.class));
+        verify(properties,times(1)).login();
+    }
+
+    @Test
+    public void loginJSONException() throws Exception {
+        when(restTemplate.exchange(anyString(),eq(HttpMethod.POST),anyObject(),eq(String.class))).thenReturn(response);
+        when(response.getBody()).thenReturn("");
+        when(response.getBody().toString()).thenReturn("");
+
+        exception.expect(JSONException.class);
+
+        adapterDeterLab.login("jsonString");
+        verify(restTemplate,times(1)).exchange(anyString(),eq(HttpMethod.POST),anyObject(),eq(String.class));
+        verify(properties,times(1)).login();
+    }
+
 }
