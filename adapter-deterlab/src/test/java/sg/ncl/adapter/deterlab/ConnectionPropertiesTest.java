@@ -98,7 +98,12 @@ public class ConnectionPropertiesTest {
         assertEquals(expected12,actual12);
         assertEquals(expected13,actual13);
         assertEquals(expected14,actual14);
+    }
 
+    @Test
+    public void testGetJoinProjectNewUsers() throws Exception {
+        assertThat(connectionProperties.getJoinProjectNewUsers()).isNotNull();
+        assertThat(connectionProperties.getJoinProjectNewUsers()).isEqualTo("http://127.0.0.1:22/joinProjectNewUsers");
     }
 
     @Test
