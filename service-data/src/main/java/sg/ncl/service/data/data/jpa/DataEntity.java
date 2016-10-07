@@ -3,13 +3,11 @@ package sg.ncl.service.data.data.jpa;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
-import org.hibernate.annotations.GenericGenerator;
+import org.hibernate.annotations.Type;
 import sg.ncl.common.jpa.AbstractEntity;
-import sg.ncl.service.data.domain.Dataset;
-import sg.ncl.service.data.domain.DatasetAccessibility;
-import sg.ncl.service.data.domain.DatasetCategory;
-import sg.ncl.service.data.domain.DatasetStatus;
-import sg.ncl.service.data.domain.DatasetVisibility;
+import sg.ncl.service.data.domain.Data;
+import sg.ncl.service.data.domain.DataAccessibility;
+import sg.ncl.service.data.domain.DataVisibility;
 
 import javax.persistence.CascadeType;
 import javax.persistence.CollectionTable;
@@ -25,7 +23,6 @@ import javax.persistence.JoinColumn;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.persistence.UniqueConstraint;
-import javax.validation.constraints.Min;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -33,79 +30,64 @@ import java.util.List;
  * Created by dcszwang on 10/5/2016.
  */
 @Entity
-@Table(name = "datasets", indexes = @Index(columnList = "name"))
+@Table(name = "data", indexes = @Index(columnList = "name"))
 @Getter
 @Setter
 @Slf4j
-public class DatasetEntity extends AbstractEntity implements Dataset {
+public class DataEntity extends AbstractEntity implements Data {
 
     @Id
-    @GeneratedValue(generator = "uuid2")
-    @GenericGenerator(name = "uuid2", strategy = "uuid2")
+    @GeneratedValue
     @Column(name = "id", nullable = false, unique = true, updatable = false)
-    private String id;
+    private Long id;
 
     @Column(name = "name", nullable = false, unique = true, updatable = false)
     private String name;
 
-    @Column(name = "description", nullable = false)
+    @Type(type = "text")
+    @Column(name = "description")
     private String description;
 
-    @Column(name = "owner_id", nullable = false, updatable = false)
-    private String ownerId;
+    @Column(name = "contributor_id", nullable = false, updatable = false)
+    private String contributorId;
 
     @Column(name = "visibility", nullable = false)
     @Enumerated(EnumType.STRING)
-    private DatasetVisibility visibility = DatasetVisibility.PUBLIC;
+    private DataVisibility visibility = DataVisibility.PUBLIC;
 
     @Column(name = "accessibility", nullable = false)
     @Enumerated(EnumType.STRING)
-    private DatasetAccessibility accessibility = DatasetAccessibility.OPEN;
-
-    @Column(name = "status", nullable = false)
-    @Enumerated(EnumType.STRING)
-    private DatasetStatus status = DatasetStatus.COMPLETE;
-
-    @Column(name = "size", nullable = false)
-    @Min(value = 0)
-    private Long size; // dataset size, in KB
-
-    @Column(name = "download_times", nullable = false)
-    @Min(value = 0)
-    private int downloadTimes = 0;
-
-    @Column(name = "category", nullable = false)
-    private DatasetCategory category;
+    private DataAccessibility accessibility = DataAccessibility.OPEN;
 
     @OneToMany(cascade = CascadeType.ALL)
-    @JoinColumn(name = "dataset_id")
-    private List<DatasetResourceEntity> resources = new ArrayList<>();
+    @JoinColumn(name = "data_id")
+    private List<DataResourceEntity> resources = new ArrayList<>();
 
     @OneToMany(cascade = CascadeType.ALL)
-    @JoinColumn(name = "dataset_id")
-    private List<DatasetDownloadEntity> downloadHistory = new ArrayList<>();
+    @JoinColumn(name = "data_id")
+    private List<DataStatisticsEntity> statistics = new ArrayList<>();
 
     @ElementCollection
-    @CollectionTable(name = "users_datasets", joinColumns = @JoinColumn(name = "dataset_id", nullable = false, updatable = false), indexes = {@Index(columnList = "user_id"), @Index(columnList = "dataset_id")}, uniqueConstraints = @UniqueConstraint(columnNames = {"user_id", "dataset_id"}))
+    @CollectionTable(name = "data_users", joinColumns = @JoinColumn(name = "data_id", nullable = false, updatable = false), indexes = {@Index(columnList = "data_id"), @Index(columnList = "user_id")}, uniqueConstraints = @UniqueConstraint(columnNames = {"data_id", "user_id"}))
     @Column(name = "user_id", nullable = false, updatable = false)
     private final List<String> approvedUsers = new ArrayList<>();
 
     public void addApprovedUser(final String userId) {
         if(approvedUsers.contains(userId)) {
-            log.warn("User {} was already approved to access dataset {}", userId, name);
+            log.warn("User {} was already approved to access data {}", userId, name);
             return;
         }
         approvedUsers.add(userId);
-        log.info("User {} approved to access dataset {}", userId, name);
+        log.info("User {} approved to access data {}", userId, name);
     }
 
     public void removeApprovedUser(final String userId) {
         if(!approvedUsers.contains(userId)) {
-            log.warn("User {} not in the approved list for dataset {}", userId, name);
+            log.warn("User {} not in the approved list for data {}", userId, name);
             return;
         }
         approvedUsers.remove(userId);
-        log.info("User {} removed from the approved list for dataset {}", userId, name);
+        log.info("User {} removed from the approved list for data {}", userId, name);
     }
 
     @Override
@@ -117,7 +99,7 @@ public class DatasetEntity extends AbstractEntity implements Dataset {
             return false;
         }
 
-        final Dataset that = (Dataset) o;
+        final Data that = (Data) o;
 
         return getId() == null ? that.getId() == null : getId().equals(that.getId());
     }
@@ -129,20 +111,16 @@ public class DatasetEntity extends AbstractEntity implements Dataset {
 
     @Override
     public String toString() {
-        return "DatasetEntity{" +
+        return "DataEntity{" +
                 "id='" + id + '\'' +
                 ", name=" + name +
                 ", description=" + description +
-                ", ownerId=" + ownerId +
+                ", contributorId=" + contributorId +
                 ", visibility=" + visibility +
                 ", accessibility=" + accessibility +
-                ", status=" + status +
-                ", size=" + size +
-                ", category=" + category +
-                ", downloadTimes=" + downloadTimes +
                 ", resources=" + resources +
                 ", approvedUsers=" + approvedUsers +
-                ", downloadHistory=" + downloadHistory +
+                ", statistics=" + statistics +
                 "} " + super.toString();
     }
 }

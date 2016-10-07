@@ -4,7 +4,7 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import sg.ncl.common.jpa.AbstractEntity;
-import sg.ncl.service.data.domain.DatasetDownload;
+import sg.ncl.service.data.domain.DataStatistics;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -17,11 +17,11 @@ import java.time.ZonedDateTime;
  * Created by dcszwang on 10/7/2016.
  */
 @Entity
-@Table(name = "dataset_download_history")
+@Table(name = "data_statistics")
 @Getter
 @Setter
 @Slf4j
-public class DatasetDownloadEntity extends AbstractEntity implements DatasetDownload {
+public class DataStatisticsEntity implements DataStatistics {
 
     @Id
     @GeneratedValue
@@ -34,16 +34,12 @@ public class DatasetDownloadEntity extends AbstractEntity implements DatasetDown
     @Column(name = "date", nullable = false, updatable = false)
     private ZonedDateTime date;
 
-    @Column(name = "success", nullable = false)
-    private boolean success = false;
-
     @Override
     public String toString() {
-        final StringBuilder sb = new StringBuilder("DatasetDownloadHistory{");
+        final StringBuilder sb = new StringBuilder("DataStatisticsEntity{");
         sb.append("id=").append(id);
         sb.append(", userId=").append(userId);
         sb.append(", date=").append(date);
-        sb.append(", success=").append(success);
         sb.append(", super=").append(super.toString());
         sb.append('}');
         return sb.toString();

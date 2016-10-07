@@ -67,7 +67,7 @@ CREATE TABLE IF NOT EXISTS `ncl`.`credentials_roles` (
 -- -----------------------------------------------------
 -- Table `ncl`.`datasets`
 -- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `ncl`.`datasets` (
+CREATE TABLE IF NOT EXISTS `ncl`.`data` (
   `id`                 BIGINT(20)   NOT NULL AUTO_INCREMENT,
   `created_date`       DATETIME     NOT NULL,
   `last_modified_date` DATETIME     NOT NULL,
@@ -76,7 +76,7 @@ CREATE TABLE IF NOT EXISTS `ncl`.`datasets` (
   `description`        LONGTEXT     NULL,
   `accessibility`      VARCHAR(255) NOT NULL,
   `visibility`         VARCHAR(255) NOT NULL,
-  `contributer_id`     VARCHAR(255) NOT NULL,
+  `contributor_id`     VARCHAR(255) NOT NULL,
   PRIMARY KEY (`id`),
   UNIQUE INDEX `name_UNIQUE` (`name` ASC),
   INDEX `name_idx` (`name` ASC),
@@ -88,16 +88,16 @@ CREATE TABLE IF NOT EXISTS `ncl`.`datasets` (
 -- -----------------------------------------------------
 -- Table `ncl`.`datasets_statistics`
 -- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `ncl`.`datasets_statistics` (
+CREATE TABLE IF NOT EXISTS `ncl`.`data_statistics` (
   `id`         BIGINT(20)   NOT NULL AUTO_INCREMENT,
   `date`       DATETIME     NOT NULL,
   `user_id`    VARCHAR(255) NOT NULL,
-  `dataset_id` BIGINT(20)   NOT NULL,
+  `data_id` BIGINT(20)   NOT NULL,
   PRIMARY KEY (`id`),
-  INDEX `FK_datasets_statistics_idx` (`dataset_id` ASC),
-  CONSTRAINT `FK_datasets_statistics`
-  FOREIGN KEY (`dataset_id`)
-  REFERENCES `ncl`.`datasets` (`id`)
+  INDEX `FK_data_statistics_idx` (`data_id` ASC),
+  CONSTRAINT `FK_data_statistics`
+  FOREIGN KEY (`data_id`)
+  REFERENCES `ncl`.`data` (`id`)
 )
   ENGINE = InnoDB
   DEFAULT CHARACTER SET = latin1;
@@ -105,18 +105,18 @@ CREATE TABLE IF NOT EXISTS `ncl`.`datasets_statistics` (
 -- -----------------------------------------------------
 -- Table `ncl`.`datasets_resources`
 -- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `ncl`.`datasets_resources` (
+CREATE TABLE IF NOT EXISTS `ncl`.`data_resources` (
   `id`                 BIGINT(20) NOT NULL AUTO_INCREMENT,
   `created_date`       DATETIME   NOT NULL,
   `last_modified_date` DATETIME   NOT NULL,
   `version`            BIGINT(20) NOT NULL,
-  `dataset_id`         BIGINT(20) NOT NULL,
+  `data_id`         BIGINT(20) NOT NULL,
   `uri`                TEXT       NOT NULL,
   PRIMARY KEY (`id`),
-  INDEX `FK_datasets_resources_idx` (`dataset_id` ASC),
-  CONSTRAINT `FK_datasets_resources`
-  FOREIGN KEY (`dataset_id`)
-  REFERENCES `ncl`.`datasets` (`id`)
+  INDEX `FK_data_resources_idx` (`data_id` ASC),
+  CONSTRAINT `FK_data_resources`
+  FOREIGN KEY (`data_id`)
+  REFERENCES `ncl`.`data` (`id`)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION
 )
@@ -372,13 +372,13 @@ CREATE TABLE IF NOT EXISTS `ncl`.`team_members` (
 -- -----------------------------------------------------
 -- Table `ncl`.`datasets_users`
 -- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `ncl`.`datasets_users` (
-  `dataset_id` BIGINT(20)   NOT NULL,
+CREATE TABLE IF NOT EXISTS `ncl`.`data_users` (
+  `data_id` BIGINT(20)   NOT NULL,
   `user_id`    VARCHAR(255) NOT NULL,
-  PRIMARY KEY (`dataset_id`, `user_id`),
-  CONSTRAINT `FK_datasets_users`
-  FOREIGN KEY (`dataset_id`)
-  REFERENCES `ncl`.`datasets` (`id`)
+  PRIMARY KEY (`data_id`, `user_id`),
+  CONSTRAINT `FK_data_users`
+  FOREIGN KEY (`data_id`)
+  REFERENCES `ncl`.`data` (`id`)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION
 )
