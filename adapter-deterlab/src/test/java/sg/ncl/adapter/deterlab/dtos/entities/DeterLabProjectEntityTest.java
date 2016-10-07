@@ -14,38 +14,61 @@ import static org.assertj.core.api.Assertions.assertThat;
 public class DeterLabProjectEntityTest {
     private DeterLabProjectEntity deterLabUserEntity;
 
-    @Before
-    public void setup(){
+
+    @Test
+    public void testGetIdDefaultValue(){
         deterLabUserEntity=new DeterLabProjectEntity();
+        String actual=deterLabUserEntity.getId();
+
+        assertThat(actual).isNull();
     }
 
     @Test
-    public void testGetId(){
+    public void testSetId(){
         final String expected = RandomStringUtils.randomAlphabetic(20);
+
+        deterLabUserEntity=new DeterLabProjectEntity();
         deterLabUserEntity.setId(expected);
         String actual=deterLabUserEntity.getId();
 
-        assertThat(actual).isNotNull();
         assertThat(actual).isEqualTo(expected);
     }
 
     @Test
-    public void testGetNclTeamId(){
+    public void testGetNclTeamIdDefaultValue(){
+        deterLabUserEntity=new DeterLabProjectEntity();
+        String actual=deterLabUserEntity.getNclTeamId();
+
+        assertThat(actual).isNull();
+    }
+
+    @Test
+    public void testSetNclTeamId(){
         final String expected = RandomStringUtils.randomAlphabetic(20);
+
+        deterLabUserEntity=new DeterLabProjectEntity();
         deterLabUserEntity.setNclTeamId(expected);
         String actual=deterLabUserEntity.getNclTeamId();
 
-        assertThat(actual).isNotNull();
         assertThat(actual).isEqualTo(expected);
     }
 
     @Test
-    public void testGetDeterProjectId(){
+    public void testGeteterProjectIdDefaultValue(){
+        deterLabUserEntity=new DeterLabProjectEntity();
+        String actual=deterLabUserEntity.getDeterProjectId();
+
+        assertThat(actual).isNull();
+    }
+
+    @Test
+    public void testSetDeterProjectId(){
         final String expected = RandomStringUtils.randomAlphabetic(20);
+
+        deterLabUserEntity=new DeterLabProjectEntity();
         deterLabUserEntity.setDeterProjectId(expected);
         String actual=deterLabUserEntity.getDeterProjectId();
 
-        assertThat(actual).isNotNull();
         assertThat(actual).isEqualTo(expected);
     }
 
