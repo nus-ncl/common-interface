@@ -41,6 +41,8 @@ ncl:
     adapter:
       ip: test.ncl.sg
       port: 8080
+      bossUrl: 172.18.178.10
+      userUrl: 172.18.178.11
   jwt:
     api-key: ${jwt.key:}
     signing-algorithm: HS512
