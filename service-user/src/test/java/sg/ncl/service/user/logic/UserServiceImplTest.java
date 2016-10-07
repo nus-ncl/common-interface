@@ -1,7 +1,6 @@
 package sg.ncl.service.user.logic;
 
 import org.apache.commons.lang3.RandomStringUtils;
-import org.hamcrest.collection.IsIterableContainingInAnyOrder;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Rule;
@@ -11,28 +10,20 @@ import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
 import sg.ncl.service.user.Util;
-import sg.ncl.service.user.data.jpa.AddressEntity;
 import sg.ncl.service.user.data.jpa.UserDetailsEntity;
 import sg.ncl.service.user.data.jpa.UserEntity;
 import sg.ncl.service.user.data.jpa.UserRepository;
-import sg.ncl.service.user.domain.Address;
 import sg.ncl.service.user.domain.User;
-import sg.ncl.service.user.domain.UserDetails;
-import sg.ncl.service.user.domain.UserService;
 import sg.ncl.service.user.domain.UserStatus;
 import sg.ncl.service.user.exceptions.*;
 
 
 import java.util.List;
 
-import static org.assertj.core.api.Assertions.anyOf;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertThat;
 import static org.mockito.Matchers.*;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static sg.ncl.service.user.Util.getUserEntity;
 import static org.assertj.core.api.Assertions.assertThat;
 /**
  * @author Tran Ly Vu
@@ -74,9 +65,8 @@ public class UserServiceImplTest {
     //no exception thrown
     @Test
     public void createUserTest2() throws Exception {
-        // UserServiceImpl userServiceImpl1=new  UserServiceImpl(userRepository);
         UserDetailsEntity userDetailsEntity = Util.getUserDetailsEntity();
-        ;
+
         userDetailsEntity.setEmail(null);
 
         User userEntity = new UserEntity();
