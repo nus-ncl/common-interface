@@ -46,6 +46,7 @@ public class ExperimentServiceImpl implements ExperimentService {
         this.adapterDeterLab = adapterDeterLab;
         this.realizationService = realizationService;
         this.adapterConnectionProperties = connectionProperties;
+        // FIXME Do not expose the internal workings of the DeterLab adapter to the experiment service; i.e., should not need to inject ConnectionProperties
     }
 
     /**
