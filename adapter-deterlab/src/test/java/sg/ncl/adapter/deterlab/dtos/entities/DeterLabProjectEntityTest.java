@@ -26,7 +26,7 @@ public class DeterLabProjectEntityTest {
         String actual=deterLabUserEntity.getId();
 
         assertThat(actual).isNotNull();
-        assertEquals(expected,actual);
+        assertThat(actual).isEqualTo(expected);
     }
 
     @Test
@@ -36,7 +36,7 @@ public class DeterLabProjectEntityTest {
         String actual=deterLabUserEntity.getNclTeamId();
 
         assertThat(actual).isNotNull();
-        assertEquals(expected,actual);
+        assertThat(actual).isEqualTo(expected);
     }
 
     @Test
@@ -46,7 +46,7 @@ public class DeterLabProjectEntityTest {
         String actual=deterLabUserEntity.getDeterProjectId();
 
         assertThat(actual).isNotNull();
-        assertEquals(expected,actual);
+        assertThat(actual).isEqualTo(expected);
     }
 
 
