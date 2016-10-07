@@ -197,9 +197,11 @@ public class ExperimentRepositoryTest {
         one.setName("sameExpName");
         two.setName("sameExpName");
 
+        final long count = repository.count();
         Experiment oneSaved = repository.saveAndFlush(one);
         Experiment twoSaved = repository.saveAndFlush(two);
 
+        assertThat(repository.count()).isEqualTo(count + 2);
         assertThat(oneSaved.getName()).isEqualTo(twoSaved.getName());
         assertThat(oneSaved.getTeamName()).isNotEqualTo(twoSaved.getTeamName());
         assertThat(oneSaved.getId()).isNotEqualTo(twoSaved.getId());
