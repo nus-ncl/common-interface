@@ -16,41 +16,59 @@ public class DeterLabUserEntityTest {
 
     private DeterLabUserEntity deterLabUserEntity;
 
-    @Before
-    public void setup(){
+    @Test
+    public void testGetIdDedaultValue(){
         deterLabUserEntity=new DeterLabUserEntity();
+        Long actual=deterLabUserEntity.getId();
+
+        assertThat(actual).isNull();
+    }
+    @Test
+    public void testSetId(){
+        final Long expected = new Random().nextLong();
+
+        deterLabUserEntity=new DeterLabUserEntity();
+        deterLabUserEntity.setId(expected);
+        Long actual=deterLabUserEntity.getId();
+        
+        assertThat(actual).isEqualTo(expected);
     }
 
     @Test
-    public void testGetId(){
-        final Long expected = new Random().nextLong();
-        deterLabUserEntity.setId(expected);
+    public void testGetNclUserIdDedaultvalue(){
+        deterLabUserEntity=new DeterLabUserEntity();
 
-        Long actual=deterLabUserEntity.getId();
-
-        assertThat(actual).isNotNull();
-        assertThat(actual).isEqualTo(expected);
+        String actual=deterLabUserEntity.getNclUserId();
+        assertThat(actual).isNull();
     }
 
     @Test
     public void testGetNclUserId(){
         final String expected = RandomStringUtils.randomAlphabetic(20);
-        deterLabUserEntity.setNclUserId(expected);
 
+        deterLabUserEntity=new DeterLabUserEntity();
+        deterLabUserEntity.setNclUserId(expected);
         String actual=deterLabUserEntity.getNclUserId();
 
-        assertThat(actual).isNotNull();
         assertThat(actual).isEqualTo(expected);
+    }
+
+    @Test
+    public void testGetDeterUserIdDedaultvalue(){
+        deterLabUserEntity=new DeterLabUserEntity();
+        String actual=deterLabUserEntity.getDeterUserId();
+
+        assertThat(actual).isNull();
     }
 
     @Test
     public void testGetDeterUserId(){
         final String expected = RandomStringUtils.randomAlphabetic(20);
-        deterLabUserEntity.setDeterUserId(expected);
 
+        deterLabUserEntity=new DeterLabUserEntity();
+        deterLabUserEntity.setDeterUserId(expected);
         String actual=deterLabUserEntity.getDeterUserId();
 
-        assertThat(actual).isNotNull();
         assertThat(actual).isEqualTo(expected);
     }
 
