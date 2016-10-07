@@ -228,6 +228,37 @@ public class AdapterDeterLab {
         }
     }
 
+    /**
+     * Creates the cookie file on the boss machine due to the timeout issue
+     * @param jsonString Contains deterUserId and password
+     */
+    public void login(String jsonString) {
+        logger.info("Login on deterlab");
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        HttpEntity<String> request = new HttpEntity<>(jsonString, headers);
+        ResponseEntity response;
+
+        try {
+            response = restTemplate.exchange(properties.login(), HttpMethod.POST, request, String.class);
+        } catch (RestClientException e) {
+            logger.warn("DeterLab connection error login on deterlab: {}", e);
+            throw new AdapterDeterlabConnectException();
+        }
+
+        try {
+            String jsonResult = new JSONObject(response.getBody().toString()).getString("msg");
+            if (!"login success".equals(jsonResult)) {
+                logger.warn("login failed: {}", response.getBody().toString());
+                throw new CredentialsUpdateException();
+            }
+            logger.info("login success");
+        } catch (JSONException e) {
+            logger.warn("Error parsing response code login on deterlab: {}", response.getBody().toString());
+            throw e;
+        }
+    }
+
     @Transactional
     public void saveDeterUserIdMapping(String deterUserId, String nclUserId) {
         DeterLabUserEntity deterLabUserEntity = new DeterLabUserEntity();
