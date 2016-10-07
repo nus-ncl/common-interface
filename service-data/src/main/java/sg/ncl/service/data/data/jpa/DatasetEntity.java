@@ -7,6 +7,7 @@ import org.hibernate.annotations.GenericGenerator;
 import sg.ncl.common.jpa.AbstractEntity;
 import sg.ncl.service.data.domain.Dataset;
 import sg.ncl.service.data.domain.DatasetAccessibility;
+import sg.ncl.service.data.domain.DatasetCategory;
 import sg.ncl.service.data.domain.DatasetStatus;
 import sg.ncl.service.data.domain.DatasetVisibility;
 
@@ -24,6 +25,7 @@ import javax.persistence.JoinColumn;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.persistence.UniqueConstraint;
+import javax.validation.constraints.Min;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -64,9 +66,24 @@ public class DatasetEntity extends AbstractEntity implements Dataset {
     @Enumerated(EnumType.STRING)
     private DatasetStatus status = DatasetStatus.COMPLETE;
 
+    @Column(name = "size", nullable = false)
+    @Min(value = 0)
+    private Long size; // dataset size, in KB
+
+    @Column(name = "download_times", nullable = false)
+    @Min(value = 0)
+    private int downloadTimes = 0;
+
+    @Column(name = "category", nullable = false)
+    private DatasetCategory category;
+
     @OneToMany(cascade = CascadeType.ALL)
     @JoinColumn(name = "dataset_id")
     private List<DatasetResourceEntity> resources = new ArrayList<>();
+
+    @OneToMany(cascade = CascadeType.ALL)
+    @JoinColumn(name = "dataset_id")
+    private List<DatasetDownloadEntity> downloadHistory = new ArrayList<>();
 
     @ElementCollection
     @CollectionTable(name = "users_datasets", joinColumns = @JoinColumn(name = "dataset_id", nullable = false, updatable = false), indexes = {@Index(columnList = "user_id"), @Index(columnList = "dataset_id")}, uniqueConstraints = @UniqueConstraint(columnNames = {"user_id", "dataset_id"}))
@@ -120,8 +137,12 @@ public class DatasetEntity extends AbstractEntity implements Dataset {
                 ", visibility=" + visibility +
                 ", accessibility=" + accessibility +
                 ", status=" + status +
+                ", size=" + size +
+                ", category=" + category +
+                ", downloadTimes=" + downloadTimes +
                 ", resources=" + resources +
                 ", approvedUsers=" + approvedUsers +
+                ", downloadHistory=" + downloadHistory +
                 "} " + super.toString();
     }
 }

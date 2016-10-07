@@ -2,7 +2,6 @@ package sg.ncl.service.data.data.jpa;
 
 import org.apache.commons.lang3.RandomStringUtils;
 import org.junit.Test;
-import sg.ncl.service.data.domain.Dataset;
 import sg.ncl.service.data.domain.DatasetAccessibility;
 import sg.ncl.service.data.domain.DatasetStatus;
 import sg.ncl.service.data.domain.DatasetVisibility;
@@ -160,6 +159,25 @@ public class DatasetEntityTest {
 
         datasetEntity.removeApprovedUser(user);
         assertThat(approvedUsers.size()).isEqualTo(0);
+    }
+
+    @Test
+    public void testGetDownloadHistory() {
+        DatasetEntity entity = new DatasetEntity();
+        assertThat(entity.getDownloadHistory().size()).isEqualTo(0);
+    }
+
+    @Test
+    public void testSetDownloadHistory() {
+        DatasetEntity datasetEntity = new DatasetEntity();
+        DatasetDownloadEntity downloadEntity = new DatasetDownloadEntity();
+        List<DatasetDownloadEntity> history = new ArrayList<>();
+        history.add(downloadEntity);
+        datasetEntity.setDownloadHistory(history);
+
+        List<DatasetDownloadEntity> retHistory = datasetEntity.getDownloadHistory();
+        assertThat(retHistory.size()).isEqualTo(1);
+        assertThat(retHistory.get(0)).isEqualTo(downloadEntity);
     }
 
     @Test
