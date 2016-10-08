@@ -1,66 +1,76 @@
 package sg.ncl.adapter.deterlab.dtos.entities;
 
 import org.apache.commons.lang3.RandomStringUtils;
+import org.junit.Before;
 import org.junit.Test;
 
 import java.util.Random;
 
-import static org.hamcrest.Matchers.equalTo;
-import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.nullValue;
-import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertEquals;
+import static org.assertj.core.api.Assertions.assertThat;
 
 /**
- * @author Te Ye
+ * @author Tran Ly Vu
  */
 public class DeterLabUserEntityTest {
 
-    @Test
-    public void testGetId() throws Exception {
-        final DeterLabUserEntity deterLabUserEntity = new DeterLabUserEntity();
+    private DeterLabUserEntity deterLabUserEntity;
 
-        assertThat(deterLabUserEntity.getId(), is(nullValue()));
+    @Test
+    public void testGetIdDedaultValue(){
+        deterLabUserEntity=new DeterLabUserEntity();
+        Long actual=deterLabUserEntity.getId();
+
+        assertThat(actual).isNull();
+    }
+    @Test
+    public void testSetId(){
+        final Long expected = new Random().nextLong();
+
+        deterLabUserEntity=new DeterLabUserEntity();
+        deterLabUserEntity.setId(expected);
+        Long actual=deterLabUserEntity.getId();
+        
+        assertThat(actual).isEqualTo(expected);
     }
 
     @Test
-    public void testSetId() throws Exception {
-        final DeterLabUserEntity deterLabUserEntity = new DeterLabUserEntity();
-        final Long one = new Random().nextLong();
-        deterLabUserEntity.setId(one);
+    public void testGetNclUserIdDedaultvalue(){
+        deterLabUserEntity=new DeterLabUserEntity();
 
-        assertThat(deterLabUserEntity.getId(), is(equalTo(one)));
+        String actual=deterLabUserEntity.getNclUserId();
+        assertThat(actual).isNull();
     }
 
     @Test
-    public void testGetNclId() throws Exception {
-        final DeterLabUserEntity deterLabUserEntity = new DeterLabUserEntity();
+    public void testGetNclUserId(){
+        final String expected = RandomStringUtils.randomAlphabetic(20);
 
-        assertThat(deterLabUserEntity.getNclUserId(), is(nullValue()));
+        deterLabUserEntity=new DeterLabUserEntity();
+        deterLabUserEntity.setNclUserId(expected);
+        String actual=deterLabUserEntity.getNclUserId();
+
+        assertThat(actual).isEqualTo(expected);
     }
 
     @Test
-    public void testSetNclId() throws Exception {
-        final DeterLabUserEntity deterLabUserEntity = new DeterLabUserEntity();
-        final String one = RandomStringUtils.randomAlphabetic(20);
-        deterLabUserEntity.setNclUserId(one);
+    public void testGetDeterUserIdDedaultvalue(){
+        deterLabUserEntity=new DeterLabUserEntity();
+        String actual=deterLabUserEntity.getDeterUserId();
 
-        assertThat(deterLabUserEntity.getNclUserId(), is(equalTo(one)));
+        assertThat(actual).isNull();
     }
 
     @Test
-    public void testGetDeterUserId() throws Exception {
-        final DeterLabUserEntity deterLabUserEntity = new DeterLabUserEntity();
+    public void testGetDeterUserId(){
+        final String expected = RandomStringUtils.randomAlphabetic(20);
 
-        assertThat(deterLabUserEntity.getDeterUserId(), is(nullValue()));
+        deterLabUserEntity=new DeterLabUserEntity();
+        deterLabUserEntity.setDeterUserId(expected);
+        String actual=deterLabUserEntity.getDeterUserId();
+
+        assertThat(actual).isEqualTo(expected);
     }
 
-    @Test
-    public void testSetDeterUserId() throws Exception {
-        final DeterLabUserEntity deterLabUserEntity = new DeterLabUserEntity();
-        final String one = RandomStringUtils.randomAlphabetic(20);
-        deterLabUserEntity.setDeterUserId(one);
-
-        assertThat(deterLabUserEntity.getDeterUserId(), is(equalTo(one)));
-    }
 
 }
