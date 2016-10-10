@@ -33,6 +33,10 @@ public class ConnectionProperties {
         this.port = port;
     }
 
+    public String login() {
+        return "http://" + ip + ":" + port + "/login";
+    }
+
     public String getJoinProjectNewUsers() {
         return "http://" + ip + ":" + port + "/joinProjectNewUsers";
     }
