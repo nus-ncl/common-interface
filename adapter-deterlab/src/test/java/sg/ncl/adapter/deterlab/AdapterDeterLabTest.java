@@ -1077,9 +1077,11 @@ public class AdapterDeterLabTest {
 
         when(restTemplate.exchange(anyString(),eq(HttpMethod.POST),anyObject(),eq(String.class)))
                 .thenReturn(response);
+        when(deterLabUserRepository.findByNclUserId(eq("userId"))).thenReturn(Util.getDeterlabUserEntity());
         when(response.getBody()).thenReturn(myobject.toString());
         when(response.getBody().toString()).thenReturn(myobject.toString());
-        adapterDeterLab.login(myobject.toString());
+
+        adapterDeterLab.login("userId", "password");
 
         verify(restTemplate,times(1)).exchange(anyString(),eq(HttpMethod.POST),anyObject(),eq(String.class));
         verify(properties,times(1)).login();
@@ -1092,12 +1094,13 @@ public class AdapterDeterLabTest {
 
         when(restTemplate.exchange(anyString(),eq(HttpMethod.POST),anyObject(),eq(String.class)))
                 .thenReturn(response);
+        when(deterLabUserRepository.findByNclUserId(eq("userId"))).thenReturn(Util.getDeterlabUserEntity());
         when(response.getBody()).thenReturn(myobject.toString());
         when(response.getBody().toString()).thenReturn(myobject.toString());
 
         exception.expect(DeterLabOperationFailedException.class);
 
-        adapterDeterLab.login(myobject.toString());
+        adapterDeterLab.login("userId", "password");
 
         verify(restTemplate,times(1)).exchange(anyString(),eq(HttpMethod.POST),anyObject(),eq(String.class));
         verify(properties,times(1)).login();
@@ -1107,10 +1110,11 @@ public class AdapterDeterLabTest {
     public void loginAdapterDeterlabConnectionException() throws Exception {
         when(restTemplate.exchange(anyString(),eq(HttpMethod.POST),anyObject(),eq(String.class))).
                 thenThrow(new RestClientException(""));
+        when(deterLabUserRepository.findByNclUserId(eq("userId"))).thenReturn(Util.getDeterlabUserEntity());
 
         exception.expect(AdapterDeterlabConnectException.class);
 
-        adapterDeterLab.login("jsonString");
+        adapterDeterLab.login("userId", "password");
 
         verify(restTemplate,times(1)).exchange(anyString(),eq(HttpMethod.POST),anyObject(),eq(String.class));
         verify(properties,times(1)).login();
@@ -1119,12 +1123,14 @@ public class AdapterDeterLabTest {
     @Test
     public void loginJSONException() throws Exception {
         when(restTemplate.exchange(anyString(),eq(HttpMethod.POST),anyObject(),eq(String.class))).thenReturn(response);
+        when(deterLabUserRepository.findByNclUserId(eq("userId"))).thenReturn(Util.getDeterlabUserEntity());
         when(response.getBody()).thenReturn("");
         when(response.getBody().toString()).thenReturn("");
 
         exception.expect(JSONException.class);
 
-        adapterDeterLab.login("jsonString");
+        adapterDeterLab.login("userId", "password");
+
         verify(restTemplate,times(1)).exchange(anyString(),eq(HttpMethod.POST),anyObject(),eq(String.class));
         verify(properties,times(1)).login();
     }
