@@ -3,7 +3,6 @@ package sg.ncl.service.authentication.logic;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import lombok.extern.slf4j.Slf4j;
-import org.json.JSONObject;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import sg.ncl.adapter.deterlab.AdapterDeterLab;
@@ -74,20 +73,11 @@ public class AuthenticationServiceImpl implements AuthenticationService {
                     .signWith(signatureAlgorithm, apiKey)
                     .compact();
 
-            loginDeterLab(credentials.getId(), password);
+            adapterDeterLab.login(credentials.getId(), password);
 
             return new AuthorizationInfo(credentials.getId(), jwt, credentials.getRoles());
         }
         // TODO lockout behavior
         throw new InvalidCredentialsException(username);
-    }
-
-    private void loginDeterLab(String nclUserId, String password) {
-        JSONObject adapterObject = new JSONObject();
-        adapterObject.put("uid", adapterDeterLab.getDeterUserIdByNclUserId(nclUserId));
-        adapterObject.put("password", password);
-
-        log.info("Now attempting to invoke adapter to login and create cookie file");
-        adapterDeterLab.login(adapterObject.toString());
     }
 }
