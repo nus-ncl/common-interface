@@ -11,7 +11,7 @@ import org.springframework.web.client.RestOperations;
 import org.springframework.web.client.RestTemplate;
 import sg.ncl.adapter.deterlab.ConnectionProperties;
 import sg.ncl.service.experiment.AbstractTest;
-import sg.ncl.service.experiment.util.Util;
+import sg.ncl.service.experiment.Util;
 import sg.ncl.service.experiment.data.jpa.ExperimentEntity;
 import sg.ncl.service.experiment.data.jpa.ExperimentRepository;
 import sg.ncl.service.experiment.domain.Experiment;
@@ -206,8 +206,6 @@ public class ExperimentServiceTest extends AbstractTest {
         compareCounts(new Long(0L));
     }
 
-
-
     private void compareCounts(Long count) {
         Long experimentCount = experimentRepository.count();
         Long realizationCount = realizationRepository.count();
@@ -215,6 +213,4 @@ public class ExperimentServiceTest extends AbstractTest {
         Assert.assertEquals(experimentCount, count);
         Assert.assertEquals(realizationCount, count);
     }
-
-
 }

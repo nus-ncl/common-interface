@@ -3,20 +3,13 @@ package sg.ncl.service.experiment.data.jpa;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.commons.lang3.RandomUtils;
 import org.junit.Test;
-import org.mockito.Mockito;
-import org.mockito.Mockito.*;
-import org.springframework.test.context.TestExecutionListeners;
-import sg.ncl.service.experiment.util.Util;
-import java.lang.Object;
+
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.nullValue;
-import static org.junit.Assert.*;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
-
+import static org.junit.Assert.assertThat;
 
 /**
- * Create by Desmond && Vu
+ * Create by Desmond
  */
 public class ExperimentEntityTest {
 
@@ -179,70 +172,4 @@ public class ExperimentEntityTest {
 
         assertThat(entity.getMaxDuration(), is(maxDuration));
     }
-
-    @Test
-    public void testEquals1() throws Exception {
-        final ExperimentEntity entity=  new ExperimentEntity();
-        final ExperimentEntity o = new ExperimentEntity();
-        boolean expected= entity.equals(o);
-        assertTrue(expected);
-    }
-
-    @Test
-    public void testEquals2() throws Exception {
-        final ExperimentEntity entity=  Util.getExperimentsEntity();
-        boolean expected= entity.equals(null);
-        assertFalse(expected);
-    }
-
-    @Test
-    public void testEquals3() throws Exception   {
-        final ExperimentEntity entity= new ExperimentEntity();
-        int o = 123;
-        boolean expected=entity.equals(o);
-        assertFalse(expected);
-    }
-
-
-    @Test
-    public void testEquals4() throws Exception {
-        final ExperimentEntity entity= new ExperimentEntity();
-        entity.setId(null);
-        final ExperimentEntity o= new ExperimentEntity();
-        o.setId(null);
-        boolean expected=entity.equals(o);
-        assertTrue(expected);
-    }
-
-    @Test
-    public void testEquals5() throws Exception {
-        final ExperimentEntity entity= new ExperimentEntity();
-        entity.setId(12345L);
-        ExperimentEntity o = Util.getExperimentsEntity();
-        o.setId(123456789L);
-        boolean expected=entity.equals(o);
-        assertFalse(expected);
-    }
-
-    @Test
-    public void testEquals6() throws Exception {
-        final ExperimentEntity entity= new ExperimentEntity();
-        entity.setId(12345L);
-        final ExperimentEntity o = new ExperimentEntity();
-        o.setId(1234L);
-        boolean expected=entity.equals(o);
-        assertFalse(expected);
-    }
-
-    @Test
-    public void testEquals7() throws Exception {
-        final ExperimentEntity entity= new ExperimentEntity();
-        entity.setId(1234L);
-        final ExperimentEntity o = new ExperimentEntity();
-        o.setId(1234L);
-        boolean expected=entity.equals(o);
-        assertTrue(expected);
-    }
-
 }
-

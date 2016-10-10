@@ -1,4 +1,4 @@
-package sg.ncl.service.experiment.util;
+package sg.ncl.service.experiment;
 
 import org.apache.commons.lang3.RandomStringUtils;
 import sg.ncl.service.experiment.data.jpa.ExperimentEntity;
