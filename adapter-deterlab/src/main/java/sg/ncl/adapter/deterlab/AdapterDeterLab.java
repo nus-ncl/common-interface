@@ -28,7 +28,6 @@ public class AdapterDeterLab {
 
     private DeterLabUserRepository deterLabUserRepository;
     private ConnectionProperties properties;
-
     private RestTemplate restTemplate;
 
     @Inject
@@ -233,35 +232,39 @@ public class AdapterDeterLab {
      * @param password Raw password
      */
     public void login(String nclUserId, String password) {
-        JSONObject adapterObject = new JSONObject();
-        adapterObject.put("uid", getDeterUserIdByNclUserId(nclUserId));
-        adapterObject.put("password", password);
+        if (properties.isProd()) {
+            JSONObject adapterObject = new JSONObject();
+            adapterObject.put("uid", getDeterUserIdByNclUserId(nclUserId));
+            adapterObject.put("password", password);
 
-        log.info("Now attempting to invoke adapter to login and create cookie file");
+            log.info("Now attempting to invoke adapter to login and create cookie file");
 
-        log.info("Login on deterlab");
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_JSON);
-        HttpEntity<String> request = new HttpEntity<>(adapterObject.toString(), headers);
-        ResponseEntity response;
+            log.info("Login on deterlab");
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.APPLICATION_JSON);
+            HttpEntity<String> request = new HttpEntity<>(adapterObject.toString(), headers);
+            ResponseEntity response;
 
-        try {
-            response = restTemplate.exchange(properties.login(), HttpMethod.POST, request, String.class);
-        } catch (RestClientException e) {
-            log.warn("DeterLab connection error login on deterlab: {}", e);
-            throw new AdapterDeterlabConnectException();
-        }
-
-        try {
-            String jsonResult = new JSONObject(response.getBody().toString()).getString("msg");
-            if (!"user is logged in".equals(jsonResult)) {
-                log.warn("login failed: {}", response.getBody().toString());
-                throw new DeterLabOperationFailedException();
+            try {
+                response = restTemplate.exchange(properties.login(), HttpMethod.POST, request, String.class);
+            } catch (RestClientException e) {
+                log.warn("DeterLab connection error login on deterlab: {}", e);
+                throw new AdapterDeterlabConnectException();
             }
-            log.info("login success");
-        } catch (JSONException e) {
-            log.warn("Error parsing response code login on deterlab: {}", response.getBody().toString());
-            throw e;
+
+            try {
+                String jsonResult = new JSONObject(response.getBody().toString()).getString("msg");
+                if (!"user is logged in".equals(jsonResult)) {
+                    log.warn("login failed: {}", response.getBody().toString());
+                    throw new DeterLabOperationFailedException();
+                }
+                log.info("login success");
+            } catch (JSONException e) {
+                log.warn("Error parsing response code login on deterlab: {}", response.getBody().toString());
+                throw e;
+            }
+        } else {
+            log.info("Bypass login");
         }
     }
 

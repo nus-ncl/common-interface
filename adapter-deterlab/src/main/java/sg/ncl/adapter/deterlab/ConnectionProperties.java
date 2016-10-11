@@ -16,6 +16,7 @@ public class ConnectionProperties {
     private String port;
     private String bossUrl;
     private String userUrl;
+    private String mode;
 
     public String getIp() {
         return ip;
@@ -106,5 +107,16 @@ public class ConnectionProperties {
     public void setUserUrl(String userUrl) {
         this.userUrl = userUrl;
     }
-}
 
+    public String getMode() {
+        return mode;
+    }
+
+    public void setMode(String mode) {
+        this.mode = mode;
+    }
+
+    public boolean isProd() {
+        return (mode.equalsIgnoreCase("prod"));
+    }
+}
