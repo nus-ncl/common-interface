@@ -117,6 +117,6 @@ public class ConnectionProperties {
     }
 
     public boolean isProd() {
-        return (mode.equalsIgnoreCase("prod"));
+        return mode.equalsIgnoreCase("prod");
     }
 }
