@@ -1075,6 +1075,7 @@ public class AdapterDeterLabTest {
         JSONObject myobject = new JSONObject();
         myobject.put("msg", "user is logged in");
 
+        when(properties.isProd()).thenReturn(true);
         when(restTemplate.exchange(anyString(),eq(HttpMethod.POST),anyObject(),eq(String.class)))
                 .thenReturn(response);
         when(deterLabUserRepository.findByNclUserId(eq("userId"))).thenReturn(Util.getDeterlabUserEntity());
@@ -1092,6 +1093,7 @@ public class AdapterDeterLabTest {
         JSONObject myobject = new JSONObject();
         myobject.put("msg", "user is logged in error");
 
+        when(properties.isProd()).thenReturn(true);
         when(restTemplate.exchange(anyString(),eq(HttpMethod.POST),anyObject(),eq(String.class)))
                 .thenReturn(response);
         when(deterLabUserRepository.findByNclUserId(eq("userId"))).thenReturn(Util.getDeterlabUserEntity());
@@ -1108,6 +1110,7 @@ public class AdapterDeterLabTest {
 
     @Test
     public void loginAdapterDeterlabConnectionException() throws Exception {
+        when(properties.isProd()).thenReturn(true);
         when(restTemplate.exchange(anyString(),eq(HttpMethod.POST),anyObject(),eq(String.class))).
                 thenThrow(new RestClientException(""));
         when(deterLabUserRepository.findByNclUserId(eq("userId"))).thenReturn(Util.getDeterlabUserEntity());
@@ -1122,6 +1125,7 @@ public class AdapterDeterLabTest {
 
     @Test
     public void loginJSONException() throws Exception {
+        when(properties.isProd()).thenReturn(true);
         when(restTemplate.exchange(anyString(),eq(HttpMethod.POST),anyObject(),eq(String.class))).thenReturn(response);
         when(deterLabUserRepository.findByNclUserId(eq("userId"))).thenReturn(Util.getDeterlabUserEntity());
         when(response.getBody()).thenReturn("");
