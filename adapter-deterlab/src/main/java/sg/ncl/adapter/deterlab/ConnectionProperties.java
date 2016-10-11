@@ -1,5 +1,7 @@
 package sg.ncl.adapter.deterlab;
 
+import lombok.Getter;
+import lombok.Setter;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
 import static sg.ncl.adapter.deterlab.ConnectionProperties.PREFIX;
@@ -8,6 +10,8 @@ import static sg.ncl.adapter.deterlab.ConnectionProperties.PREFIX;
  * Created by Te Ye
  */
 @ConfigurationProperties(prefix = PREFIX)
+@Getter
+@Setter
 public class ConnectionProperties {
 
     public static final String PREFIX = "ncl.deterlab.adapter";
@@ -16,23 +20,7 @@ public class ConnectionProperties {
     private String port;
     private String bossUrl;
     private String userUrl;
-    private String mode;
-
-    public String getIp() {
-        return ip;
-    }
-
-    public void setIp(String ip) {
-        this.ip = ip;
-    }
-
-    public String getPort() {
-        return port;
-    }
-
-    public void setPort(String port) {
-        this.port = port;
-    }
+    private boolean enable = false;
 
     public String login() {
         return "http://" + ip + ":" + port + "/login";
@@ -92,31 +80,4 @@ public class ConnectionProperties {
         return "http://" + ip + ":" + port + "/getExpStatus";
     }
 
-    public String getBossUrl() {
-        return bossUrl;
-    }
-
-    public void setBossUrl(String bossUrl) {
-        this.bossUrl = bossUrl;
-    }
-
-    public String getUserUrl() {
-        return userUrl;
-    }
-
-    public void setUserUrl(String userUrl) {
-        this.userUrl = userUrl;
-    }
-
-    public String getMode() {
-        return mode;
-    }
-
-    public void setMode(String mode) {
-        this.mode = mode;
-    }
-
-    public boolean isProd() {
-        return mode.equalsIgnoreCase("prod");
-    }
 }
