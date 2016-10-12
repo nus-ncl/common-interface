@@ -233,7 +233,7 @@ public class AdapterDeterLab {
      * @param password  Raw password
      */
     public void login(String nclUserId, String password) {
-        if (!properties.isEnable()) {
+        if (!properties.isEnabled()) {
             log.info("Bypass login");
             return;
         }

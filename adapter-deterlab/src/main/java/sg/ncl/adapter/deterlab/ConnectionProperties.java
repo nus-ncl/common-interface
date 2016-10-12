@@ -20,7 +20,7 @@ public class ConnectionProperties {
     private String port;
     private String bossUrl;
     private String userUrl;
-    private boolean enable = false;
+    private boolean enabled = false;
 
     public String login() {
         return "http://" + ip + ":" + port + "/login";
