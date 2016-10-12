@@ -28,14 +28,13 @@ public class AdapterDeterLab {
 
     private DeterLabUserRepository deterLabUserRepository;
     private ConnectionProperties properties;
-
     private RestTemplate restTemplate;
 
     @Inject
     public AdapterDeterLab(DeterLabUserRepository repository, ConnectionProperties connectionProperties, RestTemplate restTemplate) {
         this.deterLabUserRepository = repository;
         this.properties = connectionProperties;
-        this.restTemplate=restTemplate;
+        this.restTemplate = restTemplate;
     }
 
     /**
@@ -229,10 +228,16 @@ public class AdapterDeterLab {
 
     /**
      * Creates the cookie file on the boss machine due to the timeout issue
+     *
      * @param nclUserId The ncl user id is required to retrieve the deter user id
-     * @param password Raw password
+     * @param password  Raw password
      */
     public void login(String nclUserId, String password) {
+        if (!properties.isEnabled()) {
+            log.info("Bypass login");
+            return;
+        }
+
         JSONObject adapterObject = new JSONObject();
         adapterObject.put("uid", getDeterUserIdByNclUserId(nclUserId));
         adapterObject.put("password", password);
