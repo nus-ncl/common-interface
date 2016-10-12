@@ -5,16 +5,16 @@ SET @OLD_FOREIGN_KEY_CHECKS = @@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS = 0;
 SET @OLD_SQL_MODE = @@SQL_MODE, SQL_MODE = 'TRADITIONAL,ALLOW_INVALID_DATES';
 
 -- -----------------------------------------------------
--- Schema master
+-- Schema ncl
 -- -----------------------------------------------------
-CREATE SCHEMA IF NOT EXISTS `master`
+CREATE SCHEMA IF NOT EXISTS `ncl`
   DEFAULT CHARACTER SET latin1;
-USE `master`;
+USE `ncl`;
 
 -- -----------------------------------------------------
--- Table `master`.`addresses`
+-- Table `ncl`.`addresses`
 -- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `master`.`addresses` (
+CREATE TABLE IF NOT EXISTS `ncl`.`addresses` (
   `id`                 BIGINT(20)   NOT NULL AUTO_INCREMENT,
   `created_date`       TINYBLOB     NOT NULL,
   `last_modified_date` TINYBLOB     NOT NULL,
@@ -31,9 +31,9 @@ CREATE TABLE IF NOT EXISTS `master`.`addresses` (
   DEFAULT CHARACTER SET = latin1;
 
 -- -----------------------------------------------------
--- Table `master`.`credentials`
+-- Table `ncl`.`credentials`
 -- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `master`.`credentials` (
+CREATE TABLE IF NOT EXISTS `ncl`.`credentials` (
   `id`                 VARCHAR(255) NOT NULL,
   `created_date`       TINYBLOB     NOT NULL,
   `last_modified_date` TINYBLOB     NOT NULL,
@@ -49,23 +49,23 @@ CREATE TABLE IF NOT EXISTS `master`.`credentials` (
   DEFAULT CHARACTER SET = latin1;
 
 -- -----------------------------------------------------
--- Table `master`.`credentials_roles`
+-- Table `ncl`.`credentials_roles`
 -- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `master`.`credentials_roles` (
+CREATE TABLE IF NOT EXISTS `ncl`.`credentials_roles` (
   `credentials_id` VARCHAR(255) NOT NULL,
   `role`           VARCHAR(255) NOT NULL,
   PRIMARY KEY (`credentials_id`, `role`),
   CONSTRAINT `FKguvv5t3qk4mwhefyca0l0bj3y`
   FOREIGN KEY (`credentials_id`)
-  REFERENCES `master`.`credentials` (`id`)
+  REFERENCES `ncl`.`credentials` (`id`)
 )
   ENGINE = InnoDB
   DEFAULT CHARACTER SET = latin1;
 
 -- -----------------------------------------------------
--- Table `master`.`deterlab_project`
+-- Table `ncl`.`deterlab_project`
 -- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `master`.`deterlab_project` (
+CREATE TABLE IF NOT EXISTS `ncl`.`deterlab_project` (
   `id`                 VARCHAR(255) NOT NULL,
   `created_date`       TINYBLOB     NOT NULL,
   `last_modified_date` TINYBLOB     NOT NULL,
@@ -80,9 +80,9 @@ CREATE TABLE IF NOT EXISTS `master`.`deterlab_project` (
   DEFAULT CHARACTER SET = latin1;
 
 -- -----------------------------------------------------
--- Table `master`.`deterlab_user`
+-- Table `ncl`.`deterlab_user`
 -- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `master`.`deterlab_user` (
+CREATE TABLE IF NOT EXISTS `ncl`.`deterlab_user` (
   `id`                 BIGINT(20)   NOT NULL AUTO_INCREMENT,
   `created_date`       TINYBLOB     NOT NULL,
   `last_modified_date` TINYBLOB     NOT NULL,
@@ -97,9 +97,9 @@ CREATE TABLE IF NOT EXISTS `master`.`deterlab_user` (
   DEFAULT CHARACTER SET = latin1;
 
 -- -----------------------------------------------------
--- Table `master`.`email_retries`
+-- Table `ncl`.`email_retries`
 -- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `master`.`email_retries` (
+CREATE TABLE IF NOT EXISTS `ncl`.`email_retries` (
   `id`                 BIGINT(20)   NOT NULL AUTO_INCREMENT,
   `created_date`       TINYBLOB     NOT NULL,
   `last_modified_date` TINYBLOB     NOT NULL,
@@ -121,9 +121,9 @@ CREATE TABLE IF NOT EXISTS `master`.`email_retries` (
   DEFAULT CHARACTER SET = latin1;
 
 -- -----------------------------------------------------
--- Table `master`.`experiments`
+-- Table `ncl`.`experiments`
 -- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `master`.`experiments` (
+CREATE TABLE IF NOT EXISTS `ncl`.`experiments` (
   `id`                 BIGINT(20)   NOT NULL AUTO_INCREMENT,
   `created_date`       TINYBLOB     NOT NULL,
   `last_modified_date` TINYBLOB     NOT NULL,
@@ -143,9 +143,9 @@ CREATE TABLE IF NOT EXISTS `master`.`experiments` (
   DEFAULT CHARACTER SET = latin1;
 
 -- -----------------------------------------------------
--- Table `master`.`user_details`
+-- Table `ncl`.`user_details`
 -- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `master`.`user_details` (
+CREATE TABLE IF NOT EXISTS `ncl`.`user_details` (
   `id`                       BIGINT(20)   NOT NULL AUTO_INCREMENT,
   `created_date`             TINYBLOB     NOT NULL,
   `last_modified_date`       TINYBLOB     NOT NULL,
@@ -164,15 +164,15 @@ CREATE TABLE IF NOT EXISTS `master`.`user_details` (
   INDEX `FK3d5b1ii2vbv6fyt2bbijwmlqg` (`address_id` ASC),
   CONSTRAINT `FK3d5b1ii2vbv6fyt2bbijwmlqg`
   FOREIGN KEY (`address_id`)
-  REFERENCES `master`.`addresses` (`id`)
+  REFERENCES `ncl`.`addresses` (`id`)
 )
   ENGINE = InnoDB
   DEFAULT CHARACTER SET = latin1;
 
 -- -----------------------------------------------------
--- Table `master`.`users`
+-- Table `ncl`.`users`
 -- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `master`.`users` (
+CREATE TABLE IF NOT EXISTS `ncl`.`users` (
   `id`                 VARCHAR(255) NOT NULL,
   `created_date`       TINYBLOB     NOT NULL,
   `last_modified_date` TINYBLOB     NOT NULL,
@@ -187,15 +187,15 @@ CREATE TABLE IF NOT EXISTS `master`.`users` (
   UNIQUE INDEX `UK_4ai7rrtrvwtgtqavv8okpxrul` (`user_details_id` ASC),
   CONSTRAINT `FK8uj8y5ad4xl01w9wcracimb14`
   FOREIGN KEY (`user_details_id`)
-  REFERENCES `master`.`user_details` (`id`)
+  REFERENCES `ncl`.`user_details` (`id`)
 )
   ENGINE = InnoDB
   DEFAULT CHARACTER SET = latin1;
 
 -- -----------------------------------------------------
--- Table `master`.`login_activities`
+-- Table `ncl`.`login_activities`
 -- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `master`.`login_activities` (
+CREATE TABLE IF NOT EXISTS `ncl`.`login_activities` (
   `id`                 BIGINT(20)   NOT NULL AUTO_INCREMENT,
   `created_date`       TINYBLOB     NOT NULL,
   `last_modified_date` TINYBLOB     NOT NULL,
@@ -207,15 +207,15 @@ CREATE TABLE IF NOT EXISTS `master`.`login_activities` (
   INDEX `FK8dyu3xxtaw62bm46xqi9romha` (`user_id` ASC),
   CONSTRAINT `FK8dyu3xxtaw62bm46xqi9romha`
   FOREIGN KEY (`user_id`)
-  REFERENCES `master`.`users` (`id`)
+  REFERENCES `ncl`.`users` (`id`)
 )
   ENGINE = InnoDB
   DEFAULT CHARACTER SET = latin1;
 
 -- -----------------------------------------------------
--- Table `master`.`realizations`
+-- Table `ncl`.`realizations`
 -- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `master`.`realizations` (
+CREATE TABLE IF NOT EXISTS `ncl`.`realizations` (
   `id`                 BIGINT(20)   NOT NULL AUTO_INCREMENT,
   `created_date`       TINYBLOB     NOT NULL,
   `last_modified_date` TINYBLOB     NOT NULL,
@@ -235,9 +235,9 @@ CREATE TABLE IF NOT EXISTS `master`.`realizations` (
   DEFAULT CHARACTER SET = latin1;
 
 -- -----------------------------------------------------
--- Table `master`.`registrations`
+-- Table `ncl`.`registrations`
 -- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `master`.`registrations` (
+CREATE TABLE IF NOT EXISTS `ncl`.`registrations` (
   `id`                 BIGINT(20)   NOT NULL AUTO_INCREMENT,
   `created_date`       TINYBLOB     NOT NULL,
   `last_modified_date` TINYBLOB     NOT NULL,
@@ -264,9 +264,9 @@ CREATE TABLE IF NOT EXISTS `master`.`registrations` (
   DEFAULT CHARACTER SET = latin1;
 
 -- -----------------------------------------------------
--- Table `master`.`teams`
+-- Table `ncl`.`teams`
 -- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `master`.`teams` (
+CREATE TABLE IF NOT EXISTS `ncl`.`teams` (
   `id`                 VARCHAR(255) NOT NULL,
   `created_date`       TINYBLOB     NOT NULL,
   `last_modified_date` TINYBLOB     NOT NULL,
@@ -287,9 +287,9 @@ CREATE TABLE IF NOT EXISTS `master`.`teams` (
   DEFAULT CHARACTER SET = latin1;
 
 -- -----------------------------------------------------
--- Table `master`.`team_members`
+-- Table `ncl`.`team_members`
 -- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `master`.`team_members` (
+CREATE TABLE IF NOT EXISTS `ncl`.`team_members` (
   `id`                 BIGINT(20)   NOT NULL AUTO_INCREMENT,
   `created_date`       TINYBLOB     NOT NULL,
   `last_modified_date` TINYBLOB     NOT NULL,
@@ -303,15 +303,15 @@ CREATE TABLE IF NOT EXISTS `master`.`team_members` (
   UNIQUE INDEX `UKs8nuwsa7nvebc246ed822w68x` (`team_id` ASC, `user_id` ASC),
   CONSTRAINT `FKtgca08el3ofisywcf11f0f76t`
   FOREIGN KEY (`team_id`)
-  REFERENCES `master`.`teams` (`id`)
+  REFERENCES `ncl`.`teams` (`id`)
 )
   ENGINE = InnoDB
   DEFAULT CHARACTER SET = latin1;
 
 -- -----------------------------------------------------
--- Table `master`.`users_teams`
+-- Table `ncl`.`users_teams`
 -- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `master`.`users_teams` (
+CREATE TABLE IF NOT EXISTS `ncl`.`users_teams` (
   `user_id` VARCHAR(255) NOT NULL,
   `team_id` VARCHAR(255) NOT NULL,
   UNIQUE INDEX `UKbqjpbghgx6qnprt06mi96bv1q` (`user_id` ASC, `team_id` ASC),
@@ -319,10 +319,11 @@ CREATE TABLE IF NOT EXISTS `master`.`users_teams` (
   INDEX `IDXook8yqr9dleaw16r7iusof0f9` (`team_id` ASC),
   CONSTRAINT `FK31k9hhkcp7fiugrk2lu7vq9jo`
   FOREIGN KEY (`user_id`)
-  REFERENCES `master`.`users` (`id`)
+  REFERENCES `ncl`.`users` (`id`)
 )
   ENGINE = InnoDB
   DEFAULT CHARACTER SET = latin1;
+
 
 
 SET SQL_MODE = @OLD_SQL_MODE;

@@ -9,6 +9,7 @@ import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
 import org.springframework.orm.jpa.JpaSystemException;
 import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringRunner;
 import sg.ncl.common.authentication.Role;
 
@@ -25,6 +26,7 @@ import static sg.ncl.service.authentication.util.TestUtil.getCredentialsEntity;
 @DataJpaTest
 @EnableJpaAuditing
 @ContextConfiguration(classes = CredentialsRepository.class)
+@TestPropertySource(properties = "flyway.enabled=false")
 public class CredentialsRepositoryTest {
 
     @Rule

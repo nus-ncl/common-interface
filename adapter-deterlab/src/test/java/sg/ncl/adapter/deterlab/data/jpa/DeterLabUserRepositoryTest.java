@@ -8,6 +8,7 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
 import org.springframework.orm.jpa.JpaSystemException;
 import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringRunner;
 import sg.ncl.adapter.deterlab.DeterLabAutoConfiguration;
 import sg.ncl.adapter.deterlab.Util;
@@ -24,6 +25,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 @DataJpaTest
 @EnableJpaAuditing
 @ContextConfiguration(classes = {DeterLabUserRepository.class, DeterLabAutoConfiguration.class})
+@TestPropertySource(properties = "flyway.enabled=false")
 public class DeterLabUserRepositoryTest {
 
     @Rule

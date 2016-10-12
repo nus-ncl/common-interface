@@ -9,6 +9,7 @@ import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
 import org.springframework.orm.jpa.JpaSystemException;
 import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringRunner;
 import sg.ncl.service.experiment.domain.Experiment;
 
@@ -25,6 +26,7 @@ import static sg.ncl.service.experiment.util.TestUtil.getExperimentEntity;
 @DataJpaTest
 @EnableJpaAuditing
 @ContextConfiguration(classes = ExperimentRepository.class)
+@TestPropertySource(properties = "flyway.enabled=false")
 public class ExperimentRepositoryTest {
 
     @Rule

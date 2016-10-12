@@ -4,6 +4,7 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.test.context.TestPropertySource;
 import sg.ncl.service.realization.AbstractTest;
 import sg.ncl.service.realization.Util;
 import sg.ncl.service.realization.domain.RealizationState;
@@ -23,6 +24,7 @@ import static sg.ncl.common.test.Checks.checkException;
 /**
  * @author Christopher Zhong
  */
+@TestPropertySource(properties = "flyway.enabled=false")
 public class RealizationRepositoryTest extends AbstractTest {
 
     @Rule

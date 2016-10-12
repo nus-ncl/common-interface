@@ -13,6 +13,7 @@ import org.mockito.junit.MockitoRule;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
+import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.web.client.MockRestServiceServer;
 import org.springframework.web.client.RestOperations;
 import org.springframework.web.client.RestTemplate;
@@ -60,6 +61,7 @@ import static org.springframework.test.web.client.response.MockRestResponseCreat
 /**
  * @author Te Ye
  */
+@TestPropertySource(properties = "flyway.enabled=false")
 public class RegistrationServiceTest extends AbstractTest {
 
     @Rule
