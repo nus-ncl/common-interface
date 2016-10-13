@@ -8,6 +8,7 @@ dependencies {
     compile 'io.jsonwebtoken:jjwt'
     compile 'org.projectlombok:lombok'
     compile "org.flywaydb:flyway-core:4.0.3"
+    compile 'org.hibernate:hibernate-java8'
 
     compileOnly 'org.springframework.boot:spring-boot-configuration-processor'
 
