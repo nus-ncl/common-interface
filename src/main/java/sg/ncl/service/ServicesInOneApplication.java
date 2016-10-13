@@ -3,9 +3,7 @@ package sg.ncl.service;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.system.ApplicationPidFileWriter;
-import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.annotation.Import;
-import org.springframework.core.env.ConfigurableEnvironment;
 import sg.ncl.service.authentication.AuthenticationApplication;
 import sg.ncl.service.experiment.ExperimentApplication;
 import sg.ncl.service.mail.MailApplication;
@@ -36,12 +34,7 @@ public class ServicesInOneApplication {
     public static void main(String[] args) throws SQLException, ClassNotFoundException {
         final SpringApplication application = new SpringApplication(ServicesInOneApplication.class);
         application.addListeners(new ApplicationPidFileWriter());
-        final ConfigurableApplicationContext context = application.run(args);
-        final ConfigurableEnvironment environment = context.getEnvironment();
-        final FirstRun firstRun = context.getBean(FirstRun.class);
-        if (environment.containsProperty("reset")) {
-            firstRun.reset();
-        }
+        application.run(args);
     }
 
 }
