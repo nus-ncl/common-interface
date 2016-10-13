@@ -1,11 +1,12 @@
-package sg.ncl.service;
+package db.migration;
 
 import lombok.extern.slf4j.Slf4j;
+import org.flywaydb.core.api.migration.spring.SpringJdbcMigration;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.stereotype.Component;
 import sg.ncl.common.authentication.Role;
 import sg.ncl.service.authentication.domain.CredentialsStatus;
 import sg.ncl.service.team.domain.MemberStatus;
@@ -15,63 +16,71 @@ import sg.ncl.service.team.domain.TeamStatus;
 import sg.ncl.service.team.domain.TeamVisibility;
 import sg.ncl.service.user.domain.UserStatus;
 
-import javax.inject.Inject;
-import javax.validation.constraints.NotNull;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.time.ZonedDateTime;
-import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 import static java.util.UUID.randomUUID;
 
 /**
- * @author Te Ye
+ * Created by dcszwang on 10/12/2016.
  */
-@Component
 @Slf4j
-public class FirstRun {
+public class V1_1__initial_data implements SpringJdbcMigration {
 
-    // FIXME: need to include users_roles
+    static private PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
 
-    static final String SQL_INSERT_TEAMS = "INSERT INTO teams"
+    private static final String SQL_INSERT_TEAMS = "INSERT INTO teams"
             + "(id, created_date, last_modified_date, version, application_date, description, name, organisation_type, privacy, status, visibility, website) VALUES"
             + "(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
-    static final String SQL_INSERT_ADDRESS = "INSERT INTO addresses"
+    private static final String SQL_INSERT_ADDRESS = "INSERT INTO addresses"
             + "(created_date, last_modified_date, version, address_1, address_2, city, country, region, zip_code) VALUES"
             + "(?, ?, ?, ?, ?, ?, ?, ?, ?)";
-    static final String SQL_INSERT_USERS_DETAILS = "INSERT INTO user_details"
+    private static final String SQL_INSERT_USERS_DETAILS = "INSERT INTO user_details"
             + "(created_date, last_modified_date, version, email, first_name, institution, institution_abbreviation, institution_web, job_title, last_name, phone, address_id) VALUES"
             + "(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
-    static final String SQL_INSERT_USERS = "INSERT INTO users"
+    private static final String SQL_INSERT_USERS = "INSERT INTO users"
             + "(id, created_date, last_modified_date, version, application_date, is_email_verified, status, user_details_id) VALUES"
             + "(?, ?, ?, ?, ?, ?, ?, ?)";
-    static final String SQL_INSERT_CREDENTIALS = "INSERT INTO credentials"
+    private static final String SQL_INSERT_CREDENTIALS = "INSERT INTO credentials"
             + "(id, created_date, last_modified_date, version, password, status, username) VALUES"
             + "(?, ?, ?, ?, ?, ?, ?)";
-    static final String SQL_INSERT_CREDENTIALS_ROLES = "INSERT INTO credentials_roles"
+    private static final String SQL_INSERT_CREDENTIALS_ROLES = "INSERT INTO credentials_roles"
             + "(credentials_id, role) VALUES"
             + "(?, ?)";
-    static final String SQL_INSERT_DETERLAB_USER = "INSERT INTO deterlab_user"
+    private static final String SQL_INSERT_DETERLAB_USER = "INSERT INTO deterlab_user"
             + "(created_date, last_modified_date, version, deter_user_id, ncl_user_id) VALUES"
             + "(?, ?, ?, ?, ?)";
-    static final String SQL_INSERT_USERS_TEAMS = "INSERT INTO users_teams"
+    private static final String SQL_INSERT_USERS_TEAMS = "INSERT INTO users_teams"
             + "(user_id, team_id) VALUES"
             + "(?, ?)";
-    static final String SQL_INSERT_TEAM_MEMBERS = "INSERT INTO team_members"
+    private static final String SQL_INSERT_TEAM_MEMBERS = "INSERT INTO team_members"
             + "(created_date, last_modified_date, version, joined_date, member_type, user_id, team_id, status) VALUES"
             + "(?, ?, ?, ?, ?, ?, ?, ?)";
 
-    private final JdbcTemplate jdbcTemplate;
-    private final PasswordEncoder passwordEncoder;
+    @Override
+    public void migrate(final JdbcTemplate jdbcTemplate) throws Exception {
+        log.info("Initializing database on first run");
+        final String teamId = createTeam(jdbcTemplate, "NCL", "NCL Administrative Team", "Academic", "https://www.ncl.sg", TeamPrivacy.OPEN, TeamStatus.APPROVED, TeamVisibility.PRIVATE);
 
-    @Inject
-    FirstRun(@NotNull final JdbcTemplate jdbcTemplate, @NotNull final PasswordEncoder passwordEncoder) {
-        this.jdbcTemplate = jdbcTemplate;
-        this.passwordEncoder = passwordEncoder;
+        final int addressId = createAddress(jdbcTemplate, "Address1", "", "City", "Country", "Region", "123456");
+
+        final int detailsId = createDetails(jdbcTemplate, "First Name", "admin@ncl.sg", addressId, "Institution", "NCL", "https://www.ncl.sg", "Job Title", "Last Name", "12345678");
+
+        final String userId = createUser(jdbcTemplate, "Y", UserStatus.APPROVED, detailsId);
+
+        createCredentials(jdbcTemplate, "admin@ncl.sg", "ncl", userId, CredentialsStatus.ACTIVE);
+
+        createRoles(jdbcTemplate, userId, Collections.singletonList(Role.ADMIN));
+
+        addToTeam(jdbcTemplate, userId, teamId, MemberType.OWNER, MemberStatus.APPROVED);
+
+        createDeterLabUser(jdbcTemplate, "ncl", userId);
     }
 
-    private String createTeam(String teamName, String description, String organizationType, String url, final TeamPrivacy privacy, final TeamStatus status, final TeamVisibility visibility) throws SQLException {
+    private String createTeam(final JdbcTemplate jdbcTemplate, final String teamName, final String description, final String organizationType, final String url, final TeamPrivacy privacy, final TeamStatus status, final TeamVisibility visibility) throws SQLException {
         // insert the team
         final String id = randomUUID().toString();
         final ZonedDateTime time = ZonedDateTime.now();
@@ -80,7 +89,7 @@ public class FirstRun {
         return id;
     }
 
-    private int createAddress(final String address1, final String address2, final String city, final String country, final String region, final String zip) throws SQLException {
+    private int createAddress(final JdbcTemplate jdbcTemplate, final String address1, final String address2, final String city, final String country, final String region, final String zip) throws SQLException {
         // insert the address
         final KeyHolder keyHolder = new GeneratedKeyHolder();
         final int i = jdbcTemplate.update(c -> {
@@ -102,7 +111,7 @@ public class FirstRun {
         return id;
     }
 
-    private int createDetails(String firstName, String email, int addressId, final String institution, final String abbreviation, final String url, final String jobTitle, final String lastName, final String phone) throws SQLException {
+    private int createDetails(final JdbcTemplate jdbcTemplate, final String firstName, final String email, final int addressId, final String institution, final String abbreviation, final String url, final String jobTitle, final String lastName, final String phone) throws SQLException {
         // insert the userDetails
         final KeyHolder keyHolder = new GeneratedKeyHolder();
         final int i = jdbcTemplate.update(c -> {
@@ -127,7 +136,7 @@ public class FirstRun {
         return id;
     }
 
-    private String createUser(final String isEmailVerified, final UserStatus userStatus, final int detailsId) throws SQLException {
+    private String createUser(final JdbcTemplate jdbcTemplate, final String isEmailVerified, final UserStatus userStatus, final int detailsId) throws SQLException {
         // insert the users
         final String id = randomUUID().toString();
         final ZonedDateTime now = ZonedDateTime.now();
@@ -136,19 +145,19 @@ public class FirstRun {
         return id;
     }
 
-    private void createCredentials(final String username, final String password, final String userId, final CredentialsStatus status) throws SQLException {
+    private void createCredentials(final JdbcTemplate jdbcTemplate, final String username, final String password, final String userId, final CredentialsStatus status) throws SQLException {
         // insert the credentials
         final ZonedDateTime now = ZonedDateTime.now();
         final int i = jdbcTemplate.update(SQL_INSERT_CREDENTIALS, userId, now, now, 0, passwordEncoder.encode(password), status.name(), username);
         log.info("Insert {} credentials entry", i);
     }
 
-    private void createRoles(final String userId, final List<Role> roles) {
-        roles.forEach(role->jdbcTemplate.update(SQL_INSERT_CREDENTIALS_ROLES, userId, role.toString()));
+    private void createRoles(final JdbcTemplate jdbcTemplate, final String userId, final List<Role> roles) {
+        roles.forEach(role -> jdbcTemplate.update(SQL_INSERT_CREDENTIALS_ROLES, userId, role.toString()));
     }
 
     // add user to team for both user side and team side
-    private void addToTeam(String userId, String teamId, MemberType memberType, MemberStatus memberStatus) throws SQLException {
+    private void addToTeam(final JdbcTemplate jdbcTemplate, String userId, String teamId, MemberType memberType, MemberStatus memberStatus) throws SQLException {
         // insert into user side
         final int i = jdbcTemplate.update(SQL_INSERT_USERS_TEAMS, userId, teamId);
         log.info("Insert {} user_team entry", i);
@@ -159,59 +168,11 @@ public class FirstRun {
         log.info("Insert {} team_member entry", j);
     }
 
-    private void createDeterLabUser(final String name, final String userId) throws SQLException {
+    private void createDeterLabUser(final JdbcTemplate jdbcTemplate, final String name, final String userId) throws SQLException {
         // insert into deterlab_user
         final ZonedDateTime now = ZonedDateTime.now();
         final int i = jdbcTemplate.update(SQL_INSERT_DETERLAB_USER, now, now, 0, name, userId);
         log.info("Insert {} deter user entry", i);
     }
 
-    public void wipe() throws SQLException {
-        final String[] tables = {
-                "credentials_roles",
-                "credentials",
-                "deterlab_project",
-                "deterlab_user",
-                "email_retries",
-                "experiments",
-                "login_activities",
-                "realizations",
-                "registrations",
-                "team_members",
-                "teams",
-                "users_teams",
-                "users",
-                "user_details",
-                "addresses"
-        };
-        for (String table : tables) {
-            final String sql = "DELETE FROM " + table;
-            int i = jdbcTemplate.update(sql);
-            log.info("Delete {} entry/entries from '{}' table", i, table);
-        }
-    }
-
-    public void initialize() throws SQLException {
-        log.info("Initializing database on first run");
-        final String teamId = createTeam("NCL", "NCL Administrative Team", "Academic", "https://www.ncl.sg", TeamPrivacy.OPEN, TeamStatus.APPROVED, TeamVisibility.PRIVATE);
-
-        final int addressId = createAddress("Address1", "", "City", "Country", "Region", "123456");
-
-        final int detailsId = createDetails("First Name", "admin@ncl.sg", addressId, "Institution", "NCL", "https://www.ncl.sg", "Job Title", "Last Name", "12345678");
-
-        final String userId = createUser("Y", UserStatus.APPROVED, detailsId);
-
-        createCredentials("admin@ncl.sg", "ncl", userId, CredentialsStatus.ACTIVE);
-
-        createRoles(userId, Arrays.asList(Role.ADMIN));
-
-        addToTeam(userId, teamId, MemberType.OWNER, MemberStatus.APPROVED);
-
-        createDeterLabUser("ncl", userId);
-    }
-
-    public void reset() throws SQLException {
-        wipe();
-        initialize();
-    }
 }
