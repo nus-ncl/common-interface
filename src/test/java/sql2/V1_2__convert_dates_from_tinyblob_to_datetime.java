@@ -1,4 +1,4 @@
-package db.migration;
+package sql2;
 
 import lombok.extern.slf4j.Slf4j;
 import org.flywaydb.core.api.migration.spring.SpringJdbcMigration;
@@ -59,14 +59,13 @@ public class V1_2__convert_dates_from_tinyblob_to_datetime implements SpringJdbc
 
         // migrate users table: created_date, last_modified_date, application_date, processed_date
         migrate(jdbcTemplate, "users", new String[]{"created_date", "last_modified_date", "application_date", "processed_date"});
-
     }
 
     private void migrate(final JdbcTemplate jdbcTemplate, final String table, final String[] columns) {
         for (String column : columns) {
             final String s1 = String.format("ALTER TABLE %s CHANGE COLUMN %s old_%s TINYBLOB", table, column, column);
             jdbcTemplate.update(s1);
-            String s2 = String.format("ALTER TABLE %s ADD COLUMN %s DATETIME%s", table, column, column == "processed_date" ? "" : " NOT NULL");
+            final String s2 = String.format("ALTER TABLE %s ADD COLUMN %s DATETIME", table, column);
             jdbcTemplate.update(s2);
             final String s3 = String.format("SELECT id, old_%s FROM %s", column, table);
             final List<Map<String, Object>> list = jdbcTemplate.queryForList(s3);
@@ -82,6 +81,10 @@ public class V1_2__convert_dates_from_tinyblob_to_datetime implements SpringJdbc
             });
             final String s5 = String.format("ALTER TABLE %s DROP COLUMN old_%s", table, column);
             jdbcTemplate.update(s5);
+            if(column != "processed_date") {
+                final String s6 = String.format("ALTER TABLE %s ALTER COLUMN %s SET NOT NULL", table, column);
+                jdbcTemplate.update(s6);
+            }
         }
     }
 

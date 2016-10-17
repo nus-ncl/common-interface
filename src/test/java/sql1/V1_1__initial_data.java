@@ -1,4 +1,4 @@
-package sql2;
+package sql1;
 
 import lombok.extern.slf4j.Slf4j;
 import org.flywaydb.core.api.migration.spring.SpringJdbcMigration;

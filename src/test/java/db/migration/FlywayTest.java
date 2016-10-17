@@ -82,11 +82,14 @@ public class FlywayTest {
                 Integer.class)).isEqualTo(0);
         assertThat(this.template.queryForObject("SELECT COUNT(*) from users_teams",
                 Integer.class)).isEqualTo(0);
+
+        template.execute("DROP ALL OBJECTS");
     }
 
 
     @Test
     public void testEmptySchemaInitializeTablesAndData() throws Exception {
+
         flyway.setLocations("classpath:sql", "classpath:sql1");
         flyway.migrate();
 
@@ -124,10 +127,13 @@ public class FlywayTest {
         List<Map<String, Object>> results = this.template.queryForList("SHOW COLUMNS FROM addresses");
         assertThat(results.get(1).toString()).contains("FIELD=CREATED_DATE, TYPE=BLOB");
         assertThat(results.get(2).toString()).contains("FIELD=LAST_MODIFIED_DATE, TYPE=BLOB");
+
+        template.execute("DROP ALL OBJECTS");
     }
 
     @Test
     public void testConversionDatesFromBlob() throws Exception {
+
         flyway.setLocations("classpath:sql", "classpath:sql1", "classpath:sql2");
         flyway.migrate();
 
@@ -165,6 +171,8 @@ public class FlywayTest {
         List<Map<String, Object>> results = this.template.queryForList("SHOW COLUMNS FROM addresses");
         assertThat(results.get(8).toString()).contains("FIELD=CREATED_DATE, TYPE=TIMESTAMP");
         assertThat(results.get(9).toString()).contains("FIELD=LAST_MODIFIED_DATE, TYPE=TIMESTAMP");
+
+        template.execute("DROP ALL OBJECTS");
     }
 
     public void wipe() throws SQLException {
