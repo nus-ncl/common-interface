@@ -28,10 +28,10 @@ public class V1_2__convert_dates_from_tinyblob_to_datetime implements SpringJdbc
         migrate(jdbcTemplate, "credentials", new String[]{"created_date", "last_modified_date"});
 
         // migrate deterlab_projects table: created_date and last_modified_date
-        migrate(jdbcTemplate, "deterlab_projects", new String[]{"created_date", "last_modified_date"});
+        migrate(jdbcTemplate, "deterlab_project", new String[]{"created_date", "last_modified_date"});
 
         // migrate deterlab_users table: created_date and last_modified_date
-        migrate(jdbcTemplate, "deterlab_users", new String[]{"created_date", "last_modified_date"});
+        migrate(jdbcTemplate, "deterlab_user", new String[]{"created_date", "last_modified_date"});
 
         // migrate email_retries table: created_date, last_modified_date, and last_retry_time
         migrate(jdbcTemplate, "email_retries", new String[]{"created_date", "last_modified_date", "last_retry_time"});
