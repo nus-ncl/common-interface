@@ -30,6 +30,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 @TestPropertySource(properties = {"flyway.enabled=false"})
 public class FlywayTest {
 
+    static final String schema = "prod";
+
     @Configuration
     static class TestConfig {
     }
@@ -52,35 +54,35 @@ public class FlywayTest {
         flyway.setLocations("classpath:sql");
         flyway.migrate();
 
-        assertThat(this.template.queryForObject("SELECT COUNT(*) from addresses",
+        assertThat(this.template.queryForObject("SELECT COUNT(*) from " + schema + ".addresses",
                 Integer.class)).isEqualTo(0);
-        assertThat(this.template.queryForObject("SELECT COUNT(*) from credentials",
+        assertThat(this.template.queryForObject("SELECT COUNT(*) from " + schema + ".credentials",
                 Integer.class)).isEqualTo(0);
-        assertThat(this.template.queryForObject("SELECT COUNT(*) from credentials_roles",
+        assertThat(this.template.queryForObject("SELECT COUNT(*) from " + schema + ".credentials_roles",
                 Integer.class)).isEqualTo(0);
-        assertThat(this.template.queryForObject("SELECT COUNT(*) from deterlab_project",
+        assertThat(this.template.queryForObject("SELECT COUNT(*) from " + schema + ".deterlab_project",
                 Integer.class)).isEqualTo(0);
-        assertThat(this.template.queryForObject("SELECT COUNT(*) from deterlab_user",
+        assertThat(this.template.queryForObject("SELECT COUNT(*) from " + schema + ".deterlab_user",
                 Integer.class)).isEqualTo(0);
-        assertThat(this.template.queryForObject("SELECT COUNT(*) from email_retries",
+        assertThat(this.template.queryForObject("SELECT COUNT(*) from " + schema + ".email_retries",
                 Integer.class)).isEqualTo(0);
-        assertThat(this.template.queryForObject("SELECT COUNT(*) from experiments",
+        assertThat(this.template.queryForObject("SELECT COUNT(*) from " + schema + ".experiments",
                 Integer.class)).isEqualTo(0);
-        assertThat(this.template.queryForObject("SELECT COUNT(*) from user_details",
+        assertThat(this.template.queryForObject("SELECT COUNT(*) from " + schema + ".user_details",
                 Integer.class)).isEqualTo(0);
-        assertThat(this.template.queryForObject("SELECT COUNT(*) from users",
+        assertThat(this.template.queryForObject("SELECT COUNT(*) from " + schema + ".users",
                 Integer.class)).isEqualTo(0);
-        assertThat(this.template.queryForObject("SELECT COUNT(*) from login_activities",
+        assertThat(this.template.queryForObject("SELECT COUNT(*) from " + schema + ".login_activities",
                 Integer.class)).isEqualTo(0);
-        assertThat(this.template.queryForObject("SELECT COUNT(*) from realizations",
+        assertThat(this.template.queryForObject("SELECT COUNT(*) from " + schema + ".realizations",
                 Integer.class)).isEqualTo(0);
-        assertThat(this.template.queryForObject("SELECT COUNT(*) from registrations",
+        assertThat(this.template.queryForObject("SELECT COUNT(*) from " + schema + ".registrations",
                 Integer.class)).isEqualTo(0);
-        assertThat(this.template.queryForObject("SELECT COUNT(*) from teams",
+        assertThat(this.template.queryForObject("SELECT COUNT(*) from " + schema + ".teams",
                 Integer.class)).isEqualTo(0);
-        assertThat(this.template.queryForObject("SELECT COUNT(*) from team_members",
+        assertThat(this.template.queryForObject("SELECT COUNT(*) from " + schema + ".team_members",
                 Integer.class)).isEqualTo(0);
-        assertThat(this.template.queryForObject("SELECT COUNT(*) from users_teams",
+        assertThat(this.template.queryForObject("SELECT COUNT(*) from " + schema + ".users_teams",
                 Integer.class)).isEqualTo(0);
 
         template.execute("DROP ALL OBJECTS");
@@ -93,38 +95,38 @@ public class FlywayTest {
         flyway.setLocations("classpath:sql", "classpath:sql1");
         flyway.migrate();
 
-        assertThat(this.template.queryForObject("SELECT COUNT(*) from addresses",
+        assertThat(this.template.queryForObject("SELECT COUNT(*) from " + schema + ".addresses",
                 Integer.class)).isEqualTo(1);
-        assertThat(this.template.queryForObject("SELECT COUNT(*) from credentials",
+        assertThat(this.template.queryForObject("SELECT COUNT(*) from " + schema + ".credentials",
                 Integer.class)).isEqualTo(1);
-        assertThat(this.template.queryForObject("SELECT COUNT(*) from credentials_roles",
+        assertThat(this.template.queryForObject("SELECT COUNT(*) from " + schema + ".credentials_roles",
                 Integer.class)).isEqualTo(1);
-        assertThat(this.template.queryForObject("SELECT COUNT(*) from deterlab_project",
+        assertThat(this.template.queryForObject("SELECT COUNT(*) from " + schema + ".deterlab_project",
                 Integer.class)).isEqualTo(0);
-        assertThat(this.template.queryForObject("SELECT COUNT(*) from deterlab_user",
+        assertThat(this.template.queryForObject("SELECT COUNT(*) from " + schema + ".deterlab_user",
                 Integer.class)).isEqualTo(1);
-        assertThat(this.template.queryForObject("SELECT COUNT(*) from email_retries",
+        assertThat(this.template.queryForObject("SELECT COUNT(*) from " + schema + ".email_retries",
                 Integer.class)).isEqualTo(0);
-        assertThat(this.template.queryForObject("SELECT COUNT(*) from experiments",
+        assertThat(this.template.queryForObject("SELECT COUNT(*) from " + schema + ".experiments",
                 Integer.class)).isEqualTo(0);
-        assertThat(this.template.queryForObject("SELECT COUNT(*) from user_details",
+        assertThat(this.template.queryForObject("SELECT COUNT(*) from " + schema + ".user_details",
                 Integer.class)).isEqualTo(1);
-        assertThat(this.template.queryForObject("SELECT COUNT(*) from users",
+        assertThat(this.template.queryForObject("SELECT COUNT(*) from " + schema + ".users",
                 Integer.class)).isEqualTo(1);
-        assertThat(this.template.queryForObject("SELECT COUNT(*) from login_activities",
+        assertThat(this.template.queryForObject("SELECT COUNT(*) from " + schema + ".login_activities",
                 Integer.class)).isEqualTo(0);
-        assertThat(this.template.queryForObject("SELECT COUNT(*) from realizations",
+        assertThat(this.template.queryForObject("SELECT COUNT(*) from " + schema + ".realizations",
                 Integer.class)).isEqualTo(0);
-        assertThat(this.template.queryForObject("SELECT COUNT(*) from registrations",
+        assertThat(this.template.queryForObject("SELECT COUNT(*) from " + schema + ".registrations",
                 Integer.class)).isEqualTo(0);
-        assertThat(this.template.queryForObject("SELECT COUNT(*) from teams",
+        assertThat(this.template.queryForObject("SELECT COUNT(*) from " + schema + ".teams",
                 Integer.class)).isEqualTo(1);
-        assertThat(this.template.queryForObject("SELECT COUNT(*) from team_members",
+        assertThat(this.template.queryForObject("SELECT COUNT(*) from " + schema + ".team_members",
                 Integer.class)).isEqualTo(1);
-        assertThat(this.template.queryForObject("SELECT COUNT(*) from users_teams",
+        assertThat(this.template.queryForObject("SELECT COUNT(*) from " + schema + ".users_teams",
                 Integer.class)).isEqualTo(1);
 
-        List<Map<String, Object>> results = this.template.queryForList("SHOW COLUMNS FROM addresses");
+        List<Map<String, Object>> results = this.template.queryForList("SHOW COLUMNS FROM " + schema + ".addresses");
         assertThat(results.get(1).toString()).contains("FIELD=CREATED_DATE, TYPE=BLOB");
         assertThat(results.get(2).toString()).contains("FIELD=LAST_MODIFIED_DATE, TYPE=BLOB");
 
@@ -137,38 +139,38 @@ public class FlywayTest {
         flyway.setLocations("classpath:sql", "classpath:sql1", "classpath:sql2");
         flyway.migrate();
 
-        assertThat(this.template.queryForObject("SELECT COUNT(*) from addresses",
+        assertThat(this.template.queryForObject("SELECT COUNT(*) from " + schema + ".addresses",
                 Integer.class)).isEqualTo(1);
-        assertThat(this.template.queryForObject("SELECT COUNT(*) from credentials",
+        assertThat(this.template.queryForObject("SELECT COUNT(*) from " + schema + ".credentials",
                 Integer.class)).isEqualTo(1);
-        assertThat(this.template.queryForObject("SELECT COUNT(*) from credentials_roles",
+        assertThat(this.template.queryForObject("SELECT COUNT(*) from " + schema + ".credentials_roles",
                 Integer.class)).isEqualTo(1);
-        assertThat(this.template.queryForObject("SELECT COUNT(*) from deterlab_project",
+        assertThat(this.template.queryForObject("SELECT COUNT(*) from " + schema + ".deterlab_project",
                 Integer.class)).isEqualTo(0);
-        assertThat(this.template.queryForObject("SELECT COUNT(*) from deterlab_user",
+        assertThat(this.template.queryForObject("SELECT COUNT(*) from " + schema + ".deterlab_user",
                 Integer.class)).isEqualTo(1);
-        assertThat(this.template.queryForObject("SELECT COUNT(*) from email_retries",
+        assertThat(this.template.queryForObject("SELECT COUNT(*) from " + schema + ".email_retries",
                 Integer.class)).isEqualTo(0);
-        assertThat(this.template.queryForObject("SELECT COUNT(*) from experiments",
+        assertThat(this.template.queryForObject("SELECT COUNT(*) from " + schema + ".experiments",
                 Integer.class)).isEqualTo(0);
-        assertThat(this.template.queryForObject("SELECT COUNT(*) from user_details",
+        assertThat(this.template.queryForObject("SELECT COUNT(*) from " + schema + ".user_details",
                 Integer.class)).isEqualTo(1);
-        assertThat(this.template.queryForObject("SELECT COUNT(*) from users",
+        assertThat(this.template.queryForObject("SELECT COUNT(*) from " + schema + ".users",
                 Integer.class)).isEqualTo(1);
-        assertThat(this.template.queryForObject("SELECT COUNT(*) from login_activities",
+        assertThat(this.template.queryForObject("SELECT COUNT(*) from " + schema + ".login_activities",
                 Integer.class)).isEqualTo(0);
-        assertThat(this.template.queryForObject("SELECT COUNT(*) from realizations",
+        assertThat(this.template.queryForObject("SELECT COUNT(*) from " + schema + ".realizations",
                 Integer.class)).isEqualTo(0);
-        assertThat(this.template.queryForObject("SELECT COUNT(*) from registrations",
+        assertThat(this.template.queryForObject("SELECT COUNT(*) from " + schema + ".registrations",
                 Integer.class)).isEqualTo(0);
-        assertThat(this.template.queryForObject("SELECT COUNT(*) from teams",
+        assertThat(this.template.queryForObject("SELECT COUNT(*) from " + schema + ".teams",
                 Integer.class)).isEqualTo(1);
-        assertThat(this.template.queryForObject("SELECT COUNT(*) from team_members",
+        assertThat(this.template.queryForObject("SELECT COUNT(*) from " + schema + ".team_members",
                 Integer.class)).isEqualTo(1);
-        assertThat(this.template.queryForObject("SELECT COUNT(*) from users_teams",
+        assertThat(this.template.queryForObject("SELECT COUNT(*) from " + schema + ".users_teams",
                 Integer.class)).isEqualTo(1);
 
-        List<Map<String, Object>> results = this.template.queryForList("SHOW COLUMNS FROM addresses");
+        List<Map<String, Object>> results = this.template.queryForList("SHOW COLUMNS FROM " + schema + ".addresses");
         assertThat(results.get(8).toString()).contains("FIELD=CREATED_DATE, TYPE=TIMESTAMP");
         assertThat(results.get(9).toString()).contains("FIELD=LAST_MODIFIED_DATE, TYPE=TIMESTAMP");
 
