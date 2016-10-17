@@ -18,8 +18,6 @@ import java.util.Map;
 @Slf4j
 public class V1_2__convert_dates_from_tinyblob_to_datetime implements SpringJdbcMigration {
 
-    private static final String SCHEMA = "prod";
-
     private static final String CREATED_DATE = "created_date";
     private static final String LAST_MODIFIED_DATE = "last_modified_date";
     private static final String LAST_RETRY_TIME = "last_retry_time";
@@ -73,23 +71,23 @@ public class V1_2__convert_dates_from_tinyblob_to_datetime implements SpringJdbc
 
     private void migrate(final JdbcTemplate jdbcTemplate, final String table, final String[] columns) {
         for (String column : columns) {
-            final String s1 = String.format("ALTER TABLE %s.%s CHANGE COLUMN %s old_%s TINYBLOB", SCHEMA, table, column, column);
+            final String s1 = String.format("ALTER TABLE prod.%s CHANGE COLUMN %s old_%s TINYBLOB", table, column, column);
             jdbcTemplate.update(s1);
-            final String s2 = String.format("ALTER TABLE %s.%s ADD COLUMN %s DATETIME %s", SCHEMA, table, column, getType(column));
+            final String s2 = String.format("ALTER TABLE prod.%s ADD COLUMN %s DATETIME %s", table, column, getType(column));
             jdbcTemplate.update(s2);
-            final String s3 = String.format("SELECT id, old_%s FROM %s.%s", column, SCHEMA, table);
+            final String s3 = String.format("SELECT id, old_%s FROM prod.%s", column, table);
             final List<Map<String, Object>> list = jdbcTemplate.queryForList(s3);
             list.forEach(map -> {
                 final Object o = map.get(String.format("old_%s", column));
                 if (o != null) {
                     final Object id = map.get("id");
                     final ZonedDateTime date = deserialize((byte[]) o);
-                    final String s4 = String.format("UPDATE %s.%s SET %s = ? WHERE id = ?", SCHEMA, table, column);
+                    final String s4 = String.format("UPDATE prod.%s SET %s = ? WHERE id = ?", table, column);
                     jdbcTemplate.update(s4, Timestamp.valueOf(date.toLocalDateTime()), id);
                     log.info("Updated {} entry: id={}, {}={}", table, id, column, date);
                 }
             });
-            final String s5 = String.format("ALTER TABLE %s.%s DROP COLUMN old_%s", SCHEMA, table, column);
+            final String s5 = String.format("ALTER TABLE prod.%s DROP COLUMN old_%s", table, column);
             jdbcTemplate.update(s5);
         }
     }
