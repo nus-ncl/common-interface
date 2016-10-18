@@ -1,6 +1,5 @@
 package sg.ncl.service.data.logic;
 
-import io.jsonwebtoken.Claims;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import sg.ncl.service.data.data.jpa.DataRepository;
@@ -28,19 +27,22 @@ public class DataServiceImpl implements DataService {
     }
 
     /**
-     * Get list of data sets as follow:
-     *      - public (no need login)
-     *      - all (after login)
+     * Get list of all data sets.
      *
-     * @param   claims  the authenticated user, if available
+     * @return  the list of data sets
+     */
+    public List<Data> getAll() {
+        return dataRepository.findAll().stream().collect(Collectors.toList());
+    }
+
+    /**
+     * Get list of data sets based on data visibility.
+     *
+     * @param   visibility  PRIVATE|PROTECTED|PUBLIC
      * @return  the list of data sets queried
      */
-    public List<Data> getDataSets(Claims claims, DataVisibility visibility) {
-        if (claims == null) {
-            return dataRepository.findByVisibility(visibility).stream().collect(Collectors.toList());
-        } else {
-            return dataRepository.findAll().stream().collect(Collectors.toList());
-        }
+    public List<Data> findByVisibility(DataVisibility visibility) {
+        return dataRepository.findByVisibility(visibility).stream().collect(Collectors.toList());
     }
 
 }

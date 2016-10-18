@@ -41,13 +41,13 @@ public class DataServiceImplTest extends AbstractTest {
 
     @Test
     public void testGetDataSetsPublic() {
-        dataService.getDataSets(null, DataVisibility.PUBLIC);
+        dataService.findByVisibility(DataVisibility.PUBLIC);
         verify(dataRepository, times(1)).findByVisibility(any(DataVisibility.class));
     }
 
     @Test
     public void testGetDataSetsAll() {
-        dataService.getDataSets(claims, null);
+        dataService.getAll();
         verify(dataRepository, times(1)).findAll();
     }
 

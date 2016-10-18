@@ -1,7 +1,5 @@
 package sg.ncl.service.data.domain;
 
-import io.jsonwebtoken.Claims;
-
 import java.util.List;
 
 /**
@@ -9,6 +7,8 @@ import java.util.List;
  */
 public interface DataService {
 
-    List<Data> getDataSets(Claims claims, DataVisibility visibility);
+    List<Data> getAll();
+
+    List<Data> findByVisibility(DataVisibility visibility);
 
 }

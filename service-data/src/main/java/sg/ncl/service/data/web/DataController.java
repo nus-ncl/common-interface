@@ -36,21 +36,23 @@ public class DataController {
         this.dataService = dataService;
     }
 
-    // Get a list of all available datasets
+    // Get a list of all available data sets
     @GetMapping(path = "")
     @ResponseStatus(HttpStatus.OK)
-    public List<Data> get(@AuthenticationPrincipal Object claims) {
-        if (claims != null && !(claims instanceof Claims)) {
-            throw new ForbiddenException("Unknown authenticating object.");
+    public List<Data> getAll(@AuthenticationPrincipal Object claims) {
+        log.info("User principal: " + claims);
+        if (claims == null || !(claims instanceof Claims)) {
+            log.warn("Access denied for all data sets");
+            throw new ForbiddenException();
         }
-        return dataService.getDataSets((Claims) claims, null).stream().map(DataInfo::new).collect(Collectors.toList());
+        return dataService.getAll().stream().map(DataInfo::new).collect(Collectors.toList());
     }
 
-    // Get a list of public datasets
+    // Get a list of public data sets
     @GetMapping(path = "/public")
     @ResponseStatus(HttpStatus.OK)
-    public List<Data> get() {
-        return dataService.getDataSets(null, DataVisibility.PUBLIC).stream().map(DataInfo::new).collect(Collectors.toList());
+    public List<Data> getPublic() {
+        return dataService.findByVisibility(DataVisibility.PUBLIC).stream().map(DataInfo::new).collect(Collectors.toList());
     }
 
 }
