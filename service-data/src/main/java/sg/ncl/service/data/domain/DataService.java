@@ -7,6 +7,8 @@ import java.util.List;
  */
 public interface DataService {
 
+    Data getOne(Long id);
+
     List<Data> getAll();
 
     List<Data> findByVisibility(DataVisibility visibility);

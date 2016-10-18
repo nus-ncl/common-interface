@@ -27,6 +27,15 @@ public class DataServiceImpl implements DataService {
     }
 
     /**
+     * Get details about a data set
+     *
+     * @return  data set
+     */
+    public Data getOne(Long id) {
+        return dataRepository.getOne(id);
+    }
+
+    /**
      * Get list of all data sets.
      *
      * @return  the list of data sets
