@@ -1,3 +1,5 @@
+CREATE SCHEMA IF NOT EXISTS `prod`;
+
 USE `prod`;
 
 -- -----------------------------------------------------
@@ -17,7 +19,7 @@ CREATE TABLE IF NOT EXISTS `addresses` (
   PRIMARY KEY (`id`)
 )
   ENGINE = InnoDB
-  DEFAULT CHARACTER SET = latin1;
+/*!  DEFAULT CHARACTER SET = latin1 */;
 
 -- -----------------------------------------------------
 -- Table `credentials`
@@ -35,7 +37,7 @@ CREATE TABLE IF NOT EXISTS `credentials` (
   INDEX `IDXl7xhygibdj6cgkpj2ih1jgx14` (`username` ASC)
 )
   ENGINE = InnoDB
-  DEFAULT CHARACTER SET = latin1;
+/*!  DEFAULT CHARACTER SET = latin1 */;
 
 -- -----------------------------------------------------
 -- Table `credentials_roles`
@@ -49,7 +51,7 @@ CREATE TABLE IF NOT EXISTS `credentials_roles` (
   REFERENCES `credentials` (`id`)
 )
   ENGINE = InnoDB
-  DEFAULT CHARACTER SET = latin1;
+  /*!  DEFAULT CHARACTER SET = latin1 */;
 
 -- -----------------------------------------------------
 -- Table `deterlab_project`
@@ -66,7 +68,7 @@ CREATE TABLE IF NOT EXISTS `deterlab_project` (
   UNIQUE INDEX `UK_hhtgwx7cpbibo46ca82l32oce` (`ncl_team_id` ASC)
 )
   ENGINE = InnoDB
-  DEFAULT CHARACTER SET = latin1;
+  /*!  DEFAULT CHARACTER SET = latin1 */;
 
 -- -----------------------------------------------------
 -- Table `deterlab_user`
@@ -83,7 +85,7 @@ CREATE TABLE IF NOT EXISTS `deterlab_user` (
   UNIQUE INDEX `UK_i6dsyy2vylkp88w3ttkm1v22g` (`ncl_user_id` ASC)
 )
   ENGINE = InnoDB
-  DEFAULT CHARACTER SET = latin1;
+  /*!  DEFAULT CHARACTER SET = latin1 */;
 
 -- -----------------------------------------------------
 -- Table `email_retries`
@@ -107,7 +109,7 @@ CREATE TABLE IF NOT EXISTS `email_retries` (
   PRIMARY KEY (`id`)
 )
   ENGINE = InnoDB
-  DEFAULT CHARACTER SET = latin1;
+  /*!  DEFAULT CHARACTER SET = latin1 */;
 
 -- -----------------------------------------------------
 -- Table `experiments`
@@ -129,7 +131,7 @@ CREATE TABLE IF NOT EXISTS `experiments` (
   PRIMARY KEY (`id`)
 )
   ENGINE = InnoDB
-  DEFAULT CHARACTER SET = latin1;
+  /*!  DEFAULT CHARACTER SET = latin1 */;
 
 -- -----------------------------------------------------
 -- Table `user_details`
@@ -156,7 +158,7 @@ CREATE TABLE IF NOT EXISTS `user_details` (
   REFERENCES `addresses` (`id`)
 )
   ENGINE = InnoDB
-  DEFAULT CHARACTER SET = latin1;
+  /*!  DEFAULT CHARACTER SET = latin1 */;
 
 -- -----------------------------------------------------
 -- Table `users`
@@ -179,7 +181,7 @@ CREATE TABLE IF NOT EXISTS `users` (
   REFERENCES `user_details` (`id`)
 )
   ENGINE = InnoDB
-  DEFAULT CHARACTER SET = latin1;
+  /*!  DEFAULT CHARACTER SET = latin1 */;
 
 -- -----------------------------------------------------
 -- Table `login_activities`
@@ -199,7 +201,7 @@ CREATE TABLE IF NOT EXISTS `login_activities` (
   REFERENCES `users` (`id`)
 )
   ENGINE = InnoDB
-  DEFAULT CHARACTER SET = latin1;
+  /*!  DEFAULT CHARACTER SET = latin1 */;
 
 -- -----------------------------------------------------
 -- Table `realizations`
@@ -221,7 +223,7 @@ CREATE TABLE IF NOT EXISTS `realizations` (
   PRIMARY KEY (`id`)
 )
   ENGINE = InnoDB
-  DEFAULT CHARACTER SET = latin1;
+  /*!  DEFAULT CHARACTER SET = latin1 */;
 
 -- -----------------------------------------------------
 -- Table `registrations`
@@ -250,7 +252,7 @@ CREATE TABLE IF NOT EXISTS `registrations` (
   UNIQUE INDEX `UK_i4da24h32w6sf4upvsts7uhog` (`usr_email` ASC)
 )
   ENGINE = InnoDB
-  DEFAULT CHARACTER SET = latin1;
+  /*!  DEFAULT CHARACTER SET = latin1 */;
 
 -- -----------------------------------------------------
 -- Table `teams`
@@ -273,7 +275,7 @@ CREATE TABLE IF NOT EXISTS `teams` (
   UNIQUE INDEX `UK_a510no6sjwqcx153yd5sm4jrr` (`name` ASC)
 )
   ENGINE = InnoDB
-  DEFAULT CHARACTER SET = latin1;
+  /*!  DEFAULT CHARACTER SET = latin1 */;
 
 -- -----------------------------------------------------
 -- Table `team_members`
@@ -295,7 +297,7 @@ CREATE TABLE IF NOT EXISTS `team_members` (
   REFERENCES `teams` (`id`)
 )
   ENGINE = InnoDB
-  DEFAULT CHARACTER SET = latin1;
+  /*!  DEFAULT CHARACTER SET = latin1 */;
 
 -- -----------------------------------------------------
 -- Table `users_teams`
@@ -311,4 +313,4 @@ CREATE TABLE IF NOT EXISTS `users_teams` (
   REFERENCES `users` (`id`)
 )
   ENGINE = InnoDB
-  DEFAULT CHARACTER SET = latin1;
+  /*!  DEFAULT CHARACTER SET = latin1 */;
