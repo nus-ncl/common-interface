@@ -3,6 +3,7 @@ package sg.ncl.common.exception;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import javax.inject.Inject;
@@ -18,6 +19,7 @@ import static org.springframework.boot.test.context.SpringBootTest.WebEnvironmen
  */
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = TestSpringBootApp.class, webEnvironment = WebEnvironment.NONE)
+@TestPropertySource(properties = "flyway.enabled=false")
 public class ExceptionPropertiesTest {
 
     @Inject
