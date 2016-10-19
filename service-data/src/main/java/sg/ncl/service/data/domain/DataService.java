@@ -21,4 +21,6 @@ public interface DataService {
 
     Data saveResource(Long id, DataResource dataResource, Claims claims);
 
+    Data deleteResource(Long did, Long rid, Claims claims);
+
 }

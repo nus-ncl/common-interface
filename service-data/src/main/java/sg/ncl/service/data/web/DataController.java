@@ -89,6 +89,9 @@ public class DataController {
     @GetMapping(path = "/{did}/resources/{rid}")
     @ResponseStatus(HttpStatus.OK)
     public DataResource getResource(@PathVariable String did, @PathVariable String rid, @AuthenticationPrincipal Object claims) {
+        if (claims == null || !(claims instanceof Claims)) {
+            throw new ForbiddenException();
+        }
         return dataService.findResourceById(Long.getLong(did), Long.getLong(rid), (Claims) claims);
     }
 
@@ -102,6 +105,16 @@ public class DataController {
             throw new ForbiddenException();
         }
         return new DataInfo(dataService.saveResource(Long.getLong(id), dataResourceInfo, (Claims) claims));
+    }
+
+    // Delete a resource from a data set
+    @DeleteMapping(path = "/{did}/resources/{rid}")
+    @ResponseStatus(HttpStatus.OK)
+    public Data removeResource(@PathVariable String did, @PathVariable String rid, @AuthenticationPrincipal Object claims) {
+        if (claims == null || !(claims instanceof Claims)) {
+            throw new ForbiddenException();
+        }
+        return new DataInfo(dataService.deleteResource(Long.getLong(did), Long.getLong(rid), (Claims) claims));
     }
 
 }

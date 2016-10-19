@@ -130,7 +130,7 @@ public class DataServiceImpl implements DataService {
      * @param   id              data set id
      * @param   dataResource    data resource to save
      * @param   claims          authenticated credentials
-     * @return  data resource
+     * @return  data entity
      */
     @Transactional
     public Data saveResource(Long id, DataResource dataResource, Claims claims) {
@@ -138,6 +138,31 @@ public class DataServiceImpl implements DataService {
         checkPermissions(dataEntity, claims);
 
         dataEntity.getResources().add(setUpResourceEntity(dataResource));
+        DataEntity savedDataEntity = dataRepository.save(dataEntity);
+        log.info("Data saved: {}", savedDataEntity);
+        return savedDataEntity;
+    }
+
+    /**
+     * Delete a resource of a data set.
+     *
+     * @param   did             data set id
+     * @param   rid             resource id
+     * @param   claims          authenticated credentials
+     * @return  data entity
+     */
+    @Transactional
+    public Data deleteResource(Long did, Long rid, Claims claims) {
+        DataEntity dataEntity = (DataEntity) getOne(did);
+        checkPermissions(dataEntity, claims);
+
+        List<DataResourceEntity> dataResourceEntities = dataEntity.getResources();
+        DataResourceEntity dataResourceEntity = dataResourceEntities
+                .stream().filter(o -> o.getId().equals(rid)).findFirst().orElse(null);
+        if (dataEntity != null) {
+            dataResourceEntities.remove(dataResourceEntity);
+        }
+
         DataEntity savedDataEntity = dataRepository.save(dataEntity);
         log.info("Data saved: {}", savedDataEntity);
         return savedDataEntity;
