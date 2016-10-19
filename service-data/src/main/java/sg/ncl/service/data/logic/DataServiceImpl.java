@@ -1,11 +1,14 @@
 package sg.ncl.service.data.logic;
 
+import io.jsonwebtoken.Claims;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import sg.ncl.service.data.data.jpa.DataEntity;
 import sg.ncl.service.data.data.jpa.DataRepository;
+import sg.ncl.service.data.data.jpa.DataResourceEntity;
 import sg.ncl.service.data.domain.Data;
+import sg.ncl.service.data.domain.DataResource;
 import sg.ncl.service.data.domain.DataService;
 import sg.ncl.service.data.domain.DataVisibility;
 import sg.ncl.service.data.exceptions.DataNameInUseException;
@@ -14,6 +17,8 @@ import javax.inject.Inject;
 import javax.validation.constraints.NotNull;
 import java.util.List;
 import java.util.stream.Collectors;
+
+import static sg.ncl.service.data.validations.Validator.checkPermissions;
 
 /**
  * Created by jng on 17/10/16.
@@ -29,7 +34,7 @@ public class DataServiceImpl implements DataService {
         this.dataRepository = dataRepository;
     }
 
-    private DataEntity setUpEntity(Data data) {
+    private DataEntity setUpDataEntity(Data data) {
         DataEntity dataEntity = new DataEntity();
 
         dataEntity.setName(data.getName());
@@ -39,6 +44,14 @@ public class DataServiceImpl implements DataService {
         dataEntity.setVisibility(data.getVisibility());
 
         return dataEntity;
+    }
+
+    private DataResourceEntity setUpResourceEntity(DataResource dataResource) {
+        DataResourceEntity dataResourceEntity = new DataResourceEntity();
+
+        dataResourceEntity.setUri(dataResource.getUri());
+
+        return dataResourceEntity;
     }
 
     /**
@@ -63,7 +76,7 @@ public class DataServiceImpl implements DataService {
             }
         }
 
-        DataEntity savedDataEntity = dataRepository.save(setUpEntity(data));
+        DataEntity savedDataEntity = dataRepository.save(setUpDataEntity(data));
         log.info("Data saved: {}", savedDataEntity);
         return savedDataEntity;
     }
@@ -94,6 +107,25 @@ public class DataServiceImpl implements DataService {
      */
     public List<Data> findByVisibility(DataVisibility visibility) {
         return dataRepository.findByVisibility(visibility).stream().collect(Collectors.toList());
+    }
+
+    /**
+     * Save resource to a data set.
+     *
+     * @param   id              data set id
+     * @param   dataResource    data resource to save
+     * @param   claims          authenticated credentials
+     * @return  data resource
+     */
+    @Transactional
+    public Data saveResource(Long id, DataResource dataResource, Claims claims) {
+        DataEntity dataEntity = (DataEntity) getOne(id);
+        checkPermissions(dataEntity, claims);
+
+        dataEntity.getResources().add(setUpResourceEntity(dataResource));
+        DataEntity savedDataEntity = dataRepository.save(dataEntity);
+        log.info("Data saved: {}", savedDataEntity);
+        return savedDataEntity;
     }
 
 }

@@ -75,13 +75,25 @@ public class DataController {
     }
 
     // Create a data set
-    @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
+    @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE, path = "/")
     @ResponseStatus(HttpStatus.CREATED)
     public Data add(@RequestBody @Valid DataInfo dataInfo, @AuthenticationPrincipal Object claims) {
         if (claims == null || !(claims instanceof Claims)) {
             throw new ForbiddenException();
         }
         return new DataInfo(dataService.save(dataInfo));
+    }
+
+    // Add a resource to a data set
+    @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE, path = "/{id}/resources")
+    @ResponseStatus(HttpStatus.CREATED)
+    public Data addResource(@PathVariable String id,
+                                    @RequestBody @Valid DataResourceInfo dataResourceInfo,
+                                    @AuthenticationPrincipal Object claims) {
+        if (claims == null || !(claims instanceof Claims)) {
+            throw new ForbiddenException();
+        }
+        return new DataInfo(dataService.saveResource(Long.getLong(id), dataResourceInfo, (Claims) claims));
     }
 
 }
