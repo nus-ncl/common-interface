@@ -6,6 +6,7 @@ import sg.ncl.common.authentication.Role;
 import sg.ncl.common.exception.base.ForbiddenException;
 import sg.ncl.common.jwt.JwtToken;
 import sg.ncl.service.data.domain.Data;
+import sg.ncl.service.data.domain.DataAccessibility;
 
 import java.util.List;
 
@@ -35,6 +36,37 @@ public class Validator {
             log.warn("Must be either admin or owner to add data");
             throw new ForbiddenException();
         }
+    }
+
+    public static void checkAccessibility(final Data data, final Claims claims) {
+        if (data.getAccessibility().equals(DataAccessibility.RESTRICTED)) {
+            if (claims == null) {
+                log.warn("Restricted resources for public data set");
+                throw new ForbiddenException();
+            }
+
+            if (!(claims.get(JwtToken.KEY) instanceof List<?>)) {
+                log.warn("Bad claims type found: {}", claims);
+                throw new ForbiddenException();
+            }
+
+            log.info("Id of requester from web: {}", claims.getSubject());
+            log.info("Role of requester from web: {}", claims.get(JwtToken.KEY));
+            String contextUserId = claims.getSubject();
+
+            if (!isContributor(data, contextUserId) && !isApprovedUser(data, contextUserId)) {
+                throw new ForbiddenException();
+            }
+        }
+    }
+
+    private static boolean isContributor(Data data, String userId) {
+        return userId.equals(data.getContributorId());
+    }
+
+    private static boolean isApprovedUser(Data data, String userId) {
+        List<String> approvedUsers = data.getApprovedUsers();
+        return approvedUsers.stream().anyMatch(o -> o.equals(userId));
     }
 
 }

@@ -8,6 +8,7 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import sg.ncl.common.exception.base.ForbiddenException;
 import sg.ncl.service.data.domain.Data;
+import sg.ncl.service.data.domain.DataResource;
 import sg.ncl.service.data.domain.DataService;
 import sg.ncl.service.data.domain.DataVisibility;
 
@@ -84,12 +85,19 @@ public class DataController {
         return new DataInfo(dataService.save(dataInfo));
     }
 
+    // Download resource in a data set
+    @GetMapping(path = "/{did}/resources/{rid}")
+    @ResponseStatus(HttpStatus.OK)
+    public DataResource getResource(@PathVariable String did, @PathVariable String rid, @AuthenticationPrincipal Object claims) {
+        return dataService.findResourceById(Long.getLong(did), Long.getLong(rid), (Claims) claims);
+    }
+
     // Add a resource to a data set
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE, path = "/{id}/resources")
     @ResponseStatus(HttpStatus.CREATED)
     public Data addResource(@PathVariable String id,
-                                    @RequestBody @Valid DataResourceInfo dataResourceInfo,
-                                    @AuthenticationPrincipal Object claims) {
+                            @RequestBody @Valid DataResourceInfo dataResourceInfo,
+                            @AuthenticationPrincipal Object claims) {
         if (claims == null || !(claims instanceof Claims)) {
             throw new ForbiddenException();
         }

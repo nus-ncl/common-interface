@@ -17,6 +17,8 @@ public interface DataService {
 
     List<Data> findByVisibility(DataVisibility visibility);
 
+    DataResource findResourceById(Long did, Long rid, Claims claims);
+
     Data saveResource(Long id, DataResource dataResource, Claims claims);
 
 }

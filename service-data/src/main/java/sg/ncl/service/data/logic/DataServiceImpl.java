@@ -18,6 +18,7 @@ import javax.validation.constraints.NotNull;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import static sg.ncl.service.data.validations.Validator.checkAccessibility;
 import static sg.ncl.service.data.validations.Validator.checkPermissions;
 
 /**
@@ -107,6 +108,20 @@ public class DataServiceImpl implements DataService {
      */
     public List<Data> findByVisibility(DataVisibility visibility) {
         return dataRepository.findByVisibility(visibility).stream().collect(Collectors.toList());
+    }
+
+    /**
+     * Get a data set resource.
+     *
+     * @param   did             data set id
+     * @param   rid             resource id
+     * @return  data resource
+     */
+    public DataResource findResourceById(Long did, Long rid, Claims claims) {
+        DataEntity dataEntity = (DataEntity) getOne(did);
+        checkAccessibility(dataEntity, claims);
+        List<DataResourceEntity> dataResourceEntities = dataEntity.getResources();
+        return dataResourceEntities.stream().filter(o -> o.getId().equals(rid)).findFirst().orElse(null);
     }
 
     /**
