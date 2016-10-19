@@ -11,6 +11,10 @@ public interface DataService {
 
     Data save(Data data);
 
+    Data save(Long id, Data data, Claims claims);
+
+    Data delete(Long id, Claims claims);
+
     Data getOne(Long id);
 
     List<Data> getAll();

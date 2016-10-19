@@ -85,6 +85,26 @@ public class DataController {
         return new DataInfo(dataService.save(dataInfo));
     }
 
+    // Update a data set
+    @PutMapping(path = "/{id}")
+    @ResponseStatus(HttpStatus.OK)
+    public Data update(@PathVariable String id, @RequestBody @Valid DataInfo dataInfo, @AuthenticationPrincipal Object claims) {
+        if (claims == null || !(claims instanceof Claims)) {
+            throw new ForbiddenException();
+        }
+        return new DataInfo(dataService.save(Long.getLong(id), dataInfo, (Claims) claims));
+    }
+
+    // Delete a data set
+    @DeleteMapping(path = "/{id}")
+    @ResponseStatus(HttpStatus.OK)
+    public Data remove(@PathVariable String id, @AuthenticationPrincipal Object claims) {
+        if (claims == null || !(claims instanceof Claims)) {
+            throw new ForbiddenException();
+        }
+        return new DataInfo(dataService.delete(Long.getLong(id), (Claims) claims));
+    }
+
     // Download resource in a data set
     @GetMapping(path = "/{did}/resources/{rid}")
     @ResponseStatus(HttpStatus.OK)

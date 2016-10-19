@@ -35,8 +35,14 @@ public class DataServiceImpl implements DataService {
         this.dataRepository = dataRepository;
     }
 
-    private DataEntity setUpDataEntity(Data data) {
-        DataEntity dataEntity = new DataEntity();
+    private DataEntity setUpDataEntity(Data data, DataEntity... dataEntities) {
+        DataEntity dataEntity;
+
+        if (dataEntities.length > 0) {
+            dataEntity = dataEntities[0];
+        } else {
+            dataEntity = new DataEntity();
+        }
 
         dataEntity.setName(data.getName());
         dataEntity.setDescription(data.getDescription());
@@ -56,7 +62,7 @@ public class DataServiceImpl implements DataService {
     }
 
     /**
-     * Save details about a data set
+     * Save details about a new data set
      *
      * @param   data    the data object passed from the web service
      * @return  a data set
@@ -80,6 +86,42 @@ public class DataServiceImpl implements DataService {
         DataEntity savedDataEntity = dataRepository.save(setUpDataEntity(data));
         log.info("Data saved: {}", savedDataEntity);
         return savedDataEntity;
+    }
+
+    /**
+     * Save details about an existing data set
+     *
+     * @param   id      data set id
+     * @param   data    the data object passed from the web service
+     * @param   claims  authenticated credentials
+     * @return  a data set
+     */
+    @Transactional
+    public Data save(Long id, Data data, Claims claims) {
+        DataEntity dataEntity = (DataEntity) getOne(id);
+        checkPermissions(dataEntity, claims);
+
+        DataEntity savedDataEntity = dataRepository.save(setUpDataEntity(data, dataEntity));
+        log.info("Data saved: {}", savedDataEntity);
+        return savedDataEntity;
+    }
+
+    /**
+     * Delete a data set
+     *
+     * @param   id      data set id
+     * @param   claims  authenticated credentials
+     * @return  a data set
+     */
+    @Transactional
+    public Data delete(Long id, Claims claims) {
+        DataEntity dataEntity = (DataEntity) getOne(id);
+        checkPermissions(dataEntity, claims);
+
+        dataRepository.delete(id);
+        log.info("Data deleted: {}", dataEntity.getName());
+
+        return dataEntity;
     }
 
     /**
@@ -115,6 +157,7 @@ public class DataServiceImpl implements DataService {
      *
      * @param   did             data set id
      * @param   rid             resource id
+     * @param   claims          authenticated credentials
      * @return  data resource
      */
     public DataResource findResourceById(Long did, Long rid, Claims claims) {
