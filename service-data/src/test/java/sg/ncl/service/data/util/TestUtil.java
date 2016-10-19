@@ -3,11 +3,9 @@ package sg.ncl.service.data.util;
 import org.apache.commons.lang3.RandomStringUtils;
 import sg.ncl.service.data.data.jpa.DataEntity;
 import sg.ncl.service.data.data.jpa.DataResourceEntity;
-import sg.ncl.service.data.data.jpa.DataStatisticsEntity;
 import sg.ncl.service.data.domain.DataAccessibility;
 import sg.ncl.service.data.domain.DataVisibility;
 
-import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -39,17 +37,6 @@ public class TestUtil {
         return entity;
     }
 
-    public static DataEntity getDataEntityWithStatistics() {
-        DataEntity entity = getDataEntity("dataset", "description", "ncl001", DataAccessibility.OPEN, DataVisibility.PUBLIC);
-
-        DataStatisticsEntity statisticsEntity = getDataStatisticsEntity();
-        List<DataStatisticsEntity> statistics = new ArrayList<>();
-        statistics.add(statisticsEntity);
-        entity.setStatistics(statistics);
-
-        return entity;
-    }
-
     public static DataEntity getDataEntity(final String name,
                                            final String description,
                                            final String ownerId,
@@ -70,14 +57,6 @@ public class TestUtil {
     public static DataResourceEntity getDataResourceEntity() {
         DataResourceEntity entity = new DataResourceEntity();
         entity.setUri("http://" + RandomStringUtils.randomAlphanumeric(20));
-
-        return entity;
-    }
-
-    public static DataStatisticsEntity getDataStatisticsEntity() {
-        DataStatisticsEntity entity = new DataStatisticsEntity();
-        entity.setUserId(RandomStringUtils.randomAlphanumeric(20));
-        entity.setDate(ZonedDateTime.now());
 
         return entity;
     }

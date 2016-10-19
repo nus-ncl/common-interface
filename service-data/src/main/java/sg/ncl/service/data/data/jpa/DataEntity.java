@@ -63,10 +63,6 @@ public class DataEntity extends AbstractEntity implements Data {
     @JoinColumn(name = "data_id")
     private List<DataResourceEntity> resources = new ArrayList<>();
 
-    @OneToMany(cascade = CascadeType.ALL)
-    @JoinColumn(name = "data_id")
-    private List<DataStatisticsEntity> statistics = new ArrayList<>();
-
     @ElementCollection
     @CollectionTable(name = "data_users", joinColumns = @JoinColumn(name = "data_id", nullable = false, updatable = false), indexes = {@Index(columnList = "data_id"), @Index(columnList = "user_id")}, uniqueConstraints = @UniqueConstraint(columnNames = {"data_id", "user_id"}))
     @Column(name = "user_id", nullable = false, updatable = false)
@@ -120,7 +116,6 @@ public class DataEntity extends AbstractEntity implements Data {
                 ", accessibility=" + accessibility +
                 ", resources=" + resources +
                 ", approvedUsers=" + approvedUsers +
-                ", statistics=" + statistics +
                 "} " + super.toString();
     }
 }

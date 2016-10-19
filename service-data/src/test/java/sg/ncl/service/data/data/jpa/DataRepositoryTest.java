@@ -15,7 +15,6 @@ import static sg.ncl.common.test.Checks.checkException;
 import static sg.ncl.service.data.util.TestUtil.getDataEntity;
 import static sg.ncl.service.data.util.TestUtil.getDataEntityWithApprovedUsers;
 import static sg.ncl.service.data.util.TestUtil.getDataEntityWithResources;
-import static sg.ncl.service.data.util.TestUtil.getDataEntityWithStatistics;
 
 /**
  * Created by dcszwang on 10/6/2016.
@@ -124,19 +123,5 @@ public class DataRepositoryTest extends AbstractTest {
         assertThat(one).isNotNull();
         assertThat(one.getApprovedUsers().size()).isEqualTo(1);
         assertThat(one.getApprovedUsers().get(0)).isEqualTo(entity.getApprovedUsers().get(0));
-    }
-
-    @Test
-    public void testSaveDownloadEntity() throws Exception {
-        final DataEntity entity = getDataEntityWithStatistics();
-        final DataEntity savedEntity = repository.saveAndFlush(entity);
-
-        final DataEntity one = repository.findOne(savedEntity.getId());
-
-        assertThat(one).isNotNull();
-        assertThat(one.getStatistics().size()).isEqualTo(1);
-        assertThat(one.getStatistics().get(0).getId()).isNotNull();
-        assertThat(one.getStatistics().get(0).getDate()).isEqualTo(entity.getStatistics().get(0).getDate());
-        assertThat(one.getStatistics().get(0).getUserId()).isEqualTo(entity.getStatistics().get(0).getUserId());
     }
 }

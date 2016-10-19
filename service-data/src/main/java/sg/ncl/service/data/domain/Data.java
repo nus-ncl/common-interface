@@ -23,5 +23,4 @@ public interface Data {
 
     List<String> getApprovedUsers();
 
-    List<? extends DataStatistics> getStatistics();
 }

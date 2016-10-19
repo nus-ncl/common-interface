@@ -155,25 +155,6 @@ public class DataEntityTest {
     }
 
     @Test
-    public void testGetDownloadHistory() {
-        DataEntity entity = new DataEntity();
-        assertThat(entity.getStatistics().size()).isEqualTo(0);
-    }
-
-    @Test
-    public void testSetDownloadHistory() {
-        DataEntity dataEntity = new DataEntity();
-        DataStatisticsEntity statisticsEntity = new DataStatisticsEntity();
-        List<DataStatisticsEntity> statistics = new ArrayList<>();
-        statistics.add(statisticsEntity);
-        dataEntity.setStatistics(statistics);
-
-        List<DataStatisticsEntity> retStatistics = dataEntity.getStatistics();
-        assertThat(retStatistics.size()).isEqualTo(1);
-        assertThat(retStatistics.get(0)).isEqualTo(statisticsEntity);
-    }
-
-    @Test
     public void testEquals() {
         DataEntity one = new DataEntity();
         DataEntity two = new DataEntity();
