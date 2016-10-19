@@ -12,4 +12,6 @@ public interface DataRepository extends JpaRepository<DataEntity, Long> {
 
     List<DataEntity> findByVisibility(DataVisibility visibility);
 
+    List<DataEntity> findByName(String name);
+
 }

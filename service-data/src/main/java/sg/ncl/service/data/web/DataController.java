@@ -12,6 +12,7 @@ import sg.ncl.service.data.domain.DataService;
 import sg.ncl.service.data.domain.DataVisibility;
 
 import javax.inject.Inject;
+import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -71,6 +72,16 @@ public class DataController {
             throw new ForbiddenException();
         }
         return result;
+    }
+
+    // Create a data set
+    @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
+    @ResponseStatus(HttpStatus.CREATED)
+    public Data add(@RequestBody @Valid DataInfo dataInfo, @AuthenticationPrincipal Object claims) {
+        if (claims == null || !(claims instanceof Claims)) {
+            throw new ForbiddenException();
+        }
+        return new DataInfo(dataService.save(dataInfo));
     }
 
 }

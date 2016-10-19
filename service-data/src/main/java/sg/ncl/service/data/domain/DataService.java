@@ -7,6 +7,8 @@ import java.util.List;
  */
 public interface DataService {
 
+    Data save(Data data);
+
     Data getOne(Long id);
 
     List<Data> getAll();
