@@ -4,6 +4,7 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.test.context.TestPropertySource;
 import sg.ncl.service.data.AbstractTest;
 
 
@@ -19,6 +20,7 @@ import static sg.ncl.service.data.util.TestUtil.getDataEntityWithStatistics;
 /**
  * Created by dcszwang on 10/6/2016.
  */
+@TestPropertySource(properties = "flyway.enabled=false")
 public class DataRepositoryTest extends AbstractTest {
 
     @Rule
