@@ -3,6 +3,7 @@ package sg.ncl.service.data.data.jpa;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.junit.Test;
 import sg.ncl.service.data.domain.DataAccessibility;
+import sg.ncl.service.data.domain.DataResource;
 import sg.ncl.service.data.domain.DataVisibility;
 
 import java.util.ArrayList;
@@ -118,7 +119,7 @@ public class DataEntityTest {
         resources.add(resourceEntity);
         dataEntity.setResources(resources);
 
-        List<DataResourceEntity> retResources = dataEntity.getResources();
+        List<? extends DataResource> retResources = dataEntity.getResources();
         assertThat(retResources.size()).isEqualTo(1);
         assertThat(retResources.get(0)).isEqualTo(resourceEntity);
     }

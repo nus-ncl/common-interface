@@ -19,7 +19,7 @@ public interface Data {
 
     DataAccessibility getAccessibility();
 
-    List<? extends DataResource> getResources();
+    List<DataResource> getResources();
 
     List<String> getApprovedUsers();
 

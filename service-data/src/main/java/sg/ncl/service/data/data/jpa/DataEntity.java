@@ -7,6 +7,7 @@ import org.hibernate.annotations.Type;
 import sg.ncl.common.jpa.AbstractEntity;
 import sg.ncl.service.data.domain.Data;
 import sg.ncl.service.data.domain.DataAccessibility;
+import sg.ncl.service.data.domain.DataResource;
 import sg.ncl.service.data.domain.DataVisibility;
 
 import javax.persistence.CascadeType;
@@ -84,6 +85,13 @@ public class DataEntity extends AbstractEntity implements Data {
         }
         approvedUsers.remove(userId);
         log.info("User {} removed from the approved list for data {}", userId, name);
+    }
+
+    @Override
+    public List<DataResource> getResources() {
+        List<DataResource> dataResources = new ArrayList<>();
+        dataResources.addAll(resources);
+        return dataResources;
     }
 
     @Override
