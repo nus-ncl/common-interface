@@ -59,7 +59,7 @@ public class DataEntity extends AbstractEntity implements Data {
     @Enumerated(EnumType.STRING)
     private DataAccessibility accessibility = DataAccessibility.OPEN;
 
-    @OneToMany
+    @OneToMany(cascade = CascadeType.ALL)
     @JoinColumn(name = "data_id")
     private List<DataResourceEntity> resources = new ArrayList<>();
 
