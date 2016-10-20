@@ -5,8 +5,6 @@ package sg.ncl.service.data.domain;
  */
 public interface DataResource {
 
-    Long getId();
-
     String getUri();
 
 }

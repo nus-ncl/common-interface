@@ -3,9 +3,15 @@ package sg.ncl.service.data.data.jpa;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
+import org.junit.runner.RunWith;
+import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
+import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.TestPropertySource;
-import sg.ncl.service.data.AbstractTest;
+import org.springframework.test.context.junit4.SpringRunner;
+import sg.ncl.service.data.DataApplication;
 
 
 import javax.inject.Inject;
@@ -19,8 +25,12 @@ import static sg.ncl.service.data.util.TestUtil.getDataEntityWithResources;
 /**
  * Created by dcszwang on 10/6/2016.
  */
+@RunWith(SpringRunner.class)
+@DataJpaTest
+@EnableJpaAuditing
+@ContextConfiguration(classes = DataRepository.class)
 @TestPropertySource(properties = "flyway.enabled=false")
-public class DataRepositoryTest extends AbstractTest {
+public class DataRepositoryTest {
 
     @Rule
     public final ExpectedException exception = ExpectedException.none();
@@ -109,8 +119,11 @@ public class DataRepositoryTest extends AbstractTest {
 
         assertThat(one).isNotNull();
         assertThat(one.getResources().size()).isEqualTo(1);
-        assertThat(one.getResources().get(0).getId()).isNotNull();
-        assertThat(one.getResources().get(0).getUri()).isEqualTo(entity.getResources().get(0).getUri());
+
+        final DataResourceEntity savedDataResourceEntity = (DataResourceEntity) one.getResources().get(0);
+
+        assertThat(savedDataResourceEntity.getId()).isNotNull();
+        assertThat(savedDataResourceEntity.getUri()).isEqualTo(entity.getResources().get(0).getUri());
     }
 
     @Test
