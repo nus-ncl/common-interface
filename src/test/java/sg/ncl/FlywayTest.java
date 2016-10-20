@@ -68,6 +68,12 @@ public class FlywayTest {
                 Integer.class)).isEqualTo(1);
         assertThat(this.template.queryForObject("SELECT COUNT(*) from " + SCHEMA + ".users_teams",
                 Integer.class)).isEqualTo(1);
+        assertThat(this.template.queryForObject("SELECT COUNT(*) from " + SCHEMA + ".data",
+                Integer.class)).isEqualTo(0);
+        assertThat(this.template.queryForObject("SELECT COUNT(*) from " + SCHEMA + ".data_resources",
+                Integer.class)).isEqualTo(0);
+        assertThat(this.template.queryForObject("SELECT COUNT(*) from " + SCHEMA + ".data_users",
+                Integer.class)).isEqualTo(0);
 
         List<Map<String, Object>> results = this.template.queryForList("SHOW COLUMNS FROM " + SCHEMA + ".addresses");
         assertThat(results.get(8).toString().toUpperCase()).contains("FIELD=CREATED_DATE, TYPE=TIMESTAMP");
