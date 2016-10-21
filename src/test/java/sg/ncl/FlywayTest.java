@@ -1175,7 +1175,10 @@ public class FlywayTest {
         assertThat((String) userTeamsConstraints.get(0).get("COLUMN_LIST")).isEqualTo("USER_ID");
         assertThat((String) userTeamsConstraints.get(1).get("CONSTRAINT_TYPE")).isEqualTo("UNIQUE");
         assertThat((String) userTeamsConstraints.get(1).get("COLUMN_LIST")).isEqualTo("USER_ID,TEAM_ID");
+    }
 
+    @Test
+    public void testDataInsertion() throws Exception {
         // make sure that initial data has been added into tables
         assertThat(this.template.queryForObject("SELECT COUNT(*) from " + SCHEMA + ".addresses",
                 Integer.class)).isEqualTo(1);
