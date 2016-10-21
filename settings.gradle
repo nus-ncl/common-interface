@@ -6,6 +6,7 @@ include 'common'
 include 'common-test'
 
 include 'service-authentication'
+include 'service-data'
 include 'service-experiment'
 include 'service-mail'
 include 'service-realization'
