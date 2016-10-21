@@ -50,55 +50,59 @@ public class FlywayTest {
         this.template = new JdbcTemplate(dataSource);
         this.flyway = new Flyway();
         this.flyway.setDataSource(dataSource);
+        this.flyway.migrate();
     }
 
     @Test
-    public void testFlywayMigration() throws Exception {
-
-        flyway.migrate();
-
+    public void testNumOfTables() throws Exception {
         // make sure that we have the exact number of tables
         List<Map<String, Object>> tableNames = this.template.queryForList("SHOW TABLES FROM " + SCHEMA);
         assertThat(tableNames.size()).isEqualTo(18);
+    }
 
+    @Test
+    public void testTableNames() throws Exception {
         // make sure all tables name matches
-        assertThat(tableNames.get(0).get("TABLE_NAME")).isEqualTo(ADDRESSES);
-        assertThat(tableNames.get(0).get("TABLE_SCHEMA")).isEqualTo(SCHEMA);
-        assertThat(tableNames.get(1).get("TABLE_NAME")).isEqualTo(CREDENTIALS);
-        assertThat(tableNames.get(1).get("TABLE_SCHEMA")).isEqualTo(SCHEMA);
-        assertThat(tableNames.get(2).get("TABLE_NAME")).isEqualTo(CREDENTIALS_ROLES);
-        assertThat(tableNames.get(2).get("TABLE_SCHEMA")).isEqualTo(SCHEMA);
-        assertThat(tableNames.get(3).get("TABLE_NAME")).isEqualTo(DATA);
-        assertThat(tableNames.get(3).get("TABLE_SCHEMA")).isEqualTo(SCHEMA);
-        assertThat(tableNames.get(4).get("TABLE_NAME")).isEqualTo(DATA_RESOURCES);
-        assertThat(tableNames.get(4).get("TABLE_SCHEMA")).isEqualTo(SCHEMA);
-        assertThat(tableNames.get(5).get("TABLE_NAME")).isEqualTo(DATA_USERS);
-        assertThat(tableNames.get(5).get("TABLE_SCHEMA")).isEqualTo(SCHEMA);
-        assertThat(tableNames.get(6).get("TABLE_NAME")).isEqualTo(DETERLAB_PROJECT);
-        assertThat(tableNames.get(6).get("TABLE_SCHEMA")).isEqualTo(SCHEMA);
-        assertThat(tableNames.get(7).get("TABLE_NAME")).isEqualTo(DETERLAB_USER);
-        assertThat(tableNames.get(7).get("TABLE_SCHEMA")).isEqualTo(SCHEMA);
-        assertThat(tableNames.get(8).get("TABLE_NAME")).isEqualTo(EMAIL_RETRIES);
-        assertThat(tableNames.get(8).get("TABLE_SCHEMA")).isEqualTo(SCHEMA);
-        assertThat(tableNames.get(9).get("TABLE_NAME")).isEqualTo(EXPERIMENTS);
-        assertThat(tableNames.get(9).get("TABLE_SCHEMA")).isEqualTo(SCHEMA);
-        assertThat(tableNames.get(10).get("TABLE_NAME")).isEqualTo(LOGIN_ACTIVITIES);
-        assertThat(tableNames.get(10).get("TABLE_SCHEMA")).isEqualTo(SCHEMA);
-        assertThat(tableNames.get(11).get("TABLE_NAME")).isEqualTo(REALIZATIONS);
-        assertThat(tableNames.get(11).get("TABLE_SCHEMA")).isEqualTo(SCHEMA);
-        assertThat(tableNames.get(12).get("TABLE_NAME")).isEqualTo(REGISTRATIONS);
-        assertThat(tableNames.get(12).get("TABLE_SCHEMA")).isEqualTo(SCHEMA);
-        assertThat(tableNames.get(13).get("TABLE_NAME")).isEqualTo(TEAM_MEMBERS);
-        assertThat(tableNames.get(13).get("TABLE_SCHEMA")).isEqualTo(SCHEMA);
-        assertThat(tableNames.get(14).get("TABLE_NAME")).isEqualTo(TEAMS);
-        assertThat(tableNames.get(14).get("TABLE_SCHEMA")).isEqualTo(SCHEMA);
-        assertThat(tableNames.get(15).get("TABLE_NAME")).isEqualTo(USER_DETAILS);
-        assertThat(tableNames.get(15).get("TABLE_SCHEMA")).isEqualTo(SCHEMA);
-        assertThat(tableNames.get(16).get("TABLE_NAME")).isEqualTo(USERS);
-        assertThat(tableNames.get(16).get("TABLE_SCHEMA")).isEqualTo(SCHEMA);
-        assertThat(tableNames.get(17).get("TABLE_NAME")).isEqualTo(USERS_TEAMS);
-        assertThat(tableNames.get(17).get("TABLE_SCHEMA")).isEqualTo(SCHEMA);
+        List<Map<String, Object>> tableNames = this.template.queryForList("SHOW TABLES FROM " + SCHEMA);
+        assertThat((String) tableNames.get(0).get("TABLE_NAME")).isEqualTo(ADDRESSES);
+        assertThat((String) tableNames.get(0).get("TABLE_SCHEMA")).isEqualTo(SCHEMA);
+        assertThat((String) tableNames.get(1).get("TABLE_NAME")).isEqualTo(CREDENTIALS);
+        assertThat((String) tableNames.get(1).get("TABLE_SCHEMA")).isEqualTo(SCHEMA);
+        assertThat((String) tableNames.get(2).get("TABLE_NAME")).isEqualTo(CREDENTIALS_ROLES);
+        assertThat((String) tableNames.get(2).get("TABLE_SCHEMA")).isEqualTo(SCHEMA);
+        assertThat((String) tableNames.get(3).get("TABLE_NAME")).isEqualTo(DATA);
+        assertThat((String) tableNames.get(3).get("TABLE_SCHEMA")).isEqualTo(SCHEMA);
+        assertThat((String) tableNames.get(4).get("TABLE_NAME")).isEqualTo(DATA_RESOURCES);
+        assertThat((String) tableNames.get(4).get("TABLE_SCHEMA")).isEqualTo(SCHEMA);
+        assertThat((String) tableNames.get(5).get("TABLE_SCHEMA")).isEqualTo(SCHEMA);
+        assertThat((String) tableNames.get(6).get("TABLE_NAME")).isEqualTo(DETERLAB_PROJECT);
+        assertThat((String) tableNames.get(6).get("TABLE_SCHEMA")).isEqualTo(SCHEMA);
+        assertThat((String) tableNames.get(7).get("TABLE_NAME")).isEqualTo(DETERLAB_USER);
+        assertThat((String) tableNames.get(7).get("TABLE_SCHEMA")).isEqualTo(SCHEMA);
+        assertThat((String) tableNames.get(8).get("TABLE_NAME")).isEqualTo(EMAIL_RETRIES);
+        assertThat((String) tableNames.get(8).get("TABLE_SCHEMA")).isEqualTo(SCHEMA);
+        assertThat((String) tableNames.get(9).get("TABLE_NAME")).isEqualTo(EXPERIMENTS);
+        assertThat((String) tableNames.get(9).get("TABLE_SCHEMA")).isEqualTo(SCHEMA);
+        assertThat((String) tableNames.get(10).get("TABLE_NAME")).isEqualTo(LOGIN_ACTIVITIES);
+        assertThat((String) tableNames.get(10).get("TABLE_SCHEMA")).isEqualTo(SCHEMA);
+        assertThat((String) tableNames.get(11).get("TABLE_NAME")).isEqualTo(REALIZATIONS);
+        assertThat((String) tableNames.get(11).get("TABLE_SCHEMA")).isEqualTo(SCHEMA);
+        assertThat((String) tableNames.get(12).get("TABLE_NAME")).isEqualTo(REGISTRATIONS);
+        assertThat((String) tableNames.get(12).get("TABLE_SCHEMA")).isEqualTo(SCHEMA);
+        assertThat((String) tableNames.get(13).get("TABLE_NAME")).isEqualTo(TEAM_MEMBERS);
+        assertThat((String) tableNames.get(13).get("TABLE_SCHEMA")).isEqualTo(SCHEMA);
+        assertThat((String) tableNames.get(14).get("TABLE_NAME")).isEqualTo(TEAMS);
+        assertThat((String) tableNames.get(14).get("TABLE_SCHEMA")).isEqualTo(SCHEMA);
+        assertThat((String) tableNames.get(15).get("TABLE_NAME")).isEqualTo(USER_DETAILS);
+        assertThat((String) tableNames.get(15).get("TABLE_SCHEMA")).isEqualTo(SCHEMA);
+        assertThat((String) tableNames.get(16).get("TABLE_NAME")).isEqualTo(USERS);
+        assertThat((String) tableNames.get(16).get("TABLE_SCHEMA")).isEqualTo(SCHEMA);
+        assertThat((String) tableNames.get(17).get("TABLE_NAME")).isEqualTo(USERS_TEAMS);
+        assertThat((String) tableNames.get(17).get("TABLE_SCHEMA")).isEqualTo(SCHEMA);
+    }
 
+    @Test
+    public void testAddressesTable() throws Exception {
         // make sure 'addresses' table has expected number of columns
         List<Map<String, Object>> addressesTable = this.template.queryForList("SHOW COLUMNS FROM " + SCHEMA + "." + ADDRESSES);
         assertThat(addressesTable.size()).isEqualTo(10);
@@ -158,56 +162,60 @@ public class FlywayTest {
 
         assertThat((String) addressesConstraints.get(0).get("CONSTRAINT_TYPE")).isEqualTo("PRIMARY KEY");
         assertThat((String) addressesConstraints.get(0).get("COLUMN_LIST")).isEqualTo("ID");
+    }
 
+        @Test
+        public void testCredentialsTable() throws Exception {
+            // make sure 'credentials' table has expected number of columns
+            List<Map<String, Object>> credentialsTable = this.template.queryForList("SHOW COLUMNS FROM " + SCHEMA + "." + CREDENTIALS);
+            assertThat(credentialsTable.size()).isEqualTo(7);
 
-        // make sure 'credentials' table has expected number of columns
-        List<Map<String, Object>> credentialsTable = this.template.queryForList("SHOW COLUMNS FROM " + SCHEMA + "." + CREDENTIALS);
-        assertThat(credentialsTable.size()).isEqualTo(7);
+            // make sure 'credentials' table has expected column name and type
+            assertThat((String) credentialsTable.get(0).get("FIELD")).isEqualTo("id");
+            assertThat((String) credentialsTable.get(0).get("TYPE")).isEqualTo("varchar(255)");
+            assertThat((String) credentialsTable.get(0).get("NULL")).isEqualTo("NO");
+            assertThat((String) credentialsTable.get(0).get("KEY")).isEqualTo("PRI");
 
-        // make sure 'credentials' table has expected column name and type
-        assertThat((String) credentialsTable.get(0).get("FIELD")).isEqualTo("id");
-        assertThat((String) credentialsTable.get(0).get("TYPE")).isEqualTo("varchar(255)");
-        assertThat((String) credentialsTable.get(0).get("NULL")).isEqualTo("NO");
-        assertThat((String) credentialsTable.get(0).get("KEY")).isEqualTo("PRI");
+            assertThat((String) credentialsTable.get(1).get("FIELD")).isEqualTo("version");
+            assertThat((String) credentialsTable.get(1).get("TYPE")).contains("bigint");
+            assertThat((String) credentialsTable.get(1).get("NULL")).isEqualTo("NO");
+            assertThat((String) credentialsTable.get(1).get("KEY")).isEmpty();
 
-        assertThat((String) credentialsTable.get(1).get("FIELD")).isEqualTo("version");
-        assertThat((String) credentialsTable.get(1).get("TYPE")).contains("bigint");
-        assertThat((String) credentialsTable.get(1).get("NULL")).isEqualTo("NO");
-        assertThat((String) credentialsTable.get(1).get("KEY")).isEmpty();
+            assertThat((String) credentialsTable.get(2).get("FIELD")).isEqualTo("password");
+            assertThat((String) credentialsTable.get(2).get("TYPE")).isEqualTo("varchar(255)");
+            assertThat((String) credentialsTable.get(2).get("NULL")).isEqualTo("NO");
+            assertThat((String) credentialsTable.get(2).get("KEY")).isEmpty();
 
-        assertThat((String) credentialsTable.get(2).get("FIELD")).isEqualTo("password");
-        assertThat((String) credentialsTable.get(2).get("TYPE")).isEqualTo("varchar(255)");
-        assertThat((String) credentialsTable.get(2).get("NULL")).isEqualTo("NO");
-        assertThat((String) credentialsTable.get(2).get("KEY")).isEmpty();
+            assertThat((String) credentialsTable.get(3).get("FIELD")).isEqualTo("status");
+            assertThat((String) credentialsTable.get(3).get("TYPE")).isEqualTo("varchar(255)");
+            assertThat((String) credentialsTable.get(3).get("NULL")).isEqualTo("NO");
+            assertThat((String) credentialsTable.get(3).get("KEY")).isEmpty();
 
-        assertThat((String) credentialsTable.get(3).get("FIELD")).isEqualTo("status");
-        assertThat((String) credentialsTable.get(3).get("TYPE")).isEqualTo("varchar(255)");
-        assertThat((String) credentialsTable.get(3).get("NULL")).isEqualTo("NO");
-        assertThat((String) credentialsTable.get(3).get("KEY")).isEmpty();
+            assertThat((String) credentialsTable.get(4).get("FIELD")).isEqualTo("username");
+            assertThat((String) credentialsTable.get(4).get("TYPE")).isEqualTo("varchar(255)");
+            assertThat((String) credentialsTable.get(4).get("NULL")).isEqualTo("NO");
+            assertThat((String) credentialsTable.get(4).get("KEY")).isEqualTo("UNI");
 
-        assertThat((String) credentialsTable.get(4).get("FIELD")).isEqualTo("username");
-        assertThat((String) credentialsTable.get(4).get("TYPE")).isEqualTo("varchar(255)");
-        assertThat((String) credentialsTable.get(4).get("NULL")).isEqualTo("NO");
-        assertThat((String) credentialsTable.get(4).get("KEY")).isEqualTo("UNI");
+            assertThat((String) credentialsTable.get(5).get("FIELD")).isEqualTo("created_date");
+            assertThat((String) credentialsTable.get(5).get("TYPE")).contains("timestamp");
+            assertThat((String) credentialsTable.get(5).get("NULL")).isEqualTo("NO");
+            assertThat((String) credentialsTable.get(5).get("KEY")).isEmpty();
 
-        assertThat((String) credentialsTable.get(5).get("FIELD")).isEqualTo("created_date");
-        assertThat((String) credentialsTable.get(5).get("TYPE")).contains("timestamp");
-        assertThat((String) credentialsTable.get(5).get("NULL")).isEqualTo("NO");
-        assertThat((String) credentialsTable.get(5).get("KEY")).isEmpty();
+            assertThat((String) credentialsTable.get(6).get("FIELD")).isEqualTo("last_modified_date");
+            assertThat((String) credentialsTable.get(6).get("TYPE")).contains("timestamp");
+            assertThat((String) credentialsTable.get(6).get("NULL")).isEqualTo("NO");
+            assertThat((String) credentialsTable.get(6).get("KEY")).isEmpty();
 
-        assertThat((String) credentialsTable.get(6).get("FIELD")).isEqualTo("last_modified_date");
-        assertThat((String) credentialsTable.get(6).get("TYPE")).contains("timestamp");
-        assertThat((String) credentialsTable.get(6).get("NULL")).isEqualTo("NO");
-        assertThat((String) credentialsTable.get(6).get("KEY")).isEmpty();
+            List<Map<String, Object>> credentialsConstraints = this.template.queryForList("SELECT * FROM INFORMATION_SCHEMA.CONSTRAINTS WHERE TABLE_NAME = 'credentials'");
 
-        List<Map<String, Object>> credentialsConstraints = this.template.queryForList("SELECT * FROM INFORMATION_SCHEMA.CONSTRAINTS WHERE TABLE_NAME = 'credentials'");
+            assertThat((String) credentialsConstraints.get(0).get("CONSTRAINT_TYPE")).isEqualTo("PRIMARY KEY");
+            assertThat((String) credentialsConstraints.get(0).get("COLUMN_LIST")).isEqualTo("ID");
+            assertThat((String) credentialsConstraints.get(1).get("CONSTRAINT_TYPE")).isEqualTo("UNIQUE");
+            assertThat((String) credentialsConstraints.get(1).get("COLUMN_LIST")).isEqualTo("USERNAME");
+        }
 
-        assertThat((String) credentialsConstraints.get(0).get("CONSTRAINT_TYPE")).isEqualTo("PRIMARY KEY");
-        assertThat((String) credentialsConstraints.get(0).get("COLUMN_LIST")).isEqualTo("ID");
-        assertThat((String) credentialsConstraints.get(1).get("CONSTRAINT_TYPE")).isEqualTo("UNIQUE");
-        assertThat((String) credentialsConstraints.get(1).get("COLUMN_LIST")).isEqualTo("USERNAME");
-
-
+    @Test
+    public void testCredentialsRolesTable() throws Exception {
         // make sure 'credentials_roles' table has expected number of columns
         List<Map<String, Object>> credentialsRolesTable = this.template.queryForList("SHOW COLUMNS FROM " + SCHEMA + "." + CREDENTIALS_ROLES);
         assertThat(credentialsRolesTable.size()).isEqualTo(2);
@@ -228,8 +236,10 @@ public class FlywayTest {
         assertThat((String) credentialsRolesConstraints.get(0).get("COLUMN_LIST")).isEqualTo("CREDENTIALS_ID");
         assertThat((String) credentialsRolesConstraints.get(1).get("CONSTRAINT_TYPE")).isEqualTo("PRIMARY KEY");
         assertThat((String) credentialsRolesConstraints.get(1).get("COLUMN_LIST")).isEqualTo("CREDENTIALS_ID,ROLE");
+    }
 
-
+    @Test
+    public void testDataTable() throws Exception {
         // make sure 'data' table has expected number of columns
         List<Map<String, Object>> dataTable = this.template.queryForList("SHOW COLUMNS FROM " + SCHEMA + "." + DATA);
         assertThat(dataTable.size()).isEqualTo(9);
@@ -280,16 +290,16 @@ public class FlywayTest {
         assertThat((String) dataTable.get(8).get("NULL")).isEqualTo("NO");
         assertThat((String) dataTable.get(8).get("KEY")).isEmpty();
 
-
-
         List<Map<String, Object>> dataConstraints = this.template.queryForList("SELECT * FROM INFORMATION_SCHEMA.CONSTRAINTS WHERE TABLE_NAME = 'data'");
 
         assertThat((String) dataConstraints.get(1).get("CONSTRAINT_TYPE")).isEqualTo("PRIMARY KEY");
         assertThat((String) dataConstraints.get(1).get("COLUMN_LIST")).isEqualTo("ID");
         assertThat((String) dataConstraints.get(0).get("CONSTRAINT_TYPE")).isEqualTo("UNIQUE");
         assertThat((String) dataConstraints.get(0).get("COLUMN_LIST")).isEqualTo("NAME");
+    }
 
-
+    @Test
+    public void testDataResourcesTable() throws Exception {
         // make sure 'data_resources' table has expected number of columns
         List<Map<String, Object>> dataResourcesTable = this.template.queryForList("SHOW COLUMNS FROM " + SCHEMA + "." + DATA_RESOURCES);
         assertThat(dataResourcesTable.size()).isEqualTo(6);
@@ -331,8 +341,10 @@ public class FlywayTest {
         assertThat((String) dataResourcesConstraints.get(1).get("COLUMN_LIST")).isEqualTo("ID");
         assertThat((String) dataResourcesConstraints.get(0).get("CONSTRAINT_TYPE")).isEqualTo("REFERENTIAL");
         assertThat((String) dataResourcesConstraints.get(0).get("COLUMN_LIST")).isEqualTo("DATA_ID");
+    }
 
-
+    @Test
+    public void testDataUsersTable() throws Exception {
         // make sure 'data_users' table has expected number of columns
         List<Map<String, Object>> dataUsersTable = this.template.queryForList("SHOW COLUMNS FROM " + SCHEMA + "." + DATA_USERS);
         assertThat(dataUsersTable.size()).isEqualTo(2);
@@ -353,8 +365,10 @@ public class FlywayTest {
         assertThat((String) dataUsersConstraints.get(0).get("COLUMN_LIST")).isEqualTo("DATA_ID");
         assertThat((String) dataUsersConstraints.get(1).get("CONSTRAINT_TYPE")).isEqualTo("PRIMARY KEY");
         assertThat((String) dataUsersConstraints.get(1).get("COLUMN_LIST")).isEqualTo("DATA_ID,USER_ID");
+    }
 
-
+    @Test
+    public void testDeterlabProjectTable() throws Exception {
         // make sure 'deterlab_project' table has expected number of columns
         List<Map<String, Object>> deterlabProjectTable = this.template.queryForList("SHOW COLUMNS FROM " + SCHEMA + "." + DETERLAB_PROJECT);
         assertThat(deterlabProjectTable.size()).isEqualTo(6);
@@ -398,9 +412,10 @@ public class FlywayTest {
         assertThat((String) deterlabProjectConstraints.get(1).get("COLUMN_LIST")).isEqualTo("DETER_PROJECT_ID");
         assertThat((String) deterlabProjectConstraints.get(0).get("CONSTRAINT_TYPE")).isEqualTo("UNIQUE");
         assertThat((String) deterlabProjectConstraints.get(0).get("COLUMN_LIST")).isEqualTo("NCL_TEAM_ID");
+    }
 
-
-
+    @Test
+    public void testDeterlabUserTable() throws Exception {
         // make sure 'deterlab_user' table has expected number of columns
         List<Map<String, Object>> deterlabUserTable = this.template.queryForList("SHOW COLUMNS FROM " + SCHEMA + "." + DETERLAB_USER);
         assertThat(deterlabUserTable.size()).isEqualTo(6);
@@ -444,8 +459,10 @@ public class FlywayTest {
         assertThat((String) deterlabUserConstraints.get(2).get("COLUMN_LIST")).isEqualTo("DETER_USER_ID");
         assertThat((String) deterlabUserConstraints.get(0).get("CONSTRAINT_TYPE")).isEqualTo("UNIQUE");
         assertThat((String) deterlabUserConstraints.get(0).get("COLUMN_LIST")).isEqualTo("NCL_USER_ID");
+    }
 
-
+    @Test
+    public void testEmailRetriesTable() throws Exception {
         // make sure 'email_retries' table has expected number of columns
         List<Map<String, Object>> emailRetriesTable = this.template.queryForList("SHOW COLUMNS FROM " + SCHEMA + "." + EMAIL_RETRIES);
         assertThat(emailRetriesTable.size()).isEqualTo(15);
@@ -530,9 +547,10 @@ public class FlywayTest {
 
         assertThat((String) emailRetriesConstraints.get(0).get("CONSTRAINT_TYPE")).isEqualTo("PRIMARY KEY");
         assertThat((String) emailRetriesConstraints.get(0).get("COLUMN_LIST")).isEqualTo("ID");
+    }
 
-
-
+    @Test
+    public void testExperimentsTable() throws Exception {
         // make sure 'experiments' table has expected number of columns
         List<Map<String, Object>> experimentsTable = this.template.queryForList("SHOW COLUMNS FROM " + SCHEMA + "." + EXPERIMENTS);
         assertThat(experimentsTable.size()).isEqualTo(13);
@@ -607,8 +625,10 @@ public class FlywayTest {
 
         assertThat((String) experimentsConstraints.get(0).get("CONSTRAINT_TYPE")).isEqualTo("PRIMARY KEY");
         assertThat((String) experimentsConstraints.get(0).get("COLUMN_LIST")).isEqualTo("ID");
+    }
 
-
+    @Test
+    public void testLoginActivitiesTable() throws Exception {
         // make sure 'login_activities' table has expected number of columns
         List<Map<String, Object>> loginActivitiesTable = this.template.queryForList("SHOW COLUMNS FROM " + SCHEMA + "." + LOGIN_ACTIVITIES);
         assertThat(loginActivitiesTable.size()).isEqualTo(7);
@@ -655,9 +675,10 @@ public class FlywayTest {
         assertThat((String) loginActivitiesConstraints.get(0).get("COLUMN_LIST")).isEqualTo("ID");
         assertThat((String) loginActivitiesConstraints.get(1).get("CONSTRAINT_TYPE")).isEqualTo("REFERENTIAL");
         assertThat((String) loginActivitiesConstraints.get(1).get("COLUMN_LIST")).isEqualTo("USER_ID");
+    }
 
-
-
+    @Test
+    public void testRealizationsTable() throws Exception {
         // make sure 'realizations' table has expected number of columns
         List<Map<String, Object>> realizationsTable = this.template.queryForList("SHOW COLUMNS FROM " + SCHEMA + "." + REALIZATIONS);
         assertThat(realizationsTable.size()).isEqualTo(13);
@@ -732,8 +753,10 @@ public class FlywayTest {
 
         assertThat((String) realizationsConstraints.get(0).get("CONSTRAINT_TYPE")).isEqualTo("PRIMARY KEY");
         assertThat((String) realizationsConstraints.get(0).get("COLUMN_LIST")).isEqualTo("ID");
+    }
 
-
+    @Test
+    public void testRegistrationsTable() throws Exception {
         // make sure 'registrations' table has expected number of columns
         List<Map<String, Object>> registrationsTable = this.template.queryForList("SHOW COLUMNS FROM " + SCHEMA + "." + REGISTRATIONS);
         assertThat(registrationsTable.size()).isEqualTo(18);
@@ -837,9 +860,10 @@ public class FlywayTest {
         assertThat((String) registrationsConstraints.get(1).get("COLUMN_LIST")).isEqualTo("UID");
         assertThat((String) registrationsConstraints.get(0).get("CONSTRAINT_TYPE")).isEqualTo("UNIQUE");
         assertThat((String) registrationsConstraints.get(0).get("COLUMN_LIST")).isEqualTo("USR_EMAIL");
+    }
 
-
-
+    @Test
+    public void testTeamMembersTable() throws Exception {
         // make sure 'team_members' table has expected number of columns
         List<Map<String, Object>> teamMembersTable = this.template.queryForList("SHOW COLUMNS FROM " + SCHEMA + "." + TEAM_MEMBERS);
         assertThat(teamMembersTable.size()).isEqualTo(9);
@@ -898,9 +922,10 @@ public class FlywayTest {
         assertThat((String) teamMembersConstraints.get(1).get("COLUMN_LIST")).isEqualTo("TEAM_ID");
         assertThat((String) teamMembersConstraints.get(0).get("CONSTRAINT_TYPE")).isEqualTo("UNIQUE");
         assertThat((String) teamMembersConstraints.get(0).get("COLUMN_LIST")).isEqualTo("TEAM_ID,USER_ID");
+    }
 
-
-
+    @Test
+    public void testTeamsTable() throws Exception {
         // make sure 'teams' table has expected number of columns
         List<Map<String, Object>> teamsTable = this.template.queryForList("SHOW COLUMNS FROM " + SCHEMA + "." + TEAMS);
         assertThat(teamsTable.size()).isEqualTo(13);
@@ -977,8 +1002,10 @@ public class FlywayTest {
         assertThat((String) teamsConstraints.get(0).get("COLUMN_LIST")).isEqualTo("ID");
         assertThat((String) teamsConstraints.get(1).get("CONSTRAINT_TYPE")).isEqualTo("UNIQUE");
         assertThat((String) teamsConstraints.get(1).get("COLUMN_LIST")).isEqualTo("NAME");
+    }
 
-
+    @Test
+    public void testUserDetailsTable() throws Exception {
         // make sure 'user_details' table has expected number of columns
         List<Map<String, Object>> userDetailsTable = this.template.queryForList("SHOW COLUMNS FROM " + SCHEMA + "." + USER_DETAILS);
         assertThat(userDetailsTable.size()).isEqualTo(13);
@@ -1057,8 +1084,10 @@ public class FlywayTest {
         assertThat((String) userDetailsConstraints.get(1).get("COLUMN_LIST")).isEqualTo("ADDRESS_ID");
         assertThat((String) userDetailsConstraints.get(0).get("CONSTRAINT_TYPE")).isEqualTo("UNIQUE");
         assertThat((String) userDetailsConstraints.get(0).get("COLUMN_LIST")).isEqualTo("EMAIL");
+    }
 
-
+    @Test
+    public void testUsersTable() throws Exception {
         // make sure 'users' table has expected number of columns
         List<Map<String, Object>> usersTable = this.template.queryForList("SHOW COLUMNS FROM " + SCHEMA + "." + USERS);
         assertThat(usersTable.size()).isEqualTo(10);
@@ -1122,8 +1151,10 @@ public class FlywayTest {
         assertThat((String) usersConstraints.get(1).get("COLUMN_LIST")).isEqualTo("USER_DETAILS_ID");
         assertThat((String) usersConstraints.get(2).get("CONSTRAINT_TYPE")).isEqualTo("UNIQUE");
         assertThat((String) usersConstraints.get(2).get("COLUMN_LIST")).isEqualTo("USER_DETAILS_ID");
+    }
 
-
+    @Test
+    public void testUsersTeamsTable() throws Exception {
         // make sure 'users_teams' table has expected number of columns
         List<Map<String, Object>> userTeamsTable = this.template.queryForList("SHOW COLUMNS FROM " + SCHEMA + "." + USERS_TEAMS);
         assertThat(userTeamsTable.size()).isEqualTo(2);
@@ -1182,8 +1213,6 @@ public class FlywayTest {
                 Integer.class)).isEqualTo(0);
         assertThat(this.template.queryForObject("SELECT COUNT(*) from " + SCHEMA + ".data_users",
                 Integer.class)).isEqualTo(0);
-
-        this.template.execute("DROP ALL OBJECTS");
     }
 
     private SimpleDriverDataSource createDataSource() {
