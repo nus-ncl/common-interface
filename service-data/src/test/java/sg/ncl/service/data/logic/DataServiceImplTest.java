@@ -8,6 +8,7 @@ import org.junit.rules.ExpectedException;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
+import org.springframework.test.context.TestPropertySource;
 import sg.ncl.service.data.AbstractTest;
 import sg.ncl.service.data.data.jpa.DataRepository;
 import sg.ncl.service.data.domain.DataService;
@@ -19,6 +20,7 @@ import static org.mockito.Mockito.*;
 /**
  * Created by jng on 17/10/16.
  */
+@TestPropertySource(properties = "flyway.enabled=false")
 public class DataServiceImplTest extends AbstractTest {
 
     @Rule

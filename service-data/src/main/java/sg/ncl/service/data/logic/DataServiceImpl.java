@@ -163,7 +163,7 @@ public class DataServiceImpl implements DataService {
     public DataResource findResourceById(Long did, Long rid, Claims claims) {
         DataEntity dataEntity = (DataEntity) getOne(did);
         checkAccessibility(dataEntity, claims);
-        List<DataResourceEntity> dataResourceEntities = dataEntity.getResources();
+        List<DataResource> dataResourceEntities = dataEntity.getResources();
         return dataResourceEntities.stream().filter(o -> o.getId().equals(rid)).findFirst().orElse(null);
     }
 
@@ -199,11 +199,11 @@ public class DataServiceImpl implements DataService {
         DataEntity dataEntity = (DataEntity) getOne(did);
         checkPermissions(dataEntity, claims);
 
-        List<DataResourceEntity> dataResourceEntities = dataEntity.getResources();
-        DataResourceEntity dataResourceEntity = dataResourceEntities
+        List<DataResource> dataResourceEntities = dataEntity.getResources();
+        DataResource dataResource = dataResourceEntities
                 .stream().filter(o -> o.getId().equals(rid)).findFirst().orElse(null);
         if (dataEntity != null) {
-            dataResourceEntities.remove(dataResourceEntity);
+            dataResourceEntities.remove(dataResource);
         }
 
         DataEntity savedDataEntity = dataRepository.save(dataEntity);

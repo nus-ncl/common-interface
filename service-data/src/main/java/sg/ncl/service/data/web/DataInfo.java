@@ -20,8 +20,7 @@ public class DataInfo implements Data {
     private String contributorId;
     private DataVisibility visibility;
     private DataAccessibility accessibility;
-    private List<DataResourceInfo> resources;
-    private List<DataStatisticsInfo> statistics;
+    private List<DataResource> resources;
     private List<String> approvedUsers;
 
     @JsonCreator
@@ -33,7 +32,6 @@ public class DataInfo implements Data {
             @JsonProperty("visibility") final DataVisibility visibility,
             @JsonProperty("accessibility") final DataAccessibility accessibility,
             @JsonProperty("resources") final List<? extends DataResource> resources,
-            @JsonProperty("statistics") final List<? extends DataStatistics> statistics,
             @JsonProperty("approvedUsers") final List<String> approvedUsers
     ) {
         this.id = id;
@@ -43,7 +41,6 @@ public class DataInfo implements Data {
         this.visibility = visibility;
         this.accessibility = accessibility;
         this.resources = resources.stream().map(DataResourceInfo::new).collect(Collectors.toList());
-        this.statistics = statistics.stream().map(DataStatisticsInfo::new).collect(Collectors.toList());
         this.approvedUsers = approvedUsers;
     }
 
@@ -56,7 +53,6 @@ public class DataInfo implements Data {
                 data.getVisibility(),
                 data.getAccessibility(),
                 data.getResources(),
-                data.getStatistics(),
                 data.getApprovedUsers()
         );
     }
