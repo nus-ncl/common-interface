@@ -1,20 +1,15 @@
-package sg.ncl.service.experiment;
+package sg.ncl.service.experiment.util;
 
 import org.apache.commons.lang3.RandomStringUtils;
 import sg.ncl.service.experiment.data.jpa.ExperimentEntity;
-import sg.ncl.service.experiment.data.jpa.ExperimentRepository;
-import sg.ncl.service.experiment.domain.Experiment;
 import sg.ncl.service.realization.data.jpa.RealizationEntity;
 
-import java.util.ArrayList;
-import java.util.List;
-
 /**
- * Created by Desmond.
+ * @author Te Ye
  */
-public class Util {
+public class TestUtil {
 
-    public static ExperimentEntity getExperimentsEntity() {
+    public static ExperimentEntity getExperimentEntity() {
         final ExperimentEntity entity = new ExperimentEntity();
         entity.setId(Long.parseLong(RandomStringUtils.randomNumeric(10)));
         entity.setUserId(RandomStringUtils.randomAlphanumeric(20));
@@ -42,40 +37,6 @@ public class Util {
         return entity;
     }
 
-    public static boolean isListEqual(List<Experiment> one, List<Experiment> two) {
-        ArrayList<Experiment> cp = new ArrayList<>(one);
-        for (Experiment twoIterator : two) {
-            if (!cp.remove(twoIterator)) {
-                return false;
-            }
-        }
-        return cp.isEmpty();
-    }
-
-    public static void addExperimentsChangeUserId(int numEntries, String userId, ExperimentRepository experimentRepository) {
-        for (int i = 0; i < numEntries; i++) {
-            ExperimentEntity experimentEntity = Util.getExperimentsEntity();
-
-            if (i % 2 == 0) {
-                experimentEntity.setUserId(userId);
-            }
-
-            experimentRepository.save(experimentEntity);
-        }
-    }
-
-    public static void addExperimentsChangeTeamId(int numEntries, String teamId, ExperimentRepository experimentRepository) {
-        for (int i = 0; i < numEntries; i++) {
-            ExperimentEntity experimentEntity = Util.getExperimentsEntity();
-
-            if (i % 2 == 0) {
-                experimentEntity.setTeamId(teamId);
-            }
-
-            experimentRepository.save(experimentEntity);
-        }
-    }
-
     public static String createNsFileContents() {
         StringBuilder sb = new StringBuilder();
         sb.append("set ns [new Simulator]\n");
@@ -86,4 +47,5 @@ public class Util {
         sb.append("$ns run\n");
         return sb.toString();
     }
+
 }

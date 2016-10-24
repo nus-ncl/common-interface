@@ -46,7 +46,7 @@ public class ExceptionAutoConfigurationTest {
 
         final ExceptionHttpStatusMap map = configuration.exceptionHttpStatusMap();
 
-        assertThat(map.size(), is(equalTo(6)));
+        assertThat(map.size(), is(equalTo(7)));
         assertThat(map.get(clazz), is(equalTo(status)));
     }
 
@@ -61,7 +61,7 @@ public class ExceptionAutoConfigurationTest {
 
         final ExceptionHttpStatusMap map = configuration.exceptionHttpStatusMap();
 
-        assertThat(map.size(), is(equalTo(6)));
+        assertThat(map.size(), is(equalTo(7)));
         assertThat(map.get(clazz), is(equalTo(status)));
     }
 
@@ -76,7 +76,7 @@ public class ExceptionAutoConfigurationTest {
 
         final ExceptionHttpStatusMap map = configuration.exceptionHttpStatusMap();
 
-        assertThat(map.size(), is(equalTo(5)));
+        assertThat(map.size(), is(equalTo(6)));
     }
 
     @Test
@@ -93,7 +93,7 @@ public class ExceptionAutoConfigurationTest {
 
         final ExceptionHttpStatusMap map = configuration.exceptionHttpStatusMap();
 
-        assertThat(map.size(), is(equalTo(7)));
+        assertThat(map.size(), is(equalTo(8)));
         assertThat(map.get(clazz1), is(equalTo(status1)));
         assertThat(map.get(clazz2), is(equalTo(status2)));
     }
@@ -109,9 +109,9 @@ public class ExceptionAutoConfigurationTest {
 
         final ExceptionHttpStatusMap map = configuration.exceptionHttpStatusMap();
 
-        assertThat(map.size(), is(equalTo(5)));
-        assertThat(map.get(clazz), is(equalTo(DEFAULT_HTTP_STATUS)));
         assertThat(map.size(), is(equalTo(6)));
+        assertThat(map.get(clazz), is(equalTo(DEFAULT_HTTP_STATUS)));
+        assertThat(map.size(), is(equalTo(7)));
     }
 
     @Test
@@ -125,9 +125,9 @@ public class ExceptionAutoConfigurationTest {
 
         final ExceptionHttpStatusMap map = configuration.exceptionHttpStatusMap();
 
-        assertThat(map.size(), is(equalTo(5)));
-        assertThat(map.get(clazz), is(equalTo(DEFAULT_HTTP_STATUS)));
         assertThat(map.size(), is(equalTo(6)));
+        assertThat(map.get(clazz), is(equalTo(DEFAULT_HTTP_STATUS)));
+        assertThat(map.size(), is(equalTo(7)));
     }
 
     @Test
@@ -144,7 +144,7 @@ public class ExceptionAutoConfigurationTest {
 
         final ExceptionHttpStatusMap map = configuration.exceptionHttpStatusMap();
 
-        assertThat(map.size(), is(equalTo(6)));
+        assertThat(map.size(), is(equalTo(7)));
         assertThat(map.get(clazz1), is(equalTo(DEFAULT_HTTP_STATUS)));
         assertThat(map.get(clazz2), is(equalTo(status2)));
     }

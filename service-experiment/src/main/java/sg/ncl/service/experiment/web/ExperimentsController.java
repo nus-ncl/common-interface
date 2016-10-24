@@ -1,11 +1,10 @@
 package sg.ncl.service.experiment.web;
 
+import io.jsonwebtoken.Claims;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -73,16 +72,17 @@ public class ExperimentsController {
     }
 
     // delete experiment
-    @DeleteMapping(path = "/{expId}/teams/{teamName}")
+//    @DeleteMapping(path = "/{expId}/teams/{teamId}")
+    @DeleteMapping(path = "/teams/{teamId}/experiments/{expId}")
     // FIXME: should be DELETE instead of POST and path should be "/experiments/{id}"
     @ResponseStatus(HttpStatus.OK)
-    public Experiment deleteExperiment(@PathVariable String expId, @PathVariable String teamName, @AuthenticationPrincipal String user) {
-        log.info("User principal: " + user);
-        if (SecurityContextHolder.getContext().getAuthentication() == null) {
+    public Experiment deleteExperiment(@PathVariable Long expId, @PathVariable String teamId, @AuthenticationPrincipal Object claims) {
+        log.info("User principal: " + claims);
+        if ( !(claims instanceof Claims) ) {
             // throw forbidden
-            log.warn("Access denied for delete experiment: expid: {} ", expId);
-            throw new ForbiddenException("Access denied for delete experiment: expid " + expId);
+            log.warn("Access denied for delete experiment: expid: {} claims: {} ", expId, claims);
+            throw new ForbiddenException();
         }
-        return new ExperimentInfo(experimentService.deleteExperiment(Long.parseLong(expId), teamName));
+        return new ExperimentInfo(experimentService.deleteExperiment(expId, teamId, (Claims) claims));
     }
 }

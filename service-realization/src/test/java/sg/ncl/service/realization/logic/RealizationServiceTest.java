@@ -7,6 +7,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
+import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.web.client.MockRestServiceServer;
 import org.springframework.web.client.RestOperations;
 import org.springframework.web.client.RestTemplate;
@@ -29,6 +30,7 @@ import static org.springframework.test.web.client.response.MockRestResponseCreat
 /**
  * Created by Desmond.
  */
+@TestPropertySource(properties = "flyway.enabled=false")
 public class RealizationServiceTest extends AbstractTest {
 
     @Inject

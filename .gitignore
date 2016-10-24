@@ -18,3 +18,6 @@ bin/
 
 # OSX artifacts
 .DS_Store/
+
+# Spring artifacts
+*.pid

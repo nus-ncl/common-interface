@@ -1,5 +1,7 @@
 package sg.ncl.adapter.deterlab;
 
+import lombok.Getter;
+import lombok.Setter;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
 import static sg.ncl.adapter.deterlab.ConnectionProperties.PREFIX;
@@ -8,27 +10,20 @@ import static sg.ncl.adapter.deterlab.ConnectionProperties.PREFIX;
  * Created by Te Ye
  */
 @ConfigurationProperties(prefix = PREFIX)
+@Getter
+@Setter
 public class ConnectionProperties {
 
     public static final String PREFIX = "ncl.deterlab.adapter";
 
     private String ip;
     private String port;
+    private String bossUrl;
+    private String userUrl;
+    private boolean enabled = false;
 
-    public String getIp() {
-        return ip;
-    }
-
-    public void setIp(String ip) {
-        this.ip = ip;
-    }
-
-    public String getPort() {
-        return port;
-    }
-
-    public void setPort(String port) {
-        this.port = port;
+    public String login() {
+        return "http://" + ip + ":" + port + "/login";
     }
 
     public String getJoinProjectNewUsers() {
@@ -84,5 +79,5 @@ public class ConnectionProperties {
     public String getExpStatus() {
         return "http://" + ip + ":" + port + "/getExpStatus";
     }
-}
 
+}

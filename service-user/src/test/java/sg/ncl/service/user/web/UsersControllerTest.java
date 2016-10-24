@@ -12,6 +12,7 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.springframework.http.MediaType;
+import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
@@ -38,6 +39,7 @@ import static org.springframework.test.web.servlet.setup.MockMvcBuilders.webAppC
  * Created by Desmond
  */
 @WebAppConfiguration
+@TestPropertySource(properties = "flyway.enabled=false")
 public class UsersControllerTest extends AbstractTest {
 
     @Rule

@@ -3,6 +3,7 @@ package sg.ncl.service.team.logic;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.junit.Assert;
 import org.junit.Test;
+import org.springframework.test.context.TestPropertySource;
 import sg.ncl.service.team.AbstractTest;
 import sg.ncl.service.team.Util;
 import sg.ncl.service.team.data.jpa.TeamEntity;
@@ -29,6 +30,7 @@ import static org.hamcrest.core.Is.is;
 /**
  * Created by Desmond/Te Ye
  */
+@TestPropertySource(properties = "flyway.enabled=false")
 public class TeamServiceTest extends AbstractTest {
 
     @Inject

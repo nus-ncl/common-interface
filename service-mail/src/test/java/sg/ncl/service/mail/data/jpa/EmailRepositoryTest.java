@@ -4,6 +4,7 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.test.context.TestPropertySource;
 import sg.ncl.service.mail.AbstractTest;
 
 import javax.inject.Inject;
@@ -20,6 +21,7 @@ import static sg.ncl.service.mail.util.TestUtil.getEmailEntity;
 /**
  * Created by dcszwang on 9/6/2016.
  */
+@TestPropertySource(properties = "flyway.enabled=false")
 public class EmailRepositoryTest extends AbstractTest {
 
     @Rule

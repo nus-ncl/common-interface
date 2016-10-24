@@ -2,10 +2,10 @@ package sg.ncl.service;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.context.ConfigurableApplicationContext;
+import org.springframework.boot.system.ApplicationPidFileWriter;
 import org.springframework.context.annotation.Import;
-import org.springframework.core.env.ConfigurableEnvironment;
 import sg.ncl.service.authentication.AuthenticationApplication;
+import sg.ncl.service.data.DataApplication;
 import sg.ncl.service.experiment.ExperimentApplication;
 import sg.ncl.service.mail.MailApplication;
 import sg.ncl.service.realization.RealizationApplication;
@@ -22,6 +22,7 @@ import java.sql.SQLException;
 @SpringBootApplication
 @Import({
         AuthenticationApplication.class,
+        DataApplication.class,
         ExperimentApplication.class,
         MailApplication.class,
         RealizationApplication.class,
@@ -33,13 +34,9 @@ import java.sql.SQLException;
 public class ServicesInOneApplication {
 
     public static void main(String[] args) throws SQLException, ClassNotFoundException {
-        final ConfigurableApplicationContext context = SpringApplication.run(ServicesInOneApplication.class, args);
-        final ConfigurableEnvironment environment = context.getEnvironment();
-
-        final FirstRun firstRun = context.getBean(FirstRun.class);
-        if (environment.containsProperty("reset")) {
-            firstRun.reset();
-        }
+        final SpringApplication application = new SpringApplication(ServicesInOneApplication.class);
+        application.addListeners(new ApplicationPidFileWriter());
+        application.run(args);
     }
 
 }

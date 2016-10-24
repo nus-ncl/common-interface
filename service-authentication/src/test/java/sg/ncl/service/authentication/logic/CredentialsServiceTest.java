@@ -1,5 +1,6 @@
 package sg.ncl.service.authentication.logic;
 
+import io.jsonwebtoken.Claims;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -10,6 +11,7 @@ import org.mockito.junit.MockitoRule;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import sg.ncl.adapter.deterlab.AdapterDeterLab;
 import sg.ncl.common.authentication.Role;
+import sg.ncl.common.exception.base.ForbiddenException;
 import sg.ncl.service.authentication.data.jpa.CredentialsEntity;
 import sg.ncl.service.authentication.data.jpa.CredentialsRepository;
 import sg.ncl.service.authentication.domain.Credentials;
@@ -45,6 +47,8 @@ public class CredentialsServiceTest {
     public ExpectedException exception = ExpectedException.none();
 
     @Mock
+    private Claims claims;
+    @Mock
     private PasswordEncoder passwordEncoder;
     @Mock
     private CredentialsRepository credentialsRepository;
@@ -55,6 +59,7 @@ public class CredentialsServiceTest {
 
     @Before
     public void before() {
+        assertThat(mockingDetails(claims).isMock()).isTrue();
         assertThat(mockingDetails(passwordEncoder).isMock()).isTrue();
         assertThat(mockingDetails(credentialsRepository).isMock()).isTrue();
 
@@ -237,8 +242,9 @@ public class CredentialsServiceTest {
         when(credentialsRepository.findOne(anyString())).thenReturn(entity);
         when(passwordEncoder.encode(anyString())).thenReturn(password);
         when(credentialsRepository.save(any(CredentialsEntity.class))).thenReturn(entity);
+        when(claims.getSubject()).thenReturn(entity.getId());
 
-        credentialsService.updateCredentials(entity.getId(), info);
+        credentialsService.updateCredentials(entity.getId(), info, claims);
 
         verify(passwordEncoder, times(1)).encode(anyString());
         verify(credentialsRepository, times(1)).save(any(CredentialsEntity.class));
@@ -257,8 +263,9 @@ public class CredentialsServiceTest {
 
         when(credentialsRepository.findOne(eq(entity.getId()))).thenReturn(entity);
         when(credentialsRepository.save(entity)).thenReturn(entity);
+        when(claims.getSubject()).thenReturn(entity.getId());
 
-        credentialsService.updateCredentials(entity.getId(), info);
+        credentialsService.updateCredentials(entity.getId(), info, claims);
 
         verify(passwordEncoder, times(0)).encode(anyString());
         verify(credentialsRepository, times(1)).save(any(CredentialsEntity.class));
@@ -277,8 +284,9 @@ public class CredentialsServiceTest {
 
         when(credentialsRepository.findOne(eq(entity.getId()))).thenReturn(entity);
         when(credentialsRepository.save(entity)).thenReturn(entity);
+        when(claims.getSubject()).thenReturn(entity.getId());
 
-        credentialsService.updateCredentials(entity.getId(), info);
+        credentialsService.updateCredentials(entity.getId(), info, claims);
 
         verify(credentialsRepository, times(1)).save(any(CredentialsEntity.class));
         assertThat(entity.getUsername()).isEqualTo(username);
@@ -297,8 +305,9 @@ public class CredentialsServiceTest {
         when(credentialsRepository.findOne(eq(entity.getId()))).thenReturn(entity);
         when(passwordEncoder.encode(eq(password))).thenReturn(password);
         when(credentialsRepository.save(entity)).thenReturn(entity);
+        when(claims.getSubject()).thenReturn(entity.getId());
 
-        credentialsService.updateCredentials(entity.getId(), info);
+        credentialsService.updateCredentials(entity.getId(), info, claims);
 
         verify(credentialsRepository, times(1)).save(any(CredentialsEntity.class));
         assertThat(entity.getUsername()).isEqualTo(username);
@@ -317,8 +326,9 @@ public class CredentialsServiceTest {
         when(credentialsRepository.findOne(eq(entity.getId()))).thenReturn(entity);
         when(passwordEncoder.encode(eq(password))).thenReturn(password);
         when(credentialsRepository.save(entity)).thenReturn(entity);
+        when(claims.getSubject()).thenReturn(entity.getId());
 
-        credentialsService.updateCredentials(entity.getId(), info);
+        credentialsService.updateCredentials(entity.getId(), info, claims);
 
         verify(credentialsRepository, times(1)).save(any(CredentialsEntity.class));
         assertThat(entity.getUsername()).isEqualTo(username);
@@ -333,7 +343,7 @@ public class CredentialsServiceTest {
 
         exception.expect(NeitherUsernameNorPasswordModifiedException.class);
 
-        credentialsService.updateCredentials("id", credentials);
+        credentialsService.updateCredentials(null, credentials, claims);
     }
 
     @Test
@@ -342,7 +352,7 @@ public class CredentialsServiceTest {
 
         exception.expect(NeitherUsernameNorPasswordModifiedException.class);
 
-        credentialsService.updateCredentials("id", credentials);
+        credentialsService.updateCredentials("id", credentials, claims);
     }
 
     @Test
@@ -351,7 +361,7 @@ public class CredentialsServiceTest {
 
         exception.expect(NeitherUsernameNorPasswordModifiedException.class);
 
-        credentialsService.updateCredentials("id", credentials);
+        credentialsService.updateCredentials("id", credentials, claims);
     }
 
     @Test
@@ -360,7 +370,7 @@ public class CredentialsServiceTest {
 
         exception.expect(NeitherUsernameNorPasswordModifiedException.class);
 
-        credentialsService.updateCredentials("id", credentials);
+        credentialsService.updateCredentials("id", credentials, claims);
     }
 
     @Test
@@ -368,10 +378,24 @@ public class CredentialsServiceTest {
         final Credentials credentials = new CredentialsInfo("id", "username", "password", null, null);
 
         when(credentialsRepository.findOne(credentials.getId())).thenReturn(null);
+        when(claims.getSubject()).thenReturn("id");
 
         exception.expect(CredentialsNotFoundException.class);
 
-        credentialsService.updateCredentials(credentials.getId(), credentials);
+        credentialsService.updateCredentials(credentials.getId(), credentials, claims);
+    }
+
+    @Test
+    public void testUpdatePasswordCredentialsNotRightUser() {
+        final CredentialsEntity entity = getCredentialsEntity();
+
+        when(credentialsRepository.findOne(eq(entity.getId()))).thenReturn(entity);
+        when(claims.getSubject()).thenReturn("id");
+
+        exception.expect(ForbiddenException.class);
+        exception.expectMessage("Permission denied");
+
+        credentialsService.updateCredentials(entity.getId(), entity , claims);
     }
 
 }
