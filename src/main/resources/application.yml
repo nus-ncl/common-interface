@@ -36,6 +36,8 @@ ncl:
   authentication:
     uri:
       '/authentications': POST # for login
+      '/datasets/public': GET # for retrieving public datasets
+      '/datasets/public/(\w|-)+': GET # for retrieving one public dataset
       '/registrations': POST # for apply/join new teams
       '/users/(\w|-)+': GET # for retrieving public teams' owner info
       '/users/(\w|-)+/emails/\w+=*': PUT # for email verifications
