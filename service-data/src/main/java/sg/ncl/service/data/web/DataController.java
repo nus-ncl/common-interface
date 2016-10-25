@@ -6,11 +6,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
-import sg.ncl.common.exception.base.ForbiddenException;
-import sg.ncl.service.data.domain.Data;
-import sg.ncl.service.data.domain.DataResource;
-import sg.ncl.service.data.domain.DataService;
-import sg.ncl.service.data.domain.DataVisibility;
+import sg.ncl.common.exception.base.UnauthorizedException;
+import sg.ncl.service.data.domain.*;
 
 import javax.inject.Inject;
 import javax.validation.Valid;
@@ -36,51 +33,43 @@ public class DataController {
     }
 
     // Get a list of all available data sets
-    @GetMapping(path = "")
+    @GetMapping()
     @ResponseStatus(HttpStatus.OK)
-    public List<Data> getAll(@AuthenticationPrincipal Object claims) {
-        log.info("User principal: " + claims);
+    public List<Data> getDatasets(@AuthenticationPrincipal Object claims) {
         if (claims == null || !(claims instanceof Claims)) {
-            log.warn("Access denied for all data sets");
-            throw new ForbiddenException();
+            log.warn("Access denied for: /datasets GET");
+            throw new UnauthorizedException();
         }
         return dataService.getAll().stream().map(DataInfo::new).collect(Collectors.toList());
+    }
+
+    // Get a list of public data sets
+    @GetMapping(params = {"visibility"})
+    @ResponseStatus(HttpStatus.OK)
+    public List<Data> getDatasetsByVisibility(@AuthenticationPrincipal Object claims, @RequestParam("visibility") DataVisibility visibility) {
+        if (claims == null && visibility != DataVisibility.PUBLIC) {
+            log.warn("Access denied for: /datasets/?visibility=" + visibility);
+            throw new UnauthorizedException();
+        }
+        return dataService.findByVisibility(DataVisibility.PUBLIC).stream().map(DataInfo::new).collect(Collectors.toList());
     }
 
     // Get details about a data set
     @GetMapping(path = "/{id}")
     @ResponseStatus(HttpStatus.OK)
-    public Data getOne(@PathVariable String id, @AuthenticationPrincipal Object claims) {
+    public Data getDatasetById(@AuthenticationPrincipal Object claims, @PathVariable String id) {
         if (claims == null || !(claims instanceof Claims)) {
-            throw new ForbiddenException();
+            throw new UnauthorizedException();
         }
         return new DataInfo(dataService.getOne(Long.getLong(id)));
     }
 
-    // Get a list of public data sets
-    @GetMapping(path = "/public")
-    @ResponseStatus(HttpStatus.OK)
-    public List<Data> getPublic() {
-        return dataService.findByVisibility(DataVisibility.PUBLIC).stream().map(DataInfo::new).collect(Collectors.toList());
-    }
-
-    // Get details about a public data set
-    @GetMapping(path = "/public/{id}")
-    @ResponseStatus(HttpStatus.OK)
-    public Data getPublic(@PathVariable String id) {
-        Data result = new DataInfo(dataService.getOne(Long.getLong(id)));
-        if (!result.getVisibility().equals(DataVisibility.PUBLIC)) {
-            throw new ForbiddenException();
-        }
-        return result;
-    }
-
     // Create a data set
-    @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE, path = "/")
+    @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.CREATED)
-    public Data add(@RequestBody @Valid DataInfo dataInfo, @AuthenticationPrincipal Object claims) {
+    public Data add(@AuthenticationPrincipal Object claims, @RequestBody @Valid DataInfo dataInfo) {
         if (claims == null || !(claims instanceof Claims)) {
-            throw new ForbiddenException();
+            throw new UnauthorizedException();
         }
         return new DataInfo(dataService.save(dataInfo));
     }
@@ -88,9 +77,9 @@ public class DataController {
     // Update a data set
     @PutMapping(path = "/{id}")
     @ResponseStatus(HttpStatus.OK)
-    public Data update(@PathVariable String id, @RequestBody @Valid DataInfo dataInfo, @AuthenticationPrincipal Object claims) {
+    public Data update(@AuthenticationPrincipal Object claims, @PathVariable String id, @RequestBody @Valid DataInfo dataInfo) {
         if (claims == null || !(claims instanceof Claims)) {
-            throw new ForbiddenException();
+            throw new UnauthorizedException();
         }
         return new DataInfo(dataService.save(Long.getLong(id), dataInfo, (Claims) claims));
     }
@@ -98,19 +87,19 @@ public class DataController {
     // Delete a data set
     @DeleteMapping(path = "/{id}")
     @ResponseStatus(HttpStatus.OK)
-    public Data remove(@PathVariable String id, @AuthenticationPrincipal Object claims) {
+    public Data remove(@AuthenticationPrincipal Object claims, @PathVariable String id) {
         if (claims == null || !(claims instanceof Claims)) {
-            throw new ForbiddenException();
+            throw new UnauthorizedException();
         }
         return new DataInfo(dataService.delete(Long.getLong(id), (Claims) claims));
     }
 
-    // Download resource in a data set
+    // View resource in a data set
     @GetMapping(path = "/{did}/resources/{rid}")
     @ResponseStatus(HttpStatus.OK)
-    public DataResource getResource(@PathVariable String did, @PathVariable String rid, @AuthenticationPrincipal Object claims) {
+    public DataResource getResource(@AuthenticationPrincipal Object claims, @PathVariable String did, @PathVariable String rid) {
         if (claims == null || !(claims instanceof Claims)) {
-            throw new ForbiddenException();
+            throw new UnauthorizedException();
         }
         return dataService.findResourceById(Long.getLong(did), Long.getLong(rid), (Claims) claims);
     }
@@ -118,11 +107,11 @@ public class DataController {
     // Add a resource to a data set
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE, path = "/{id}/resources")
     @ResponseStatus(HttpStatus.CREATED)
-    public Data addResource(@PathVariable String id,
-                            @RequestBody @Valid DataResourceInfo dataResourceInfo,
-                            @AuthenticationPrincipal Object claims) {
+    public Data addResource(@AuthenticationPrincipal Object claims,
+                            @PathVariable String id,
+                            @RequestBody @Valid DataResourceInfo dataResourceInfo) {
         if (claims == null || !(claims instanceof Claims)) {
-            throw new ForbiddenException();
+            throw new UnauthorizedException();
         }
         return new DataInfo(dataService.saveResource(Long.getLong(id), dataResourceInfo, (Claims) claims));
     }
@@ -130,11 +119,33 @@ public class DataController {
     // Delete a resource from a data set
     @DeleteMapping(path = "/{did}/resources/{rid}")
     @ResponseStatus(HttpStatus.OK)
-    public Data removeResource(@PathVariable String did, @PathVariable String rid, @AuthenticationPrincipal Object claims) {
+    public Data removeResource(@AuthenticationPrincipal Object claims, @PathVariable String did, @PathVariable String rid) {
         if (claims == null || !(claims instanceof Claims)) {
-            throw new ForbiddenException();
+            throw new UnauthorizedException();
         }
         return new DataInfo(dataService.deleteResource(Long.getLong(did), Long.getLong(rid), (Claims) claims));
+    }
+
+    // Request access to a dataset
+    @PostMapping(path = "/{id}/requests")
+    @ResponseStatus(HttpStatus.CREATED)
+    public DataRequest addRequest(@AuthenticationPrincipal Object claims, @PathVariable String id) {
+        if (claims == null || !(claims instanceof Claims)) {
+            throw new UnauthorizedException();
+        }
+        // TODO: add request to database
+        return null;
+    }
+
+    // Process request
+    @PutMapping(path = "{did}/requests/{rid}")
+    @ResponseStatus(HttpStatus.OK)
+    public DataRequest processRequest(@AuthenticationPrincipal Object claims, @PathVariable String did, @PathVariable String rid) {
+        if (claims == null || !(claims instanceof Claims)) {
+            throw new UnauthorizedException();
+        }
+        // TODO: process request to add to approved users
+        return null;
     }
 
 }

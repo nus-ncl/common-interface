@@ -12,6 +12,8 @@ import sg.ncl.service.data.domain.DataResource;
 import sg.ncl.service.data.domain.DataService;
 import sg.ncl.service.data.domain.DataVisibility;
 import sg.ncl.service.data.exceptions.DataNameInUseException;
+import sg.ncl.service.data.exceptions.DataNotFoundException;
+import sg.ncl.service.data.exceptions.DataResourceNotFoundException;
 
 import javax.inject.Inject;
 import javax.validation.constraints.NotNull;
@@ -130,7 +132,11 @@ public class DataServiceImpl implements DataService {
      * @return  data set
      */
     public Data getOne(Long id) {
-        return dataRepository.getOne(id);
+        Data data = dataRepository.getOne(id);
+        if (data == null) {
+            throw new DataNotFoundException();
+        }
+        return data;
     }
 
     /**
@@ -164,7 +170,11 @@ public class DataServiceImpl implements DataService {
         DataEntity dataEntity = (DataEntity) getOne(did);
         checkAccessibility(dataEntity, claims);
         List<DataResource> dataResourceEntities = dataEntity.getResources();
-        return dataResourceEntities.stream().filter(o -> o.getId().equals(rid)).findFirst().orElse(null);
+        DataResource dataResource = dataResourceEntities.stream().filter(o -> o.getId().equals(rid)).findFirst().orElse(null);
+        if (dataResource == null) {
+            throw new DataResourceNotFoundException();
+        }
+        return dataResource;
     }
 
     /**
@@ -202,7 +212,7 @@ public class DataServiceImpl implements DataService {
         List<DataResource> dataResourceEntities = dataEntity.getResources();
         DataResource dataResource = dataResourceEntities
                 .stream().filter(o -> o.getId().equals(rid)).findFirst().orElse(null);
-        if (dataEntity != null) {
+        if (dataResource != null) {
             dataResourceEntities.remove(dataResource);
         }
 
