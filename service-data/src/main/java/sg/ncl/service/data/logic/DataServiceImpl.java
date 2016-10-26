@@ -30,6 +30,8 @@ import static sg.ncl.service.data.validations.Validator.checkPermissions;
 @Slf4j
 public class DataServiceImpl implements DataService {
 
+    private static final String INFO_TEXT = "Data saved: {}";
+
     private final DataRepository dataRepository;
 
     @Inject
@@ -70,6 +72,7 @@ public class DataServiceImpl implements DataService {
      * @return  a data set
      */
     @Transactional
+    @Override
     public Data save(Data data) {
         log.info("Save data set");
 
@@ -86,7 +89,7 @@ public class DataServiceImpl implements DataService {
         }
 
         DataEntity savedDataEntity = dataRepository.save(setUpDataEntity(data));
-        log.info("Data saved: {}", savedDataEntity);
+        log.info(INFO_TEXT, savedDataEntity);
         return savedDataEntity;
     }
 
@@ -99,12 +102,13 @@ public class DataServiceImpl implements DataService {
      * @return  a data set
      */
     @Transactional
+    @Override
     public Data save(Long id, Data data, Claims claims) {
         DataEntity dataEntity = (DataEntity) getOne(id);
         checkPermissions(dataEntity, claims);
 
         DataEntity savedDataEntity = dataRepository.save(setUpDataEntity(data, dataEntity));
-        log.info("Data saved: {}", savedDataEntity);
+        log.info(INFO_TEXT, savedDataEntity);
         return savedDataEntity;
     }
 
@@ -116,6 +120,7 @@ public class DataServiceImpl implements DataService {
      * @return  a data set
      */
     @Transactional
+    @Override
     public Data delete(Long id, Claims claims) {
         DataEntity dataEntity = (DataEntity) getOne(id);
         checkPermissions(dataEntity, claims);
@@ -131,6 +136,7 @@ public class DataServiceImpl implements DataService {
      *
      * @return  data set
      */
+    @Override
     public Data getOne(Long id) {
         Data data = dataRepository.getOne(id);
         if (data == null) {
@@ -144,6 +150,7 @@ public class DataServiceImpl implements DataService {
      *
      * @return  the list of data sets
      */
+    @Override
     public List<Data> getAll() {
         return dataRepository.findAll().stream().collect(Collectors.toList());
     }
@@ -154,6 +161,7 @@ public class DataServiceImpl implements DataService {
      * @param   visibility  PRIVATE|PROTECTED|PUBLIC
      * @return  the list of data sets queried
      */
+    @Override
     public List<Data> findByVisibility(DataVisibility visibility) {
         return dataRepository.findByVisibility(visibility).stream().collect(Collectors.toList());
     }
@@ -166,6 +174,7 @@ public class DataServiceImpl implements DataService {
      * @param   claims          authenticated credentials
      * @return  data resource
      */
+    @Override
     public DataResource findResourceById(Long did, Long rid, Claims claims) {
         DataEntity dataEntity = (DataEntity) getOne(did);
         checkAccessibility(dataEntity, claims);
@@ -192,7 +201,7 @@ public class DataServiceImpl implements DataService {
 
         dataEntity.getResources().add(setUpResourceEntity(dataResource));
         DataEntity savedDataEntity = dataRepository.save(dataEntity);
-        log.info("Data saved: {}", savedDataEntity);
+        log.info(INFO_TEXT, savedDataEntity);
         return savedDataEntity;
     }
 
@@ -205,6 +214,7 @@ public class DataServiceImpl implements DataService {
      * @return  data entity
      */
     @Transactional
+    @Override
     public Data deleteResource(Long did, Long rid, Claims claims) {
         DataEntity dataEntity = (DataEntity) getOne(did);
         checkPermissions(dataEntity, claims);
@@ -217,7 +227,7 @@ public class DataServiceImpl implements DataService {
         }
 
         DataEntity savedDataEntity = dataRepository.save(dataEntity);
-        log.info("Data saved: {}", savedDataEntity);
+        log.info(INFO_TEXT, savedDataEntity);
         return savedDataEntity;
     }
 
