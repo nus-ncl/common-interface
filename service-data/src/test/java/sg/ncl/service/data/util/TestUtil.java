@@ -1,5 +1,6 @@
 package sg.ncl.service.data.util;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.lang3.RandomStringUtils;
 import sg.ncl.service.data.data.jpa.DataEntity;
 import sg.ncl.service.data.data.jpa.DataResourceEntity;
@@ -60,4 +61,15 @@ public class TestUtil {
 
         return entity;
     }
+
+    public static String asJsonString(final Object obj) {
+        try {
+            final ObjectMapper mapper = new ObjectMapper();
+            final String jsonContent = mapper.writeValueAsString(obj);
+            return jsonContent;
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
 }
