@@ -195,6 +195,7 @@ public class DataServiceImpl implements DataService {
      * @return  data entity
      */
     @Transactional
+    @Override
     public Data createResource(Long id, DataResource dataResource, Claims claims) {
         DataEntity dataEntity = (DataEntity) getDataset(id);
         checkPermissions(dataEntity, claims);
