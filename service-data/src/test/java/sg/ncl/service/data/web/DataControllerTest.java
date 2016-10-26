@@ -116,7 +116,7 @@ public class DataControllerTest {
         when(securityContext.getAuthentication()).thenReturn(authentication);
         SecurityContextHolder.setContext(securityContext);
         when(authentication.getPrincipal()).thenReturn(claims);
-        when(dataService.getAll()).thenReturn(dataSets);
+        when(dataService.getDatasets()).thenReturn(dataSets);
 
         mockMvc.perform(get(DataController.PATH))
                 .andExpect(status().isOk())
@@ -135,7 +135,7 @@ public class DataControllerTest {
         when(securityContext.getAuthentication()).thenReturn(authentication);
         SecurityContextHolder.setContext(securityContext);
         when(authentication.getPrincipal()).thenReturn("");
-        when(dataService.getAll()).thenReturn(null);
+        when(dataService.getDatasets()).thenReturn(null);
 
         mockMvc.perform(get(DataController.PATH))
                 .andExpect(status().isUnauthorized())
@@ -147,7 +147,7 @@ public class DataControllerTest {
         when(securityContext.getAuthentication()).thenReturn(authentication);
         SecurityContextHolder.setContext(securityContext);
         when(authentication.getPrincipal()).thenReturn(null);
-        when(dataService.getAll()).thenReturn(null);
+        when(dataService.getDatasets()).thenReturn(null);
 
         mockMvc.perform(get(DataController.PATH))
                 .andExpect(status().isUnauthorized())
@@ -161,7 +161,7 @@ public class DataControllerTest {
         when(securityContext.getAuthentication()).thenReturn(authentication);
         SecurityContextHolder.setContext(securityContext);
         when(authentication.getPrincipal()).thenReturn(claims);
-        when(dataService.getOne(anyLong())).thenReturn(dataEntity);
+        when(dataService.getDataset(anyLong())).thenReturn(dataEntity);
 
         mockMvc.perform(get(DataController.PATH + "/1"))
                 .andExpect(status().isOk())
@@ -181,7 +181,7 @@ public class DataControllerTest {
         when(securityContext.getAuthentication()).thenReturn(authentication);
         SecurityContextHolder.setContext(securityContext);
         when(authentication.getPrincipal()).thenReturn(claims);
-        when(dataService.save(any(DataInfo.class))).thenReturn(dataEntity);
+        when(dataService.createDataset(any(DataInfo.class))).thenReturn(dataEntity);
 
         mockMvc.perform(post(DataController.PATH)
                 .contentType(MediaType.APPLICATION_JSON)
@@ -204,7 +204,7 @@ public class DataControllerTest {
         when(securityContext.getAuthentication()).thenReturn(authentication);
         SecurityContextHolder.setContext(securityContext);
         when(authentication.getPrincipal()).thenReturn(claims);
-        when(dataService.save(anyLong(), any(DataInfo.class), any(Claims.class))).thenReturn(dataEntity);
+        when(dataService.updateDataset(anyLong(), any(DataInfo.class), any(Claims.class))).thenReturn(dataEntity);
 
         mockMvc.perform(put(DataController.PATH + "/1")
                 .contentType(MediaType.APPLICATION_JSON)
@@ -227,7 +227,7 @@ public class DataControllerTest {
         when(securityContext.getAuthentication()).thenReturn(authentication);
         SecurityContextHolder.setContext(securityContext);
         when(authentication.getPrincipal()).thenReturn(claims);
-        when(dataService.delete(anyLong(), any(Claims.class))).thenReturn(dataEntity);
+        when(dataService.deleteDataset(anyLong(), any(Claims.class))).thenReturn(dataEntity);
 
         mockMvc.perform(delete(DataController.PATH + "/1"))
                 .andExpect(status().isOk())
@@ -263,7 +263,7 @@ public class DataControllerTest {
         when(securityContext.getAuthentication()).thenReturn(authentication);
         SecurityContextHolder.setContext(securityContext);
         when(authentication.getPrincipal()).thenReturn(claims);
-        when(dataService.saveResource(anyLong(), any(DataResourceInfo.class), any(Claims.class))).thenReturn(dataEntity);
+        when(dataService.createResource(anyLong(), any(DataResourceInfo.class), any(Claims.class))).thenReturn(dataEntity);
 
         mockMvc.perform(post(DataController.PATH + "/1/resources")
                 .contentType(MediaType.APPLICATION_JSON)

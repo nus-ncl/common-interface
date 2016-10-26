@@ -73,7 +73,7 @@ public class DataServiceImpl implements DataService {
      */
     @Transactional
     @Override
-    public Data save(Data data) {
+    public Data createDataset(Data data) {
         log.info("Save data set");
 
         // check if data name already exists
@@ -103,8 +103,8 @@ public class DataServiceImpl implements DataService {
      */
     @Transactional
     @Override
-    public Data save(Long id, Data data, Claims claims) {
-        DataEntity dataEntity = (DataEntity) getOne(id);
+    public Data updateDataset(Long id, Data data, Claims claims) {
+        DataEntity dataEntity = (DataEntity) getDataset(id);
         checkPermissions(dataEntity, claims);
 
         DataEntity savedDataEntity = dataRepository.save(setUpDataEntity(data, dataEntity));
@@ -121,8 +121,8 @@ public class DataServiceImpl implements DataService {
      */
     @Transactional
     @Override
-    public Data delete(Long id, Claims claims) {
-        DataEntity dataEntity = (DataEntity) getOne(id);
+    public Data deleteDataset(Long id, Claims claims) {
+        DataEntity dataEntity = (DataEntity) getDataset(id);
         checkPermissions(dataEntity, claims);
 
         dataRepository.delete(id);
@@ -137,7 +137,7 @@ public class DataServiceImpl implements DataService {
      * @return  data set
      */
     @Override
-    public Data getOne(Long id) {
+    public Data getDataset(Long id) {
         Data data = dataRepository.getOne(id);
         if (data == null) {
             throw new DataNotFoundException();
@@ -151,7 +151,7 @@ public class DataServiceImpl implements DataService {
      * @return  the list of data sets
      */
     @Override
-    public List<Data> getAll() {
+    public List<Data> getDatasets() {
         return dataRepository.findAll().stream().collect(Collectors.toList());
     }
 
@@ -176,7 +176,7 @@ public class DataServiceImpl implements DataService {
      */
     @Override
     public DataResource findResourceById(Long did, Long rid, Claims claims) {
-        DataEntity dataEntity = (DataEntity) getOne(did);
+        DataEntity dataEntity = (DataEntity) getDataset(did);
         checkAccessibility(dataEntity, claims);
         List<DataResource> dataResourceEntities = dataEntity.getResources();
         DataResource dataResource = dataResourceEntities.stream().filter(o -> o.getId().equals(rid)).findFirst().orElse(null);
@@ -195,8 +195,8 @@ public class DataServiceImpl implements DataService {
      * @return  data entity
      */
     @Transactional
-    public Data saveResource(Long id, DataResource dataResource, Claims claims) {
-        DataEntity dataEntity = (DataEntity) getOne(id);
+    public Data createResource(Long id, DataResource dataResource, Claims claims) {
+        DataEntity dataEntity = (DataEntity) getDataset(id);
         checkPermissions(dataEntity, claims);
 
         dataEntity.getResources().add(setUpResourceEntity(dataResource));
@@ -216,7 +216,7 @@ public class DataServiceImpl implements DataService {
     @Transactional
     @Override
     public Data deleteResource(Long did, Long rid, Claims claims) {
-        DataEntity dataEntity = (DataEntity) getOne(did);
+        DataEntity dataEntity = (DataEntity) getDataset(did);
         checkPermissions(dataEntity, claims);
 
         List<DataResource> dataResourceEntities = dataEntity.getResources();

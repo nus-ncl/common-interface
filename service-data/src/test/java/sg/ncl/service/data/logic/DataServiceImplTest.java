@@ -64,7 +64,7 @@ public class DataServiceImplTest extends AbstractTest {
 
     @Test
     public void testGetDatasets() {
-        dataService.getAll();
+        dataService.getDatasets();
         verify(dataRepository, times(1)).findAll();
     }
 
@@ -72,13 +72,13 @@ public class DataServiceImplTest extends AbstractTest {
     public void testGetDatasetUnknownId() {
         when(dataRepository.getOne(anyLong())).thenReturn(null);
         exception.expect(DataNotFoundException.class);
-        dataService.getOne(1L);
+        dataService.getDataset(1L);
     }
 
     @Test
     public void testGetDatasetknownId() {
         when(dataRepository.getOne(anyLong())).thenReturn(TestUtil.getDataEntity());
-        dataService.getOne(1L);
+        dataService.getDataset(1L);
         verify(dataRepository, times(1)).getOne(anyLong());
     }
 
@@ -90,7 +90,7 @@ public class DataServiceImplTest extends AbstractTest {
 
         when(dataRepository.findByName(anyString())).thenReturn(dataEntityList);
         exception.expect(DataNameInUseException.class);
-        dataService.save(dataEntity);
+        dataService.createDataset(dataEntity);
     }
 
     @Test
@@ -101,7 +101,7 @@ public class DataServiceImplTest extends AbstractTest {
         dataEntityList.add(dataEntity);
 
         when(dataRepository.findByName(anyString())).thenReturn(dataEntityList);
-        dataService.save(TestUtil.getDataEntity());
+        dataService.createDataset(TestUtil.getDataEntity());
         verify(dataRepository, times(1)).save(any(DataEntity.class));
     }
 
@@ -112,7 +112,7 @@ public class DataServiceImplTest extends AbstractTest {
         when(dataRepository.getOne(anyLong())).thenReturn(dataEntity);
         exception.expect(ForbiddenException.class);
 
-        dataService.save(dataEntity.getId(), dataEntity, claims);
+        dataService.updateDataset(dataEntity.getId(), dataEntity, claims);
     }
 
     @Test
@@ -124,7 +124,7 @@ public class DataServiceImplTest extends AbstractTest {
         when(claims.get(JwtToken.KEY)).thenReturn(roles);
         when(claims.getSubject()).thenReturn(dataEntity.getContributorId());
 
-        dataService.save(dataEntity.getId(), dataEntity, claims);
+        dataService.updateDataset(dataEntity.getId(), dataEntity, claims);
         verify(dataRepository, times(1)).save(any(DataEntity.class));
     }
 
@@ -137,7 +137,7 @@ public class DataServiceImplTest extends AbstractTest {
         when(claims.get(JwtToken.KEY)).thenReturn(roles);
         when(claims.getSubject()).thenReturn(dataEntity.getContributorId());
 
-        dataService.delete(dataEntity.getId(), claims);
+        dataService.deleteDataset(dataEntity.getId(), claims);
         verify(dataRepository, times(1)).delete(anyLong());
     }
 
@@ -187,7 +187,7 @@ public class DataServiceImplTest extends AbstractTest {
         when(claims.get(JwtToken.KEY)).thenReturn(roles);
         when(claims.getSubject()).thenReturn(dataEntity.getContributorId());
 
-        dataService.saveResource(dataEntity.getId(), dataResourceEntity, claims);
+        dataService.createResource(dataEntity.getId(), dataResourceEntity, claims);
         verify(dataRepository, times(1)).save(any(DataEntity.class));
     }
 

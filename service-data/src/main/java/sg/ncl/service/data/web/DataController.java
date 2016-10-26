@@ -40,7 +40,7 @@ public class DataController {
             log.warn("Access denied for: /datasets GET");
             throw new UnauthorizedException();
         }
-        return dataService.getAll().stream().map(DataInfo::new).collect(Collectors.toList());
+        return dataService.getDatasets().stream().map(DataInfo::new).collect(Collectors.toList());
     }
 
     // Get a list of public data sets
@@ -61,7 +61,7 @@ public class DataController {
         if (claims == null || !(claims instanceof Claims)) {
             throw new UnauthorizedException();
         }
-        return new DataInfo(dataService.getOne(Long.getLong(id)));
+        return new DataInfo(dataService.getDataset(Long.getLong(id)));
     }
 
     // Create a data set
@@ -71,7 +71,7 @@ public class DataController {
         if (claims == null || !(claims instanceof Claims)) {
             throw new UnauthorizedException();
         }
-        return new DataInfo(dataService.save(dataInfo));
+        return new DataInfo(dataService.createDataset(dataInfo));
     }
 
     // Update a data set
@@ -81,7 +81,7 @@ public class DataController {
         if (claims == null || !(claims instanceof Claims)) {
             throw new UnauthorizedException();
         }
-        return new DataInfo(dataService.save(Long.getLong(id), dataInfo, (Claims) claims));
+        return new DataInfo(dataService.updateDataset(Long.getLong(id), dataInfo, (Claims) claims));
     }
 
     // Delete a data set
@@ -91,7 +91,7 @@ public class DataController {
         if (claims == null || !(claims instanceof Claims)) {
             throw new UnauthorizedException();
         }
-        return new DataInfo(dataService.delete(Long.getLong(id), (Claims) claims));
+        return new DataInfo(dataService.deleteDataset(Long.getLong(id), (Claims) claims));
     }
 
     // View resource in a data set
@@ -113,7 +113,7 @@ public class DataController {
         if (claims == null || !(claims instanceof Claims)) {
             throw new UnauthorizedException();
         }
-        return new DataInfo(dataService.saveResource(Long.getLong(id), dataResourceInfo, (Claims) claims));
+        return new DataInfo(dataService.createResource(Long.getLong(id), dataResourceInfo, (Claims) claims));
     }
 
     // Delete a resource from a data set
@@ -129,23 +129,23 @@ public class DataController {
     // Request access to a dataset
     @PostMapping(path = "/{id}/requests")
     @ResponseStatus(HttpStatus.CREATED)
-    public DataRequest addRequest(@AuthenticationPrincipal Object claims, @PathVariable String id) {
+    public String addRequest(@AuthenticationPrincipal Object claims, @PathVariable String id) {
         if (claims == null || !(claims instanceof Claims)) {
             throw new UnauthorizedException();
         }
         // TODO: add request to database
-        return null;
+        return "";
     }
 
     // Process request
     @PutMapping(path = "{did}/requests/{rid}")
     @ResponseStatus(HttpStatus.OK)
-    public DataRequest processRequest(@AuthenticationPrincipal Object claims, @PathVariable String did, @PathVariable String rid) {
+    public String processRequest(@AuthenticationPrincipal Object claims, @PathVariable String did, @PathVariable String rid) {
         if (claims == null || !(claims instanceof Claims)) {
             throw new UnauthorizedException();
         }
         // TODO: process request to add to approved users
-        return null;
+        return "";
     }
 
 }
