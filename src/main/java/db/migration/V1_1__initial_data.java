@@ -76,7 +76,7 @@ public class V1_1__initial_data implements SpringJdbcMigration {
 
         final String userId = createUser(jdbcTemplate, "Y", UserStatus.APPROVED, detailsId);
 
-        createCredentials(jdbcTemplate, "admin@ncl.sg", "ncl", userId, CredentialsStatus.ACTIVE);
+        createCredentials(jdbcTemplate, "admin@ncl.sg", "nclenvfinal", userId, CredentialsStatus.ACTIVE);
 
         createRoles(jdbcTemplate, userId, Collections.singletonList(Role.ADMIN));
 
