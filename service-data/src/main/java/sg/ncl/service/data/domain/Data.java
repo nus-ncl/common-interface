@@ -1,5 +1,6 @@
 package sg.ncl.service.data.domain;
 
+import java.time.ZonedDateTime;
 import java.util.List;
 
 /**
@@ -22,5 +23,7 @@ public interface Data {
     List<DataResource> getResources();
 
     List<String> getApprovedUsers();
+
+    ZonedDateTime getReleaseDate();
 
 }

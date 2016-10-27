@@ -24,6 +24,7 @@ import javax.persistence.JoinColumn;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.persistence.UniqueConstraint;
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -59,6 +60,9 @@ public class DataEntity extends AbstractEntity implements Data {
     @Column(name = "accessibility", nullable = false)
     @Enumerated(EnumType.STRING)
     private DataAccessibility accessibility = DataAccessibility.OPEN;
+
+    @Column(name = "release_date", nullable = false)
+    private ZonedDateTime releaseDate;
 
     @OneToMany(cascade = CascadeType.ALL)
     @JoinColumn(name = "data_id")
