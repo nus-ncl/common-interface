@@ -151,10 +151,6 @@ public class RealizationServiceImpl implements RealizationService {
     public RealizationEntity startExperimentInDeter(final String teamName, final String expId) {
         log.info("Starting experiment {} for team {}", expId, teamName);
         RealizationEntity realizationEntityDb = realizationRepository.findByExperimentId(Long.parseLong(expId));
-        if(!realizationEntityDb.getState().equals(RealizationState.NOT_RUNNING)) {
-            log.warn("Failed to start experiment {}: current status {}", realizationEntityDb.getExperimentName(), realizationEntityDb.getState());
-            return null;
-        }
         String experimentName = realizationEntityDb.getExperimentName();
         String userId = realizationEntityDb.getUserId();
 
@@ -315,10 +311,6 @@ public class RealizationServiceImpl implements RealizationService {
 
     public void updateRealizationLog(String teamId, Long expId) {
         List<RealizationLogEntity> realizationLogEntities = realizationLogRepository.findByTeamIdAndExpId(teamId, expId);
-        if(realizationLogEntities.size() <= 0) {
-            log.warn("Cannot find realization logs for exp {} in team {}", expId, teamId);
-            return;
-        }
         for(RealizationLogEntity realizationLogEntity : realizationLogEntities) {
             if(null == realizationLogEntity.getEndDate()) {
                 realizationLogEntity.setEndDate(ZonedDateTime.now());
@@ -327,5 +319,10 @@ public class RealizationServiceImpl implements RealizationService {
                 return;
             }
         }
+    }
+
+    public int getCurrentMonthUsageByTeam(String id) {
+       // realizationLogRepository.findByTeamId(id);
+        return 0;
     }
 }
