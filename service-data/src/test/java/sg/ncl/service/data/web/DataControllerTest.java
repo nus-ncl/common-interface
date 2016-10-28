@@ -1,6 +1,7 @@
 package sg.ncl.service.data.web;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import io.jsonwebtoken.Claims;
 import org.junit.Before;
 import org.junit.Test;
@@ -59,8 +60,10 @@ public class DataControllerTest {
     private DataService dataService;
 
     @Inject
-    private WebApplicationContext webApplicationContext;
+    private ObjectMapper mapper;
     @Inject
+    private WebApplicationContext webApplicationContext;
+
     private MockMvc mockMvc;
 
     @Before
@@ -178,6 +181,9 @@ public class DataControllerTest {
     public void testAddDatasetGoodAuthentication() throws Exception {
         final DataEntity dataEntity = TestUtil.getDataEntity();
 
+        mapper.registerModule(new JavaTimeModule());
+        final byte[] content = mapper.writeValueAsBytes(new DataInfo(dataEntity));
+
         when(securityContext.getAuthentication()).thenReturn(authentication);
         SecurityContextHolder.setContext(securityContext);
         when(authentication.getPrincipal()).thenReturn(claims);
@@ -185,7 +191,7 @@ public class DataControllerTest {
 
         mockMvc.perform(post(DataController.PATH)
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(asJsonString(dataEntity)))
+                .content(content))
 
                 .andExpect(status().isCreated())
                 .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
@@ -201,6 +207,9 @@ public class DataControllerTest {
     public void testUpdateDatasetGoodAuthentication() throws Exception {
         final DataEntity dataEntity = TestUtil.getDataEntity();
 
+        mapper.registerModule(new JavaTimeModule());
+        final byte[] content = mapper.writeValueAsBytes(new DataInfo(dataEntity));
+
         when(securityContext.getAuthentication()).thenReturn(authentication);
         SecurityContextHolder.setContext(securityContext);
         when(authentication.getPrincipal()).thenReturn(claims);
@@ -208,7 +217,7 @@ public class DataControllerTest {
 
         mockMvc.perform(put(DataController.PATH + "/1")
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(asJsonString(dataEntity)))
+                .content(content))
 
                 .andExpect(status().isOk())
                 .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
