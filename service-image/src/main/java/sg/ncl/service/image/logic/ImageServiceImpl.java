@@ -2,6 +2,7 @@ package sg.ncl.service.image.logic;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import sg.ncl.adapter.deterlab.AdapterDeterLab;
 import sg.ncl.service.image.domain.ImageService;
 
@@ -22,7 +23,22 @@ public class ImageServiceImpl implements ImageService {
         this.adapterDeterLab = adapterDeterLab;
     }
 
-    public String getSavedImages() {
+    @Transactional
+    @Override
+    public String getAll() {
+        // TODO call adapter deterlab
+        return "";
+    }
 
+    @Transactional
+    @Override
+    public String getImage() {
+        return null;
+    }
+
+    @Transactional
+    @Override
+    public String addImage() {
+        return null;
     }
 }
