@@ -4,7 +4,6 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Getter;
 import sg.ncl.service.image.domain.Image;
-import sg.ncl.service.image.domain.ImageVisibility;
 
 /**
  * Created by dcsyeoty on 28-Oct-16.
@@ -17,7 +16,6 @@ public class ImageInfo implements Image {
     private String imageName;
     private String nodeId;
     private String description;
-    private ImageVisibility visibility;
 
     @JsonCreator
     public ImageInfo(
@@ -25,19 +23,17 @@ public class ImageInfo implements Image {
             @JsonProperty("teamId") final String teamId,
             @JsonProperty("imageName") final String imageName,
             @JsonProperty("nodeId") final String nodeId,
-            @JsonProperty("description") final String description,
-            @JsonProperty("visibility") final ImageVisibility visibility
-            ) {
+            @JsonProperty("description") final String description
+    ) {
         this.id = id;
         this.teamId = teamId;
         this.imageName = imageName;
         this.nodeId = nodeId;
         this.description = description;
-        this.visibility = visibility;
     }
 
     public ImageInfo(final Image image) {
-        this(image.getId(), image.getTeamId(), image.getImageName(), image.getNodeId(), image.getDescription(), image.getVisibility());
+        this(image.getId(), image.getTeamId(), image.getImageName(), image.getNodeId(), image.getDescription());
     }
 
 }

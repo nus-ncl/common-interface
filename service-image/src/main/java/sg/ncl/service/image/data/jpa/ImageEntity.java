@@ -4,7 +4,6 @@ import lombok.Getter;
 import lombok.Setter;
 import sg.ncl.common.jpa.AbstractEntity;
 import sg.ncl.service.image.domain.Image;
-import sg.ncl.service.image.domain.ImageVisibility;
 
 import javax.persistence.*;
 
@@ -34,10 +33,6 @@ public class ImageEntity extends AbstractEntity implements Image {
     @Column(name = "description", nullable = true, updatable = false)
     private String description;
 
-    @Column(name = "visibility", nullable = false)
-    @Enumerated(EnumType.STRING)
-    private ImageVisibility visibility = ImageVisibility.PRIVATE;
-
     @Override
     public boolean equals(final Object o) {
         if (this == o) {
@@ -63,9 +58,8 @@ public class ImageEntity extends AbstractEntity implements Image {
                 "id='" + id + '\'' +
                 ", teamId='" + teamId + '\'' +
                 ", nodeId='" + nodeId + '\'' +
-                ", imageName=" + imageName + '\'' +
-                ", description=" + description + '\'' +
-                ", visibility=" + visibility +
+                ", imageName=" + imageName +
+                ", description=" + description +
                 "} " + super.toString();
     }
 }
