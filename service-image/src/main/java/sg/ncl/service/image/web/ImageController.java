@@ -31,9 +31,21 @@ public class ImageController {
     }
 
     @GetMapping
-    @ResponseStatus(HttpStatus.CREATED)
-    public Map<String, String> getSavedImages() {
+    @ResponseStatus(HttpStatus.OK)
+    public Map<String, String> getAll() {
         return null;
     }
 
+    @GetMapping(path = "/{id}")
+    @ResponseStatus(HttpStatus.OK)
+    public Map<String, String> getImage(@PathVariable final String id) {
+        return null;
+    }
+
+    // status is ACCEPTED because creating an image is not an instant process
+    @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
+    @ResponseStatus(HttpStatus.ACCEPTED)
+    public Map<String, String> addImage() {
+        return null;
+    }
 }
