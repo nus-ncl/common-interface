@@ -7,6 +7,7 @@ import sg.ncl.service.data.data.jpa.DataResourceEntity;
 import sg.ncl.service.data.domain.DataAccessibility;
 import sg.ncl.service.data.domain.DataVisibility;
 
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -51,6 +52,7 @@ public class TestUtil {
         entity.setContributorId(ownerId);
         entity.setAccessibility(accessibility);
         entity.setVisibility(visibility);
+        entity.setReleaseDate(ZonedDateTime.now());
 
         return entity;
     }

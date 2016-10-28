@@ -6,4 +6,5 @@ dependencies {
     compileOnly 'org.springframework.boot:spring-boot-configuration-processor'
 
     testCompile project(':common-test')
+    testCompile 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310'
 }
