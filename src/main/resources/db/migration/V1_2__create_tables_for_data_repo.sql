@@ -11,6 +11,7 @@ CREATE TABLE IF NOT EXISTS `prod`.`data` (
   `accessibility`      VARCHAR(255) NOT NULL,
   `visibility`         VARCHAR(255) NOT NULL,
   `contributor_id`     VARCHAR(255) NOT NULL,
+  `release_date`       DATETIME     NOT NULL,
   PRIMARY KEY (`id`),
   UNIQUE INDEX `UK_krxed372ocm2ni4s42qjnuxmn` (`name` ASC),
   INDEX `IDXkrxed372ocm2ni4s42qjnuxmn` (`name` ASC)

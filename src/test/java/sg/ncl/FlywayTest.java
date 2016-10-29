@@ -113,50 +113,51 @@ public class FlywayTest {
         assertThat((String) addressesTable.get(0).get("NULL")).isEqualTo("NO");
         assertThat((String) addressesTable.get(0).get("KEY")).isEqualTo("PRI");
 
-        assertThat((String) addressesTable.get(1).get("FIELD")).isEqualTo("version");
-        assertThat((String) addressesTable.get(1).get("TYPE")).contains("bigint");
+        assertThat((String) addressesTable.get(1).get("FIELD")).isEqualTo("created_date");
+        assertThat((String) addressesTable.get(1).get("TYPE")).contains("timestamp");
         assertThat((String) addressesTable.get(1).get("NULL")).isEqualTo("NO");
         assertThat((String) addressesTable.get(1).get("KEY")).isEmpty();
 
-        assertThat((String) addressesTable.get(2).get("FIELD")).isEqualTo("address_1");
-        assertThat((String) addressesTable.get(2).get("TYPE")).isEqualTo("varchar(255)");
+        assertThat((String) addressesTable.get(2).get("FIELD")).isEqualTo("last_modified_date");
+        assertThat((String) addressesTable.get(2).get("TYPE")).contains("timestamp");
         assertThat((String) addressesTable.get(2).get("NULL")).isEqualTo("NO");
         assertThat((String) addressesTable.get(2).get("KEY")).isEmpty();
 
-        assertThat((String) addressesTable.get(3).get("FIELD")).isEqualTo("address_2");
-        assertThat((String) addressesTable.get(3).get("TYPE")).isEqualTo("varchar(255)");
-        assertThat((String) addressesTable.get(3).get("NULL")).isEqualTo("YES");
+        assertThat((String) addressesTable.get(3).get("FIELD")).isEqualTo("version");
+        assertThat((String) addressesTable.get(3).get("TYPE")).contains("bigint");
+        assertThat((String) addressesTable.get(3).get("NULL")).isEqualTo("NO");
         assertThat((String) addressesTable.get(3).get("KEY")).isEmpty();
 
-        assertThat((String) addressesTable.get(4).get("FIELD")).isEqualTo("city");
+        assertThat((String) addressesTable.get(4).get("FIELD")).isEqualTo("address_1");
         assertThat((String) addressesTable.get(4).get("TYPE")).isEqualTo("varchar(255)");
         assertThat((String) addressesTable.get(4).get("NULL")).isEqualTo("NO");
         assertThat((String) addressesTable.get(4).get("KEY")).isEmpty();
 
-        assertThat((String) addressesTable.get(5).get("FIELD")).isEqualTo("country");
+        assertThat((String) addressesTable.get(5).get("FIELD")).isEqualTo("address_2");
         assertThat((String) addressesTable.get(5).get("TYPE")).isEqualTo("varchar(255)");
-        assertThat((String) addressesTable.get(5).get("NULL")).isEqualTo("NO");
+        assertThat((String) addressesTable.get(5).get("NULL")).isEqualTo("YES");
         assertThat((String) addressesTable.get(5).get("KEY")).isEmpty();
 
-        assertThat((String) addressesTable.get(6).get("FIELD")).isEqualTo("region");
+        assertThat((String) addressesTable.get(6).get("FIELD")).isEqualTo("city");
         assertThat((String) addressesTable.get(6).get("TYPE")).isEqualTo("varchar(255)");
-        assertThat((String) addressesTable.get(6).get("NULL")).isEqualTo("YES");
+        assertThat((String) addressesTable.get(6).get("NULL")).isEqualTo("NO");
         assertThat((String) addressesTable.get(6).get("KEY")).isEmpty();
 
-        assertThat((String) addressesTable.get(7).get("FIELD")).isEqualTo("zip_code");
+        assertThat((String) addressesTable.get(7).get("FIELD")).isEqualTo("country");
         assertThat((String) addressesTable.get(7).get("TYPE")).isEqualTo("varchar(255)");
         assertThat((String) addressesTable.get(7).get("NULL")).isEqualTo("NO");
         assertThat((String) addressesTable.get(7).get("KEY")).isEmpty();
 
-        assertThat((String) addressesTable.get(8).get("FIELD")).isEqualTo("created_date");
-        assertThat((String) addressesTable.get(8).get("TYPE")).contains("timestamp");
-        assertThat((String) addressesTable.get(8).get("NULL")).isEqualTo("NO");
+        assertThat((String) addressesTable.get(8).get("FIELD")).isEqualTo("region");
+        assertThat((String) addressesTable.get(8).get("TYPE")).isEqualTo("varchar(255)");
+        assertThat((String) addressesTable.get(8).get("NULL")).isEqualTo("YES");
         assertThat((String) addressesTable.get(8).get("KEY")).isEmpty();
 
-        assertThat((String) addressesTable.get(9).get("FIELD")).isEqualTo("last_modified_date");
-        assertThat((String) addressesTable.get(9).get("TYPE")).contains("timestamp");
+        assertThat((String) addressesTable.get(9).get("FIELD")).isEqualTo("zip_code");
+        assertThat((String) addressesTable.get(9).get("TYPE")).isEqualTo("varchar(255)");
         assertThat((String) addressesTable.get(9).get("NULL")).isEqualTo("NO");
         assertThat((String) addressesTable.get(9).get("KEY")).isEmpty();
+
 
         List<Map<String, Object>> addressesConstraints = this.template.queryForList("SELECT * FROM INFORMATION_SCHEMA.CONSTRAINTS WHERE TABLE_NAME = 'addresses'");
 
@@ -176,35 +177,36 @@ public class FlywayTest {
             assertThat((String) credentialsTable.get(0).get("NULL")).isEqualTo("NO");
             assertThat((String) credentialsTable.get(0).get("KEY")).isEqualTo("PRI");
 
-            assertThat((String) credentialsTable.get(1).get("FIELD")).isEqualTo("version");
-            assertThat((String) credentialsTable.get(1).get("TYPE")).contains("bigint");
+            assertThat((String) credentialsTable.get(1).get("FIELD")).isEqualTo("created_date");
+            assertThat((String) credentialsTable.get(1).get("TYPE")).contains("timestamp");
             assertThat((String) credentialsTable.get(1).get("NULL")).isEqualTo("NO");
             assertThat((String) credentialsTable.get(1).get("KEY")).isEmpty();
 
-            assertThat((String) credentialsTable.get(2).get("FIELD")).isEqualTo("password");
-            assertThat((String) credentialsTable.get(2).get("TYPE")).isEqualTo("varchar(255)");
+            assertThat((String) credentialsTable.get(2).get("FIELD")).isEqualTo("last_modified_date");
+            assertThat((String) credentialsTable.get(2).get("TYPE")).contains("timestamp");
             assertThat((String) credentialsTable.get(2).get("NULL")).isEqualTo("NO");
             assertThat((String) credentialsTable.get(2).get("KEY")).isEmpty();
 
-            assertThat((String) credentialsTable.get(3).get("FIELD")).isEqualTo("status");
-            assertThat((String) credentialsTable.get(3).get("TYPE")).isEqualTo("varchar(255)");
+            assertThat((String) credentialsTable.get(3).get("FIELD")).isEqualTo("version");
+            assertThat((String) credentialsTable.get(3).get("TYPE")).contains("bigint");
             assertThat((String) credentialsTable.get(3).get("NULL")).isEqualTo("NO");
             assertThat((String) credentialsTable.get(3).get("KEY")).isEmpty();
 
-            assertThat((String) credentialsTable.get(4).get("FIELD")).isEqualTo("username");
+            assertThat((String) credentialsTable.get(4).get("FIELD")).isEqualTo("password");
             assertThat((String) credentialsTable.get(4).get("TYPE")).isEqualTo("varchar(255)");
             assertThat((String) credentialsTable.get(4).get("NULL")).isEqualTo("NO");
-            assertThat((String) credentialsTable.get(4).get("KEY")).isEqualTo("UNI");
+            assertThat((String) credentialsTable.get(4).get("KEY")).isEmpty();
 
-            assertThat((String) credentialsTable.get(5).get("FIELD")).isEqualTo("created_date");
-            assertThat((String) credentialsTable.get(5).get("TYPE")).contains("timestamp");
+            assertThat((String) credentialsTable.get(5).get("FIELD")).isEqualTo("status");
+            assertThat((String) credentialsTable.get(5).get("TYPE")).isEqualTo("varchar(255)");
             assertThat((String) credentialsTable.get(5).get("NULL")).isEqualTo("NO");
             assertThat((String) credentialsTable.get(5).get("KEY")).isEmpty();
 
-            assertThat((String) credentialsTable.get(6).get("FIELD")).isEqualTo("last_modified_date");
-            assertThat((String) credentialsTable.get(6).get("TYPE")).contains("timestamp");
+            assertThat((String) credentialsTable.get(6).get("FIELD")).isEqualTo("username");
+            assertThat((String) credentialsTable.get(6).get("TYPE")).isEqualTo("varchar(255)");
             assertThat((String) credentialsTable.get(6).get("NULL")).isEqualTo("NO");
-            assertThat((String) credentialsTable.get(6).get("KEY")).isEmpty();
+            assertThat((String) credentialsTable.get(6).get("KEY")).isEqualTo("UNI");
+
 
             List<Map<String, Object>> credentialsConstraints = this.template.queryForList("SELECT * FROM INFORMATION_SCHEMA.CONSTRAINTS WHERE TABLE_NAME = 'credentials'");
 
@@ -242,7 +244,7 @@ public class FlywayTest {
     public void testDataTable() throws Exception {
         // make sure 'data' table has expected number of columns
         List<Map<String, Object>> dataTable = this.template.queryForList("SHOW COLUMNS FROM " + SCHEMA + "." + DATA);
-        assertThat(dataTable.size()).isEqualTo(9);
+        assertThat(dataTable.size()).isEqualTo(10);
 
         // make sure 'data' table has expected column name and type
         assertThat((String) dataTable.get(0).get("FIELD")).isEqualTo("id");
@@ -289,6 +291,11 @@ public class FlywayTest {
         assertThat((String) dataTable.get(8).get("TYPE")).isEqualTo("varchar(255)");
         assertThat((String) dataTable.get(8).get("NULL")).isEqualTo("NO");
         assertThat((String) dataTable.get(8).get("KEY")).isEmpty();
+
+        assertThat((String) dataTable.get(9).get("FIELD")).isEqualTo("release_date");
+        assertThat((String) dataTable.get(9).get("TYPE")).contains("timestamp");
+        assertThat((String) dataTable.get(9).get("NULL")).isEqualTo("NO");
+        assertThat((String) dataTable.get(9).get("KEY")).isEmpty();
 
         List<Map<String, Object>> dataConstraints = this.template.queryForList("SELECT * FROM INFORMATION_SCHEMA.CONSTRAINTS WHERE TABLE_NAME = 'data'");
 
@@ -375,34 +382,35 @@ public class FlywayTest {
 
         // make sure 'deterlab_project' table has expected column name and type
         assertThat((String) deterlabProjectTable.get(0).get("FIELD")).isEqualTo("id");
-        assertThat((String) deterlabProjectTable.get(0).get("TYPE")).isEqualTo("varchar(255)");
+        assertThat((String) deterlabProjectTable.get(0).get("TYPE")).contains("bigint");
         assertThat((String) deterlabProjectTable.get(0).get("NULL")).isEqualTo("NO");
         assertThat((String) deterlabProjectTable.get(0).get("KEY")).isEqualTo("PRI");
 
-        assertThat((String) deterlabProjectTable.get(1).get("FIELD")).isEqualTo("version");
-        assertThat((String) deterlabProjectTable.get(1).get("TYPE")).contains("bigint");
+        assertThat((String) deterlabProjectTable.get(1).get("FIELD")).isEqualTo("created_date");
+        assertThat((String) deterlabProjectTable.get(1).get("TYPE")).contains("timestamp");
         assertThat((String) deterlabProjectTable.get(1).get("NULL")).isEqualTo("NO");
         assertThat((String) deterlabProjectTable.get(1).get("KEY")).isEmpty();
 
-        assertThat((String) deterlabProjectTable.get(2).get("FIELD")).isEqualTo("deter_project_id");
-        assertThat((String) deterlabProjectTable.get(2).get("TYPE")).isEqualTo("varchar(255)");
+        assertThat((String) deterlabProjectTable.get(2).get("FIELD")).isEqualTo("last_modified_date");
+        assertThat((String) deterlabProjectTable.get(2).get("TYPE")).contains("timestamp");
         assertThat((String) deterlabProjectTable.get(2).get("NULL")).isEqualTo("NO");
-        assertThat((String) deterlabProjectTable.get(2).get("KEY")).isEqualTo("UNI");
+        assertThat((String) deterlabProjectTable.get(2).get("KEY")).isEmpty();
 
-        assertThat((String) deterlabProjectTable.get(3).get("FIELD")).isEqualTo("ncl_team_id");
-        assertThat((String) deterlabProjectTable.get(3).get("TYPE")).isEqualTo("varchar(255)");
+        assertThat((String) deterlabProjectTable.get(3).get("FIELD")).isEqualTo("version");
+        assertThat((String) deterlabProjectTable.get(3).get("TYPE")).contains("bigint");
         assertThat((String) deterlabProjectTable.get(3).get("NULL")).isEqualTo("NO");
-        assertThat((String) deterlabProjectTable.get(3).get("KEY")).isEqualTo("UNI");
+        assertThat((String) deterlabProjectTable.get(3).get("KEY")).isEmpty();
 
-        assertThat((String) deterlabProjectTable.get(4).get("FIELD")).isEqualTo("created_date");
-        assertThat((String) deterlabProjectTable.get(4).get("TYPE")).contains("timestamp");
+        assertThat((String) deterlabProjectTable.get(4).get("FIELD")).isEqualTo("deter_project_id");
+        assertThat((String) deterlabProjectTable.get(4).get("TYPE")).isEqualTo("varchar(255)");
         assertThat((String) deterlabProjectTable.get(4).get("NULL")).isEqualTo("NO");
-        assertThat((String) deterlabProjectTable.get(4).get("KEY")).isEmpty();
+        assertThat((String) deterlabProjectTable.get(4).get("KEY")).isEqualTo("UNI");
 
-        assertThat((String) deterlabProjectTable.get(5).get("FIELD")).isEqualTo("last_modified_date");
-        assertThat((String) deterlabProjectTable.get(5).get("TYPE")).contains("timestamp");
+        assertThat((String) deterlabProjectTable.get(5).get("FIELD")).isEqualTo("ncl_team_id");
+        assertThat((String) deterlabProjectTable.get(5).get("TYPE")).isEqualTo("varchar(255)");
         assertThat((String) deterlabProjectTable.get(5).get("NULL")).isEqualTo("NO");
-        assertThat((String) deterlabProjectTable.get(5).get("KEY")).isEmpty();
+        assertThat((String) deterlabProjectTable.get(5).get("KEY")).isEqualTo("UNI");
+
 
         List<Map<String, Object>> deterlabProjectConstraints = this.template.queryForList("SELECT * FROM INFORMATION_SCHEMA.CONSTRAINTS WHERE TABLE_NAME = 'deterlab_project'");
 
@@ -426,30 +434,31 @@ public class FlywayTest {
         assertThat((String) deterlabUserTable.get(0).get("NULL")).isEqualTo("NO");
         assertThat((String) deterlabUserTable.get(0).get("KEY")).isEqualTo("PRI");
 
-        assertThat((String) deterlabUserTable.get(1).get("FIELD")).isEqualTo("version");
-        assertThat((String) deterlabUserTable.get(1).get("TYPE")).contains("bigint");
+        assertThat((String) deterlabUserTable.get(1).get("FIELD")).isEqualTo("created_date");
+        assertThat((String) deterlabUserTable.get(1).get("TYPE")).contains("timestamp");
         assertThat((String) deterlabUserTable.get(1).get("NULL")).isEqualTo("NO");
         assertThat((String) deterlabUserTable.get(1).get("KEY")).isEmpty();
 
-        assertThat((String) deterlabUserTable.get(2).get("FIELD")).isEqualTo("deter_user_id");
-        assertThat((String) deterlabUserTable.get(2).get("TYPE")).isEqualTo("varchar(255)");
+        assertThat((String) deterlabUserTable.get(2).get("FIELD")).isEqualTo("last_modified_date");
+        assertThat((String) deterlabUserTable.get(2).get("TYPE")).contains("timestamp");
         assertThat((String) deterlabUserTable.get(2).get("NULL")).isEqualTo("NO");
-        assertThat((String) deterlabUserTable.get(2).get("KEY")).isEqualTo("UNI");
+        assertThat((String) deterlabUserTable.get(2).get("KEY")).isEmpty();
 
-        assertThat((String) deterlabUserTable.get(3).get("FIELD")).isEqualTo("ncl_user_id");
-        assertThat((String) deterlabUserTable.get(3).get("TYPE")).isEqualTo("varchar(255)");
+        assertThat((String) deterlabUserTable.get(3).get("FIELD")).isEqualTo("version");
+        assertThat((String) deterlabUserTable.get(3).get("TYPE")).contains("bigint");
         assertThat((String) deterlabUserTable.get(3).get("NULL")).isEqualTo("NO");
-        assertThat((String) deterlabUserTable.get(3).get("KEY")).isEqualTo("UNI");
+        assertThat((String) deterlabUserTable.get(3).get("KEY")).isEmpty();
 
-        assertThat((String) deterlabUserTable.get(4).get("FIELD")).isEqualTo("created_date");
-        assertThat((String) deterlabUserTable.get(4).get("TYPE")).contains("timestamp");
+        assertThat((String) deterlabUserTable.get(4).get("FIELD")).isEqualTo("deter_user_id");
+        assertThat((String) deterlabUserTable.get(4).get("TYPE")).isEqualTo("varchar(255)");
         assertThat((String) deterlabUserTable.get(4).get("NULL")).isEqualTo("NO");
-        assertThat((String) deterlabUserTable.get(4).get("KEY")).isEmpty();
+        assertThat((String) deterlabUserTable.get(4).get("KEY")).isEqualTo("UNI");
 
-        assertThat((String) deterlabUserTable.get(5).get("FIELD")).isEqualTo("last_modified_date");
-        assertThat((String) deterlabUserTable.get(5).get("TYPE")).contains("timestamp");
+        assertThat((String) deterlabUserTable.get(5).get("FIELD")).isEqualTo("ncl_user_id");
+        assertThat((String) deterlabUserTable.get(5).get("TYPE")).isEqualTo("varchar(255)");
         assertThat((String) deterlabUserTable.get(5).get("NULL")).isEqualTo("NO");
-        assertThat((String) deterlabUserTable.get(5).get("KEY")).isEmpty();
+        assertThat((String) deterlabUserTable.get(5).get("KEY")).isEqualTo("UNI");
+
 
         List<Map<String, Object>> deterlabUserConstraints = this.template.queryForList("SELECT * FROM INFORMATION_SCHEMA.CONSTRAINTS WHERE TABLE_NAME = 'deterlab_user'");
 
@@ -473,73 +482,73 @@ public class FlywayTest {
         assertThat((String) emailRetriesTable.get(0).get("NULL")).isEqualTo("NO");
         assertThat((String) emailRetriesTable.get(0).get("KEY")).isEqualTo("PRI");
 
-        assertThat((String) emailRetriesTable.get(1).get("FIELD")).isEqualTo("version");
-        assertThat((String) emailRetriesTable.get(1).get("TYPE")).contains("bigint");
+        assertThat((String) emailRetriesTable.get(1).get("FIELD")).isEqualTo("created_date");
+        assertThat((String) emailRetriesTable.get(1).get("TYPE")).contains("timestamp");
         assertThat((String) emailRetriesTable.get(1).get("NULL")).isEqualTo("NO");
         assertThat((String) emailRetriesTable.get(1).get("KEY")).isEmpty();
 
-        assertThat((String) emailRetriesTable.get(2).get("FIELD")).isEqualTo("bcc");
-        assertThat((String) emailRetriesTable.get(2).get("TYPE")).contains("blob");
-        assertThat((String) emailRetriesTable.get(2).get("NULL")).isEqualTo("YES");
+        assertThat((String) emailRetriesTable.get(2).get("FIELD")).isEqualTo("last_modified_date");
+        assertThat((String) emailRetriesTable.get(2).get("TYPE")).contains("timestamp");
+        assertThat((String) emailRetriesTable.get(2).get("NULL")).isEqualTo("NO");
         assertThat((String) emailRetriesTable.get(2).get("KEY")).isEmpty();
 
-        assertThat((String) emailRetriesTable.get(3).get("FIELD")).isEqualTo("cc");
-        assertThat((String) emailRetriesTable.get(3).get("TYPE")).contains("blob");
-        assertThat((String) emailRetriesTable.get(3).get("NULL")).isEqualTo("YES");
+        assertThat((String) emailRetriesTable.get(3).get("FIELD")).isEqualTo("version");
+        assertThat((String) emailRetriesTable.get(3).get("TYPE")).contains("bigint");
+        assertThat((String) emailRetriesTable.get(3).get("NULL")).isEqualTo("NO");
         assertThat((String) emailRetriesTable.get(3).get("KEY")).isEmpty();
 
-        assertThat((String) emailRetriesTable.get(4).get("FIELD")).isEqualTo("content");
-        assertThat((String) emailRetriesTable.get(4).get("TYPE")).isEqualTo("varchar(255)");
-        assertThat((String) emailRetriesTable.get(4).get("NULL")).isEqualTo("NO");
+        assertThat((String) emailRetriesTable.get(4).get("FIELD")).isEqualTo("bcc");
+        assertThat((String) emailRetriesTable.get(4).get("TYPE")).contains("blob");
+        assertThat((String) emailRetriesTable.get(4).get("NULL")).isEqualTo("YES");
         assertThat((String) emailRetriesTable.get(4).get("KEY")).isEmpty();
 
-        assertThat((String) emailRetriesTable.get(5).get("FIELD")).isEqualTo("error_message");
-        assertThat((String) emailRetriesTable.get(5).get("TYPE")).isEqualTo("varchar(255)");
+        assertThat((String) emailRetriesTable.get(5).get("FIELD")).isEqualTo("cc");
+        assertThat((String) emailRetriesTable.get(5).get("TYPE")).contains("blob");
         assertThat((String) emailRetriesTable.get(5).get("NULL")).isEqualTo("YES");
         assertThat((String) emailRetriesTable.get(5).get("KEY")).isEmpty();
 
-        assertThat((String) emailRetriesTable.get(6).get("FIELD")).isEqualTo("html");
-        assertThat((String) emailRetriesTable.get(6).get("TYPE")).isEqualTo("boolean(1)");
+        assertThat((String) emailRetriesTable.get(6).get("FIELD")).isEqualTo("content");
+        assertThat((String) emailRetriesTable.get(6).get("TYPE")).isEqualTo("varchar(255)");
         assertThat((String) emailRetriesTable.get(6).get("NULL")).isEqualTo("NO");
         assertThat((String) emailRetriesTable.get(6).get("KEY")).isEmpty();
 
-        assertThat((String) emailRetriesTable.get(7).get("FIELD")).isEqualTo("recipients");
-        assertThat((String) emailRetriesTable.get(7).get("TYPE")).contains("blob");
-        assertThat((String) emailRetriesTable.get(7).get("NULL")).isEqualTo("NO");
+        assertThat((String) emailRetriesTable.get(7).get("FIELD")).isEqualTo("error_message");
+        assertThat((String) emailRetriesTable.get(7).get("TYPE")).isEqualTo("varchar(255)");
+        assertThat((String) emailRetriesTable.get(7).get("NULL")).isEqualTo("YES");
         assertThat((String) emailRetriesTable.get(7).get("KEY")).isEmpty();
 
-        assertThat((String) emailRetriesTable.get(8).get("FIELD")).isEqualTo("retry_times");
-        assertThat((String) emailRetriesTable.get(8).get("TYPE")).isEqualTo("integer(10)");
+        assertThat((String) emailRetriesTable.get(8).get("FIELD")).isEqualTo("html");
+        assertThat((String) emailRetriesTable.get(8).get("TYPE")).isEqualTo("boolean(1)");
         assertThat((String) emailRetriesTable.get(8).get("NULL")).isEqualTo("NO");
         assertThat((String) emailRetriesTable.get(8).get("KEY")).isEmpty();
 
-        assertThat((String) emailRetriesTable.get(9).get("FIELD")).isEqualTo("sender");
-        assertThat((String) emailRetriesTable.get(9).get("TYPE")).isEqualTo("varchar(255)");
+        assertThat((String) emailRetriesTable.get(9).get("FIELD")).isEqualTo("last_retry_time");
+        assertThat((String) emailRetriesTable.get(9).get("TYPE")).contains("timestamp");
         assertThat((String) emailRetriesTable.get(9).get("NULL")).isEqualTo("NO");
         assertThat((String) emailRetriesTable.get(9).get("KEY")).isEmpty();
 
-        assertThat((String) emailRetriesTable.get(10).get("FIELD")).isEqualTo("sent");
-        assertThat((String) emailRetriesTable.get(10).get("TYPE")).isEqualTo("boolean(1)");
+        assertThat((String) emailRetriesTable.get(10).get("FIELD")).isEqualTo("recipients");
+        assertThat((String) emailRetriesTable.get(10).get("TYPE")).contains("blob");
         assertThat((String) emailRetriesTable.get(10).get("NULL")).isEqualTo("NO");
         assertThat((String) emailRetriesTable.get(10).get("KEY")).isEmpty();
 
-        assertThat((String) emailRetriesTable.get(11).get("FIELD")).isEqualTo("subject");
-        assertThat((String) emailRetriesTable.get(11).get("TYPE")).isEqualTo("varchar(255)");
+        assertThat((String) emailRetriesTable.get(11).get("FIELD")).isEqualTo("retry_times");
+        assertThat((String) emailRetriesTable.get(11).get("TYPE")).isEqualTo("integer(10)");
         assertThat((String) emailRetriesTable.get(11).get("NULL")).isEqualTo("NO");
         assertThat((String) emailRetriesTable.get(11).get("KEY")).isEmpty();
 
-        assertThat((String) emailRetriesTable.get(12).get("FIELD")).isEqualTo("created_date");
-        assertThat((String) emailRetriesTable.get(12).get("TYPE")).contains("timestamp");
+        assertThat((String) emailRetriesTable.get(12).get("FIELD")).isEqualTo("sender");
+        assertThat((String) emailRetriesTable.get(12).get("TYPE")).isEqualTo("varchar(255)");
         assertThat((String) emailRetriesTable.get(12).get("NULL")).isEqualTo("NO");
         assertThat((String) emailRetriesTable.get(12).get("KEY")).isEmpty();
 
-        assertThat((String) emailRetriesTable.get(13).get("FIELD")).isEqualTo("last_modified_date");
-        assertThat((String) emailRetriesTable.get(13).get("TYPE")).contains("timestamp");
+        assertThat((String) emailRetriesTable.get(13).get("FIELD")).isEqualTo("sent");
+        assertThat((String) emailRetriesTable.get(13).get("TYPE")).isEqualTo("boolean(1)");
         assertThat((String) emailRetriesTable.get(13).get("NULL")).isEqualTo("NO");
         assertThat((String) emailRetriesTable.get(13).get("KEY")).isEmpty();
 
-        assertThat((String) emailRetriesTable.get(14).get("FIELD")).isEqualTo("last_retry_time");
-        assertThat((String) emailRetriesTable.get(14).get("TYPE")).contains("timestamp");
+        assertThat((String) emailRetriesTable.get(14).get("FIELD")).isEqualTo("subject");
+        assertThat((String) emailRetriesTable.get(14).get("TYPE")).isEqualTo("varchar(255)");
         assertThat((String) emailRetriesTable.get(14).get("NULL")).isEqualTo("NO");
         assertThat((String) emailRetriesTable.get(14).get("KEY")).isEmpty();
 
@@ -561,63 +570,63 @@ public class FlywayTest {
         assertThat((String) experimentsTable.get(0).get("NULL")).isEqualTo("NO");
         assertThat((String) experimentsTable.get(0).get("KEY")).isEqualTo("PRI");
 
-        assertThat((String) experimentsTable.get(1).get("FIELD")).isEqualTo("version");
-        assertThat((String) experimentsTable.get(1).get("TYPE")).contains("bigint");
+        assertThat((String) experimentsTable.get(1).get("FIELD")).isEqualTo("created_date");
+        assertThat((String) experimentsTable.get(1).get("TYPE")).contains("timestamp");
         assertThat((String) experimentsTable.get(1).get("NULL")).isEqualTo("NO");
         assertThat((String) experimentsTable.get(1).get("KEY")).isEmpty();
 
-        assertThat((String) experimentsTable.get(2).get("FIELD")).isEqualTo("description");
-        assertThat((String) experimentsTable.get(2).get("TYPE")).isEqualTo("varchar(255)");
+        assertThat((String) experimentsTable.get(2).get("FIELD")).isEqualTo("last_modified_date");
+        assertThat((String) experimentsTable.get(2).get("TYPE")).contains("timestamp");
         assertThat((String) experimentsTable.get(2).get("NULL")).isEqualTo("NO");
         assertThat((String) experimentsTable.get(2).get("KEY")).isEmpty();
 
-        assertThat((String) experimentsTable.get(3).get("FIELD")).isEqualTo("idle_swap");
-        assertThat((String) experimentsTable.get(3).get("TYPE")).contains("integer");
+        assertThat((String) experimentsTable.get(3).get("FIELD")).isEqualTo("version");
+        assertThat((String) experimentsTable.get(3).get("TYPE")).contains("bigint");
         assertThat((String) experimentsTable.get(3).get("NULL")).isEqualTo("NO");
         assertThat((String) experimentsTable.get(3).get("KEY")).isEmpty();
 
-        assertThat((String) experimentsTable.get(4).get("FIELD")).isEqualTo("max_duration");
-        assertThat((String) experimentsTable.get(4).get("TYPE")).contains("integer");
+        assertThat((String) experimentsTable.get(4).get("FIELD")).isEqualTo("description");
+        assertThat((String) experimentsTable.get(4).get("TYPE")).isEqualTo("varchar(255)");
         assertThat((String) experimentsTable.get(4).get("NULL")).isEqualTo("NO");
         assertThat((String) experimentsTable.get(4).get("KEY")).isEmpty();
 
-        assertThat((String) experimentsTable.get(5).get("FIELD")).isEqualTo("name");
-        assertThat((String) experimentsTable.get(5).get("TYPE")).isEqualTo("varchar(255)");
+        assertThat((String) experimentsTable.get(5).get("FIELD")).isEqualTo("idle_swap");
+        assertThat((String) experimentsTable.get(5).get("TYPE")).contains("integer");
         assertThat((String) experimentsTable.get(5).get("NULL")).isEqualTo("NO");
         assertThat((String) experimentsTable.get(5).get("KEY")).isEmpty();
 
-        assertThat((String) experimentsTable.get(6).get("FIELD")).isEqualTo("ns_file");
-        assertThat((String) experimentsTable.get(6).get("TYPE")).isEqualTo("varchar(255)");
+        assertThat((String) experimentsTable.get(6).get("FIELD")).isEqualTo("max_duration");
+        assertThat((String) experimentsTable.get(6).get("TYPE")).contains("integer");
         assertThat((String) experimentsTable.get(6).get("NULL")).isEqualTo("NO");
         assertThat((String) experimentsTable.get(6).get("KEY")).isEmpty();
 
-        assertThat((String) experimentsTable.get(7).get("FIELD")).isEqualTo("ns_file_content");
-        assertThat((String) experimentsTable.get(7).get("TYPE")).contains("clob");
+        assertThat((String) experimentsTable.get(7).get("FIELD")).isEqualTo("name");
+        assertThat((String) experimentsTable.get(7).get("TYPE")).isEqualTo("varchar(255)");
         assertThat((String) experimentsTable.get(7).get("NULL")).isEqualTo("NO");
         assertThat((String) experimentsTable.get(7).get("KEY")).isEmpty();
 
-        assertThat((String) experimentsTable.get(8).get("FIELD")).isEqualTo("team_id");
+        assertThat((String) experimentsTable.get(8).get("FIELD")).isEqualTo("ns_file");
         assertThat((String) experimentsTable.get(8).get("TYPE")).isEqualTo("varchar(255)");
         assertThat((String) experimentsTable.get(8).get("NULL")).isEqualTo("NO");
         assertThat((String) experimentsTable.get(8).get("KEY")).isEmpty();
 
-        assertThat((String) experimentsTable.get(9).get("FIELD")).isEqualTo("team_name");
-        assertThat((String) experimentsTable.get(9).get("TYPE")).isEqualTo("varchar(255)");
+        assertThat((String) experimentsTable.get(9).get("FIELD")).isEqualTo("ns_file_content");
+        assertThat((String) experimentsTable.get(9).get("TYPE")).contains("clob");
         assertThat((String) experimentsTable.get(9).get("NULL")).isEqualTo("NO");
         assertThat((String) experimentsTable.get(9).get("KEY")).isEmpty();
 
-        assertThat((String) experimentsTable.get(10).get("FIELD")).isEqualTo("user_id");
+        assertThat((String) experimentsTable.get(10).get("FIELD")).isEqualTo("team_id");
         assertThat((String) experimentsTable.get(10).get("TYPE")).isEqualTo("varchar(255)");
         assertThat((String) experimentsTable.get(10).get("NULL")).isEqualTo("NO");
         assertThat((String) experimentsTable.get(10).get("KEY")).isEmpty();
 
-        assertThat((String) experimentsTable.get(11).get("FIELD")).isEqualTo("created_date");
-        assertThat((String) experimentsTable.get(11).get("TYPE")).contains("timestamp");
+        assertThat((String) experimentsTable.get(11).get("FIELD")).isEqualTo("team_name");
+        assertThat((String) experimentsTable.get(11).get("TYPE")).isEqualTo("varchar(255)");
         assertThat((String) experimentsTable.get(11).get("NULL")).isEqualTo("NO");
         assertThat((String) experimentsTable.get(11).get("KEY")).isEmpty();
 
-        assertThat((String) experimentsTable.get(12).get("FIELD")).isEqualTo("last_modified_date");
-        assertThat((String) experimentsTable.get(12).get("TYPE")).contains("timestamp");
+        assertThat((String) experimentsTable.get(12).get("FIELD")).isEqualTo("user_id");
+        assertThat((String) experimentsTable.get(12).get("TYPE")).isEqualTo("varchar(255)");
         assertThat((String) experimentsTable.get(12).get("NULL")).isEqualTo("NO");
         assertThat((String) experimentsTable.get(12).get("KEY")).isEmpty();
 
@@ -639,34 +648,34 @@ public class FlywayTest {
         assertThat((String) loginActivitiesTable.get(0).get("NULL")).isEqualTo("NO");
         assertThat((String) loginActivitiesTable.get(0).get("KEY")).isEqualTo("PRI");
 
-        assertThat((String) loginActivitiesTable.get(1).get("FIELD")).isEqualTo("version");
-        assertThat((String) loginActivitiesTable.get(1).get("TYPE")).contains("bigint");
+        assertThat((String) loginActivitiesTable.get(1).get("FIELD")).isEqualTo("created_date");
+        assertThat((String) loginActivitiesTable.get(1).get("TYPE")).contains("timestamp");
         assertThat((String) loginActivitiesTable.get(1).get("NULL")).isEqualTo("NO");
         assertThat((String) loginActivitiesTable.get(1).get("KEY")).isEmpty();
 
-        assertThat((String) loginActivitiesTable.get(2).get("FIELD")).isEqualTo("ip_address");
-        assertThat((String) loginActivitiesTable.get(2).get("TYPE")).isEqualTo("varchar(255)");
+        assertThat((String) loginActivitiesTable.get(2).get("FIELD")).isEqualTo("last_modified_date");
+        assertThat((String) loginActivitiesTable.get(2).get("TYPE")).contains("timestamp");
         assertThat((String) loginActivitiesTable.get(2).get("NULL")).isEqualTo("NO");
         assertThat((String) loginActivitiesTable.get(2).get("KEY")).isEmpty();
 
-        assertThat((String) loginActivitiesTable.get(3).get("FIELD")).isEqualTo("user_id");
-        assertThat((String) loginActivitiesTable.get(3).get("TYPE")).isEqualTo("varchar(255)");
-        assertThat((String) loginActivitiesTable.get(3).get("NULL")).isEqualTo("YES");
+        assertThat((String) loginActivitiesTable.get(3).get("FIELD")).isEqualTo("version");
+        assertThat((String) loginActivitiesTable.get(3).get("TYPE")).contains("bigint");
+        assertThat((String) loginActivitiesTable.get(3).get("NULL")).isEqualTo("NO");
         assertThat((String) loginActivitiesTable.get(3).get("KEY")).isEmpty();
 
-        assertThat((String) loginActivitiesTable.get(4).get("FIELD")).isEqualTo("created_date");
+        assertThat((String) loginActivitiesTable.get(4).get("FIELD")).isEqualTo("date");
         assertThat((String) loginActivitiesTable.get(4).get("TYPE")).contains("timestamp");
         assertThat((String) loginActivitiesTable.get(4).get("NULL")).isEqualTo("NO");
         assertThat((String) loginActivitiesTable.get(4).get("KEY")).isEmpty();
 
-        assertThat((String) loginActivitiesTable.get(5).get("FIELD")).isEqualTo("last_modified_date");
-        assertThat((String) loginActivitiesTable.get(5).get("TYPE")).contains("timestamp");
+        assertThat((String) loginActivitiesTable.get(5).get("FIELD")).isEqualTo("ip_address");
+        assertThat((String) loginActivitiesTable.get(5).get("TYPE")).isEqualTo("varchar(255)");
         assertThat((String) loginActivitiesTable.get(5).get("NULL")).isEqualTo("NO");
         assertThat((String) loginActivitiesTable.get(5).get("KEY")).isEmpty();
 
-        assertThat((String) loginActivitiesTable.get(6).get("FIELD")).isEqualTo("date");
-        assertThat((String) loginActivitiesTable.get(6).get("TYPE")).contains("timestamp");
-        assertThat((String) loginActivitiesTable.get(6).get("NULL")).isEqualTo("NO");
+        assertThat((String) loginActivitiesTable.get(6).get("FIELD")).isEqualTo("user_id");
+        assertThat((String) loginActivitiesTable.get(6).get("TYPE")).isEqualTo("varchar(255)");
+        assertThat((String) loginActivitiesTable.get(6).get("NULL")).isEqualTo("YES");
         assertThat((String) loginActivitiesTable.get(6).get("KEY")).isEmpty();
 
         List<Map<String, Object>> loginActivitiesConstraints = this.template.queryForList("SELECT * FROM INFORMATION_SCHEMA.CONSTRAINTS WHERE TABLE_NAME = 'login_activities'");
@@ -689,63 +698,63 @@ public class FlywayTest {
         assertThat((String) realizationsTable.get(0).get("NULL")).isEqualTo("NO");
         assertThat((String) realizationsTable.get(0).get("KEY")).isEqualTo("PRI");
 
-        assertThat((String) realizationsTable.get(1).get("FIELD")).isEqualTo("version");
-        assertThat((String) realizationsTable.get(1).get("TYPE")).contains("bigint");
+        assertThat((String) realizationsTable.get(1).get("FIELD")).isEqualTo("created_date");
+        assertThat((String) realizationsTable.get(1).get("TYPE")).contains("timestamp");
         assertThat((String) realizationsTable.get(1).get("NULL")).isEqualTo("NO");
         assertThat((String) realizationsTable.get(1).get("KEY")).isEmpty();
 
-        assertThat((String) realizationsTable.get(2).get("FIELD")).isEqualTo("details");
-        assertThat((String) realizationsTable.get(2).get("TYPE")).contains("clob");
-        assertThat((String) realizationsTable.get(2).get("NULL")).isEqualTo("YES");
+        assertThat((String) realizationsTable.get(2).get("FIELD")).isEqualTo("last_modified_date");
+        assertThat((String) realizationsTable.get(2).get("TYPE")).contains("timestamp");
+        assertThat((String) realizationsTable.get(2).get("NULL")).isEqualTo("NO");
         assertThat((String) realizationsTable.get(2).get("KEY")).isEmpty();
 
-        assertThat((String) realizationsTable.get(3).get("FIELD")).isEqualTo("experiment_id");
+        assertThat((String) realizationsTable.get(3).get("FIELD")).isEqualTo("version");
         assertThat((String) realizationsTable.get(3).get("TYPE")).contains("bigint");
         assertThat((String) realizationsTable.get(3).get("NULL")).isEqualTo("NO");
         assertThat((String) realizationsTable.get(3).get("KEY")).isEmpty();
 
-        assertThat((String) realizationsTable.get(4).get("FIELD")).isEqualTo("experiment_name");
-        assertThat((String) realizationsTable.get(4).get("TYPE")).isEqualTo("varchar(255)");
-        assertThat((String) realizationsTable.get(4).get("NULL")).isEqualTo("NO");
+        assertThat((String) realizationsTable.get(4).get("FIELD")).isEqualTo("details");
+        assertThat((String) realizationsTable.get(4).get("TYPE")).contains("clob");
+        assertThat((String) realizationsTable.get(4).get("NULL")).isEqualTo("YES");
         assertThat((String) realizationsTable.get(4).get("KEY")).isEmpty();
 
-        assertThat((String) realizationsTable.get(5).get("FIELD")).isEqualTo("idle_minutes");
+        assertThat((String) realizationsTable.get(5).get("FIELD")).isEqualTo("experiment_id");
         assertThat((String) realizationsTable.get(5).get("TYPE")).contains("bigint");
         assertThat((String) realizationsTable.get(5).get("NULL")).isEqualTo("NO");
         assertThat((String) realizationsTable.get(5).get("KEY")).isEmpty();
 
-        assertThat((String) realizationsTable.get(6).get("FIELD")).isEqualTo("num_nodes");
-        assertThat((String) realizationsTable.get(6).get("TYPE")).contains("integer");
+        assertThat((String) realizationsTable.get(6).get("FIELD")).isEqualTo("experiment_name");
+        assertThat((String) realizationsTable.get(6).get("TYPE")).isEqualTo("varchar(255)");
         assertThat((String) realizationsTable.get(6).get("NULL")).isEqualTo("NO");
         assertThat((String) realizationsTable.get(6).get("KEY")).isEmpty();
 
-        assertThat((String) realizationsTable.get(7).get("FIELD")).isEqualTo("running_minutes");
+        assertThat((String) realizationsTable.get(7).get("FIELD")).isEqualTo("idle_minutes");
         assertThat((String) realizationsTable.get(7).get("TYPE")).contains("bigint");
         assertThat((String) realizationsTable.get(7).get("NULL")).isEqualTo("NO");
         assertThat((String) realizationsTable.get(7).get("KEY")).isEmpty();
 
-        assertThat((String) realizationsTable.get(8).get("FIELD")).isEqualTo("state");
-        assertThat((String) realizationsTable.get(8).get("TYPE")).isEqualTo("varchar(255)");
+        assertThat((String) realizationsTable.get(8).get("FIELD")).isEqualTo("num_nodes");
+        assertThat((String) realizationsTable.get(8).get("TYPE")).contains("integer");
         assertThat((String) realizationsTable.get(8).get("NULL")).isEqualTo("NO");
         assertThat((String) realizationsTable.get(8).get("KEY")).isEmpty();
 
-        assertThat((String) realizationsTable.get(9).get("FIELD")).isEqualTo("team_id");
-        assertThat((String) realizationsTable.get(9).get("TYPE")).isEqualTo("varchar(255)");
+        assertThat((String) realizationsTable.get(9).get("FIELD")).isEqualTo("running_minutes");
+        assertThat((String) realizationsTable.get(9).get("TYPE")).contains("bigint");
         assertThat((String) realizationsTable.get(9).get("NULL")).isEqualTo("NO");
         assertThat((String) realizationsTable.get(9).get("KEY")).isEmpty();
 
-        assertThat((String) realizationsTable.get(10).get("FIELD")).isEqualTo("user_id");
+        assertThat((String) realizationsTable.get(10).get("FIELD")).isEqualTo("state");
         assertThat((String) realizationsTable.get(10).get("TYPE")).isEqualTo("varchar(255)");
         assertThat((String) realizationsTable.get(10).get("NULL")).isEqualTo("NO");
         assertThat((String) realizationsTable.get(10).get("KEY")).isEmpty();
 
-        assertThat((String) realizationsTable.get(11).get("FIELD")).isEqualTo("created_date");
-        assertThat((String) realizationsTable.get(11).get("TYPE")).contains("timestamp");
+        assertThat((String) realizationsTable.get(11).get("FIELD")).isEqualTo("team_id");
+        assertThat((String) realizationsTable.get(11).get("TYPE")).isEqualTo("varchar(255)");
         assertThat((String) realizationsTable.get(11).get("NULL")).isEqualTo("NO");
         assertThat((String) realizationsTable.get(11).get("KEY")).isEmpty();
 
-        assertThat((String) realizationsTable.get(12).get("FIELD")).isEqualTo("last_modified_date");
-        assertThat((String) realizationsTable.get(12).get("TYPE")).contains("timestamp");
+        assertThat((String) realizationsTable.get(12).get("FIELD")).isEqualTo("user_id");
+        assertThat((String) realizationsTable.get(12).get("TYPE")).isEqualTo("varchar(255)");
         assertThat((String) realizationsTable.get(12).get("NULL")).isEqualTo("NO");
         assertThat((String) realizationsTable.get(12).get("KEY")).isEmpty();
 
@@ -767,88 +776,88 @@ public class FlywayTest {
         assertThat((String) registrationsTable.get(0).get("NULL")).isEqualTo("NO");
         assertThat((String) registrationsTable.get(0).get("KEY")).isEqualTo("PRI");
 
-        assertThat((String) registrationsTable.get(1).get("FIELD")).isEqualTo("version");
-        assertThat((String) registrationsTable.get(1).get("TYPE")).contains("bigint");
+        assertThat((String) registrationsTable.get(1).get("FIELD")).isEqualTo("created_date");
+        assertThat((String) registrationsTable.get(1).get("TYPE")).contains("timestamp");
         assertThat((String) registrationsTable.get(1).get("NULL")).isEqualTo("NO");
         assertThat((String) registrationsTable.get(1).get("KEY")).isEmpty();
 
-        assertThat((String) registrationsTable.get(2).get("FIELD")).isEqualTo("pid");
-        assertThat((String) registrationsTable.get(2).get("TYPE")).isEqualTo("varchar(255)");
+        assertThat((String) registrationsTable.get(2).get("FIELD")).isEqualTo("last_modified_date");
+        assertThat((String) registrationsTable.get(2).get("TYPE")).contains("timestamp");
         assertThat((String) registrationsTable.get(2).get("NULL")).isEqualTo("NO");
         assertThat((String) registrationsTable.get(2).get("KEY")).isEmpty();
 
-        assertThat((String) registrationsTable.get(3).get("FIELD")).isEqualTo("uid");
-        assertThat((String) registrationsTable.get(3).get("TYPE")).isEqualTo("varchar(255)");
+        assertThat((String) registrationsTable.get(3).get("FIELD")).isEqualTo("version");
+        assertThat((String) registrationsTable.get(3).get("TYPE")).contains("bigint");
         assertThat((String) registrationsTable.get(3).get("NULL")).isEqualTo("NO");
-        assertThat((String) registrationsTable.get(3).get("KEY")).isEqualTo("UNI");
+        assertThat((String) registrationsTable.get(3).get("KEY")).isEmpty();
 
-        assertThat((String) registrationsTable.get(4).get("FIELD")).isEqualTo("usr_addr");
+        assertThat((String) registrationsTable.get(4).get("FIELD")).isEqualTo("pid");
         assertThat((String) registrationsTable.get(4).get("TYPE")).isEqualTo("varchar(255)");
         assertThat((String) registrationsTable.get(4).get("NULL")).isEqualTo("NO");
         assertThat((String) registrationsTable.get(4).get("KEY")).isEmpty();
 
-        assertThat((String) registrationsTable.get(5).get("FIELD")).isEqualTo("usr_addr2");
+        assertThat((String) registrationsTable.get(5).get("FIELD")).isEqualTo("uid");
         assertThat((String) registrationsTable.get(5).get("TYPE")).isEqualTo("varchar(255)");
-        assertThat((String) registrationsTable.get(5).get("NULL")).isEqualTo("YES");
-        assertThat((String) registrationsTable.get(5).get("KEY")).isEmpty();
+        assertThat((String) registrationsTable.get(5).get("NULL")).isEqualTo("NO");
+        assertThat((String) registrationsTable.get(5).get("KEY")).isEqualTo("UNI");
 
-        assertThat((String) registrationsTable.get(6).get("FIELD")).isEqualTo("usr_affil");
+        assertThat((String) registrationsTable.get(6).get("FIELD")).isEqualTo("usr_addr");
         assertThat((String) registrationsTable.get(6).get("TYPE")).isEqualTo("varchar(255)");
         assertThat((String) registrationsTable.get(6).get("NULL")).isEqualTo("NO");
         assertThat((String) registrationsTable.get(6).get("KEY")).isEmpty();
 
-        assertThat((String) registrationsTable.get(7).get("FIELD")).isEqualTo("usr_affil_abbrev");
+        assertThat((String) registrationsTable.get(7).get("FIELD")).isEqualTo("usr_addr2");
         assertThat((String) registrationsTable.get(7).get("TYPE")).isEqualTo("varchar(255)");
-        assertThat((String) registrationsTable.get(7).get("NULL")).isEqualTo("NO");
+        assertThat((String) registrationsTable.get(7).get("NULL")).isEqualTo("YES");
         assertThat((String) registrationsTable.get(7).get("KEY")).isEmpty();
 
-        assertThat((String) registrationsTable.get(8).get("FIELD")).isEqualTo("usr_city");
+        assertThat((String) registrationsTable.get(8).get("FIELD")).isEqualTo("usr_affil");
         assertThat((String) registrationsTable.get(8).get("TYPE")).isEqualTo("varchar(255)");
         assertThat((String) registrationsTable.get(8).get("NULL")).isEqualTo("NO");
         assertThat((String) registrationsTable.get(8).get("KEY")).isEmpty();
 
-        assertThat((String) registrationsTable.get(9).get("FIELD")).isEqualTo("usr_country");
+        assertThat((String) registrationsTable.get(9).get("FIELD")).isEqualTo("usr_affil_abbrev");
         assertThat((String) registrationsTable.get(9).get("TYPE")).isEqualTo("varchar(255)");
         assertThat((String) registrationsTable.get(9).get("NULL")).isEqualTo("NO");
         assertThat((String) registrationsTable.get(9).get("KEY")).isEmpty();
 
-        assertThat((String) registrationsTable.get(10).get("FIELD")).isEqualTo("usr_email");
+        assertThat((String) registrationsTable.get(10).get("FIELD")).isEqualTo("usr_city");
         assertThat((String) registrationsTable.get(10).get("TYPE")).isEqualTo("varchar(255)");
         assertThat((String) registrationsTable.get(10).get("NULL")).isEqualTo("NO");
-        assertThat((String) registrationsTable.get(10).get("KEY")).isEqualTo("UNI");
+        assertThat((String) registrationsTable.get(10).get("KEY")).isEmpty();
 
-        assertThat((String) registrationsTable.get(11).get("FIELD")).isEqualTo("usr_name");
+        assertThat((String) registrationsTable.get(11).get("FIELD")).isEqualTo("usr_country");
         assertThat((String) registrationsTable.get(11).get("TYPE")).isEqualTo("varchar(255)");
         assertThat((String) registrationsTable.get(11).get("NULL")).isEqualTo("NO");
         assertThat((String) registrationsTable.get(11).get("KEY")).isEmpty();
 
-        assertThat((String) registrationsTable.get(12).get("FIELD")).isEqualTo("usr_phone");
+        assertThat((String) registrationsTable.get(12).get("FIELD")).isEqualTo("usr_email");
         assertThat((String) registrationsTable.get(12).get("TYPE")).isEqualTo("varchar(255)");
         assertThat((String) registrationsTable.get(12).get("NULL")).isEqualTo("NO");
-        assertThat((String) registrationsTable.get(12).get("KEY")).isEmpty();
+        assertThat((String) registrationsTable.get(12).get("KEY")).isEqualTo("UNI");
 
-        assertThat((String) registrationsTable.get(13).get("FIELD")).isEqualTo("usr_state");
-        assertThat((String) registrationsTable.get(13).get("TYPE")).contains("varchar(255)");
+        assertThat((String) registrationsTable.get(13).get("FIELD")).isEqualTo("usr_name");
+        assertThat((String) registrationsTable.get(13).get("TYPE")).isEqualTo("varchar(255)");
         assertThat((String) registrationsTable.get(13).get("NULL")).isEqualTo("NO");
         assertThat((String) registrationsTable.get(13).get("KEY")).isEmpty();
 
-        assertThat((String) registrationsTable.get(14).get("FIELD")).isEqualTo("usr_title");
+        assertThat((String) registrationsTable.get(14).get("FIELD")).isEqualTo("usr_phone");
         assertThat((String) registrationsTable.get(14).get("TYPE")).isEqualTo("varchar(255)");
         assertThat((String) registrationsTable.get(14).get("NULL")).isEqualTo("NO");
         assertThat((String) registrationsTable.get(14).get("KEY")).isEmpty();
 
-        assertThat((String) registrationsTable.get(15).get("FIELD")).isEqualTo("usr_zip");
-        assertThat((String) registrationsTable.get(15).get("TYPE")).isEqualTo("varchar(255)");
+        assertThat((String) registrationsTable.get(15).get("FIELD")).isEqualTo("usr_state");
+        assertThat((String) registrationsTable.get(15).get("TYPE")).contains("varchar(255)");
         assertThat((String) registrationsTable.get(15).get("NULL")).isEqualTo("NO");
         assertThat((String) registrationsTable.get(15).get("KEY")).isEmpty();
 
-        assertThat((String) registrationsTable.get(16).get("FIELD")).isEqualTo("created_date");
-        assertThat((String) registrationsTable.get(16).get("TYPE")).contains("timestamp");
+        assertThat((String) registrationsTable.get(16).get("FIELD")).isEqualTo("usr_title");
+        assertThat((String) registrationsTable.get(16).get("TYPE")).isEqualTo("varchar(255)");
         assertThat((String) registrationsTable.get(16).get("NULL")).isEqualTo("NO");
         assertThat((String) registrationsTable.get(16).get("KEY")).isEmpty();
 
-        assertThat((String) registrationsTable.get(17).get("FIELD")).isEqualTo("last_modified_date");
-        assertThat((String) registrationsTable.get(17).get("TYPE")).contains("timestamp");
+        assertThat((String) registrationsTable.get(17).get("FIELD")).isEqualTo("usr_zip");
+        assertThat((String) registrationsTable.get(17).get("TYPE")).isEqualTo("varchar(255)");
         assertThat((String) registrationsTable.get(17).get("NULL")).isEqualTo("NO");
         assertThat((String) registrationsTable.get(17).get("KEY")).isEmpty();
 
@@ -874,45 +883,45 @@ public class FlywayTest {
         assertThat((String) teamMembersTable.get(0).get("NULL")).isEqualTo("NO");
         assertThat((String) teamMembersTable.get(0).get("KEY")).isEqualTo("PRI");
 
-        assertThat((String) teamMembersTable.get(1).get("FIELD")).isEqualTo("version");
-        assertThat((String) teamMembersTable.get(1).get("TYPE")).contains("bigint");
+        assertThat((String) teamMembersTable.get(1).get("FIELD")).isEqualTo("created_date");
+        assertThat((String) teamMembersTable.get(1).get("TYPE")).contains("timestamp");
         assertThat((String) teamMembersTable.get(1).get("NULL")).isEqualTo("NO");
         assertThat((String) teamMembersTable.get(1).get("KEY")).isEmpty();
 
-        assertThat((String) teamMembersTable.get(2).get("FIELD")).isEqualTo("status");
-        assertThat((String) teamMembersTable.get(2).get("TYPE")).isEqualTo("varchar(255)");
+        assertThat((String) teamMembersTable.get(2).get("FIELD")).isEqualTo("last_modified_date");
+        assertThat((String) teamMembersTable.get(2).get("TYPE")).contains("timestamp");
         assertThat((String) teamMembersTable.get(2).get("NULL")).isEqualTo("NO");
         assertThat((String) teamMembersTable.get(2).get("KEY")).isEmpty();
 
-        assertThat((String) teamMembersTable.get(3).get("FIELD")).isEqualTo("member_type");
-        assertThat((String) teamMembersTable.get(3).get("TYPE")).isEqualTo("varchar(255)");
+        assertThat((String) teamMembersTable.get(3).get("FIELD")).isEqualTo("version");
+        assertThat((String) teamMembersTable.get(3).get("TYPE")).contains("bigint");
         assertThat((String) teamMembersTable.get(3).get("NULL")).isEqualTo("NO");
         assertThat((String) teamMembersTable.get(3).get("KEY")).isEmpty();
 
-        assertThat((String) teamMembersTable.get(4).get("FIELD")).isEqualTo("user_id");
-        assertThat((String) teamMembersTable.get(4).get("TYPE")).isEqualTo("varchar(255)");
+        assertThat((String) teamMembersTable.get(4).get("FIELD")).isEqualTo("joined_date");
+        assertThat((String) teamMembersTable.get(4).get("TYPE")).contains("timestamp");
         assertThat((String) teamMembersTable.get(4).get("NULL")).isEqualTo("NO");
-        assertThat((String) teamMembersTable.get(4).get("KEY")).isEqualTo("UNI");
+        assertThat((String) teamMembersTable.get(4).get("KEY")).isEmpty();
 
-        assertThat((String) teamMembersTable.get(5).get("FIELD")).isEqualTo("team_id");
+        assertThat((String) teamMembersTable.get(5).get("FIELD")).isEqualTo("status");
         assertThat((String) teamMembersTable.get(5).get("TYPE")).isEqualTo("varchar(255)");
         assertThat((String) teamMembersTable.get(5).get("NULL")).isEqualTo("NO");
-        assertThat((String) teamMembersTable.get(5).get("KEY")).isEqualTo("UNI");
+        assertThat((String) teamMembersTable.get(5).get("KEY")).isEmpty();
 
-        assertThat((String) teamMembersTable.get(6).get("FIELD")).isEqualTo("created_date");
-        assertThat((String) teamMembersTable.get(6).get("TYPE")).contains("timestamp");
+        assertThat((String) teamMembersTable.get(6).get("FIELD")).isEqualTo("member_type");
+        assertThat((String) teamMembersTable.get(6).get("TYPE")).isEqualTo("varchar(255)");
         assertThat((String) teamMembersTable.get(6).get("NULL")).isEqualTo("NO");
         assertThat((String) teamMembersTable.get(6).get("KEY")).isEmpty();
 
-        assertThat((String) teamMembersTable.get(7).get("FIELD")).isEqualTo("last_modified_date");
-        assertThat((String) teamMembersTable.get(7).get("TYPE")).contains("timestamp");
+        assertThat((String) teamMembersTable.get(7).get("FIELD")).isEqualTo("user_id");
+        assertThat((String) teamMembersTable.get(7).get("TYPE")).isEqualTo("varchar(255)");
         assertThat((String) teamMembersTable.get(7).get("NULL")).isEqualTo("NO");
-        assertThat((String) teamMembersTable.get(7).get("KEY")).isEmpty();
+        assertThat((String) teamMembersTable.get(7).get("KEY")).isEqualTo("UNI");
 
-        assertThat((String) teamMembersTable.get(8).get("FIELD")).isEqualTo("joined_date");
-        assertThat((String) teamMembersTable.get(8).get("TYPE")).contains("timestamp");
+        assertThat((String) teamMembersTable.get(8).get("FIELD")).isEqualTo("team_id");
+        assertThat((String) teamMembersTable.get(8).get("TYPE")).isEqualTo("varchar(255)");
         assertThat((String) teamMembersTable.get(8).get("NULL")).isEqualTo("NO");
-        assertThat((String) teamMembersTable.get(8).get("KEY")).isEmpty();
+        assertThat((String) teamMembersTable.get(8).get("KEY")).isEqualTo("UNI");
 
         List<Map<String, Object>> teamMembersConstraints = this.template.queryForList("SELECT * FROM INFORMATION_SCHEMA.CONSTRAINTS WHERE TABLE_NAME = 'team_members'");
 
@@ -936,64 +945,64 @@ public class FlywayTest {
         assertThat((String) teamsTable.get(0).get("NULL")).isEqualTo("NO");
         assertThat((String) teamsTable.get(0).get("KEY")).isEqualTo("PRI");
 
-        assertThat((String) teamsTable.get(1).get("FIELD")).isEqualTo("version");
-        assertThat((String) teamsTable.get(1).get("TYPE")).contains("bigint");
+        assertThat((String) teamsTable.get(1).get("FIELD")).isEqualTo("created_date");
+        assertThat((String) teamsTable.get(1).get("TYPE")).contains("timestamp");
         assertThat((String) teamsTable.get(1).get("NULL")).isEqualTo("NO");
         assertThat((String) teamsTable.get(1).get("KEY")).isEmpty();
 
-        assertThat((String) teamsTable.get(2).get("FIELD")).isEqualTo("description");
-        assertThat((String) teamsTable.get(2).get("TYPE")).isEqualTo("varchar(255)");
-        assertThat((String) teamsTable.get(2).get("NULL")).isEqualTo("YES");
+        assertThat((String) teamsTable.get(2).get("FIELD")).isEqualTo("last_modified_date");
+        assertThat((String) teamsTable.get(2).get("TYPE")).contains("timestamp");
+        assertThat((String) teamsTable.get(2).get("NULL")).isEqualTo("NO");
         assertThat((String) teamsTable.get(2).get("KEY")).isEmpty();
 
-        assertThat((String) teamsTable.get(3).get("FIELD")).isEqualTo("name");
-        assertThat((String) teamsTable.get(3).get("TYPE")).isEqualTo("varchar(255)");
+        assertThat((String) teamsTable.get(3).get("FIELD")).isEqualTo("version");
+        assertThat((String) teamsTable.get(3).get("TYPE")).contains("bigint");
         assertThat((String) teamsTable.get(3).get("NULL")).isEqualTo("NO");
-        assertThat((String) teamsTable.get(3).get("KEY")).isEqualTo("UNI");
+        assertThat((String) teamsTable.get(3).get("KEY")).isEmpty();
 
-        assertThat((String) teamsTable.get(4).get("FIELD")).isEqualTo("organisation_type");
-        assertThat((String) teamsTable.get(4).get("TYPE")).isEqualTo("varchar(255)");
+        assertThat((String) teamsTable.get(4).get("FIELD")).isEqualTo("application_date");
+        assertThat((String) teamsTable.get(4).get("TYPE")).contains("timestamp");
         assertThat((String) teamsTable.get(4).get("NULL")).isEqualTo("NO");
         assertThat((String) teamsTable.get(4).get("KEY")).isEmpty();
 
-        assertThat((String) teamsTable.get(5).get("FIELD")).isEqualTo("privacy");
+        assertThat((String) teamsTable.get(5).get("FIELD")).isEqualTo("description");
         assertThat((String) teamsTable.get(5).get("TYPE")).isEqualTo("varchar(255)");
-        assertThat((String) teamsTable.get(5).get("NULL")).isEqualTo("NO");
+        assertThat((String) teamsTable.get(5).get("NULL")).isEqualTo("YES");
         assertThat((String) teamsTable.get(5).get("KEY")).isEmpty();
 
-        assertThat((String) teamsTable.get(6).get("FIELD")).isEqualTo("status");
+        assertThat((String) teamsTable.get(6).get("FIELD")).isEqualTo("name");
         assertThat((String) teamsTable.get(6).get("TYPE")).isEqualTo("varchar(255)");
         assertThat((String) teamsTable.get(6).get("NULL")).isEqualTo("NO");
-        assertThat((String) teamsTable.get(6).get("KEY")).isEmpty();
+        assertThat((String) teamsTable.get(6).get("KEY")).isEqualTo("UNI");
 
-        assertThat((String) teamsTable.get(7).get("FIELD")).isEqualTo("visibility");
+        assertThat((String) teamsTable.get(7).get("FIELD")).isEqualTo("organisation_type");
         assertThat((String) teamsTable.get(7).get("TYPE")).isEqualTo("varchar(255)");
         assertThat((String) teamsTable.get(7).get("NULL")).isEqualTo("NO");
         assertThat((String) teamsTable.get(7).get("KEY")).isEmpty();
 
-        assertThat((String) teamsTable.get(8).get("FIELD")).isEqualTo("website");
+        assertThat((String) teamsTable.get(8).get("FIELD")).isEqualTo("privacy");
         assertThat((String) teamsTable.get(8).get("TYPE")).isEqualTo("varchar(255)");
         assertThat((String) teamsTable.get(8).get("NULL")).isEqualTo("NO");
         assertThat((String) teamsTable.get(8).get("KEY")).isEmpty();
 
-        assertThat((String) teamsTable.get(9).get("FIELD")).isEqualTo("created_date");
+        assertThat((String) teamsTable.get(9).get("FIELD")).isEqualTo("processed_date");
         assertThat((String) teamsTable.get(9).get("TYPE")).contains("timestamp");
-        assertThat((String) teamsTable.get(9).get("NULL")).isEqualTo("NO");
+        assertThat((String) teamsTable.get(9).get("NULL")).isEqualTo("YES");
         assertThat((String) teamsTable.get(9).get("KEY")).isEmpty();
 
-        assertThat((String) teamsTable.get(10).get("FIELD")).isEqualTo("last_modified_date");
-        assertThat((String) teamsTable.get(10).get("TYPE")).contains("timestamp");
+        assertThat((String) teamsTable.get(10).get("FIELD")).isEqualTo("status");
+        assertThat((String) teamsTable.get(10).get("TYPE")).isEqualTo("varchar(255)");
         assertThat((String) teamsTable.get(10).get("NULL")).isEqualTo("NO");
         assertThat((String) teamsTable.get(10).get("KEY")).isEmpty();
 
-        assertThat((String) teamsTable.get(11).get("FIELD")).isEqualTo("application_date");
-        assertThat((String) teamsTable.get(11).get("TYPE")).contains("timestamp");
+        assertThat((String) teamsTable.get(11).get("FIELD")).isEqualTo("visibility");
+        assertThat((String) teamsTable.get(11).get("TYPE")).isEqualTo("varchar(255)");
         assertThat((String) teamsTable.get(11).get("NULL")).isEqualTo("NO");
         assertThat((String) teamsTable.get(11).get("KEY")).isEmpty();
 
-        assertThat((String) teamsTable.get(12).get("FIELD")).isEqualTo("processed_date");
-        assertThat((String) teamsTable.get(12).get("TYPE")).contains("timestamp");
-        assertThat((String) teamsTable.get(12).get("NULL")).isEqualTo("YES");
+        assertThat((String) teamsTable.get(12).get("FIELD")).isEqualTo("website");
+        assertThat((String) teamsTable.get(12).get("TYPE")).isEqualTo("varchar(255)");
+        assertThat((String) teamsTable.get(12).get("NULL")).isEqualTo("NO");
         assertThat((String) teamsTable.get(12).get("KEY")).isEmpty();
 
         List<Map<String, Object>> teamsConstraints = this.template.queryForList("SELECT * FROM INFORMATION_SCHEMA.CONSTRAINTS WHERE TABLE_NAME = 'teams'");
@@ -1016,63 +1025,63 @@ public class FlywayTest {
         assertThat((String) userDetailsTable.get(0).get("NULL")).isEqualTo("NO");
         assertThat((String) userDetailsTable.get(0).get("KEY")).isEqualTo("PRI");
 
-        assertThat((String) userDetailsTable.get(1).get("FIELD")).isEqualTo("version");
-        assertThat((String) userDetailsTable.get(1).get("TYPE")).contains("bigint");
+        assertThat((String) userDetailsTable.get(1).get("FIELD")).isEqualTo("created_date");
+        assertThat((String) userDetailsTable.get(1).get("TYPE")).contains("timestamp");
         assertThat((String) userDetailsTable.get(1).get("NULL")).isEqualTo("NO");
         assertThat((String) userDetailsTable.get(1).get("KEY")).isEmpty();
 
-        assertThat((String) userDetailsTable.get(2).get("FIELD")).isEqualTo("email");
-        assertThat((String) userDetailsTable.get(2).get("TYPE")).isEqualTo("varchar(255)");
+        assertThat((String) userDetailsTable.get(2).get("FIELD")).isEqualTo("last_modified_date");
+        assertThat((String) userDetailsTable.get(2).get("TYPE")).contains("timestamp");
         assertThat((String) userDetailsTable.get(2).get("NULL")).isEqualTo("NO");
-        assertThat((String) userDetailsTable.get(2).get("KEY")).isEqualTo("UNI");
+        assertThat((String) userDetailsTable.get(2).get("KEY")).isEmpty();
 
-        assertThat((String) userDetailsTable.get(3).get("FIELD")).isEqualTo("first_name");
-        assertThat((String) userDetailsTable.get(3).get("TYPE")).isEqualTo("varchar(255)");
+        assertThat((String) userDetailsTable.get(3).get("FIELD")).isEqualTo("version");
+        assertThat((String) userDetailsTable.get(3).get("TYPE")).contains("bigint");
         assertThat((String) userDetailsTable.get(3).get("NULL")).isEqualTo("NO");
         assertThat((String) userDetailsTable.get(3).get("KEY")).isEmpty();
 
-        assertThat((String) userDetailsTable.get(4).get("FIELD")).isEqualTo("institution");
+        assertThat((String) userDetailsTable.get(4).get("FIELD")).isEqualTo("email");
         assertThat((String) userDetailsTable.get(4).get("TYPE")).isEqualTo("varchar(255)");
         assertThat((String) userDetailsTable.get(4).get("NULL")).isEqualTo("NO");
-        assertThat((String) userDetailsTable.get(4).get("KEY")).isEmpty();
+        assertThat((String) userDetailsTable.get(4).get("KEY")).isEqualTo("UNI");
 
-        assertThat((String) userDetailsTable.get(5).get("FIELD")).isEqualTo("institution_abbreviation");
+        assertThat((String) userDetailsTable.get(5).get("FIELD")).isEqualTo("first_name");
         assertThat((String) userDetailsTable.get(5).get("TYPE")).isEqualTo("varchar(255)");
         assertThat((String) userDetailsTable.get(5).get("NULL")).isEqualTo("NO");
         assertThat((String) userDetailsTable.get(5).get("KEY")).isEmpty();
 
-        assertThat((String) userDetailsTable.get(6).get("FIELD")).isEqualTo("institution_web");
+        assertThat((String) userDetailsTable.get(6).get("FIELD")).isEqualTo("institution");
         assertThat((String) userDetailsTable.get(6).get("TYPE")).isEqualTo("varchar(255)");
         assertThat((String) userDetailsTable.get(6).get("NULL")).isEqualTo("NO");
         assertThat((String) userDetailsTable.get(6).get("KEY")).isEmpty();
 
-        assertThat((String) userDetailsTable.get(7).get("FIELD")).isEqualTo("job_title");
+        assertThat((String) userDetailsTable.get(7).get("FIELD")).isEqualTo("institution_abbreviation");
         assertThat((String) userDetailsTable.get(7).get("TYPE")).isEqualTo("varchar(255)");
         assertThat((String) userDetailsTable.get(7).get("NULL")).isEqualTo("NO");
         assertThat((String) userDetailsTable.get(7).get("KEY")).isEmpty();
 
-        assertThat((String) userDetailsTable.get(8).get("FIELD")).isEqualTo("last_name");
+        assertThat((String) userDetailsTable.get(8).get("FIELD")).isEqualTo("institution_web");
         assertThat((String) userDetailsTable.get(8).get("TYPE")).isEqualTo("varchar(255)");
         assertThat((String) userDetailsTable.get(8).get("NULL")).isEqualTo("NO");
         assertThat((String) userDetailsTable.get(8).get("KEY")).isEmpty();
 
-        assertThat((String) userDetailsTable.get(9).get("FIELD")).isEqualTo("phone");
+        assertThat((String) userDetailsTable.get(9).get("FIELD")).isEqualTo("job_title");
         assertThat((String) userDetailsTable.get(9).get("TYPE")).isEqualTo("varchar(255)");
         assertThat((String) userDetailsTable.get(9).get("NULL")).isEqualTo("NO");
         assertThat((String) userDetailsTable.get(9).get("KEY")).isEmpty();
 
-        assertThat((String) userDetailsTable.get(10).get("FIELD")).isEqualTo("address_id");
-        assertThat((String) userDetailsTable.get(10).get("TYPE")).contains("bigint");
+        assertThat((String) userDetailsTable.get(10).get("FIELD")).isEqualTo("last_name");
+        assertThat((String) userDetailsTable.get(10).get("TYPE")).isEqualTo("varchar(255)");
         assertThat((String) userDetailsTable.get(10).get("NULL")).isEqualTo("NO");
         assertThat((String) userDetailsTable.get(10).get("KEY")).isEmpty();
 
-        assertThat((String) userDetailsTable.get(11).get("FIELD")).isEqualTo("created_date");
-        assertThat((String) userDetailsTable.get(11).get("TYPE")).contains("timestamp");
+        assertThat((String) userDetailsTable.get(11).get("FIELD")).isEqualTo("phone");
+        assertThat((String) userDetailsTable.get(11).get("TYPE")).isEqualTo("varchar(255)");
         assertThat((String) userDetailsTable.get(11).get("NULL")).isEqualTo("NO");
         assertThat((String) userDetailsTable.get(11).get("KEY")).isEmpty();
 
-        assertThat((String) userDetailsTable.get(12).get("FIELD")).isEqualTo("last_modified_date");
-        assertThat((String) userDetailsTable.get(12).get("TYPE")).contains("timestamp");
+        assertThat((String) userDetailsTable.get(12).get("FIELD")).isEqualTo("address_id");
+        assertThat((String) userDetailsTable.get(12).get("TYPE")).contains("bigint");
         assertThat((String) userDetailsTable.get(12).get("NULL")).isEqualTo("NO");
         assertThat((String) userDetailsTable.get(12).get("KEY")).isEmpty();
 
@@ -1098,50 +1107,50 @@ public class FlywayTest {
         assertThat((String) usersTable.get(0).get("NULL")).isEqualTo("NO");
         assertThat((String) usersTable.get(0).get("KEY")).isEqualTo("PRI");
 
-        assertThat((String) usersTable.get(1).get("FIELD")).isEqualTo("version");
-        assertThat((String) usersTable.get(1).get("TYPE")).contains("bigint");
+        assertThat((String) usersTable.get(1).get("FIELD")).isEqualTo("created_date");
+        assertThat((String) usersTable.get(1).get("TYPE")).contains("timestamp");
         assertThat((String) usersTable.get(1).get("NULL")).isEqualTo("NO");
         assertThat((String) usersTable.get(1).get("KEY")).isEmpty();
 
-        assertThat((String) usersTable.get(2).get("FIELD")).isEqualTo("is_email_verified");
-        assertThat((String) usersTable.get(2).get("TYPE")).isEqualTo("char(1)");
+        assertThat((String) usersTable.get(2).get("FIELD")).isEqualTo("last_modified_date");
+        assertThat((String) usersTable.get(2).get("TYPE")).contains("timestamp");
         assertThat((String) usersTable.get(2).get("NULL")).isEqualTo("NO");
         assertThat((String) usersTable.get(2).get("KEY")).isEmpty();
 
-        assertThat((String) usersTable.get(3).get("FIELD")).isEqualTo("status");
-        assertThat((String) usersTable.get(3).get("TYPE")).isEqualTo("varchar(255)");
+        assertThat((String) usersTable.get(3).get("FIELD")).isEqualTo("version");
+        assertThat((String) usersTable.get(3).get("TYPE")).contains("bigint");
         assertThat((String) usersTable.get(3).get("NULL")).isEqualTo("NO");
         assertThat((String) usersTable.get(3).get("KEY")).isEmpty();
 
-        assertThat((String) usersTable.get(4).get("FIELD")).isEqualTo("verification_key");
-        assertThat((String) usersTable.get(4).get("TYPE")).isEqualTo("varchar(255)");
-        assertThat((String) usersTable.get(4).get("NULL")).isEqualTo("YES");
+        assertThat((String) usersTable.get(4).get("FIELD")).isEqualTo("application_date");
+        assertThat((String) usersTable.get(4).get("TYPE")).contains("timestamp");
+        assertThat((String) usersTable.get(4).get("NULL")).isEqualTo("NO");
         assertThat((String) usersTable.get(4).get("KEY")).isEmpty();
 
-        assertThat((String) usersTable.get(5).get("FIELD")).isEqualTo("user_details_id");
-        assertThat((String) usersTable.get(5).get("TYPE")).contains("bigint");
+        assertThat((String) usersTable.get(5).get("FIELD")).isEqualTo("is_email_verified");
+        assertThat((String) usersTable.get(5).get("TYPE")).isEqualTo("char(1)");
         assertThat((String) usersTable.get(5).get("NULL")).isEqualTo("NO");
-        assertThat((String) usersTable.get(5).get("KEY")).isEqualTo("UNI");
+        assertThat((String) usersTable.get(5).get("KEY")).isEmpty();
 
-        assertThat((String) usersTable.get(6).get("FIELD")).isEqualTo("created_date");
+        assertThat((String) usersTable.get(6).get("FIELD")).isEqualTo("processed_date");
         assertThat((String) usersTable.get(6).get("TYPE")).contains("timestamp");
-        assertThat((String) usersTable.get(6).get("NULL")).isEqualTo("NO");
+        assertThat((String) usersTable.get(6).get("NULL")).isEqualTo("YES");
         assertThat((String) usersTable.get(6).get("KEY")).isEmpty();
 
-        assertThat((String) usersTable.get(7).get("FIELD")).isEqualTo("last_modified_date");
-        assertThat((String) usersTable.get(7).get("TYPE")).contains("timestamp");
+        assertThat((String) usersTable.get(7).get("FIELD")).isEqualTo("status");
+        assertThat((String) usersTable.get(7).get("TYPE")).isEqualTo("varchar(255)");
         assertThat((String) usersTable.get(7).get("NULL")).isEqualTo("NO");
         assertThat((String) usersTable.get(7).get("KEY")).isEmpty();
 
-        assertThat((String) usersTable.get(8).get("FIELD")).isEqualTo("application_date");
-        assertThat((String) usersTable.get(8).get("TYPE")).contains("timestamp");
-        assertThat((String) usersTable.get(8).get("NULL")).isEqualTo("NO");
+        assertThat((String) usersTable.get(8).get("FIELD")).isEqualTo("verification_key");
+        assertThat((String) usersTable.get(8).get("TYPE")).isEqualTo("varchar(255)");
+        assertThat((String) usersTable.get(8).get("NULL")).isEqualTo("YES");
         assertThat((String) usersTable.get(8).get("KEY")).isEmpty();
 
-        assertThat((String) usersTable.get(9).get("FIELD")).isEqualTo("processed_date");
-        assertThat((String) usersTable.get(9).get("TYPE")).contains("timestamp");
-        assertThat((String) usersTable.get(9).get("NULL")).isEqualTo("YES");
-        assertThat((String) usersTable.get(9).get("KEY")).isEmpty();
+        assertThat((String) usersTable.get(9).get("FIELD")).isEqualTo("user_details_id");
+        assertThat((String) usersTable.get(9).get("TYPE")).contains("bigint");
+        assertThat((String) usersTable.get(9).get("NULL")).isEqualTo("NO");
+        assertThat((String) usersTable.get(9).get("KEY")).isEqualTo("UNI");
 
         List<Map<String, Object>> usersConstraints = this.template.queryForList("SELECT * FROM INFORMATION_SCHEMA.CONSTRAINTS WHERE TABLE_NAME = 'users'");
 
