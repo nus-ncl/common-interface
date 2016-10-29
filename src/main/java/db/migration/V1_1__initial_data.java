@@ -58,6 +58,9 @@ public class V1_1__initial_data implements SpringJdbcMigration {
     private static final String SQL_INSERT_DETERLAB_USER = "INSERT INTO prod.deterlab_user"
             + "(created_date, last_modified_date, version, deter_user_id, ncl_user_id) VALUES"
             + "(?, ?, ?, ?, ?)";
+    private static final String SQL_INSERT_DETERLAB_PROJECT = "INSERT INTO prod.deterlab_project"
+            + "(created_date, last_modified_date, version, deter_project_id, ncl_team_id) VALUES"
+            + "(?, ?, ?, ?, ?)";
 
     private final PasswordEncoder passwordEncoder;
 
@@ -84,6 +87,8 @@ public class V1_1__initial_data implements SpringJdbcMigration {
         addToTeam(jdbcTemplate, userId, teamId, MemberType.OWNER, MemberStatus.APPROVED);
 
         createDeterLabUser(jdbcTemplate, "ncl", userId);
+
+        createDeterLabProject(jdbcTemplate, "ncl", teamId);
     }
 
     private String createTeam(final JdbcTemplate jdbcTemplate, final String teamName, final String description, final String organizationType, final String url, final TeamPrivacy privacy, final TeamStatus status, final TeamVisibility visibility) throws SQLException {
@@ -188,6 +193,14 @@ public class V1_1__initial_data implements SpringJdbcMigration {
         final int version = 0;
         final int i = jdbcTemplate.update(SQL_INSERT_DETERLAB_USER, now, now, version, name, userId);
         log.info("Inserted {} deter user entry: created_date={}, last_modified_date={}, version={}, deter_user_id={}, ncl_user_id={}", i, now, now, version, name, userId);
+    }
+
+    private void createDeterLabProject(final JdbcTemplate jdbcTemplate, final String name, final String teamId) throws SQLException {
+        // insert into deterlab_user
+        final Timestamp now = Timestamp.valueOf(ZonedDateTime.now().toLocalDateTime());
+        final int version = 0;
+        final int i = jdbcTemplate.update(SQL_INSERT_DETERLAB_PROJECT, now, now, version, name, teamId);
+        log.info("Inserted {} deter project entry: created_date={}, last_modified_date={}, version={}, deter_project_id={}, ncl_team_id={}", i, now, now, version, name, teamId);
     }
 
 }
