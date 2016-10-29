@@ -7,6 +7,7 @@ import org.springframework.context.annotation.Import;
 import sg.ncl.service.authentication.AuthenticationApplication;
 import sg.ncl.service.data.DataApplication;
 import sg.ncl.service.experiment.ExperimentApplication;
+import sg.ncl.service.image.ImageApplication;
 import sg.ncl.service.mail.MailApplication;
 import sg.ncl.service.realization.RealizationApplication;
 import sg.ncl.service.registration.RegistrationApplication;
@@ -24,6 +25,7 @@ import java.sql.SQLException;
         AuthenticationApplication.class,
         DataApplication.class,
         ExperimentApplication.class,
+        ImageApplication.class,
         MailApplication.class,
         RealizationApplication.class,
         RegistrationApplication.class,

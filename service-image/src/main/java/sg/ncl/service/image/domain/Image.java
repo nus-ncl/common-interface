@@ -15,4 +15,5 @@ public interface Image {
 
     String getDescription();
 
+    ImageVisibility getVisibility();
 }

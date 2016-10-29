@@ -1,13 +1,15 @@
 package sg.ncl.service.image.domain;
 
+import java.util.List;
+
 /**
  * Created by dcsyeoty on 28-Oct-16.
  */
 public interface ImageService {
 
-    String getAll();
+    List<Image> getAll();
 
-    String getImage();
+    Image getImage(Long id);
 
-    String addImage();
+    Image addImage(Image image);
 }
