@@ -23,7 +23,7 @@ public class DataInfo implements Data {
     private DataAccessibility accessibility;
     private List<DataResource> resources;
     private List<String> approvedUsers;
-    private ZonedDateTime releaseDate;
+    private ZonedDateTime releasedDate;
 
     @JsonCreator
     public DataInfo(
@@ -35,7 +35,7 @@ public class DataInfo implements Data {
             @JsonProperty("accessibility") final DataAccessibility accessibility,
             @JsonProperty("resources") final List<? extends DataResource> resources,
             @JsonProperty("approvedUsers") final List<String> approvedUsers,
-            @JsonProperty("releaseDate") final ZonedDateTime releaseDate
+            @JsonProperty("releasedDate") final ZonedDateTime releasedDate
     ) {
         this.id = id;
         this.name = name;
@@ -45,7 +45,7 @@ public class DataInfo implements Data {
         this.accessibility = accessibility;
         this.resources = resources.stream().map(DataResourceInfo::new).collect(Collectors.toList());
         this.approvedUsers = approvedUsers;
-        this.releaseDate = releaseDate;
+        this.releasedDate = releasedDate;
     }
 
     public DataInfo(final Data data) {
@@ -58,7 +58,7 @@ public class DataInfo implements Data {
                 data.getAccessibility(),
                 data.getResources(),
                 data.getApprovedUsers(),
-                data.getReleaseDate()
+                data.getReleasedDate()
         );
     }
 }

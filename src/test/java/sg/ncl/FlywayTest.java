@@ -290,7 +290,7 @@ public class FlywayTest {
         assertThat((String) dataTable.get(8).get("NULL")).isEqualTo("NO");
         assertThat((String) dataTable.get(8).get("KEY")).isEmpty();
 
-        assertThat((String) dataTable.get(9).get("FIELD")).isEqualTo("release_date");
+        assertThat((String) dataTable.get(9).get("FIELD")).isEqualTo("released_date");
         assertThat((String) dataTable.get(9).get("TYPE")).contains("timestamp");
         assertThat((String) dataTable.get(9).get("NULL")).isEqualTo("NO");
         assertThat((String) dataTable.get(9).get("KEY")).isEmpty();

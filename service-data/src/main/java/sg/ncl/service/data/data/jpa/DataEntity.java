@@ -61,8 +61,8 @@ public class DataEntity extends AbstractEntity implements Data {
     @Enumerated(EnumType.STRING)
     private DataAccessibility accessibility = DataAccessibility.OPEN;
 
-    @Column(name = "release_date", nullable = false)
-    private ZonedDateTime releaseDate;
+    @Column(name = "released_date", nullable = false)
+    private ZonedDateTime releasedDate;
 
     @OneToMany(cascade = CascadeType.ALL)
     @JoinColumn(name = "data_id")
@@ -126,7 +126,7 @@ public class DataEntity extends AbstractEntity implements Data {
                 ", contributorId=" + contributorId +
                 ", visibility=" + visibility +
                 ", accessibility=" + accessibility +
-                ", releaseDate=" + releaseDate +
+                ", releaseDate=" + releasedDate +
                 ", resources=" + resources +
                 ", approvedUsers=" + approvedUsers +
                 "} " + super.toString();
