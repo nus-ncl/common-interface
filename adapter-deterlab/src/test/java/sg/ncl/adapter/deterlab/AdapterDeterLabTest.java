@@ -15,6 +15,7 @@ import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 import sg.ncl.adapter.deterlab.data.jpa.DeterLabProjectRepository;
 import sg.ncl.adapter.deterlab.data.jpa.DeterLabUserRepository;
+import sg.ncl.adapter.deterlab.dtos.entities.DeterLabProjectEntity;
 import sg.ncl.adapter.deterlab.dtos.entities.DeterLabUserEntity;
 import sg.ncl.adapter.deterlab.exceptions.*;
 
@@ -432,6 +433,40 @@ public class AdapterDeterLabTest {
         String actual=adapterDeterLab.getDeterUserIdByNclUserId("");
 
         verify(deterLabUserRepository,times(1)).findByNclUserId(anyString());
+        assertEquals(expected,actual);
+    }
+
+    @Test
+    public void saveDeterProjectIdTest() {
+        String deterProjectId = "test1";
+        String nclTeamId = "test2";
+
+        adapterDeterLab.saveDeterProjectId(deterProjectId, nclTeamId);
+
+        verify(deterLabProjectRepository,times(1)).save(any(DeterLabProjectEntity.class));
+    }
+
+    @Test
+    public void getDeterProjectIdByNclTeamIdTestException() {
+        String nclTeamId = "test";
+
+        exception.expect(TeamNotFoundException.class);
+        when(deterLabProjectRepository.findByNclTeamId(nclTeamId)).thenReturn(null);
+        adapterDeterLab.getDeterProjectIdByNclTeamId(nclTeamId);
+
+        verify(deterLabProjectRepository,times(1)).findByNclTeamId(nclTeamId);
+    }
+
+    @Test
+    public void getDeterProjectIdByNclTeamIdTestGood(){
+        DeterLabProjectEntity deterLabProjectEntity = new DeterLabProjectEntity();
+        deterLabProjectEntity.setDeterProjectId("test1");
+        String expected = deterLabProjectEntity.getDeterProjectId();
+
+        when(deterLabProjectRepository.findByNclTeamId(anyString())).thenReturn(deterLabProjectEntity);
+        String actual = adapterDeterLab.getDeterProjectIdByNclTeamId("");
+
+        verify(deterLabProjectRepository,times(1)).findByNclTeamId(anyString());
         assertEquals(expected,actual);
     }
 
