@@ -6,7 +6,7 @@ import sg.ncl.adapter.deterlab.dtos.entities.DeterLabUserEntity;
 /**
  * @author Yeo Te Ye
  */
-public interface DeterLabUserRepository extends JpaRepository<DeterLabUserEntity, String> {
+public interface DeterLabUserRepository extends JpaRepository<DeterLabUserEntity, Long> {
 
     DeterLabUserEntity findByDeterUserId(String deterUserId);
 

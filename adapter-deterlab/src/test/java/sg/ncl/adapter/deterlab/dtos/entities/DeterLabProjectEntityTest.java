@@ -12,32 +12,33 @@ import static org.assertj.core.api.Assertions.assertThat;
  */
 
 public class DeterLabProjectEntityTest {
-    private DeterLabProjectEntity deterLabUserEntity;
+
+    private DeterLabProjectEntity deterLabProjectEntity;
 
 
     @Test
     public void testGetIdDefaultValue(){
-        deterLabUserEntity=new DeterLabProjectEntity();
-        String actual=deterLabUserEntity.getId();
+        deterLabProjectEntity=new DeterLabProjectEntity();
+        Long actual=deterLabProjectEntity.getId();
 
         assertThat(actual).isNull();
     }
 
     @Test
     public void testSetId(){
-        final String expected = RandomStringUtils.randomAlphabetic(20);
+        final Long expected = Long.parseLong(RandomStringUtils.randomNumeric(15));
 
-        deterLabUserEntity=new DeterLabProjectEntity();
-        deterLabUserEntity.setId(expected);
-        String actual=deterLabUserEntity.getId();
+        deterLabProjectEntity=new DeterLabProjectEntity();
+        deterLabProjectEntity.setId(expected);
+        Long actual=deterLabProjectEntity.getId();
 
         assertThat(actual).isEqualTo(expected);
     }
 
     @Test
     public void testGetNclTeamIdDefaultValue(){
-        deterLabUserEntity=new DeterLabProjectEntity();
-        String actual=deterLabUserEntity.getNclTeamId();
+        deterLabProjectEntity=new DeterLabProjectEntity();
+        String actual=deterLabProjectEntity.getNclTeamId();
 
         assertThat(actual).isNull();
     }
@@ -46,17 +47,17 @@ public class DeterLabProjectEntityTest {
     public void testSetNclTeamId(){
         final String expected = RandomStringUtils.randomAlphabetic(20);
 
-        deterLabUserEntity=new DeterLabProjectEntity();
-        deterLabUserEntity.setNclTeamId(expected);
-        String actual=deterLabUserEntity.getNclTeamId();
+        deterLabProjectEntity=new DeterLabProjectEntity();
+        deterLabProjectEntity.setNclTeamId(expected);
+        String actual=deterLabProjectEntity.getNclTeamId();
 
         assertThat(actual).isEqualTo(expected);
     }
 
     @Test
     public void testGeteterProjectIdDefaultValue(){
-        deterLabUserEntity=new DeterLabProjectEntity();
-        String actual=deterLabUserEntity.getDeterProjectId();
+        deterLabProjectEntity=new DeterLabProjectEntity();
+        String actual=deterLabProjectEntity.getDeterProjectId();
 
         assertThat(actual).isNull();
     }
@@ -65,12 +66,10 @@ public class DeterLabProjectEntityTest {
     public void testSetDeterProjectId(){
         final String expected = RandomStringUtils.randomAlphabetic(20);
 
-        deterLabUserEntity=new DeterLabProjectEntity();
-        deterLabUserEntity.setDeterProjectId(expected);
-        String actual=deterLabUserEntity.getDeterProjectId();
+        deterLabProjectEntity=new DeterLabProjectEntity();
+        deterLabProjectEntity.setDeterProjectId(expected);
+        String actual=deterLabProjectEntity.getDeterProjectId();
 
         assertThat(actual).isEqualTo(expected);
     }
-
-
 }
