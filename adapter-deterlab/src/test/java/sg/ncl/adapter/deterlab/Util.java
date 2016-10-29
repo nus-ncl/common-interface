@@ -2,6 +2,7 @@ package sg.ncl.adapter.deterlab;
 
 import org.apache.commons.lang3.RandomStringUtils;
 import org.json.JSONObject;
+import sg.ncl.adapter.deterlab.dtos.entities.DeterLabProjectEntity;
 import sg.ncl.adapter.deterlab.dtos.entities.DeterLabUserEntity;
 
 /**
@@ -51,6 +52,13 @@ public class Util {
         deterLabUserEntity.setNclUserId(RandomStringUtils.randomAlphabetic(20));
         deterLabUserEntity.setDeterUserId(RandomStringUtils.randomAlphabetic(8));
         return deterLabUserEntity;
+    }
+
+    public static DeterLabProjectEntity getDeterLabProjectEntity() {
+        final DeterLabProjectEntity deterLabProjectEntity = new DeterLabProjectEntity();
+        deterLabProjectEntity.setDeterProjectId(RandomStringUtils.randomAlphabetic(8));
+        deterLabProjectEntity.setNclTeamId(RandomStringUtils.randomAlphabetic(20));
+        return deterLabProjectEntity;
     }
 
     public static JSONObject getExperimentAdapterJsonObject() {
