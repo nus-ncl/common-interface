@@ -552,4 +552,19 @@ public class AdapterDeterLab {
             throw e;
         }
     }
+
+    public String getTopologyThumbnail(String jsonString) {
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        HttpEntity<String> request = new HttpEntity<>(jsonString, headers);
+        ResponseEntity response;
+
+        try {
+            response = restTemplate.exchange(properties.getTopoThumbnail(), HttpMethod.GET, request, String.class);
+        } catch (RestClientException e) {
+            log.warn("DeterLab connection error get thumbnail: {}", e);
+            throw new AdapterDeterlabConnectException();
+        }
+        return response.getBody().toString();
+    }
 }
