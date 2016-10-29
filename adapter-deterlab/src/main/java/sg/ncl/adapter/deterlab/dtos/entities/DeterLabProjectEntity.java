@@ -2,6 +2,7 @@ package sg.ncl.adapter.deterlab.dtos.entities;
 
 import lombok.Getter;
 import lombok.Setter;
+import org.hibernate.annotations.GenericGenerator;
 import sg.ncl.adapter.deterlab.domain.DeterLabProject;
 import sg.ncl.common.jpa.AbstractEntity;
 
@@ -14,10 +15,10 @@ import javax.persistence.Table;
 /**
  * Created by Te Ye on 16-Jun-16.
  */
-@Getter
-@Setter
 @Entity
 @Table(name = "deterlab_project")
+@Getter
+@Setter
 public class DeterLabProjectEntity extends AbstractEntity implements DeterLabProject {
 
     @Id
