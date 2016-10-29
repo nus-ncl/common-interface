@@ -10,6 +10,4 @@ public interface DeterLabProjectRepository extends JpaRepository<DeterLabProject
 
     DeterLabProjectEntity findByNclTeamId(String nclTeamId);
 
-    DeterLabProjectEntity findByNclTeamId(String nclTeamId);
-
 }
