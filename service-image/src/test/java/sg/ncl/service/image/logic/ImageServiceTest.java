@@ -15,9 +15,6 @@ import sg.ncl.service.image.domain.ImageService;
 import sg.ncl.service.image.domain.ImageVisibility;
 import sg.ncl.service.image.web.ImageInfo;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.*;
@@ -82,15 +79,7 @@ public class ImageServiceTest {
 
     @Test
     public void testGetListOfImagesGood() {
-        List<ImageEntity> expected = new ArrayList<>();
-        final ImageEntity entity1 = getImageEntity();
-        final ImageEntity entity2 = getImageEntity();
-        expected.add(entity1);
-        expected.add(entity2);
 
-        when(imageRepository.findAll()).thenReturn(expected);
-
-        List<Image> result = imageService.getAll();
-        assertThat(expected).isEqualTo(result);
     }
+
 }
