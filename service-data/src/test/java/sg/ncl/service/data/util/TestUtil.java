@@ -52,7 +52,7 @@ public class TestUtil {
         entity.setContributorId(ownerId);
         entity.setAccessibility(accessibility);
         entity.setVisibility(visibility);
-        entity.setReleaseDate(ZonedDateTime.now());
+        entity.setReleasedDate(ZonedDateTime.now());
 
         return entity;
     }

@@ -53,7 +53,7 @@ public class DataServiceImpl implements DataService {
         dataEntity.setContributorId(data.getContributorId());
         dataEntity.setAccessibility(data.getAccessibility());
         dataEntity.setVisibility(data.getVisibility());
-        dataEntity.setReleaseDate(data.getReleaseDate());
+        dataEntity.setReleasedDate(data.getReleasedDate());
 
         return dataEntity;
     }

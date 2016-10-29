@@ -24,6 +24,6 @@ public interface Data {
 
     List<String> getApprovedUsers();
 
-    ZonedDateTime getReleaseDate();
+    ZonedDateTime getReleasedDate();
 
 }
