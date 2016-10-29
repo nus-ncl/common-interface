@@ -12,6 +12,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
+import sg.ncl.adapter.deterlab.data.jpa.DeterLabProjectRepository;
 import sg.ncl.adapter.deterlab.data.jpa.DeterLabUserRepository;
 import sg.ncl.adapter.deterlab.dtos.entities.DeterLabUserEntity;
 import sg.ncl.adapter.deterlab.exceptions.*;
@@ -26,13 +27,15 @@ import javax.inject.Inject;
 @Slf4j
 public class AdapterDeterLab {
 
+    private DeterLabProjectRepository deterLabProjectRepository;
     private DeterLabUserRepository deterLabUserRepository;
     private ConnectionProperties properties;
     private RestTemplate restTemplate;
 
     @Inject
-    public AdapterDeterLab(DeterLabUserRepository repository, ConnectionProperties connectionProperties, RestTemplate restTemplate) {
+    public AdapterDeterLab(DeterLabUserRepository repository, DeterLabProjectRepository deterLabProjectRepository, ConnectionProperties connectionProperties, RestTemplate restTemplate) {
         this.deterLabUserRepository = repository;
+        this.deterLabProjectRepository = deterLabProjectRepository;
         this.properties = connectionProperties;
         this.restTemplate = restTemplate;
     }

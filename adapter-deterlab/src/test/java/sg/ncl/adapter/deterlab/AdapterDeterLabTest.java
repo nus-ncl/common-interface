@@ -13,6 +13,7 @@ import org.mockito.junit.MockitoRule;
 import org.springframework.http.*;;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
+import sg.ncl.adapter.deterlab.data.jpa.DeterLabProjectRepository;
 import sg.ncl.adapter.deterlab.data.jpa.DeterLabUserRepository;
 import sg.ncl.adapter.deterlab.dtos.entities.DeterLabUserEntity;
 import sg.ncl.adapter.deterlab.exceptions.*;
@@ -37,6 +38,9 @@ public class AdapterDeterLabTest {
     private DeterLabUserRepository deterLabUserRepository;
 
     @Mock
+    private DeterLabProjectRepository deterLabProjectRepository;
+
+    @Mock
     private ConnectionProperties properties;
 
     @Mock
@@ -53,7 +57,7 @@ public class AdapterDeterLabTest {
         assertThat(mockingDetails(deterLabUserRepository).isMock()).isTrue();
         assertThat(mockingDetails(properties).isMock()).isTrue();
         assertThat(mockingDetails(restTemplate).isMock()).isTrue();
-        adapterDeterLab=new AdapterDeterLab(deterLabUserRepository, properties,restTemplate);
+        adapterDeterLab=new AdapterDeterLab(deterLabUserRepository, deterLabProjectRepository, properties,restTemplate);
     }
 
 
