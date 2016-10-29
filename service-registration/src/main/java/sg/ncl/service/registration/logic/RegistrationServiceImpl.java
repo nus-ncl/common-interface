@@ -114,6 +114,7 @@ public class RegistrationServiceImpl implements RegistrationService {
         // no problem with the team
         // create the team
         Team createdTeam = teamService.createTeam(team);
+        addNclTeamIdMapping(team.getName(), team.getId());
 
         TeamMemberEntity teamMemberEntity = new TeamMemberEntity();
         teamMemberEntity.setUserId(nclUserId);
@@ -214,6 +215,7 @@ public class RegistrationServiceImpl implements RegistrationService {
             // check if team already exists
             teamEntity = teamService.createTeam(team);
             teamId = teamEntity.getId();
+            addNclTeamIdMapping(teamEntity.getName(), teamId);
             log.info("Register new user: apply new Team {}", team.getName());
         }
 
@@ -479,6 +481,11 @@ public class RegistrationServiceImpl implements RegistrationService {
         String deterUserId = userObject.getString("uid");
         adapterDeterLab.saveDeterUserIdMapping(deterUserId, nclUserId);
         log.info("Register new user: map and save ncl user id: {} to deter user id: {}", nclUserId, deterUserId);
+    }
+
+    private void addNclTeamIdMapping(String deterProjectId, String nclTeamId) {
+        adapterDeterLab.saveDeterProjectId(deterProjectId, nclTeamId);
+        log.info("Register new team: map and save ncl team id: {} to deter team id: {}", nclTeamId, deterProjectId);
     }
 
     private Registration addUserToRegistrationRepository(String resultJSON, User user, Team team) {
