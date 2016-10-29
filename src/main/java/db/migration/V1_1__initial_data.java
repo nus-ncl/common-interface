@@ -18,6 +18,7 @@ import sg.ncl.service.user.domain.UserStatus;
 
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
+import java.sql.Timestamp;
 import java.time.ZonedDateTime;
 import java.util.Collections;
 import java.util.List;
@@ -68,11 +69,11 @@ public class V1_1__initial_data implements SpringJdbcMigration {
     @Override
     public void migrate(final JdbcTemplate jdbcTemplate) throws Exception {
         log.debug("Adding initial data to database");
-        final String teamId = createTeam(jdbcTemplate, "NCL", "NCL Administrative Team", "Academic", "https://www.ncl.sg", TeamPrivacy.OPEN, TeamStatus.APPROVED, TeamVisibility.PRIVATE);
+        final String teamId = createTeam(jdbcTemplate, "ncl", "NCL Administrative Team", "Academic", "https://ncl.sg", TeamPrivacy.OPEN, TeamStatus.APPROVED, TeamVisibility.PRIVATE);
 
-        final int addressId = createAddress(jdbcTemplate, "Address1", "", "City", "Country", "Region", "123456");
+        final int addressId = createAddress(jdbcTemplate, "13 Computing Drive", "COM1-01-16", "Singapore", "SG", "SG", "117417");
 
-        final int detailsId = createDetails(jdbcTemplate, "First Name", "admin@ncl.sg", addressId, "Institution", "NCL", "https://www.ncl.sg", "Job Title", "Last Name", "12345678");
+        final int detailsId = createDetails(jdbcTemplate, "Admin", "admin@ncl.sg", addressId, "National Cybersecurity R&D Lab", "NCL", "https://ncl.sg", "Research Lab", "NCL", "12345678");
 
         final String userId = createUser(jdbcTemplate, "Y", UserStatus.APPROVED, detailsId);
 
@@ -88,7 +89,7 @@ public class V1_1__initial_data implements SpringJdbcMigration {
     private String createTeam(final JdbcTemplate jdbcTemplate, final String teamName, final String description, final String organizationType, final String url, final TeamPrivacy privacy, final TeamStatus status, final TeamVisibility visibility) throws SQLException {
         // insert the team
         final String id = randomUUID().toString();
-        final ZonedDateTime time = ZonedDateTime.now();
+        final Timestamp time = Timestamp.valueOf(ZonedDateTime.now().toLocalDateTime());
         final int version = 0;
         final int i = jdbcTemplate.update(SQL_INSERT_TEAMS, id, time, time, version, time, description, teamName, organizationType, privacy.name(), status.name(), visibility.name(), url);
         log.info("Inserted {} team entry: id={}, created_date={}, last_modified_date={}, version={}, application_date={}, description={}, name={}, organisation_type={}, privacy={}, status={}, visibility={}, website={}", i, id, time, time, version, time, description, teamName, organizationType, privacy.name(), status.name(), visibility.name(), url);
@@ -98,7 +99,7 @@ public class V1_1__initial_data implements SpringJdbcMigration {
     private int createAddress(final JdbcTemplate jdbcTemplate, final String address1, final String address2, final String city, final String country, final String region, final String zip) throws SQLException {
         // insert the address
         final KeyHolder keyHolder = new GeneratedKeyHolder();
-        final ZonedDateTime now = ZonedDateTime.now();
+        final Timestamp now = Timestamp.valueOf(ZonedDateTime.now().toLocalDateTime());
         final int version = 0;
         final int i = jdbcTemplate.update(c -> {
             final PreparedStatement statement = c.prepareStatement(SQL_INSERT_ADDRESS, new String[]{"id"});
@@ -121,7 +122,7 @@ public class V1_1__initial_data implements SpringJdbcMigration {
     private int createDetails(final JdbcTemplate jdbcTemplate, final String firstName, final String email, final int addressId, final String institution, final String abbreviation, final String url, final String jobTitle, final String lastName, final String phone) throws SQLException {
         // insert the userDetails
         final KeyHolder keyHolder = new GeneratedKeyHolder();
-        final ZonedDateTime now = ZonedDateTime.now();
+        final Timestamp now = Timestamp.valueOf(ZonedDateTime.now().toLocalDateTime());
         final int version = 0;
         final int i = jdbcTemplate.update(c -> {
             final PreparedStatement statement = c.prepareStatement(SQL_INSERT_USERS_DETAILS, new String[]{"id"});
@@ -147,7 +148,7 @@ public class V1_1__initial_data implements SpringJdbcMigration {
     private String createUser(final JdbcTemplate jdbcTemplate, final String isEmailVerified, final UserStatus userStatus, final int detailsId) throws SQLException {
         // insert the users
         final String id = randomUUID().toString();
-        final ZonedDateTime now = ZonedDateTime.now();
+        final Timestamp now = Timestamp.valueOf(ZonedDateTime.now().toLocalDateTime());
         final int version = 0;
         final int i = jdbcTemplate.update(SQL_INSERT_USERS, id, now, now, version, now, isEmailVerified, userStatus.name(), detailsId);
         log.info("Inserted {} user entry: id={}, created_date={}, last_modified_date={}, version={}, application_date={}, is_email_verified={}, status={}, user_details_id={}", i, id, now, now, version, now, isEmailVerified, userStatus, detailsId);
@@ -156,7 +157,7 @@ public class V1_1__initial_data implements SpringJdbcMigration {
 
     private void createCredentials(final JdbcTemplate jdbcTemplate, final String username, final String password, final String userId, final CredentialsStatus status) throws SQLException {
         // insert the credentials
-        final ZonedDateTime now = ZonedDateTime.now();
+        final Timestamp now = Timestamp.valueOf(ZonedDateTime.now().toLocalDateTime());
         final int version = 0;
         final int i = jdbcTemplate.update(SQL_INSERT_CREDENTIALS, userId, now, now, version, passwordEncoder.encode(password), status.name(), username);
         log.info("Inserted {} credentials entry: id={}, created_date={}, last_modified_date={}, version={}, status={}, username={}", i, userId, now, now, version, status, username);
@@ -176,14 +177,14 @@ public class V1_1__initial_data implements SpringJdbcMigration {
         log.info("Inserted {} user_team entry: user_id={}, team_id={}", i, userId, teamId);
 
         // insert into team side (team members)
-        final ZonedDateTime now = ZonedDateTime.now();
+        final Timestamp now = Timestamp.valueOf(ZonedDateTime.now().toLocalDateTime());
         final int j = jdbcTemplate.update(SQL_INSERT_TEAM_MEMBERS, now, now, 0, now, memberType.name(), userId, teamId, memberStatus.name());
         log.info("Inserted {} team_member entry: created_date={}, last_modified_date={}, version={}, joined_date={}, member_type={}, user_id={}, team_id={}, status={}", j, now, now, 0, now, memberType, userId, teamId, memberStatus);
     }
 
     private void createDeterLabUser(final JdbcTemplate jdbcTemplate, final String name, final String userId) throws SQLException {
         // insert into deterlab_user
-        final ZonedDateTime now = ZonedDateTime.now();
+        final Timestamp now = Timestamp.valueOf(ZonedDateTime.now().toLocalDateTime());
         final int version = 0;
         final int i = jdbcTemplate.update(SQL_INSERT_DETERLAB_USER, now, now, version, name, userId);
         log.info("Inserted {} deter user entry: created_date={}, last_modified_date={}, version={}, deter_user_id={}, ncl_user_id={}", i, now, now, version, name, userId);
