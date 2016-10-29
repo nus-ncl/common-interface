@@ -7,8 +7,8 @@ USE `prod`;
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS `addresses` (
   `id`                 BIGINT(20)   NOT NULL AUTO_INCREMENT,
-  `created_date`       TINYBLOB     NOT NULL,
-  `last_modified_date` TINYBLOB     NOT NULL,
+  `created_date`       DATETIME     NOT NULL,
+  `last_modified_date` DATETIME     NOT NULL,
   `version`            BIGINT(20)   NOT NULL,
   `address_1`          VARCHAR(255) NOT NULL,
   `address_2`          VARCHAR(255) NULL     DEFAULT NULL,
@@ -26,8 +26,8 @@ CREATE TABLE IF NOT EXISTS `addresses` (
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS `credentials` (
   `id`                 VARCHAR(255) NOT NULL,
-  `created_date`       TINYBLOB     NOT NULL,
-  `last_modified_date` TINYBLOB     NOT NULL,
+  `created_date`       DATETIME     NOT NULL,
+  `last_modified_date` DATETIME     NOT NULL,
   `version`            BIGINT(20)   NOT NULL,
   `password`           VARCHAR(255) NOT NULL,
   `status`             VARCHAR(255) NOT NULL,
@@ -57,9 +57,9 @@ CREATE TABLE IF NOT EXISTS `credentials_roles` (
 -- Table `deterlab_project`
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS `deterlab_project` (
-  `id`                 VARCHAR(255) NOT NULL,
-  `created_date`       TINYBLOB     NOT NULL,
-  `last_modified_date` TINYBLOB     NOT NULL,
+  `id`                 BIGINT(20)   NOT NULL AUTO_INCREMENT,
+  `created_date`       DATETIME     NOT NULL,
+  `last_modified_date` DATETIME     NOT NULL,
   `version`            BIGINT(20)   NOT NULL,
   `deter_project_id`   VARCHAR(255) NOT NULL,
   `ncl_team_id`        VARCHAR(255) NOT NULL,
@@ -75,8 +75,8 @@ CREATE TABLE IF NOT EXISTS `deterlab_project` (
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS `deterlab_user` (
   `id`                 BIGINT(20)   NOT NULL AUTO_INCREMENT,
-  `created_date`       TINYBLOB     NOT NULL,
-  `last_modified_date` TINYBLOB     NOT NULL,
+  `created_date`       DATETIME     NOT NULL,
+  `last_modified_date` DATETIME     NOT NULL,
   `version`            BIGINT(20)   NOT NULL,
   `deter_user_id`      VARCHAR(255) NOT NULL,
   `ncl_user_id`        VARCHAR(255) NOT NULL,
@@ -92,15 +92,15 @@ CREATE TABLE IF NOT EXISTS `deterlab_user` (
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS `email_retries` (
   `id`                 BIGINT(20)   NOT NULL AUTO_INCREMENT,
-  `created_date`       TINYBLOB     NOT NULL,
-  `last_modified_date` TINYBLOB     NOT NULL,
+  `created_date`       DATETIME     NOT NULL,
+  `last_modified_date` DATETIME     NOT NULL,
   `version`            BIGINT(20)   NOT NULL,
   `bcc`                TINYBLOB     NULL     DEFAULT NULL,
   `cc`                 TINYBLOB     NULL     DEFAULT NULL,
   `content`            VARCHAR(255) NOT NULL,
   `error_message`      VARCHAR(255) NULL     DEFAULT NULL,
   `html`               BIT(1)       NOT NULL,
-  `last_retry_time`    TINYBLOB     NOT NULL,
+  `last_retry_time`    DATETIME     NOT NULL,
   `recipients`         TINYBLOB     NOT NULL,
   `retry_times`        INT(11)      NOT NULL,
   `sender`             VARCHAR(255) NOT NULL,
@@ -116,8 +116,8 @@ CREATE TABLE IF NOT EXISTS `email_retries` (
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS `experiments` (
   `id`                 BIGINT(20)   NOT NULL AUTO_INCREMENT,
-  `created_date`       TINYBLOB     NOT NULL,
-  `last_modified_date` TINYBLOB     NOT NULL,
+  `created_date`       DATETIME     NOT NULL,
+  `last_modified_date` DATETIME     NOT NULL,
   `version`            BIGINT(20)   NOT NULL,
   `description`        VARCHAR(255) NOT NULL,
   `idle_swap`          INT(11)      NOT NULL,
@@ -138,8 +138,8 @@ CREATE TABLE IF NOT EXISTS `experiments` (
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS `user_details` (
   `id`                       BIGINT(20)   NOT NULL AUTO_INCREMENT,
-  `created_date`             TINYBLOB     NOT NULL,
-  `last_modified_date`       TINYBLOB     NOT NULL,
+  `created_date`             DATETIME     NOT NULL,
+  `last_modified_date`       DATETIME     NOT NULL,
   `version`                  BIGINT(20)   NOT NULL,
   `email`                    VARCHAR(255) NOT NULL,
   `first_name`               VARCHAR(255) NOT NULL,
@@ -165,12 +165,12 @@ CREATE TABLE IF NOT EXISTS `user_details` (
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS `users` (
   `id`                 VARCHAR(255) NOT NULL,
-  `created_date`       TINYBLOB     NOT NULL,
-  `last_modified_date` TINYBLOB     NOT NULL,
+  `created_date`       DATETIME     NOT NULL,
+  `last_modified_date` DATETIME     NOT NULL,
   `version`            BIGINT(20)   NOT NULL,
-  `application_date`   TINYBLOB     NOT NULL,
+  `application_date`   DATETIME     NOT NULL,
   `is_email_verified`  CHAR(1)      NOT NULL,
-  `processed_date`     TINYBLOB     NULL DEFAULT NULL,
+  `processed_date`     DATETIME     NULL DEFAULT NULL,
   `status`             VARCHAR(255) NOT NULL,
   `verification_key`   VARCHAR(255) NULL DEFAULT NULL,
   `user_details_id`    BIGINT(20)   NOT NULL,
@@ -188,10 +188,10 @@ CREATE TABLE IF NOT EXISTS `users` (
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS `login_activities` (
   `id`                 BIGINT(20)   NOT NULL AUTO_INCREMENT,
-  `created_date`       TINYBLOB     NOT NULL,
-  `last_modified_date` TINYBLOB     NOT NULL,
+  `created_date`       DATETIME     NOT NULL,
+  `last_modified_date` DATETIME     NOT NULL,
   `version`            BIGINT(20)   NOT NULL,
-  `date`               TINYBLOB     NOT NULL,
+  `date`               DATETIME     NOT NULL,
   `ip_address`         VARCHAR(255) NOT NULL,
   `user_id`            VARCHAR(255) NULL     DEFAULT NULL,
   PRIMARY KEY (`id`),
@@ -208,8 +208,8 @@ CREATE TABLE IF NOT EXISTS `login_activities` (
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS `realizations` (
   `id`                 BIGINT(20)   NOT NULL AUTO_INCREMENT,
-  `created_date`       TINYBLOB     NOT NULL,
-  `last_modified_date` TINYBLOB     NOT NULL,
+  `created_date`       DATETIME     NOT NULL,
+  `last_modified_date` DATETIME     NOT NULL,
   `version`            BIGINT(20)   NOT NULL,
   `details`            LONGTEXT     NULL     DEFAULT NULL,
   `experiment_id`      BIGINT(20)   NOT NULL,
@@ -230,8 +230,8 @@ CREATE TABLE IF NOT EXISTS `realizations` (
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS `registrations` (
   `id`                 BIGINT(20)   NOT NULL AUTO_INCREMENT,
-  `created_date`       TINYBLOB     NOT NULL,
-  `last_modified_date` TINYBLOB     NOT NULL,
+  `created_date`       DATETIME     NOT NULL,
+  `last_modified_date` DATETIME     NOT NULL,
   `version`            BIGINT(20)   NOT NULL,
   `pid`                VARCHAR(255) NOT NULL,
   `uid`                VARCHAR(255) NOT NULL,
@@ -259,15 +259,15 @@ CREATE TABLE IF NOT EXISTS `registrations` (
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS `teams` (
   `id`                 VARCHAR(255) NOT NULL,
-  `created_date`       TINYBLOB     NOT NULL,
-  `last_modified_date` TINYBLOB     NOT NULL,
+  `created_date`       DATETIME     NOT NULL,
+  `last_modified_date` DATETIME     NOT NULL,
   `version`            BIGINT(20)   NOT NULL,
-  `application_date`   TINYBLOB     NOT NULL,
+  `application_date`   DATETIME     NOT NULL,
   `description`        VARCHAR(255) NULL DEFAULT NULL,
   `name`               VARCHAR(255) NOT NULL,
   `organisation_type`  VARCHAR(255) NOT NULL,
   `privacy`            VARCHAR(255) NOT NULL,
-  `processed_date`     TINYBLOB     NULL DEFAULT NULL,
+  `processed_date`     DATETIME     NULL DEFAULT NULL,
   `status`             VARCHAR(255) NOT NULL,
   `visibility`         VARCHAR(255) NOT NULL,
   `website`            VARCHAR(255) NOT NULL,
@@ -282,10 +282,10 @@ CREATE TABLE IF NOT EXISTS `teams` (
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS `team_members` (
   `id`                 BIGINT(20)   NOT NULL AUTO_INCREMENT,
-  `created_date`       TINYBLOB     NOT NULL,
-  `last_modified_date` TINYBLOB     NOT NULL,
+  `created_date`       DATETIME     NOT NULL,
+  `last_modified_date` DATETIME     NOT NULL,
   `version`            BIGINT(20)   NOT NULL,
-  `joined_date`        TINYBLOB     NOT NULL,
+  `joined_date`        DATETIME     NOT NULL,
   `status`             VARCHAR(255) NOT NULL,
   `member_type`        VARCHAR(255) NOT NULL,
   `user_id`            VARCHAR(255) NOT NULL,
