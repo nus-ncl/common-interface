@@ -242,7 +242,7 @@ public class FlywayTest {
     public void testDataTable() throws Exception {
         // make sure 'data' table has expected number of columns
         List<Map<String, Object>> dataTable = this.template.queryForList("SHOW COLUMNS FROM " + SCHEMA + "." + DATA);
-        assertThat(dataTable.size()).isEqualTo(9);
+        assertThat(dataTable.size()).isEqualTo(10);
 
         // make sure 'data' table has expected column name and type
         assertThat((String) dataTable.get(0).get("FIELD")).isEqualTo("id");
@@ -289,6 +289,11 @@ public class FlywayTest {
         assertThat((String) dataTable.get(8).get("TYPE")).isEqualTo("varchar(255)");
         assertThat((String) dataTable.get(8).get("NULL")).isEqualTo("NO");
         assertThat((String) dataTable.get(8).get("KEY")).isEmpty();
+
+        assertThat((String) dataTable.get(9).get("FIELD")).isEqualTo("release_date");
+        assertThat((String) dataTable.get(9).get("TYPE")).contains("timestamp");
+        assertThat((String) dataTable.get(9).get("NULL")).isEqualTo("NO");
+        assertThat((String) dataTable.get(9).get("KEY")).isEmpty();
 
         List<Map<String, Object>> dataConstraints = this.template.queryForList("SELECT * FROM INFORMATION_SCHEMA.CONSTRAINTS WHERE TABLE_NAME = 'data'");
 
