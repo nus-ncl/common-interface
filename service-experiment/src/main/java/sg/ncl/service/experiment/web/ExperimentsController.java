@@ -85,4 +85,10 @@ public class ExperimentsController {
         }
         return new ExperimentInfo(experimentService.deleteExperiment(expId, teamId, (Claims) claims));
     }
+
+    @GetMapping(path = "/teams/{teamId}/experiments/{expId}/topology")
+    @ResponseStatus(HttpStatus.OK)
+    public String getTopology(@PathVariable String teamId, @PathVariable Long expId) {
+        return experimentService.getTopology(teamId, expId);
+    }
 }

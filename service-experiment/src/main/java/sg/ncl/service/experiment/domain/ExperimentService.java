@@ -21,4 +21,6 @@ public interface ExperimentService {
 
     Experiment deleteExperiment(Long id, String teamId, Claims claims);
 
+    String getTopology(String teamId, Long expId);
+
 }
