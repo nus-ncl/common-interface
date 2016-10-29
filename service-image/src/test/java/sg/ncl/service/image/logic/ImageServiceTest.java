@@ -93,5 +93,4 @@ public class ImageServiceTest {
         List<Image> result = imageService.getAll();
         assertThat(expected).isEqualTo(result);
     }
-
 }
