@@ -7,7 +7,7 @@ import java.util.List;
  */
 public interface ImageService {
 
-    List<Image> getAll();
+    List<Image> getAll(String teamId, ImageVisibility visibility);
 
     Image getImage(Long id);
 
