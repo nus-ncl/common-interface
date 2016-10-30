@@ -2,7 +2,6 @@ package sg.ncl.adapter.deterlab.dtos.entities;
 
 import lombok.Getter;
 import lombok.Setter;
-import org.hibernate.annotations.GenericGenerator;
 import sg.ncl.adapter.deterlab.domain.DeterLabProject;
 import sg.ncl.common.jpa.AbstractEntity;
 
