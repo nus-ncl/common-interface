@@ -18,18 +18,18 @@ public class DeterLabProjectEntityTest {
     @Test
     public void testGetIdDefaultValue(){
         deterLabUserEntity=new DeterLabProjectEntity();
-        String actual=deterLabUserEntity.getId();
+        Long actual=deterLabUserEntity.getId();
 
         assertThat(actual).isNull();
     }
 
     @Test
     public void testSetId(){
-        final String expected = RandomStringUtils.randomAlphabetic(20);
+        final Long expected = Long.parseLong(RandomStringUtils.randomNumeric(10));
 
         deterLabUserEntity=new DeterLabProjectEntity();
         deterLabUserEntity.setId(expected);
-        String actual=deterLabUserEntity.getId();
+        Long actual=deterLabUserEntity.getId();
 
         assertThat(actual).isEqualTo(expected);
     }
