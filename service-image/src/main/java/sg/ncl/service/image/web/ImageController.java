@@ -6,6 +6,7 @@ import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 import sg.ncl.service.image.domain.Image;
 import sg.ncl.service.image.domain.ImageService;
+import sg.ncl.service.image.domain.ImageVisibility;
 
 import javax.inject.Inject;
 import javax.validation.constraints.NotNull;
@@ -35,8 +36,8 @@ public class ImageController {
 
     @GetMapping
     @ResponseStatus(HttpStatus.OK)
-    public List<Image> getAll() {
-        return imageService.getAll().stream().map(ImageInfo::new).collect(Collectors.toList());
+    public List<Image> getAll(@RequestParam(value = "teamId", required = false) String teamId, @RequestParam(value = "visibility", required = false) ImageVisibility imageVisibility) {
+        return imageService.getAll(teamId, imageVisibility).stream().map(ImageInfo::new).collect(Collectors.toList());
     }
 
     @GetMapping(path = "/{id}")

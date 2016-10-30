@@ -90,7 +90,45 @@ public class ImageServiceTest {
 
         when(imageRepository.findAll()).thenReturn(expected);
 
-        List<Image> result = imageService.getAll();
+        List<Image> result = imageService.getAll(null, null);
+        assertThat(expected).isEqualTo(result);
+    }
+
+    @Test
+    public void testGetListOfImageWithTeamIdAndVisibility() {
+        List<ImageEntity> expected = new ArrayList<>();
+        final ImageEntity entity1 = getImageEntity();
+        expected.add(entity1);
+
+        when(imageRepository.findByTeamIdAndVisibility(anyString(), any(ImageVisibility.class))).thenReturn(expected);
+
+        List<Image> result = imageService.getAll(entity1.getTeamId(), entity1.getVisibility());
+        assertThat(expected).isEqualTo(result);
+    }
+
+    @Test
+    public void testGetListOfImageWithTeamIdOnly() {
+        List<ImageEntity> expected = new ArrayList<>();
+        final ImageEntity entity1 = getImageEntity();
+        expected.add(entity1);
+
+        when(imageRepository.findByTeamIdOrVisibility(anyString(), any())).thenReturn(expected);
+
+        List<Image> result = imageService.getAll(entity1.getTeamId(), null);
+        assertThat(expected).isEqualTo(result);
+    }
+
+    @Test
+    public void testGetListOfImageWithVisibilityOnly() {
+        List<ImageEntity> expected = new ArrayList<>();
+        final ImageEntity entity1 = getImageEntity();
+        final ImageEntity entity2 = getImageEntity();
+        expected.add(entity1);
+        expected.add(entity2);
+
+        when(imageRepository.findByTeamIdOrVisibility(anyString(), any(ImageVisibility.class))).thenReturn(expected);
+
+        List<Image> result = imageService.getAll(null, ImageVisibility.PRIVATE);
         assertThat(expected).isEqualTo(result);
     }
 }

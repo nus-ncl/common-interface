@@ -8,6 +8,7 @@ import sg.ncl.service.image.data.jpa.ImageEntity;
 import sg.ncl.service.image.data.jpa.ImageRepository;
 import sg.ncl.service.image.domain.Image;
 import sg.ncl.service.image.domain.ImageService;
+import sg.ncl.service.image.domain.ImageVisibility;
 
 import javax.inject.Inject;
 import javax.validation.constraints.NotNull;
@@ -30,10 +31,26 @@ public class ImageServiceImpl implements ImageService {
         this.imageRepository = imageRepository;
     }
 
+    /**
+     * Get the list of saved images
+     * 1st case: get all images in the system
+     * 2nd case: get all images that the team shares
+     * 3rd case: get all images either shared by the team or by the visibility
+     * @param teamId ncl team id
+     * @param visibility visibility of the image
+     * @return list of saved images
+     */
     @Transactional
     @Override
-    public List<Image> getAll() {
-        return imageRepository.findAll().stream().collect(Collectors.toList());
+    public List<Image> getAll(String teamId, ImageVisibility visibility) {
+        log.info("Getting list of saved images for team: {}, with visibility: {}", teamId, visibility);
+        if (teamId == null && visibility == null) {
+            return imageRepository.findAll().stream().collect(Collectors.toList());
+        }
+        if (teamId != null && visibility != null) {
+            return imageRepository.findByTeamIdAndVisibility(teamId, visibility).stream().collect(Collectors.toList());
+        }
+        return imageRepository.findByTeamIdOrVisibility(teamId, visibility).stream().collect(Collectors.toList());
     }
 
     @Transactional
