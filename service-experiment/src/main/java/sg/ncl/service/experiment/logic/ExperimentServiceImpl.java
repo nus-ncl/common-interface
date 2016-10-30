@@ -265,4 +265,24 @@ public class ExperimentServiceImpl implements ExperimentService {
 
         adapterDeterLab.deleteExperiment(jsonObject.toString());
     }
+
+    /**
+     * Get the network topology map thumbnail from deterlab.
+     *
+     * @param teamId    the team to get the exp for
+     * @param expId     the experiment to get the thumbnail
+     * @return  Base64 image string
+     */
+    @Override
+    public String getTopology(String teamId, Long expId) {
+        Experiment experimentEntity = experimentRepository.getOne(expId);
+        String teamName = experimentEntity.getTeamName();
+        String experimentName = experimentEntity.getName();
+
+        JSONObject jsonObject = new JSONObject();
+        jsonObject.put("pid", teamName);
+        jsonObject.put("eid", experimentName);
+
+        return adapterDeterLab.getTopologyThumbnail(jsonObject.toString());
+    }
 }

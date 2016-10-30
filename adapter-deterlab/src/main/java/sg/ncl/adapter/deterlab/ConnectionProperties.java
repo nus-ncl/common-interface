@@ -80,4 +80,8 @@ public class ConnectionProperties {
         return "http://" + ip + ":" + port + "/getExpStatus";
     }
 
+    public String getTopoThumbnail() {
+        return "http://" + ip + ":" + port + "/getTopoThumbnail";
+    }
+
 }

@@ -1139,4 +1139,16 @@ public class AdapterDeterLabTest {
         verify(properties,times(1)).login();
     }
 
+    //throw AdapterDeterlabConnectException
+    @Test
+    public void getTopoThumbnailTest() {
+        JSONObject myobject = new JSONObject();
+        myobject.put("thumbnail", "");
+
+        exception.expect(AdapterDeterlabConnectException.class);
+        when(restTemplate.exchange(anyString(),eq(HttpMethod.GET),anyObject(),eq(String.class)))
+                .thenThrow(new RestClientException(""));
+        adapterDeterLab.getTopologyThumbnail(myobject.toString());
+    }
+
 }
