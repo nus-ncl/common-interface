@@ -5,7 +5,7 @@ package sg.ncl.adapter.deterlab.domain;
  */
 public interface DeterLabProject {
 
-    String getId();
+    Long getId();
 
     String getNclTeamId();
 
