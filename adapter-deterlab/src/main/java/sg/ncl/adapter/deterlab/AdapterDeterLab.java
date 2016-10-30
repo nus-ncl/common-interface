@@ -12,7 +12,9 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
+import sg.ncl.adapter.deterlab.data.jpa.DeterLabProjectRepository;
 import sg.ncl.adapter.deterlab.data.jpa.DeterLabUserRepository;
+import sg.ncl.adapter.deterlab.dtos.entities.DeterLabProjectEntity;
 import sg.ncl.adapter.deterlab.dtos.entities.DeterLabUserEntity;
 import sg.ncl.adapter.deterlab.exceptions.*;
 
@@ -26,13 +28,15 @@ import javax.inject.Inject;
 @Slf4j
 public class AdapterDeterLab {
 
+    private DeterLabProjectRepository deterLabProjectRepository;
     private DeterLabUserRepository deterLabUserRepository;
     private ConnectionProperties properties;
     private RestTemplate restTemplate;
 
     @Inject
-    public AdapterDeterLab(DeterLabUserRepository repository, ConnectionProperties connectionProperties, RestTemplate restTemplate) {
+    public AdapterDeterLab(DeterLabUserRepository repository, DeterLabProjectRepository deterLabProjectRepository, ConnectionProperties connectionProperties, RestTemplate restTemplate) {
         this.deterLabUserRepository = repository;
+        this.deterLabProjectRepository = deterLabProjectRepository;
         this.properties = connectionProperties;
         this.restTemplate = restTemplate;
     }
@@ -285,6 +289,24 @@ public class AdapterDeterLab {
             throw new UserNotFoundException(nclUserId);
         }
         return deterLabUserEntity.getDeterUserId();
+    }
+
+    // deterProjectId is ncl teamName
+    @Transactional
+    public DeterLabProjectEntity saveDeterProjectId(String deterProjectId, String nclTeamId) {
+        DeterLabProjectEntity deterLabProjectEntity = new DeterLabProjectEntity();
+        deterLabProjectEntity.setNclTeamId(nclTeamId);
+        deterLabProjectEntity.setDeterProjectId(deterProjectId);
+        return deterLabProjectRepository.save(deterLabProjectEntity);
+    }
+
+    @Transactional
+    public String getDeterProjectIdByNclTeamId(String nclTeamId) {
+        DeterLabProjectEntity deterLabProjectEntity = deterLabProjectRepository.findByNclTeamId(nclTeamId);
+        if (deterLabProjectEntity == null) {
+            throw new TeamNotFoundException(nclTeamId);
+        }
+        return deterLabProjectEntity.getDeterProjectId();
     }
 
     /**

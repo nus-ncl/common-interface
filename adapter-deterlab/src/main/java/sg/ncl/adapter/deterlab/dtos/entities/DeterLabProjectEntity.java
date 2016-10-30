@@ -14,10 +14,10 @@ import javax.persistence.Table;
 /**
  * Created by Te Ye on 16-Jun-16.
  */
-@Getter
-@Setter
 @Entity
 @Table(name = "deterlab_project")
+@Getter
+@Setter
 public class DeterLabProjectEntity extends AbstractEntity implements DeterLabProject {
 
     @Id

@@ -30,6 +30,7 @@ public class FlywayTest {
     private static final String DETERLAB_USER = "deterlab_user";
     private static final String EMAIL_RETRIES = "email_retries";
     private static final String EXPERIMENTS = "experiments";
+    private static final String IMAGES = "images";
     private static final String LOGIN_ACTIVITIES = "login_activities";
     private static final String REALIZATIONS = "realizations";
     private static final String REGISTRATIONS = "registrations";
@@ -57,7 +58,7 @@ public class FlywayTest {
     public void testNumOfTables() throws Exception {
         // make sure that we have the exact number of tables
         List<Map<String, Object>> tableNames = this.template.queryForList("SHOW TABLES FROM " + SCHEMA);
-        assertThat(tableNames.size()).isEqualTo(18);
+        assertThat(tableNames.size()).isEqualTo(19);
     }
 
     @Test
@@ -83,22 +84,24 @@ public class FlywayTest {
         assertThat((String) tableNames.get(8).get("TABLE_SCHEMA")).isEqualTo(SCHEMA);
         assertThat((String) tableNames.get(9).get("TABLE_NAME")).isEqualTo(EXPERIMENTS);
         assertThat((String) tableNames.get(9).get("TABLE_SCHEMA")).isEqualTo(SCHEMA);
-        assertThat((String) tableNames.get(10).get("TABLE_NAME")).isEqualTo(LOGIN_ACTIVITIES);
+        assertThat((String) tableNames.get(10).get("TABLE_NAME")).isEqualTo(IMAGES);
         assertThat((String) tableNames.get(10).get("TABLE_SCHEMA")).isEqualTo(SCHEMA);
-        assertThat((String) tableNames.get(11).get("TABLE_NAME")).isEqualTo(REALIZATIONS);
+        assertThat((String) tableNames.get(11).get("TABLE_NAME")).isEqualTo(LOGIN_ACTIVITIES);
         assertThat((String) tableNames.get(11).get("TABLE_SCHEMA")).isEqualTo(SCHEMA);
-        assertThat((String) tableNames.get(12).get("TABLE_NAME")).isEqualTo(REGISTRATIONS);
+        assertThat((String) tableNames.get(12).get("TABLE_NAME")).isEqualTo(REALIZATIONS);
         assertThat((String) tableNames.get(12).get("TABLE_SCHEMA")).isEqualTo(SCHEMA);
-        assertThat((String) tableNames.get(13).get("TABLE_NAME")).isEqualTo(TEAM_MEMBERS);
+        assertThat((String) tableNames.get(13).get("TABLE_NAME")).isEqualTo(REGISTRATIONS);
         assertThat((String) tableNames.get(13).get("TABLE_SCHEMA")).isEqualTo(SCHEMA);
-        assertThat((String) tableNames.get(14).get("TABLE_NAME")).isEqualTo(TEAMS);
+        assertThat((String) tableNames.get(14).get("TABLE_NAME")).isEqualTo(TEAM_MEMBERS);
         assertThat((String) tableNames.get(14).get("TABLE_SCHEMA")).isEqualTo(SCHEMA);
-        assertThat((String) tableNames.get(15).get("TABLE_NAME")).isEqualTo(USER_DETAILS);
+        assertThat((String) tableNames.get(15).get("TABLE_NAME")).isEqualTo(TEAMS);
         assertThat((String) tableNames.get(15).get("TABLE_SCHEMA")).isEqualTo(SCHEMA);
-        assertThat((String) tableNames.get(16).get("TABLE_NAME")).isEqualTo(USERS);
+        assertThat((String) tableNames.get(16).get("TABLE_NAME")).isEqualTo(USER_DETAILS);
         assertThat((String) tableNames.get(16).get("TABLE_SCHEMA")).isEqualTo(SCHEMA);
-        assertThat((String) tableNames.get(17).get("TABLE_NAME")).isEqualTo(USERS_TEAMS);
+        assertThat((String) tableNames.get(17).get("TABLE_NAME")).isEqualTo(USERS);
         assertThat((String) tableNames.get(17).get("TABLE_SCHEMA")).isEqualTo(SCHEMA);
+        assertThat((String) tableNames.get(18).get("TABLE_NAME")).isEqualTo(USERS_TEAMS);
+        assertThat((String) tableNames.get(18).get("TABLE_SCHEMA")).isEqualTo(SCHEMA);
     }
 
     @Test
@@ -1196,7 +1199,7 @@ public class FlywayTest {
         assertThat(this.template.queryForObject("SELECT COUNT(*) from " + SCHEMA + ".credentials_roles",
                 Integer.class)).isEqualTo(1);
         assertThat(this.template.queryForObject("SELECT COUNT(*) from " + SCHEMA + ".deterlab_project",
-                Integer.class)).isEqualTo(0);
+                Integer.class)).isEqualTo(1);
         assertThat(this.template.queryForObject("SELECT COUNT(*) from " + SCHEMA + ".deterlab_user",
                 Integer.class)).isEqualTo(1);
         assertThat(this.template.queryForObject("SELECT COUNT(*) from " + SCHEMA + ".email_retries",

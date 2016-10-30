@@ -8,4 +8,6 @@ import sg.ncl.adapter.deterlab.dtos.entities.DeterLabProjectEntity;
  */
 public interface DeterLabProjectRepository extends JpaRepository<DeterLabProjectEntity, Long> {
 
+    DeterLabProjectEntity findByNclTeamId(String nclTeamId);
+
 }
