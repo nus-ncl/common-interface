@@ -273,6 +273,7 @@ public class ExperimentServiceImpl implements ExperimentService {
      * @param expId     the experiment to get the thumbnail
      * @return  Base64 image string
      */
+    @Override
     public String getTopology(String teamId, Long expId) {
         Experiment experimentEntity = experimentRepository.getOne(expId);
         String teamName = experimentEntity.getTeamName();
