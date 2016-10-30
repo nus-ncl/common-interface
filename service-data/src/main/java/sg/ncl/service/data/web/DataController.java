@@ -67,7 +67,7 @@ public class DataController {
     // Create a data set
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.CREATED)
-    public Data add(@AuthenticationPrincipal Object claims, @RequestBody @Valid DataInfo dataInfo) {
+    public Data add(@AuthenticationPrincipal Object claims, @RequestBody DataInfo dataInfo) {
         if (claims == null || !(claims instanceof Claims)) {
             throw new UnauthorizedException();
         }
