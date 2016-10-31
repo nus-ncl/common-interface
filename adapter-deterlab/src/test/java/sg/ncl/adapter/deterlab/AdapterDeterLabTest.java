@@ -1185,7 +1185,7 @@ public class AdapterDeterLabTest {
         myobject.put("thumbnail", "");
 
         exception.expect(AdapterDeterlabConnectException.class);
-        when(restTemplate.exchange(anyString(),eq(HttpMethod.GET),anyObject(),eq(String.class)))
+        when(restTemplate.exchange(anyString(),eq(HttpMethod.POST),anyObject(),eq(String.class)))
                 .thenThrow(new RestClientException(""));
         adapterDeterLab.getTopologyThumbnail(myobject.toString());
     }
