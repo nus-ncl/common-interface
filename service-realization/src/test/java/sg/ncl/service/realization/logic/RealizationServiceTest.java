@@ -109,9 +109,11 @@ public class RealizationServiceTest extends AbstractTest {
 
         realizationRepository.save((realizationEntity));
 
+        JSONObject reportJson = new JSONObject();
+        reportJson.put("test", "test2");
         JSONObject predefinedResultJson = new JSONObject();
         predefinedResultJson.put("status", "active");
-        predefinedResultJson.put("report", "ok");
+        predefinedResultJson.put("report", reportJson);
 
         JSONObject input = new JSONObject();
         input.put("pid", teamName);
@@ -125,7 +127,7 @@ public class RealizationServiceTest extends AbstractTest {
 
         Assert.assertNotNull(realizationEntityDb);
         Assert.assertThat(realizationEntityDb.getState(), is(RealizationState.RUNNING));
-        Assert.assertThat(realizationEntityDb.getDetails(), is("ok"));
+        Assert.assertThat(realizationEntityDb.getDetails(), is("{\"test\":\"test2\"}"));
     }
 
     @Test
@@ -243,7 +245,7 @@ public class RealizationServiceTest extends AbstractTest {
         JSONObject predefinedResultJson = new JSONObject();
         predefinedResultJson.put("msg", "experiment start success");
         predefinedResultJson.put("status", "active");
-        predefinedResultJson.put("report", "this is a report");
+        predefinedResultJson.put("report", new JSONObject());
 
         mockServer.expect(requestTo(properties.startExperiment()))
                 .andExpect(method(HttpMethod.POST))
