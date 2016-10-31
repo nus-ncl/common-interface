@@ -589,4 +589,26 @@ public class AdapterDeterLab {
         }
         return response.getBody().toString();
     }
+
+    public String getUsageStatistics(String teamId, String startDate, String endDate) {
+        // start : mm/dd/yy
+        // end : mm/dd/yy
+        JSONObject tmp = new JSONObject();
+        tmp.put("pid", deterLabProjectRepository.findByNclTeamId(teamId).getDeterProjectId());
+        tmp.put("start", startDate);
+        tmp.put("end", endDate);
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        HttpEntity<String> request = new HttpEntity<>(tmp.toString(), headers);
+        ResponseEntity response;
+
+        try {
+            response = restTemplate.exchange(properties.getUsageStatistics(), HttpMethod.POST, request, String.class);
+        } catch (RestClientException e) {
+            log.warn("DeterLab connection error get usage statistics: {}", e);
+            return "?";
+        }
+        return response.getBody().toString();
+    }
 }

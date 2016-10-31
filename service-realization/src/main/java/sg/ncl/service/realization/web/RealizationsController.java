@@ -63,4 +63,11 @@ public class RealizationsController {
     public Realization stopExperiment(@PathVariable String teamName, @PathVariable String expId) {
         return realizationService.stopExperimentInDeter(teamName, expId);
     }
+
+    //FIXME: This is a temporary hack; should be moved to analytics
+    @GetMapping(path = "/teams/{id}/usage")
+    @ResponseStatus(HttpStatus.OK)
+    public String getUsageStatistics(@PathVariable final String id) {
+        return realizationService.getUsageStatistics(id);
+    }
 }
