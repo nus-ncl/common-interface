@@ -582,7 +582,7 @@ public class AdapterDeterLab {
         ResponseEntity response;
 
         try {
-            response = restTemplate.exchange(properties.getTopoThumbnail(), HttpMethod.GET, request, String.class);
+            response = restTemplate.exchange(properties.getTopoThumbnail(), HttpMethod.POST, request, String.class);
         } catch (RestClientException e) {
             log.warn("DeterLab connection error get thumbnail: {}", e);
             throw new AdapterDeterlabConnectException();
