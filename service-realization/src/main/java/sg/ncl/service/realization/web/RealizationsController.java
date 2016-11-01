@@ -63,4 +63,11 @@ public class RealizationsController {
     public Realization stopExperiment(@PathVariable String teamName, @PathVariable String expId) {
         return realizationService.stopExperimentInDeter(teamName, expId);
     }
+
+    @GetMapping(path = "/usage/teams/{id}")
+    @ResponseStatus(HttpStatus.OK)
+    public int getCurrentMonthUsageByTeam(String id){
+        return realizationService.getCurrentMonthUsageByTeam(id);
+    }
+
 }

@@ -36,4 +36,6 @@ public interface RealizationService {
     String getRealizationDetails(Long experimentId);
 
     void deleteRealization(Long realizationId);
+
+    int getCurrentMonthUsageByTeam(String id);
 }

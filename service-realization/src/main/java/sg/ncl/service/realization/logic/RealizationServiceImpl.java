@@ -6,12 +6,16 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import sg.ncl.adapter.deterlab.AdapterDeterLab;
 import sg.ncl.service.realization.data.jpa.RealizationEntity;
+import sg.ncl.service.realization.data.jpa.RealizationLogEntity;
+import sg.ncl.service.realization.data.jpa.RealizationLogRepository;
 import sg.ncl.service.realization.data.jpa.RealizationRepository;
 import sg.ncl.service.realization.domain.RealizationService;
 import sg.ncl.service.realization.domain.RealizationState;
 
 import javax.inject.Inject;
 import javax.validation.constraints.NotNull;
+import java.time.ZonedDateTime;
+import java.util.List;
 
 /**
  * Created by Desmond.
@@ -21,11 +25,17 @@ import javax.validation.constraints.NotNull;
 public class RealizationServiceImpl implements RealizationService {
 
     private final RealizationRepository realizationRepository;
+    private final RealizationLogRepository realizationLogRepository;
     private final AdapterDeterLab adapterDeterLab;
 
     @Inject
-    RealizationServiceImpl(@NotNull final RealizationRepository realizationRepository, @NotNull final AdapterDeterLab adapterDeterLab) {
+    RealizationServiceImpl(
+            @NotNull final RealizationRepository realizationRepository,
+            @NotNull final RealizationLogRepository realizationLogRepository,
+            @NotNull final AdapterDeterLab adapterDeterLab
+    ) {
         this.realizationRepository = realizationRepository;
+        this.realizationLogRepository = realizationLogRepository;
         this.adapterDeterLab = adapterDeterLab;
     }
 
@@ -139,7 +149,7 @@ public class RealizationServiceImpl implements RealizationService {
      */
     @Transactional
     public RealizationEntity startExperimentInDeter(final String teamName, final String expId) {
-        log.info("Starting experiment: {} for team: ", expId, teamName);
+        log.info("Starting experiment {} for team {}", expId, teamName);
         RealizationEntity realizationEntityDb = realizationRepository.findByExperimentId(Long.parseLong(expId));
         String experimentName = realizationEntityDb.getExperimentName();
         String userId = realizationEntityDb.getUserId();
@@ -167,6 +177,7 @@ public class RealizationServiceImpl implements RealizationService {
         switch (status) {
             case "active":
                 realizationState = RealizationState.RUNNING;
+                addRealizationLog(realizationEntityDb.getTeamId(), realizationEntityDb.getExperimentId(), realizationEntityDb.getNumberOfNodes());
                 break;
             case "activating":
                 realizationState = RealizationState.STARTING;
@@ -217,6 +228,9 @@ public class RealizationServiceImpl implements RealizationService {
         } else {
             realizationState = RealizationState.ERROR;
         }
+
+        updateRealizationLog(realizationEntityDb.getTeamId(), realizationEntityDb.getExperimentId());
+
         log.info("Stop Experiment: {}, Team: {} Status: {}", experimentName, teamName, realizationState);
         realizationEntityDb.setState(realizationState);
         realizationEntityDb.setDetails("");
@@ -283,5 +297,32 @@ public class RealizationServiceImpl implements RealizationService {
     public void deleteRealization(final Long realizationId) {
         log.info("Delete realization. {}", realizationId);
         realizationRepository.delete(realizationId);
+    }
+
+    public void addRealizationLog(String teamId, Long expId, int numNodes) {
+        RealizationLogEntity realizationLogEntity = new RealizationLogEntity();
+        realizationLogEntity.setTeamId(teamId);
+        realizationLogEntity.setExpId(expId);
+        realizationLogEntity.setStartDate(ZonedDateTime.now());
+        realizationLogEntity.setNumNodes(numNodes);
+        realizationLogRepository.save(realizationLogEntity);
+        log.info("Added realization log for exp {} in team {}", expId, teamId);
+    }
+
+    public void updateRealizationLog(String teamId, Long expId) {
+        List<RealizationLogEntity> realizationLogEntities = realizationLogRepository.findByTeamIdAndExpId(teamId, expId);
+        for(RealizationLogEntity realizationLogEntity : realizationLogEntities) {
+            if(null == realizationLogEntity.getEndDate()) {
+                realizationLogEntity.setEndDate(ZonedDateTime.now());
+                realizationLogRepository.save(realizationLogEntity);
+                log.info("Updated realization log for exp {} in team {}", expId, teamId);
+                return;
+            }
+        }
+    }
+
+    public int getCurrentMonthUsageByTeam(String id) {
+       // realizationLogRepository.findByTeamId(id);
+        return 0;
     }
 }
