@@ -14,6 +14,7 @@ import static sg.ncl.adapter.deterlab.ConnectionProperties.PREFIX;
 @Setter
 public class ConnectionProperties {
 
+    private static final String HTTP_MODE = "http://";
     public static final String PREFIX = "ncl.deterlab.adapter";
 
     private String ip;
@@ -23,65 +24,69 @@ public class ConnectionProperties {
     private boolean enabled = false;
 
     public String login() {
-        return "http://" + ip + ":" + port + "/login";
+        return HTTP_MODE + ip + ":" + port + "/login";
     }
 
     public String getJoinProjectNewUsers() {
-        return "http://" + ip + ":" + port + "/joinProjectNewUsers";
+        return HTTP_MODE + ip + ":" + port + "/joinProjectNewUsers";
     }
 
     public String getJoinProject() {
-        return "http://" + ip + ":" + port + "/joinProject";
+        return HTTP_MODE + ip + ":" + port + "/joinProject";
     }
 
     public String getApplyProjectNewUsers() {
-        return "http://" + ip + ":" + port + "/applyProjectNewUsers";
+        return HTTP_MODE + ip + ":" + port + "/applyProjectNewUsers";
     }
 
     public String getCreateExperiment() {
-        return "http://" + ip + ":" + port + "/createExperiment";
+        return HTTP_MODE + ip + ":" + port + "/createExperiment";
     }
 
     public String startExperiment() {
-        return "http://" + ip + ":" + port + "/startExperiment";
+        return HTTP_MODE + ip + ":" + port + "/startExperiment";
     }
 
     public String stopExperiment() {
-        return "http://" + ip + ":" + port + "/stopExperiment";
+        return HTTP_MODE + ip + ":" + port + "/stopExperiment";
     }
 
-    public String deleteExperiment() { return "http://" + ip + ":" + port + "/deleteExperiment"; }
+    public String deleteExperiment() { return HTTP_MODE + ip + ":" + port + "/deleteExperiment"; }
 
     public String getUpdateCredentials() {
-        return "http://" + ip + ":" + port + "/changePassword";
+        return HTTP_MODE + ip + ":" + port + "/changePassword";
     }
 
     public String getApproveJoinRequest() {
-        return "http://" + ip + ":" + port + "/approveJoinRequest";
+        return HTTP_MODE + ip + ":" + port + "/approveJoinRequest";
     }
 
     public String getRejectJoinRequest() {
-        return "http://" + ip + ":" + port + "/rejectJoinRequest";
+        return HTTP_MODE + ip + ":" + port + "/rejectJoinRequest";
     }
 
     public String getApplyProject() {
-        return "http://" + ip + ":" + port + "/applyProject";
+        return HTTP_MODE + ip + ":" + port + "/applyProject";
     }
 
     public String getApproveProject() {
-        return "http://" + ip + ":" + port + "/approveProject";
+        return HTTP_MODE + ip + ":" + port + "/approveProject";
     }
 
     public String getRejectProject() {
-        return "http://" + ip + ":" + port + "/rejectProject";
+        return HTTP_MODE + ip + ":" + port + "/rejectProject";
     }
 
     public String getExpStatus() {
-        return "http://" + ip + ":" + port + "/getExpStatus";
+        return HTTP_MODE + ip + ":" + port + "/getExpStatus";
     }
 
     public String getTopoThumbnail() {
-        return "http://" + ip + ":" + port + "/getTopoThumbnail";
+        return HTTP_MODE + ip + ":" + port + "/getTopoThumbnail";
+    }
+
+    public String getUsageStatistics() {
+        return HTTP_MODE + ip + ":" + port + "/getUsageStatistics";
     }
 
 }
