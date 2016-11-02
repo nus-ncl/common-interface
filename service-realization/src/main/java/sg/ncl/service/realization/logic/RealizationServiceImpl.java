@@ -90,7 +90,7 @@ public class RealizationServiceImpl implements RealizationService {
                 switch (status) {
                     case "active":
                         realizationState = RealizationState.RUNNING;
-                        String report = jsonObjectFromExperiment.getString("report");
+                        String report = jsonObjectFromExperiment.getJSONObject("report").toString();
                         realizationEntity.setDetails(report);
                         break;
                     case "activating":
@@ -163,7 +163,7 @@ public class RealizationServiceImpl implements RealizationService {
         JSONObject jsonObjectFromExperiment = new JSONObject(stringFromExperiment);
 
         String status = jsonObjectFromExperiment.getString("status");
-        String report = jsonObjectFromExperiment.getString("report");
+        String report = jsonObjectFromExperiment.getJSONObject("report").toString();
         RealizationState realizationState;
 
         switch (status) {
