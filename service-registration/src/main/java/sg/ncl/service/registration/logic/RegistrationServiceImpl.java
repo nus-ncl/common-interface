@@ -106,7 +106,7 @@ public class RegistrationServiceImpl implements RegistrationService {
         // no problem with the team
         // create the team
         Team createdTeam = teamService.createTeam(team);
-        addNclTeamIdMapping(team.getName(), createdTeam.getId());
+        addNclTeamIdMapping(createdTeam.getName(), createdTeam.getId());
 
         TeamMemberEntity teamMemberEntity = new TeamMemberEntity();
         teamMemberEntity.setUserId(nclUserId);
