@@ -143,6 +143,23 @@ public class RegistrationServiceImplTest {
         verify(teamService, times(1)).addMember(anyString(), any(TeamMember.class));
     }
 
+    // to test mapping from ncl team id to deter project id
+    @Test
+    public void testRegisterRequestToApplyTeamNullTeamIdMapping() {
+        UserEntity userEntity = Util.getUserEntity();
+        TeamEntity teamEntity = Util.getTeamEntity();
+        teamEntity.setId(null);
+
+        userEntity.setId(RandomStringUtils.randomAlphanumeric(8));
+
+        when(userService.getUser(anyString())).thenReturn(userEntity);
+        when(teamService.createTeam(any(Team.class))).thenReturn(teamEntity);
+
+        exception.expect(TeamIdNullOrEmptyException.class);
+
+        registrationService.registerRequestToApplyTeam(userEntity.getId(), teamEntity);
+    }
+
     @Test
     public void testRegisterRequestToJoinTeamEmptyTeamName() {
         TeamEntity teamEntity = Util.getTeamEntity();
@@ -312,6 +329,22 @@ public class RegistrationServiceImplTest {
 
         Registration result = registrationService.register(credentialsEntity, userEntity, teamEntity, isJoinTeam);
         assertThat(result.getId()).isEqualTo(registrationEntity.getId());
+    }
+
+    // to test mapping from ncl team id to deter project id
+    @Test
+    public void testRegisterNulLTeamIdMapping() {
+        CredentialsEntity credentialsEntity = Util.getCredentialsEntity();
+        UserEntity userEntity = Util.getUserEntity();
+        TeamEntity teamEntity = Util.getTeamEntity();
+        teamEntity.setId(null);
+        isJoinTeam = false;
+
+        Mockito.doReturn(teamEntity).when(teamService).createTeam(any(Team.class));
+
+        exception.expect(TeamIdNullOrEmptyException.class);
+
+        registrationService.register(credentialsEntity, userEntity, teamEntity, isJoinTeam);
     }
 
     @Test
