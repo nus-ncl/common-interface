@@ -19,15 +19,7 @@ import sg.ncl.service.registration.data.jpa.RegistrationEntity;
 import sg.ncl.service.registration.data.jpa.RegistrationRepository;
 import sg.ncl.service.registration.domain.Registration;
 import sg.ncl.service.registration.domain.RegistrationService;
-import sg.ncl.service.registration.exceptions.IdNullOrEmptyException;
-import sg.ncl.service.registration.exceptions.InvalidTeamStatusException;
-import sg.ncl.service.registration.exceptions.NoMembersInTeamException;
-import sg.ncl.service.registration.exceptions.TeamNameDuplicateException;
-import sg.ncl.service.registration.exceptions.TeamNameNullOrEmptyException;
-import sg.ncl.service.registration.exceptions.UserFormException;
-import sg.ncl.service.registration.exceptions.UserIdNullOrEmptyException;
-import sg.ncl.service.registration.exceptions.UserIsNotTeamMemberException;
-import sg.ncl.service.registration.exceptions.UserIsNotTeamOwnerException;
+import sg.ncl.service.registration.exceptions.*;
 import sg.ncl.service.team.data.jpa.TeamMemberEntity;
 import sg.ncl.service.team.domain.MemberStatus;
 import sg.ncl.service.team.domain.MemberType;
@@ -114,7 +106,7 @@ public class RegistrationServiceImpl implements RegistrationService {
         // no problem with the team
         // create the team
         Team createdTeam = teamService.createTeam(team);
-        addNclTeamIdMapping(team.getName(), team.getId());
+        addNclTeamIdMapping(team.getName(), createdTeam.getId());
 
         TeamMemberEntity teamMemberEntity = new TeamMemberEntity();
         teamMemberEntity.setUserId(nclUserId);
@@ -484,6 +476,10 @@ public class RegistrationServiceImpl implements RegistrationService {
     }
 
     private void addNclTeamIdMapping(String deterProjectId, String nclTeamId) {
+        if (nclTeamId == null || nclTeamId.isEmpty()) {
+            log.warn("Map ncl team id is null");
+            throw new TeamIdNullOrEmptyException();
+        }
         adapterDeterLab.saveDeterProjectId(deterProjectId, nclTeamId);
         log.info("Register new team: map and save ncl team id: {} to deter team id: {}", nclTeamId, deterProjectId);
     }
