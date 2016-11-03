@@ -1,8 +1,10 @@
 Dear ${firstname},
 
-Please verify your email account by clicking the below link
+Thank you for your registration on the NCL testbed!
 
-http://${domain}/emailVerification?id=${id}&email=${email}&key=${key}
+Please verify your email by clicking the below link:
+
+https://${domain}/emailVerification?id=${id}&email=${email}&key=${key}
 
 Regards,
 NCL Testbed Operations
