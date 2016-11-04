@@ -2,6 +2,7 @@ package sg.ncl.service.mail.data.jpa;
 
 import lombok.Getter;
 import lombok.Setter;
+import org.hibernate.annotations.Type;
 import sg.ncl.common.jpa.AbstractEntity;
 import sg.ncl.service.mail.domain.Email;
 
@@ -42,6 +43,7 @@ public class EmailEntity extends AbstractEntity implements Email {
     @Column(name = "subject", nullable = false, updatable = false)
     private String subject;
 
+    @Type(type = "text")
     @Column(name = "content", nullable = false, updatable = false)
     private String content;
 

@@ -29,5 +29,5 @@ public interface CredentialsService {
 
     void verifyPasswordResetRequestTimeout(String id);
 
-    Credentials resetPassword(String username, String newPassword);
+    Credentials resetPassword(Credentials credentials);
 }
