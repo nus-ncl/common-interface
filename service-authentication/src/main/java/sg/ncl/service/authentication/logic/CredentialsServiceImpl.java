@@ -91,7 +91,7 @@ public class CredentialsServiceImpl implements CredentialsService {
             changePassword(id, credentials.getPassword());
         }
         final CredentialsEntity saved = credentialsRepository.save(entity);
-        log.info("Credentials updated: {}", saved);
+        log.info("Credentials updated: username: {}, status: {}, roles: {}, createdDate: {}, lastModifiedDate: {}", saved.getUsername(), saved.getStatus(), saved.getRoles(), saved.getCreatedDate(), saved.getLastModifiedDate());
         return saved;
     }
 
