@@ -178,7 +178,7 @@ public class CredentialsServiceImpl implements CredentialsService {
         adapterObject.put("password1", password);
         adapterObject.put("password2", password);
 
-        log.info("Credentials to be updated on Deter: {}", adapterObject.toString());
+        log.info("Credentials to be updated on Deter on ncl user id: {}", nclUserId);
 
         adapterDeterLab.updateCredentials(adapterObject.toString());
     }
