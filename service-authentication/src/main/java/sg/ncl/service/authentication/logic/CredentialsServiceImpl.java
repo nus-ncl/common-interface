@@ -20,6 +20,8 @@ import sg.ncl.service.authentication.domain.Credentials;
 import sg.ncl.service.authentication.domain.CredentialsService;
 import sg.ncl.service.authentication.domain.CredentialsStatus;
 import sg.ncl.service.authentication.exceptions.CredentialsNotFoundException;
+import sg.ncl.service.authentication.exceptions.PasswordResetRequestNotFoundException;
+import sg.ncl.service.authentication.exceptions.PasswordResetRequestTimeoutException;
 import sg.ncl.service.authentication.exceptions.UserIdAlreadyExistsException;
 import sg.ncl.service.authentication.exceptions.UsernameAlreadyExistsException;
 import sg.ncl.service.mail.domain.MailService;
@@ -48,6 +50,8 @@ import static sg.ncl.service.authentication.validation.Validator.checkRoles;
 @Service
 @Slf4j
 public class CredentialsServiceImpl implements CredentialsService {
+
+    private static final int PASSWORD_RESET_REQUEST_TIMEOUT_HOUR = 72;
 
     private final CredentialsRepository credentialsRepository;
     private final PasswordEncoder passwordEncoder;
@@ -258,5 +262,28 @@ public class CredentialsServiceImpl implements CredentialsService {
         } catch (IOException | TemplateException e) {
             log.warn("{}", e);
         }
+    }
+
+    /**
+     * Verify whether the password reset request is timeout or not
+     *
+     * @param id the random string before hash
+     */
+    public void verifyPasswordResetRequestTimeout(String id) {
+
+        PasswordResetRequestEntity one = passwordResetRepository.findByHash(passwordEncoder.encode(id));
+        if(null == one) {
+            log.warn("Password reset request NOT found {}", id);
+            throw new PasswordResetRequestNotFoundException(id);
+        }
+
+        // check whether the request has timed out or not
+        ZonedDateTime now = ZonedDateTime.now();
+        if(now.isAfter(one.getTime().plusHours(PASSWORD_RESET_REQUEST_TIMEOUT_HOUR))) {
+            log.warn("Password reset request timeout: request date {}, now {}", one.getTime(), now);
+            throw new PasswordResetRequestTimeoutException();
+        }
+
+        // do nothing, this password reset request looks ok
     }
 }

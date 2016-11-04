@@ -69,4 +69,9 @@ public class CredentialsController {
         credentialsService.addPasswordResetRequest(username);
     }
 
+    @PostMapping(path = "/passwordResetVerification", params = {"id"})
+    @ResponseStatus(HttpStatus.OK)
+    public void verifyPasswordResetRequestTimeout(@RequestParam("id") final String id) {
+        credentialsService.verifyPasswordResetRequestTimeout(id);
+    }
 }
