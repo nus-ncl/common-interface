@@ -508,7 +508,8 @@ public class RegistrationServiceImpl implements RegistrationService {
         registrationEntity.setUsrZip(user.getUserDetails().getAddress().getZipCode());
 
         RegistrationEntity one = registrationRepository.save(registrationEntity);
-        log.info("Register new user: saved registration entity {}", one);
+        log.info("Register new user: saved registration entity for username: {} - team: {}", one.getUsrEmail(), team.getName());
+        log.debug("Register new user: saved registration entity {}", one);
         return one;
     }
 
