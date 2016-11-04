@@ -49,7 +49,7 @@ public class AdapterDeterLab {
      * @return The Deter userid (randomly generated)
      */
     public String joinProjectNewUsers(String jsonString) {
-        log.info("Joining project as new user: {}", jsonString);
+        log.debug("Joining project as new user: {}", jsonString);
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
@@ -93,7 +93,7 @@ public class AdapterDeterLab {
      * @return The Deter userid (randomly generated)
      */
     public String applyProjectNewUsers(String jsonString) {
-        log.info("Applying new project as new user: {}", jsonString);
+        log.debug("Applying new project as new user: {}", jsonString);
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
