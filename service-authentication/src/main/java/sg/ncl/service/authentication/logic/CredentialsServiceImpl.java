@@ -1,25 +1,38 @@
 package sg.ncl.service.authentication.logic;
 
+import freemarker.template.Template;
+import freemarker.template.TemplateException;
 import io.jsonwebtoken.Claims;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.RandomStringUtils;
 import org.json.JSONObject;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.ui.freemarker.FreeMarkerTemplateUtils;
 import sg.ncl.adapter.deterlab.AdapterDeterLab;
+import sg.ncl.common.DomainProperties;
 import sg.ncl.common.authentication.Role;
 import sg.ncl.service.authentication.data.jpa.CredentialsEntity;
 import sg.ncl.service.authentication.data.jpa.CredentialsRepository;
+import sg.ncl.service.authentication.data.jpa.PasswordResetRequestEntity;
+import sg.ncl.service.authentication.data.jpa.PasswordResetRequestRepository;
 import sg.ncl.service.authentication.domain.Credentials;
 import sg.ncl.service.authentication.domain.CredentialsService;
 import sg.ncl.service.authentication.domain.CredentialsStatus;
 import sg.ncl.service.authentication.exceptions.CredentialsNotFoundException;
 import sg.ncl.service.authentication.exceptions.UserIdAlreadyExistsException;
 import sg.ncl.service.authentication.exceptions.UsernameAlreadyExistsException;
+import sg.ncl.service.mail.domain.MailService;
 
 import javax.inject.Inject;
+import javax.inject.Named;
 import javax.transaction.Transactional;
 import javax.validation.constraints.NotNull;
+import java.io.IOException;
+import java.time.ZonedDateTime;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 import static sg.ncl.service.authentication.validation.Validator.addCheck;
@@ -39,12 +52,27 @@ public class CredentialsServiceImpl implements CredentialsService {
     private final CredentialsRepository credentialsRepository;
     private final PasswordEncoder passwordEncoder;
     private final AdapterDeterLab adapterDeterLab;
+    private final MailService mailService;
+    private final DomainProperties domainProperties;
+    private final Template passwordResetEmailTemplate;
+    private final PasswordResetRequestRepository passwordResetRepository;
 
     @Inject
-    CredentialsServiceImpl(@NotNull final CredentialsRepository credentialsRepository, @NotNull final PasswordEncoder passwordEncoder, @NotNull final AdapterDeterLab adapterDeterLab) {
+    CredentialsServiceImpl(
+            @NotNull final CredentialsRepository credentialsRepository,
+            @NotNull final PasswordEncoder passwordEncoder,
+            @NotNull final AdapterDeterLab adapterDeterLab,
+            @NotNull final MailService mailService,
+            @NotNull final DomainProperties domainProperties,
+            @NotNull final PasswordResetRequestRepository passwordResetRepository,
+            @NotNull @Named("passwordResetEmailTemplate") final Template passwordResetEmailTemplate) {
         this.credentialsRepository = credentialsRepository;
         this.passwordEncoder = passwordEncoder;
         this.adapterDeterLab = adapterDeterLab;
+        this.mailService = mailService;
+        this.domainProperties = domainProperties;
+        this.passwordResetRepository = passwordResetRepository;
+        this.passwordResetEmailTemplate = passwordResetEmailTemplate;
     }
 
     @Transactional
@@ -183,4 +211,52 @@ public class CredentialsServiceImpl implements CredentialsService {
         adapterDeterLab.updateCredentials(adapterObject.toString());
     }
 
+    /**
+     *
+     * @param username the username to reset, should be an email address
+     */
+    public void addPasswordResetRequest(String username){
+        final Credentials one = credentialsRepository.findByUsername(username);
+        if(null == one) {
+            log.warn("User {} not found in password reset", username);
+            throw new CredentialsNotFoundException(username);
+        }
+        String id = RandomStringUtils.randomAlphanumeric(20);
+        PasswordResetRequestEntity passwordResetRequestEntity = new PasswordResetRequestEntity();
+        passwordResetRequestEntity.setHash(passwordEncoder.encode(id));
+        passwordResetRequestEntity.setTime(ZonedDateTime.now());
+        passwordResetRequestEntity.setUsername(username);
+        passwordResetRepository.save(passwordResetRequestEntity);
+        log.info("Password reset request saved: {}", passwordResetRequestEntity.toString());
+
+        sendPasswordResetEmail(username, id);
+    }
+    /**
+     *
+     * @param username the email address
+     * @param id the random ID before hash
+     */
+    private void sendPasswordResetEmail(String username, String id) {
+
+        final Map<String, String> map = new HashMap<>();
+        map.put("username", username);
+        map.put("domain", domainProperties.getDomain());
+        map.put("id", id);
+
+        /*
+         * If sending email fails, we catch the exceptions and log them,
+         * rather than throw the exceptions. Hence, the email will not cause
+         * the main application to fail. If users cannot receive emails after
+         * a certain amount of time, they should send email to support@ncl.sg
+         */
+        try {
+            String msgText = FreeMarkerTemplateUtils.processTemplateIntoString(
+                    passwordResetEmailTemplate, map);
+            mailService.send("testbed-ops@ncl.sg", username,
+                    "NCL Testbed: Your Reset Password Request", msgText, false, null, null);
+            log.info("Password reset email sent to {}: {}", username, msgText);
+        } catch (IOException | TemplateException e) {
+            log.warn("{}", e);
+        }
+    }
 }
