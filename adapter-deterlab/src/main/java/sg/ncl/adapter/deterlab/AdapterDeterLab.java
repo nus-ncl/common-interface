@@ -204,7 +204,6 @@ public class AdapterDeterLab {
      * @param jsonString Contains uid, password, confirm password
      */
     public void updateCredentials(String jsonString) {
-        log.debug("Updating credentials: {}");
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
         HttpEntity<String> request = new HttpEntity<>(jsonString, headers);
