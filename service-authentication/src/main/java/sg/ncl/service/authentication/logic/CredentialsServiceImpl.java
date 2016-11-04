@@ -32,6 +32,8 @@ import javax.inject.Named;
 import javax.transaction.Transactional;
 import javax.validation.constraints.NotNull;
 import java.io.IOException;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.time.ZonedDateTime;
 import java.util.HashMap;
 import java.util.List;
@@ -229,7 +231,7 @@ public class CredentialsServiceImpl implements CredentialsService {
 
         String id = RandomStringUtils.randomAlphanumeric(20);
         PasswordResetRequestEntity passwordResetRequestEntity = new PasswordResetRequestEntity();
-        passwordResetRequestEntity.setHash(String.valueOf((long) id.hashCode()));
+        passwordResetRequestEntity.setHash(generateShaHash(id));
         passwordResetRequestEntity.setTime(ZonedDateTime.now());
         passwordResetRequestEntity.setUsername(username);
         passwordResetRepository.save(passwordResetRequestEntity);
@@ -273,7 +275,7 @@ public class CredentialsServiceImpl implements CredentialsService {
      */
     public void verifyPasswordResetRequestTimeout(String id) {
 
-        String hashedId = String.valueOf((long) id.hashCode());
+        String hashedId = generateShaHash(id);
         log.info("hashed id {}", hashedId);
         PasswordResetRequestEntity one = passwordResetRepository.findByHash(hashedId);
         if(null == one) {
@@ -315,5 +317,23 @@ public class CredentialsServiceImpl implements CredentialsService {
 
         log.warn("Password null or empty!");
         throw new PasswordNullOrEmptyException();
+    }
+
+    private String generateShaHash(String str) {
+        MessageDigest md = null;
+        try {
+            md = MessageDigest.getInstance("SHA-256");
+        } catch (NoSuchAlgorithmException e) {
+            log.warn("Error in getting message digest method {}", e);
+            return String.valueOf(str.hashCode());
+        }
+        md.update(str.getBytes());
+        byte byteData[] = md.digest();
+        //convert the byte to hex format method 1
+        StringBuffer sb = new StringBuffer();
+        for (int i = 0; i < byteData.length; i++) {
+            sb.append(Integer.toString((byteData[i] & 0xff) + 0x100, 16).substring(1));
+        }
+        return sb.toString();
     }
 }
