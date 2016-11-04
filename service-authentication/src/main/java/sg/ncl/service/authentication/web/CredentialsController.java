@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import sg.ncl.service.authentication.domain.Credentials;
@@ -60,6 +61,12 @@ public class CredentialsController {
         checkClaimsType(claims);
         updateCheck(id, credentials, (Claims) claims);
         return new CredentialsInfo(credentialsService.updateCredentials(id, credentials, (Claims) claims));
+    }
+
+    @PostMapping(path = "/passwordResetRequests", params = {"username"})
+    @ResponseStatus(HttpStatus.CREATED)
+    public void addPasswordResetRequest(@RequestParam("username") final String username) {
+        credentialsService.addPasswordResetRequest(username);
     }
 
 }

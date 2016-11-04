@@ -1,5 +1,6 @@
 package sg.ncl.service.authentication.logic;
 
+import freemarker.template.Template;
 import io.jsonwebtoken.Claims;
 import org.junit.Before;
 import org.junit.Rule;
@@ -10,10 +11,12 @@ import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import sg.ncl.adapter.deterlab.AdapterDeterLab;
+import sg.ncl.common.DomainProperties;
 import sg.ncl.common.authentication.Role;
 import sg.ncl.common.exception.base.ForbiddenException;
 import sg.ncl.service.authentication.data.jpa.CredentialsEntity;
 import sg.ncl.service.authentication.data.jpa.CredentialsRepository;
+import sg.ncl.service.authentication.data.jpa.PasswordResetRequestRepository;
 import sg.ncl.service.authentication.domain.Credentials;
 import sg.ncl.service.authentication.domain.CredentialsService;
 import sg.ncl.service.authentication.domain.CredentialsStatus;
@@ -25,6 +28,7 @@ import sg.ncl.service.authentication.exceptions.UserIdNullOrEmptyException;
 import sg.ncl.service.authentication.exceptions.UsernameAlreadyExistsException;
 import sg.ncl.service.authentication.exceptions.UsernameNullOrEmptyException;
 import sg.ncl.service.authentication.web.CredentialsInfo;
+import sg.ncl.service.mail.domain.MailService;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Matchers.anyString;
@@ -54,6 +58,14 @@ public class CredentialsServiceTest {
     private CredentialsRepository credentialsRepository;
     @Mock
     private AdapterDeterLab adapterDeterLab;
+    @Mock
+    private MailService mailService;
+    @Mock
+    private DomainProperties domainProperties;
+    @Mock
+    private PasswordResetRequestRepository passwordResetRequestRepository;
+    @Mock
+    private Template passwordResetEmailTemplate;
 
     private CredentialsService credentialsService;
 
@@ -63,7 +75,8 @@ public class CredentialsServiceTest {
         assertThat(mockingDetails(passwordEncoder).isMock()).isTrue();
         assertThat(mockingDetails(credentialsRepository).isMock()).isTrue();
 
-        credentialsService = new CredentialsServiceImpl(credentialsRepository, passwordEncoder, adapterDeterLab);
+        credentialsService = new CredentialsServiceImpl(credentialsRepository, passwordEncoder, adapterDeterLab,
+                mailService, domainProperties, passwordResetRequestRepository, passwordResetEmailTemplate);
     }
 
     @Test
