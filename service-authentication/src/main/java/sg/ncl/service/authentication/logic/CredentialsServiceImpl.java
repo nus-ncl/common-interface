@@ -20,6 +20,7 @@ import sg.ncl.service.authentication.domain.Credentials;
 import sg.ncl.service.authentication.domain.CredentialsService;
 import sg.ncl.service.authentication.domain.CredentialsStatus;
 import sg.ncl.service.authentication.exceptions.CredentialsNotFoundException;
+import sg.ncl.service.authentication.exceptions.PasswordNullOrEmptyException;
 import sg.ncl.service.authentication.exceptions.PasswordResetRequestNotFoundException;
 import sg.ncl.service.authentication.exceptions.PasswordResetRequestTimeoutException;
 import sg.ncl.service.authentication.exceptions.UserIdAlreadyExistsException;
@@ -225,9 +226,10 @@ public class CredentialsServiceImpl implements CredentialsService {
             log.warn("User {} not found in password reset", username);
             throw new CredentialsNotFoundException(username);
         }
+
         String id = RandomStringUtils.randomAlphanumeric(20);
         PasswordResetRequestEntity passwordResetRequestEntity = new PasswordResetRequestEntity();
-        passwordResetRequestEntity.setHash(passwordEncoder.encode(id));
+        passwordResetRequestEntity.setHash(String.valueOf((long) id.hashCode()));
         passwordResetRequestEntity.setTime(ZonedDateTime.now());
         passwordResetRequestEntity.setUsername(username);
         passwordResetRepository.save(passwordResetRequestEntity);
@@ -258,7 +260,7 @@ public class CredentialsServiceImpl implements CredentialsService {
                     passwordResetEmailTemplate, map);
             mailService.send("testbed-ops@ncl.sg", username,
                     "NCL Testbed: Your Reset Password Request", msgText, false, null, null);
-            log.info("Password reset email sent to {}: {}", username, msgText);
+            log.info("Password reset email sent: {}", msgText);
         } catch (IOException | TemplateException e) {
             log.warn("{}", e);
         }
@@ -271,7 +273,9 @@ public class CredentialsServiceImpl implements CredentialsService {
      */
     public void verifyPasswordResetRequestTimeout(String id) {
 
-        PasswordResetRequestEntity one = passwordResetRepository.findByHash(passwordEncoder.encode(id));
+        String hashedId = String.valueOf((long) id.hashCode());
+        log.info("hashed id {}", hashedId);
+        PasswordResetRequestEntity one = passwordResetRepository.findByHash(hashedId);
         if(null == one) {
             log.warn("Password reset request NOT found {}", id);
             throw new PasswordResetRequestNotFoundException(id);
@@ -285,5 +289,31 @@ public class CredentialsServiceImpl implements CredentialsService {
         }
 
         // do nothing, this password reset request looks ok
+    }
+
+    /**
+     * Reset password
+     *
+     * @param credentials the username and password to be updated
+     * @return
+     */
+    public Credentials resetPassword(final Credentials credentials) {
+
+        CredentialsEntity one = credentialsRepository.findByUsername(credentials.getUsername());
+        if(null == one) {
+            log.warn("Credentials not found: {}", credentials.getUsername());
+            throw new CredentialsNotFoundException(credentials.getUsername());
+        }
+
+        if (credentials.getPassword() != null && !credentials.getPassword().trim().isEmpty()) {
+            hashPassword(one, credentials.getPassword());
+            changePassword(one.getId(), credentials.getPassword());
+            final CredentialsEntity saved = credentialsRepository.save(one);
+            log.info("Password was reset: {}", saved);
+            return saved;
+        }
+
+        log.warn("Password null or empty!");
+        throw new PasswordNullOrEmptyException();
     }
 }

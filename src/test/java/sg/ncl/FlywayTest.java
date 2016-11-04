@@ -32,6 +32,7 @@ public class FlywayTest {
     private static final String EXPERIMENTS = "experiments";
     private static final String IMAGES = "images";
     private static final String LOGIN_ACTIVITIES = "login_activities";
+    private static final String PASSWORD_RESET_REQUESTS = "password_reset_requests";
     private static final String REALIZATIONS = "realizations";
     private static final String REGISTRATIONS = "registrations";
     private static final String TEAM_MEMBERS = "team_members";
@@ -58,7 +59,7 @@ public class FlywayTest {
     public void testNumOfTables() throws Exception {
         // make sure that we have the exact number of tables
         List<Map<String, Object>> tableNames = this.template.queryForList("SHOW TABLES FROM " + SCHEMA);
-        assertThat(tableNames.size()).isEqualTo(19);
+        assertThat(tableNames.size()).isEqualTo(20);
     }
 
     @Test
@@ -88,20 +89,22 @@ public class FlywayTest {
         assertThat((String) tableNames.get(10).get("TABLE_SCHEMA")).isEqualTo(SCHEMA);
         assertThat((String) tableNames.get(11).get("TABLE_NAME")).isEqualTo(LOGIN_ACTIVITIES);
         assertThat((String) tableNames.get(11).get("TABLE_SCHEMA")).isEqualTo(SCHEMA);
-        assertThat((String) tableNames.get(12).get("TABLE_NAME")).isEqualTo(REALIZATIONS);
+        assertThat((String) tableNames.get(12).get("TABLE_NAME")).isEqualTo(PASSWORD_RESET_REQUESTS);
         assertThat((String) tableNames.get(12).get("TABLE_SCHEMA")).isEqualTo(SCHEMA);
-        assertThat((String) tableNames.get(13).get("TABLE_NAME")).isEqualTo(REGISTRATIONS);
+        assertThat((String) tableNames.get(13).get("TABLE_NAME")).isEqualTo(REALIZATIONS);
         assertThat((String) tableNames.get(13).get("TABLE_SCHEMA")).isEqualTo(SCHEMA);
-        assertThat((String) tableNames.get(14).get("TABLE_NAME")).isEqualTo(TEAM_MEMBERS);
+        assertThat((String) tableNames.get(14).get("TABLE_NAME")).isEqualTo(REGISTRATIONS);
         assertThat((String) tableNames.get(14).get("TABLE_SCHEMA")).isEqualTo(SCHEMA);
-        assertThat((String) tableNames.get(15).get("TABLE_NAME")).isEqualTo(TEAMS);
+        assertThat((String) tableNames.get(15).get("TABLE_NAME")).isEqualTo(TEAM_MEMBERS);
         assertThat((String) tableNames.get(15).get("TABLE_SCHEMA")).isEqualTo(SCHEMA);
-        assertThat((String) tableNames.get(16).get("TABLE_NAME")).isEqualTo(USER_DETAILS);
+        assertThat((String) tableNames.get(16).get("TABLE_NAME")).isEqualTo(TEAMS);
         assertThat((String) tableNames.get(16).get("TABLE_SCHEMA")).isEqualTo(SCHEMA);
-        assertThat((String) tableNames.get(17).get("TABLE_NAME")).isEqualTo(USERS);
+        assertThat((String) tableNames.get(17).get("TABLE_NAME")).isEqualTo(USER_DETAILS);
         assertThat((String) tableNames.get(17).get("TABLE_SCHEMA")).isEqualTo(SCHEMA);
-        assertThat((String) tableNames.get(18).get("TABLE_NAME")).isEqualTo(USERS_TEAMS);
+        assertThat((String) tableNames.get(18).get("TABLE_NAME")).isEqualTo(USERS);
         assertThat((String) tableNames.get(18).get("TABLE_SCHEMA")).isEqualTo(SCHEMA);
+        assertThat((String) tableNames.get(19).get("TABLE_NAME")).isEqualTo(USERS_TEAMS);
+        assertThat((String) tableNames.get(19).get("TABLE_SCHEMA")).isEqualTo(SCHEMA);
     }
 
     @Test
