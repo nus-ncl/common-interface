@@ -71,8 +71,8 @@ public class CredentialsController {
 
     @GetMapping(path = "/passwordResets/requests/{id}")
     @ResponseStatus(HttpStatus.OK)
-    public void verifyPasswordResetRequestTimeout(@PathVariable final String id) {
-        credentialsService.verifyPasswordResetRequestTimeout(id);
+    public Credentials verifyPasswordResetRequestTimeout(@PathVariable final String id) {
+        return new CredentialsInfo(credentialsService.verifyPasswordResetRequestTimeout(id));
     }
 
     @PostMapping(path = "/passwordResets")

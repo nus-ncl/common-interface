@@ -273,7 +273,7 @@ public class CredentialsServiceImpl implements CredentialsService {
      *
      * @param id the random string before hash
      */
-    public void verifyPasswordResetRequestTimeout(String id) {
+    public Credentials verifyPasswordResetRequestTimeout(String id) {
 
         String hashedId = generateShaHash(id);
         log.info("hashed id {}", hashedId);
@@ -290,7 +290,7 @@ public class CredentialsServiceImpl implements CredentialsService {
             throw new PasswordResetRequestTimeoutException();
         }
 
-        // do nothing, this password reset request looks ok
+        return credentialsRepository.findByUsername(one.getUsername());
     }
 
     /**
@@ -311,7 +311,7 @@ public class CredentialsServiceImpl implements CredentialsService {
             hashPassword(one, credentials.getPassword());
             changePassword(one.getId(), credentials.getPassword());
             final CredentialsEntity saved = credentialsRepository.save(one);
-            log.info("Password was reset: {}", saved);
+            log.info("Password reset for user {}", saved.getUsername());
             return saved;
         }
 
