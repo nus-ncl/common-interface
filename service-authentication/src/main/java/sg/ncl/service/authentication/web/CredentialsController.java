@@ -63,19 +63,22 @@ public class CredentialsController {
         return new CredentialsInfo(credentialsService.updateCredentials(id, credentials, (Claims) claims));
     }
 
-    @PostMapping(path = "/passwordResets/requests", params = {"username"})
-    @ResponseStatus(HttpStatus.CREATED)
+    // issue a new password reset request
+    @PostMapping(path = "/password/resets", params = {"username"})
+    @ResponseStatus(HttpStatus.ACCEPTED)
     public void addPasswordResetRequest(@RequestParam("username") final String username) {
         credentialsService.addPasswordResetRequest(username);
     }
 
-    @GetMapping(path = "/passwordResets/requests/{id}")
+    // check validity of this password reset request
+    @GetMapping(path = "/password/resets/{id}")
     @ResponseStatus(HttpStatus.OK)
     public Credentials verifyPasswordResetRequestTimeout(@PathVariable final String id) {
         return new CredentialsInfo(credentialsService.verifyPasswordResetRequestTimeout(id));
     }
 
-    @PostMapping(path = "/passwordResets")
+    // reset password
+    @PutMapping(path = "/password")
     @ResponseStatus(HttpStatus.OK)
     public Credentials resetPassword(@RequestBody final CredentialsInfo credentials) {
         return new CredentialsInfo(credentialsService.resetPassword(credentials));
