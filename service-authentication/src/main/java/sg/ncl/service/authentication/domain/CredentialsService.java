@@ -25,9 +25,7 @@ public interface CredentialsService {
 
     Credentials removeRoles(String id, Credentials credentials);
 
-    void addPasswordResetRequest(String username);
+    void addPasswordResetRequest(String jsonString);
 
-    Credentials verifyPasswordResetRequestTimeout(String id);
-
-    Credentials resetPassword(Credentials credentials);
+    Credentials resetPassword(String jsonString);
 }

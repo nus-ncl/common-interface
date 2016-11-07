@@ -11,7 +11,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import sg.ncl.service.authentication.domain.Credentials;
@@ -63,24 +62,17 @@ public class CredentialsController {
         return new CredentialsInfo(credentialsService.updateCredentials(id, credentials, (Claims) claims));
     }
 
-    // issue a new password reset request
-    @PostMapping(path = "/password/resets", params = {"username"})
+    // post a new password reset request
+    @PostMapping(path = "/password/resets")
     @ResponseStatus(HttpStatus.ACCEPTED)
-    public void addPasswordResetRequest(@RequestParam("username") final String username) {
-        credentialsService.addPasswordResetRequest(username);
-    }
-
-    // check validity of this password reset request
-    @GetMapping(path = "/password/resets/{id}")
-    @ResponseStatus(HttpStatus.OK)
-    public Credentials verifyPasswordResetRequestTimeout(@PathVariable final String id) {
-        return new CredentialsInfo(credentialsService.verifyPasswordResetRequestTimeout(id));
+    public void addPasswordResetRequest(@RequestBody final String jsonString) {
+        credentialsService.addPasswordResetRequest(jsonString);
     }
 
     // reset password
     @PutMapping(path = "/password")
     @ResponseStatus(HttpStatus.OK)
-    public Credentials resetPassword(@RequestBody final CredentialsInfo credentials) {
-        return new CredentialsInfo(credentialsService.resetPassword(credentials));
+    public Credentials resetPassword(@RequestBody final String jsonString) {
+        return new CredentialsInfo(credentialsService.resetPassword(jsonString));
     }
 }

@@ -43,7 +43,6 @@ ncl:
       '/teams\?visibility=PUBLIC': GET # for retrieving public teams
       '/teams\?name=(\w| )+': GET # for retrieving teams by name
       '/credentials/password/resets': POST
-      '/credentials/password/resets/(\w)+': GET
       '/credentials/password': PUT
   domain: dev.ncl.sg
   deterlab:

@@ -25,6 +25,7 @@ import sg.ncl.service.authentication.exceptions.PasswordResetRequestNotFoundExce
 import sg.ncl.service.authentication.exceptions.PasswordResetRequestTimeoutException;
 import sg.ncl.service.authentication.exceptions.UserIdAlreadyExistsException;
 import sg.ncl.service.authentication.exceptions.UsernameAlreadyExistsException;
+import sg.ncl.service.authentication.exceptions.UsernameNullOrEmptyException;
 import sg.ncl.service.mail.domain.MailService;
 
 import javax.inject.Inject;
@@ -220,12 +221,21 @@ public class CredentialsServiceImpl implements CredentialsService {
 
     /**
      *
-     * @param username the username to reset, should be an email address
+     * @param jsonString {
+     *                   "username": "abc@edf.com"
+     *                   }
      */
-    public void addPasswordResetRequest(String username){
+    @Override
+    public void addPasswordResetRequest(String jsonString){
+        final String username = new JSONObject(jsonString).getString("username");
+        if(null == username || username.trim().isEmpty()) {
+            log.warn("Username null or empty in password reset request");
+            throw new UsernameNullOrEmptyException();
+        }
+
         final Credentials one = credentialsRepository.findByUsername(username);
         if(null == one) {
-            log.warn("User {} not found in password reset", username);
+            log.warn("User {} not found in password reset request", username);
             throw new CredentialsNotFoundException(username);
         }
 
@@ -269,14 +279,15 @@ public class CredentialsServiceImpl implements CredentialsService {
     }
 
     /**
-     * Verify whether the password reset request is timeout or not
+     * Verify whether the password reset request timeout or not
      *
      * @param id the random string before hash
+     *
+     * @return credentialsEntity for the user who requests to reset password
      */
-    public Credentials verifyPasswordResetRequestTimeout(String id) {
+    private CredentialsEntity verifyPasswordResetRequestTimeout(String id) {
 
-        String hashedId = generateShaHash(id);
-        log.info("hashed id {}", hashedId);
+        final String hashedId = generateShaHash(id);
         PasswordResetRequestEntity one = passwordResetRepository.findByHash(hashedId);
         if(null == one) {
             log.warn("Password reset request NOT found {}", id);
@@ -296,26 +307,37 @@ public class CredentialsServiceImpl implements CredentialsService {
     /**
      * Reset password
      *
-     * @param credentials the username and password to be updated
-     * @return
+     * @param jsonString {
+     *                   "id": "1234abcd5678efgh",
+     *                   "new": "password"
+     *                   }
+     *
+     * @return credentialsEntity after resetting password
      */
-    public Credentials resetPassword(final Credentials credentials) {
+    @Override
+    @Transactional
+    public Credentials resetPassword(final String jsonString) {
 
-        CredentialsEntity one = credentialsRepository.findByUsername(credentials.getUsername());
+        final JSONObject tmp = new JSONObject(jsonString);
+        final String id = tmp.getString("id");
+        final String newPassword = tmp.getString("new");
+
+        CredentialsEntity one = verifyPasswordResetRequestTimeout(id);
+
         if(null == one) {
-            log.warn("Credentials not found: {}", credentials.getUsername());
-            throw new CredentialsNotFoundException(credentials.getUsername());
+            log.warn("Credentials not found for password reset request {}", id);
+            throw new CredentialsNotFoundException("Password reset request " + id);
         }
 
-        if (credentials.getPassword() != null && !credentials.getPassword().trim().isEmpty()) {
-            hashPassword(one, credentials.getPassword());
-            changePassword(one.getId(), credentials.getPassword());
+        if (newPassword != null && !newPassword.trim().isEmpty()) {
+            hashPassword(one, newPassword);
+            changePassword(one.getId(), newPassword);
             final CredentialsEntity saved = credentialsRepository.save(one);
-            log.info("Password reset for user {}", saved.getUsername());
+            log.info("Password has been reset for user {}", saved.getUsername());
             return saved;
         }
 
-        log.warn("Password null or empty!");
+        log.warn("Password null or empty in password reset!");
         throw new PasswordNullOrEmptyException();
     }
 
