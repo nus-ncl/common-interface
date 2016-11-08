@@ -28,7 +28,7 @@ import java.util.UUID;
  */
 @Configuration
 @ConditionalOnClass({SignatureAlgorithm.class, Key.class, Duration.class})
-@EnableConfigurationProperties(JwtProperties.class)
+@EnableConfigurationProperties({JwtProperties.class, AuthenticationProperties.class})
 @Slf4j
 public class JwtAutoConfiguration {
 
