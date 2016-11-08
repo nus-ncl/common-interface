@@ -23,11 +23,11 @@ public class JwtFilter extends OncePerRequestFilter {
 
     static final String BEARER = "Bearer ";
 
-    private final Map<String, String> whitelistRegexMap;
+    private final AuthenticationProperties properties;
 
     @Inject
     JwtFilter(@NotNull AuthenticationProperties properties) {
-        this.whitelistRegexMap = properties.getUri();
+        this.properties = properties;
     }
 
     @Override
@@ -46,18 +46,12 @@ public class JwtFilter extends OncePerRequestFilter {
 
     private boolean isWhitelisted(final HttpServletRequest request) {
         String path = request.getServletPath();
-        String method = request.getMethod();
+        String reqMethod = request.getMethod();
         String queryString = request.getQueryString();
         String fullPath = constructFullPath(path, queryString);
 
-        for (Map.Entry<String, String> entry : whitelistRegexMap.entrySet()) {
-            if (fullPath.matches(entry.getKey()) && method.equals(entry.getValue())) {
-                log.debug("Allow this request: {} - {}", fullPath, method);
-                return true;
-            }
-        }
-        log.info("No filters match for: {} - {}", fullPath, method);
-        return false;
+        log.info("Filtering: {} - {}", fullPath, reqMethod);
+        return properties.getUri().entrySet().stream().filter((entry -> fullPath.matches(entry.getKey()) && reqMethod.equals(entry.getValue()))).findFirst().isPresent();
     }
 
     /**
