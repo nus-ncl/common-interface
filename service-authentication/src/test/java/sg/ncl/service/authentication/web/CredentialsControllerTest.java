@@ -2,6 +2,7 @@ package sg.ncl.service.authentication.web;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.jsonwebtoken.Claims;
+import org.apache.commons.lang3.RandomStringUtils;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -24,6 +25,10 @@ import sg.ncl.service.authentication.domain.Credentials;
 import sg.ncl.service.authentication.domain.CredentialsService;
 import sg.ncl.service.authentication.domain.CredentialsStatus;
 import sg.ncl.service.authentication.exceptions.CredentialsNotFoundException;
+import sg.ncl.service.authentication.exceptions.PasswordNullOrEmptyException;
+import sg.ncl.service.authentication.exceptions.PasswordResetRequestNotFoundException;
+import sg.ncl.service.authentication.exceptions.PasswordResetRequestTimeoutException;
+import sg.ncl.service.authentication.exceptions.UsernameNullOrEmptyException;
 
 import javax.inject.Inject;
 import java.util.ArrayList;
@@ -416,6 +421,99 @@ public class CredentialsControllerTest {
 
         mockMvc.perform(put(CredentialsController.PATH + "/id").contentType(MediaType.APPLICATION_JSON).content(content))
                 .andExpect(status().isNotFound())
+                .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON));
+    }
+
+    @Test
+    public void testAddPasswordResetRequestUnknownUsername() throws Exception {
+        final String username = "alice@nus.edu.sg";
+        final String jsonString = "{\"username\": " + "\"" + username +"\"}" ;
+        final byte[] content = mapper.writeValueAsBytes(jsonString);
+
+        doThrow(new CredentialsNotFoundException(username)).when(credentialsService).addPasswordResetRequest(anyString());
+
+        mockMvc.perform(post(CredentialsController.PATH + "/password/resets").contentType(MediaType.APPLICATION_JSON).content(content))
+                .andExpect(status().isNotFound());
+    }
+
+    @Test
+    public void testAddPasswordResetRequestNullUsername() throws Exception {
+        final String username = "";
+        final String jsonString = "{\"username\": " + "\"" + username +"\"}" ;
+        final byte[] content = mapper.writeValueAsBytes(jsonString);
+
+        doThrow(new UsernameNullOrEmptyException()).when(credentialsService).addPasswordResetRequest(anyString());
+
+        mockMvc.perform(post(CredentialsController.PATH + "/password/resets").contentType(MediaType.APPLICATION_JSON).content(content))
+                .andExpect(status().isBadRequest());
+    }
+
+
+    @Test
+    public void testAddPasswordResetRequestGood() throws Exception {
+        final String username = "alice@nus.edu.sg";
+        final String jsonString = "{\"username\": " + "\"" + username +"\"}" ;
+        final byte[] content = mapper.writeValueAsBytes(jsonString);
+
+        mockMvc.perform(post(CredentialsController.PATH + "/password/resets").contentType(MediaType.APPLICATION_JSON).content(content))
+                .andExpect(status().isAccepted());
+    }
+
+    @Test
+    public void testResetPasswordGood() throws Exception {
+        final Credentials credentialsInfo = new CredentialsInfo("id", "username", "password", null, null);
+        final String id = RandomStringUtils.randomAlphanumeric(20);
+        final String password = "password";
+        final String jsonString = "{\"id\": " + "\"" + id +"\", \"new\": \"" + password + "\"}" ;
+        final byte[] content = mapper.writeValueAsBytes(jsonString);
+
+        doReturn(credentialsInfo).when(credentialsService).resetPassword(anyString());
+
+        mockMvc.perform(put(CredentialsController.PATH + "/password").contentType(MediaType.APPLICATION_JSON).content(content))
+                .andExpect(status().isOk())
+                .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON));
+    }
+
+    @Test
+    public void testResetPasswordRequestNotFound() throws Exception {
+        final String id = RandomStringUtils.randomAlphanumeric(20);
+        final String password = "password";
+        final String jsonString = "{\"id\": " + "\"" + id +"\", \"new\": \"" + password + "\"}" ;
+        final byte[] content = mapper.writeValueAsBytes(jsonString);
+
+        doThrow(new PasswordResetRequestNotFoundException(id)).when(credentialsService).resetPassword(anyString());
+
+        mockMvc.perform(put(CredentialsController.PATH + "/password").contentType(MediaType.APPLICATION_JSON).content(content))
+                .andExpect(status().isNotFound())
+                .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON));
+    }
+
+    @Test
+    public void testResetPasswordRequestTimeout() throws Exception {
+        final String id = RandomStringUtils.randomAlphanumeric(20);
+        final String password = "password";
+        final String jsonString = "{\"id\": " + "\"" + id +"\", \"new\": \"" + password + "\"}" ;
+        final byte[] content = mapper.writeValueAsBytes(jsonString);
+
+        doThrow(new PasswordResetRequestTimeoutException()).when(credentialsService).resetPassword(anyString());
+
+        mockMvc.perform(put(CredentialsController.PATH + "/password").contentType(MediaType.APPLICATION_JSON).content(content))
+                .andExpect(status().isBadRequest())
+                .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON));
+    }
+
+    @Test
+    public void testResetPasswordNullPassword() throws Exception {
+        final Credentials credentialsInfo = new CredentialsInfo("id", "username", "password", null, null);
+        final String id = RandomStringUtils.randomAlphanumeric(20);
+        final String password = "";
+        final String jsonString = "{\"id\": " + "\"" + id +"\", \"new\": \"" + password + "\"}" ;
+        final byte[] content = mapper.writeValueAsBytes(jsonString);
+
+        doThrow(new PasswordNullOrEmptyException()).when(credentialsService).resetPassword(anyString());
+
+        mockMvc.perform(put(CredentialsController.PATH + "/password").contentType(MediaType.APPLICATION_JSON).content(content))
+                .andExpect(status().isBadRequest())
                 .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON));
     }
 

@@ -2,6 +2,7 @@ package sg.ncl.service.authentication.logic;
 
 import freemarker.template.Template;
 import io.jsonwebtoken.Claims;
+import org.apache.commons.lang3.RandomStringUtils;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -16,6 +17,7 @@ import sg.ncl.common.authentication.Role;
 import sg.ncl.common.exception.base.ForbiddenException;
 import sg.ncl.service.authentication.data.jpa.CredentialsEntity;
 import sg.ncl.service.authentication.data.jpa.CredentialsRepository;
+import sg.ncl.service.authentication.data.jpa.PasswordResetRequestEntity;
 import sg.ncl.service.authentication.data.jpa.PasswordResetRequestRepository;
 import sg.ncl.service.authentication.domain.Credentials;
 import sg.ncl.service.authentication.domain.CredentialsService;
@@ -23,6 +25,8 @@ import sg.ncl.service.authentication.domain.CredentialsStatus;
 import sg.ncl.service.authentication.exceptions.CredentialsNotFoundException;
 import sg.ncl.service.authentication.exceptions.NeitherUsernameNorPasswordModifiedException;
 import sg.ncl.service.authentication.exceptions.PasswordNullOrEmptyException;
+import sg.ncl.service.authentication.exceptions.PasswordResetRequestNotFoundException;
+import sg.ncl.service.authentication.exceptions.PasswordResetRequestTimeoutException;
 import sg.ncl.service.authentication.exceptions.UserIdAlreadyExistsException;
 import sg.ncl.service.authentication.exceptions.UserIdNullOrEmptyException;
 import sg.ncl.service.authentication.exceptions.UsernameAlreadyExistsException;
@@ -39,6 +43,7 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static sg.ncl.service.authentication.util.TestUtil.getCredentialsEntity;
+import static sg.ncl.service.authentication.util.TestUtil.getPasswordResetRequestEntity;
 
 /**
  * @author Christopher Zhong
@@ -411,4 +416,104 @@ public class CredentialsServiceTest {
         credentialsService.updateCredentials(entity.getId(), entity , claims);
     }
 
+    @Test
+    public void testAddPasswordResetRequestNullUsername() {
+        String jsonString = "{\"username\": \"\"}";
+
+        exception.expect(UsernameNullOrEmptyException.class);
+
+        credentialsService.addPasswordResetRequest(jsonString);
+    }
+
+    @Test
+    public void testAddPasswordResetRequestUsernameNotExist() {
+        String jsonString = "{\"username\": \"alice@nus.edu.sg\"}";
+
+        exception.expect(CredentialsNotFoundException.class);
+
+        credentialsService.addPasswordResetRequest(jsonString);
+    }
+
+    @Test
+    public void testAddPasswordResetRequestGood() {
+        String username = "alice";
+        String jsonString = "{\"username\": " + "\"" + username +"\"}" ;
+        CredentialsEntity credentials = new CredentialsEntity();
+
+        when(credentialsRepository.findByUsername(username)).thenReturn(credentials);
+
+        credentialsService.addPasswordResetRequest(jsonString);
+    }
+
+    @Test
+    public void testResetPasswordUnknownId() {
+        String id = RandomStringUtils.randomAlphanumeric(20);
+        String password = "password";
+        String jsonString = "{\"id\": " + "\"" + id +"\", \"new\": \"" + password + "\"}" ;
+
+        exception.expect(PasswordResetRequestNotFoundException.class);
+
+        credentialsService.resetPassword(jsonString);
+    }
+
+    @Test
+    public void testResetPasswordRequestTimeout() {
+        String id = RandomStringUtils.randomAlphanumeric(20);
+        String password = "password";
+        String jsonString = "{\"id\": " + "\"" + id +"\", \"new\": \"" + password + "\"}" ;
+        PasswordResetRequestEntity passwordEntity = getPasswordResetRequestEntity();
+        passwordEntity.setTime(passwordEntity.getTime().minusHours(73));
+
+        when(passwordResetRequestRepository.findByHash(anyString())).thenReturn(passwordEntity);
+
+        exception.expect(PasswordResetRequestTimeoutException.class);
+
+        credentialsService.resetPassword(jsonString);
+    }
+
+    @Test
+    public void testResetPasswordCredentialsNotFound() {
+        String id = RandomStringUtils.randomAlphanumeric(20);
+        String password = "password";
+        String jsonString = "{\"id\": " + "\"" + id +"\", \"new\": \"" + password + "\"}" ;
+        PasswordResetRequestEntity passwordEntity = getPasswordResetRequestEntity();
+
+        when(passwordResetRequestRepository.findByHash(anyString())).thenReturn(passwordEntity);
+
+        exception.expect(CredentialsNotFoundException.class);
+
+        credentialsService.resetPassword(jsonString);
+    }
+
+
+    @Test
+    public void testResetPasswordNullPassword() {
+        String id = RandomStringUtils.randomAlphanumeric(20);
+        String password = "";
+        String jsonString = "{\"id\": " + "\"" + id +"\", \"new\": \"" + password + "\"}" ;
+        PasswordResetRequestEntity passwordEntity = getPasswordResetRequestEntity();
+        CredentialsEntity credentialsEntity = getCredentialsEntity();
+
+        when(passwordResetRequestRepository.findByHash(anyString())).thenReturn(passwordEntity);
+        when(credentialsRepository.findByUsername(anyString())).thenReturn(credentialsEntity);
+
+        exception.expect(PasswordNullOrEmptyException.class);
+
+        credentialsService.resetPassword(jsonString);
+    }
+
+
+    @Test
+    public void testResetPasswordGood() {
+        String id = RandomStringUtils.randomAlphanumeric(20);
+        String password = "password";
+        String jsonString = "{\"id\": " + "\"" + id +"\", \"new\": \"" + password + "\"}" ;
+        PasswordResetRequestEntity passwordEntity = getPasswordResetRequestEntity();
+        CredentialsEntity credentialsEntity = getCredentialsEntity();
+
+        when(passwordResetRequestRepository.findByHash(anyString())).thenReturn(passwordEntity);
+        when(credentialsRepository.findByUsername(anyString())).thenReturn(credentialsEntity);
+
+        credentialsService.resetPassword(jsonString);
+    }
 }

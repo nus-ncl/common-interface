@@ -2,7 +2,6 @@ package sg.ncl.service.authentication.data.jpa;
 
 import lombok.Getter;
 import lombok.Setter;
-import sg.ncl.service.authentication.domain.Credentials;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -43,7 +42,7 @@ public class PasswordResetRequestEntity {
             return false;
         }
 
-        final Credentials that = (Credentials) o;
+        final PasswordResetRequestEntity that = (PasswordResetRequestEntity) o;
 
         return getId() == null ? that.getId() == null : getId().equals(that.getId());
     }

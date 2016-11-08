@@ -333,7 +333,7 @@ public class CredentialsServiceImpl implements CredentialsService {
             hashPassword(one, newPassword);
             changePassword(one.getId(), newPassword);
             final CredentialsEntity saved = credentialsRepository.save(one);
-            log.info("Password has been reset for user {}", saved.getUsername());
+            log.info("Password has been reset for user {}", one.getUsername());
             return saved;
         }
 
@@ -341,7 +341,7 @@ public class CredentialsServiceImpl implements CredentialsService {
         throw new PasswordNullOrEmptyException();
     }
 
-    private String generateShaHash(String str) {
+    private static String generateShaHash(String str) {
         MessageDigest md = null;
         try {
             md = MessageDigest.getInstance("SHA-256");
