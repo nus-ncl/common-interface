@@ -13,7 +13,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.constraints.NotNull;
 import java.io.IOException;
-import java.util.Map;
 
 /**
  * @author Te Ye, Christopher Zhong
@@ -51,7 +50,7 @@ public class JwtFilter extends OncePerRequestFilter {
         String fullPath = constructFullPath(path, queryString);
 
         log.info("Filtering: {} - {}", fullPath, reqMethod);
-        return properties.getUri().entrySet().stream().filter((entry -> fullPath.matches(entry.getKey()) && reqMethod.equals(entry.getValue()))).findFirst().isPresent();
+        return properties.getUri() != null && properties.getUri().entrySet().stream().filter((entry -> fullPath.matches(entry.getKey()) && reqMethod.equals(entry.getValue()))).findFirst().isPresent();
     }
 
     /**

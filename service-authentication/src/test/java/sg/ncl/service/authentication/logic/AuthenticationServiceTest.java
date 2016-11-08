@@ -17,6 +17,7 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringRunner;
 import sg.ncl.adapter.deterlab.AdapterDeterLab;
+import sg.ncl.common.authentication.AuthenticationProperties;
 import sg.ncl.common.jwt.JwtAutoConfiguration;
 import sg.ncl.service.authentication.data.jpa.CredentialsEntity;
 import sg.ncl.service.authentication.data.jpa.CredentialsRepository;
@@ -40,7 +41,7 @@ import static sg.ncl.service.authentication.util.TestUtil.getCredentialsEntity;
  * @author Christopher Zhong
  */
 @RunWith(SpringRunner.class)
-@ContextConfiguration(classes = JwtAutoConfiguration.class)
+@ContextConfiguration(classes = {JwtAutoConfiguration.class, AuthenticationProperties.class})
 @TestPropertySource(properties = {
         "ncl.jwt.api-key=123",
         "ncl.jwt.expiry-duration=PT1H",

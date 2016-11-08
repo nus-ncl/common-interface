@@ -8,6 +8,7 @@ import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
+import sg.ncl.common.authentication.AuthenticationProperties;
 
 import java.security.Key;
 import java.time.Duration;
@@ -29,6 +30,8 @@ public class JwtAutoConfigurationTest {
     public MockitoRule mockito = MockitoJUnit.rule();
     @Mock
     private JwtProperties properties;
+    @Mock
+    private AuthenticationProperties authenticationProperties;
 
     private JwtAutoConfiguration configuration;
 
@@ -39,7 +42,7 @@ public class JwtAutoConfigurationTest {
 
     @Test
     public void testJwtFilter() throws Exception {
-        final JwtFilter jwtFilter = configuration.jwtFilter();
+        final JwtFilter jwtFilter = configuration.jwtFilter(authenticationProperties);
 
         assertThat(jwtFilter).isNotNull();
     }
