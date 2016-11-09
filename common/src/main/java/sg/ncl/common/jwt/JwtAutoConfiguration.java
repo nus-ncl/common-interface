@@ -10,6 +10,7 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import sg.ncl.common.authentication.AuthenticationProperties;
 
 import javax.crypto.spec.SecretKeySpec;
 import javax.inject.Inject;
@@ -27,7 +28,7 @@ import java.util.UUID;
  */
 @Configuration
 @ConditionalOnClass({SignatureAlgorithm.class, Key.class, Duration.class})
-@EnableConfigurationProperties(JwtProperties.class)
+@EnableConfigurationProperties({JwtProperties.class, AuthenticationProperties.class})
 @Slf4j
 public class JwtAutoConfiguration {
 
@@ -44,8 +45,8 @@ public class JwtAutoConfiguration {
 
     @Bean
     @ConditionalOnMissingBean(JwtFilter.class)
-    public JwtFilter jwtFilter() {
-        return new JwtFilter();
+    public JwtFilter jwtFilter(@NotNull AuthenticationProperties authenticationProperties) {
+        return new JwtFilter(authenticationProperties);
     }
 
     @Bean

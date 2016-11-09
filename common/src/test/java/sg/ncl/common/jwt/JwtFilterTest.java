@@ -8,6 +8,7 @@ import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
 import org.springframework.http.HttpHeaders;
 import org.springframework.security.core.context.SecurityContextHolder;
+import sg.ncl.common.authentication.AuthenticationProperties;
 
 import javax.servlet.FilterChain;
 import javax.servlet.http.HttpServletRequest;
@@ -30,12 +31,15 @@ public class JwtFilterTest {
     private HttpServletResponse response;
     @Mock
     private FilterChain filterChain;
+    @Mock
+    private AuthenticationProperties authenticationProperties;
 
-    private JwtFilter jwtFilter = new JwtFilter();
+    private JwtFilter jwtFilter;
 
     @Before
     public void before() {
         SecurityContextHolder.getContext().setAuthentication(null);
+        jwtFilter = new JwtFilter(authenticationProperties);
     }
 
     @Test
