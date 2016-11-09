@@ -49,7 +49,7 @@ public class JwtFilter extends OncePerRequestFilter {
         String queryString = request.getQueryString();
         String fullPath = constructFullPath(path, queryString);
 
-//        log.info("Filtering: {} - {}", fullPath, reqMethod);
+        log.debug("Filtering: {} - {}", fullPath, reqMethod);
         return properties.getUri() != null && properties.getUri().entrySet().stream().filter((entry -> fullPath.matches(entry.getKey()) && reqMethod.equals(entry.getValue()))).findFirst().isPresent();
     }
 
