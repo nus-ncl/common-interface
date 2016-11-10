@@ -32,7 +32,7 @@ import java.io.IOException;
 })
 public class AuthenticationApplication {
 
-    private static final String PASSWORD_RESET_EMAIL_TEMPLATE_NAME = "passwordResetEmailTemplate.ftl";
+    private static final String RESET_EMAIL_TEMPLATE_NAME = "passwordResetEmailTemplate.ftl";
 
     public static void main(final String[] args) {
         try (final ConfigurableApplicationContext context = SpringApplication.run(AuthenticationApplication.class, args)) {
@@ -42,7 +42,7 @@ public class AuthenticationApplication {
 
     @Bean
     Template passwordResetEmailTemplate(final Configuration configuration) throws IOException {
-        return configuration.getTemplate(PASSWORD_RESET_EMAIL_TEMPLATE_NAME);
+        return configuration.getTemplate(RESET_EMAIL_TEMPLATE_NAME);
     }
 
 }

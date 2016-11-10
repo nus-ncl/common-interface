@@ -495,7 +495,7 @@ public class CredentialsControllerTest {
         final String jsonString = "{\"id\": " + "\"" + id +"\", \"new\": \"" + password + "\"}" ;
         final byte[] content = mapper.writeValueAsBytes(jsonString);
 
-        doThrow(new PasswordResetRequestTimeoutException()).when(credentialsService).resetPassword(anyString());
+        doThrow(new PasswordResetRequestTimeoutException("timeout")).when(credentialsService).resetPassword(anyString());
 
         mockMvc.perform(put(CredentialsController.PATH + "/password").contentType(MediaType.APPLICATION_JSON).content(content))
                 .andExpect(status().isBadRequest())

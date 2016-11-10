@@ -230,6 +230,35 @@ public class AdapterDeterLab {
     }
 
     /**
+     *
+     * @param jsonString {"uid" : "uid",
+     *                   "password": "password"
+     *                   }
+     */
+    public void resetPassword(String jsonString) {
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        HttpEntity<String> request = new HttpEntity<>(jsonString, headers);
+        ResponseEntity response;
+
+        try {
+            response = restTemplate.exchange(properties.getResetPasswordURI(), HttpMethod.POST, request, String.class);
+        } catch (RestClientException e) {
+            log.warn("Cannot connect to adapter | server internal error: {}", e);
+            throw new AdapterDeterlabConnectException();
+        }
+
+        String msg = new JSONObject(response.getBody().toString()).getString("msg");
+        if ("password was reset".equals(msg)) {
+            log.info("Password was reset");
+            return;
+        }
+
+        log.warn("Reset password failed: {}", msg);
+        throw new CredentialsUpdateException();
+    }
+
+    /**
      * Creates the cookie file on the boss machine due to the timeout issue
      *
      * @param nclUserId The ncl user id is required to retrieve the deter user id

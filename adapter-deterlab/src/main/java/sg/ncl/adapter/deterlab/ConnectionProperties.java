@@ -89,4 +89,8 @@ public class ConnectionProperties {
         return HTTP_MODE + ip + ":" + port + "/getUsageStatistics";
     }
 
+    public String getResetPasswordURI() {
+        return HTTP_MODE + ip + ":" + port + "/resetPassword";
+    }
+
 }

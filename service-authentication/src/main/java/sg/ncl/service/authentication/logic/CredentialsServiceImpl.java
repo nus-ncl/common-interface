@@ -220,6 +220,23 @@ public class CredentialsServiceImpl implements CredentialsService {
     }
 
     /**
+     * Invokes the reset password on Deterlab
+     *
+     * @param nclUserId the ncl UUID
+     * @param password  the new password
+     */
+    private void resetPassword(String nclUserId, String password) {
+        JSONObject adapterObject = new JSONObject();
+        // FIXME: need to handle error when getDeterUserIdByNclUserId() returns nothing
+        final String uid = adapterDeterLab.getDeterUserIdByNclUserId(nclUserId);
+        adapterObject.put("uid", uid);
+        adapterObject.put("password", password);
+
+        adapterDeterLab.resetPassword(adapterObject.toString());
+        log.info("Password was reset for Deter user {}", uid);
+    }
+
+    /**
      *
      * @param jsonString {
      *                   "username": "abc@edf.com"
@@ -298,7 +315,7 @@ public class CredentialsServiceImpl implements CredentialsService {
         ZonedDateTime now = ZonedDateTime.now();
         if(now.isAfter(one.getTime().plusHours(PASSWORD_RESET_REQUEST_TIMEOUT_HOUR))) {
             log.warn("Password reset request timeout: request date {}, now {}", one.getTime(), now);
-            throw new PasswordResetRequestTimeoutException();
+            throw new PasswordResetRequestTimeoutException("requested on " + one.getTime() + ", now " + now);
         }
 
         return credentialsRepository.findByUsername(one.getUsername());
@@ -331,9 +348,9 @@ public class CredentialsServiceImpl implements CredentialsService {
 
         if (newPassword != null && !newPassword.trim().isEmpty()) {
             hashPassword(one, newPassword);
-            changePassword(one.getId(), newPassword);
+            resetPassword(one.getId(), newPassword);
             final CredentialsEntity saved = credentialsRepository.save(one);
-            log.info("Password has been reset for user {}", one.getUsername());
+            log.info("Password was reset for user {}", one.getUsername());
             return saved;
         }
 
@@ -352,7 +369,7 @@ public class CredentialsServiceImpl implements CredentialsService {
         md.update(str.getBytes());
         byte byteData[] = md.digest();
         //convert the byte to hex format method 1
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
         for (int i = 0; i < byteData.length; i++) {
             sb.append(Integer.toString((byteData[i] & 0xff) + 0x100, 16).substring(1));
         }
