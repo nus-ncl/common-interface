@@ -256,27 +256,27 @@ public class CredentialsServiceImpl implements CredentialsService {
             throw new CredentialsNotFoundException(username);
         }
 
-        String id = RandomStringUtils.randomAlphanumeric(20);
+        String key = RandomStringUtils.randomAlphanumeric(20);
         PasswordResetRequestEntity passwordResetRequestEntity = new PasswordResetRequestEntity();
-        passwordResetRequestEntity.setHash(generateShaHash(id));
+        passwordResetRequestEntity.setHash(generateShaHash(key));
         passwordResetRequestEntity.setTime(ZonedDateTime.now());
         passwordResetRequestEntity.setUsername(username);
         passwordResetRepository.save(passwordResetRequestEntity);
         log.info("Password reset request saved: {}", passwordResetRequestEntity.toString());
 
-        sendPasswordResetEmail(username, id);
+        sendPasswordResetEmail(username, key);
     }
     /**
      *
      * @param username the email address
-     * @param id the random ID before hash
+     * @param key the random string before hash
      */
-    private void sendPasswordResetEmail(String username, String id) {
+    private void sendPasswordResetEmail(String username, String key) {
 
         final Map<String, String> map = new HashMap<>();
         map.put("username", username);
         map.put("domain", domainProperties.getDomain());
-        map.put("id", id);
+        map.put("key", key);
 
         /*
          * If sending email fails, we catch the exceptions and log them,
@@ -298,17 +298,17 @@ public class CredentialsServiceImpl implements CredentialsService {
     /**
      * Verify whether the password reset request timeout or not
      *
-     * @param id the random string before hash
+     * @param key the random string before hash
      *
      * @return credentialsEntity for the user who requests to reset password
      */
-    private CredentialsEntity verifyPasswordResetRequestTimeout(String id) {
+    private CredentialsEntity verifyPasswordResetRequestTimeout(String key) {
 
-        final String hashedId = generateShaHash(id);
+        final String hashedId = generateShaHash(key);
         PasswordResetRequestEntity one = passwordResetRepository.findByHash(hashedId);
         if(null == one) {
-            log.warn("Password reset request NOT found {}", id);
-            throw new PasswordResetRequestNotFoundException(id);
+            log.warn("Password reset request NOT found {}", key);
+            throw new PasswordResetRequestNotFoundException(key);
         }
 
         // check whether the request has timed out or not
@@ -325,7 +325,7 @@ public class CredentialsServiceImpl implements CredentialsService {
      * Reset password
      *
      * @param jsonString {
-     *                   "id": "1234abcd5678efgh",
+     *                   "key": "1234abcd5678efgh",
      *                   "new": "password"
      *                   }
      *
@@ -336,14 +336,14 @@ public class CredentialsServiceImpl implements CredentialsService {
     public Credentials resetPassword(final String jsonString) {
 
         final JSONObject tmp = new JSONObject(jsonString);
-        final String id = tmp.getString("id");
+        final String key = tmp.getString("key");
         final String newPassword = tmp.getString("new");
 
-        CredentialsEntity one = verifyPasswordResetRequestTimeout(id);
+        CredentialsEntity one = verifyPasswordResetRequestTimeout(key);
 
         if(null == one) {
-            log.warn("Credentials not found for password reset request {}", id);
-            throw new CredentialsNotFoundException("Password reset request " + id);
+            log.warn("Credentials not found for password reset request {}", key);
+            throw new CredentialsNotFoundException("Password reset request " + key);
         }
 
         if (newPassword != null && !newPassword.trim().isEmpty()) {
