@@ -447,9 +447,9 @@ public class CredentialsServiceTest {
 
     @Test
     public void testResetPasswordUnknownId() {
-        String id = RandomStringUtils.randomAlphanumeric(20);
+        String key = RandomStringUtils.randomAlphanumeric(20);
         String password = "password";
-        String jsonString = "{\"id\": " + "\"" + id +"\", \"new\": \"" + password + "\"}" ;
+        String jsonString = "{\"key\": " + "\"" + key +"\", \"new\": \"" + password + "\"}" ;
 
         exception.expect(PasswordResetRequestNotFoundException.class);
 
@@ -458,9 +458,9 @@ public class CredentialsServiceTest {
 
     @Test
     public void testResetPasswordRequestTimeout() {
-        String id = RandomStringUtils.randomAlphanumeric(20);
+        String key = RandomStringUtils.randomAlphanumeric(20);
         String password = "password";
-        String jsonString = "{\"id\": " + "\"" + id +"\", \"new\": \"" + password + "\"}" ;
+        String jsonString = "{\"key\": " + "\"" + key +"\", \"new\": \"" + password + "\"}" ;
         PasswordResetRequestEntity passwordEntity = getPasswordResetRequestEntity();
         passwordEntity.setTime(passwordEntity.getTime().minusHours(73));
 
@@ -473,9 +473,9 @@ public class CredentialsServiceTest {
 
     @Test
     public void testResetPasswordCredentialsNotFound() {
-        String id = RandomStringUtils.randomAlphanumeric(20);
+        String key = RandomStringUtils.randomAlphanumeric(20);
         String password = "password";
-        String jsonString = "{\"id\": " + "\"" + id +"\", \"new\": \"" + password + "\"}" ;
+        String jsonString = "{\"key\": " + "\"" + key +"\", \"new\": \"" + password + "\"}" ;
         PasswordResetRequestEntity passwordEntity = getPasswordResetRequestEntity();
 
         when(passwordResetRequestRepository.findByHash(anyString())).thenReturn(passwordEntity);
@@ -488,9 +488,9 @@ public class CredentialsServiceTest {
 
     @Test
     public void testResetPasswordNullPassword() {
-        String id = RandomStringUtils.randomAlphanumeric(20);
+        String key = RandomStringUtils.randomAlphanumeric(20);
         String password = "";
-        String jsonString = "{\"id\": " + "\"" + id +"\", \"new\": \"" + password + "\"}" ;
+        String jsonString = "{\"key\": " + "\"" + key +"\", \"new\": \"" + password + "\"}" ;
         PasswordResetRequestEntity passwordEntity = getPasswordResetRequestEntity();
         CredentialsEntity credentialsEntity = getCredentialsEntity();
 
@@ -505,9 +505,9 @@ public class CredentialsServiceTest {
 
     @Test
     public void testResetPasswordGood() {
-        String id = RandomStringUtils.randomAlphanumeric(20);
+        String key = RandomStringUtils.randomAlphanumeric(20);
         String password = "password";
-        String jsonString = "{\"id\": " + "\"" + id +"\", \"new\": \"" + password + "\"}" ;
+        String jsonString = "{\"key\": " + "\"" + key +"\", \"new\": \"" + password + "\"}" ;
         PasswordResetRequestEntity passwordEntity = getPasswordResetRequestEntity();
         CredentialsEntity credentialsEntity = getCredentialsEntity();
 
