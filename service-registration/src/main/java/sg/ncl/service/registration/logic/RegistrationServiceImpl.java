@@ -3,6 +3,7 @@ package sg.ncl.service.registration.logic;
 import freemarker.template.Template;
 import freemarker.template.TemplateException;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.tomcat.util.codec.binary.Base64;
 import org.json.JSONObject;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -526,7 +527,8 @@ public class RegistrationServiceImpl implements RegistrationService {
         map.put("firstname", user.getUserDetails().getFirstName());
         map.put("domain", domainProperties.getDomain());
         map.put("id", user.getId());
-        map.put("email", user.getUserDetails().getEmail());
+        // email address may contain special characters (e.g. '+') which does not form a valid URI
+        map.put("email", Base64.encodeBase64String(user.getUserDetails().getEmail().getBytes()));
         map.put("key", user.getVerificationKey());
 
         /*
@@ -541,6 +543,7 @@ public class RegistrationServiceImpl implements RegistrationService {
             mailService.send("testbed-ops@ncl.sg",
                     user.getUserDetails().getEmail(),
                     "Please Verify Your Email Account", msgText, false, null, null);
+            log.debug("Email sent: {}", msgText);
         } catch (IOException | TemplateException e) {
             log.warn("{}", e);
         }
