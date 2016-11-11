@@ -55,7 +55,7 @@ import static sg.ncl.service.authentication.validation.Validator.checkRoles;
 @Slf4j
 public class CredentialsServiceImpl implements CredentialsService {
 
-    private static final int PASSWORD_RESET_REQUEST_TIMEOUT_HOUR = 72;
+    private static final int PASSWORD_RESET_REQUEST_TIMEOUT_HOUR = 24;
 
     private final CredentialsRepository credentialsRepository;
     private final PasswordEncoder passwordEncoder;
