@@ -256,7 +256,7 @@ public class RegistrationServiceImpl implements RegistrationService {
             userObject.put("projName", teamEntity.getName());
             userObject.put("projGoals", teamEntity.getDescription());
             userObject.put("pid", teamEntity.getName());
-            userObject.put("projWeb", "http://ncl.sg");
+            userObject.put("projWeb", teamEntity.getWebsite());
             userObject.put("projOrg", "Academic");
             userObject.put("projPublic", teamEntity.getVisibility());
             resultJSON = adapterDeterLab.applyProjectNewUsers(userObject.toString());
