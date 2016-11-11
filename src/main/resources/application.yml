@@ -26,8 +26,8 @@ spring:
         enable: true
       auth: true
 flyway:
-  baseline-version: 1.1
-  baseline-on-migrate: true # for cases when the schema is non-empty and there is no metadata table
+  # baseline-version: 1.1
+  # baseline-on-migrate: true # for cases when the schema is non-empty and there is no metadata table
   schemas: flyway, prod
   url: ${db.url:} # e.g., jdbc:mysql://localhost:3306?useSSL=false
   user: ${db.user:}
@@ -42,6 +42,8 @@ ncl:
       '/users/(\w|-)+/emails/\w+=*': PUT # for email verifications
       '/teams\?visibility=PUBLIC': GET # for retrieving public teams
       '/teams\?name=(\w| )+': GET # for retrieving teams by name
+      '/credentials/password/resets': POST
+      '/credentials/password': PUT
   domain: dev.ncl.sg
   deterlab:
     adapter:

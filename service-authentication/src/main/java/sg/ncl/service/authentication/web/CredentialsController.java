@@ -62,4 +62,17 @@ public class CredentialsController {
         return new CredentialsInfo(credentialsService.updateCredentials(id, credentials, (Claims) claims));
     }
 
+    // post a new password reset request
+    @PostMapping(path = "/password/resets")
+    @ResponseStatus(HttpStatus.ACCEPTED)
+    public void addPasswordResetRequest(@RequestBody final String jsonString) {
+        credentialsService.addPasswordResetRequest(jsonString);
+    }
+
+    // reset password
+    @PutMapping(path = "/password")
+    @ResponseStatus(HttpStatus.OK)
+    public Credentials resetPassword(@RequestBody final String jsonString) {
+        return new CredentialsInfo(credentialsService.resetPassword(jsonString));
+    }
 }
