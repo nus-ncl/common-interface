@@ -56,6 +56,7 @@ public class EmailEntity extends AbstractEntity implements Email {
     @Column(name = "last_retry_time", nullable = false)
     private ZonedDateTime lastRetryTime;
 
+    @Type(type = "text")
     @Column(name = "error_message")
     private String errorMessage = null;
 

@@ -519,7 +519,7 @@ public class FlywayTest {
         assertThat((String) emailRetriesTable.get(6).get("KEY")).isEmpty();
 
         assertThat((String) emailRetriesTable.get(7).get("FIELD")).isEqualTo("error_message");
-        assertThat((String) emailRetriesTable.get(7).get("TYPE")).isEqualTo("varchar(255)");
+        assertThat((String) emailRetriesTable.get(7).get("TYPE")).contains("clob");
         assertThat((String) emailRetriesTable.get(7).get("NULL")).isEqualTo("YES");
         assertThat((String) emailRetriesTable.get(7).get("KEY")).isEmpty();
 
