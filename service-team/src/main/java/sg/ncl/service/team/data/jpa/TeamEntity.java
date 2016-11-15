@@ -1,5 +1,7 @@
 package sg.ncl.service.team.data.jpa;
 
+import lombok.Getter;
+import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.hibernate.annotations.GenericGenerator;
 import sg.ncl.common.jpa.AbstractEntity;
@@ -9,7 +11,6 @@ import sg.ncl.service.team.domain.TeamMember;
 import sg.ncl.service.team.domain.TeamPrivacy;
 import sg.ncl.service.team.domain.TeamStatus;
 import sg.ncl.service.team.domain.TeamVisibility;
-import sg.ncl.service.team.web.TeamMemberInfo;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -30,24 +31,12 @@ import java.util.Map;
 /**
  * @author Christopher Zhong
  */
+@Getter
+@Setter
 @Entity
 @Slf4j
 @Table(name = "teams")
 public class TeamEntity extends AbstractEntity implements Team {
-
-//    public TeamEntity() {
-//
-//    }
-//
-//    public TeamEntity(Team team) {
-//        setApplicationDate(ZonedDateTime.now());
-//        setDescription(team.getDescription());
-//        setName(team.getName());
-//        setOrganisationType(team.getOrganisationType());
-//        setPrivacy(team.getPrivacy());
-//        setWebsite(team.getWebsite());
-//        setVisibility(team.getVisibility());
-//    }
 
     @Id
     @GeneratedValue(generator = "uuid2")
@@ -90,146 +79,51 @@ public class TeamEntity extends AbstractEntity implements Team {
     private final Map<String, TeamMemberEntity> members = new HashMap<>();
 
     @Override
-    public String getId() {
-        return id;
-    }
-
-    public void setId(final String id) {
-        this.id = id;
-    }
-
-    @Override
-    public String getName() {
-        return name;
-    }
-
-    public void setName(final String name) {
-        this.name = name;
-    }
-
-    @Override
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(final String description) {
-        this.description = description;
-    }
-
-    @Override
-    public String getWebsite() {
-        return website;
-    }
-
-    public void setWebsite(String website) {
-        this.website = website;
-    }
-
-    @Override
-    public String getOrganisationType() {
-        return organisationType;
-    }
-
-    public void setOrganisationType(String organisationType) {
-        this.organisationType = organisationType;
-    }
-
-    @Override
-    public TeamVisibility getVisibility() {
-        return visibility;
-    }
-
-    public void setVisibility(final TeamVisibility visibility) {
-        this.visibility = visibility;
-    }
-
-    @Override
-    public TeamPrivacy getPrivacy() {
-        return privacy;
-    }
-
-    public void setPrivacy(final TeamPrivacy privacy) {
-        this.privacy = privacy;
-    }
-
-    @Override
-    public TeamStatus getStatus() {
-        return status;
-    }
-
-    public void setStatus(final TeamStatus status) {
-        this.status = status;
-    }
-
-    @Override
-    public ZonedDateTime getApplicationDate() {
-        return applicationDate;
-    }
-
-    public void setApplicationDate(ZonedDateTime applicationDate) {
-        this.applicationDate = applicationDate;
-    }
-
-    @Override
-    public ZonedDateTime getProcessedDate() {
-        return processedDate;
-    }
-
-    public void setProcessedDate(ZonedDateTime processedDate) {
-        this.processedDate = processedDate;
-    }
-
-    @Override
     public List<TeamMemberEntity> getMembers() {
         return new ArrayList<>(members.values());
     }
 
-    public void addMember(final TeamMember member) {
+    public TeamMember addMember(final TeamMember member) {
         final String userId = member.getUserId();
-        // member maybe resubmitting another request
-        // so member status may be REJECTED
+        // user removed from a team has status REJECTED
         if (members.containsKey(userId)) {
             TeamMemberEntity teamMemberEntity = members.get(userId);
             if (teamMemberEntity.getMemberStatus() == MemberStatus.REJECTED) {
                 teamMemberEntity.setMemberStatus(MemberStatus.PENDING);
                 teamMemberEntity.setJoinedDate(ZonedDateTime.now());
                 members.put(userId, teamMemberEntity);
-                return;
+                return members.get(userId);
             } else {
-                return;
+                return null;
             }
-        }
-        TeamMemberEntity entity = new TeamMemberEntity();
-        entity.setUserId(userId);
-        entity.setTeam(this);
-        entity.setJoinedDate(ZonedDateTime.now());
-        entity.setMemberType(member.getMemberType());
-
-        if (member.getMemberStatus() != null) {
+        } else {
+            TeamMemberEntity entity = new TeamMemberEntity();
+            entity.setUserId(userId);
+            entity.setTeam(this);
+            entity.setJoinedDate(ZonedDateTime.now());
+            entity.setMemberType(member.getMemberType());
             entity.setMemberStatus(member.getMemberStatus());
+            members.put(userId, entity);
+            return members.get(userId);
         }
-
-        members.put(userId, entity);
     }
 
     public TeamMember getMember(final String userId) {
         if (members.containsKey(userId)) {
-            return new TeamMemberInfo(members.get(userId));
-        } else {
-            return null;
+            return members.get(userId);
         }
+        return null;
     }
 
-    public TeamMember changeMemberStatus(final TeamMember member, MemberStatus memberStatus) {
+    public TeamMember changeMemberStatus(final TeamMember member, final MemberStatus memberStatus) {
         final String userId = member.getUserId();
         if (members.containsKey(userId)) {
             TeamMemberEntity entity = members.get(userId);
             entity.setMemberStatus(memberStatus);
             members.put(userId, entity);
-            return new TeamMemberInfo(members.get(userId));
-        } else {
-            return null;
+            return members.get(userId);
         }
+        return null;
     }
 
     @Override

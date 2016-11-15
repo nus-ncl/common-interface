@@ -7,6 +7,9 @@ import sg.ncl.common.exception.base.NotFoundException;
 /**
  * @author Te Ye
  */
-@ResponseStatus(code = HttpStatus.NOT_FOUND, reason = "Team member is not in team")
+@ResponseStatus(code = HttpStatus.NOT_FOUND, reason = "User is not a member of the team")
 public class TeamMemberNotFoundException extends NotFoundException {
+    public TeamMemberNotFoundException(final String message) {
+        super(message);
+    }
 }

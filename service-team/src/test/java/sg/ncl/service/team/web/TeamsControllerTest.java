@@ -75,29 +75,6 @@ public class TeamsControllerTest extends AbstractTest {
     }
 
     @Test
-    public void testPostTeam() throws Exception {
-        // Note: must have TeamEntity to create the JSON
-        TeamEntity teamEntity = Util.getTeamEntity();
-
-        GsonBuilder gsonBuilder = new GsonBuilder();
-        gsonBuilder.registerTypeAdapter(ZonedDateTime.class, new DateTimeSerializer());
-        gsonBuilder.registerTypeAdapter(ZonedDateTime.class, new DateTimeDeserializer());
-        Gson gson = gsonBuilder.create();
-        String jsonInString = gson.toJson(new TeamInfo(teamEntity));
-
-        MvcResult createdTeamResult = mockMvc.perform(post("/teams").contentType(MediaType.APPLICATION_JSON).content(jsonInString))
-                .andExpect(status().isCreated())
-                .andReturn();
-
-        String response = createdTeamResult.getResponse().getContentAsString();
-        Team createdTeam = gson.fromJson(response, TeamInfo.class);
-
-        Assert.assertEquals(teamEntity.getName(), createdTeam.getName());
-        Assert.assertEquals(teamEntity.getDescription(), createdTeam.getDescription());
-        Assert.assertEquals(teamEntity.getStatus(), TeamStatus.PENDING);
-    }
-
-    @Test
     public void testGetAllTeamsWithNoUserInDb() throws Exception {
         MvcResult result = mockMvc.perform(get("/teams")).andReturn();
         Assert.assertTrue(result.getResponse().getContentLength() == 0);
