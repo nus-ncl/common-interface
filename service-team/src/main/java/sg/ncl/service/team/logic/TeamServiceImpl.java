@@ -241,8 +241,9 @@ public class TeamServiceImpl implements TeamService {
     }
 
     private boolean isTeamNameValid(@NotNull final String name) {
-        return name.trim().length() >= 6 &&
+        return  name.trim().length() >= 2 &&
                 name.trim().length() <= 12 &&
-                 name.matches("^[a-zA-Z0-9]*$");
+                name.matches("^([-\\w]+)$") &&
+                !name.trim().startsWith("-");
     }
 }

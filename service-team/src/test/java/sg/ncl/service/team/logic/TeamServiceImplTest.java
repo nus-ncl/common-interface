@@ -64,7 +64,14 @@ public class TeamServiceImplTest {
 
     @Test
     public void testCreateTeamTooShortName() {
-        final TeamInfo teamInfo = new TeamInfo("id", "ncl", "description", "website", "organisationType", null, null, null, null, null, members);
+        final TeamInfo teamInfo = new TeamInfo("id", "a", "description", "website", "organisationType", null, null, null, null, null, members);
+        exception.expect(InvalidTeamNameException.class);
+        teamService.createTeam(teamInfo);
+    }
+
+    @Test
+    public void testCreateTeamNameStartingWithDash() {
+        final TeamInfo teamInfo = new TeamInfo("id", "-a", "description", "website", "organisationType", null, null, null, null, null, members);
         exception.expect(InvalidTeamNameException.class);
         teamService.createTeam(teamInfo);
     }
@@ -92,7 +99,21 @@ public class TeamServiceImplTest {
 
     @Test
     public void testCreateTeamGoodName() {
-        final TeamInfo teamInfo = new TeamInfo("id", "nclteam", "description", "website", "organisationType", null, null, null, null, null, members);
+        final TeamInfo teamInfo = new TeamInfo("id", "ncl-team", "description", "website", "organisationType", null, null, null, null, null, members);
+        when(teamRepository.save(any(TeamEntity.class))).thenAnswer(i -> i.getArgumentAt(0, TeamEntity.class));
+        final Team team = teamService.createTeam(teamInfo);
+
+        verify(teamRepository, times(1)).save(any(TeamEntity.class));
+//        assertThat(team.getId()).isEqualTo(teamInfo.getId());
+        assertThat(team.getName()).isEqualTo(teamInfo.getName());
+        assertThat(team.getDescription()).isEqualTo(teamInfo.getDescription());
+        assertThat(team.getWebsite()).isEqualTo(teamInfo.getWebsite());
+        assertThat(team.getOrganisationType()).isEqualTo(teamInfo.getOrganisationType());
+    }
+
+    @Test
+    public void testCreateTeamGoodName2() {
+        final TeamInfo teamInfo = new TeamInfo("id", "n-", "description", "website", "organisationType", null, null, null, null, null, members);
         when(teamRepository.save(any(TeamEntity.class))).thenAnswer(i -> i.getArgumentAt(0, TeamEntity.class));
         final Team team = teamService.createTeam(teamInfo);
 
