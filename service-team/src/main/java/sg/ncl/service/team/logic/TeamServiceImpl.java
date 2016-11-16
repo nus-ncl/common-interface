@@ -241,18 +241,8 @@ public class TeamServiceImpl implements TeamService {
     }
 
     private boolean isTeamNameValid(@NotNull final String name) {
-
-        // check for string length
-        if(name.trim().length() < 6 || name.trim().length() >12) {
-            return false;
-        }
-
-        // check whether string contains whitespace
-        if(name.matches("^\\s*$")) {
-            return false;
-        }
-
-        // check whether string contains alphanumeric characters only
-        return name.matches("^[a-zA-Z0-9]*$");
+        return name.trim().length() >= 6 &&
+                name.trim().length() <= 12 &&
+                 name.matches("^[a-zA-Z0-9]*$");
     }
 }
