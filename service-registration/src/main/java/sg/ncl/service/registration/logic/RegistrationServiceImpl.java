@@ -201,15 +201,15 @@ public class RegistrationServiceImpl implements RegistrationService {
         if (isJoinTeam) {
             // accept the team data
             teamEntity = teamService.getTeamById(team.getId());
-            teamId = team.getId();
-            log.info("Register new user: join Team {}", team.getName());
+            teamId = teamEntity.getId();
+            log.info("Register new user: join Team {}", teamEntity.getName());
         } else {
             // apply for new team
             // check if team already exists
             teamEntity = teamService.createTeam(team);
             teamId = teamEntity.getId();
             addNclTeamIdMapping(teamEntity.getName(), teamId);
-            log.info("Register new user: apply new Team {}", team.getName());
+            log.info("Register new user: apply new Team {}", teamEntity.getName());
         }
 
         // accept user data from form
@@ -229,7 +229,7 @@ public class RegistrationServiceImpl implements RegistrationService {
 
         userService.addTeam(userId, teamId);
         teamService.addMember(teamId, teamMemberInfo);
-        log.info("Register new user: added user {} to team {}", user.getUserDetails().getEmail(), team.getName());
+        log.info("Register new user: added user {} to team {}", user.getUserDetails().getEmail(), teamEntity.getName());
 
         JSONObject userObject = new JSONObject();
         userObject.put("firstName", user.getUserDetails().getFirstName());
