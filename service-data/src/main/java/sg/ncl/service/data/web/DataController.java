@@ -57,17 +57,17 @@ public class DataController {
     // Get details about a data set
     @GetMapping(path = "/{id}")
     @ResponseStatus(HttpStatus.OK)
-    public Data getDatasetById(@AuthenticationPrincipal Object claims, @PathVariable String id) {
+    public Data getDatasetById(@AuthenticationPrincipal Object claims, @PathVariable Long id) {
         if (claims == null || !(claims instanceof Claims)) {
             throw new UnauthorizedException();
         }
-        return new DataInfo(dataService.getDataset(Long.getLong(id)));
+        return new DataInfo(dataService.getDataset(id));
     }
 
     // Create a data set
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.CREATED)
-    public Data add(@AuthenticationPrincipal Object claims, @RequestBody DataInfo dataInfo) {
+    public Data add(@AuthenticationPrincipal Object claims, @RequestBody @Valid DataInfo dataInfo) {
         if (claims == null || !(claims instanceof Claims)) {
             throw new UnauthorizedException();
         }
@@ -77,21 +77,21 @@ public class DataController {
     // Update a data set
     @PutMapping(path = "/{id}")
     @ResponseStatus(HttpStatus.OK)
-    public Data update(@AuthenticationPrincipal Object claims, @PathVariable String id, @RequestBody @Valid DataInfo dataInfo) {
+    public Data update(@AuthenticationPrincipal Object claims, @PathVariable Long id, @RequestBody @Valid DataInfo dataInfo) {
         if (claims == null || !(claims instanceof Claims)) {
             throw new UnauthorizedException();
         }
-        return new DataInfo(dataService.updateDataset(Long.getLong(id), dataInfo, (Claims) claims));
+        return new DataInfo(dataService.updateDataset(id, dataInfo, (Claims) claims));
     }
 
     // Delete a data set
     @DeleteMapping(path = "/{id}")
     @ResponseStatus(HttpStatus.OK)
-    public Data remove(@AuthenticationPrincipal Object claims, @PathVariable String id) {
+    public Data remove(@AuthenticationPrincipal Object claims, @PathVariable Long id) {
         if (claims == null || !(claims instanceof Claims)) {
             throw new UnauthorizedException();
         }
-        return new DataInfo(dataService.deleteDataset(Long.getLong(id), (Claims) claims));
+        return new DataInfo(dataService.deleteDataset(id, (Claims) claims));
     }
 
     // View resource in a data set
