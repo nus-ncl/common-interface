@@ -17,7 +17,7 @@ public class Util {
     public static TeamEntity getTeamEntityWithId() {
         final TeamEntity entity = new TeamEntity();
         entity.setId(RandomStringUtils.randomAlphanumeric(20));
-        entity.setName(RandomStringUtils.randomAlphanumeric(20));
+        entity.setName(RandomStringUtils.randomAlphanumeric(10));
         entity.setDescription(RandomStringUtils.randomAlphanumeric(20));
         entity.setWebsite("http://" + RandomStringUtils.randomAlphanumeric(20) + ".com");
         entity.setOrganisationType(RandomStringUtils.randomAlphanumeric(20));
@@ -28,7 +28,7 @@ public class Util {
     public static TeamEntity getTeamEntity() {
         final TeamEntity entity = new TeamEntity();
 //        entity.setId(RandomStringUtils.randomAlphanumeric(20));
-        entity.setName(RandomStringUtils.randomAlphanumeric(20));
+        entity.setName(RandomStringUtils.randomAlphanumeric(10));
         entity.setDescription(RandomStringUtils.randomAlphanumeric(20));
         entity.setWebsite("http://" + RandomStringUtils.randomAlphanumeric(20) + ".com");
         entity.setOrganisationType(RandomStringUtils.randomAlphanumeric(20));

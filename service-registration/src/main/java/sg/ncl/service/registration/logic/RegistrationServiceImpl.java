@@ -147,7 +147,7 @@ public class RegistrationServiceImpl implements RegistrationService {
         Team teamEntity = teamService.getTeamByName(team.getName());
         if (teamEntity == null) {
             log.warn("Team not found: {}", team.getName());
-            throw new TeamNotFoundException();
+            throw new TeamNotFoundException("Team " + team.getName() + " not found");
         }
 
         String teamId = teamEntity.getId();
@@ -290,7 +290,7 @@ public class RegistrationServiceImpl implements RegistrationService {
         Team team = teamService.getTeamById(teamId);
         if (team == null) {
             log.warn("Team NOT found, TeamId {}", teamId);
-            throw new TeamNotFoundException(teamId);
+            throw new TeamNotFoundException("Team " + teamId + " not found");
         }
         String pid = team.getName();
         // already add to user side when request to join
@@ -318,7 +318,7 @@ public class RegistrationServiceImpl implements RegistrationService {
         Team one = teamService.getTeamById(teamId);
         if (one == null) {
             log.warn("Team NOT found, TeamId {}", teamId);
-            throw new TeamNotFoundException(teamId);
+            throw new TeamNotFoundException("Team " + teamId + " not found");
         }
         String pid = one.getName();
 

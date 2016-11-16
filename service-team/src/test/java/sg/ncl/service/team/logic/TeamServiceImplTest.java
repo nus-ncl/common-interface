@@ -63,8 +63,36 @@ public class TeamServiceImplTest {
     }
 
     @Test
+    public void testCreateTeamTooShortName() {
+        final TeamInfo teamInfo = new TeamInfo("id", "ncl", "description", "website", "organisationType", null, null, null, null, null, members);
+        exception.expect(InvalidTeamNameException.class);
+        teamService.createTeam(teamInfo);
+    }
+
+    @Test
+    public void testCreateTeamTooLongName() {
+        final TeamInfo teamInfo = new TeamInfo("id", "qwertyuiopasdfg", "description", "website", "organisationType", null, null, null, null, null, members);
+        exception.expect(InvalidTeamNameException.class);
+        teamService.createTeam(teamInfo);
+    }
+
+    @Test
+    public void testCreateTeamNameHasWhiteSpace() {
+        final TeamInfo teamInfo = new TeamInfo("id", "ncl ncl", "description", "website", "organisationType", null, null, null, null, null, members);
+        exception.expect(InvalidTeamNameException.class);
+        teamService.createTeam(teamInfo);
+    }
+
+    @Test
+    public void testCreateTeamNameHasSpecialCharacters() {
+        final TeamInfo teamInfo = new TeamInfo("id", "ncl#ncl", "description", "website", "organisationType", null, null, null, null, null, members);
+        exception.expect(InvalidTeamNameException.class);
+        teamService.createTeam(teamInfo);
+    }
+
+    @Test
     public void testCreateTeamGoodName() {
-        final TeamInfo teamInfo = new TeamInfo("id", "name", "description", "website", "organisationType", null, null, null, null, null, members);
+        final TeamInfo teamInfo = new TeamInfo("id", "nclteam", "description", "website", "organisationType", null, null, null, null, null, members);
         when(teamRepository.save(any(TeamEntity.class))).thenAnswer(i -> i.getArgumentAt(0, TeamEntity.class));
         final Team team = teamService.createTeam(teamInfo);
 
@@ -305,4 +333,5 @@ public class TeamServiceImplTest {
 
         assertThat(team.getStatus()).isEqualTo(updatedEntity.getStatus());
     }
+
 }

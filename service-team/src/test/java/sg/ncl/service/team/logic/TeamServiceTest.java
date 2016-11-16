@@ -14,10 +14,7 @@ import sg.ncl.service.team.domain.TeamMember;
 import sg.ncl.service.team.domain.TeamService;
 import sg.ncl.service.team.domain.TeamStatus;
 import sg.ncl.service.team.domain.TeamVisibility;
-import sg.ncl.service.team.exceptions.NoOwnerInTeamException;
-import sg.ncl.service.team.exceptions.TeamIdNullOrEmptyException;
 import sg.ncl.service.team.exceptions.TeamMemberNotFoundException;
-import sg.ncl.service.team.exceptions.TeamNameNullOrEmptyException;
 import sg.ncl.service.team.exceptions.TeamNotFoundException;
 import sg.ncl.service.team.web.TeamMemberInfo;
 
@@ -72,14 +69,12 @@ public class TeamServiceTest extends AbstractTest {
     }
 
     @Test
-    //(expected = TeamIdNullOrEmptyException.class)
     public void testGetTeamWithNullId() throws Exception {
         Team team = teamService.getTeamById(null);
         Assert.assertTrue(team == null);
     }
 
     @Test
-    //(expected = TeamIdNullOrEmptyException.class)
     public void testGetTeamWithEmptyId() throws Exception {
         Team team = teamService.getTeamById("");
         Assert.assertTrue(team == null);
@@ -137,7 +132,7 @@ public class TeamServiceTest extends AbstractTest {
     @Test(expected = TeamNotFoundException.class)
     public void testUpdateTeamEmptyId() throws Exception {
         TeamEntity teamEntity = Util.getTeamEntity();
-        teamEntity.setName(RandomStringUtils.randomAlphanumeric(20));
+        teamEntity.setName(RandomStringUtils.randomAlphanumeric(10));
         Team team = teamService.createTeam(teamEntity);
         teamService.updateTeam("", team);
     }

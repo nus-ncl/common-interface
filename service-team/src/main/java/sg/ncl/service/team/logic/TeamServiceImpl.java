@@ -13,6 +13,7 @@ import sg.ncl.service.team.domain.TeamMember;
 import sg.ncl.service.team.domain.TeamService;
 import sg.ncl.service.team.domain.TeamStatus;
 import sg.ncl.service.team.domain.TeamVisibility;
+import sg.ncl.service.team.exceptions.InvalidTeamNameException;
 import sg.ncl.service.team.exceptions.TeamMemberAlreadyExistsException;
 import sg.ncl.service.team.exceptions.TeamMemberNotFoundException;
 import sg.ncl.service.team.exceptions.TeamNameAlreadyExistsException;
@@ -44,6 +45,11 @@ public class TeamServiceImpl implements TeamService {
         if (team.getName() == null || team.getName().isEmpty()) {
             log.warn("Create team error: team name null or empty");
             throw new TeamNameNullOrEmptyException();
+        }
+
+        if(!isTeamNameValid(team.getName())) {
+            log.warn("Create team error: invalid team name {}", team.getName());
+            throw new InvalidTeamNameException("Team name " + team.getName() + " invalid");
         }
 
         if (teamRepository.findByName(team.getName()) != null) {
@@ -137,7 +143,7 @@ public class TeamServiceImpl implements TeamService {
         }
         log.info("Adding new member {} to team {}", teamMember.getUserId(), id);
         final TeamMember newMember = entity.addMember(teamMember);
-        if(null == newMember) {
+        if(newMember == null) {
             log.warn("Add team member error: member {} already exists", teamMember.getUserId());
             throw new TeamMemberAlreadyExistsException("Member " + teamMember.getUserId() + " already exists");
         }
@@ -232,5 +238,21 @@ public class TeamServiceImpl implements TeamService {
             }
         }
         return false;
+    }
+
+    private boolean isTeamNameValid(@NotNull final String name) {
+
+        // check for string length
+        if(name.trim().length() < 6 || name.trim().length() >12) {
+            return false;
+        }
+
+        // check whether string contains whitespace
+        if(name.matches("^\\s*$")) {
+            return false;
+        }
+
+        // check whether string contains alphanumeric characters only
+        return name.matches("^[a-zA-Z0-9]*$");
     }
 }
