@@ -13,12 +13,12 @@ import sg.ncl.service.team.domain.TeamMember;
 import sg.ncl.service.team.domain.TeamService;
 import sg.ncl.service.team.domain.TeamStatus;
 import sg.ncl.service.team.domain.TeamVisibility;
-import sg.ncl.service.team.exceptions.NoOwnerInTeamException;
-import sg.ncl.service.team.exceptions.TeamIdNullOrEmptyException;
+import sg.ncl.service.team.exceptions.InvalidTeamNameException;
+import sg.ncl.service.team.exceptions.TeamMemberAlreadyExistsException;
 import sg.ncl.service.team.exceptions.TeamMemberNotFoundException;
+import sg.ncl.service.team.exceptions.TeamNameAlreadyExistsException;
 import sg.ncl.service.team.exceptions.TeamNameNullOrEmptyException;
 import sg.ncl.service.team.exceptions.TeamNotFoundException;
-import sg.ncl.service.team.exceptions.UserIdNullOrEmptyException;
 
 import javax.inject.Inject;
 import javax.validation.constraints.NotNull;
@@ -42,144 +42,134 @@ public class TeamServiceImpl implements TeamService {
 
     @Transactional
     public Team createTeam(@NotNull final Team team) {
-        if (team == null) {
-            throw new IllegalArgumentException("Team object is NULL");
-        }
         if (team.getName() == null || team.getName().isEmpty()) {
+            log.warn("Create team error: team name null or empty");
             throw new TeamNameNullOrEmptyException();
         }
-        // FIXME: need to check whether team already exists or not
-        if (teamRepository.findByName(team.getName()) != null) {
-            // throw new TeamAlreadyExistsException();
+
+        if(!isTeamNameValid(team.getName())) {
+            log.warn("Create team error: invalid team name {}", team.getName());
+            throw new InvalidTeamNameException("Team name " + team.getName() + " invalid");
         }
+
+        if (teamRepository.findByName(team.getName()) != null) {
+            log.warn("Create team error: team name {} already exists", team.getName());
+            throw new TeamNameAlreadyExistsException("Team name " + team.getName() + " already exists");
+        }
+
+        log.info("Creating new team: {}", team.getName());
 
         TeamEntity entity = new TeamEntity();
         entity.setApplicationDate(ZonedDateTime.now());
         entity.setDescription(team.getDescription());
         entity.setName(team.getName());
         entity.setOrganisationType(team.getOrganisationType());
-//        entity.setPrivacy(team.getPrivacy());
         entity.setWebsite(team.getWebsite());
         entity.setVisibility(team.getVisibility());
+        entity.setStatus(TeamStatus.PENDING);
 
-        return teamRepository.save(entity);
+        final Team savedTeam = teamRepository.save(entity);
+        log.info("New team created and saved: {}", savedTeam);
+
+        return savedTeam;
     }
 
     @Transactional
     public void removeTeam(@NotNull final String id) {
-        if (id == null || id.isEmpty()) {
-            throw new TeamIdNullOrEmptyException();
-        }
         TeamEntity entity = findTeam(id);
         if (entity == null) {
+            log.warn("Remove team error: team {} not found", id);
             throw new TeamNotFoundException(id);
         }
         teamRepository.delete(id);
+        log.info("Team {} removed", id);
     }
 
-    @Transactional
     public List<Team> getAllTeams() {
         return teamRepository.findAll().stream().collect(Collectors.toList());
     }
 
-    @Transactional
     public List<Team> getTeamsByVisibility(@NotNull final TeamVisibility visibility) {
         return teamRepository.findByVisibility(visibility).stream().collect(Collectors.toList());
     }
 
-    @Transactional
     public Team getTeamById(@NotNull final String id) {
         return findTeam(id);
     }
 
-    @Transactional
     public Team getTeamByName(@NotNull final String name) {
-        if (name == null || name.isEmpty()) {
-            throw new TeamNameNullOrEmptyException();
-        }
         return teamRepository.findByName(name);
     }
 
+    // for user to update team profile
     @Transactional
     public Team updateTeam(@NotNull final String id, @NotNull final Team team) {
-        if (id == null || id.isEmpty()) {
-            throw new TeamIdNullOrEmptyException();
-        }
-        if (team == null) {
-            throw new IllegalArgumentException("Team object is NULL");
-        }
         // Note: team name should be unchangeable
         final TeamEntity entity = findTeam(id);
         if (entity == null) {
+            log.warn("Update team profile error: team {} not found", id);
             throw new TeamNotFoundException(id);
         }
 
+        log.info("Updating team profile: team to update {}, new profile {}", id, team);
         if (team.getDescription() != null) {
             entity.setDescription(team.getDescription());
         }
-
+        if (team.getWebsite() != null) {
+            entity.setWebsite(team.getWebsite());
+        }
+        if(team.getOrganisationType() != null) {
+            entity.setOrganisationType(team.getOrganisationType());
+        }
+        if (team.getVisibility() != null) {
+            entity.setVisibility(team.getVisibility());
+        }
         if (team.getPrivacy() != null) {
             entity.setPrivacy(team.getPrivacy());
         }
 
-        if (team.getStatus() != null) {
-            entity.setStatus(team.getStatus());
-        }
+        final Team updatedTeam = teamRepository.save(entity);
+        log.info("Team profile updated: {}", updatedTeam);
 
-        if (team.getVisibility() != null) {
-            entity.setVisibility(team.getVisibility());
-        }
-
-        if (team.getWebsite() != null) {
-            entity.setWebsite(team.getWebsite());
-        }
-
-        return teamRepository.save(entity);
+        return updatedTeam;
     }
 
     @Transactional
     public Team addMember(@NotNull final String id, @NotNull final TeamMember teamMember) {
-        if (id == null || id.isEmpty()) {
-            throw new TeamIdNullOrEmptyException();
-        }
-        if (teamMember == null) {
-            throw new IllegalArgumentException("TeamMember object null");
-        }
         TeamEntity entity = findTeam(id);
         if (entity == null) {
+            log.warn("Add team member error: team {} not found", id);
             throw new TeamNotFoundException(id);
         }
-        log.info("Adding team member {} to Team {}", teamMember, entity);
-        entity.addMember(teamMember);
-        return teamRepository.save(entity);
+        log.info("Adding new member {} to team {}", teamMember.getUserId(), id);
+        final TeamMember newMember = entity.addMember(teamMember);
+        if(newMember == null) {
+            log.warn("Add team member error: member {} already exists", teamMember.getUserId());
+            throw new TeamMemberAlreadyExistsException("Member " + teamMember.getUserId() + " already exists");
+        }
+        final Team updatedTeam = teamRepository.save(entity);
+        log.info("New member {} added to team {}", teamMember.getUserId(), updatedTeam.getId());
+        return updatedTeam;
     }
 
     @Transactional
     public Team removeMember(@NotNull final String id, @NotNull final TeamMember teamMember) {
-        if (id == null || id.isEmpty()) {
-            throw new TeamIdNullOrEmptyException();
-        }
-        if (teamMember == null) {
-            throw new IllegalArgumentException("TeamMember object null");
-        }
         TeamEntity entity = findTeam(id);
         if (entity == null) {
+            log.warn("Remove team member error: team {} not found", id);
             throw new TeamNotFoundException(id);
         }
+        log.info("Removing member {} from team {}", teamMember.getUserId(), id);
         entity.changeMemberStatus(teamMember, MemberStatus.REJECTED);
-        return teamRepository.save(entity);
+        final Team updatedTeam = teamRepository.save(entity);
+        log.info("Member {} removed from team {}", teamMember.getUserId(), updatedTeam.getId());
+        return updatedTeam;
     }
 
-    @Transactional
     public Boolean isOwner(@NotNull final String teamId, @NotNull final String userId) {
-        if (userId == null || userId.isEmpty()) {
-            throw new UserIdNullOrEmptyException();
-        }
-        if (teamId == null || teamId.isEmpty()) {
-            throw new TeamIdNullOrEmptyException();
-        }
         TeamEntity entity = findTeam(teamId);
         if (entity == null) {
+            log.warn("Check is team owner error: team {} not found", teamId);
             throw new TeamNotFoundException(teamId);
         }
         List<TeamMemberEntity> teamMembersList = entity.getMembers();
@@ -193,69 +183,51 @@ public class TeamServiceImpl implements TeamService {
 
     @Transactional
     public TeamMember updateMemberStatus(@NotNull final String teamId, @NotNull final String userId, @NotNull final MemberStatus status) {
-        if (userId == null || userId.isEmpty()) {
-            throw new UserIdNullOrEmptyException();
-        }
-        if (teamId == null || teamId.isEmpty()) {
-            throw new TeamIdNullOrEmptyException();
-        }
-        if (status == null) {
-            throw new IllegalArgumentException("MemberStatus object null");
-        }
         TeamEntity entity = findTeam(teamId);
         if (entity == null) {
+            log.warn("Update member status error: team {} not found", teamId);
             throw new TeamNotFoundException(teamId);
         }
 
         TeamMember member = entity.getMember(userId);
         if (member == null) {
-            throw new TeamMemberNotFoundException();
+            log.warn("Update member status error: user {} is not a member of team {}", userId, teamId);
+            throw new TeamMemberNotFoundException("User " + userId + " is not a member of team " + teamId);
         }
 
+        log.info("Update member status: user {}, new status {}", userId, status);
         return entity.changeMemberStatus(member, status);
     }
 
     @Transactional
-    public Team updateTeamStatus(String id, TeamStatus teamStatus) {
-        if (id == null || id.isEmpty()) {
-            throw new TeamIdNullOrEmptyException();
-        }
-        if (teamStatus == null) {
-            throw new IllegalArgumentException("TeamStatus object null");
-        }
-
+    public Team updateTeamStatus(@NotNull final String id, @NotNull final TeamStatus teamStatus) {
         TeamEntity entity = findTeam(id);
         if (entity == null) {
+            log.warn("Update team status error: team {} not found", id);
             throw new TeamNotFoundException(id);
         }
 
-        // FIXME: why need to check team owner exists here???
-        if (hasTeamOwner(id) == false) {
-            throw new NoOwnerInTeamException();
-        }
+        log.info("Updating team status: team {}, new status {}", id, teamStatus);
 
         entity.setStatus(teamStatus);
         entity.setProcessedDate(ZonedDateTime.now());
 
-        // FIXME: why don't save(entity)???
-        return entity;
+        final Team updatedTeam = teamRepository.save(entity);
+        log.info("Team status updated: team {}, status {}", updatedTeam.getId(), updatedTeam.getStatus());
+        return updatedTeam;
     }
 
     private TeamEntity findTeam(final String id) {
         if (id == null || id.isEmpty()) {
             return null;
         }
-
         return teamRepository.findOne(id);
     }
 
-    private boolean hasTeamOwner(final String teamId) {
-        if (teamId == null || teamId.isEmpty()) {
-            throw new TeamIdNullOrEmptyException();
-        }
-
+    private boolean hasTeamOwner(@NotNull final String teamId) {
         TeamEntity entity = findTeam(teamId);
         if (entity == null) {
+            log.warn("Check has team owner error: team {} not found", teamId);
             throw new TeamNotFoundException(teamId);
         }
 
@@ -266,5 +238,12 @@ public class TeamServiceImpl implements TeamService {
             }
         }
         return false;
+    }
+
+    private boolean isTeamNameValid(@NotNull final String name) {
+        return  name.trim().length() >= 2 &&
+                name.trim().length() <= 12 &&
+                name.matches("^([-\\w]+)$") &&
+                !name.trim().startsWith("-");
     }
 }

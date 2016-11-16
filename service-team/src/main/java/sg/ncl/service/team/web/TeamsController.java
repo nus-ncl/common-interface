@@ -3,7 +3,6 @@ package sg.ncl.service.team.web;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
-import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -15,14 +14,12 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import sg.ncl.common.exception.base.ForbiddenException;
-import sg.ncl.common.jwt.JwtToken;
 import sg.ncl.service.team.domain.Team;
 import sg.ncl.service.team.domain.TeamService;
 import sg.ncl.service.team.domain.TeamVisibility;
 import sg.ncl.service.team.exceptions.TeamNotFoundException;
 
 import javax.inject.Inject;
-import javax.validation.Valid;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -39,13 +36,6 @@ public class TeamsController {
     @Inject
     TeamsController(final TeamService teamService) {
         this.teamService = teamService;
-    }
-
-    @PostMapping
-    @ResponseStatus(HttpStatus.CREATED)
-    public Team createTeam(@RequestBody @Valid final TeamInfo team) {
-        log.info("Creating a team: {}", team);
-        return new TeamInfo(teamService.createTeam(team));
     }
 
     @GetMapping
@@ -82,6 +72,7 @@ public class TeamsController {
     }
 
     @GetMapping(path = "/{id}")
+    @ResponseStatus(HttpStatus.OK)
     public Team getTeamById(@PathVariable final String id) {
         if (SecurityContextHolder.getContext().getAuthentication() == null) {
             // throw forbidden
@@ -98,13 +89,20 @@ public class TeamsController {
     @PutMapping(path = "/{id}")
     @ResponseStatus(HttpStatus.OK)
     public Team updateTeam(@PathVariable final String id, @RequestBody final TeamInfo team) {
+        if (SecurityContextHolder.getContext().getAuthentication() == null) {
+            log.warn("Access denied for: /teams/{} PUT", id);
+            throw new ForbiddenException();
+        }
         return new TeamInfo(teamService.updateTeam(id, team));
     }
 
     @PostMapping(path = "/{id}/members")
     @ResponseStatus(HttpStatus.CREATED)
     public Team addTeamMember(@PathVariable final String id, @RequestBody final TeamMemberInfo teamMember) {
-        // id is the team id
+        if (SecurityContextHolder.getContext().getAuthentication() == null) {
+            log.warn("Access denied for: /teams/{}/members POST", id);
+            throw new ForbiddenException();
+        }
         return new TeamInfo(teamService.addMember(id, teamMember));
     }
 }

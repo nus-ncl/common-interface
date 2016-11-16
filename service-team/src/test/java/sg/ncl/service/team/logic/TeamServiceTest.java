@@ -14,10 +14,7 @@ import sg.ncl.service.team.domain.TeamMember;
 import sg.ncl.service.team.domain.TeamService;
 import sg.ncl.service.team.domain.TeamStatus;
 import sg.ncl.service.team.domain.TeamVisibility;
-import sg.ncl.service.team.exceptions.NoOwnerInTeamException;
-import sg.ncl.service.team.exceptions.TeamIdNullOrEmptyException;
 import sg.ncl.service.team.exceptions.TeamMemberNotFoundException;
-import sg.ncl.service.team.exceptions.TeamNameNullOrEmptyException;
 import sg.ncl.service.team.exceptions.TeamNotFoundException;
 import sg.ncl.service.team.web.TeamMemberInfo;
 
@@ -72,27 +69,19 @@ public class TeamServiceTest extends AbstractTest {
     }
 
     @Test
-    //(expected = TeamIdNullOrEmptyException.class)
     public void testGetTeamWithNullId() throws Exception {
         Team team = teamService.getTeamById(null);
         Assert.assertTrue(team == null);
     }
 
     @Test
-    //(expected = TeamIdNullOrEmptyException.class)
     public void testGetTeamWithEmptyId() throws Exception {
         Team team = teamService.getTeamById("");
         Assert.assertTrue(team == null);
     }
 
-    @Test(expected = TeamNameNullOrEmptyException.class)
-    public void testGetTeamWithNullName() throws Exception {
-        teamService.getTeamByName(null);
-    }
-
-    @Test(expected = TeamNameNullOrEmptyException.class)
     public void testGetTeamWithEmptyName() throws Exception {
-        teamService.getTeamByName("");
+        Assert.assertNull(teamService.getTeamByName(""));
     }
 
     @Test
@@ -140,17 +129,10 @@ public class TeamServiceTest extends AbstractTest {
         Assert.assertEquals(teamFromDb.getVisibility(), TeamVisibility.PRIVATE);
     }
 
-    @Test(expected = TeamIdNullOrEmptyException.class)
-    public void testUpdateTeamNullId() throws Exception {
-        TeamEntity teamEntity = new TeamEntity();
-        teamEntity.setName(null);
-        teamService.updateTeam(null, teamEntity);
-    }
-
-    @Test(expected = TeamIdNullOrEmptyException.class)
+    @Test(expected = TeamNotFoundException.class)
     public void testUpdateTeamEmptyId() throws Exception {
         TeamEntity teamEntity = Util.getTeamEntity();
-        teamEntity.setName(RandomStringUtils.randomAlphanumeric(20));
+        teamEntity.setName(RandomStringUtils.randomAlphanumeric(10));
         Team team = teamService.createTeam(teamEntity);
         teamService.updateTeam("", team);
     }
@@ -241,21 +223,9 @@ public class TeamServiceTest extends AbstractTest {
         TeamMember result = teamService.updateMemberStatus(teamId, userId, MemberStatus.APPROVED);
     }
 
-    @Test(expected = TeamIdNullOrEmptyException.class)
-    public void changeTeamStatusNullTeam() throws Exception {
-        teamService.updateTeamStatus(null, TeamStatus.APPROVED);
-    }
-
     @Test(expected = TeamNotFoundException.class)
     public void changeTeamStatusNoSuchTeam() throws Exception {
         teamService.updateTeamStatus(RandomStringUtils.randomAlphanumeric(20), TeamStatus.APPROVED);
-    }
-
-    @Test(expected = NoOwnerInTeamException.class)
-    public void changeTeamStatusNoOwner() throws Exception {
-        Team one = Util.getTeamEntity();
-        Team createdTeam = teamService.createTeam(one);
-        teamService.updateTeamStatus(createdTeam.getId(), TeamStatus.APPROVED);
     }
 
     @Test
@@ -269,11 +239,6 @@ public class TeamServiceTest extends AbstractTest {
         Assert.assertThat(approvedTeam.getId(), is(createdTeam.getId()));
         Assert.assertThat(approvedTeam.getStatus(), is(TeamStatus.APPROVED));
         Assert.assertThat(approvedTeam.getMembers().size(), is(1));
-    }
-
-    @Test(expected = TeamIdNullOrEmptyException.class)
-    public void removeTeamNullId() throws Exception {
-        teamService.removeTeam(null);
     }
 
     @Test(expected = TeamNotFoundException.class)
@@ -291,11 +256,6 @@ public class TeamServiceTest extends AbstractTest {
         // expect a team not found exception here when retrieving since we already remove the team previously
         Team team = teamService.getTeamById(createdTeam.getId());
         Assert.assertTrue(team == null);
-    }
-
-    @Test(expected = TeamIdNullOrEmptyException.class)
-    public void removeTeamMemberTeamIdNull() throws Exception {
-        teamService.removeMember(null, Util.getTeamMemberInfo(MemberType.MEMBER));
     }
 
     @Test(expected = TeamNotFoundException.class)

@@ -147,7 +147,7 @@ public class RegistrationServiceImpl implements RegistrationService {
         Team teamEntity = teamService.getTeamByName(team.getName());
         if (teamEntity == null) {
             log.warn("Team not found: {}", team.getName());
-            throw new TeamNotFoundException();
+            throw new TeamNotFoundException(team.getName());
         }
 
         String teamId = teamEntity.getId();

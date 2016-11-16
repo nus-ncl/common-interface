@@ -1,5 +1,7 @@
 package sg.ncl.service.team.data.jpa;
 
+import lombok.Getter;
+import lombok.Setter;
 import sg.ncl.common.jpa.AbstractEntity;
 import sg.ncl.service.team.domain.MemberStatus;
 import sg.ncl.service.team.domain.MemberType;
@@ -21,6 +23,8 @@ import java.time.ZonedDateTime;
 /**
  * @author Christopher Zhong
  */
+@Getter
+@Setter
 @Entity
 @Table(name = "team_members", uniqueConstraints = @UniqueConstraint(columnNames = {"team_id", "user_id"}))
 public class TeamMemberEntity extends AbstractEntity implements TeamMember {
@@ -48,55 +52,4 @@ public class TeamMemberEntity extends AbstractEntity implements TeamMember {
     @Enumerated(EnumType.STRING)
     private MemberStatus memberStatus = MemberStatus.PENDING;
 
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(final Long id) {
-        this.id = id;
-    }
-
-    public TeamEntity getTeam() {
-        return team;
-    }
-
-    void setTeam(final TeamEntity team) {
-        this.team = team;
-    }
-
-    @Override
-    public String getUserId() {
-        return userId;
-    }
-
-    public void setUserId(final String userId) {
-        this.userId = userId;
-    }
-
-    @Override
-    public ZonedDateTime getJoinedDate() {
-        return joinedDate;
-    }
-
-    public void setJoinedDate(final ZonedDateTime joinedDate) {
-        this.joinedDate = joinedDate;
-    }
-
-    @Override
-    public MemberType getMemberType() {
-        return memberType;
-    }
-
-    public void setMemberType(MemberType memberType) {
-        this.memberType = memberType;
-    }
-
-    @Override
-    public MemberStatus getMemberStatus() {
-        return memberStatus;
-    }
-
-    public void setMemberStatus(MemberStatus memberStatus) {
-        this.memberStatus = memberStatus;
-    }
 }

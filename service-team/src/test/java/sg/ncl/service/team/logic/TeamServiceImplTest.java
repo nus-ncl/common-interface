@@ -49,13 +49,6 @@ public class TeamServiceImplTest {
     }
 
     @Test
-    public void testCreateTeamNullTeam() {
-        final TeamInfo teamInfo = null;
-        exception.expect(IllegalArgumentException.class);
-        teamService.createTeam(teamInfo);
-    }
-
-    @Test
     public void testCreateTeamNullName() {
         final TeamInfo teamInfo = new TeamInfo("id", null, "description", "website", "organisationType", null, null, null, null, null, members);
         exception.expect(TeamNameNullOrEmptyException.class);
@@ -70,8 +63,43 @@ public class TeamServiceImplTest {
     }
 
     @Test
+    public void testCreateTeamTooShortName() {
+        final TeamInfo teamInfo = new TeamInfo("id", "a", "description", "website", "organisationType", null, null, null, null, null, members);
+        exception.expect(InvalidTeamNameException.class);
+        teamService.createTeam(teamInfo);
+    }
+
+    @Test
+    public void testCreateTeamNameStartingWithDash() {
+        final TeamInfo teamInfo = new TeamInfo("id", "-a", "description", "website", "organisationType", null, null, null, null, null, members);
+        exception.expect(InvalidTeamNameException.class);
+        teamService.createTeam(teamInfo);
+    }
+
+    @Test
+    public void testCreateTeamTooLongName() {
+        final TeamInfo teamInfo = new TeamInfo("id", "qwertyuiopasdfg", "description", "website", "organisationType", null, null, null, null, null, members);
+        exception.expect(InvalidTeamNameException.class);
+        teamService.createTeam(teamInfo);
+    }
+
+    @Test
+    public void testCreateTeamNameHasWhiteSpace() {
+        final TeamInfo teamInfo = new TeamInfo("id", "ncl ncl", "description", "website", "organisationType", null, null, null, null, null, members);
+        exception.expect(InvalidTeamNameException.class);
+        teamService.createTeam(teamInfo);
+    }
+
+    @Test
+    public void testCreateTeamNameHasSpecialCharacters() {
+        final TeamInfo teamInfo = new TeamInfo("id", "ncl#ncl", "description", "website", "organisationType", null, null, null, null, null, members);
+        exception.expect(InvalidTeamNameException.class);
+        teamService.createTeam(teamInfo);
+    }
+
+    @Test
     public void testCreateTeamGoodName() {
-        final TeamInfo teamInfo = new TeamInfo("id", "name", "description", "website", "organisationType", null, null, null, null, null, members);
+        final TeamInfo teamInfo = new TeamInfo("id", "ncl-team", "description", "website", "organisationType", null, null, null, null, null, members);
         when(teamRepository.save(any(TeamEntity.class))).thenAnswer(i -> i.getArgumentAt(0, TeamEntity.class));
         final Team team = teamService.createTeam(teamInfo);
 
@@ -84,14 +112,22 @@ public class TeamServiceImplTest {
     }
 
     @Test
-    public void testRemoveTeamNullId() {
-        exception.expect(TeamIdNullOrEmptyException.class);
-        teamService.removeTeam(null);
+    public void testCreateTeamGoodName2() {
+        final TeamInfo teamInfo = new TeamInfo("id", "n-", "description", "website", "organisationType", null, null, null, null, null, members);
+        when(teamRepository.save(any(TeamEntity.class))).thenAnswer(i -> i.getArgumentAt(0, TeamEntity.class));
+        final Team team = teamService.createTeam(teamInfo);
+
+        verify(teamRepository, times(1)).save(any(TeamEntity.class));
+//        assertThat(team.getId()).isEqualTo(teamInfo.getId());
+        assertThat(team.getName()).isEqualTo(teamInfo.getName());
+        assertThat(team.getDescription()).isEqualTo(teamInfo.getDescription());
+        assertThat(team.getWebsite()).isEqualTo(teamInfo.getWebsite());
+        assertThat(team.getOrganisationType()).isEqualTo(teamInfo.getOrganisationType());
     }
 
     @Test
     public void testRemoveTeamEmptyId() {
-        exception.expect(TeamIdNullOrEmptyException.class);
+        exception.expect(TeamNotFoundException.class);
         teamService.removeTeam("");
     }
 
@@ -128,39 +164,15 @@ public class TeamServiceImplTest {
     }
 
     @Test
-    public void testGetTeamByNullName() {
-        exception.expect(TeamNameNullOrEmptyException.class);
-        teamService.getTeamByName(null);
-    }
-
-    @Test
-    public void testGetTeamByEmptyName() {
-        exception.expect(TeamNameNullOrEmptyException.class);
-        teamService.getTeamByName("");
-    }
-
-    @Test
     public void testGetTeamByGoodName() {
         teamService.getTeamByName(teamEntity.getName());
         verify(teamRepository, times(1)).findByName(anyString());
     }
 
     @Test
-    public void testUpdateTeamNullId() {
-        exception.expect(TeamIdNullOrEmptyException.class);
-        teamService.updateTeam(null, teamEntity);
-    }
-
-    @Test
     public void testUpdateTeamEmptyId() {
-        exception.expect(TeamIdNullOrEmptyException.class);
+        exception.expect(TeamNotFoundException.class);
         teamService.updateTeam("", teamEntity);
-    }
-
-    @Test
-    public void testUpdateTeamNullTeam() {
-        exception.expect(IllegalArgumentException.class);
-        teamService.updateTeam(teamEntity.getId(), null);
     }
 
     @Test
@@ -185,21 +197,9 @@ public class TeamServiceImplTest {
     }
 
     @Test
-    public void testAddMemberNullId() {
-        exception.expect(TeamIdNullOrEmptyException.class);
-        teamService.addMember(null, teamMemberInfo);
-    }
-
-    @Test
     public void testAddMemberEmptyId() {
-        exception.expect(TeamIdNullOrEmptyException.class);
+        exception.expect(TeamNotFoundException.class);
         teamService.addMember("", teamMemberInfo);
-    }
-
-    @Test
-    public void testAddMemberNullTeamMember() {
-        exception.expect(IllegalArgumentException.class);
-        teamService.addMember(teamEntity.getId(), null);
     }
 
     @Test
@@ -211,27 +211,20 @@ public class TeamServiceImplTest {
 
     @Test
     public void testAddMemberKnownId() {
+        TeamEntity team2 = Util.getTeamEntityWithId();
+        team2.addMember(teamMemberInfo);
+
         when(teamRepository.findOne(anyString())).thenReturn(teamEntity);
+        when(teamRepository.save(any(TeamEntity.class))).thenReturn(team2);
+
         teamService.addMember(teamEntity.getId(), teamMemberInfo);
         verify(teamRepository, times(1)).save(any(TeamEntity.class));
     }
 
     @Test
-    public void testRemoveMemberNullId() {
-        exception.expect(TeamIdNullOrEmptyException.class);
-        teamService.removeMember(null, teamMemberInfo);
-    }
-
-    @Test
     public void testRemoveMemberEmptyId() {
-        exception.expect(TeamIdNullOrEmptyException.class);
+        exception.expect(TeamNotFoundException.class);
         teamService.removeMember("", teamMemberInfo);
-    }
-
-    @Test
-    public void testRemoveMemberNullTeamMember() {
-        exception.expect(IllegalArgumentException.class);
-        teamService.removeMember(teamEntity.getId(), null);
     }
 
     @Test
@@ -243,32 +236,23 @@ public class TeamServiceImplTest {
 
     @Test
     public void testRemoveMemberKnownId() {
+        TeamEntity team2 = teamEntity;
+        teamEntity.addMember(teamMemberInfo);
         when(teamRepository.findOne(anyString())).thenReturn(teamEntity);
+        when(teamRepository.save(any(TeamEntity.class))).thenReturn(team2);
         teamService.removeMember(teamEntity.getId(), teamMemberInfo);
         verify(teamRepository, times(1)).save(any(TeamEntity.class));
     }
 
     @Test
-    public void testIsOwnerNullUserId() {
-        exception.expect(UserIdNullOrEmptyException.class);
-        teamService.isOwner(teamEntity.getId(), null);
-    }
-
-    @Test
     public void testIsOwnerEmptyUserId() {
-        exception.expect(UserIdNullOrEmptyException.class);
-        teamService.isOwner(teamEntity.getId(), "");
-    }
-
-    @Test
-    public void testIsOwnerNullTeamId() {
-        exception.expect(TeamIdNullOrEmptyException.class);
-        teamService.isOwner(null, teamMemberInfo.getUserId());
+        when(teamRepository.findOne(anyString())).thenReturn(teamEntity);
+        assertFalse(teamService.isOwner(teamEntity.getId(), ""));
     }
 
     @Test
     public void testIsOwnerEmptyTeamId() {
-        exception.expect(TeamIdNullOrEmptyException.class);
+        exception.expect(TeamNotFoundException.class);
         teamService.isOwner("", teamMemberInfo.getUserId());
     }
 
@@ -300,33 +284,19 @@ public class TeamServiceImplTest {
     }
 
     @Test
-    public void testUpdateMemberStatusNullUserId() {
-        exception.expect(UserIdNullOrEmptyException.class);
-        teamService.updateMemberStatus(teamEntity.getId(), null, MemberStatus.PENDING);
-    }
-
-    @Test
     public void testUpdateMemberStatusEmptyUserId() {
-        exception.expect(UserIdNullOrEmptyException.class);
+        TeamEntity entity = Util.getTeamEntityWithId();
+        TeamMember member = Util.getTeamMemberInfo(MemberType.MEMBER);
+        entity.addMember(member);
+        when(teamRepository.findOne(anyString())).thenReturn(entity);
+        exception.expect(TeamMemberNotFoundException.class);
         teamService.updateMemberStatus(teamEntity.getId(), "", MemberStatus.PENDING);
     }
 
     @Test
-    public void testUpdateMemberStatusNullTeamId() {
-        exception.expect(TeamIdNullOrEmptyException.class);
-        teamService.updateMemberStatus(null, teamMemberInfo.getUserId(), MemberStatus.PENDING);
-    }
-
-    @Test
     public void testUpdateMemberStatusEmptyTeamId() {
-        exception.expect(TeamIdNullOrEmptyException.class);
+        exception.expect(TeamNotFoundException.class);
         teamService.updateMemberStatus("", teamMemberInfo.getUserId(), MemberStatus.PENDING);
-    }
-
-    @Test
-    public void testUpdateMemberStatusNullStatus() {
-        exception.expect(IllegalArgumentException.class);
-        teamService.updateMemberStatus(teamEntity.getId(), teamMemberInfo.getUserId(), null);
     }
 
     @Test
@@ -356,21 +326,9 @@ public class TeamServiceImplTest {
     }
 
     @Test
-    public void testUpdateTeamStatusNullId() {
-        exception.expect(TeamIdNullOrEmptyException.class);
-        teamService.updateTeamStatus(null, TeamStatus.PENDING);
-    }
-
-    @Test
     public void testUpdateTeamStatusEmptyId() {
-        exception.expect(TeamIdNullOrEmptyException.class);
+        exception.expect(TeamNotFoundException.class);
         teamService.updateTeamStatus("", TeamStatus.PENDING);
-    }
-
-    @Test
-    public void testUpdateTeamStatusNullStatus() {
-        exception.expect(IllegalArgumentException.class);
-        teamService.updateTeamStatus(teamEntity.getId(), null);
     }
 
     @Test
@@ -381,22 +339,20 @@ public class TeamServiceImplTest {
     }
 
     @Test
-    public void testUpdateMemberStatusFalseTeamOwner() {
-        TeamEntity entity = Util.getTeamEntityWithId();
-        TeamMember member = Util.getTeamMemberInfo(MemberType.MEMBER);
-        entity.addMember(member);
-        when(teamRepository.findOne(anyString())).thenReturn(entity);
-        exception.expect(NoOwnerInTeamException.class);
-        teamService.updateTeamStatus(teamEntity.getId(), TeamStatus.PENDING);
-    }
-
-    @Test
     public void testUpdateMemberStatusTrueTeamOwner() {
         TeamEntity entity = Util.getTeamEntityWithId();
         TeamMember member = Util.getTeamMemberInfo(MemberType.OWNER);
         entity.addMember(member);
+
+        TeamEntity updatedEntity = entity;
+        updatedEntity.setStatus(TeamStatus.APPROVED);
+
         when(teamRepository.findOne(anyString())).thenReturn(entity);
-        Team team = teamService.updateTeamStatus(teamEntity.getId(), TeamStatus.PENDING);
-        assertThat(team.getStatus()).isEqualTo(TeamStatus.PENDING);
+        when(teamRepository.save(any(TeamEntity.class))).thenReturn(updatedEntity);
+
+        Team team = teamService.updateTeamStatus(teamEntity.getId(), TeamStatus.APPROVED);
+
+        assertThat(team.getStatus()).isEqualTo(updatedEntity.getStatus());
     }
+
 }
