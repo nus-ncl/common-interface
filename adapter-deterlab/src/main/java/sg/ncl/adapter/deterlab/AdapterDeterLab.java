@@ -116,6 +116,9 @@ public class AdapterDeterLab {
             if ("email address in use".equals(jsonResult)) {
                 log.warn("Apply new project as new user failed: {}. Email address already exists.", responseBody);
                 throw new EmailAlreadyExistsException();
+            } else if ("invalid password".equals(jsonResult)) {
+                log.warn("Apply new project as new user failed: {}. Password is invalid.", responseBody);
+                throw new InvalidPasswordException();
             } else if (!"user is created".equals(jsonResult)) {
                 log.warn("Apply project as new user failed: {}", responseBody);
                 throw new DeterLabOperationFailedException();
