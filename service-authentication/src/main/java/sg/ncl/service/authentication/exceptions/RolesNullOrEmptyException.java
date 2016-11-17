@@ -5,9 +5,9 @@ import sg.ncl.common.exception.base.BadRequestException;
 /**
  * Created by chris on 9/9/2016.
  */
-public class RolesIsNullOrEmptyException extends BadRequestException {
+public class RolesNullOrEmptyException extends BadRequestException {
 
-    public RolesIsNullOrEmptyException() {
+    public RolesNullOrEmptyException() {
         super("Roles cannot be null or empty");
     }
 
