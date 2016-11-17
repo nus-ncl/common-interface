@@ -5,9 +5,9 @@ import sg.ncl.common.exception.base.BadRequestException;
 /**
  * @author Te Ye
  */
-public class ExpStartException extends BadRequestException {
+public class ExperimentStartException extends BadRequestException {
 
-    public ExpStartException() {
+    public ExperimentStartException() {
         super("Error in start experiment");
     }
 
