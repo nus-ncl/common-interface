@@ -8,9 +8,9 @@ import sg.ncl.common.exception.base.NotFoundException;
 /**
  * @author by Desmond / Te Ye
  */
-@ResponseStatus(code = HttpStatus.BAD_REQUEST, reason = "Team ID cannot be null or empty")
-public class TeamIdNullOrEmptyException extends BadRequestException {
-    public TeamIdNullOrEmptyException() {
-        super("Team ID cannot be null or empty");
+@ResponseStatus(code = HttpStatus.BAD_REQUEST, reason = "Registration form has empty fields")
+public class IncompleteRegistrationFormException extends BadRequestException {
+    public IncompleteRegistrationFormException() {
+        super("Registration form has empty fields");
     }
 }
