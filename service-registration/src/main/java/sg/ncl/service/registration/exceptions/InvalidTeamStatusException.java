@@ -9,4 +9,7 @@ import sg.ncl.common.exception.base.BadRequestException;
  */
 @ResponseStatus(code = HttpStatus.BAD_REQUEST, reason = "Team Status Invalid")
 public class InvalidTeamStatusException extends BadRequestException {
+    public InvalidTeamStatusException() {
+        super("Team status is invalid");
+    }
 }
