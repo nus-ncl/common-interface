@@ -17,8 +17,9 @@ import sg.ncl.service.experiment.data.jpa.ExperimentEntity;
 import sg.ncl.service.experiment.data.jpa.ExperimentRepository;
 import sg.ncl.service.experiment.domain.Experiment;
 import sg.ncl.service.experiment.domain.ExperimentService;
-import sg.ncl.service.experiment.exceptions.ExperimentNameInUseException;
-import sg.ncl.service.experiment.exceptions.UserIdNotFoundException;
+import sg.ncl.service.experiment.exceptions.ExperimentNameAlreadyExistsException;
+import sg.ncl.service.experiment.exceptions.TeamIdNullOrEmptyException;
+import sg.ncl.service.experiment.exceptions.UserIdNullOrEmptyException;
 import sg.ncl.service.realization.data.jpa.RealizationEntity;
 import sg.ncl.service.realization.domain.RealizationService;
 
@@ -96,7 +97,7 @@ public class ExperimentServiceTest {
 
         when(experimentRepository.findByTeamName(anyString())).thenReturn(expList);
 
-        exception.expect(ExperimentNameInUseException.class);
+        exception.expect(ExperimentNameAlreadyExistsException.class);
 
         experimentService.save(createdExperimentSave);
 
@@ -137,7 +138,7 @@ public class ExperimentServiceTest {
 
     @Test
     public void testGetExperimentsByUserNullId() throws Exception {
-        exception.expect(UserIdNotFoundException.class);
+        exception.expect(UserIdNullOrEmptyException.class);
         experimentService.findByUser("");
     }
 
@@ -156,7 +157,7 @@ public class ExperimentServiceTest {
 
     @Test
     public void testGetExperimentsByTeamNullId() throws Exception {
-        exception.expect(UserIdNotFoundException.class);
+        exception.expect(TeamIdNullOrEmptyException.class);
         experimentService.findByTeam("");
     }
 
