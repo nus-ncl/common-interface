@@ -5,9 +5,9 @@ import sg.ncl.common.exception.base.BadRequestException;
 /**
  * @author Te Ye
  */
-public class ExpDeleteException extends BadRequestException {
+public class ExperimentDeleteException extends BadRequestException {
 
-    public ExpDeleteException() {
+    public ExperimentDeleteException() {
         super("Error in delete experiment");
     }
 
