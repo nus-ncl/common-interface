@@ -8,9 +8,9 @@ import sg.ncl.common.exception.base.ConflictException;
  * @author Te Ye
  */
 @ResponseStatus(value = HttpStatus.CONFLICT, reason = "User name already exists")
-public class UserNameAlreadyExistsException extends ConflictException {
+public class UsernameAlreadyExistsException extends ConflictException {
 
-    public UserNameAlreadyExistsException(final String message) {
+    public UsernameAlreadyExistsException(final String message) {
         super(message);
     }
 
