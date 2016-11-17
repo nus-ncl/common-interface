@@ -10,6 +10,8 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.client.HttpServerErrorException;
+import org.springframework.web.client.ResourceAccessException;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 import sg.ncl.adapter.deterlab.data.jpa.DeterLabProjectRepository;
@@ -58,9 +60,12 @@ public class AdapterDeterLab {
         ResponseEntity response;
         try {
             response = restTemplate.exchange(properties.getJoinProjectNewUsers(), HttpMethod.POST, request, String.class);
-        } catch (RestClientException e) {
-            log.warn("DeterLab connection error new user join project: {}", e);
-            throw new AdapterDeterlabConnectException();
+        } catch (ResourceAccessException rae) {
+            log.warn("New user join project error: {}", rae.getMessage());
+            throw new AdapterDeterLabConnectionFailedException(rae.getMessage());
+        } catch (HttpServerErrorException hsee) {
+            log.warn("New user join project error: Adapter DeterLab internal server error {}", hsee);
+            throw hsee;
         }
         // Will get the following JSON:
         // msg: join project request new users fail
@@ -68,21 +73,17 @@ public class AdapterDeterLab {
         // msg: user is created, uid: xxx
         // msg: user not found, uid: xxx
         String responseBody = response.getBody().toString();
-        try {
-            String jsonResult = new JSONObject(responseBody).getString("msg");
-            if ("email address in use".equals(jsonResult)) {
-                log.warn("Join new project as new user failed: {}. Email address already exists.", responseBody);
-                throw new EmailAlreadyExistsException();
-            } else if (!"user is created".equals(jsonResult)) {
-                log.warn("Join project as new user failed: {}", responseBody);
-                throw new DeterLabOperationFailedException();
-            }
-            log.info("Join project as new user to DeterLab OK");
-            return responseBody;
-        } catch (JSONException e) {
-            log.warn("Error parsing response code new user join project: {}", responseBody);
-            throw e;
+        String jsonResult = new JSONObject(responseBody).getString("msg");
+        if ("email address in use".equals(jsonResult)) {
+            log.warn("Join new project as new user failed: {}. Email address already exists.", responseBody);
+            throw new EmailAlreadyExistsException(responseBody);
+        } else if (!"user is created".equals(jsonResult)) {
+            log.warn("Join project as new user failed: {}", responseBody);
+            throw new AdapterDeterLabOperationFailedException(responseBody);
         }
+        log.info("Join project as new user to DeterLab OK");
+        return responseBody;
+
     }
 
     /**
@@ -103,7 +104,7 @@ public class AdapterDeterLab {
             response = restTemplate.exchange(properties.getApplyProjectNewUsers(), HttpMethod.POST, request, String.class);
         } catch (RestClientException e) {
             log.warn("DeterLab connection error new user apply project: {}", e);
-            throw new AdapterDeterlabConnectException();
+            throw new AdapterDeterLabConnectionFailedException();
         }
         // Will get the following JSON:
         // msg: join project request new users fail
@@ -115,10 +116,10 @@ public class AdapterDeterLab {
             String jsonResult = new JSONObject(responseBody).getString("msg");
             if ("email address in use".equals(jsonResult)) {
                 log.warn("Apply new project as new user failed: {}. Email address already exists.", responseBody);
-                throw new EmailAlreadyExistsException();
+                throw new EmailAlreadyExistsException(responseBody);
             } else if (!"user is created".equals(jsonResult)) {
                 log.warn("Apply project as new user failed: {}", responseBody);
-                throw new DeterLabOperationFailedException();
+                throw new AdapterDeterLabOperationFailedException(responseBody);
             }
             log.info("Apply project as new user to DeterLab OK");
             return responseBody;
@@ -146,14 +147,14 @@ public class AdapterDeterLab {
             response = restTemplate.exchange(properties.getApplyProject(), HttpMethod.POST, request, String.class);
         } catch (RestClientException e) {
             log.warn("DeterLab connection error apply project existing user: {}", e);
-            throw new AdapterDeterlabConnectException();
+            throw new AdapterDeterLabConnectionFailedException();
         }
         String responseBody = response.getBody().toString();
         try {
             String jsonResult = new JSONObject(responseBody).getString("msg");
             if (!"apply project request existing users success".equals(jsonResult)) {
                 log.warn("Apply project as existing user to DeterLab failed: {}", responseBody);
-                throw new DeterLabOperationFailedException();
+                throw new AdapterDeterLabOperationFailedException(responseBody);
             }
             log.info("Apply project as existing user to DeterLab OK");
             return responseBody;
@@ -181,14 +182,14 @@ public class AdapterDeterLab {
             response = restTemplate.exchange(properties.getJoinProject(), HttpMethod.POST, request, String.class);
         } catch (RestClientException e) {
             log.warn("DeterLab connection error join project existing user: {}", e);
-            throw new AdapterDeterlabConnectException();
+            throw new AdapterDeterLabConnectionFailedException();
         }
         String responseBody = response.getBody().toString();
         try {
             String jsonResult = new JSONObject(responseBody).getString("msg");
             if (!"join project request existing users success".equals(jsonResult)) {
                 log.warn("Join project as existing user to DeterLab failed: {}", responseBody);
-                throw new DeterLabOperationFailedException();
+                throw new AdapterDeterLabOperationFailedException(responseBody);
             }
             log.info("Join project as existing user to DeterLab OK");
             return responseBody;
@@ -213,7 +214,7 @@ public class AdapterDeterLab {
             response = restTemplate.exchange(properties.getUpdateCredentials(), HttpMethod.POST, request, String.class);
         } catch (RestClientException e) {
             log.warn("DeterLab connection error update credentials: {}", e);
-            throw new AdapterDeterlabConnectException();
+            throw new AdapterDeterLabConnectionFailedException();
         }
 
         try {
@@ -245,7 +246,7 @@ public class AdapterDeterLab {
             response = restTemplate.exchange(properties.getResetPasswordURI(), HttpMethod.POST, request, String.class);
         } catch (RestClientException e) {
             log.warn("Cannot connect to adapter | server internal error: {}", e);
-            throw new AdapterDeterlabConnectException();
+            throw new AdapterDeterLabConnectionFailedException();
         }
 
         String msg = new JSONObject(response.getBody().toString()).getString("msg");
@@ -286,14 +287,14 @@ public class AdapterDeterLab {
             response = restTemplate.exchange(properties.login(), HttpMethod.POST, request, String.class);
         } catch (RestClientException e) {
             log.warn("DeterLab connection error login on deterlab: {}", e);
-            throw new AdapterDeterlabConnectException();
+            throw new AdapterDeterLabConnectionFailedException();
         }
 
         try {
             String jsonResult = new JSONObject(response.getBody().toString()).getString("msg");
             if (!"user is logged in".equals(jsonResult)) {
                 log.warn("login failed: {}", response.getBody().toString());
-                throw new DeterLabOperationFailedException();
+                throw new AdapterDeterLabOperationFailedException(jsonResult);
             }
             log.info("login success");
         } catch (JSONException e) {
@@ -354,17 +355,17 @@ public class AdapterDeterLab {
         try {
             response = restTemplate.exchange(properties.getCreateExperiment(), HttpMethod.POST, request, String.class);
         } catch (Exception e) {
-            throw new AdapterDeterlabConnectException();
+            throw new AdapterDeterLabConnectionFailedException();
         }
 
         String jsonResult = new JSONObject(response.getBody().toString()).getString("msg");
 
         if ("experiment create fail ns file error".equals(jsonResult)) {
-            throw new NSFileParseException();
+            throw new NSFileParseException(jsonResult);
         } else if ("experiment create fail exp name already in use".equals(jsonResult)) {
-            throw new ExpNameAlreadyExistsException();
+            throw new ExperimentNameAlreadyExistsException(jsonResult);
         } else if (!"experiment create success".equals(jsonResult)) {
-            throw new AdapterDeterlabConnectException();
+            throw new AdapterDeterLabConnectionFailedException();
         }
     }
 
@@ -388,7 +389,7 @@ public class AdapterDeterLab {
             response = restTemplate.exchange(properties.startExperiment(), HttpMethod.POST, request, String.class);
         } catch (Exception e) {
             log.warn("Adapter error start experiment: {}", e);
-            throw new AdapterDeterlabConnectException(e.getMessage());
+            throw new AdapterDeterLabConnectionFailedException(e.getMessage());
         }
 
         log.info("Start experiment request submitted to deterlab");
@@ -396,10 +397,10 @@ public class AdapterDeterLab {
 
         if ("experiment start fail".equals(jsonResult)) {
             log.warn("Fail to start experiment at deterlab {}", jsonString);
-            throw new ExpStartException();
+            throw new ExperimentStartException();
         } else if (!"experiment start success".equals(jsonResult)) {
             log.warn("Start experiment connection error {}", jsonString);
-            throw new AdapterDeterlabConnectException();
+            throw new AdapterDeterLabConnectionFailedException();
         }
 
         log.info("Start experiment request success at deterlab", response.getBody().toString());
@@ -426,7 +427,7 @@ public class AdapterDeterLab {
             response = restTemplate.exchange(properties.stopExperiment(), HttpMethod.POST, request, String.class);
         } catch (Exception e) {
             log.warn("Adapter error start experiment: {}", e);
-            throw new AdapterDeterlabConnectException(e.getMessage());
+            throw new AdapterDeterLabConnectionFailedException(e.getMessage());
         }
 
         log.info("Stop experiment request submitted to deterlab");
@@ -458,7 +459,7 @@ public class AdapterDeterLab {
             response = restTemplate.exchange(properties.deleteExperiment(), HttpMethod.POST, request, String.class);
         } catch (Exception e) {
             log.warn("Adapter error delete experiment: {}", e);
-            throw new AdapterDeterlabConnectException(e.getMessage());
+            throw new AdapterDeterLabConnectionFailedException(e.getMessage());
         }
 
         log.info("Delete experiment request submitted to deterlab");
@@ -466,7 +467,7 @@ public class AdapterDeterLab {
 
         if (!"no experiment found".equals(expStatus)) {
             log.warn("Fail to delete experiment at deterlab {}", jsonString);
-            throw new ExpDeleteException();
+            throw new ExperimentDeleteException();
         }
 
         log.info("Delete experiment request success at deterlab", response.getBody().toString());
@@ -525,13 +526,13 @@ public class AdapterDeterLab {
             httpResponse = restTemplate.exchange(reqUrl, HttpMethod.POST, httpRequest, String.class);
         } catch (RestClientException e) {
             log.warn("DeterLab connection error process join request: {}", e);
-            throw new AdapterDeterlabConnectException();
+            throw new AdapterDeterLabConnectionFailedException();
         }
         String responseBody = httpResponse.getBody().toString();
         try {
             if (!"process join request OK".equals(new JSONObject(responseBody).getString("msg"))) {
                 log.warn("{} join request to team {} FAIL", action, pid);
-                throw new DeterLabOperationFailedException();
+                throw new AdapterDeterLabOperationFailedException(responseBody);
             }
             log.info("{} join request to team {} OK", action, pid);
             return responseBody;
@@ -555,7 +556,7 @@ public class AdapterDeterLab {
             response = restTemplate.exchange(properties.getApproveProject(), HttpMethod.POST, request, String.class);
         } catch (RestClientException e) {
             log.warn("DeterLab connection error approve project: {}", e);
-            throw new AdapterDeterlabConnectException();
+            throw new AdapterDeterLabConnectionFailedException();
         }
         try {
             String jsonResult = new JSONObject(response.getBody().toString()).getString("msg");
@@ -564,7 +565,7 @@ public class AdapterDeterLab {
                 return response.getBody().toString();
             } else {
                 log.warn("Approve team {} FAIL", pid);
-                throw new DeterLabOperationFailedException();
+                throw new AdapterDeterLabOperationFailedException(jsonResult);
             }
         } catch (JSONException e) {
             log.warn("Error parsing response code approve project: {}", response.getBody().toString());
@@ -586,7 +587,7 @@ public class AdapterDeterLab {
             response = restTemplate.exchange(properties.getRejectProject(), HttpMethod.POST, request, String.class);
         } catch (RestClientException e) {
             log.warn("DeterLab connection error reject project: {}", e);
-            throw new AdapterDeterlabConnectException();
+            throw new AdapterDeterLabConnectionFailedException();
         }
         try {
             String jsonResult = new JSONObject(response.getBody().toString()).getString("msg");
@@ -595,7 +596,7 @@ public class AdapterDeterLab {
                 return response.getBody().toString();
             } else {
                 log.warn("Reject team {} FAIL", pid);
-                throw new DeterLabOperationFailedException();
+                throw new AdapterDeterLabOperationFailedException(jsonResult);
             }
         } catch (JSONException e) {
             log.warn("Error parsing response code reject project: {}", response.getBody().toString());
@@ -613,7 +614,7 @@ public class AdapterDeterLab {
             response = restTemplate.exchange(properties.getTopoThumbnail(), HttpMethod.POST, request, String.class);
         } catch (RestClientException e) {
             log.warn("DeterLab connection error get thumbnail: {}", e);
-            throw new AdapterDeterlabConnectException();
+            throw new AdapterDeterLabConnectionFailedException();
         }
         return response.getBody().toString();
     }

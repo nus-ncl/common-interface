@@ -10,8 +10,8 @@ import sg.ncl.common.exception.base.BadRequestException;
 @ResponseStatus(value = HttpStatus.BAD_REQUEST, reason = "Error parsing ns file")
 public class NSFileParseException extends BadRequestException {
 
-    public NSFileParseException() {
-        super("Error parsing ns file");
+    public NSFileParseException(final String message) {
+        super(message);
     }
 
 }

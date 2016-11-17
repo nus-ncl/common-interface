@@ -7,10 +7,10 @@ import sg.ncl.common.exception.base.ConflictException;
 /**
  * @author Te Ye
  */
-@ResponseStatus(value = HttpStatus.CONFLICT, reason = "Email address already exists")
-public class EmailAlreadyExistsException extends ConflictException {
+@ResponseStatus(value = HttpStatus.CONFLICT, reason = "Team name already exists")
+public class TeamNameAlreadyExistsException extends ConflictException {
 
-    public EmailAlreadyExistsException(final String message) {
+    public TeamNameAlreadyExistsException(final String message) {
         super(message);
     }
 
