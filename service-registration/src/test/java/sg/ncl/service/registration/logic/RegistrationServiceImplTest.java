@@ -121,7 +121,7 @@ public class RegistrationServiceImplTest {
         when(userService.getUser(anyString())).thenReturn(userEntity);
         when(teamService.getTeamByName(anyString())).thenReturn(teamEntity);
 
-        exception.expect(TeamNameDuplicateException.class);
+        exception.expect(TeamNameAlreadyExistsException.class);
         registrationService.registerRequestToApplyTeam(userEntity.getId(), teamEntity);
     }
 
@@ -210,7 +210,7 @@ public class RegistrationServiceImplTest {
 
         credentialsEntity.setPassword("");
 
-        exception.expect(UserFormException.class);
+        exception.expect(IncompleteRegistrationFormException.class);
         registrationService.register(credentialsEntity, userEntity, teamEntity, isJoinTeam);
     }
 
@@ -223,7 +223,7 @@ public class RegistrationServiceImplTest {
         TeamEntity teamEntity = Util.getTeamEntity();
         teamEntity.setId("");
 
-        exception.expect(UserFormException.class);
+        exception.expect(IncompleteRegistrationFormException.class);
         registrationService.register(credentialsEntity, user, teamEntity, isJoinTeam);
     }
 
@@ -237,7 +237,7 @@ public class RegistrationServiceImplTest {
         teamEntity.setId("id");
         teamEntity.setName("");
 
-        exception.expect(UserFormException.class);
+        exception.expect(IncompleteRegistrationFormException.class);
         registrationService.register(credentialsEntity, user, teamEntity, isJoinTeam);
     }
 
@@ -253,7 +253,7 @@ public class RegistrationServiceImplTest {
 
         when(teamService.getTeamByName(teamName)).thenReturn(teamEntity);
 
-        exception.expect(TeamNameDuplicateException.class);
+        exception.expect(TeamNameAlreadyExistsException.class);
         registrationService.register(credentialsEntity, user, teamEntity, isJoinTeam);
     }
 
@@ -456,7 +456,7 @@ public class RegistrationServiceImplTest {
         UserEntity userEntity = Util.getUserEntity();
         userEntity.setId(RandomStringUtils.randomAlphanumeric(20));
 
-        exception.expect(IdNullOrEmptyException.class);
+        exception.expect(TeamIdNullOrEmptyException.class);
         registrationService.approveOrRejectNewTeam("", userEntity.getId(), null);
     }
 
@@ -465,7 +465,7 @@ public class RegistrationServiceImplTest {
         TeamEntity teamEntity = Util.getTeamEntity();
         UserEntity userEntity = Util.getUserEntity();
 
-        exception.expect(IdNullOrEmptyException.class);
+        exception.expect(UserIdNullOrEmptyException.class);
         registrationService.approveOrRejectNewTeam(teamEntity.getId(), userEntity.getId(), null);
     }
 
@@ -533,7 +533,7 @@ public class RegistrationServiceImplTest {
     public void testUserFormFieldsHasErrorsNullUser() {
         CredentialsEntity credentialsEntity = Util.getCredentialsEntity();
         Team team = Util.getTeamEntity();
-        exception.expect(UserFormException.class);
+        exception.expect(IncompleteRegistrationFormException.class);
         registrationService.register(credentialsEntity, null, team, true);
     }
 
@@ -545,7 +545,7 @@ public class RegistrationServiceImplTest {
         UserEntity userEntity = Util.getUserEntity();
         userEntity.getUserDetails().setFirstName("");
 
-        exception.expect(UserFormException.class);
+        exception.expect(IncompleteRegistrationFormException.class);
         registrationService.register(credentialsEntity, userEntity, team, true);
     }
 
@@ -557,7 +557,7 @@ public class RegistrationServiceImplTest {
         UserEntity userEntity = Util.getUserEntity();
         userEntity.getUserDetails().setLastName("");
 
-        exception.expect(UserFormException.class);
+        exception.expect(IncompleteRegistrationFormException.class);
         registrationService.register(credentialsEntity, userEntity, team, true);
     }
 
@@ -569,7 +569,7 @@ public class RegistrationServiceImplTest {
         UserEntity userEntity = Util.getUserEntity();
         userEntity.getUserDetails().setJobTitle("");
 
-        exception.expect(UserFormException.class);
+        exception.expect(IncompleteRegistrationFormException.class);
         registrationService.register(credentialsEntity, userEntity, team, true);
     }
 
@@ -581,7 +581,7 @@ public class RegistrationServiceImplTest {
         UserEntity userEntity = Util.getUserEntity();
         userEntity.getUserDetails().setEmail("");
 
-        exception.expect(UserFormException.class);
+        exception.expect(IncompleteRegistrationFormException.class);
         registrationService.register(credentialsEntity, userEntity, team, true);
     }
 
@@ -593,7 +593,7 @@ public class RegistrationServiceImplTest {
         UserEntity userEntity = Util.getUserEntity();
         userEntity.getUserDetails().setPhone("");
 
-        exception.expect(UserFormException.class);
+        exception.expect(IncompleteRegistrationFormException.class);
         registrationService.register(credentialsEntity, userEntity, team, true);
     }
 
@@ -605,7 +605,7 @@ public class RegistrationServiceImplTest {
         UserEntity userEntity = Util.getUserEntity();
         userEntity.getUserDetails().setInstitution("");
 
-        exception.expect(UserFormException.class);
+        exception.expect(IncompleteRegistrationFormException.class);
         registrationService.register(credentialsEntity, userEntity, team, true);
     }
 
@@ -617,7 +617,7 @@ public class RegistrationServiceImplTest {
         UserEntity userEntity = Util.getUserEntity();
         userEntity.getUserDetails().setInstitutionAbbreviation("");
 
-        exception.expect(UserFormException.class);
+        exception.expect(IncompleteRegistrationFormException.class);
         registrationService.register(credentialsEntity, userEntity, team, true);
     }
 
@@ -629,7 +629,7 @@ public class RegistrationServiceImplTest {
         UserEntity userEntity = Util.getUserEntity();
         userEntity.getUserDetails().setInstitutionWeb("");
 
-        exception.expect(UserFormException.class);
+        exception.expect(IncompleteRegistrationFormException.class);
         registrationService.register(credentialsEntity, userEntity, team, true);
     }
 
@@ -641,7 +641,7 @@ public class RegistrationServiceImplTest {
         UserEntity userEntity = Util.getUserEntity();
         userEntity.getUserDetails().getAddress().setAddress1("");
 
-        exception.expect(UserFormException.class);
+        exception.expect(IncompleteRegistrationFormException.class);
         registrationService.register(credentialsEntity, userEntity, team, true);
     }
 
@@ -653,7 +653,7 @@ public class RegistrationServiceImplTest {
         UserEntity userEntity = Util.getUserEntity();
         userEntity.getUserDetails().getAddress().setCountry("");
 
-        exception.expect(UserFormException.class);
+        exception.expect(IncompleteRegistrationFormException.class);
         registrationService.register(credentialsEntity, userEntity, team, true);
     }
 
@@ -665,7 +665,7 @@ public class RegistrationServiceImplTest {
         UserEntity userEntity = Util.getUserEntity();
         userEntity.getUserDetails().getAddress().setRegion("");
 
-        exception.expect(UserFormException.class);
+        exception.expect(IncompleteRegistrationFormException.class);
         registrationService.register(credentialsEntity, userEntity, team, true);
     }
 
@@ -677,7 +677,7 @@ public class RegistrationServiceImplTest {
         UserEntity userEntity = Util.getUserEntity();
         userEntity.getUserDetails().getAddress().setCity("");
 
-        exception.expect(UserFormException.class);
+        exception.expect(IncompleteRegistrationFormException.class);
         registrationService.register(credentialsEntity, userEntity, team, true);
     }
 
@@ -689,7 +689,7 @@ public class RegistrationServiceImplTest {
         UserEntity userEntity = Util.getUserEntity();
         userEntity.getUserDetails().getAddress().setZipCode("");
 
-        exception.expect(UserFormException.class);
+        exception.expect(IncompleteRegistrationFormException.class);
         registrationService.register(credentialsEntity, userEntity, team, true);
     }
 
