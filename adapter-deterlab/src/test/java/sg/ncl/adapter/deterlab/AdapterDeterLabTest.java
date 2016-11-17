@@ -144,6 +144,22 @@ public class AdapterDeterLabTest {
         verify(properties,times(1)).getJoinProjectNewUsers();
     }
 
+    //throw InvalidPasswordException
+    @Test
+    public void joinProjectNewUsersTest6() {
+        JSONObject myobject = new JSONObject();
+        myobject.put("msg", "invalid password");
+
+        exception.expect(InvalidPasswordException.class);
+        when(restTemplate.exchange(anyString(),eq(HttpMethod.POST),anyObject(),eq(String.class))).thenReturn(response);
+        when(response.getBody()).thenReturn(myobject.toString());
+        when(response.getBody().toString()).thenReturn(myobject.toString());
+
+        adapterDeterLab.joinProjectNewUsers(myobject.toString());
+        verify(restTemplate,times(1)).exchange(anyString(),eq(HttpMethod.POST),anyObject(),eq(String.class));
+        verify(properties,times(1)).getJoinProjectNewUsers();
+    }
+
 
     //no Exception thrown
     @Test
