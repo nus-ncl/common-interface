@@ -10,7 +10,7 @@ import sg.ncl.service.user.domain.Address;
 import sg.ncl.service.user.domain.User;
 import sg.ncl.service.user.domain.UserService;
 import sg.ncl.service.user.domain.UserStatus;
-import sg.ncl.service.user.exceptions.EmailNotMatchException;
+import sg.ncl.service.user.exceptions.VerificationEmailNotMatchException;
 import sg.ncl.service.user.exceptions.InvalidStatusTransitionException;
 import sg.ncl.service.user.exceptions.InvalidUserStatusException;
 import sg.ncl.service.user.exceptions.UserIdNullOrEmptyException;
@@ -74,7 +74,7 @@ public class UserServiceImpl implements UserService {
         }
         if (!email.equals(user.getUserDetails().getEmail())) {
             log.warn("Email not match. Expected: {}, received: {}", user.getUserDetails().getEmail(), email);
-            throw new EmailNotMatchException("expected: " + user.getUserDetails().getEmail() +
+            throw new VerificationEmailNotMatchException("expected: " + user.getUserDetails().getEmail() +
                     ", received: " + email);
         }
         if (null != user.getVerificationKey() && key.equals(user.getVerificationKey())) {
