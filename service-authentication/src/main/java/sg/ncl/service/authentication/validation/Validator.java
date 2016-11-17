@@ -6,9 +6,9 @@ import sg.ncl.common.authentication.Role;
 import sg.ncl.common.exception.base.ForbiddenException;
 import sg.ncl.service.authentication.domain.Credentials;
 import sg.ncl.service.authentication.domain.CredentialsStatus;
-import sg.ncl.service.authentication.exceptions.NeitherUsernameNorPasswordModifiedException;
 import sg.ncl.service.authentication.exceptions.PasswordNullOrEmptyException;
-import sg.ncl.service.authentication.exceptions.RolesIsNullOrEmptyException;
+import sg.ncl.service.authentication.exceptions.NeitherUsernameNorPasswordModifiedException;
+import sg.ncl.service.authentication.exceptions.RolesNullOrEmptyException;
 import sg.ncl.service.authentication.exceptions.StatusNullException;
 import sg.ncl.service.authentication.exceptions.UserIdNullOrEmptyException;
 import sg.ncl.service.authentication.exceptions.UsernameNullOrEmptyException;
@@ -84,7 +84,7 @@ public class Validator {
         final Set<Role> roles = credentials.getRoles();
         if (roles == null || roles.isEmpty()) {
             log.warn("Roles is null or empty: {}", roles);
-            throw new RolesIsNullOrEmptyException();
+            throw new RolesNullOrEmptyException();
         }
     }
 
