@@ -118,33 +118,6 @@ public class RegistrationControllerTest extends AbstractTest {
     }
 
     @Test
-    public void addTeamUserControllerTest() throws Exception {
-        // UserController addMember test can only be tested here because it requires an existing team in the database
-        User user = userService.createUser(Util.getUserEntity());
-        Team team = teamService.createTeam(Util.getTeamEntity());
-
-        // craft the RequestBody to add user to team
-        JSONObject userObject = new JSONObject();
-        JSONArray teamArray = new JSONArray();
-        teamArray.put(team.getId());
-        userObject.put("teams", teamArray);
-
-        mockMvc.perform(post("/users/" + user.getId() + "/teams").contentType(MediaType.APPLICATION_JSON).content(userObject.toString()))
-                .andExpect(status().isOk());
-
-        // after add user complete, retrieve the user from database
-        // assert that the team ids are identical
-        MvcResult result = mockMvc.perform(get("/users/" + user.getId()))
-                .andExpect(status().isOk())
-                .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
-                .andReturn();
-
-        JSONObject resultObject = new JSONObject(result.getResponse().getContentAsString());
-        JSONArray resulTeamArray = resultObject.getJSONArray("teams");
-        Assert.assertThat(team.getId(), is(resulTeamArray.get(0).toString()));
-    }
-
-    @Test
     public void approveTeam() throws Exception {
         Team one = Util.getTeamEntity();
         User user = userService.createUser(Util.getUserEntity());
