@@ -69,14 +69,8 @@ public class AdapterDeterLab {
         // msg: user not found, uid: xxx
         String responseBody = response.getBody().toString();
         try {
-            String jsonResult = new JSONObject(responseBody).getString("msg");
-            if ("email address in use".equals(jsonResult)) {
-                log.warn("Join new project as new user failed: {}. Email address already exists.", responseBody);
-                throw new EmailAlreadyExistsException();
-            } else if (!"user is created".equals(jsonResult)) {
-                log.warn("Join project as new user failed: {}", responseBody);
-                throw new DeterLabOperationFailedException();
-            }
+            checkAdapterResultNewUsers(responseBody, "Join new project as new user failed: {}.");
+
             log.info("Join project as new user to DeterLab OK");
             return responseBody;
         } catch (JSONException e) {
@@ -112,14 +106,8 @@ public class AdapterDeterLab {
         // msg: user not found, uid: xxx
         String responseBody = response.getBody().toString();
         try {
-            String jsonResult = new JSONObject(responseBody).getString("msg");
-            if ("email address in use".equals(jsonResult)) {
-                log.warn("Apply new project as new user failed: {}. Email address already exists.", responseBody);
-                throw new EmailAlreadyExistsException();
-            } else if (!"user is created".equals(jsonResult)) {
-                log.warn("Apply project as new user failed: {}", responseBody);
-                throw new DeterLabOperationFailedException();
-            }
+            checkAdapterResultNewUsers(responseBody, "Apply new project as new user failed: {}.");
+
             log.info("Apply project as new user to DeterLab OK");
             return responseBody;
         } catch (JSONException e) {
@@ -638,5 +626,26 @@ public class AdapterDeterLab {
             return "?";
         }
         return response.getBody().toString();
+    }
+
+    /**
+     * Checks the response from adapter deterlab when applying or joining a new project as a new user and determines the exception to be thrown
+     * Use only if @applyProjectNewUsers and @joinProjectNewUsers are performing identical checks
+     * @param responseBody the JSON response from adapter deterlab python script
+     * @param logPrefix the prefix for the log messages to display either "Apply new project as new user..." or "Join new project as new user..."
+     */
+    private void checkAdapterResultNewUsers(String responseBody, String logPrefix) {
+        String jsonResult = new JSONObject(responseBody).getString("msg");
+
+        if ("email address in use".equals(jsonResult)) {
+            log.warn(logPrefix + " Email address already exists.", responseBody);
+            throw new EmailAlreadyExistsException();
+        } else if ("invalid password".equals(jsonResult)) {
+            log.warn(logPrefix + " Password is invalid.", responseBody);
+            throw new InvalidPasswordException();
+        } else if (!"user is created".equals(jsonResult)) {
+            log.warn(logPrefix, responseBody);
+            throw new DeterLabOperationFailedException();
+        }
     }
 }
