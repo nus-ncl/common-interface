@@ -74,10 +74,7 @@ public class RealizationServiceImpl implements RealizationService {
 
         if (realizationEntity != null && realizationEntity.getId() > 0) {
             log.info("Retrieved realization entity: {}", realizationEntity);
-            JSONObject jsonObject = new JSONObject();
-            jsonObject.put("pid", teamName);
-            jsonObject.put("eid", realizationEntity.getExperimentName());
-            String result = adapterDeterLab.getExperimentStatus(jsonObject.toString());
+            String result = adapterDeterLab.getExperimentStatus(teamName, realizationEntity.getExperimentName());
 
             log.info("Retrieved deterlab exp status...Exp: {} State: {}", realizationEntity.getExperimentName(), result);
 
@@ -155,24 +152,10 @@ public class RealizationServiceImpl implements RealizationService {
         String experimentName = realizationEntityDb.getExperimentName();
         String userId = realizationEntityDb.getUserId();
 
-        StringBuilder httpCommand = new StringBuilder();
-        httpCommand.append("?inout=in");
-        httpCommand.append("&");
-        httpCommand.append("pid=" + teamName);
-        httpCommand.append("&");
-        httpCommand.append("eid=" + experimentName);
-
-        JSONObject jsonObject = new JSONObject();
-        jsonObject.put("httpCommand", httpCommand.toString());
-        jsonObject.put("deterLogin", adapterDeterLab.getDeterUserIdByNclUserId(userId));
-        jsonObject.put("pid", teamName);
-        jsonObject.put("eid", experimentName);
-
-        String stringFromExperiment = adapterDeterLab.startExperiment(jsonObject.toString());
+        String stringFromExperiment = adapterDeterLab.startExperiment(teamName, experimentName, userId);
         JSONObject jsonObjectFromExperiment = new JSONObject(stringFromExperiment);
 
         String status = jsonObjectFromExperiment.getString("status");
-        String report = jsonObjectFromExperiment.getJSONObject("report").toString();
         RealizationState realizationState;
 
         switch (status) {
@@ -209,20 +192,7 @@ public class RealizationServiceImpl implements RealizationService {
         String experimentName = realizationEntityDb.getExperimentName();
         String userId = realizationEntityDb.getUserId();
 
-        StringBuilder httpCommand = new StringBuilder();
-        httpCommand.append("?inout=out");
-        httpCommand.append("&");
-        httpCommand.append("pid=" + teamName);
-        httpCommand.append("&");
-        httpCommand.append("eid=" + experimentName);
-
-        JSONObject jsonObject = new JSONObject();
-        jsonObject.put("httpCommand", httpCommand.toString());
-        jsonObject.put("deterLogin", adapterDeterLab.getDeterUserIdByNclUserId(userId));
-        jsonObject.put("pid", teamName);
-        jsonObject.put("eid", experimentName);
-
-        String resultState = adapterDeterLab.stopExperiment(jsonObject.toString());
+        String resultState = adapterDeterLab.stopExperiment(teamName, experimentName, userId);
         RealizationState realizationState;
         if (resultState.equals("swapped")) {
             realizationState = RealizationState.NOT_RUNNING;

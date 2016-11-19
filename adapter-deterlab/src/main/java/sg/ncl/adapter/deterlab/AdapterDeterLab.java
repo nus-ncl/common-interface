@@ -359,11 +359,28 @@ public class AdapterDeterLab {
     /**
      * Creates a start experiment request to Deterlab
      *
-     * @param jsonString Contains pid, eid, and deterlab userId
+     * @param teamName equivalent of pid
+     * @param experimentName equivalent of eid
+     * @param nclUserId to convert it to a deter user id
      * @return a experiment report if the experiment is started successfully and active, otherwise a "experiment start fail" is return
      * @implNote must return the entire response body as realization service needs to store the experiment report to transmit back to UI
      */
-    public String startExperiment(String jsonString) {
+    public String startExperiment(String teamName, String experimentName, String nclUserId) {
+        StringBuilder httpCommand = new StringBuilder();
+        httpCommand.append("?inout=in");
+        httpCommand.append("&");
+        httpCommand.append("pid=" + teamName);
+        httpCommand.append("&");
+        httpCommand.append("eid=" + experimentName);
+
+        JSONObject jsonObject = new JSONObject();
+        jsonObject.put("httpCommand", httpCommand.toString());
+        jsonObject.put("deterLogin", getDeterUserIdByNclUserId(nclUserId));
+        jsonObject.put("pid", teamName);
+        jsonObject.put("eid", experimentName);
+
+        String jsonString = jsonObject.toString();
+
         log.info("Start experiment - {} at {}: {}", properties.getIp(), properties.getPort(), jsonString);
 
         HttpHeaders headers = new HttpHeaders();
@@ -397,11 +414,28 @@ public class AdapterDeterLab {
     /**
      * Creates a stop experiment request to Deterlab
      *
-     * @param jsonString Contains pid, eid, and deterlab userId
+     * @param teamName equivalent of pid
+     * @param experimentName equivalent of eid
+     * @param nclUserId to convert it to a deter user id
      * @return the experiment status
      * @implNote we don't throw any exception if the result returned from deterlab is not "swapped" since there may be other types of experiment status unknown to us
      */
-    public String stopExperiment(String jsonString) {
+    public String stopExperiment(String teamName, String experimentName, String nclUserId) {
+        StringBuilder httpCommand = new StringBuilder();
+        httpCommand.append("?inout=out");
+        httpCommand.append("&");
+        httpCommand.append("pid=" + teamName);
+        httpCommand.append("&");
+        httpCommand.append("eid=" + experimentName);
+
+        JSONObject jsonObject = new JSONObject();
+        jsonObject.put("httpCommand", httpCommand.toString());
+        jsonObject.put("deterLogin", getDeterUserIdByNclUserId(nclUserId));
+        jsonObject.put("pid", teamName);
+        jsonObject.put("eid", experimentName);
+
+        String jsonString = jsonObject.toString();
+
         log.info("Stop experiment - {} at {}: {}", properties.getIp(), properties.getPort(), jsonString);
 
         HttpHeaders headers = new HttpHeaders();
@@ -464,11 +498,17 @@ public class AdapterDeterLab {
     /**
      * Retrieves the experiment status from Deterlab
      *
-     * @param jsonString Contains eid and pid
+     * @param teamName equivalent of pid
+     * @param experimentName equivalent of eid
      * @return the status of the experiment, a "error" if the request fails
      * @implNote cannot throw exception for this method
      */
-    public String getExperimentStatus(String jsonString) {
+    public String getExperimentStatus(String teamName, String experimentName) {
+        JSONObject jsonObject = new JSONObject();
+        jsonObject.put("pid", teamName);
+        jsonObject.put("eid", experimentName);
+        String jsonString = jsonObject.toString();
+
         log.info("Get experiment status - {} at {} : {}", properties.getIp(), properties.getPort(), jsonString);
 
         HttpHeaders headers = new HttpHeaders();
