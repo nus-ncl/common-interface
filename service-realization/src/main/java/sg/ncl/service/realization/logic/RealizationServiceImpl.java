@@ -90,15 +90,12 @@ public class RealizationServiceImpl implements RealizationService {
                 switch (status) {
                     case "active":
                         realizationState = RealizationState.RUNNING;
-                        String report = jsonObjectFromExperiment.getJSONObject("report").toString();
-                        realizationEntity.setDetails(report);
                         break;
                     case "activating":
                         realizationState = RealizationState.STARTING;
                         break;
                     case "swapping":
                         realizationState = RealizationState.STOPPING;
-                        realizationEntity.setDetails("");
                         break;
                     case "error":
                         realizationState = RealizationState.ERROR;
@@ -110,6 +107,18 @@ public class RealizationServiceImpl implements RealizationService {
             }
             if (realizationEntity.getState() != realizationState) {
                 realizationEntity.setState(realizationState);
+                // only set details if state is different
+                switch (realizationState) {
+                    case RUNNING:
+                        String report = jsonObjectFromExperiment.getJSONObject("report").toString();
+                        realizationEntity.setDetails(report);
+                        break;
+                    case STOPPING:
+                        realizationEntity.setDetails("");
+                        break;
+                    default:
+                        break;
+                }
                 log.info("Realization: {} updated to state: {}", realizationEntity, realizationState);
                 return realizationRepository.save(realizationEntity);
             }
@@ -178,8 +187,9 @@ public class RealizationServiceImpl implements RealizationService {
                 break;
         }
         log.info("Start Experiment: {}, Team: {} Status: {}", experimentName, teamName, realizationState);
+        // remove set details since it is set when user refreshes the page
+        // also ensure spring does not lock start experiment for too long
         realizationEntityDb.setState(realizationState);
-        realizationEntityDb.setDetails(report);
         return realizationRepository.save(realizationEntityDb);
     }
 
