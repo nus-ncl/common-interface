@@ -245,7 +245,7 @@ public class RealizationServiceTest extends AbstractTest {
         JSONObject predefinedResultJson = new JSONObject();
         predefinedResultJson.put("msg", "experiment start success");
         predefinedResultJson.put("status", "active");
-        predefinedResultJson.put("report", new JSONObject());
+        predefinedResultJson.put("report", "");
 
         mockServer.expect(requestTo(properties.startExperiment()))
                 .andExpect(method(HttpMethod.POST))
@@ -262,7 +262,7 @@ public class RealizationServiceTest extends AbstractTest {
         RealizationEntity result = realizationService.startExperimentInDeter(teamName, expId);
 
         Assert.assertNotEquals(one.getState(), result.getState());
-        Assert.assertNotEquals(one.getDetails(), result.getDetails());
+        Assert.assertEquals(one.getDetails(), result.getDetails());
     }
 
     @Test
