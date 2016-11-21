@@ -643,6 +643,9 @@ public class AdapterDeterLab {
         } else if ("invalid password".equals(jsonResult)) {
             log.warn(logPrefix + " Password is invalid.", responseBody);
             throw new InvalidPasswordException();
+        } else if ("team name is already in use".equals( jsonResult)) {
+            log.warn (logPrefix + " Team Name is already in use.", responseBody);
+            throw new TeamNameExistsException();
         } else if (!"user is created".equals(jsonResult)) {
             log.warn(logPrefix, responseBody);
             throw new DeterLabOperationFailedException();
