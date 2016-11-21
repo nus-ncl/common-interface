@@ -3,29 +3,30 @@ package sg.ncl.service.realization.data.jpa;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
+import org.junit.runner.RunWith;
+import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
+import org.springframework.orm.jpa.JpaSystemException;
+import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.TestPropertySource;
-import sg.ncl.service.realization.AbstractTest;
-import sg.ncl.service.realization.Util;
-import sg.ncl.service.realization.domain.RealizationState;
+import org.springframework.test.context.junit4.SpringRunner;
 
 import javax.inject.Inject;
-import java.time.ZonedDateTime;
 
-import static org.hamcrest.Matchers.equalTo;
-import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.not;
-import static org.hamcrest.Matchers.nullValue;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 import static sg.ncl.common.test.Checks.checkException;
+import static sg.ncl.service.realization.util.TestUtil.getRealizationEntity;
 
 /**
  * @author Christopher Zhong
  */
+@RunWith(SpringRunner.class)
+@DataJpaTest
+@EnableJpaAuditing
+@ContextConfiguration(classes = RealizationRepository.class)
 @TestPropertySource(properties = "flyway.enabled=false")
-public class RealizationRepositoryTest extends AbstractTest {
+public class RealizationRepositoryTest {
 
     @Rule
     public final ExpectedException exception = ExpectedException.none();
@@ -35,31 +36,54 @@ public class RealizationRepositoryTest extends AbstractTest {
 
     @Test
     public void testRepositoryExists() throws Exception {
-        assertThat(repository, is(not(nullValue(RealizationRepository.class))));
+        assertThat(repository).isNotNull();
     }
 
     @Test
     public void testGoodSave() throws Exception {
-        final RealizationEntity entity = Util.getRealizationEntity();
+        final RealizationEntity entity = getRealizationEntity();
 
         final long count = repository.count();
         final RealizationEntity savedEntity = repository.saveAndFlush(entity);
-        assertThat(repository.count(), is(equalTo(count + 1)));
-        assertThat(savedEntity.getUserId(), is(not(nullValue(String.class))));
-        assertThat(savedEntity.getTeamId(), is(not(nullValue(String.class))));
-        assertThat(savedEntity.getExperimentId(), is(not(nullValue(Long.class))));
-        assertThat(savedEntity.getNumberOfNodes(), is(not(nullValue(Integer.class))));
-        assertThat(savedEntity.getState(), is(not(nullValue(RealizationState.class))));
-        assertThat(savedEntity.getIdleMinutes(), is(not(nullValue(Long.class))));
-        assertThat(savedEntity.getRunningMinutes(), is(not(nullValue(Long.class))));
-        assertThat(savedEntity.getCreatedDate(), is(not(nullValue(ZonedDateTime.class))));
-        assertThat(savedEntity.getLastModifiedDate(), is(not(nullValue(ZonedDateTime.class))));
-        assertThat(savedEntity.getVersion(), is(equalTo(0L)));
+
+        assertThat(repository.count()).isEqualTo(count + 1);
+        assertThat(savedEntity.getCreatedDate()).isNotNull();
+        assertThat(savedEntity.getLastModifiedDate()).isNotNull();
+        assertThat(savedEntity.getUserId()).isNotNull();
+        assertThat(savedEntity.getTeamId()).isNotNull();
+        assertThat(savedEntity.getExperimentId()).isNotNull();
+        assertThat(savedEntity.getNumberOfNodes()).isNotNull();
+        assertThat(savedEntity.getState()).isNotNull();
+        assertThat(savedEntity.getIdleMinutes()).isNotNull();
+        assertThat(savedEntity.getRunningMinutes()).isNotNull();
+    }
+
+    @Test
+    public void testSaveWithNullId() throws Exception {
+        final RealizationEntity entity = getRealizationEntity();
+        entity.setId(null);
+        final long count = repository.count();
+
+        final RealizationEntity saved = repository.saveAndFlush(entity);
+
+        assertThat(repository.count()).isEqualTo(count + 1);
+        assertThat(saved.getId()).isNotNull();
+    }
+
+    @Test
+    public void testSaveWithExistingEntityWithNullId() throws Exception {
+        final RealizationEntity entity = getRealizationEntity();
+        final RealizationEntity saved = repository.saveAndFlush(entity);
+        saved.setId(null);
+
+        exception.expect(JpaSystemException.class);
+
+        repository.saveAndFlush(saved);
     }
 
     @Test
     public void testSaveNullExperimentId() throws Exception {
-        final RealizationEntity entity = Util.getRealizationEntity();
+        final RealizationEntity entity = getRealizationEntity();
         entity.setExperimentId(null);
 
         try {
@@ -72,7 +96,7 @@ public class RealizationRepositoryTest extends AbstractTest {
 
     @Test
     public void testSaveNullExperimentName() throws Exception {
-        final RealizationEntity entity = Util.getRealizationEntity();
+        final RealizationEntity entity = getRealizationEntity();
         entity.setExperimentName(null);
 
         try {
@@ -85,7 +109,7 @@ public class RealizationRepositoryTest extends AbstractTest {
 
     @Test
     public void testSaveNullUserId() throws Exception {
-        final RealizationEntity entity = Util.getRealizationEntity();
+        final RealizationEntity entity = getRealizationEntity();
         entity.setUserId(null);
 
         try {
@@ -98,7 +122,7 @@ public class RealizationRepositoryTest extends AbstractTest {
 
     @Test
     public void testSaveNullTeamId() throws Exception {
-        final RealizationEntity entity = Util.getRealizationEntity();
+        final RealizationEntity entity = getRealizationEntity();
         entity.setTeamId(null);
 
         try {
@@ -111,7 +135,7 @@ public class RealizationRepositoryTest extends AbstractTest {
 
     @Test
     public void testSaveNullNumberOfNodes() throws Exception {
-        final RealizationEntity entity = Util.getRealizationEntity();
+        final RealizationEntity entity = getRealizationEntity();
         entity.setNumberOfNodes(null);
 
         try {
@@ -124,7 +148,7 @@ public class RealizationRepositoryTest extends AbstractTest {
 
     @Test
     public void testSaveNullState() throws Exception {
-        final RealizationEntity entity = Util.getRealizationEntity();
+        final RealizationEntity entity = getRealizationEntity();
         entity.setState(null);
 
         try {
@@ -137,7 +161,7 @@ public class RealizationRepositoryTest extends AbstractTest {
 
     @Test
     public void testSaveNullIdleMinutes() throws Exception {
-        final RealizationEntity entity = Util.getRealizationEntity();
+        final RealizationEntity entity = getRealizationEntity();
         entity.setIdleMinutes(null);
 
         try {
@@ -150,7 +174,7 @@ public class RealizationRepositoryTest extends AbstractTest {
 
     @Test
     public void testSaveNullRunningMinutes() throws Exception {
-        final RealizationEntity entity = Util.getRealizationEntity();
+        final RealizationEntity entity = getRealizationEntity();
         entity.setRunningMinutes(null);
 
         try {
@@ -163,20 +187,18 @@ public class RealizationRepositoryTest extends AbstractTest {
 
     @Test
     public void testGetRealizationByExperimentId() throws Exception {
-        final RealizationEntity entity = Util.getRealizationEntity();
+        final RealizationEntity entity = getRealizationEntity();
         RealizationEntity savedRealizationEntitiy = repository.save(entity);
 
-        Long experimentId = savedRealizationEntitiy.getExperimentId();
+        RealizationEntity result = repository.findByExperimentId(savedRealizationEntitiy.getExperimentId());
 
-        RealizationEntity realizationEntityDB = repository.findByExperimentId(experimentId);
-
-        assertNotNull(realizationEntityDB);
-        assertEquals(entity.getUserId(), realizationEntityDB.getUserId());
-        assertEquals(entity.getTeamId(), realizationEntityDB.getTeamId());
-        assertEquals(entity.getExperimentId(), realizationEntityDB.getExperimentId());
-        assertEquals(entity.getNumberOfNodes(), realizationEntityDB.getNumberOfNodes());
-        assertEquals(entity.getState(), realizationEntityDB.getState());
-        assertEquals(entity.getIdleMinutes(), realizationEntityDB.getIdleMinutes());
-        assertEquals(entity.getRunningMinutes(), realizationEntityDB.getRunningMinutes());
+        assertThat(result).isNotNull();
+        assertThat(result.getUserId()).isEqualTo(entity.getUserId());
+        assertThat(result.getTeamId()).isEqualTo(entity.getTeamId());
+        assertThat(result.getExperimentId()).isEqualTo(entity.getExperimentId());
+        assertThat(result.getNumberOfNodes()).isEqualTo(entity.getNumberOfNodes());
+        assertThat(result.getState()).isEqualTo(entity.getState());
+        assertThat(result.getIdleMinutes()).isEqualTo(entity.getIdleMinutes());
+        assertThat(result.getRunningMinutes()).isEqualTo(entity.getRunningMinutes());
     }
 }
