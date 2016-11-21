@@ -247,7 +247,7 @@ public class ExperimentServiceImpl implements ExperimentService {
             experimentRepository.delete(id);
             log.info("Experiment deleted from experiment repository: {} from Team: {}", experimentEntity.getName(), teamName);
 
-            deleteExperimentInDeter(experimentEntity.getName(), teamName, realizationEntity.getUserId());
+            adapterDeterLab.deleteExperiment(teamName, experimentEntity.getName(), claims.getSubject());
             log.info("Experiment deleted in deter: {} from Team: {}", experimentEntity.getName(), teamName);
         } else {
             log.warn("Experiment not deleted");
@@ -255,15 +255,6 @@ public class ExperimentServiceImpl implements ExperimentService {
 
         log.info("End deleteExperiment");
         return experimentEntity;
-    }
-
-    private void deleteExperimentInDeter(final String experimentName, final String teamName, final String nclUserId) {
-        JSONObject jsonObject = new JSONObject();
-        jsonObject.put("teamName", teamName);
-        jsonObject.put("experimentName", experimentName);
-        jsonObject.put("deterLogin", adapterDeterLab.getDeterUserIdByNclUserId(nclUserId));
-
-        adapterDeterLab.deleteExperiment(jsonObject.toString());
     }
 
     /**

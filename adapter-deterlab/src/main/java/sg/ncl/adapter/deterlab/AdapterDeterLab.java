@@ -361,7 +361,7 @@ public class AdapterDeterLab {
      *
      * @param teamName equivalent of pid
      * @param experimentName equivalent of eid
-     * @param nclUserId the ncl user id that starts the experiment
+     * @param nclUserId the ncl user id who starts the experiment
      * @return a experiment report if the experiment is started successfully and active, otherwise a "experiment start fail" is return
      * @implNote must return the entire response body as realization service needs to store the experiment report to transmit back to UI
      */
@@ -464,10 +464,19 @@ public class AdapterDeterLab {
     /**
      * Creates a delete experiment request to Deterlab
      *
-     * @param jsonString Contains experiment name, team name and deterlab userid
+     * @param teamName equivalent of pid
+     * @param experimentName equivalent of eid
+     * @param nclUserId the ncl user id who deletes the experiment
      * @return the experiment status
      */
-    public String deleteExperiment(String jsonString) {
+    public String deleteExperiment(String teamName, String experimentName, String nclUserId) {
+        JSONObject jsonObject = new JSONObject();
+        jsonObject.put("teamName", teamName);
+        jsonObject.put("experimentName", experimentName);
+        jsonObject.put("deterLogin", getDeterUserIdByNclUserId(nclUserId));
+
+        String jsonString = jsonObject.toString();
+
         log.info("Delete experiment - {} at {} : {}", properties.getIp(), properties.getPort(), jsonString);
 
         HttpHeaders headers = new HttpHeaders();
