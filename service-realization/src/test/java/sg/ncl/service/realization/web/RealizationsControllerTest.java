@@ -1,21 +1,31 @@
 package sg.ncl.service.realization.web;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import io.jsonwebtoken.Claims;
 import org.apache.commons.lang3.RandomStringUtils;
+import org.assertj.core.api.Assertions;
 import org.junit.Before;
 import org.junit.Test;
-import org.springframework.test.context.ActiveProfiles;
+import org.junit.runner.RunWith;
+import org.mockito.Mock;
+import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.TestPropertySource;
+import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
-import sg.ncl.service.realization.AbstractTest;
+import sg.ncl.common.exception.ExceptionAutoConfiguration;
+import sg.ncl.common.exception.GlobalExceptionHandler;
 import sg.ncl.service.realization.data.jpa.RealizationEntity;
 import sg.ncl.service.realization.domain.RealizationService;
 
 import javax.inject.Inject;
 
-import static org.hamcrest.Matchers.is;
-import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.mockingDetails;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -25,21 +35,35 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 /**
  * Created by Desmond.
  */
-@ActiveProfiles("mock-realization-service")
+@RunWith(SpringRunner.class)
+@WebMvcTest(controllers = RealizationsController.class, secure = true)
+@ContextConfiguration(classes = {RealizationsController.class, ExceptionAutoConfiguration.class, GlobalExceptionHandler.class})
 @TestPropertySource(properties = "flyway.enabled=false")
-public class RealizationsControllerTest extends AbstractTest {
+public class RealizationsControllerTest {
 
+    @Inject
+    private ObjectMapper mapper;
+    @Inject
+    private MockMvc mockMvc;
     @Inject
     private WebApplicationContext webApplicationContext;
 
-    @Inject
-    private RealizationService realizationService;
+    @Mock
+    private Claims claims;
+    @Mock
+    private Authentication authentication;
+    @Mock
+    private SecurityContext securityContext;
 
-    private MockMvc mockMvc;
+    @MockBean
+    private RealizationService realizationService;
 
     @Before
     public void before() {
-        assertThat(mockingDetails(realizationService).isMock(), is(true));
+        Assertions.assertThat(mockingDetails(claims).isMock()).isTrue();
+        Assertions.assertThat(mockingDetails(securityContext).isMock()).isTrue();
+        Assertions.assertThat(mockingDetails(authentication).isMock()).isTrue();
+        Assertions.assertThat(mockingDetails(realizationService).isMock()).isTrue();
         mockMvc = MockMvcBuilders.webAppContextSetup(webApplicationContext).build();
     }
 
@@ -49,7 +73,7 @@ public class RealizationsControllerTest extends AbstractTest {
 
         when(realizationService.getByExperimentId(Long.parseLong(experimentId))).thenReturn(new RealizationEntity());
 
-        mockMvc.perform(get("/realizations/" + experimentId))
+        mockMvc.perform(get(RealizationsController.PATH + "/" + experimentId))
                 .andExpect(status().isOk());
     }
 
@@ -60,7 +84,7 @@ public class RealizationsControllerTest extends AbstractTest {
 
         when(realizationService.getByExperimentId(teamName, Long.parseLong(experimentId))).thenReturn(new RealizationEntity());
 
-        mockMvc.perform(get("/realizations/team/" + teamName + "/experiment/" + experimentId))
+        mockMvc.perform(get(RealizationsController.PATH + "/team/" + teamName + "/experiment/" + experimentId))
                 .andExpect(status().isOk());
     }
 
@@ -68,12 +92,13 @@ public class RealizationsControllerTest extends AbstractTest {
     public void testStartExperiment() throws Exception {
         final String teamName = RandomStringUtils.randomAlphanumeric(8);
         final String experimentId = RandomStringUtils.randomNumeric(5);
-        final String userId = RandomStringUtils.randomAlphanumeric(20);
 
+        when(securityContext.getAuthentication()).thenReturn(authentication);
+        SecurityContextHolder.setContext(securityContext);
+        when(authentication.getPrincipal()).thenReturn(claims);
         when(realizationService.getByExperimentId(Long.parseLong(experimentId))).thenReturn(new RealizationEntity());
-//        when(realizationService.startExperimentInDeter(teamName, experimentId, userId)).thenReturn("");
 
-        mockMvc.perform(post("/realizations/start/team/" + teamName + "/experiment/" + experimentId))
+        mockMvc.perform(post(RealizationsController.PATH + "/start/team/" + teamName + "/experiment/" + experimentId))
                 .andExpect(status().isAccepted());
     }
 
@@ -84,7 +109,7 @@ public class RealizationsControllerTest extends AbstractTest {
 
         when(realizationService.getByExperimentId(Long.parseLong(experimentId))).thenReturn(new RealizationEntity());
 
-        mockMvc.perform(post("/realizations/stop/team/" + teamName + "/experiment/" + experimentId))
+        mockMvc.perform(post(RealizationsController.PATH + "/stop/team/" + teamName + "/experiment/" + experimentId))
                 .andExpect(status().isAccepted());
     }
 }
