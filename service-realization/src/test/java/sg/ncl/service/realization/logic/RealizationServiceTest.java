@@ -155,7 +155,7 @@ public class RealizationServiceTest {
         when(realizationRepository.save(any(RealizationEntity.class))).thenReturn(entity);
         when(adapterDeterLab.stopExperiment(anyString(), anyString(), anyString())).thenReturn("swapped");
 
-        Realization result = realizationService.stopExperimentInDeter("teamName", "1");
+        Realization result = realizationService.stopExperimentInDeter("teamName", "1", claims);
 
         assertThat(result.getState()).isEqualTo(RealizationState.NOT_RUNNING);
     }
@@ -168,7 +168,7 @@ public class RealizationServiceTest {
         when(realizationRepository.save(any(RealizationEntity.class))).thenReturn(entity);
         when(adapterDeterLab.stopExperiment(anyString(), anyString(), anyString())).thenReturn("error");
 
-        Realization result = realizationService.stopExperimentInDeter("teamName", "1");
+        Realization result = realizationService.stopExperimentInDeter("teamName", "1", claims);
 
         assertThat(result.getState()).isEqualTo(RealizationState.ERROR);
     }

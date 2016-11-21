@@ -18,7 +18,7 @@ public interface RealizationService {
 
     RealizationEntity startExperimentInDeter(String teamName, String expId, Claims claims);
 
-    RealizationEntity stopExperimentInDeter(String teamName, String expId);
+    RealizationEntity stopExperimentInDeter(String teamName, String expId, Claims claims);
 
     void deleteRealization(Long realizationId);
 

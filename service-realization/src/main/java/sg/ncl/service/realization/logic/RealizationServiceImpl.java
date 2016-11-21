@@ -184,17 +184,18 @@ public class RealizationServiceImpl implements RealizationService {
      *
      * @param teamName the team to stop the exp
      * @param expId    the experiment name to stop
+     * @param claims   the jwt token
      * @return the realization entity object that contains the updated experiment status and with empty report
      * @implNote DB sync not an issue since experiment status and report will be re-updated when users refresh the page
      */
     @Transactional
-    public RealizationEntity stopExperimentInDeter(final String teamName, final String expId) {
+    public RealizationEntity stopExperimentInDeter(final String teamName, final String expId, final Claims claims) {
         log.info("Stopping experiment: {} for team: ", expId, teamName);
         RealizationEntity realizationEntityDb = realizationRepository.findByExperimentId(Long.parseLong(expId));
         String experimentName = realizationEntityDb.getExperimentName();
-        String userId = realizationEntityDb.getUserId();
+        String experimentStopperUserId = claims.getSubject();
 
-        String resultState = adapterDeterLab.stopExperiment(teamName, experimentName, userId);
+        String resultState = adapterDeterLab.stopExperiment(teamName, experimentName, experimentStopperUserId);
         RealizationState realizationState;
         if (resultState.equals("swapped")) {
             realizationState = RealizationState.NOT_RUNNING;

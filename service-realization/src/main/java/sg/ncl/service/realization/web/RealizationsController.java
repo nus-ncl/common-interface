@@ -67,8 +67,9 @@ public class RealizationsController {
     // FIXME: path should be "/{id}"
     @RequestMapping(path = "/stop/team/{teamName}/experiment/{expId}", method = RequestMethod.POST)
     @ResponseStatus(HttpStatus.ACCEPTED)
-    public Realization stopExperiment(@PathVariable String teamName, @PathVariable String expId) {
-        return realizationService.stopExperimentInDeter(teamName, expId);
+    public Realization stopExperiment(@PathVariable String teamName, @PathVariable String expId, @AuthenticationPrincipal Object claims) {
+        checkClaimsType(claims);
+        return realizationService.stopExperimentInDeter(teamName, expId, (Claims) claims);
     }
 
     //FIXME: This is a temporary hack; should be moved to analytics
