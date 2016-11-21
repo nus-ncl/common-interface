@@ -103,6 +103,19 @@ public class RealizationsControllerTest {
     }
 
     @Test
+    public void testStartExperimentForbidden() throws Exception {
+        final String teamName = RandomStringUtils.randomAlphanumeric(8);
+        final String experimentId = RandomStringUtils.randomNumeric(5);
+
+        when(securityContext.getAuthentication()).thenReturn(authentication);
+        SecurityContextHolder.setContext(securityContext);
+        when(authentication.getPrincipal()).thenReturn(null);
+
+        mockMvc.perform(post(RealizationsController.PATH + "/start/team/" + teamName + "/experiment/" + experimentId))
+                .andExpect(status().isForbidden());
+    }
+
+    @Test
     public void testStopExperiment() throws Exception {
         final String teamName = RandomStringUtils.randomAlphanumeric(8);
         final String experimentId = RandomStringUtils.randomNumeric(5);
