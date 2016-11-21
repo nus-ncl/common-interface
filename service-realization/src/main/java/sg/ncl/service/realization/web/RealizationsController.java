@@ -24,9 +24,11 @@ import static sg.ncl.common.validation.Validator.checkClaimsType;
  * @author Christopher Zhong
  */
 @RestController
-@RequestMapping(path = "/realizations", produces = MediaType.APPLICATION_JSON_VALUE)
+@RequestMapping(path = RealizationsController.PATH, produces = MediaType.APPLICATION_JSON_VALUE)
 @Slf4j
 public class RealizationsController {
+
+    static final String PATH = "/realizations";
 
     private final RealizationService realizationService;
 
