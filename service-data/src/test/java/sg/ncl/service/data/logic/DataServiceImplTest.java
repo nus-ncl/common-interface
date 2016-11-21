@@ -21,7 +21,7 @@ import sg.ncl.service.data.domain.DataAccessibility;
 import sg.ncl.service.data.domain.DataResource;
 import sg.ncl.service.data.domain.DataService;
 import sg.ncl.service.data.domain.DataVisibility;
-import sg.ncl.service.data.exceptions.DataNameInUseException;
+import sg.ncl.service.data.exceptions.DataNameAlreadyExistsException;
 import sg.ncl.service.data.exceptions.DataNotFoundException;
 import sg.ncl.service.data.util.TestUtil;
 
@@ -89,7 +89,7 @@ public class DataServiceImplTest extends AbstractTest {
         dataEntityList.add(dataEntity);
 
         when(dataRepository.findByName(anyString())).thenReturn(dataEntityList);
-        exception.expect(DataNameInUseException.class);
+        exception.expect(DataNameAlreadyExistsException.class);
         dataService.createDataset(dataEntity);
     }
 
