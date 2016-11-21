@@ -361,7 +361,7 @@ public class AdapterDeterLab {
      *
      * @param teamName equivalent of pid
      * @param experimentName equivalent of eid
-     * @param nclUserId to convert it to a deter user id
+     * @param nclUserId the ncl user id that starts the experiment
      * @return a experiment report if the experiment is started successfully and active, otherwise a "experiment start fail" is return
      * @implNote must return the entire response body as realization service needs to store the experiment report to transmit back to UI
      */
@@ -416,7 +416,7 @@ public class AdapterDeterLab {
      *
      * @param teamName equivalent of pid
      * @param experimentName equivalent of eid
-     * @param nclUserId to convert it to a deter user id
+     * @param nclUserId the ncl user id that stops the experiment
      * @return the experiment status
      * @implNote we don't throw any exception if the result returned from deterlab is not "swapped" since there may be other types of experiment status unknown to us
      */

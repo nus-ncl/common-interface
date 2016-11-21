@@ -1,5 +1,6 @@
 package sg.ncl.service.realization.logic;
 
+import io.jsonwebtoken.Claims;
 import lombok.extern.slf4j.Slf4j;
 import org.json.JSONObject;
 import org.springframework.stereotype.Service;
@@ -142,17 +143,18 @@ public class RealizationServiceImpl implements RealizationService {
      *
      * @param teamName the team to start the exp for
      * @param expId    the experiment name to start, e.g. demo, Identical experiment names are allow for different teams
+     * @param claims   the jwt token
      * @return the realization entity object that contains the updated experiment status and report pulled from Deterlab
      * @implNote DB sync not an issue since experiment status and report will be re-updated when users refresh the page
      */
     @Transactional
-    public RealizationEntity startExperimentInDeter(final String teamName, final String expId) {
+    public RealizationEntity startExperimentInDeter(final String teamName, final String expId, final Claims claims) {
         log.info("Starting experiment: {} for team: ", expId, teamName);
         RealizationEntity realizationEntityDb = realizationRepository.findByExperimentId(Long.parseLong(expId));
         String experimentName = realizationEntityDb.getExperimentName();
-        String userId = realizationEntityDb.getUserId();
+        String experimentStarterUserId = claims.getSubject();
 
-        String stringFromExperiment = adapterDeterLab.startExperiment(teamName, experimentName, userId);
+        String stringFromExperiment = adapterDeterLab.startExperiment(teamName, experimentName, experimentStarterUserId);
         JSONObject jsonObjectFromExperiment = new JSONObject(stringFromExperiment);
 
         String status = jsonObjectFromExperiment.getString("status");
