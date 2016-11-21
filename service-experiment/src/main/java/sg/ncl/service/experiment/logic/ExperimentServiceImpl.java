@@ -240,15 +240,14 @@ public class ExperimentServiceImpl implements ExperimentService {
             log.info("Realization deleted: {}", realizationId);
 
             experimentEntity = experimentRepository.getOne(id);
-            String teamName = experimentEntity.getTeamName();
             // TODO: use other deleteExperimentInDeter(teamName, experimentName) if using script_wrapper.py
 //            deleteExperimentInDeter(experimentEntity.getName(), realizationEntity.getUserId());
 
             experimentRepository.delete(id);
-            log.info("Experiment deleted from experiment repository: {} from Team: {}", experimentEntity.getName(), teamName);
+            log.info("Experiment deleted from experiment repository: {} from Team: {}", experimentEntity.getName(), experimentEntity.getTeamName());
 
-            adapterDeterLab.deleteExperiment(teamName, experimentEntity.getName(), claims.getSubject());
-            log.info("Experiment deleted in deter: {} from Team: {}", experimentEntity.getName(), teamName);
+            adapterDeterLab.deleteExperiment(experimentEntity.getTeamName(), experimentEntity.getName(), claims.getSubject());
+            log.info("Experiment deleted in deter: {} from Team: {}", experimentEntity.getName(), experimentEntity.getTeamName());
         } else {
             log.warn("Experiment not deleted");
         }
