@@ -366,20 +366,8 @@ public class AdapterDeterLab {
      * @implNote must return the entire response body as realization service needs to store the experiment report to transmit back to UI
      */
     public String startExperiment(String teamName, String experimentName, String nclUserId) {
-        StringBuilder httpCommand = new StringBuilder();
-        httpCommand.append("?inout=in");
-        httpCommand.append("&");
-        httpCommand.append("pid=" + teamName);
-        httpCommand.append("&");
-        httpCommand.append("eid=" + experimentName);
 
-        JSONObject jsonObject = new JSONObject();
-        jsonObject.put("httpCommand", httpCommand.toString());
-        jsonObject.put("deterLogin", getDeterUserIdByNclUserId(nclUserId));
-        jsonObject.put("pid", teamName);
-        jsonObject.put("eid", experimentName);
-
-        String jsonString = jsonObject.toString();
+        String jsonString = craftJSONStringStartStopExperiment("in", teamName, experimentName, nclUserId);
 
         log.info("Start experiment - {} at {}: {}", properties.getIp(), properties.getPort(), jsonString);
 
@@ -422,20 +410,8 @@ public class AdapterDeterLab {
      * @implNote we don't throw any exception if the result returned from deterlab is not "swapped" since there may be other types of experiment status unknown to us
      */
     public String stopExperiment(String teamName, String experimentName, String nclUserId) {
-        StringBuilder httpCommand = new StringBuilder();
-        httpCommand.append("?inout=out");
-        httpCommand.append("&");
-        httpCommand.append("pid=" + teamName);
-        httpCommand.append("&");
-        httpCommand.append("eid=" + experimentName);
 
-        JSONObject jsonObject = new JSONObject();
-        jsonObject.put("httpCommand", httpCommand.toString());
-        jsonObject.put("deterLogin", getDeterUserIdByNclUserId(nclUserId));
-        jsonObject.put("pid", teamName);
-        jsonObject.put("eid", experimentName);
-
-        String jsonString = jsonObject.toString();
+        String jsonString = craftJSONStringStartStopExperiment("out", teamName, experimentName, nclUserId);
 
         log.info("Stop experiment - {} at {}: {}", properties.getIp(), properties.getPort(), jsonString);
 
@@ -697,5 +673,30 @@ public class AdapterDeterLab {
             log.warn(logPrefix, responseBody);
             throw new DeterLabOperationFailedException();
         }
+    }
+
+    /**
+     * Crafts the JSON string for start/stop experiment
+     * @param operation in or out, implies start or stop experiment respectively
+     * @param teamName the equivalent of pid
+     * @param experimentName the equivalent of eid
+     * @param nclUserId the ncl user id that initiate the start/stop experiment
+     * @return a JSON string representation of the items to be sent to adapter
+     */
+    private String craftJSONStringStartStopExperiment(String operation, String teamName, String experimentName, String nclUserId) {
+        StringBuilder httpCommand = new StringBuilder();
+        httpCommand.append("?inout=" + operation);
+        httpCommand.append("&");
+        httpCommand.append("pid=" + teamName);
+        httpCommand.append("&");
+        httpCommand.append("eid=" + experimentName);
+
+        JSONObject jsonObject = new JSONObject();
+        jsonObject.put("httpCommand", httpCommand.toString());
+        jsonObject.put("deterLogin", getDeterUserIdByNclUserId(nclUserId));
+        jsonObject.put("pid", teamName);
+        jsonObject.put("eid", experimentName);
+
+        return jsonObject.toString();
     }
 }

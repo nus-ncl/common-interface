@@ -12,6 +12,10 @@ import sg.ncl.common.exception.base.ForbiddenException;
 @Slf4j
 public class Validator {
 
+    private Validator() {
+
+    }
+
     public static void checkClaimsType(final Object claims) {
         if ( !(claims instanceof Claims) ) {
             // throw forbidden
