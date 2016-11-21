@@ -11,7 +11,6 @@ import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
 import org.springframework.test.context.TestPropertySource;
 import sg.ncl.adapter.deterlab.AdapterDeterLab;
-import sg.ncl.service.realization.Util;
 import sg.ncl.service.realization.data.jpa.RealizationEntity;
 import sg.ncl.service.realization.data.jpa.RealizationRepository;
 import sg.ncl.service.realization.domain.Realization;
@@ -24,6 +23,7 @@ import static org.mockito.Matchers.anyLong;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.mockingDetails;
 import static org.mockito.Mockito.when;
+import static sg.ncl.service.realization.util.TestUtil.getRealizationEntity;
 
 /**
  * Created by Desmond.
@@ -65,7 +65,7 @@ public class RealizationServiceTest {
 
     @Test
     public void testGetRealizationWithId() {
-        RealizationEntity entity = Util.getRealizationEntity();
+        RealizationEntity entity = getRealizationEntity();
 
         when(realizationRepository.findOne(anyLong())).thenReturn(entity);
 
@@ -85,7 +85,7 @@ public class RealizationServiceTest {
 
     @Test
     public void testGetRealizationWithExperimentId() {
-        RealizationEntity entity = Util.getRealizationEntity();
+        RealizationEntity entity = getRealizationEntity();
 
         when(realizationRepository.findByExperimentId(entity.getExperimentId())).thenReturn(entity);
 
@@ -96,7 +96,7 @@ public class RealizationServiceTest {
 
     @Test
     public void testGetRealizationWithTeamAndExperimentId() {
-        RealizationEntity entity = Util.getRealizationEntity();
+        RealizationEntity entity = getRealizationEntity();
 
         JSONObject predefinedResultJson = new JSONObject();
         JSONObject reportJson = new JSONObject();
@@ -116,7 +116,7 @@ public class RealizationServiceTest {
 
     @Test
     public void testSaveRealization() {
-        RealizationEntity entity = Util.getRealizationEntity();
+        RealizationEntity entity = getRealizationEntity();
 
         when(realizationRepository.save(any(RealizationEntity.class))).thenReturn(entity);
 
@@ -136,7 +136,7 @@ public class RealizationServiceTest {
         predefinedResultJson.put("msg", "experiment start success");
         predefinedResultJson.put("status", "active");
         predefinedResultJson.put("report", "");
-        RealizationEntity entity = Util.getRealizationEntity();
+        RealizationEntity entity = getRealizationEntity();
 
         when(realizationRepository.findByExperimentId(anyLong())).thenReturn(entity);
         when(realizationRepository.save(any(RealizationEntity.class))).thenReturn(entity);
@@ -149,7 +149,7 @@ public class RealizationServiceTest {
 
     @Test
     public void testStopExperimentNotRunning() {
-        RealizationEntity entity = Util.getRealizationEntity();
+        RealizationEntity entity = getRealizationEntity();
 
         when(realizationRepository.findByExperimentId(anyLong())).thenReturn(entity);
         when(realizationRepository.save(any(RealizationEntity.class))).thenReturn(entity);
@@ -162,7 +162,7 @@ public class RealizationServiceTest {
 
     @Test
     public void testStopExperimentError() {
-        RealizationEntity entity = Util.getRealizationEntity();
+        RealizationEntity entity = getRealizationEntity();
 
         when(realizationRepository.findByExperimentId(anyLong())).thenReturn(entity);
         when(realizationRepository.save(any(RealizationEntity.class))).thenReturn(entity);
