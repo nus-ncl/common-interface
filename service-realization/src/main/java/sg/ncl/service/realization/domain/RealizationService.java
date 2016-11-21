@@ -20,22 +20,6 @@ public interface RealizationService {
 
     RealizationEntity stopExperimentInDeter(String teamName, String expId);
 
-    void setState(Long experimentId, RealizationState state);
-
-    RealizationState getState(Long experimentId);
-
-    void setIdleMinutes(Long experimentId, Long minutes);
-
-    Long getIdleMinutes(Long experimentId);
-
-    void setRunningMinutes(Long experimentId, Long minutes);
-
-    Long getRunningMinutes(Long experimentId);
-
-    void setRealizationDetails(Long experimentId, String details);
-
-    String getRealizationDetails(Long experimentId);
-
     void deleteRealization(Long realizationId);
 
     String getUsageStatistics(String id);
