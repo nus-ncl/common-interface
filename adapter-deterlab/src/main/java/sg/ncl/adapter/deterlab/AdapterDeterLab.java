@@ -397,6 +397,7 @@ public class AdapterDeterLab {
         }
 
         log.info("Start experiment request submitted to deterlab");
+        log.info("Start experiment response from deterlab: {}", response.getBody());
         String jsonResult = new JSONObject(response.getBody().toString()).getString("msg");
 
         if ("experiment start fail".equals(jsonResult)) {
@@ -407,7 +408,7 @@ public class AdapterDeterLab {
             throw new AdapterDeterlabConnectException();
         }
 
-        log.info("Start experiment request success at deterlab", response.getBody().toString());
+        log.info("Start experiment request success at deterlab {}", response.getBody().toString());
         return response.getBody().toString();
     }
 
@@ -457,7 +458,7 @@ public class AdapterDeterLab {
         if (!"swapped".equals(expStatus)) {
             log.warn("Fail to stop experiment at deterlab {}", jsonString);
         }
-        log.info("Stop experiment request success at deterlab", response.getBody().toString());
+        log.info("Stop experiment request success at deterlab {}", response.getBody().toString());
         return expStatus;
     }
 
@@ -500,7 +501,7 @@ public class AdapterDeterLab {
             throw new ExpDeleteException();
         }
 
-        log.info("Delete experiment request success at deterlab", response.getBody().toString());
+        log.info("Delete experiment request success at deterlab {}", response.getBody().toString());
         return expStatus;
     }
 
