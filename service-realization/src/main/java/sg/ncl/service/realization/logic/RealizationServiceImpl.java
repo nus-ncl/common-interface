@@ -1,5 +1,6 @@
 package sg.ncl.service.realization.logic;
 
+import io.jsonwebtoken.Claims;
 import lombok.extern.slf4j.Slf4j;
 import org.json.JSONObject;
 import org.springframework.stereotype.Service;
@@ -74,10 +75,7 @@ public class RealizationServiceImpl implements RealizationService {
 
         if (realizationEntity != null && realizationEntity.getId() > 0) {
             log.info("Retrieved realization entity: {}", realizationEntity);
-            JSONObject jsonObject = new JSONObject();
-            jsonObject.put("pid", teamName);
-            jsonObject.put("eid", realizationEntity.getExperimentName());
-            String result = adapterDeterLab.getExperimentStatus(jsonObject.toString());
+            String result = adapterDeterLab.getExperimentStatus(teamName, realizationEntity.getExperimentName());
 
             log.info("Retrieved deterlab exp status...Exp: {} State: {}", realizationEntity.getExperimentName(), result);
 
@@ -90,15 +88,12 @@ public class RealizationServiceImpl implements RealizationService {
                 switch (status) {
                     case "active":
                         realizationState = RealizationState.RUNNING;
-                        String report = jsonObjectFromExperiment.getJSONObject("report").toString();
-                        realizationEntity.setDetails(report);
                         break;
                     case "activating":
                         realizationState = RealizationState.STARTING;
                         break;
                     case "swapping":
                         realizationState = RealizationState.STOPPING;
-                        realizationEntity.setDetails("");
                         break;
                     case "error":
                         realizationState = RealizationState.ERROR;
@@ -110,6 +105,18 @@ public class RealizationServiceImpl implements RealizationService {
             }
             if (realizationEntity.getState() != realizationState) {
                 realizationEntity.setState(realizationState);
+                // only set details if state is different
+                switch (realizationState) {
+                    case RUNNING:
+                        String report = jsonObjectFromExperiment.getJSONObject("report").toString();
+                        realizationEntity.setDetails(report);
+                        break;
+                    case STOPPING:
+                        realizationEntity.setDetails("");
+                        break;
+                    default:
+                        break;
+                }
                 log.info("Realization: {} updated to state: {}", realizationEntity, realizationState);
                 return realizationRepository.save(realizationEntity);
             }
@@ -136,34 +143,21 @@ public class RealizationServiceImpl implements RealizationService {
      *
      * @param teamName the team to start the exp for
      * @param expId    the experiment name to start, e.g. demo, Identical experiment names are allow for different teams
+     * @param claims   the jwt token
      * @return the realization entity object that contains the updated experiment status and report pulled from Deterlab
      * @implNote DB sync not an issue since experiment status and report will be re-updated when users refresh the page
      */
     @Transactional
-    public RealizationEntity startExperimentInDeter(final String teamName, final String expId) {
+    public RealizationEntity startExperimentInDeter(final String teamName, final String expId, final Claims claims) {
         log.info("Starting experiment: {} for team: ", expId, teamName);
         RealizationEntity realizationEntityDb = realizationRepository.findByExperimentId(Long.parseLong(expId));
         String experimentName = realizationEntityDb.getExperimentName();
-        String userId = realizationEntityDb.getUserId();
+        String experimentStarterUserId = claims.getSubject();
 
-        StringBuilder httpCommand = new StringBuilder();
-        httpCommand.append("?inout=in");
-        httpCommand.append("&");
-        httpCommand.append("pid=" + teamName);
-        httpCommand.append("&");
-        httpCommand.append("eid=" + experimentName);
-
-        JSONObject jsonObject = new JSONObject();
-        jsonObject.put("httpCommand", httpCommand.toString());
-        jsonObject.put("deterLogin", adapterDeterLab.getDeterUserIdByNclUserId(userId));
-        jsonObject.put("pid", teamName);
-        jsonObject.put("eid", experimentName);
-
-        String stringFromExperiment = adapterDeterLab.startExperiment(jsonObject.toString());
+        String stringFromExperiment = adapterDeterLab.startExperiment(teamName, experimentName, experimentStarterUserId);
         JSONObject jsonObjectFromExperiment = new JSONObject(stringFromExperiment);
 
         String status = jsonObjectFromExperiment.getString("status");
-        String report = jsonObjectFromExperiment.getJSONObject("report").toString();
         RealizationState realizationState;
 
         switch (status) {
@@ -178,8 +172,9 @@ public class RealizationServiceImpl implements RealizationService {
                 break;
         }
         log.info("Start Experiment: {}, Team: {} Status: {}", experimentName, teamName, realizationState);
+        // remove set details since it is set when user refreshes the page
+        // also ensure spring does not lock start experiment for too long
         realizationEntityDb.setState(realizationState);
-        realizationEntityDb.setDetails(report);
         return realizationRepository.save(realizationEntityDb);
     }
 
@@ -189,30 +184,18 @@ public class RealizationServiceImpl implements RealizationService {
      *
      * @param teamName the team to stop the exp
      * @param expId    the experiment name to stop
+     * @param claims   the jwt token
      * @return the realization entity object that contains the updated experiment status and with empty report
      * @implNote DB sync not an issue since experiment status and report will be re-updated when users refresh the page
      */
     @Transactional
-    public RealizationEntity stopExperimentInDeter(final String teamName, final String expId) {
+    public RealizationEntity stopExperimentInDeter(final String teamName, final String expId, final Claims claims) {
         log.info("Stopping experiment: {} for team: ", expId, teamName);
         RealizationEntity realizationEntityDb = realizationRepository.findByExperimentId(Long.parseLong(expId));
         String experimentName = realizationEntityDb.getExperimentName();
-        String userId = realizationEntityDb.getUserId();
+        String experimentStopperUserId = claims.getSubject();
 
-        StringBuilder httpCommand = new StringBuilder();
-        httpCommand.append("?inout=out");
-        httpCommand.append("&");
-        httpCommand.append("pid=" + teamName);
-        httpCommand.append("&");
-        httpCommand.append("eid=" + experimentName);
-
-        JSONObject jsonObject = new JSONObject();
-        jsonObject.put("httpCommand", httpCommand.toString());
-        jsonObject.put("deterLogin", adapterDeterLab.getDeterUserIdByNclUserId(userId));
-        jsonObject.put("pid", teamName);
-        jsonObject.put("eid", experimentName);
-
-        String resultState = adapterDeterLab.stopExperiment(jsonObject.toString());
+        String resultState = adapterDeterLab.stopExperiment(teamName, experimentName, experimentStopperUserId);
         RealizationState realizationState;
         if (resultState.equals("swapped")) {
             realizationState = RealizationState.NOT_RUNNING;
@@ -223,62 +206,6 @@ public class RealizationServiceImpl implements RealizationService {
         realizationEntityDb.setState(realizationState);
         realizationEntityDb.setDetails("");
         return realizationRepository.save(realizationEntityDb);
-    }
-
-    @Transactional
-    public void setState(final Long experimentId, final RealizationState state) {
-        log.info("Set realization state. {} : {}", experimentId, state);
-        RealizationEntity realizationEntity = realizationRepository.findByExperimentId(experimentId);
-        realizationEntity.setState(state);
-        realizationRepository.save(realizationEntity);
-    }
-
-    @Transactional
-    public RealizationState getState(final Long experimentId) {
-        log.info("Get realization state. {}", experimentId);
-        return realizationRepository.findByExperimentId(experimentId).getState();
-    }
-
-    @Transactional
-    public void setIdleMinutes(final Long experimentId, final Long minutes) {
-        log.info("Set realization idle minutes. {} : {}", experimentId, minutes);
-        RealizationEntity realizationEntity = realizationRepository.findByExperimentId(experimentId);
-        realizationEntity.setIdleMinutes(minutes);
-        realizationRepository.saveAndFlush(realizationEntity);
-    }
-
-    @Transactional
-    public Long getIdleMinutes(final Long experimentId) {
-        log.info("Get realization idle minutes. {}", experimentId);
-        return realizationRepository.findByExperimentId(experimentId).getIdleMinutes();
-    }
-
-    @Transactional
-    public void setRunningMinutes(final Long experimentId, final Long minutes) {
-        log.info("Set realization running minutes. {} : {}", experimentId, minutes);
-        RealizationEntity realizationEntity = realizationRepository.findByExperimentId(experimentId);
-        realizationEntity.setRunningMinutes(minutes);
-        realizationRepository.saveAndFlush(realizationEntity);
-    }
-
-    @Transactional
-    public Long getRunningMinutes(final Long experimentId) {
-        log.info("Get realization running minutes. {}", experimentId);
-        return realizationRepository.findByExperimentId(experimentId).getRunningMinutes();
-    }
-
-    @Transactional
-    public void setRealizationDetails(final Long experimentId, final String details) {
-        log.info("Set realization details. {} : {}", experimentId, details);
-        RealizationEntity realizationEntity = realizationRepository.findByExperimentId(experimentId);
-        realizationEntity.setDetails(details);
-        realizationRepository.saveAndFlush(realizationEntity);
-    }
-
-    @Transactional
-    public String getRealizationDetails(final Long experimentId) {
-        log.info("Get realization details. {}", experimentId);
-        return realizationRepository.findByExperimentId(experimentId).getDetails();
     }
 
     @Transactional

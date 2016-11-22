@@ -1,8 +1,9 @@
-package sg.ncl.service.realization;
+package sg.ncl.service.realization.util;
 
 import org.apache.commons.lang3.RandomStringUtils;
 import sg.ncl.service.realization.data.jpa.RealizationEntity;
 import sg.ncl.service.realization.data.jpa.RealizationRepository;
+import sg.ncl.service.realization.domain.RealizationState;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -10,7 +11,7 @@ import java.util.List;
 /**
  * Created by Desmond.
  */
-public class Util {
+public class TestUtil {
 
     public static RealizationEntity getRealizationEntity() {
         final RealizationEntity entity = new RealizationEntity();
@@ -23,6 +24,7 @@ public class Util {
         entity.setIdleMinutes(Long.parseLong(RandomStringUtils.randomNumeric(10)));
         entity.setRunningMinutes(Long.parseLong(RandomStringUtils.randomNumeric(10)));
         entity.setDetails(RandomStringUtils.randomAlphanumeric(20));
+        entity.setState(RealizationState.NOT_RUNNING);
         return entity;
     }
 
@@ -38,7 +40,7 @@ public class Util {
 
     public static void addExperiments(int numEntries, String userId, RealizationRepository realizationRepository) {
         for (int i = 0; i < numEntries; i++) {
-            RealizationEntity realizationEntity = Util.getRealizationEntity();
+            RealizationEntity realizationEntity = TestUtil.getRealizationEntity();
 
             if (i % 2 == 0) {
                 realizationEntity.setUserId(userId);

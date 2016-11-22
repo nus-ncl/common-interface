@@ -606,8 +606,9 @@ public class AdapterDeterLabTest {
         when(restTemplate.exchange(anyString(),eq(HttpMethod.POST),anyObject(),eq(String.class))).thenReturn(response);
         when(response.getBody()).thenReturn(myobject.toString());
         when(response.getBody().toString()).thenReturn(myobject.toString());
+        when(deterLabUserRepository.findByNclUserId(anyString())).thenReturn(new DeterLabUserEntity());
 
-        String actual= adapterDeterLab.startExperiment(myobject.toString());
+        String actual= adapterDeterLab.startExperiment("teamName", "experimentName", "nclUserId");
 
         verify(restTemplate,times(1)).exchange(anyString(),eq(HttpMethod.POST),anyObject(),eq(String.class));
         verify(properties,times(1)).startExperiment();
@@ -626,7 +627,9 @@ public class AdapterDeterLabTest {
         exception.expect(AdapterDeterlabConnectException.class);
         when(restTemplate.exchange(anyString(),eq(HttpMethod.POST),anyObject(),eq(String.class)))
                 .thenThrow(new RuntimeException());
-        String actual=adapterDeterLab.startExperiment(myobject.toString());
+        when(deterLabUserRepository.findByNclUserId(anyString())).thenReturn(new DeterLabUserEntity());
+
+        String actual=adapterDeterLab.startExperiment("teamName", "experimentName", "nclUserId");
 
         verify(restTemplate,times(1)).exchange(anyString(),eq(HttpMethod.POST),anyObject(),eq(String.class));
         verify(properties,times(1)).startExperiment();
@@ -646,8 +649,9 @@ public class AdapterDeterLabTest {
         when(restTemplate.exchange(anyString(),eq(HttpMethod.POST),anyObject(),eq(String.class))).thenReturn(response);
         when(response.getBody()).thenReturn(myobject.toString());
         when(response.getBody().toString()).thenReturn(myobject.toString());
+        when(deterLabUserRepository.findByNclUserId(anyString())).thenReturn(new DeterLabUserEntity());
 
-        String actual=adapterDeterLab.startExperiment(myobject.toString());
+        String actual=adapterDeterLab.startExperiment("teamName", "experimentName", "nclUserId");
 
         verify(restTemplate,times(1)).exchange(anyString(),eq(HttpMethod.POST),anyObject(),eq(String.class));
         verify(properties,times(1)).startExperiment();
@@ -666,8 +670,9 @@ public class AdapterDeterLabTest {
         when(restTemplate.exchange(anyString(),eq(HttpMethod.POST),anyObject(),eq(String.class))).thenReturn(response);
         when(response.getBody()).thenReturn(myobject.toString());
         when(response.getBody().toString()).thenReturn(myobject.toString());
+        when(deterLabUserRepository.findByNclUserId(anyString())).thenReturn(new DeterLabUserEntity());
 
-        String actual=adapterDeterLab.startExperiment(myobject.toString());
+        String actual=adapterDeterLab.startExperiment("teamName", "experimentName", "nclUserId");
 
         verify(restTemplate,times(1)).exchange(anyString(),eq(HttpMethod.POST),anyObject(),eq(String.class));
         verify(properties,times(1)).startExperiment();
@@ -685,8 +690,9 @@ public class AdapterDeterLabTest {
         when(restTemplate.exchange(anyString(),eq(HttpMethod.POST),anyObject(),eq(String.class))).thenReturn(response);
         when(response.getBody()).thenReturn(myobject.toString());
         when(response.getBody().toString()).thenReturn(myobject.toString());
+        when(deterLabUserRepository.findByNclUserId(anyString())).thenReturn(new DeterLabUserEntity());
 
-        String actual= adapterDeterLab.stopExperiment(myobject.toString());
+        String actual= adapterDeterLab.stopExperiment("teamName", "experimentName", "nclUserId");
 
         verify(restTemplate,times(1)).exchange(anyString(),eq(HttpMethod.POST),anyObject(),eq(String.class));
         verify(properties,times(1)).stopExperiment();
@@ -705,7 +711,9 @@ public class AdapterDeterLabTest {
         exception.expect(AdapterDeterlabConnectException.class);
         when(restTemplate.exchange(anyString(),eq(HttpMethod.POST),anyObject(),eq(String.class)))
                 .thenThrow(new RuntimeException());
-        String actual=adapterDeterLab.stopExperiment(myobject.toString());
+        when(deterLabUserRepository.findByNclUserId(anyString())).thenReturn(new DeterLabUserEntity());
+
+        String actual=adapterDeterLab.stopExperiment("teamName", "experimentName", "nclUserId");
 
         verify(restTemplate,times(1)).exchange(anyString(),eq(HttpMethod.POST),anyObject(),eq(String.class));
         verify(properties,times(1)).stopExperiment();
@@ -722,8 +730,9 @@ public class AdapterDeterLabTest {
         when(restTemplate.exchange(anyString(),eq(HttpMethod.POST),anyObject(),eq(String.class))).thenReturn(response);
         when(response.getBody()).thenReturn(myobject.toString());
         when(response.getBody().toString()).thenReturn(myobject.toString());
+        when(deterLabUserRepository.findByNclUserId(anyString())).thenReturn(new DeterLabUserEntity());
 
-        String actual= adapterDeterLab.deleteExperiment(myobject.toString());
+        String actual= adapterDeterLab.deleteExperiment("teamName", "experimentName", "nclUserId");
 
         verify(restTemplate,times(1)).exchange(anyString(),eq(HttpMethod.POST),anyObject(),eq(String.class));
         verify(properties,times(1)).deleteExperiment();
@@ -742,8 +751,9 @@ public class AdapterDeterLabTest {
         exception.expect(AdapterDeterlabConnectException.class);
         when(restTemplate.exchange(anyString(),eq(HttpMethod.POST),anyObject(),eq(String.class)))
                 .thenThrow(new  RuntimeException());
+        when(deterLabUserRepository.findByNclUserId(anyString())).thenReturn(new DeterLabUserEntity());
 
-        String actual=adapterDeterLab. deleteExperiment(myobject.toString());
+        String actual=adapterDeterLab. deleteExperiment("teamName", "experimentName", "nclUserId");
 
         verify(restTemplate,times(1)).exchange(anyString(),eq(HttpMethod.POST),anyObject(),eq(String.class));
         verify(properties,times(1)).deleteExperiment();
@@ -762,7 +772,9 @@ public class AdapterDeterLabTest {
                 .thenReturn(response);
         when(response.getBody()).thenReturn(myobject.toString());
         when(response.getBody().toString()).thenReturn(myobject.toString());
-        String actual=adapterDeterLab.deleteExperiment(myobject.toString());
+        when(deterLabUserRepository.findByNclUserId(anyString())).thenReturn(new DeterLabUserEntity());
+
+        String actual=adapterDeterLab.deleteExperiment("teamName", "experimentName", "nclUserId");
 
         verify(restTemplate,times(1)).exchange(anyString(),eq(HttpMethod.POST),anyObject(),eq(String.class));
         verify(properties,times(1)).deleteExperiment();
@@ -780,7 +792,7 @@ public class AdapterDeterLabTest {
         when(response.getBody()).thenReturn(myobject.toString());
         when(response.getBody().toString()).thenReturn(myobject.toString());
 
-        String actual= adapterDeterLab.getExperimentStatus(myobject.toString());
+        String actual= adapterDeterLab.getExperimentStatus("teamName", "experimentName");
 
         verify(restTemplate,times(1)).exchange(anyString(),eq(HttpMethod.POST),anyObject(),eq(String.class));
         verify(properties,times(1)).getExpStatus();
@@ -802,7 +814,7 @@ public class AdapterDeterLabTest {
 
         String expected="{\"status\": \"error\"}";
 
-        String actual=adapterDeterLab.getExperimentStatus(myobject.toString());
+        String actual=adapterDeterLab.getExperimentStatus("teamName", "experimentName");
 
         verify(restTemplate,times(1)).exchange(anyString(),eq(HttpMethod.POST),anyObject(),eq(String.class));
         verify(properties,times(1)).getExpStatus();
