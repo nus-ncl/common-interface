@@ -106,7 +106,7 @@ public class AdapterDeterLab {
         // msg: user not found, uid: xxx
         String responseBody = response.getBody().toString();
         try {
-            checkAdapterResultNewUsers(responseBody, "Apply new project as new user failed: {}.");
+            checkAdapterResultNewUsers(responseBody, "Apply new project as new user failed: {}. ");
 
             log.info("Apply project as new user to DeterLab OK");
             return responseBody;
@@ -635,29 +635,45 @@ public class AdapterDeterLab {
      * @param logPrefix the prefix for the log messages to display either "Apply new project as new user..." or "Join new project as new user..."
      */
     private void checkAdapterResultNewUsers(String responseBody, String logPrefix) {
+
         String jsonResult = new JSONObject(responseBody).getString("msg");
 
-        if ("email address in use".equals(jsonResult)) {
-            log.warn(logPrefix + " Email address already exists.", responseBody);
-            throw new EmailAlreadyExistsException();
-        } else if ("invalid password".equals(jsonResult)) {
-            log.warn(logPrefix + " Password is invalid.", responseBody);
-            throw new InvalidPasswordException();
-        } else if ("team name is already in use".equals( jsonResult)) {
-            log.warn (logPrefix + " Team Name is already in use.", responseBody);
-            throw new TeamNameExistsException();
-        } else if ("incorrect verification key".equals( jsonResult)) {
-            log.warn (logPrefix + " Incorrect verification key.", responseBody);
-            throw new VerificationKeyException();
-        } else if ("already verified".equals( jsonResult)) {
-            log.warn (logPrefix + " Verification key has already verified.", responseBody);
-            throw new VerificationKeyException();
-        } else if ("key missing".equals( jsonResult)) {
-            log.warn (logPrefix + " Verification key is missing.", responseBody);
-            throw new VerificationKeyException();
-        } else if (!"user is created".equals(jsonResult)) {
+        checkEmailAddressError (responseBody, jsonResult, logPrefix);
+
+        checkTeamNameError (responseBody, jsonResult, logPrefix);
+
+        checkVerificationKeyError (responseBody, jsonResult, logPrefix);
+
+        if (!"user is created".equals(jsonResult)) {
             log.warn(logPrefix, responseBody);
             throw new DeterLabOperationFailedException();
+        }
+    }
+
+    private void checkVerificationKeyError (String responseBody, String  jsonResult, String logPrefix) {
+
+        if ("Incorrect verification key".equals(jsonResult) || "Key has already been verified".equals(jsonResult) || "Missing verification key".equals(jsonResult)) {
+            log.warn(logPrefix + jsonResult, responseBody);
+            throw new VerificationKeyException();
+        }
+    }
+
+    private void checkEmailAddressError (String responseBody, String jsonResult, String logPrefix) {
+
+        if ("email address in use".equals(jsonResult)) {
+            log.warn(logPrefix + "Email address already exists.", responseBody);
+            throw new EmailAlreadyExistsException();
+        } else if ("invalid password".equals(jsonResult)) {
+            log.warn(logPrefix + "Password is invalid.", responseBody);
+            throw new InvalidPasswordException();
+        }
+    }
+
+    private void checkTeamNameError (String responseBody, String  jsonResult, String logPrefix) {
+
+        if ("team name is already in use".equals(jsonResult)) {
+            log.warn(logPrefix + "Team Name is already in use.", responseBody);
+            throw new TeamNameExistsException();
         }
     }
 }
