@@ -689,6 +689,15 @@ public class AdapterDeterLab {
         } else if ("team name is already in use".equals( jsonResult)) {
             log.warn (logPrefix + " Team Name is already in use.", responseBody);
             throw new TeamNameExistsException();
+        } else if ("incorrect verification key".equals( jsonResult)) {
+            log.warn (logPrefix + " Incorrect verification key.", responseBody);
+            throw new VerificationKeyException();
+        } else if ("already verified".equals( jsonResult)) {
+            log.warn (logPrefix + " Verification key has already verified.", responseBody);
+            throw new VerificationKeyException();
+        } else if ("key missing".equals( jsonResult)) {
+            log.warn (logPrefix + " Verification key is missing.", responseBody);
+            throw new VerificationKeyException();
         } else if (!"user is created".equals(jsonResult)) {
             log.warn(logPrefix, responseBody);
             throw new AdapterDeterLabOperationFailedException(jsonResult);
