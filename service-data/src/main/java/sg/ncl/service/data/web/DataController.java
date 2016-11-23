@@ -87,11 +87,12 @@ public class DataController {
     // Delete a data set
     @DeleteMapping(path = "/{id}")
     @ResponseStatus(HttpStatus.OK)
-    public Data remove(@AuthenticationPrincipal Object claims, @PathVariable Long id) {
+    public boolean remove(@AuthenticationPrincipal Object claims, @PathVariable Long id) {
         if (claims == null || !(claims instanceof Claims)) {
             throw new UnauthorizedException();
         }
-        return new DataInfo(dataService.deleteDataset(id, (Claims) claims));
+        dataService.deleteDataset(id, (Claims) claims);
+        return true;
     }
 
     // View resource in a data set
