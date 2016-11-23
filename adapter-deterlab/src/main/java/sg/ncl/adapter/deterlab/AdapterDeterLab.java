@@ -695,10 +695,16 @@ public class AdapterDeterLab {
 
     private void checkVerificationKeyError (String responseBody, String  jsonResult, String logPrefix) {
 
-        if ("verification key not found".equals(jsonResult) || "Incorrect verification key".equals(jsonResult) || "missing verification key".equals(jsonResult) || "unapproved account".equals(jsonResult) || "failed verification".equals(jsonResult)) {
+        if ("verification key not found".equals(jsonResult)) {
             log.warn(logPrefix + jsonResult, responseBody);
             throw new VerificationKeyException();
         }
+
+        if ("incorrect verification key".equals(jsonResult) || "missing verification key".equals(jsonResult) ||"failed verification".equals(jsonResult))  {
+            log.warn(logPrefix + jsonResult, responseBody);
+            throw new VerificationKeyException();
+        }
+
     }
 
     private void checkEmailAddressError (String responseBody, String jsonResult, String logPrefix) {
