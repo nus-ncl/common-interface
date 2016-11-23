@@ -638,6 +638,8 @@ public class AdapterDeterLab {
 
         String jsonResult = new JSONObject(responseBody).getString("msg");
 
+        checkUserNotFound (responseBody, jsonResult, logPrefix);
+
         checkEmailAddressError (responseBody, jsonResult, logPrefix);
 
         checkTeamNameError (responseBody, jsonResult, logPrefix);
@@ -653,15 +655,15 @@ public class AdapterDeterLab {
     private void checkVerificationKeyError (String responseBody, String  jsonResult, String logPrefix) {
 
         if ("verification key not found".equals(jsonResult)) {
-            log.warn(logPrefix + jsonResult, responseBody);
+            log.warn(logPrefix + "Verification key is not found", responseBody);
+            throw new VerificationKeyException();
+        } else if ("incorrect verification key".equals(jsonResult)) {
+            log.warn(logPrefix + "Incorrect verification key", responseBody);
+            throw new VerificationKeyException();
+        } else if ("user verification failed".equals(jsonResult)) {
+            log.warn(logPrefix + "user verification failed", responseBody);
             throw new VerificationKeyException();
         }
-
-        if ("incorrect verification key".equals(jsonResult) || "missing verification key".equals(jsonResult) ||"failed verification".equals(jsonResult))  {
-            log.warn(logPrefix + jsonResult, responseBody);
-            throw new VerificationKeyException();
-        }
-
     }
 
     private void checkEmailAddressError (String responseBody, String jsonResult, String logPrefix) {
@@ -680,6 +682,13 @@ public class AdapterDeterLab {
         if ("team name is already in use".equals(jsonResult)) {
             log.warn(logPrefix + "Team Name is already in use.", responseBody);
             throw new TeamNameExistsException();
+        }
+    }
+
+    private void checkUserNotFound (String responseBody, String jsonResult, String logPrefix) {
+        if ("user not created in deter database".equals(jsonResult)) {
+            log.warn(logPrefix + "User is not found in database.", responseBody);
+            throw new UserNotFoundException("User is not found in database.");
         }
     }
 }
