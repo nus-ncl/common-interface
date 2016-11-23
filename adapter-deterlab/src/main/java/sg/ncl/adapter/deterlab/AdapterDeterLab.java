@@ -543,12 +543,15 @@ public class AdapterDeterLab {
         }
         String responseBody = httpResponse.getBody().toString();
         try {
-            if (!"process join request OK".equals(new JSONObject(responseBody).getString("msg"))) {
+            String adapterResponse = new JSONObject(responseBody).getString("msg");
+            log.info("process join request adapter response: {}", adapterResponse);
+            if ("process join request OK".equals(adapterResponse) || ("approve".equals(action) && "user is already an approved member in the project".equals(adapterResponse))) {
+                log.info("{} join request to team {} OK", action, pid);
+                return responseBody;
+            } else {
                 log.warn("{} join request to team {} FAIL", action, pid);
                 throw new DeterLabOperationFailedException();
             }
-            log.info("{} join request to team {} OK", action, pid);
-            return responseBody;
         } catch (JSONException e) {
             log.warn("Error parsing response code process join request: {}", responseBody);
             throw e;
