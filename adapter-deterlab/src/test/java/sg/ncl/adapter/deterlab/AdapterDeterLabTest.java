@@ -1062,6 +1062,56 @@ public class AdapterDeterLabTest {
         assertEquals(myobject.toString(),actual);
     }
 
+    //"action" is reject and "msg" no join request found
+    // expect to throw deterlab fail operation
+    @Test
+    public void processJoinRequestTest12() {
+        JSONObject myobject = new JSONObject();
+        myobject.put("pid", "");
+        myobject.put("approverUid", "");
+        myobject.put("uid", "");
+        myobject.put("gid", "");
+        myobject.put("action", "approve");
+        myobject.put("msg", "no join request found");
+
+        when(restTemplate.exchange(anyString(),eq(HttpMethod.POST),anyObject(),eq(String.class)))
+                .thenReturn(response);
+        when(response.getBody()).thenReturn(myobject.toString());
+        when(response.getBody().toString()).thenReturn(myobject.toString());
+
+        String actual=adapterDeterLab.processJoinRequest(myobject.toString());
+
+        verify(restTemplate,times(1)).exchange(anyString(),eq(HttpMethod.POST),anyObject(),eq(String.class));
+        verify(properties,times(1)).getRejectJoinRequest();
+        assertEquals(myobject.toString(),actual);
+    }
+
+    //"action" is approve and "msg" no join request found
+    // expect to throw deterlab
+    @Test
+    public void processJoinRequestTest13() {
+        JSONObject myobject = new JSONObject();
+        myobject.put("pid", "");
+        myobject.put("approverUid", "");
+        myobject.put("uid", "");
+        myobject.put("gid", "");
+        myobject.put("action", "approve");
+        myobject.put("msg", "no join request found");
+
+        exception.expect(DeterLabOperationFailedException.class);
+
+        when(restTemplate.exchange(anyString(),eq(HttpMethod.POST),anyObject(),eq(String.class)))
+                .thenReturn(response);
+        when(response.getBody()).thenReturn(myobject.toString());
+        when(response.getBody().toString()).thenReturn(myobject.toString());
+
+        String actual=adapterDeterLab.processJoinRequest(myobject.toString());
+
+        verify(restTemplate,times(1)).exchange(anyString(),eq(HttpMethod.POST),anyObject(),eq(String.class));
+        verify(properties,times(1)).getApproveJoinRequest();
+        assertEquals(myobject.toString(),actual);
+    }
+
     //throw AdapterDeterlabConnectException
     @Test
     public void approveProjectTest1(){
