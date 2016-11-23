@@ -556,7 +556,7 @@ public class AdapterDeterLab {
             log.info("process join request adapter response: {}", adapterResponse);
             if ("process join request OK".equals(adapterResponse) ||
                     ("approve".equals(action) && "user is already an approved member in the project".equals(adapterResponse)) ||
-                    ("reject".equals(action) && "no join request found".equals(adapterResponse)) ) {
+                    ("deny".equals(action) && "no join request found".equals(adapterResponse)) ) {
                 log.info("{} join request to team {} OK", action, pid);
                 return responseBody;
             } else {
