@@ -86,7 +86,7 @@ public class AdapterDeterLabTest {
     public void joinProjectNewUsersTest2(){
         JSONObject myobject = new JSONObject();
 
-        exception.expect(ResourceAccessException.class);
+        exception.expect(AdapterDeterLabConnectionFailedException.class);
         when(restTemplate.exchange(anyString(),eq(HttpMethod.POST),anyObject(),eq(String.class))).
                 thenThrow(new ResourceAccessException(""));
 
