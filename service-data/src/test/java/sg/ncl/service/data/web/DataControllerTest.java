@@ -240,13 +240,7 @@ public class DataControllerTest {
 
         mockMvc.perform(delete(DataController.PATH + "/1"))
                 .andExpect(status().isOk())
-                .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
-
-                .andExpect(jsonPath("name", is(equalTo(dataEntity.getName()))))
-                .andExpect(jsonPath("description", is(equalTo(dataEntity.getDescription()))))
-                .andExpect(jsonPath("contributorId", is(equalTo(dataEntity.getContributorId()))))
-                .andExpect(jsonPath("accessibility", is(equalTo(dataEntity.getAccessibility().toString()))))
-                .andExpect(jsonPath("visibility", is(equalTo(dataEntity.getVisibility().toString()))));
+                .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON));
     }
 
     @Test
