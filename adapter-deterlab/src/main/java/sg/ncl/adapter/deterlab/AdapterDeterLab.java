@@ -695,7 +695,7 @@ public class AdapterDeterLab {
 
     private void checkVerificationKeyError (String responseBody, String  jsonResult, String logPrefix) {
 
-        if ("Incorrect verification key".equals(jsonResult) || "Key has already been verified".equals(jsonResult) || "Missing verification key".equals(jsonResult)) {
+        if ("verification key not found".equals(jsonResult) || "Incorrect verification key".equals(jsonResult) || "missing verification key".equals(jsonResult) || "unapproved account".equals(jsonResult) || "failed verification".equals(jsonResult)) {
             log.warn(logPrefix + jsonResult, responseBody);
             throw new VerificationKeyException();
         }
