@@ -8,7 +8,6 @@ import sg.ncl.common.exception.base.BadRequestException;
  */
 
 @ResponseStatus(reason = "Verification key error")
-public class VerificationKeyException extends BadRequestException {
-    public VerificationKeyException () { super("Verification key error");}
+public class VerificationKeyException extends DeterLabOperationFailedException {
 
 }

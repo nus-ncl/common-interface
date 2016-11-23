@@ -1,5 +1,6 @@
 package sg.ncl.adapter.deterlab;
 
+
 import lombok.extern.slf4j.Slf4j;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -681,11 +682,13 @@ public class AdapterDeterLab {
 
         String jsonResult = new JSONObject(responseBody).getString("msg");
 
-        checkUserNotFound (responseBody, jsonResult, logPrefix);
+        checkUserNotFoundError (responseBody, jsonResult, logPrefix);
 
         checkEmailAddressError (responseBody, jsonResult, logPrefix);
 
-        checkTeamNameError (responseBody, jsonResult, logPrefix);
+        checkInvalidPasswordError (responseBody, jsonResult, logPrefix);
+
+        checkTeamNameAlreadyExistsError (responseBody, jsonResult, logPrefix);
 
         checkVerificationKeyError (responseBody, jsonResult, logPrefix);
 
@@ -714,13 +717,18 @@ public class AdapterDeterLab {
         if ("email address in use".equals(jsonResult)) {
             log.warn(logPrefix + "Email address already exists.", responseBody);
             throw new EmailAlreadyExistsException();
-        } else if ("invalid password".equals(jsonResult)) {
+        }
+    }
+
+    private void checkInvalidPasswordError (String responseBody, String jsonResult, String logPrefix) {
+
+        if ("invalid password".equals(jsonResult)) {
             log.warn(logPrefix + "Password is invalid.", responseBody);
             throw new InvalidPasswordException();
         }
     }
 
-    private void checkTeamNameError (String responseBody, String  jsonResult, String logPrefix) {
+    private void checkTeamNameAlreadyExistsError (String responseBody, String  jsonResult, String logPrefix) {
 
         if ("team name is already in use".equals(jsonResult)) {
             log.warn(logPrefix + "Team Name is already in use.", responseBody);
@@ -728,6 +736,7 @@ public class AdapterDeterLab {
         }
     }
 
+    private void checkUserNotFoundError (String responseBody, String jsonResult, String logPrefix) {
     /**
      * Crafts the JSON string for start/stop experiment
      * @param operation in or out, implies start or stop experiment respectively
