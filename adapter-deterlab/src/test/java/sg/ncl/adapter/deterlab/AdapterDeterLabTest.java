@@ -932,7 +932,7 @@ public class AdapterDeterLabTest {
         myobject.put("approverUid", "");
         myobject.put("uid", "");
         myobject.put("gid", "");
-        myobject.put("action", "reject");
+        myobject.put("action", "deny");
 
         exception.expect(AdapterDeterlabConnectException.class);
         when(restTemplate.exchange(anyString(),eq(HttpMethod.POST),anyObject(),eq(String.class)))
@@ -952,7 +952,7 @@ public class AdapterDeterLabTest {
         myobject.put("approverUid", "");
         myobject.put("uid", "");
         myobject.put("gid", "");
-        myobject.put("action", "reject");
+        myobject.put("action", "deny");
         myobject.put("msg", "process join request not OK");
 
         exception.expect(DeterLabOperationFailedException.class);
@@ -975,7 +975,7 @@ public class AdapterDeterLabTest {
         myobject.put("approverUid", "");
         myobject.put("uid", "");
         myobject.put("gid", "");
-        myobject.put("action", "reject");
+        myobject.put("action", "deny");
         myobject.put("msg", "process join request OK");
 
         exception.expect(JSONException.class);
@@ -998,7 +998,7 @@ public class AdapterDeterLabTest {
         myobject.put("approverUid", "");
         myobject.put("uid", "");
         myobject.put("gid", "");
-        myobject.put("action", "reject");
+        myobject.put("action", "deny");
         myobject.put("msg", "process join request OK");
 
         when(restTemplate.exchange(anyString(),eq(HttpMethod.POST),anyObject(),eq(String.class)))
@@ -1036,7 +1036,7 @@ public class AdapterDeterLabTest {
         assertEquals(myobject.toString(),actual);
     }
 
-    //"action" is reject and "msg" is user is already an approved member in the project
+    //"action" is deny and "msg" is user is already an approved member in the project
     // expect to throw deterlab fail operation
     @Test
     public void processJoinRequestTest11() {
@@ -1045,7 +1045,7 @@ public class AdapterDeterLabTest {
         myobject.put("approverUid", "");
         myobject.put("uid", "");
         myobject.put("gid", "");
-        myobject.put("action", "reject");
+        myobject.put("action", "deny");
         myobject.put("msg", "user is already an approved member in the project");
 
         exception.expect(DeterLabOperationFailedException.class);
@@ -1062,8 +1062,7 @@ public class AdapterDeterLabTest {
         assertEquals(myobject.toString(),actual);
     }
 
-    //"action" is reject and "msg" no join request found
-    // expect to throw deterlab fail operation
+    //"action" is deny and "msg" no join request found
     @Test
     public void processJoinRequestTest12() {
         JSONObject myobject = new JSONObject();
@@ -1071,7 +1070,7 @@ public class AdapterDeterLabTest {
         myobject.put("approverUid", "");
         myobject.put("uid", "");
         myobject.put("gid", "");
-        myobject.put("action", "approve");
+        myobject.put("action", "deny");
         myobject.put("msg", "no join request found");
 
         when(restTemplate.exchange(anyString(),eq(HttpMethod.POST),anyObject(),eq(String.class)))
