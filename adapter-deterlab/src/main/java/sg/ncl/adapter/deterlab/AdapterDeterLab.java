@@ -61,7 +61,7 @@ public class AdapterDeterLab {
         try {
             response = restTemplate.exchange(properties.getJoinProjectNewUsers(), HttpMethod.POST, request, String.class);
         } catch (ResourceAccessException rae) {
-            log.warn("New user join project error: {}", rae.getMessage());
+            log.warn("New user join project error: {}", rae);
             throw new AdapterDeterLabConnectionFailedException(rae.getMessage());
         } catch (HttpServerErrorException hsee) {
             log.warn("New user join project error: Adapter DeterLab internal server error {}", hsee);
