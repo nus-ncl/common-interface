@@ -5,9 +5,9 @@ import sg.ncl.common.exception.base.BadRequestException;
 /**
  * Created by chris on 9/9/2016.
  */
-public class StatusNullException extends BadRequestException {
+public class CredentialsStatusNullException extends BadRequestException {
 
-    public StatusNullException() {
+    public CredentialsStatusNullException() {
         super("Status cannot be null");
     }
 
