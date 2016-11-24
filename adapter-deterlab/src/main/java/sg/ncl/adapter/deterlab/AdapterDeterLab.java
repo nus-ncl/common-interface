@@ -694,7 +694,7 @@ public class AdapterDeterLab {
 
         if (!"user is created".equals(jsonResult)) {
             log.warn(logPrefix, responseBody);
-            throw new DeterLabOperationFailedException();
+            throw new AdapterDeterLabOperationFailedException("User creation failed");
         }
     }
 
@@ -702,13 +702,13 @@ public class AdapterDeterLab {
 
         if ("verification key not found".equals(jsonResult)) {
             log.warn(logPrefix + "Verification key is not found", responseBody);
-            throw new VerificationKeyException();
+            throw new AdapterDeterLabOperationFailedException("Verification key is not found");
         } else if ("incorrect verification key".equals(jsonResult)) {
             log.warn(logPrefix + "Incorrect verification key", responseBody);
-            throw new VerificationKeyException();
+            throw new AdapterDeterLabOperationFailedException("Incorrect verification key");
         } else if ("user verification failed".equals(jsonResult)) {
             log.warn(logPrefix + "user verification failed", responseBody);
-            throw new VerificationKeyException();
+            throw new AdapterDeterLabOperationFailedException("User verification failed");
         }
     }
 
@@ -716,7 +716,7 @@ public class AdapterDeterLab {
 
         if ("email address in use".equals(jsonResult)) {
             log.warn(logPrefix + "Email address already exists.", responseBody);
-            throw new EmailAlreadyExistsException();
+            throw new EmailAlreadyExistsException("Email address already exists.");
         }
     }
 
@@ -732,11 +732,17 @@ public class AdapterDeterLab {
 
         if ("team name is already in use".equals(jsonResult)) {
             log.warn(logPrefix + "Team Name is already in use.", responseBody);
-            throw new TeamNameExistsException();
+            throw new TeamNameAlreadyExistsException("Team Name is already in use.");
         }
     }
 
     private void checkUserNotFoundError (String responseBody, String jsonResult, String logPrefix) {
+
+        if ("user not created in deter database".equals(jsonResult)) {
+            log.warn(logPrefix + "User is not found in database.", responseBody);
+            throw new UserNotFoundException("User is not found in database.");
+        }
+    }
     /**
      * Crafts the JSON string for start/stop experiment
      * @param operation in or out, implies start or stop experiment respectively
@@ -762,10 +768,4 @@ public class AdapterDeterLab {
         return jsonObject.toString();
     }
 
-    private void checkUserNotFound (String responseBody, String jsonResult, String logPrefix) {
-        if ("user not created in deter database".equals(jsonResult)) {
-            log.warn(logPrefix + "User is not found in database.", responseBody);
-            throw new UserNotFoundException("User is not found in database.");
-        }
-    }
 }
