@@ -548,16 +548,28 @@ public class AdapterDeterLab {
         }
         String responseBody = httpResponse.getBody().toString();
         try {
-            if (!"process join request OK".equals(new JSONObject(responseBody).getString("msg"))) {
+            // cases where we want to process join request:
+            // case1: normal join request entry exists on deterlab
+            // case2: approve a join request not updated on our DB but already approved on deterlab DB
+            // case3: reject a join request not updated on our DB but does not exists on deterlab DB
+            String adapterResponse = new JSONObject(responseBody).getString("msg");
+            log.info("process join request adapter response: {}", adapterResponse);
+            if ("process join request OK".equals(adapterResponse) || isJoinRequestValid(action, adapterResponse)) {
+                log.info("{} join request to team {} OK", action, pid);
+                return responseBody;
+            } else {
                 log.warn("{} join request to team {} FAIL", action, pid);
                 throw new AdapterDeterLabOperationFailedException(responseBody);
             }
-            log.info("{} join request to team {} OK", action, pid);
-            return responseBody;
         } catch (JSONException e) {
             log.warn("Error parsing response code process join request: {}", responseBody);
             throw e;
         }
+    }
+
+    private boolean isJoinRequestValid(String action, String adapterResponse) {
+        return ("approve".equals(action) && "user is already an approved member in the project".equals(adapterResponse)) ||
+                ("deny".equals(action) && "no join request found".equals(adapterResponse));
     }
 
     public String approveProject(String jsonString) {
