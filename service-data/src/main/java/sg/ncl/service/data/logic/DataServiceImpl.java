@@ -14,6 +14,8 @@ import sg.ncl.service.data.domain.DataVisibility;
 import sg.ncl.service.data.exceptions.DataNameAlreadyExistsException;
 import sg.ncl.service.data.exceptions.DataNotFoundException;
 import sg.ncl.service.data.exceptions.DataResourceNotFoundException;
+import sg.ncl.service.upload.domain.UploadService;
+import sg.ncl.service.upload.web.ResumableInfo;
 
 import javax.inject.Inject;
 import javax.validation.constraints.NotNull;
@@ -33,10 +35,12 @@ public class DataServiceImpl implements DataService {
     private static final String INFO_TEXT = "Data saved: {}";
 
     private final DataRepository dataRepository;
+    private final UploadService uploadService;
 
     @Inject
-    DataServiceImpl(@NotNull final DataRepository dataRepository) {
+    DataServiceImpl(@NotNull final DataRepository dataRepository, @NotNull final UploadService uploadService) {
         this.dataRepository = dataRepository;
+        this.uploadService = uploadService;
     }
 
     private DataEntity setUpDataEntity(Data data, DataEntity... dataEntities) {
@@ -231,6 +235,16 @@ public class DataServiceImpl implements DataService {
         DataEntity savedDataEntity = dataRepository.save(dataEntity);
         log.info(INFO_TEXT, savedDataEntity);
         return savedDataEntity;
+    }
+
+    @Override
+    public String checkChunk(String resumableIdentifier, int resumableChunkNumber) {
+        return uploadService.checkChunk(resumableIdentifier, resumableChunkNumber);
+    }
+
+    @Override
+    public String addChunk(ResumableInfo resumableInfo, int resumableChunkNumber) {
+        return uploadService.addChunk(resumableInfo, resumableChunkNumber, "dataDir");
     }
 
 }

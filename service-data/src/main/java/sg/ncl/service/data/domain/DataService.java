@@ -1,6 +1,7 @@
 package sg.ncl.service.data.domain;
 
 import io.jsonwebtoken.Claims;
+import sg.ncl.service.upload.web.ResumableInfo;
 
 import java.util.List;
 
@@ -26,5 +27,9 @@ public interface DataService {
     Data createResource(Long id, DataResource dataResource, Claims claims);
 
     Data deleteResource(Long did, Long rid, Claims claims);
+
+    String checkChunk(String resumableIdentifier, int resumableChunkNumber);
+
+    String addChunk(ResumableInfo resumableInfo, int resumableChunkNumber);
 
 }

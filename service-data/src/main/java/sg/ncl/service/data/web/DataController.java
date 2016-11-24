@@ -7,7 +7,11 @@ import org.springframework.http.MediaType;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import sg.ncl.common.exception.base.UnauthorizedException;
-import sg.ncl.service.data.domain.*;
+import sg.ncl.service.data.domain.Data;
+import sg.ncl.service.data.domain.DataResource;
+import sg.ncl.service.data.domain.DataService;
+import sg.ncl.service.data.domain.DataVisibility;
+import sg.ncl.service.upload.web.ResumableInfo;
 
 import javax.inject.Inject;
 import javax.validation.Valid;
@@ -147,6 +151,28 @@ public class DataController {
         }
         // TODO: process request to add to approved users
         return "";
+    }
+
+    @GetMapping(value = "/chunks/{resumableChunkNumber}/files/{resumableIdentifier}")
+    @ResponseStatus(HttpStatus.OK)
+    public String checkUpload(@AuthenticationPrincipal Object claims,
+                              @PathVariable String resumableIdentifier,
+                              @PathVariable String resumableChunkNumber) {
+        if (claims == null || !(claims instanceof Claims)) {
+            throw new UnauthorizedException();
+        }
+        return dataService.checkChunk(resumableIdentifier, Integer.parseInt(resumableChunkNumber));
+    }
+
+    @PostMapping(value = "/chunks/{resumableChunkNumber}")
+    @ResponseStatus(HttpStatus.ACCEPTED)
+    public String fileUpload(@AuthenticationPrincipal Object claims,
+                             @RequestBody @Valid ResumableInfo resumableInfo,
+                             @PathVariable String resumableChunkNumber) {
+        if (claims == null || !(claims instanceof Claims)) {
+            throw new UnauthorizedException();
+        }
+        return dataService.addChunk(resumableInfo, Integer.parseInt(resumableChunkNumber));
     }
 
 }

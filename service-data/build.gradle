@@ -2,7 +2,7 @@ version '1.0-SNAPSHOT'
 
 dependencies {
     compile project(':common')
-
+    compile project(':service-upload')
     compileOnly 'org.springframework.boot:spring-boot-configuration-processor'
 
     testCompile project(':common-test')
