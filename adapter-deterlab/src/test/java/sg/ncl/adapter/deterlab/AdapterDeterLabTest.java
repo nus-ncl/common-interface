@@ -1050,7 +1050,7 @@ public class AdapterDeterLabTest {
         myobject.put("action", "deny");
         myobject.put("msg", "user is already an approved member in the project");
 
-        exception.expect(DeterLabOperationFailedException.class);
+        exception.expect(AdapterDeterLabOperationFailedException.class);
 
         when(restTemplate.exchange(anyString(),eq(HttpMethod.POST),anyObject(),eq(String.class)))
                 .thenReturn(response);
@@ -1099,7 +1099,7 @@ public class AdapterDeterLabTest {
         myobject.put("action", "approve");
         myobject.put("msg", "no join request found");
 
-        exception.expect(DeterLabOperationFailedException.class);
+        exception.expect(AdapterDeterLabOperationFailedException.class);
 
         when(restTemplate.exchange(anyString(),eq(HttpMethod.POST),anyObject(),eq(String.class)))
                 .thenReturn(response);
