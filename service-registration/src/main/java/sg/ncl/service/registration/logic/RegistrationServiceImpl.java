@@ -175,21 +175,21 @@ public class RegistrationServiceImpl implements RegistrationService {
     public Registration register(Credentials credentials, User user, Team team, boolean isJoinTeam) {
         if (userFormFieldsHasErrors(user)) {
             log.warn("User form fields has errors {}", user);
-            throw new UserFormException();
+            throw new IncompleteRegistrationFormException();
         }
         if (credentials.getPassword() == null || credentials.getPassword().isEmpty()) {
             log.warn("Credentials password is empty");
-            throw new UserFormException();
+            throw new IncompleteRegistrationFormException();
         }
         if (isJoinTeam) {
             if (team.getId() == null || team.getId().isEmpty()) {
                 log.warn("Apply to join team: Team ID is null or empty!");
-                throw new UserFormException();
+                throw new IncompleteRegistrationFormException();
             }
         } else {
             if (team.getName() == null || team.getName().isEmpty()) {
                 log.warn("Apply to create team: Team name is null or empty!");
-                throw new UserFormException();
+                throw new IncompleteRegistrationFormException();
             }
             checkTeamNameDuplicate(team.getName());
         }
@@ -201,15 +201,15 @@ public class RegistrationServiceImpl implements RegistrationService {
         if (isJoinTeam) {
             // accept the team data
             teamEntity = teamService.getTeamById(team.getId());
-            teamId = team.getId();
-            log.info("Register new user: join Team {}", team.getName());
+            teamId = teamEntity.getId();
+            log.info("Register new user: join Team {}", teamEntity.getName());
         } else {
             // apply for new team
             // check if team already exists
             teamEntity = teamService.createTeam(team);
             teamId = teamEntity.getId();
             addNclTeamIdMapping(teamEntity.getName(), teamId);
-            log.info("Register new user: apply new Team {}", team.getName());
+            log.info("Register new user: apply new Team {}", teamEntity.getName());
         }
 
         // accept user data from form
@@ -229,7 +229,7 @@ public class RegistrationServiceImpl implements RegistrationService {
 
         userService.addTeam(userId, teamId);
         teamService.addMember(teamId, teamMemberInfo);
-        log.info("Register new user: added user {} to team {}", user.getUserDetails().getEmail(), team.getName());
+        log.info("Register new user: added user {} to team {}", user.getUserDetails().getEmail(), teamEntity.getName());
 
         JSONObject userObject = new JSONObject();
         userObject.put("firstName", user.getUserDetails().getFirstName());
@@ -343,7 +343,7 @@ public class RegistrationServiceImpl implements RegistrationService {
             }
         }
         log.warn("Cannot process join request from User {} to Team {}: User is NOT a member of the team.", userId, teamId);
-        throw new UserIsNotTeamMemberException();
+        throw new UserIsNotTeamMemberException("User " + userId + " is not a member of team " + teamId);
     }
 
     @Override
@@ -355,10 +355,9 @@ public class RegistrationServiceImpl implements RegistrationService {
     ) {
         // FIXME required additional parameters to validate if approver is of admin or ordinary user
 
-        if (teamId == null || teamId.isEmpty() || ownerId == null || ownerId.isEmpty()) {
-            log.warn("Id null or empty exception. TeamId: {}, UserId: {}", teamId, ownerId);
-            throw new IdNullOrEmptyException();
-        }
+        checkTeamId(teamId);
+        checkUserId(ownerId);
+
         if (status == null ||
                 !(status.equals(TeamStatus.APPROVED) || status.equals(TeamStatus.REJECTED))) {
             log.warn("Invalid TeamStatus {}", status);
@@ -518,7 +517,7 @@ public class RegistrationServiceImpl implements RegistrationService {
         Team one = teamService.getTeamByName(teamName);
         if (one != null) {
             log.warn("Team name duplicate entry found: {}", teamName);
-            throw new TeamNameDuplicateException();
+            throw new TeamNameAlreadyExistsException(teamName);
         }
     }
 
@@ -550,4 +549,17 @@ public class RegistrationServiceImpl implements RegistrationService {
 
     }
 
+    private static void checkUserId(final String id) {
+        if(id == null || id.trim().isEmpty()) {
+            log.warn("User ID is null or empty: {}", id);
+            throw new UserIdNullOrEmptyException();
+        }
+    }
+
+    private static void checkTeamId(final String id) {
+        if(id == null || id.trim().isEmpty()) {
+            log.warn("Team ID is null or empty: {}", id);
+            throw new TeamIdNullOrEmptyException();
+        }
+    }
 }

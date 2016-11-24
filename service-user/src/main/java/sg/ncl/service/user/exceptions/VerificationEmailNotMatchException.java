@@ -7,10 +7,10 @@ import sg.ncl.common.exception.base.BadRequestException;
 /**
  * Created by dcszwang on 8/12/2016.
  */
-@ResponseStatus(value = HttpStatus.BAD_REQUEST, reason = "Verification key not match")
-public class VerificationKeyNotMatchException extends BadRequestException {
+@ResponseStatus(value = HttpStatus.BAD_REQUEST, reason = "Verification email not match")
+public class VerificationEmailNotMatchException extends BadRequestException {
 
-    public VerificationKeyNotMatchException(final String msg) {
+    public VerificationEmailNotMatchException(final String msg) {
         super(msg);
     }
 }

@@ -7,11 +7,11 @@ import sg.ncl.common.exception.base.BadRequestException;
 /**
  * @author Te Ye
  */
-@ResponseStatus(value = HttpStatus.BAD_REQUEST, reason = "Exp name already exists")
-public class ExpNameAlreadyExistsException extends BadRequestException {
+@ResponseStatus(value = HttpStatus.BAD_REQUEST, reason = "Error in start experiment")
+public class ExperimentStartException extends BadRequestException {
 
-    public ExpNameAlreadyExistsException() {
-        super("Exp name already exists");
+    public ExperimentStartException() {
+        super("Error in start experiment");
     }
 
 }

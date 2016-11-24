@@ -7,11 +7,11 @@ import sg.ncl.common.exception.base.BadRequestException;
 /**
  * @author Te Ye
  */
-@ResponseStatus(value = HttpStatus.BAD_REQUEST, reason = "Error parsing ns file")
-public class NSFileParseException extends BadRequestException {
+@ResponseStatus(value = HttpStatus.BAD_REQUEST, reason = "Error in delete experiment")
+public class ExperimentDeleteException extends BadRequestException {
 
-    public NSFileParseException(final String message) {
-        super(message);
+    public ExperimentDeleteException() {
+        super("Error in delete experiment");
     }
 
 }

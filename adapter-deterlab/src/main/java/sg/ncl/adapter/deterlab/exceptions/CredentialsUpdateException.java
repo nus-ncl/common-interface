@@ -9,9 +9,7 @@ import sg.ncl.common.exception.base.BadRequestException;
  */
 @ResponseStatus(value = HttpStatus.BAD_REQUEST, reason = "Password cannot be updated")
 public class CredentialsUpdateException extends BadRequestException {
-
     public CredentialsUpdateException() {
         super("Password cannot be updated");
     }
-
 }

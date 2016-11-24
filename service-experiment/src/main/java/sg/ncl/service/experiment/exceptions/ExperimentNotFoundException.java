@@ -7,5 +7,9 @@ import sg.ncl.common.exception.base.NotFoundException;
 /**
  * Created by Desmond.
  */
-@ResponseStatus(code = HttpStatus.NOT_FOUND, reason = "There are no experiments.")
-public class ExperimentNotFoundException extends NotFoundException {}
+@ResponseStatus(value = HttpStatus.NOT_FOUND, reason = "Experiment not found")
+public class ExperimentNotFoundException extends NotFoundException {
+    public ExperimentNotFoundException(final String message) {
+        super(message);
+    }
+}

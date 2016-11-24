@@ -11,7 +11,7 @@ import sg.ncl.service.data.domain.Data;
 import sg.ncl.service.data.domain.DataResource;
 import sg.ncl.service.data.domain.DataService;
 import sg.ncl.service.data.domain.DataVisibility;
-import sg.ncl.service.data.exceptions.DataNameInUseException;
+import sg.ncl.service.data.exceptions.DataNameAlreadyExistsException;
 import sg.ncl.service.data.exceptions.DataNotFoundException;
 import sg.ncl.service.data.exceptions.DataResourceNotFoundException;
 
@@ -84,7 +84,7 @@ public class DataServiceImpl implements DataService {
             for (DataEntity dataEntity : dataEntities) {
                 if (dataEntity.getName().equals(data.getName())) {
                     log.warn("Data name is in use: {}", data.getName());
-                    throw new DataNameInUseException();
+                    throw new DataNameAlreadyExistsException(data.getName());
                 }
             }
         }

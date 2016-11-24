@@ -157,7 +157,7 @@ public class UserServiceImplTest {
         verify(userRepository, times(1)).findOne(anyString());
     }
 
-    //throw EmailNotMatchException
+    //throw VerificationEmailNotMatchException
     @Test
     public void testVerifyEmailEmailNotMatch() throws Exception {
         String randomUidStringForTest = RandomStringUtils.randomAlphanumeric(20);
@@ -167,7 +167,7 @@ public class UserServiceImplTest {
         UserEntity userEntity = Util.getUserEntity();
         UserDetailsEntity userDetailsEntity = Util.getUserDetailsEntity();
 
-        exception.expect(EmailNotMatchException.class);
+        exception.expect(VerificationEmailNotMatchException.class);
         when(userRepository.findOne(anyString())).thenReturn(userEntity);
 
         UserStatus actual = userServiceImpl.verifyEmail(randomUidStringForTest, randomEmailStringForTest, randomKeyStringForTest);

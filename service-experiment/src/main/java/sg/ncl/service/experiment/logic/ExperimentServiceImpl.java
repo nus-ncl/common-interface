@@ -12,8 +12,9 @@ import sg.ncl.service.experiment.data.jpa.ExperimentEntity;
 import sg.ncl.service.experiment.data.jpa.ExperimentRepository;
 import sg.ncl.service.experiment.domain.Experiment;
 import sg.ncl.service.experiment.domain.ExperimentService;
-import sg.ncl.service.experiment.exceptions.ExperimentNameInUseException;
-import sg.ncl.service.experiment.exceptions.UserIdNotFoundException;
+import sg.ncl.service.experiment.exceptions.ExperimentNameAlreadyExistsException;
+import sg.ncl.service.experiment.exceptions.TeamIdNullOrEmptyException;
+import sg.ncl.service.experiment.exceptions.UserIdNullOrEmptyException;
 import sg.ncl.service.realization.data.jpa.RealizationEntity;
 import sg.ncl.service.realization.domain.RealizationService;
 
@@ -68,7 +69,7 @@ public class ExperimentServiceImpl implements ExperimentService {
             for (ExperimentEntity one : experimentEntityList) {
                 if (one.getName().equals(experiment.getName())) {
                     log.warn("Experiment name is in use: {}", experiment.getName());
-                    throw new ExperimentNameInUseException();
+                    throw new ExperimentNameAlreadyExistsException(experiment.getName());
                 }
             }
         }
@@ -131,7 +132,7 @@ public class ExperimentServiceImpl implements ExperimentService {
 
         if (userId == null || userId.isEmpty()) {
             // FIXME: this is the wrong exception to throw; it should be a BadRequestException type
-            throw new UserIdNotFoundException();
+            throw new UserIdNullOrEmptyException();
         }
 
         return experimentRepository.findByUserId(userId).stream().collect(Collectors.toList());
@@ -143,7 +144,7 @@ public class ExperimentServiceImpl implements ExperimentService {
 
         if (teamId == null || teamId.isEmpty()) {
             // FIXME: this is the wrong exception to throw; it should be a BadRequestException type
-            throw new UserIdNotFoundException();
+            throw new TeamIdNullOrEmptyException();
         }
 
         return experimentRepository.findByTeamId(teamId).stream().collect(Collectors.toList());
