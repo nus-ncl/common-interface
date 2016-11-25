@@ -81,6 +81,7 @@ public class AdapterDeterLab {
                 log.info("Join project as new user to DeterLab OK");
                 return responseBody;
             }
+            log.warn("Join project new user error: {}", deterMessage);
             throw new AdapterDeterLabOperationFailedException(deterMessage);
         } catch (JSONException e) {
             log.warn("Error parsing response code new user join project: {}", responseBody);
@@ -121,6 +122,7 @@ public class AdapterDeterLab {
                 log.info("Apply project as new user to DeterLab OK");
                 return responseBody;
             }
+            log.warn("Apply project new user error: {}", deterMessage);
             throw new AdapterDeterLabOperationFailedException(deterMessage);
         } catch (JSONException e) {
             log.warn("Error parsing response code new user apply project: {}", responseBody);
