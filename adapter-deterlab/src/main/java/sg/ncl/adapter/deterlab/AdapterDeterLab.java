@@ -75,10 +75,13 @@ public class AdapterDeterLab {
         // msg: user not found, uid: xxx
         String responseBody = response.getBody().toString();
         try {
-            checkAdapterResultNewUsers(responseBody, "Join new project as new user failed: {}.");
-
-            log.info("Join project as new user to DeterLab OK");
-            return responseBody;
+            //checkAdapterResultNewUsers(responseBody, "Join new project as new user failed: {}.");
+            String deterMessage = new JSONObject(responseBody).getString("msg");
+            if("user is created".equalsIgnoreCase(deterMessage)) {
+                log.info("Join project as new user to DeterLab OK");
+                return responseBody;
+            }
+            throw new AdapterDeterLabOperationFailedException(deterMessage);
         } catch (JSONException e) {
             log.warn("Error parsing response code new user join project: {}", responseBody);
             throw e;
@@ -112,10 +115,13 @@ public class AdapterDeterLab {
         // msg: user not found, uid: xxx
         String responseBody = response.getBody().toString();
         try {
-            checkAdapterResultNewUsers(responseBody, "Apply new project as new user failed: {}. ");
-
-            log.info("Apply project as new user to DeterLab OK");
-            return responseBody;
+            // checkAdapterResultNewUsers(responseBody, "Apply new project as new user failed: {}. ");
+            String deterMessage = new JSONObject(responseBody).getString("msg");
+            if("user is created".equalsIgnoreCase(deterMessage)) {
+                log.info("Apply project as new user to DeterLab OK");
+                return responseBody;
+            }
+            throw new AdapterDeterLabOperationFailedException(deterMessage);
         } catch (JSONException e) {
             log.warn("Error parsing response code new user apply project: {}", responseBody);
             throw e;
@@ -678,6 +684,7 @@ public class AdapterDeterLab {
      * @param responseBody the JSON response from adapter deterlab python script
      * @param logPrefix the prefix for the log messages to display either "Apply new project as new user..." or "Join new project as new user..."
      */
+/*
     private void checkAdapterResultNewUsers(String responseBody, String logPrefix) {
 
         String jsonResult = new JSONObject(responseBody).getString("msg");
@@ -743,6 +750,7 @@ public class AdapterDeterLab {
             throw new UserNotFoundException("User is not found in database.");
         }
     }
+*/
     /**
      * Crafts the JSON string for start/stop experiment
      * @param operation in or out, implies start or stop experiment respectively

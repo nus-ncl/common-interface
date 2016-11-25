@@ -135,7 +135,7 @@ public class AdapterDeterLabTest {
         String stubUid = RandomStringUtils.randomAlphanumeric(8);
         myobject.put("msg", "email address in use");
 
-        exception.expect(EmailAlreadyExistsException.class);
+        exception.expect(AdapterDeterLabOperationFailedException.class);
         when(restTemplate.exchange(anyString(),eq(HttpMethod.POST),anyObject(),eq(String.class))).thenReturn(response);
         when(response.getBody()).thenReturn(myobject.toString());
         when(response.getBody().toString()).thenReturn(myobject.toString());
@@ -151,7 +151,7 @@ public class AdapterDeterLabTest {
         JSONObject myobject = new JSONObject();
         myobject.put("msg", "invalid password");
 
-        exception.expect(InvalidPasswordException.class);
+        exception.expect(AdapterDeterLabOperationFailedException.class);
         when(restTemplate.exchange(anyString(),eq(HttpMethod.POST),anyObject(),eq(String.class))).thenReturn(response);
         when(response.getBody()).thenReturn(myobject.toString());
         when(response.getBody().toString()).thenReturn(myobject.toString());
@@ -230,7 +230,7 @@ public class AdapterDeterLabTest {
         JSONObject myobject = new JSONObject();
         myobject.put("msg", "invalid password");
 
-        exception.expect(InvalidPasswordException.class);
+        exception.expect(AdapterDeterLabOperationFailedException.class);
         when(restTemplate.exchange(anyString(),eq(HttpMethod.POST),anyObject(),eq(String.class))).thenReturn(response);
         when(response.getBody()).thenReturn(myobject.toString());
         when(response.getBody().toString()).thenReturn(myobject.toString());
