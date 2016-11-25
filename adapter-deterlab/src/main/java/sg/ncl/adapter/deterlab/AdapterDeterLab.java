@@ -1,5 +1,6 @@
 package sg.ncl.adapter.deterlab;
 
+
 import lombok.extern.slf4j.Slf4j;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -74,10 +75,14 @@ public class AdapterDeterLab {
         // msg: user not found, uid: xxx
         String responseBody = response.getBody().toString();
         try {
-            checkAdapterResultNewUsers(responseBody, "Join new project as new user failed: {}.");
-
-            log.info("Join project as new user to DeterLab OK");
-            return responseBody;
+            //checkAdapterResultNewUsers(responseBody, "Join new project as new user failed: {}.");
+            String deterMessage = new JSONObject(responseBody).getString("msg");
+            if("user is created".equalsIgnoreCase(deterMessage)) {
+                log.info("Join project as new user to DeterLab OK");
+                return responseBody;
+            }
+            log.warn("Join project new user error: {}", deterMessage);
+            throw new AdapterDeterLabOperationFailedException(deterMessage);
         } catch (JSONException e) {
             log.warn("Error parsing response code new user join project: {}", responseBody);
             throw e;
@@ -111,10 +116,14 @@ public class AdapterDeterLab {
         // msg: user not found, uid: xxx
         String responseBody = response.getBody().toString();
         try {
-            checkAdapterResultNewUsers(responseBody, "Apply new project as new user failed: {}.");
-
-            log.info("Apply project as new user to DeterLab OK");
-            return responseBody;
+            // checkAdapterResultNewUsers(responseBody, "Apply new project as new user failed: {}. ");
+            String deterMessage = new JSONObject(responseBody).getString("msg");
+            if("user is created".equalsIgnoreCase(deterMessage)) {
+                log.info("Apply project as new user to DeterLab OK");
+                return responseBody;
+            }
+            log.warn("Apply project new user error: {}", deterMessage);
+            throw new AdapterDeterLabOperationFailedException(deterMessage);
         } catch (JSONException e) {
             log.warn("Error parsing response code new user apply project: {}", responseBody);
             throw e;
@@ -677,21 +686,73 @@ public class AdapterDeterLab {
      * @param responseBody the JSON response from adapter deterlab python script
      * @param logPrefix the prefix for the log messages to display either "Apply new project as new user..." or "Join new project as new user..."
      */
+/*
     private void checkAdapterResultNewUsers(String responseBody, String logPrefix) {
+
         String jsonResult = new JSONObject(responseBody).getString("msg");
 
-        if ("email address in use".equals(jsonResult)) {
-            log.warn(logPrefix + " Email address already exists.", responseBody);
-            throw new EmailAlreadyExistsException("Email already exists");
-        } else if ("invalid password".equals(jsonResult)) {
-            log.warn(logPrefix + " Password is invalid.", responseBody);
-            throw new InvalidPasswordException();
-        } else if (!"user is created".equals(jsonResult)) {
+        checkUserNotFoundError (responseBody, jsonResult, logPrefix);
+
+        checkEmailAddressError (responseBody, jsonResult, logPrefix);
+
+        checkInvalidPasswordError (responseBody, jsonResult, logPrefix);
+
+        checkTeamNameAlreadyExistsError (responseBody, jsonResult, logPrefix);
+
+        checkVerificationKeyError (responseBody, jsonResult, logPrefix);
+
+        if (!"user is created".equals(jsonResult)) {
             log.warn(logPrefix, responseBody);
-            throw new AdapterDeterLabOperationFailedException(jsonResult);
+            throw new AdapterDeterLabOperationFailedException("User creation failed");
         }
     }
 
+    private void checkVerificationKeyError (String responseBody, String  jsonResult, String logPrefix) {
+
+        if ("verification key not found".equals(jsonResult)) {
+            log.warn(logPrefix + "Verification key is not found", responseBody);
+            throw new AdapterDeterLabOperationFailedException("Verification key is not found");
+        } else if ("incorrect verification key".equals(jsonResult)) {
+            log.warn(logPrefix + "Incorrect verification key", responseBody);
+            throw new AdapterDeterLabOperationFailedException("Incorrect verification key");
+        } else if ("user verification failed".equals(jsonResult)) {
+            log.warn(logPrefix + "user verification failed", responseBody);
+            throw new AdapterDeterLabOperationFailedException("User verification failed");
+        }
+    }
+
+    private void checkEmailAddressError (String responseBody, String jsonResult, String logPrefix) {
+
+        if ("email address in use".equals(jsonResult)) {
+            log.warn(logPrefix + "Email address already exists.", responseBody);
+            throw new EmailAlreadyExistsException("Email address already exists.");
+        }
+    }
+
+    private void checkInvalidPasswordError (String responseBody, String jsonResult, String logPrefix) {
+
+        if ("invalid password".equals(jsonResult)) {
+            log.warn(logPrefix + "Password is invalid.", responseBody);
+            throw new InvalidPasswordException();
+        }
+    }
+
+    private void checkTeamNameAlreadyExistsError (String responseBody, String  jsonResult, String logPrefix) {
+
+        if ("team name is already in use".equals(jsonResult)) {
+            log.warn(logPrefix + "Team Name is already in use.", responseBody);
+            throw new TeamNameAlreadyExistsException("Team Name is already in use.");
+        }
+    }
+
+    private void checkUserNotFoundError (String responseBody, String jsonResult, String logPrefix) {
+
+        if ("user not created in deter database".equals(jsonResult)) {
+            log.warn(logPrefix + "User is not found in database.", responseBody);
+            throw new UserNotFoundException("User is not found in database.");
+        }
+    }
+*/
     /**
      * Crafts the JSON string for start/stop experiment
      * @param operation in or out, implies start or stop experiment respectively
@@ -716,4 +777,5 @@ public class AdapterDeterLab {
 
         return jsonObject.toString();
     }
+
 }
