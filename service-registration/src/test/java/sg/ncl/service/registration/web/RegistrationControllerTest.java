@@ -107,7 +107,7 @@ public class RegistrationControllerTest extends AbstractTest {
         mainJSON.put("team", teamFields);
 
         JSONObject predefinedResultJson = new JSONObject();
-        predefinedResultJson.put("msg", "join project request existing users success");
+        predefinedResultJson.put("msg", "join project existing user ok");
 
         mockServer.expect(requestTo(properties.getJoinProject()))
                 .andExpect(method(HttpMethod.POST))
