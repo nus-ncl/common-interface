@@ -136,31 +136,34 @@ public class AdapterDeterLab {
      *
      * @param jsonString Contains uid, project name, pid, project goals, project web, project organisation, project visibility
      */
-    public String applyProject(String jsonString) {
+    public String applyProject( String jsonString) {
         log.info("Applying project as existing user: {}", jsonString);
 
         HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_JSON);
-        HttpEntity<String> request = new HttpEntity<>(jsonString, headers);
+        headers.setContentType( MediaType.APPLICATION_JSON);
+        HttpEntity<String> request = new HttpEntity<>( jsonString, headers);
         ResponseEntity response;
 
         try {
-            response = restTemplate.exchange(properties.getApplyProject(), HttpMethod.POST, request, String.class);
-        } catch (RestClientException e) {
-            log.warn("DeterLab connection error apply project existing user: {}", e);
+            response = restTemplate.exchange( properties.getApplyProject(), HttpMethod.POST, request, String.class);
+        } catch ( RestClientException e) {
+            log.warn( "DeterLab connection error apply project existing user: {}", e);
             throw new AdapterDeterLabConnectionFailedException();
         }
+
         String responseBody = response.getBody().toString();
         try {
-            String jsonResult = new JSONObject(responseBody).getString("msg");
-            if (!"apply project request existing users success".equals(jsonResult)) {
-                log.warn("Apply project as existing user to DeterLab failed: {}", responseBody);
-                throw new AdapterDeterLabOperationFailedException(responseBody);
+            String deterMessage = new JSONObject(responseBody).getString("msg");
+            if( "join project request for existing user is successful".equalsIgnoreCase( deterMessage)) {
+                log.info( "Apply project as existing user to DeterLab OK");
+                return responseBody;
             }
-            log.info("Apply project as existing user to DeterLab OK");
-            return responseBody;
-        } catch (JSONException e) {
-            log.warn("Error parsing response code existing user apply project: {}", responseBody);
+
+            log.warn( "Apply project as existing user to DeterLab failed: {}", deterMessage);
+            throw new AdapterDeterLabOperationFailedException( deterMessage);
+
+        } catch ( JSONException e) {
+            log.warn( "Error parsing response code existing user apply project: {}", responseBody);
             throw e;
         }
     }
