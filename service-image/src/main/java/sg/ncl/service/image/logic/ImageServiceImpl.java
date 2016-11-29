@@ -12,7 +12,9 @@ import sg.ncl.service.image.domain.ImageVisibility;
 
 import javax.inject.Inject;
 import javax.validation.constraints.NotNull;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 /**
@@ -60,6 +62,13 @@ public class ImageServiceImpl implements ImageService {
             return null;
         }
         return imageRepository.findOne(id);
+    }
+
+    @Override
+    public Map<String, String> getSavedImages(String teamId) {
+        Map<String, String> result = new HashMap<>();
+        result.put(teamId, adapterDeterLab.getSavedImages(teamId));
+        return result;
     }
 
     @Transactional
