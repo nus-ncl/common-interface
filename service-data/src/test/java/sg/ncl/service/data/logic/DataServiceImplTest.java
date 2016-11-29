@@ -24,6 +24,7 @@ import sg.ncl.service.data.domain.DataVisibility;
 import sg.ncl.service.data.exceptions.DataNameAlreadyExistsException;
 import sg.ncl.service.data.exceptions.DataNotFoundException;
 import sg.ncl.service.data.util.TestUtil;
+import sg.ncl.service.upload.domain.UploadService;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -46,6 +47,8 @@ public class DataServiceImplTest extends AbstractTest {
     @Mock
     private DataRepository dataRepository;
     @Mock
+    private UploadService uploadService;
+    @Mock
     private Claims claims;
 
     private DataService dataService;
@@ -53,7 +56,8 @@ public class DataServiceImplTest extends AbstractTest {
     @Before
     public void before() {
         assertThat(mockingDetails(dataRepository).isMock()).isTrue();
-        dataService = new DataServiceImpl(dataRepository);
+        assertThat(mockingDetails(uploadService).isMock()).isTrue();
+        dataService = new DataServiceImpl(dataRepository, uploadService);
     }
 
     @Test
