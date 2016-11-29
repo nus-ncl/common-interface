@@ -9,6 +9,6 @@ public interface UploadService {
 
     String checkChunk(String resumableIdentifier, int resumableChunkNumber);
 
-    String addChunk(ResumableInfo resumableInfo, int resumableChunkNumber, String subDirKey);
+    String addChunk(ResumableInfo resumableInfo, int resumableChunkNumber, String subDirKey, String preDir);
 
 }

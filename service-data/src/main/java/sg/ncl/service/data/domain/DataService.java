@@ -28,8 +28,8 @@ public interface DataService {
 
     Data deleteResource(Long did, Long rid, Claims claims);
 
-    String checkChunk(String resumableIdentifier, int resumableChunkNumber);
+    String checkChunk(String resumableIdentifier, String resumableChunkNumber);
 
-    String addChunk(ResumableInfo resumableInfo, int resumableChunkNumber);
+    String addChunk(ResumableInfo resumableInfo, String resumableChunkNumber, String dataId);
 
 }

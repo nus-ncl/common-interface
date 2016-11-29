@@ -45,7 +45,7 @@ public class ResumableEntity implements Resumable {
 
     public String resumableFilePath;
 
-    public boolean vaild(){
+    public boolean valid(){
         if (resumableChunkSize < 0 || resumableTotalSize < 0
                 || HttpUtils.isEmpty(resumableIdentifier)
                 || HttpUtils.isEmpty(resumableFilename)

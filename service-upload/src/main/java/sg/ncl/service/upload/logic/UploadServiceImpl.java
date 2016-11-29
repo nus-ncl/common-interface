@@ -11,8 +11,11 @@ import sg.ncl.service.upload.domain.UploadService;
 import sg.ncl.service.upload.web.ResumableInfo;
 
 import javax.inject.Inject;
-import java.io.File;
+import java.io.IOException;
 import java.io.RandomAccessFile;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
 /**
  * Created by dcsjnh on 11/24/2016.
@@ -41,16 +44,31 @@ public class UploadServiceImpl implements UploadService {
     }
 
     @Override
-    public String addChunk(ResumableInfo resumableInfo, int resumableChunkNumber, String subDirKey) {
+    public String addChunk(ResumableInfo resumableInfo, int resumableChunkNumber, String subDirKey, String preDir) {
         String baseDir = properties.getBaseDir();
         String subDir = (subDirKey == null) ? null : properties.getSubDirs().get(subDirKey);
         if (subDir != null) {
             baseDir = baseDir + "/" + subDir;
         }
+        if (preDir != null) {
+            baseDir = baseDir + "/" + preDir;
+        }
+
+        //https://www.mkyong.com/java/how-to-create-directory-in-java/
+        Path path = Paths.get(System.getProperty("user.home"), baseDir);
+        //if directory exists?
+        if (!Files.exists(path)) {
+            try {
+                Files.createDirectories(path);
+            } catch (IOException e) {
+                //fail to create directory
+                e.printStackTrace();
+                throw new BadRequestException();
+            }
+        }
 
         //Here we add a ".temp" to every upload file to indicate NON-FINISHED
-        new File(baseDir).mkdir();
-        String resumableFilePath = new File(baseDir, resumableInfo.getResumableFilename()).getAbsolutePath() + ".temp";
+        String resumableFilePath = path.toString() + "/" + resumableInfo.getResumableFilename() + ".temp";
 
         ResumableEntity entity = storage.get(
                 resumableInfo.getResumableChunkSize(),
@@ -60,7 +78,7 @@ public class UploadServiceImpl implements UploadService {
                 resumableInfo.getResumableRelativePath(),
                 resumableFilePath);
 
-        if (!entity.vaild()) {
+        if (!entity.valid()) {
             storage.remove(entity);
             log.error("Invalid resumable");
             throw new BadRequestException();
@@ -77,7 +95,7 @@ public class UploadServiceImpl implements UploadService {
             raf.close();
         } catch (Exception e) {
             log.error("Error saving chunk: {}", e.getMessage());
-            e.printStackTrace();
+            throw new BadRequestException();
         }
 
         //Mark as uploaded.

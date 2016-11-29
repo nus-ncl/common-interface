@@ -52,7 +52,7 @@ public class UploadController {
         if (claims == null || !(claims instanceof Claims)) {
             throw new UnauthorizedException();
         }
-        return uploadService.addChunk(resumableInfo, Integer.parseInt(resumableChunkNumber), null);
+        return uploadService.addChunk(resumableInfo, Integer.parseInt(resumableChunkNumber), null, null);
     }
 
 }

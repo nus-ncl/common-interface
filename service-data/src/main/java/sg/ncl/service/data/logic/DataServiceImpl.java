@@ -238,13 +238,13 @@ public class DataServiceImpl implements DataService {
     }
 
     @Override
-    public String checkChunk(String resumableIdentifier, int resumableChunkNumber) {
-        return uploadService.checkChunk(resumableIdentifier, resumableChunkNumber);
+    public String checkChunk(String resumableIdentifier, String resumableChunkNumber) {
+        return uploadService.checkChunk(resumableIdentifier, Integer.parseInt(resumableChunkNumber));
     }
 
     @Override
-    public String addChunk(ResumableInfo resumableInfo, int resumableChunkNumber) {
-        return uploadService.addChunk(resumableInfo, resumableChunkNumber, "dataDir");
+    public String addChunk(ResumableInfo resumableInfo, String resumableChunkNumber, String dataId) {
+        return uploadService.addChunk(resumableInfo, Integer.parseInt(resumableChunkNumber), "dataDir", dataId);
     }
 
 }

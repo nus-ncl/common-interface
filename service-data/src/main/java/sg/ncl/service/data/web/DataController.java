@@ -143,7 +143,7 @@ public class DataController {
     }
 
     // Process request
-    @PutMapping(path = "{did}/requests/{rid}")
+    @PutMapping(path = "/{did}/requests/{rid}")
     @ResponseStatus(HttpStatus.OK)
     public String processRequest(@AuthenticationPrincipal Object claims, @PathVariable String did, @PathVariable String rid) {
         if (claims == null || !(claims instanceof Claims)) {
@@ -153,26 +153,20 @@ public class DataController {
         return "";
     }
 
-    @GetMapping(value = "/chunks/{resumableChunkNumber}/files/{resumableIdentifier}")
+    @GetMapping(value = "/{id}/chunks/{resumableChunkNumber}/files/{resumableIdentifier}")
     @ResponseStatus(HttpStatus.OK)
-    public String checkUpload(@AuthenticationPrincipal Object claims,
-                              @PathVariable String resumableIdentifier,
-                              @PathVariable String resumableChunkNumber) {
-        if (claims == null || !(claims instanceof Claims)) {
-            throw new UnauthorizedException();
-        }
-        return dataService.checkChunk(resumableIdentifier, Integer.parseInt(resumableChunkNumber));
+    public String checkUpload(@PathVariable String resumableIdentifier,
+                              @PathVariable String resumableChunkNumber,
+                              @PathVariable String id) {
+        return dataService.checkChunk(resumableIdentifier, resumableChunkNumber);
     }
 
-    @PostMapping(value = "/chunks/{resumableChunkNumber}")
+    @PostMapping(value = "/{id}/chunks/{resumableChunkNumber}")
     @ResponseStatus(HttpStatus.ACCEPTED)
-    public String fileUpload(@AuthenticationPrincipal Object claims,
-                             @RequestBody @Valid ResumableInfo resumableInfo,
-                             @PathVariable String resumableChunkNumber) {
-        if (claims == null || !(claims instanceof Claims)) {
-            throw new UnauthorizedException();
-        }
-        return dataService.addChunk(resumableInfo, Integer.parseInt(resumableChunkNumber));
+    public String fileUpload(@RequestBody @Valid ResumableInfo resumableInfo,
+                             @PathVariable String resumableChunkNumber,
+                             @PathVariable String id) {
+        return dataService.addChunk(resumableInfo, resumableChunkNumber, id);
     }
 
 }
