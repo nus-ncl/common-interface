@@ -688,10 +688,13 @@ public class AdapterDeterLab {
         return response.getBody().toString();
     }
 
-    public String getSavedImages(String teamId) {
+    public String getSavedImages(String teamName) {
+        JSONObject json = new JSONObject();
+        json.put("pid", getDeterProjectIdByNclTeamId(teamName));
+
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
-        HttpEntity<String> request = new HttpEntity<>(headers);
+        HttpEntity<String> request = new HttpEntity<>(json.toString(), headers);
 
         ResponseEntity response;
 
