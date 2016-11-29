@@ -688,6 +688,25 @@ public class AdapterDeterLab {
         return response.getBody().toString();
     }
 
+    public String getSavedImages(String teamId) {
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        HttpEntity<String> request = new HttpEntity<>(headers);
+
+        ResponseEntity response;
+
+        try {
+            response = restTemplate.exchange(properties.getSavedImages(), HttpMethod.POST, request, String.class);
+        } catch (Exception e) {
+            log.warn("Adapter connection error get list of saved images by team: {}", e);
+            return "{}";
+        }
+
+        log.info("Get list of saved images request submitted to deterlab");
+
+        return response.getBody().toString();
+    }
+
     /**
      * Checks the response from adapter deterlab when applying or joining a new project as a new user and determines the exception to be thrown
      * Use only if @applyProjectNewUsers and @joinProjectNewUsers are performing identical checks
