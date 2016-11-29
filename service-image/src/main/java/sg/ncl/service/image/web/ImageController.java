@@ -12,6 +12,7 @@ import javax.inject.Inject;
 import javax.validation.constraints.NotNull;
 
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 import static sg.ncl.service.image.web.ImageController.PATH;
@@ -43,6 +44,15 @@ public class ImageController {
     @ResponseStatus(HttpStatus.OK)
     public Image getImage(@PathVariable final Long id) {
         return new ImageInfo(imageService.getImage(id));
+    }
+
+    /**
+     * Invokes the adapter to retrieve the list of saved images
+     */
+    @GetMapping(path = "/teams/{id}")
+    @ResponseStatus(HttpStatus.OK)
+    public Map<String, String> getSavedImages(@PathVariable final String id) {
+        return imageService.getSavedImages(id);
     }
 
     /**
