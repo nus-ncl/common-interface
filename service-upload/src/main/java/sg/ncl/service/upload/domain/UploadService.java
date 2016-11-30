@@ -7,8 +7,8 @@ import sg.ncl.service.upload.web.ResumableInfo;
  */
 public interface UploadService {
 
-    String checkChunk(String resumableIdentifier, int resumableChunkNumber);
+    UploadStatus checkChunk(String resumableIdentifier, int resumableChunkNumber);
 
-    String addChunk(ResumableInfo resumableInfo, int resumableChunkNumber, String subDirKey, String preDir);
+    UploadStatus addChunk(ResumableInfo resumableInfo, int resumableChunkNumber, String subDirKey, String preDir);
 
 }

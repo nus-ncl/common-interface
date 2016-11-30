@@ -30,6 +30,6 @@ public interface DataService {
 
     String checkChunk(String resumableIdentifier, String resumableChunkNumber);
 
-    String addChunk(ResumableInfo resumableInfo, String resumableChunkNumber, String dataId);
+    String addChunk(ResumableInfo resumableInfo, String resumableChunkNumber, String dataId, Claims claims);
 
 }

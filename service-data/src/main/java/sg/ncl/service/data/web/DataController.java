@@ -163,10 +163,14 @@ public class DataController {
 
     @PostMapping(value = "/{id}/chunks/{resumableChunkNumber}")
     @ResponseStatus(HttpStatus.ACCEPTED)
-    public String fileUpload(@RequestBody @Valid ResumableInfo resumableInfo,
+    public String fileUpload(@AuthenticationPrincipal Object claims,
+                             @RequestBody @Valid ResumableInfo resumableInfo,
                              @PathVariable String resumableChunkNumber,
                              @PathVariable String id) {
-        return dataService.addChunk(resumableInfo, resumableChunkNumber, id);
+        if (claims == null || !(claims instanceof Claims)) {
+            throw new UnauthorizedException();
+        }
+        return dataService.addChunk(resumableInfo, resumableChunkNumber, id, (Claims) claims);
     }
 
 }

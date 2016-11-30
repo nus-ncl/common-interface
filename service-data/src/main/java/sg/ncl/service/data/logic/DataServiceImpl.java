@@ -14,6 +14,7 @@ import sg.ncl.service.data.domain.DataVisibility;
 import sg.ncl.service.data.exceptions.DataNameAlreadyExistsException;
 import sg.ncl.service.data.exceptions.DataNotFoundException;
 import sg.ncl.service.data.exceptions.DataResourceNotFoundException;
+import sg.ncl.service.data.web.DataResourceInfo;
 import sg.ncl.service.upload.domain.UploadService;
 import sg.ncl.service.upload.web.ResumableInfo;
 
@@ -205,7 +206,7 @@ public class DataServiceImpl implements DataService {
         DataEntity dataEntity = (DataEntity) getDataset(id);
         checkPermissions(dataEntity, claims);
 
-        dataEntity.getResources().add(setUpResourceEntity(dataResource));
+        dataEntity.addResource(setUpResourceEntity(dataResource));
         DataEntity savedDataEntity = dataRepository.save(dataEntity);
         log.info(INFO_TEXT, savedDataEntity);
         return savedDataEntity;
@@ -239,12 +240,28 @@ public class DataServiceImpl implements DataService {
 
     @Override
     public String checkChunk(String resumableIdentifier, String resumableChunkNumber) {
-        return uploadService.checkChunk(resumableIdentifier, Integer.parseInt(resumableChunkNumber));
+        switch (uploadService.checkChunk(resumableIdentifier, Integer.parseInt(resumableChunkNumber))) {
+            case UPLOADED:
+                return "Uploaded.";
+            case NOT_FOUND:
+                return "Not found";
+            default:
+                return "";
+        }
     }
 
     @Override
-    public String addChunk(ResumableInfo resumableInfo, String resumableChunkNumber, String dataId) {
-        return uploadService.addChunk(resumableInfo, Integer.parseInt(resumableChunkNumber), "dataDir", dataId);
+    public String addChunk(ResumableInfo resumableInfo, String resumableChunkNumber, String dataId, Claims claims) {
+        switch (uploadService.addChunk(resumableInfo, Integer.parseInt(resumableChunkNumber), "dataDir", dataId)) {
+            case FINISHED:
+                DataResourceInfo dataResourceInfo = new DataResourceInfo(null, resumableInfo.getResumableFilename());
+                createResource(Long.parseLong(dataId), dataResourceInfo, claims);
+                return "All finished.";
+            case UPLOAD:
+                return "Upload";
+            default:
+                return "";
+        }
     }
 
 }

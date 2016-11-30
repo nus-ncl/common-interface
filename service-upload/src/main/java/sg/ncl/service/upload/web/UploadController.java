@@ -41,7 +41,14 @@ public class UploadController {
         if (claims == null || !(claims instanceof Claims)) {
             throw new UnauthorizedException();
         }
-        return uploadService.checkChunk(resumableIdentifier, Integer.parseInt(resumableChunkNumber));
+        switch (uploadService.checkChunk(resumableIdentifier, Integer.parseInt(resumableChunkNumber))) {
+            case UPLOADED:
+                return "Uploaded";
+            case NOT_FOUND:
+                return "Not Found";
+            default:
+                return "";
+        }
     }
 
     @PostMapping(value = "/chunks/{resumableChunkNumber}")
@@ -52,7 +59,14 @@ public class UploadController {
         if (claims == null || !(claims instanceof Claims)) {
             throw new UnauthorizedException();
         }
-        return uploadService.addChunk(resumableInfo, Integer.parseInt(resumableChunkNumber), null, null);
+        switch (uploadService.addChunk(resumableInfo, Integer.parseInt(resumableChunkNumber), null, null)) {
+            case FINISHED:
+                return "Finished";
+            case UPLOAD:
+                return "Upload";
+            default:
+                return "";
+        }
     }
 
 }

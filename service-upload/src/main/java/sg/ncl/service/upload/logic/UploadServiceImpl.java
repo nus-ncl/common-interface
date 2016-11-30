@@ -8,6 +8,7 @@ import sg.ncl.service.upload.DirectoryProperties;
 import sg.ncl.service.upload.data.ResumableEntity;
 import sg.ncl.service.upload.data.ResumableStorage;
 import sg.ncl.service.upload.domain.UploadService;
+import sg.ncl.service.upload.domain.UploadStatus;
 import sg.ncl.service.upload.web.ResumableInfo;
 
 import javax.inject.Inject;
@@ -34,17 +35,17 @@ public class UploadServiceImpl implements UploadService {
     }
 
     @Override
-    public String checkChunk(String resumableIdentifier, int resumableChunkNumber) {
+    public UploadStatus checkChunk(String resumableIdentifier, int resumableChunkNumber) {
         ResumableEntity entity = storage.get(resumableIdentifier);
         if (entity != null && entity.uploadedChunks.contains(new ResumableEntity.ResumableChunkNumber(resumableChunkNumber))) {
-            return "Uploaded.";
+            return UploadStatus.UPLOADED;
         } else {
-            return "Not found";
+            return  UploadStatus.NOT_FOUND;
         }
     }
 
     @Override
-    public String addChunk(ResumableInfo resumableInfo, int resumableChunkNumber, String subDirKey, String preDir) {
+    public UploadStatus addChunk(ResumableInfo resumableInfo, int resumableChunkNumber, String subDirKey, String preDir) {
         String baseDir = properties.getBaseDir();
         String subDir = (subDirKey == null) ? null : properties.getSubDirs().get(subDirKey);
         if (subDir != null) {
@@ -102,9 +103,9 @@ public class UploadServiceImpl implements UploadService {
         entity.uploadedChunks.add(new ResumableEntity.ResumableChunkNumber(resumableChunkNumber));
         if (entity.checkIfUploadFinished()) { //Check if all chunks uploaded, and change filename
             storage.remove(entity);
-            return "All finished.";
+            return UploadStatus.FINISHED;
         } else {
-            return "Upload";
+            return UploadStatus.UPLOAD;
         }
     }
 
