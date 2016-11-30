@@ -1334,4 +1334,33 @@ public class AdapterDeterLabTest {
         adapterDeterLab.getTopologyThumbnail(myobject.toString());
     }
 
+    @Test
+    public void getSavedImagesTestBad() {
+        when(deterLabProjectRepository.findByNclTeamId(anyString())).thenReturn(new DeterLabProjectEntity());
+        when(restTemplate.exchange(anyString(),eq(HttpMethod.POST),anyObject(),eq(String.class))).thenThrow(new RestClientException(""));
+
+        String result = adapterDeterLab.getSavedImages("teamName");
+
+        assertThat(result).isEqualTo("{}");
+    }
+
+    @Test
+    public void getSavedImagesGood() {
+        JSONObject myobject = new JSONObject();
+        myobject.put("imageA", "created");
+        myobject.put("imageB", "saving");
+        myobject.put("imageC", "failed");
+
+        when(deterLabProjectRepository.findByNclTeamId(anyString())).thenReturn(new DeterLabProjectEntity());
+        when(restTemplate.exchange(anyString(),eq(HttpMethod.POST),anyObject(),eq(String.class))).thenReturn(response);
+        when(response.getBody()).thenReturn(myobject.toString());
+        when(response.getBody().toString()).thenReturn(myobject.toString());
+
+        String result = adapterDeterLab.getSavedImages("teamName");
+
+        verify(restTemplate,times(1)).exchange(anyString(),eq(HttpMethod.POST),anyObject(),eq(String.class));
+        verify(properties,times(1)).getSavedImages();
+        assertThat(result).isEqualTo(myobject.toString());
+    }
+
 }
