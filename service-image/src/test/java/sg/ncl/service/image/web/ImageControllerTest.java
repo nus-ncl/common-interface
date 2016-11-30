@@ -20,7 +20,9 @@ import sg.ncl.service.image.domain.ImageVisibility;
 import javax.inject.Inject;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.equalTo;
@@ -135,6 +137,20 @@ public class ImageControllerTest {
                 .andExpect(jsonPath("$.nodeId", is(equalTo(entity.getNodeId()))))
                 .andExpect(jsonPath("$.description", is(equalTo(entity.getDescription()))))
                 .andExpect(jsonPath("$.visibility", is(equalTo(entity.getVisibility().toString()))));
+    }
+
+    @Test
+    public void testGetSavedImages() throws Exception {
+        Map<String, String> result = new HashMap<>();
+        result.put("teamId", "{imageA:created}");
+
+        when(imageService.getSavedImages(anyString())).thenReturn(result);
+
+        mockMvc.perform(get(ImageController.PATH + "/teams/teamId"))
+                .andExpect(status().isOk())
+                .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
+
+                .andExpect(jsonPath("$.teamId", is(equalTo("{imageA:created}"))));
     }
 
 }

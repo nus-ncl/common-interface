@@ -17,6 +17,7 @@ import sg.ncl.service.image.web.ImageInfo;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Matchers.any;
@@ -130,5 +131,15 @@ public class ImageServiceTest {
 
         List<Image> result = imageService.getAll(null, ImageVisibility.PRIVATE);
         assertThat(expected).isEqualTo(result);
+    }
+
+    @Test
+    public void testGetSavedImages() {
+
+        when(adapterDeterLab.getSavedImages(anyString())).thenReturn("adapterResult");
+
+        Map<String, String> result = imageService.getSavedImages("teamId");
+        assertThat(result).hasSize(1);
+        assertThat(result).containsEntry("teamId", "adapterResult");
     }
 }
