@@ -692,7 +692,7 @@ public class AdapterDeterLab {
 
         try {
             response = restTemplate.exchange(properties.getSavedImages(), HttpMethod.POST, request, String.class);
-        } catch (Exception e) {
+        } catch (RestClientException e) {
             log.warn("Adapter connection error get list of saved images by team: {}", e);
             return "{}";
         }
