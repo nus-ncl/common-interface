@@ -1339,7 +1339,7 @@ public class AdapterDeterLabTest {
         when(deterLabProjectRepository.findByNclTeamId(anyString())).thenReturn(new DeterLabProjectEntity());
         when(restTemplate.exchange(anyString(),eq(HttpMethod.POST),anyObject(),eq(String.class))).thenThrow(new RestClientException(""));
 
-        String result = adapterDeterLab.getSavedImages("teamName");
+        String result = adapterDeterLab.getSavedImages("teamId");
 
         assertThat(result).isEqualTo("{}");
     }
@@ -1356,7 +1356,7 @@ public class AdapterDeterLabTest {
         when(response.getBody()).thenReturn(myobject.toString());
         when(response.getBody().toString()).thenReturn(myobject.toString());
 
-        String result = adapterDeterLab.getSavedImages("teamName");
+        String result = adapterDeterLab.getSavedImages("teamId");
 
         verify(restTemplate,times(1)).exchange(anyString(),eq(HttpMethod.POST),anyObject(),eq(String.class));
         verify(properties,times(1)).getSavedImages();
