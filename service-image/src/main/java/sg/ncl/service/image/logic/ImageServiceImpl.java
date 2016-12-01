@@ -1,5 +1,6 @@
 package sg.ncl.service.image.logic;
 
+import io.jsonwebtoken.Claims;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -73,13 +74,15 @@ public class ImageServiceImpl implements ImageService {
 
     @Transactional
     @Override
-    public Image addImage(Image image) {
+    public Image addImage(Image image, Claims claims) {
         final ImageEntity entity = new ImageEntity();
         entity.setImageName(image.getImageName());
         entity.setDescription(image.getDescription());
         entity.setNodeId(image.getNodeId());
         entity.setTeamId(image.getTeamId());
         entity.setVisibility(image.getVisibility());
+        entity.setCurrentOS(image.getCurrentOS());
+        adapterDeterLab.saveImage(image.getTeamId(), claims.getSubject(), image.getNodeId(), image.getImageName(), image.getCurrentOS());
         final ImageEntity saved = imageRepository.save(entity);
         log.info("Image created: {}", saved);
         return saved;
