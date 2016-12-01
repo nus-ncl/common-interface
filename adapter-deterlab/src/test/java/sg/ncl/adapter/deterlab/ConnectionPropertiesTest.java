@@ -174,4 +174,10 @@ public class ConnectionPropertiesTest {
         assertThat(connectionProperties.getSavedImages()).isNotNull();
         assertThat(connectionProperties.getSavedImages()).isEqualTo("http://127.0.0.1:22/getSavedImages");
     }
+
+    @Test
+    public void testSaveImage() throws Exception {
+        assertThat(connectionProperties.saveImage()).isNotNull();
+        assertThat(connectionProperties.saveImage()).isEqualTo("http://127.0.0.1:22/saveImage");
+    }
 }

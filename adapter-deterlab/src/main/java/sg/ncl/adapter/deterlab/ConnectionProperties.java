@@ -97,4 +97,8 @@ public class ConnectionProperties {
         return HTTP_MODE + ip + ":" + port + "/getSavedImages";
     }
 
+    public String saveImage() {
+        return HTTP_MODE + ip + ":" + port + "/saveImage";
+    }
+
 }
