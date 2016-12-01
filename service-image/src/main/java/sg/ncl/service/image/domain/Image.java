@@ -15,5 +15,7 @@ public interface Image {
 
     String getDescription();
 
+    String getCurrentOS();
+
     ImageVisibility getVisibility();
 }
