@@ -38,6 +38,9 @@ public class ImageEntity extends AbstractEntity implements Image {
     @Enumerated(EnumType.STRING)
     private ImageVisibility visibility = ImageVisibility.PRIVATE;
 
+    @Column(name = "current_os", nullable = false)
+    private String currentOS;
+
     @Override
     public boolean equals(final Object o) {
         if (this == o) {
@@ -65,7 +68,8 @@ public class ImageEntity extends AbstractEntity implements Image {
                 ", nodeId='" + nodeId + '\'' +
                 ", imageName=" + imageName + '\'' +
                 ", description=" + description + '\'' +
-                ", visibility=" + visibility +
+                ", visibility=" + visibility + '\'' +
+                ", currentOS=" + currentOS +
                 "} " + super.toString();
     }
 }
