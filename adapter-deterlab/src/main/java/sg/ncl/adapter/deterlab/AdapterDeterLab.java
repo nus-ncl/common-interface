@@ -702,10 +702,17 @@ public class AdapterDeterLab {
         return response.getBody().toString();
     }
 
-    public String saveImage() {
+    public String saveImage(String nclTeamId, String nclUserId, String nodeId, String imageName, String currentOS) {
+        JSONObject json = new JSONObject();
+        json.put("pid", getDeterProjectIdByNclTeamId(nclTeamId));
+        json.put("uid", getDeterUserIdByNclUserId(nclUserId));
+        json.put("nodeId", nodeId);
+        json.put("imageName", imageName);
+        json.put("currentOS", currentOS);
+
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
-        HttpEntity<String> request = new HttpEntity<>(headers);
+        HttpEntity<String> request = new HttpEntity<>(json.toString(), headers);
 
         ResponseEntity response;
 
