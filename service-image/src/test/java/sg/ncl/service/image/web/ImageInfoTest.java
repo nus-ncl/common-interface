@@ -16,8 +16,9 @@ public class ImageInfoTest {
     private String imageName = RandomStringUtils.randomAlphanumeric(20);
     private String nodeId = RandomStringUtils.randomAlphanumeric(20);
     private String description = RandomStringUtils.randomAlphanumeric(20);
+    private String currentOS = RandomStringUtils.randomAlphanumeric(20);
     private ImageVisibility visibility = ImageVisibility.PUBLIC;
-    private final ImageInfo imageInfo = new ImageInfo(id, teamId, imageName, nodeId, description, visibility);
+    private final ImageInfo imageInfo = new ImageInfo(id, teamId, imageName, nodeId, description, currentOS, visibility);
 
     @Test
     public void testGetId() throws Exception {
@@ -42,6 +43,11 @@ public class ImageInfoTest {
     @Test
     public void testGetDescription() throws Exception {
         assertThat(imageInfo.getDescription()).isEqualTo(description);
+    }
+
+    @Test
+    public void testGetCurrentOS() throws Exception {
+        assertThat(imageInfo.getCurrentOS()).isEqualTo(currentOS);
     }
 
     @Test
