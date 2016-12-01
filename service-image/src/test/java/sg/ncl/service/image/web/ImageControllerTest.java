@@ -1,12 +1,17 @@
 package sg.ncl.service.image.web;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import io.jsonwebtoken.Claims;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.Mock;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
@@ -46,7 +51,7 @@ import static sg.ncl.service.image.util.TestUtil.getImageEntity;
  * Created by dcsyeoty on 30-Oct-16.
  */
 @RunWith(SpringRunner.class)
-@WebMvcTest(controllers = ImageController.class, secure = false)
+@WebMvcTest(controllers = ImageController.class, secure = true)
 @ContextConfiguration(classes = {ImageController.class})
 public class ImageControllerTest {
 
@@ -56,6 +61,13 @@ public class ImageControllerTest {
     @Inject
     private WebApplicationContext webApplicationContext;
 
+    @Mock
+    private Claims claims;
+    @Mock
+    private Authentication authentication;
+    @Mock
+    private SecurityContext securityContext;
+
     private MockMvc mockMvc;
 
     @MockBean
@@ -63,6 +75,9 @@ public class ImageControllerTest {
 
     @Before
     public void before() {
+        assertThat(mockingDetails(claims).isMock()).isTrue();
+        assertThat(mockingDetails(securityContext).isMock()).isTrue();
+        assertThat(mockingDetails(authentication).isMock()).isTrue();
         assertThat(mockingDetails(imageService).isMock()).isTrue();
 
         mockMvc = MockMvcBuilders.webAppContextSetup(webApplicationContext).build();
@@ -71,7 +86,7 @@ public class ImageControllerTest {
     @Test
     public void testAddImage() throws Exception {
 
-        final ImageInfo imageInfo =  new ImageInfo(1L, "teamId", "imageName", "nodeId", "description", ImageVisibility.PUBLIC);
+        final ImageInfo imageInfo =  new ImageInfo(1L, "teamId", "imageName", "nodeId", "description", "currentOS", ImageVisibility.PUBLIC);
         final byte[] content = mapper.writeValueAsBytes(imageInfo);
 
         final ImageEntity entity = new ImageEntity();
@@ -82,7 +97,10 @@ public class ImageControllerTest {
         entity.setDescription("description");
         entity.setVisibility(ImageVisibility.PUBLIC);
 
-        when(imageService.addImage(any(Image.class))).thenReturn(entity);
+        when(securityContext.getAuthentication()).thenReturn(authentication);
+        SecurityContextHolder.setContext(securityContext);
+        when(authentication.getPrincipal()).thenReturn(claims);
+        when(imageService.addImage(any(Image.class), any(Claims.class))).thenReturn(entity);
 
         mockMvc.perform(post(ImageController.PATH).contentType(MediaType.APPLICATION_JSON).content(content))
                 .andExpect(status().isAccepted())
