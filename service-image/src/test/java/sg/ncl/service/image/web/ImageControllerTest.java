@@ -109,6 +109,28 @@ public class ImageControllerTest {
     }
 
     @Test
+    public void testAddImageInvalidAuthenticationPrincipal() throws Exception {
+        final ImageInfo imageInfo =  new ImageInfo(1L, "teamId", "imageName", "nodeId", "description", "currentOS", ImageVisibility.PUBLIC);
+        final byte[] content = mapper.writeValueAsBytes(imageInfo);
+
+        final ImageEntity entity = new ImageEntity();
+        entity.setId(1L);
+        entity.setTeamId("teamId");
+        entity.setImageName("imageName");
+        entity.setNodeId("nodeId");
+        entity.setDescription("description");
+        entity.setVisibility(ImageVisibility.PUBLIC);
+
+        when(securityContext.getAuthentication()).thenReturn(authentication);
+        SecurityContextHolder.setContext(securityContext);
+        when(authentication.getPrincipal()).thenReturn(null);
+        when(imageService.addImage(any(Image.class), any(Claims.class))).thenReturn(entity);
+
+        mockMvc.perform(post(ImageController.PATH).contentType(MediaType.APPLICATION_JSON).content(content))
+                .andExpect(status().isForbidden());
+    }
+
+    @Test
     public void testGetAll() throws Exception {
         final List<ImageEntity> list = new ArrayList<>();
         final ImageEntity entity1 = getImageEntity();
