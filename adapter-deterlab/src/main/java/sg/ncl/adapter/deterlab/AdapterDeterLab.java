@@ -710,6 +710,35 @@ public class AdapterDeterLab {
         return response.getBody().toString();
     }
 
+    public String saveImage() {
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        HttpEntity<String> request = new HttpEntity<>(headers);
+
+        ResponseEntity response;
+
+        try {
+            response = restTemplate.exchange(properties.saveImage(), HttpMethod.POST, request, String.class);
+            String responseBody = response.getBody().toString();
+            String deterMessage = new JSONObject(responseBody).getString("msg");
+
+            if ("save image OK".equals(deterMessage)) {
+                log.info("Save image OK");
+                return responseBody;
+            } else {
+                log.warn("Save image FAIL");
+                throw new AdapterDeterLabOperationFailedException(deterMessage);
+            }
+
+        } catch (ResourceAccessException rae) {
+            log.warn("Save image error: {}", rae);
+            throw new AdapterDeterLabConnectionFailedException(rae.getMessage());
+        } catch (HttpServerErrorException hsee) {
+            log.warn("Save image error: Adapter DeterLab internal server error {}", hsee);
+            throw hsee;
+        }
+    }
+
     /**
      * Checks the response from adapter deterlab when applying or joining a new project as a new user and determines the exception to be thrown
      * Use only if @applyProjectNewUsers and @joinProjectNewUsers are performing identical checks

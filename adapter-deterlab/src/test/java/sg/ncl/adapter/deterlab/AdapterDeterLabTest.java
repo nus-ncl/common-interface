@@ -11,6 +11,7 @@ import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
 import org.springframework.http.*;;
+import org.springframework.web.client.HttpServerErrorException;
 import org.springframework.web.client.ResourceAccessException;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
@@ -21,6 +22,8 @@ import sg.ncl.adapter.deterlab.dtos.entities.DeterLabUserEntity;
 import sg.ncl.adapter.deterlab.exceptions.*;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Matchers.*;
 import static org.mockito.Mockito.*;
@@ -1363,4 +1366,68 @@ public class AdapterDeterLabTest {
         assertThat(result).isEqualTo(myobject.toString());
     }
 
+    @Test
+    public void saveImageGood() {
+        JSONObject myobject = new JSONObject();
+        myobject.put("msg", "save image OK");
+
+        when(restTemplate.exchange(anyString(),eq(HttpMethod.POST),anyObject(),eq(String.class))).thenReturn(response);
+        when(response.getBody()).thenReturn(myobject.toString());
+        when(response.getBody().toString()).thenReturn(myobject.toString());
+
+        String result = adapterDeterLab.saveImage();
+
+        verify(restTemplate,times(1)).exchange(anyString(),eq(HttpMethod.POST),anyObject(),eq(String.class));
+        verify(properties,times(1)).saveImage();
+        assertThat(result).isEqualTo(myobject.toString());
+    }
+
+    //throw AdapterDeterLabConnectionFailedException
+    @Test
+    public void saveImageAdapterDeterLabConnectionFailed() {
+
+        exception.expect(AdapterDeterLabConnectionFailedException.class);
+        exception.expectMessage(is(equalTo("rae")));
+
+        when(restTemplate.exchange(anyString(),eq(HttpMethod.POST),anyObject(),eq(String.class))).thenThrow(new ResourceAccessException("rae"));
+
+        adapterDeterLab.saveImage();
+
+        verify(restTemplate,times(1)).exchange(anyString(),eq(HttpMethod.POST),anyObject(),eq(String.class));
+        verify(properties,times(1)).saveImage();
+    }
+
+    //throw HttpServerErrorException
+    @Test
+    public void saveImageHttpServerErrorException() {
+
+        exception.expect(HttpServerErrorException.class);
+
+        when(restTemplate.exchange(anyString(),eq(HttpMethod.POST),anyObject(),eq(String.class))).thenThrow(new HttpServerErrorException(HttpStatus.INTERNAL_SERVER_ERROR));
+
+        adapterDeterLab.saveImage();
+
+        verify(restTemplate,times(1)).exchange(anyString(),eq(HttpMethod.POST),anyObject(),eq(String.class));
+        verify(properties,times(1)).saveImage();
+    }
+
+    // throw AdapterDeterLabOperationFailedException
+    @Test
+    public void saveImageAdapterDeterLabOperationFailedException() {
+        JSONObject myobject = new JSONObject();
+        myobject.put("msg", "image name invalid characters");
+
+
+        exception.expect(AdapterDeterLabOperationFailedException.class);
+        exception.expectMessage(is(equalTo("image name invalid characters")));
+
+        when(restTemplate.exchange(anyString(),eq(HttpMethod.POST),anyObject(),eq(String.class))).thenReturn(response);
+        when(response.getBody()).thenReturn(myobject.toString());
+        when(response.getBody().toString()).thenReturn(myobject.toString());
+
+        adapterDeterLab.saveImage();
+
+        verify(restTemplate,times(1)).exchange(anyString(),eq(HttpMethod.POST),anyObject(),eq(String.class));
+        verify(properties,times(1)).saveImage();
+    }
 }
