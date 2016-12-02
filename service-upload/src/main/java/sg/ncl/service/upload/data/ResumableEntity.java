@@ -45,15 +45,14 @@ public class ResumableEntity implements Resumable {
 
     public String resumableFilePath;
 
-    public boolean valid(){
-        if (resumableChunkSize < 0 || resumableTotalSize < 0
-                || HttpUtils.isEmpty(resumableIdentifier)
+    public boolean valid() {
+        return !(resumableChunkSize < 0 || resumableTotalSize < 0 || isEmpty());
+    }
+
+    private boolean isEmpty() {
+        return (HttpUtils.isEmpty(resumableIdentifier)
                 || HttpUtils.isEmpty(resumableFilename)
-                || HttpUtils.isEmpty(resumableRelativePath)) {
-            return false;
-        } else {
-            return true;
-        }
+                || HttpUtils.isEmpty(resumableRelativePath));
     }
 
     public boolean checkIfUploadFinished() {

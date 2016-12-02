@@ -4,6 +4,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import sg.ncl.service.upload.DirectoryProperties;
 import sg.ncl.service.upload.domain.DownloadService;
+import sg.ncl.service.upload.util.HttpUtils;
 
 import javax.inject.Inject;
 import javax.servlet.http.HttpServletResponse;
@@ -12,7 +13,6 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 
 /**
  * Created by dcsjnh on 12/1/2016.
@@ -36,16 +36,7 @@ public class DownloadServiceImpl implements DownloadService {
 
     @Override
     public void getChunks(HttpServletResponse response, String subDirKey, String preDir, String fileName) throws IOException {
-        String baseDir = properties.getBaseDir();
-        String subDir = (subDirKey == null) ? null : properties.getSubDirs().get(subDirKey);
-        if (subDir != null) {
-            baseDir = baseDir + "/" + subDir;
-        }
-        if (preDir != null) {
-            baseDir = baseDir + "/" + preDir;
-        }
-
-        Path path = Paths.get(System.getProperty("user.home"), baseDir);
+        Path path = HttpUtils.getPath(properties, subDirKey, preDir);
         String filePath = path.toString() + "/" + fileName;
         File downloadFile = new File(filePath);
         FileInputStream inStream = new FileInputStream(downloadFile);
