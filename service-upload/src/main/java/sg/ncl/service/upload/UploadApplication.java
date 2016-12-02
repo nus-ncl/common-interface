@@ -9,9 +9,6 @@ import org.springframework.context.ConfigurableApplicationContext;
  */
 @SpringBootApplication
 public class UploadApplication {
-
-    private UploadApplication() {}
-
     public static void main(final String[] args) {
         try (final ConfigurableApplicationContext context = SpringApplication.run(UploadApplication.class, args)) {}
     }
