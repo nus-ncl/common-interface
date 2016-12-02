@@ -83,6 +83,21 @@ public class DataControllerTest {
     }
 
     @Test
+    public void testGetPublicDatasetsNotPublic() throws Exception {
+        final List<Data> dataSets = new ArrayList<>();
+        DataEntity publicDataSet1 = TestUtil.getDataEntity();
+        DataEntity publicDataSet2 = TestUtil.getDataEntity();
+        dataSets.add(publicDataSet1);
+        dataSets.add(publicDataSet2);
+
+        when(dataService.findByVisibility(any(DataVisibility.class))).thenReturn(dataSets);
+
+        mockMvc.perform(get(DataController.PATH + "?visibility=PRIVATE"))
+                .andExpect(status().isUnauthorized())
+                .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON));
+    }
+
+    @Test
     public void testGetPublicDatasets() throws Exception {
         final List<Data> dataSets = new ArrayList<>();
         DataEntity publicDataSet1 = TestUtil.getDataEntity();

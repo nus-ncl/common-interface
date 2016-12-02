@@ -50,9 +50,9 @@ public class ResumableEntity implements Resumable {
     }
 
     private boolean isEmpty() {
-        return (HttpUtils.isEmpty(resumableIdentifier)
+        return HttpUtils.isEmpty(resumableIdentifier)
                 || HttpUtils.isEmpty(resumableFilename)
-                || HttpUtils.isEmpty(resumableRelativePath));
+                || HttpUtils.isEmpty(resumableRelativePath);
     }
 
     public boolean checkIfUploadFinished() {

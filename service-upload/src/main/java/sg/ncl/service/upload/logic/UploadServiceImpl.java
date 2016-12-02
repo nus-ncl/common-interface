@@ -52,7 +52,6 @@ public class UploadServiceImpl implements UploadService {
             try {
                 Files.createDirectories(path);
             } catch (IOException e) {
-                //fail to create directory
                 log.error(e.getMessage());
                 throw new BadRequestException();
             }
@@ -75,18 +74,7 @@ public class UploadServiceImpl implements UploadService {
             throw new BadRequestException();
         }
 
-        try (RandomAccessFile raf = new RandomAccessFile(entity.resumableFilePath, "rw")) {
-            //Seek to position
-            log.info("resumableChunkNumber: " + resumableChunkNumber + " resumableChunkSize: " + entity.resumableChunkSize);
-            raf.seek((resumableChunkNumber - 1) * (long) entity.resumableChunkSize);
-            //Save to file
-            byte[] bytes = Base64.decodeBase64(resumableInfo.getResumableChunk());
-            raf.write(bytes);
-            raf.close();
-        } catch (Exception e) {
-            log.error("Error saving chunk: {}", e.getMessage());
-            throw new BadRequestException();
-        }
+        writeChunk(entity, resumableChunkNumber, resumableInfo);
 
         //Mark as uploaded.
         entity.uploadedChunks.add(new ResumableEntity.ResumableChunkNumber(resumableChunkNumber));
@@ -95,6 +83,20 @@ public class UploadServiceImpl implements UploadService {
             return UploadStatus.FINISHED;
         } else {
             return UploadStatus.UPLOAD;
+        }
+    }
+
+    private void writeChunk(ResumableEntity entity, int resumableChunkNumber, ResumableInfo resumableInfo) {
+        try (RandomAccessFile raf = new RandomAccessFile(entity.resumableFilePath, "rw")) {
+            //Seek to position
+            log.info("resumableChunkNumber: " + resumableChunkNumber + " resumableChunkSize: " + entity.resumableChunkSize);
+            raf.seek((resumableChunkNumber - 1) * (long) entity.resumableChunkSize);
+            //Save to file
+            byte[] bytes = Base64.decodeBase64(resumableInfo.getResumableChunk());
+            raf.write(bytes);
+        } catch (Exception e) {
+            log.error("Error saving chunk: {}", e.getMessage());
+            throw new BadRequestException();
         }
     }
 

@@ -6,6 +6,7 @@ import sg.ncl.service.data.data.jpa.DataEntity;
 import sg.ncl.service.data.data.jpa.DataResourceEntity;
 import sg.ncl.service.data.domain.DataAccessibility;
 import sg.ncl.service.data.domain.DataVisibility;
+import sg.ncl.service.upload.web.ResumableInfo;
 
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
@@ -74,4 +75,7 @@ public class TestUtil {
         }
     }
 
+    public static ResumableInfo getResumableInfo() {
+        return new ResumableInfo(1024, 1L, "identifier", "filename", "relativePath", "chunk");
+    }
 }

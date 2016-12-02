@@ -26,6 +26,8 @@ import sg.ncl.service.data.exceptions.DataNotFoundException;
 import sg.ncl.service.data.util.TestUtil;
 import sg.ncl.service.upload.domain.DownloadService;
 import sg.ncl.service.upload.domain.UploadService;
+import sg.ncl.service.upload.domain.UploadStatus;
+import sg.ncl.service.upload.web.ResumableInfo;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -211,6 +213,38 @@ public class DataServiceImplTest extends AbstractTest {
 
         dataService.deleteResource(dataEntity.getId(), dataResourceEntity.getId(), claims);
         verify(dataRepository, times(1)).save(any(DataEntity.class));
+    }
+
+    @Test
+    public void testCheckChunkUploaded() {
+        String resumableIdentifier = "identifier";
+        String resumableChunkNumber = "1";
+
+        when(uploadService.checkChunk(anyString(), anyInt())).thenReturn(UploadStatus.UPLOADED);
+
+        String result = dataService.checkChunk(resumableIdentifier, resumableChunkNumber);
+        assertThat(result).isEqualTo("Uploaded.");
+    }
+
+    @Test
+    public void testCheckChunkNotFound() {
+        String resumableIdentifier = "identifier";
+        String resumableChunkNumber = "1";
+
+        when(uploadService.checkChunk(anyString(), anyInt())).thenReturn(UploadStatus.NOT_FOUND);
+
+        String result = dataService.checkChunk(resumableIdentifier, resumableChunkNumber);
+        assertThat(result).isEqualTo("Not found");
+    }
+
+    @Test
+    public void testAddChunkUpload() {
+        ResumableInfo resumableInfo = TestUtil.getResumableInfo();
+
+        when(uploadService.addChunk(any(ResumableInfo.class), anyInt(), anyString(), anyString())).thenReturn(UploadStatus.UPLOAD);
+
+        String result = dataService.addChunk(resumableInfo, "1", "1", claims);
+        assertThat(result).isEqualTo("Upload");
     }
 
 }
