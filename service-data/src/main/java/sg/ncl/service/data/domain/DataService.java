@@ -3,6 +3,7 @@ package sg.ncl.service.data.domain;
 import io.jsonwebtoken.Claims;
 import sg.ncl.service.upload.web.ResumableInfo;
 
+import javax.servlet.http.HttpServletResponse;
 import java.util.List;
 
 /**
@@ -31,5 +32,7 @@ public interface DataService {
     String checkChunk(String resumableIdentifier, String resumableChunkNumber);
 
     String addChunk(ResumableInfo resumableInfo, String resumableChunkNumber, String dataId, Claims claims);
+
+    void downloadResource(HttpServletResponse response, Long did, Long rid, Claims claims);
 
 }

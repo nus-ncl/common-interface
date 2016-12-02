@@ -14,6 +14,7 @@ import sg.ncl.service.data.domain.DataVisibility;
 import sg.ncl.service.upload.web.ResumableInfo;
 
 import javax.inject.Inject;
+import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import java.util.List;
@@ -171,6 +172,16 @@ public class DataController {
             throw new UnauthorizedException();
         }
         return dataService.addChunk(resumableInfo, resumableChunkNumber, id, (Claims) claims);
+    }
+
+    @GetMapping(value = "/{did}/resources/{rid}/download")
+    public void downloadResource(@AuthenticationPrincipal Object claims,
+                                 @PathVariable Long did, @PathVariable Long rid,
+                                 HttpServletResponse response) {
+        if (claims == null || !(claims instanceof Claims)) {
+            throw new UnauthorizedException();
+        }
+        dataService.downloadResource(response, did, rid, (Claims) claims);
     }
 
 }

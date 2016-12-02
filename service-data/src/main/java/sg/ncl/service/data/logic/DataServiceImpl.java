@@ -4,6 +4,7 @@ import io.jsonwebtoken.Claims;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import sg.ncl.common.exception.base.NotFoundException;
 import sg.ncl.service.data.data.jpa.DataEntity;
 import sg.ncl.service.data.data.jpa.DataRepository;
 import sg.ncl.service.data.data.jpa.DataResourceEntity;
@@ -15,11 +16,14 @@ import sg.ncl.service.data.exceptions.DataNameAlreadyExistsException;
 import sg.ncl.service.data.exceptions.DataNotFoundException;
 import sg.ncl.service.data.exceptions.DataResourceNotFoundException;
 import sg.ncl.service.data.web.DataResourceInfo;
+import sg.ncl.service.upload.domain.DownloadService;
 import sg.ncl.service.upload.domain.UploadService;
 import sg.ncl.service.upload.web.ResumableInfo;
 
 import javax.inject.Inject;
+import javax.servlet.http.HttpServletResponse;
 import javax.validation.constraints.NotNull;
+import java.io.IOException;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -37,11 +41,15 @@ public class DataServiceImpl implements DataService {
 
     private final DataRepository dataRepository;
     private final UploadService uploadService;
+    private final DownloadService downloadService;
 
     @Inject
-    DataServiceImpl(@NotNull final DataRepository dataRepository, @NotNull final UploadService uploadService) {
+    DataServiceImpl(@NotNull final DataRepository dataRepository,
+                    @NotNull final UploadService uploadService,
+                    @NotNull final DownloadService downloadService) {
         this.dataRepository = dataRepository;
         this.uploadService = uploadService;
+        this.downloadService = downloadService;
     }
 
     private DataEntity setUpDataEntity(Data data, DataEntity... dataEntities) {
@@ -261,6 +269,17 @@ public class DataServiceImpl implements DataService {
                 return "Upload";
             default:
                 return "";
+        }
+    }
+
+    @Override
+    public void downloadResource(HttpServletResponse response, Long did, Long rid, Claims claims) {
+        DataResource dataResource = findResourceById(did, rid, claims);
+        try {
+            downloadService.getChunks(response, "dataDir", did.toString(), dataResource.getUri());
+        } catch (IOException e) {
+            log.error(e.getMessage());
+            throw new NotFoundException();
         }
     }
 
