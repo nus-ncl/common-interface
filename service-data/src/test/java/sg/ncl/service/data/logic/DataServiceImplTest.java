@@ -238,6 +238,32 @@ public class DataServiceImplTest extends AbstractTest {
     }
 
     @Test
+    public void  testAddChunkDataNotFound() {
+        ResumableInfo resumableInfo = TestUtil.getResumableInfo();
+
+        when(uploadService.addChunk(any(ResumableInfo.class), anyInt(), anyString(), anyString())).thenReturn(UploadStatus.FINISHED);
+        exception.expect(DataNotFoundException.class);
+
+        dataService.addChunk(resumableInfo, "1", "1", claims);
+    }
+
+    @Test
+    public void testAddChunkFinished() {
+        ResumableInfo resumableInfo = TestUtil.getResumableInfo();
+        DataEntity dataEntity = TestUtil.getDataEntity();
+        DataResourceEntity dataResourceEntity = TestUtil.getDataResourceEntity();
+        final List<Role> roles = Collections.singletonList(Role.USER);
+
+        when(dataRepository.getOne(anyLong())).thenReturn(dataEntity);
+        when(claims.get(JwtToken.KEY)).thenReturn(roles);
+        when(claims.getSubject()).thenReturn(dataEntity.getContributorId());
+        when(uploadService.addChunk(any(ResumableInfo.class), anyInt(), anyString(), anyString())).thenReturn(UploadStatus.FINISHED);
+
+        String result = dataService.addChunk(resumableInfo, "1", "1", claims);
+        assertThat(result).isEqualTo("All finished.");
+    }
+
+    @Test
     public void testAddChunkUpload() {
         ResumableInfo resumableInfo = TestUtil.getResumableInfo();
 
@@ -246,5 +272,10 @@ public class DataServiceImplTest extends AbstractTest {
         String result = dataService.addChunk(resumableInfo, "1", "1", claims);
         assertThat(result).isEqualTo("Upload");
     }
+
+    /*
+    @Test
+    public void testDownloadResource() {}
+    */
 
 }

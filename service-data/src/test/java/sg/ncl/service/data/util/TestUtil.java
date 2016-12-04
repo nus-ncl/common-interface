@@ -76,6 +76,6 @@ public class TestUtil {
     }
 
     public static ResumableInfo getResumableInfo() {
-        return new ResumableInfo(1024, 1L, "identifier", "filename", "relativePath", "chunk");
+        return new ResumableInfo(1, 1L, RandomStringUtils.randomAlphanumeric(20), RandomStringUtils.randomAlphanumeric(20), RandomStringUtils.randomAlphanumeric(20), null);
     }
 }
