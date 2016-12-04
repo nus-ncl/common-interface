@@ -83,7 +83,26 @@ public class UploadServiceImplTest extends AbstractTest {
     }
 
     @Test
-    public void testAddChunkBadRequestException() {
+    public void testAddChunkInvalidBadRequestException() {
+        ResumableInfo resumableInfo = TestUtil.getResumableInfo();
+        int resumableChunkNumber = (new Random()).nextInt();
+
+        final ResumableEntity entity = new ResumableEntity();
+        entity.resumableChunkSize = -1;
+        entity.resumableTotalSize = 1L;
+        entity.resumableIdentifier = RandomStringUtils.randomAlphanumeric(20);
+        entity.resumableFilename = RandomStringUtils.randomAlphanumeric(20);
+        entity.resumableRelativePath = RandomStringUtils.randomAlphanumeric(20);
+
+        when(properties.getBaseDir()).thenReturn("uploads");
+        when(storage.get(anyInt(), anyLong(), anyString(), anyString(), anyString(), anyString())).thenReturn(entity);
+
+        exception.expect(BadRequestException.class);
+        uploadService.addChunk(resumableInfo, resumableChunkNumber, null, null);
+    }
+
+    @Test
+    public void testAddChunkWriteChunkBadRequestException() {
         ResumableInfo resumableInfo = TestUtil.getResumableInfo();
         int resumableChunkNumber = (new Random()).nextInt();
 
