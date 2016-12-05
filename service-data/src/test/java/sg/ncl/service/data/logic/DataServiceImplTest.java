@@ -24,10 +24,10 @@ import sg.ncl.service.data.domain.DataVisibility;
 import sg.ncl.service.data.exceptions.DataNameAlreadyExistsException;
 import sg.ncl.service.data.exceptions.DataNotFoundException;
 import sg.ncl.service.data.util.TestUtil;
-import sg.ncl.service.upload.domain.DownloadService;
-import sg.ncl.service.upload.domain.UploadService;
-import sg.ncl.service.upload.domain.UploadStatus;
-import sg.ncl.service.upload.web.ResumableInfo;
+import sg.ncl.service.transmission.domain.DownloadService;
+import sg.ncl.service.transmission.domain.UploadService;
+import sg.ncl.service.transmission.domain.UploadStatus;
+import sg.ncl.service.transmission.web.ResumableInfo;
 
 import java.util.ArrayList;
 import java.util.Collections;

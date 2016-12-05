@@ -11,7 +11,7 @@ import sg.ncl.service.data.domain.Data;
 import sg.ncl.service.data.domain.DataResource;
 import sg.ncl.service.data.domain.DataService;
 import sg.ncl.service.data.domain.DataVisibility;
-import sg.ncl.service.upload.web.ResumableInfo;
+import sg.ncl.service.transmission.web.ResumableInfo;
 
 import javax.inject.Inject;
 import javax.servlet.http.HttpServletResponse;

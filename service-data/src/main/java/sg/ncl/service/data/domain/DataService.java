@@ -1,7 +1,7 @@
 package sg.ncl.service.data.domain;
 
 import io.jsonwebtoken.Claims;
-import sg.ncl.service.upload.web.ResumableInfo;
+import sg.ncl.service.transmission.web.ResumableInfo;
 
 import javax.servlet.http.HttpServletResponse;
 import java.util.List;

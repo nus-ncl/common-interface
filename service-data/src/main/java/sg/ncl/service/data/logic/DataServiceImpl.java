@@ -16,9 +16,9 @@ import sg.ncl.service.data.exceptions.DataNameAlreadyExistsException;
 import sg.ncl.service.data.exceptions.DataNotFoundException;
 import sg.ncl.service.data.exceptions.DataResourceNotFoundException;
 import sg.ncl.service.data.web.DataResourceInfo;
-import sg.ncl.service.upload.domain.DownloadService;
-import sg.ncl.service.upload.domain.UploadService;
-import sg.ncl.service.upload.web.ResumableInfo;
+import sg.ncl.service.transmission.domain.DownloadService;
+import sg.ncl.service.transmission.domain.UploadService;
+import sg.ncl.service.transmission.web.ResumableInfo;
 
 import javax.inject.Inject;
 import javax.servlet.http.HttpServletResponse;
