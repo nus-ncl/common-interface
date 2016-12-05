@@ -1384,11 +1384,11 @@ public class AdapterDeterLabTest {
         assertThat(result).isEqualTo(myobject.toString());
     }
 
-    //throw AdapterDeterLabConnectionFailedException
+    //throw AdapterConnectionException
     @Test
     public void saveImageAdapterDeterLabConnectionFailed() {
 
-        exception.expect(AdapterDeterLabConnectionFailedException.class);
+        exception.expect(AdapterConnectionException.class);
         exception.expectMessage(is(equalTo("rae")));
 
         when(restTemplate.exchange(anyString(),eq(HttpMethod.POST),anyObject(),eq(String.class))).thenThrow(new ResourceAccessException("rae"));
@@ -1417,14 +1417,14 @@ public class AdapterDeterLabTest {
         verify(properties,times(1)).saveImage();
     }
 
-    // throw AdapterDeterLabOperationFailedException
+    // throw DeterLabOperationFailedException
     @Test
     public void saveImageAdapterDeterLabOperationFailedException() {
         JSONObject myobject = new JSONObject();
         myobject.put("msg", "image name invalid characters");
 
 
-        exception.expect(AdapterDeterLabOperationFailedException.class);
+        exception.expect(DeterLabOperationFailedException.class);
         exception.expectMessage(is(equalTo("image name invalid characters")));
 
         when(restTemplate.exchange(anyString(),eq(HttpMethod.POST),anyObject(),eq(String.class))).thenReturn(response);

@@ -734,12 +734,12 @@ public class AdapterDeterLab {
                 return responseBody;
             } else {
                 log.warn("Save image FAIL");
-                throw new AdapterDeterLabOperationFailedException(deterMessage);
+                throw new DeterLabOperationFailedException(deterMessage);
             }
 
         } catch (ResourceAccessException rae) {
             log.warn("Save image error: {}", rae);
-            throw new AdapterDeterLabConnectionFailedException(rae.getMessage());
+            throw new AdapterConnectionException(rae.getMessage());
         } catch (HttpServerErrorException hsee) {
             log.warn("Save image error: Adapter DeterLab internal server error {}", hsee);
             throw hsee;
