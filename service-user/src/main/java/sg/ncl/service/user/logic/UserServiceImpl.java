@@ -100,6 +100,12 @@ public class UserServiceImpl implements UserService {
             log.warn("User not found when updating: {}", id);
             throw new UserNotFoundException(id);
         }
+
+        // will invoke save repository once
+        if (user.getStatus() != null && user.getStatus() != one.getStatus()) {
+            updateUserStatus(id, user.getStatus());
+        }
+
         if (user.getUserDetails().getFirstName() != null) {
             one.getUserDetails().setFirstName(user.getUserDetails().getFirstName());
         }
@@ -224,6 +230,8 @@ public class UserServiceImpl implements UserService {
                 }
             case CLOSED:
                 return updateUserStatusInternal(one, UserStatus.CLOSED);
+            case FROZEN:
+                return updateUserStatusInternal(one, UserStatus.FROZEN);
             default:
                 log.warn("Update status failed for {}: unknown status {}", id, status);
                 throw new InvalidUserStatusException(status.toString());

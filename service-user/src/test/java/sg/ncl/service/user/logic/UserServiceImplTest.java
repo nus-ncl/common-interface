@@ -20,6 +20,8 @@ import sg.ncl.service.user.exceptions.*;
 
 import java.util.List;
 
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.is;
 import static org.mockito.Matchers.*;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -315,6 +317,22 @@ public class UserServiceImplTest {
         verify(userRepository, times(1)).save(any(UserEntity.class));
     }
 
+    @Test
+    public void testUpdateUserWithUpdatedStatus() throws Exception {
+        String randomIdForTest = RandomStringUtils.randomAlphanumeric(20);
+        UserEntity userEntity = Util.getUserEntity();
+
+        UserEntity updatedUserEntity = Util.getUserEntity();;
+        updatedUserEntity.setStatus(UserStatus.FROZEN);
+
+        when(userRepository.findOne(anyString())).thenReturn(userEntity);
+        when(userRepository.save(any(UserEntity.class))).thenReturn(updatedUserEntity);
+        userServiceImpl.updateUser(randomIdForTest, updatedUserEntity);
+
+        verify(userRepository, times(2)).findOne(anyString());
+        verify(userRepository, times(2)).save(any(UserEntity.class));
+    }
+
 
     //thrown UserNotFoundException
     @Test
@@ -573,6 +591,22 @@ public class UserServiceImplTest {
         verify(userRepository, times(1)).save(any(UserEntity.class));
     }
 
+    //case FROZEN
+    @Test
+    public void testUpdateUserStatusCaseFrozen() throws Exception {
+        String randomIdForTest = RandomStringUtils.randomAlphanumeric(20);
+        UserEntity userEntity = Util.getUserEntity();
+        userEntity.setStatus(UserStatus.CREATED);
+
+        when(userRepository.findOne(anyString())).thenReturn(userEntity);
+        when(userRepository.save(any(UserEntity.class))).thenReturn(userEntity);
+        User actual = userServiceImpl.updateUserStatus(randomIdForTest, UserStatus.FROZEN);
+        User expected = userEntity;
+
+        assertThat(actual).isEqualTo(expected);
+        verify(userRepository, times(1)).findOne(anyString());
+        verify(userRepository, times(1)).save(any(UserEntity.class));
+    }
 }
 
 
