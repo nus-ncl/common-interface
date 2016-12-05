@@ -27,6 +27,9 @@ public class ResumableEntity implements Resumable {
     private String   resumableRelativePath;
     private String   resumableFilePath;
 
+    //Chunks uploaded
+    public Set<ResumableChunkNumber> uploadedChunks = new HashSet<>();
+
     public static class ResumableChunkNumber {
         private int number;
 
@@ -48,9 +51,6 @@ public class ResumableEntity implements Resumable {
             return number;
         }
     }
-
-    //Chunks uploaded
-    public HashSet<ResumableChunkNumber> uploadedChunks = new HashSet<ResumableChunkNumber>();
 
     public boolean valid() {
         return !(resumableChunkSize < 0 || resumableTotalSize < 0 || isEmpty());
