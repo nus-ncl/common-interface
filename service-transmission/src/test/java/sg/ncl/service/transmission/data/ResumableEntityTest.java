@@ -47,7 +47,7 @@ public class ResumableEntityTest {
         final int number = (new Random()).nextInt();
         final ResumableEntity.ResumableChunkNumber chunkNumber =
                 new ResumableEntity.ResumableChunkNumber(number);
-        assertThat(chunkNumber.number).isEqualTo(number);
+        assertThat(chunkNumber.getNumber()).isEqualTo(number);
     }
 
     @Test

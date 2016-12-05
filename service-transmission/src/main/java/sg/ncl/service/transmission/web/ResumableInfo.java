@@ -11,12 +11,12 @@ import sg.ncl.service.transmission.domain.Resumable;
 @Getter
 public class ResumableInfo implements Resumable {
 
-    public Integer  resumableChunkSize;
-    public Long     resumableTotalSize;
-    public String   resumableIdentifier;
-    public String   resumableFilename;
-    public String   resumableRelativePath;
-    public String   resumableChunk;
+    private Integer  resumableChunkSize;
+    private Long     resumableTotalSize;
+    private String   resumableIdentifier;
+    private String   resumableFilename;
+    private String   resumableRelativePath;
+    private String   resumableChunk;
 
     @JsonCreator
     public ResumableInfo(

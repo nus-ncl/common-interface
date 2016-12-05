@@ -2,6 +2,7 @@ package sg.ncl.service.transmission.data;
 
 import lombok.Getter;
 import lombok.Setter;
+import lombok.extern.slf4j.Slf4j;
 import sg.ncl.service.transmission.domain.Resumable;
 import sg.ncl.service.transmission.util.HttpUtils;
 
@@ -16,6 +17,7 @@ import java.util.HashSet;
  */
 @Getter
 @Setter
+@Slf4j
 public class ResumableEntity implements Resumable {
 
     private Integer  resumableChunkSize;
@@ -23,14 +25,18 @@ public class ResumableEntity implements Resumable {
     private String   resumableIdentifier;
     private String   resumableFilename;
     private String   resumableRelativePath;
-    private String resumableFilePath;
+    private String   resumableFilePath;
 
     public static class ResumableChunkNumber {
+        private int number;
+
         public ResumableChunkNumber(int number) {
             this.number = number;
         }
 
-        public int number;
+        public int getNumber() {
+            return number;
+        }
 
         @Override
         public boolean equals(Object obj) {
@@ -67,8 +73,11 @@ public class ResumableEntity implements Resumable {
 
         //Upload finished, change filename.
         File file = new File(resumableFilePath);
-        String new_path = file.getAbsolutePath().substring(0, file.getAbsolutePath().length() - ".temp".length());
-        file.renameTo(new File(new_path));
+        String newPath = file.getAbsolutePath().substring(0, file.getAbsolutePath().length() - ".temp".length());
+        boolean success = file.renameTo(new File(newPath));
+        if (!success) {
+            log.warn("Temp file {} not renamed.", resumableFilePath);
+        }
         return true;
     }
 

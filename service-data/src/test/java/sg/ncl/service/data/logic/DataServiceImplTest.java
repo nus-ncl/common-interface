@@ -29,6 +29,8 @@ import sg.ncl.service.transmission.domain.UploadService;
 import sg.ncl.service.transmission.domain.UploadStatus;
 import sg.ncl.service.transmission.web.ResumableInfo;
 
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -55,6 +57,8 @@ public class DataServiceImplTest extends AbstractTest {
     private DownloadService downloadService;
     @Mock
     private Claims claims;
+    @Mock
+    private HttpServletResponse response;
 
     private DataService dataService;
 
@@ -251,7 +255,6 @@ public class DataServiceImplTest extends AbstractTest {
     public void testAddChunkFinished() {
         ResumableInfo resumableInfo = TestUtil.getResumableInfo();
         DataEntity dataEntity = TestUtil.getDataEntity();
-        DataResourceEntity dataResourceEntity = TestUtil.getDataResourceEntity();
         final List<Role> roles = Collections.singletonList(Role.USER);
 
         when(dataRepository.getOne(anyLong())).thenReturn(dataEntity);
@@ -273,9 +276,27 @@ public class DataServiceImplTest extends AbstractTest {
         assertThat(result).isEqualTo("Upload");
     }
 
-    /*
     @Test
-    public void testDownloadResource() {}
-    */
+    public void testDownloadResource() {
+        final List<Role> roles = Collections.singletonList(Role.USER);
+        DataEntity dataEntity = TestUtil.getDataEntity();
+        List<DataResourceEntity> dataResourceList = new ArrayList<>();
+        DataResourceEntity dataResourceEntity = TestUtil.getDataResourceEntity();
+        dataResourceEntity.setId(1L);
+        dataResourceList.add(dataResourceEntity);
+        dataEntity.setResources(dataResourceList);
+
+        when(dataRepository.getOne(anyLong())).thenReturn(dataEntity);
+        when(claims.get(JwtToken.KEY)).thenReturn(roles);
+        when(claims.getSubject()).thenReturn(dataEntity.getContributorId());
+        try {
+            doThrow(new IOException()).when(downloadService).getChunks(any(HttpServletResponse.class), anyString(), anyString(), anyString());
+        } catch (IOException e) {
+            throw new RuntimeException();
+        }
+
+        exception.expect(NotFoundException.class);
+        dataService.downloadResource(response, 1L, 1L, claims);
+    }
 
 }

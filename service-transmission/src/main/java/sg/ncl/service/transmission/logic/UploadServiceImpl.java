@@ -52,7 +52,7 @@ public class UploadServiceImpl implements UploadService {
             try {
                 Files.createDirectories(path);
             } catch (IOException e) {
-                log.error(e.getMessage());
+                log.error("Unable to create directory path: {}", e);
                 throw new BadRequestException();
             }
         }
@@ -95,7 +95,7 @@ public class UploadServiceImpl implements UploadService {
             byte[] bytes = Base64.decodeBase64(resumableInfo.getResumableChunk());
             raf.write(bytes);
         } catch (Exception e) {
-            log.error("Error saving chunk: {}", e.getMessage());
+            log.error("Error saving chunk: {}", e);
             throw new BadRequestException();
         }
     }
