@@ -49,12 +49,12 @@ public class ResumableStorageImpl implements ResumableStorage {
         if (entity == null) {
             entity = new ResumableEntity();
 
-            entity.resumableChunkSize     = resumableChunkSize;
-            entity.resumableTotalSize     = resumableTotalSize;
-            entity.resumableIdentifier    = resumableIdentifier;
-            entity.resumableFilename      = resumableFilename;
-            entity.resumableRelativePath  = resumableRelativePath;
-            entity.resumableFilePath      = resumableFilePath;
+            entity.setResumableChunkSize(resumableChunkSize);
+            entity.setResumableTotalSize(resumableTotalSize);
+            entity.setResumableIdentifier(resumableIdentifier);
+            entity.setResumableFilename(resumableFilename);
+            entity.setResumableRelativePath(resumableRelativePath);
+            entity.setResumableFilePath(resumableFilePath);
 
             mMap.put(resumableIdentifier, entity);
         }
@@ -69,7 +69,7 @@ public class ResumableStorageImpl implements ResumableStorage {
      */
     @Override
     public void remove(ResumableEntity entity) {
-        mMap.remove(entity.resumableIdentifier);
+        mMap.remove(entity.getResumableIdentifier());
     }
 
 }

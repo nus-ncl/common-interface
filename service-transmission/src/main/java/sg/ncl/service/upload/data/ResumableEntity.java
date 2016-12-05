@@ -1,6 +1,7 @@
 package sg.ncl.service.upload.data;
 
 import lombok.Getter;
+import lombok.Setter;
 import sg.ncl.service.upload.domain.Resumable;
 import sg.ncl.service.upload.util.HttpUtils;
 
@@ -14,13 +15,15 @@ import java.util.HashSet;
  * [1] https://github.com/23/resumable.js/blob/master/samples/java/src/main/java/resumable/js/upload/ResumableInfo.java
  */
 @Getter
+@Setter
 public class ResumableEntity implements Resumable {
 
-    public Integer  resumableChunkSize;
-    public Long     resumableTotalSize;
-    public String   resumableIdentifier;
-    public String   resumableFilename;
-    public String   resumableRelativePath;
+    private Integer  resumableChunkSize;
+    private Long     resumableTotalSize;
+    private String   resumableIdentifier;
+    private String   resumableFilename;
+    private String   resumableRelativePath;
+    private String resumableFilePath;
 
     public static class ResumableChunkNumber {
         public ResumableChunkNumber(int number) {
@@ -42,8 +45,6 @@ public class ResumableEntity implements Resumable {
 
     //Chunks uploaded
     public HashSet<ResumableChunkNumber> uploadedChunks = new HashSet<ResumableChunkNumber>();
-
-    public String resumableFilePath;
 
     public boolean valid() {
         return !(resumableChunkSize < 0 || resumableTotalSize < 0 || isEmpty());

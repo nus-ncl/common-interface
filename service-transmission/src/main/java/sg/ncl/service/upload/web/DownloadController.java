@@ -45,7 +45,7 @@ public class DownloadController {
         try {
             downloadService.getChunks(response, null, null, UriUtils.decode(filename, "UTF-8"));
         } catch (IOException e) {
-            log.error(e.getMessage());
+            log.error("Unable to download file: {}", e);
             throw new NotFoundException();
         }
     }

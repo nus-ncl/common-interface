@@ -278,7 +278,7 @@ public class DataServiceImpl implements DataService {
         try {
             downloadService.getChunks(response, "dataDir", did.toString(), dataResource.getUri());
         } catch (IOException e) {
-            log.error(e.getMessage());
+            log.error("Unable to download resource: {}", e);
             throw new NotFoundException();
         }
     }

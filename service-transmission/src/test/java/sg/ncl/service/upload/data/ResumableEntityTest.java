@@ -77,26 +77,26 @@ public class ResumableEntityTest {
     @Test
     public void testInvalidResumableEntity() {
         final ResumableEntity entity = new ResumableEntity();
-        entity.resumableChunkSize = -1;
+        entity.setResumableChunkSize(-1);
         assertThat(entity.valid()).isFalse();
     }
 
     @Test
     public void testValidResumableEntity() {
         final ResumableEntity entity = new ResumableEntity();
-        entity.resumableChunkSize = 1;
-        entity.resumableTotalSize = 1L;
-        entity.resumableIdentifier = RandomStringUtils.randomAlphanumeric(20);
-        entity.resumableFilename = RandomStringUtils.randomAlphanumeric(20);
-        entity.resumableRelativePath = RandomStringUtils.randomAlphanumeric(20);
+        entity.setResumableChunkSize(1);
+        entity.setResumableTotalSize(1L);
+        entity.setResumableIdentifier(RandomStringUtils.randomAlphanumeric(20));
+        entity.setResumableFilename(RandomStringUtils.randomAlphanumeric(20));
+        entity.setResumableRelativePath(RandomStringUtils.randomAlphanumeric(20));
         assertThat(entity.valid()).isTrue();
     }
 
     @Test
     public void testCheckIfUploaoFinishedFalse() {
         final ResumableEntity entity = new ResumableEntity();
-        entity.resumableChunkSize = 1;
-        entity.resumableTotalSize = 2L;
+        entity.setResumableChunkSize(1);
+        entity.setResumableTotalSize(1L);
         assertThat(entity.checkIfUploadFinished()).isFalse();
     }
 
@@ -107,9 +107,9 @@ public class ResumableEntityTest {
         final ResumableEntity.ResumableChunkNumber chunkNumber =
                 new ResumableEntity.ResumableChunkNumber(number);
 
-        entity.resumableChunkSize = 2;
-        entity.resumableTotalSize = 2L;
-        entity.resumableFilePath = "filePDF.temp";
+        entity.setResumableChunkSize(2);
+        entity.setResumableTotalSize(2L);
+        entity.setResumableFilePath("filePDF.temp");
 
         assertThat(entity.checkIfUploadFinished()).isTrue();
     }

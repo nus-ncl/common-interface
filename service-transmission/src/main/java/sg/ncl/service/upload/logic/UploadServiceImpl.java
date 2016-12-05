@@ -87,10 +87,10 @@ public class UploadServiceImpl implements UploadService {
     }
 
     private void writeChunk(ResumableEntity entity, int resumableChunkNumber, ResumableInfo resumableInfo) {
-        try (RandomAccessFile raf = new RandomAccessFile(entity.resumableFilePath, "rw")) {
+        try (RandomAccessFile raf = new RandomAccessFile(entity.getResumableFilePath(), "rw")) {
             //Seek to position
-            log.info("resumableChunkNumber: " + resumableChunkNumber + " resumableChunkSize: " + entity.resumableChunkSize);
-            raf.seek((resumableChunkNumber - 1) * (long) entity.resumableChunkSize);
+            log.info("resumableChunkNumber: " + resumableChunkNumber + " resumableChunkSize: " + entity.getResumableChunkSize());
+            raf.seek((resumableChunkNumber - 1) * (long) entity.getResumableChunkSize());
             //Save to file
             byte[] bytes = Base64.decodeBase64(resumableInfo.getResumableChunk());
             raf.write(bytes);
