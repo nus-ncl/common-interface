@@ -18,6 +18,7 @@ import sg.ncl.service.user.exceptions.UserNotFoundException;
 import javax.inject.Inject;
 import java.util.List;
 
+
 /**
  * @author Christopher Zhong
  */
@@ -51,8 +52,8 @@ public class UsersController {
 
     @PutMapping(path = "/users/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
-    public void updateUser(@PathVariable String id, @RequestBody UserInfo user) {
-        userService.updateUser(id, user);
+    public User updateUser(@PathVariable String id, @RequestBody UserInfo user) {
+        return new UserInfo(userService.updateUser(id, user));
     }
 
     @PutMapping(path = "/users/{id}/emails/{emailBase64}")

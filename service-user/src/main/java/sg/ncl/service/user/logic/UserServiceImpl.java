@@ -94,23 +94,25 @@ public class UserServiceImpl implements UserService {
     }
 
     @Transactional
-    public void updateUser(final String id, final User user) {
+    public User updateUser(final String id, final User user) {
         final UserEntity one = findUser(id);
         if (one == null) {
             log.warn("User not found when updating: {}", id);
             throw new UserNotFoundException(id);
         }
 
+        User result = one;
+
         // will invoke save repository once
         if (user.getStatus() != null && user.getStatus() != one.getStatus()) {
             log.info("Updating user {} status to {}", id, user.getStatus());
-            updateUserStatus(id, user.getStatus());
+            result = updateUserStatus(id, user.getStatus());
             log.info("Updated user {} status to {} OK", id, user.getStatus());
         }
 
         if (user.getUserDetails() == null) {
             // return since no user details to update
-            return;
+            return result;
         }
 
         if (user.getUserDetails().getFirstName() != null) {
@@ -174,7 +176,7 @@ public class UserServiceImpl implements UserService {
             }
         }
 
-        userRepository.save(one);
+        return userRepository.save(one);
     }
 
     @Transactional
