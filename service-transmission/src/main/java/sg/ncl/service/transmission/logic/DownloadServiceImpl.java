@@ -46,7 +46,7 @@ public class DownloadServiceImpl implements DownloadService {
         response.setContentLength((int) downloadFile.length());
 
         String headerKey = "Content-Disposition";
-        String headerValue = String.format("attachment; filename='%s'", downloadFile.getName());
+        String headerValue = String.format("attachment; filename=\"%s\"", downloadFile.getName());
         response.setHeader(headerKey, headerValue);
 
         // obtains response's output stream
