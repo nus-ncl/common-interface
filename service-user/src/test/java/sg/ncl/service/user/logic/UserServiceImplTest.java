@@ -333,6 +333,23 @@ public class UserServiceImplTest {
         verify(userRepository, times(2)).save(any(UserEntity.class));
     }
 
+    @Test
+    public void testUpdateUserWithUpdatedStatusFrozenToApproved() throws Exception {
+        String randomIdForTest = RandomStringUtils.randomAlphanumeric(20);
+        UserEntity userEntity = Util.getUserEntity();
+        userEntity.setStatus(UserStatus.FROZEN);
+
+        UserEntity updatedUserEntity = Util.getUserEntity();;
+        updatedUserEntity.setStatus(UserStatus.APPROVED);
+
+        when(userRepository.findOne(anyString())).thenReturn(userEntity);
+        when(userRepository.save(any(UserEntity.class))).thenReturn(updatedUserEntity);
+        userServiceImpl.updateUser(randomIdForTest, updatedUserEntity);
+
+        verify(userRepository, times(2)).findOne(anyString());
+        verify(userRepository, times(2)).save(any(UserEntity.class));
+    }
+
 
     //thrown UserNotFoundException
     @Test
