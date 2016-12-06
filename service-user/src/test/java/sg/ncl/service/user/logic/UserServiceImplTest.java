@@ -607,6 +607,25 @@ public class UserServiceImplTest {
         verify(userRepository, times(1)).findOne(anyString());
         verify(userRepository, times(1)).save(any(UserEntity.class));
     }
+
+    //case FROZEN to APPROVED
+    // should not throw InvalidStatusTransitionException
+    @Test
+    public void testUpdateUserStatusCaseFrozenToApproved() throws Exception {
+        String randomIdForTest = RandomStringUtils.randomAlphanumeric(20);
+        UserEntity userEntity = Util.getUserEntity();
+        userEntity.setStatus(UserStatus.FROZEN);
+
+        when(userRepository.findOne(anyString())).thenReturn(userEntity);
+        when(userRepository.save(any(UserEntity.class))).thenReturn(userEntity);
+        User actual = userServiceImpl.updateUserStatus(randomIdForTest, UserStatus.APPROVED);
+        User expected = userEntity;
+
+        assertThat(actual).isEqualTo(expected);
+        assertThat(actual.getStatus()).isEqualTo(UserStatus.APPROVED);
+        verify(userRepository, times(1)).findOne(anyString());
+        verify(userRepository, times(1)).save(any(UserEntity.class));
+    }
 }
 
 
