@@ -689,8 +689,11 @@ public class AdapterDeterLab {
     }
 
     public String getSavedImages(String teamId) {
+        final String pid = getDeterProjectIdByNclTeamId(teamId);
+        log.info("Getting list of saved images for project: {}", pid);
+
         JSONObject json = new JSONObject();
-        json.put("pid", getDeterProjectIdByNclTeamId(teamId));
+        json.put("pid", pid);
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
@@ -705,15 +708,19 @@ public class AdapterDeterLab {
             return "{}";
         }
 
-        log.info("Get list of saved images request submitted to deterlab");
+        log.info("Get list of saved images OK, Deter response: {}", response.getBody().toString());
 
         return response.getBody().toString();
     }
 
     public String saveImage(String nclTeamId, String nclUserId, String nodeId, String imageName, String currentOS) {
+        final String pid = getDeterProjectIdByNclTeamId(nclTeamId);
+        final String uid = getDeterUserIdByNclUserId(nclUserId);
+        log.info("Saving image: pid {}, uid {}, node ID {}, image name {}", pid, uid, nodeId, imageName);
+
         JSONObject json = new JSONObject();
-        json.put("pid", getDeterProjectIdByNclTeamId(nclTeamId));
-        json.put("uid", getDeterUserIdByNclUserId(nclUserId));
+        json.put("pid", pid);
+        json.put("uid", uid);
         json.put("nodeId", nodeId);
         json.put("imageName", imageName);
         json.put("currentOS", currentOS);
@@ -742,7 +749,7 @@ public class AdapterDeterLab {
             throw new AdapterConnectionException(rae.getMessage());
         } catch (HttpServerErrorException hsee) {
             log.warn("Save image error: Adapter DeterLab internal server error {}", hsee);
-            throw hsee;
+            throw new AdapterInternalErrorException();
         }
     }
 

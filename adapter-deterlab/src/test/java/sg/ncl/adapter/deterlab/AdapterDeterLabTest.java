@@ -1403,9 +1403,9 @@ public class AdapterDeterLabTest {
 
     //throw HttpServerErrorException
     @Test
-    public void saveImageHttpServerErrorException() {
+    public void saveImageAdapterInternalErrorException() {
 
-        exception.expect(HttpServerErrorException.class);
+        exception.expect(AdapterInternalErrorException.class);
 
         when(restTemplate.exchange(anyString(),eq(HttpMethod.POST),anyObject(),eq(String.class))).thenThrow(new HttpServerErrorException(HttpStatus.INTERNAL_SERVER_ERROR));
         when(deterLabProjectRepository.findByNclTeamId(anyString())).thenReturn(new DeterLabProjectEntity());

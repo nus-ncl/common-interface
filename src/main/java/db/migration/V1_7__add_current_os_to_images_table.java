@@ -19,7 +19,7 @@ public class V1_7__add_current_os_to_images_table implements SpringJdbcMigration
     }
 
     private void migrate(final JdbcTemplate jdbcTemplate, final String table, final String column) {
-        final String s1 = String.format("ALTER TABLE prod.%s ADD COLUMN %s VARCHAR(255) NULL", table, column);
+        final String s1 = String.format("ALTER TABLE prod.%s ADD COLUMN %s VARCHAR(255) NOT NULL", table, column);
         jdbcTemplate.update(s1);
     }
 }
