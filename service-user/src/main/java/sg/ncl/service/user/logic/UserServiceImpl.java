@@ -103,7 +103,14 @@ public class UserServiceImpl implements UserService {
 
         // will invoke save repository once
         if (user.getStatus() != null && user.getStatus() != one.getStatus()) {
+            log.info("Updating user {} status to {}", id, user.getStatus());
             updateUserStatus(id, user.getStatus());
+            log.info("Updated user {} status to {} OK", id, user.getStatus());
+        }
+
+        if (user.getUserDetails() == null) {
+            // return since no user details to update
+            return;
         }
 
         if (user.getUserDetails().getFirstName() != null) {
@@ -217,7 +224,7 @@ public class UserServiceImpl implements UserService {
                     throw new InvalidStatusTransitionException(one.getStatus() + " -> " + status);
                 }
             case APPROVED:
-                if (one.getStatus().equals(UserStatus.PENDING)) {
+                if (one.getStatus().equals(UserStatus.PENDING) || one.getStatus().equals(UserStatus.FROZEN)) {
                     return updateUserStatusInternal(one, UserStatus.APPROVED);
                 } else {
                     throw new InvalidStatusTransitionException(one.getStatus() + " -> " + status);
