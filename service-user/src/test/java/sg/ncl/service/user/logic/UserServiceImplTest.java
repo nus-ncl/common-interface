@@ -20,13 +20,10 @@ import sg.ncl.service.user.exceptions.*;
 
 import java.util.List;
 
-import static org.hamcrest.Matchers.equalTo;
-import static org.hamcrest.Matchers.is;
 import static org.mockito.Matchers.*;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.*;
+
 /**
  * @author Tran Ly Vu
  * @Version 1.0
@@ -43,11 +40,11 @@ public class UserServiceImplTest {
     @Mock
     private UserRepository userRepository;
 
-
     private UserServiceImpl userServiceImpl;
 
     @Before
     public void setup() {
+        assertThat(mockingDetails(userRepository).isMock()).isTrue();
         userServiceImpl = new UserServiceImpl(userRepository);
     }
 
