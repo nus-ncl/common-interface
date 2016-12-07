@@ -3,25 +3,29 @@ package sg.ncl.service.user.data.jpa;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
+import org.junit.runner.RunWith;
+import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
+import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.TestPropertySource;
-import sg.ncl.service.user.AbstractTest;
+import org.springframework.test.context.junit4.SpringRunner;
 import sg.ncl.service.user.Util;
 
 import javax.inject.Inject;
 
-import static org.hamcrest.Matchers.equalTo;
-import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.not;
-import static org.hamcrest.Matchers.nullValue;
-import static org.junit.Assert.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 import static sg.ncl.common.test.Checks.checkException;
 
 /**
  * @author Christopher Zhong
  */
+@RunWith(SpringRunner.class)
+@DataJpaTest
+@EnableJpaAuditing
+@ContextConfiguration(classes = AddressRepository.class)
 @TestPropertySource(properties = "flyway.enabled=false")
-public class AddressRepositoryTest extends AbstractTest {
+public class AddressRepositoryTest {
 
     @Rule
     public final ExpectedException exception = ExpectedException.none();
@@ -30,7 +34,7 @@ public class AddressRepositoryTest extends AbstractTest {
 
     @Test
     public void testRepositoryExists() throws Exception {
-        assertThat(repository, is(not(nullValue(AddressRepository.class))));
+        assertThat(repository).isNotNull();
     }
 
     @Test
@@ -38,9 +42,11 @@ public class AddressRepositoryTest extends AbstractTest {
         final AddressEntity entity = Util.getAddressEntity();
 
         final long count = repository.count();
-        final AddressEntity persistedEntity = repository.save(entity);
-        assertThat(persistedEntity.getId(), is(not(nullValue(Long.class))));
-        assertThat(repository.count(), is(equalTo(count + 1)));
+        final AddressEntity saved = repository.save(entity);
+
+        assertThat(repository.count()).isEqualTo(count + 1);
+        assertThat(saved.getCreatedDate()).isNotNull();
+        assertThat(saved.getLastModifiedDate()).isNotNull();
     }
 
     @Test
