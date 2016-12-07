@@ -155,7 +155,7 @@ public class AdapterDeterLab {
         try {
             String deterMessage = new JSONObject(responseBody).getString("msg");
             if ("apply project existing users ok".equalsIgnoreCase(deterMessage)) {
-                log.info("Apply project as new user to DeterLab OK");
+                log.info("Apply project as existing user to DeterLab OK");
                 return responseBody;
             }
             log.warn("Apply project new user error: {}", deterMessage);
