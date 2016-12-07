@@ -158,7 +158,7 @@ public class AdapterDeterLab {
                 log.info("Apply project as existing user to DeterLab OK");
                 return responseBody;
             }
-            log.warn("Apply project new user error: {}", deterMessage);
+            log.warn("Apply project existing user error: {}", deterMessage);
             throw new DeterLabOperationFailedException(deterMessage);
         } catch (JSONException e) {
             log.warn("Error parsing response code existing user apply project: {}", responseBody);
