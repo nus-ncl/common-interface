@@ -43,7 +43,7 @@ public class DownloadServiceImpl implements DownloadService {
 
         // modifies response
         response.setContentType("application/octet-stream");
-        response.setContentLength((int) downloadFile.length());
+        response.setContentLengthLong(downloadFile.length());
 
         String headerKey = "Content-Disposition";
         String headerValue = String.format("attachment; filename=\"%s\"", downloadFile.getName());
@@ -52,7 +52,7 @@ public class DownloadServiceImpl implements DownloadService {
         // obtains response's output stream
         OutputStream outStream = response.getOutputStream();
         byte[] buffer = new byte[4096];
-        int bytesRead ;
+        int bytesRead;
 
         while ((bytesRead = inStream.read(buffer)) != -1) {
             outStream.write(buffer, 0, bytesRead);
