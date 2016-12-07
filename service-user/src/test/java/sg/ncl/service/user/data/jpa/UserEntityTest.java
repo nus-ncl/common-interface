@@ -14,10 +14,7 @@ import sg.ncl.service.user.exceptions.UserAlreadyInTeamException;
 import java.time.ZonedDateTime;
 import java.util.List;
 
-import static org.hamcrest.Matchers.*;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertThat;
-import static org.junit.Assert.assertTrue;
+import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * @author Christopher Zhong
@@ -33,7 +30,7 @@ public class UserEntityTest {
     public void testGetId() throws Exception {
         final UserEntity userEntity = new UserEntity();
 
-        assertThat(userEntity.getId(), is(nullValue()));
+        assertThat(userEntity.getId()).isNull();
     }
 
     @Test
@@ -42,14 +39,14 @@ public class UserEntityTest {
         final String random = RandomStringUtils.random(20);
         userEntity.setId(random);
 
-        assertThat(userEntity.getId(), is(equalTo(random)));
+        assertThat(userEntity.getId()).isEqualTo(random);
     }
 
     @Test
     public void testGetUserDetails() throws Exception {
         final UserEntity userEntity = new UserEntity();
 
-        assertThat(userEntity.getUserDetails(), is(nullValue()));
+        assertThat(userEntity.getUserDetails()).isNull();
     }
 
     @Test
@@ -58,21 +55,21 @@ public class UserEntityTest {
         final UserDetailsEntity userDetailsEntity = new UserDetailsEntity();
         userEntity.setUserDetails(userDetailsEntity);
 
-        assertThat(userEntity.getUserDetails(), is(equalTo(userDetailsEntity)));
+        assertThat(userEntity.getUserDetails()).isEqualTo(userDetailsEntity);
     }
 
     @Test
     public void testGetVerificationKey() throws Exception {
         final UserEntity userEntity = Util.getUserEntity();
 
-        assertThat(userEntity.getVerificationKey(), not(isEmptyOrNullString()));
+        assertThat(userEntity.getVerificationKey()).isNotEmpty();
     }
 
     @Test
     public void testIsEmailVerified() throws Exception {
         final UserEntity userEntity = new UserEntity();
 
-        assertThat(userEntity.isEmailVerified(), is(equalTo(false)));
+        assertThat(userEntity.isEmailVerified()).isEqualTo(false);
     }
 
     @Test
@@ -80,14 +77,14 @@ public class UserEntityTest {
         final UserEntity userEntity = new UserEntity();
         userEntity.setEmailVerified(true);
 
-        assertThat(userEntity.isEmailVerified(), is(equalTo(true)));
+        assertThat(userEntity.isEmailVerified()).isEqualTo(true);
     }
 
     @Test
     public void testGetStatus() throws Exception {
         final UserEntity userEntity = new UserEntity();
 
-        assertThat(userEntity.getStatus(), is(equalTo(UserStatus.CREATED)));
+        assertThat(userEntity.getStatus()).isEqualTo(UserStatus.CREATED);
     }
 
     @Test
@@ -95,14 +92,14 @@ public class UserEntityTest {
         final UserEntity userEntity = new UserEntity();
         userEntity.setStatus(UserStatus.APPROVED);
 
-        assertThat(userEntity.getStatus(), is(equalTo(UserStatus.APPROVED)));
+        assertThat(userEntity.getStatus()).isEqualTo(UserStatus.APPROVED);
     }
 
     @Test
     public void testGetRegistrationDate() throws Exception {
         final UserEntity userEntity = new UserEntity();
 
-        assertThat(userEntity.getApplicationDate(), is(nullValue()));
+        assertThat(userEntity.getApplicationDate()).isNull();
     }
 
     @Test
@@ -111,14 +108,14 @@ public class UserEntityTest {
         final ZonedDateTime now = ZonedDateTime.now();
         userEntity.setApplicationDate(now);
 
-        assertThat(userEntity.getApplicationDate(), is(equalTo(now)));
+        assertThat(userEntity.getApplicationDate()).isEqualTo(now);
     }
 
     @Test
     public void testGetProcessedDate() throws Exception {
         final UserEntity userEntity = new UserEntity();
 
-        assertThat(userEntity.getProcessedDate(), is(nullValue()));
+        assertThat(userEntity.getProcessedDate()).isNull();
     }
 
     @Test
@@ -127,7 +124,7 @@ public class UserEntityTest {
         final ZonedDateTime now = ZonedDateTime.now();
         userEntity.setProcessedDate(now);
 
-        assertThat(userEntity.getProcessedDate(), is(equalTo(now)));
+        assertThat(userEntity.getProcessedDate()).isEqualTo(now);
     }
 
     @Test
@@ -135,8 +132,9 @@ public class UserEntityTest {
         final UserEntity userEntity = new UserEntity();
 
         final List<LoginActivityEntity> loginActivities = userEntity.getLoginActivities();
-        assertThat(loginActivities, is(not(nullValue())));
-        assertThat(loginActivities, is(empty()));
+
+        assertThat(loginActivities).isNotNull();
+        assertThat(loginActivities).isEmpty();
     }
 
     @Test
@@ -147,16 +145,16 @@ public class UserEntityTest {
 
         final List<LoginActivityEntity> loginActivities = userEntity.getLoginActivities();
 
-        assertThat(loginActivities, is(not(nullValue())));
-        assertThat(loginActivities, is(not(empty())));
-        assertThat(loginActivities, contains(loginActivity1));
-        assertThat(loginActivities.size(), is(equalTo(1)));
+        assertThat(loginActivities).isNotNull();
+        assertThat(loginActivities).isNotEmpty();
+        assertThat(loginActivities.size()).isEqualTo(1);
+        assertThat(loginActivities).contains(loginActivity1);
 
         final LoginActivityEntity loginActivity2 = new LoginActivityEntity();
         userEntity.addLoginActivity(loginActivity2);
 
-        assertThat(loginActivities, contains(loginActivity1, loginActivity2));
-        assertThat(loginActivities.size(), is(equalTo(2)));
+        assertThat(loginActivities.size()).isEqualTo(2);
+        assertThat(loginActivities).contains(loginActivity1, loginActivity2);
     }
 
     @Test
@@ -164,21 +162,21 @@ public class UserEntityTest {
         final UserEntity userEntity1 = new UserEntity();
         final UserEntity userEntity2 = new UserEntity();
 
-        assertThat(userEntity1, is(equalTo(userEntity2)));
+        assertThat(userEntity1).isEqualTo(userEntity2);
 
         final String id1 = "id1";
         userEntity1.setId(id1);
 
-        assertThat(userEntity1, is(not(equalTo(userEntity2))));
+        assertThat(userEntity1).isNotEqualTo(userEntity2);
 
         userEntity2.setId(id1);
 
-        assertThat(userEntity1, is(equalTo(userEntity2)));
+        assertThat(userEntity1).isEqualTo(userEntity2);
 
         final String id2 = "id2";
         userEntity2.setId(id2);
 
-        assertThat(userEntity1, is(not(equalTo(userEntity2))));
+        assertThat(userEntity1).isNotEqualTo(userEntity2);
     }
 
     @Test
@@ -186,7 +184,7 @@ public class UserEntityTest {
         final UserEntity userEntity1 = new UserEntity();
         final UserEntity userEntity2 = userEntity1;
 
-        assertTrue(userEntity1.equals(userEntity2));
+        assertThat(userEntity1).isEqualTo(userEntity2);
     }
 
     @Test
@@ -194,7 +192,7 @@ public class UserEntityTest {
         final UserEntity userEntity1 = new UserEntity();
         final UserEntity userEntity2 = null;
 
-        assertFalse(userEntity1.equals(userEntity2));
+        assertThat(userEntity1).isNotEqualTo(userEntity2);
     }
 
     @Test
@@ -202,7 +200,7 @@ public class UserEntityTest {
         final UserEntity userEntity1 = new UserEntity();
         final UserDetailsEntity userEntity2 = new UserDetailsEntity();
 
-        assertFalse(userEntity1.equals(userEntity2));
+        assertThat(userEntity1).isNotEqualTo(userEntity2);
     }
 
     @Test
@@ -210,21 +208,21 @@ public class UserEntityTest {
         final UserEntity userEntity1 = new UserEntity();
         final UserEntity userEntity2 = new UserEntity();
 
-        assertThat(userEntity1.hashCode(), is(equalTo(userEntity2.hashCode())));
+        assertThat(userEntity1.hashCode()).isEqualTo(userEntity2.hashCode());
 
         final String id1 = "id1";
         userEntity1.setId(id1);
 
-        assertThat(userEntity1.hashCode(), is(not(equalTo(userEntity2.hashCode()))));
+        assertThat(userEntity1.hashCode()).isNotEqualTo(userEntity2.hashCode());
 
         userEntity2.setId(id1);
 
-        assertThat(userEntity1.hashCode(), is(equalTo(userEntity2.hashCode())));
+        assertThat(userEntity1.hashCode()).isEqualTo(userEntity2.hashCode());
 
         final String id2 = "id2";
         userEntity2.setId(id2);
 
-        assertThat(userEntity1.hashCode(), is(not(equalTo(userEntity2.hashCode()))));
+        assertThat(userEntity1.hashCode()).isNotEqualTo(userEntity2.hashCode());
     }
 
     @Test
@@ -243,12 +241,12 @@ public class UserEntityTest {
 
         final String toString = userEntity.toString();
 
-        assertThat(toString, containsString(id));
-        assertThat(toString, containsString(status.toString()));
-        assertThat(toString, containsString(String.valueOf(true)));
-        assertThat(toString, containsString(String.valueOf("null")));
-        assertThat(toString, containsString(registrationDate.toString()));
-        assertThat(toString, containsString(processedDate.toString()));
+        assertThat(toString).contains(id);
+        assertThat(toString).contains(status.toString());
+        assertThat(toString).contains(String.valueOf(true));
+        assertThat(toString).contains(String.valueOf("null"));
+        assertThat(toString).contains(registrationDate.toString());
+        assertThat(toString).contains(processedDate.toString());
     }
 
     @Test
@@ -272,7 +270,7 @@ public class UserEntityTest {
         // first assert that the team don't exist
         List<String> teamsList = userEntity.getTeams();
 
-        assertThat(teamsList.size(), is(2));
+        assertThat(teamsList.size()).isEqualTo(2);
 
         userEntity.removeTeam(RandomStringUtils.randomAlphanumeric(20));
 
@@ -298,15 +296,15 @@ public class UserEntityTest {
         // first assert that the team don't exist
         List<String> teamsList = userEntity.getTeams();
 
-        assertThat(teamsList.size(), is(2));
+        assertThat(teamsList.size()).isEqualTo(2);
 
         userEntity.removeTeam(teamId_2);
 
         // finally assert that only teamId_2 is removed
         List<String> result = userEntity.getTeams();
 
-        assertThat(result.size(), is(1));
-        assertThat(result.get(0), is(teamId_1));
+        assertThat(result.size()).isEqualTo(1);
+        assertThat(result.get(0)).isEqualTo(teamId_1);
     }
 
 }
