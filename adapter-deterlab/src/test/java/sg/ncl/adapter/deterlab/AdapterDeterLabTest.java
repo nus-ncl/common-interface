@@ -247,7 +247,7 @@ public class AdapterDeterLabTest {
     @Test
     public void applyProjectTest1() {
         JSONObject myobject = new JSONObject();
-        myobject.put("msg", "apply project request existing users success");
+        myobject.put("msg", "apply project existing users ok");
 
         when(restTemplate.exchange(anyString(),eq(HttpMethod.POST),anyObject(),eq(String.class))).thenReturn(response);
         when(response.getBody()).thenReturn(myobject.toString());
