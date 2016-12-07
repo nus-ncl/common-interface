@@ -7,13 +7,13 @@ import org.springframework.web.bind.annotation.ResponseStatus;
  * @author Te Ye
  */
 @ResponseStatus(value = HttpStatus.REQUEST_TIMEOUT, reason = "Connection refused to adapter deterlab")
-public class AdapterDeterLabConnectionFailedException extends RuntimeException {
+public class AdapterConnectionException extends RuntimeException {
 
-    public AdapterDeterLabConnectionFailedException() {
+    public AdapterConnectionException() {
         super("Connection refused to adapter deterlab");
     }
 
-    public AdapterDeterLabConnectionFailedException(final String message) {
+    public AdapterConnectionException(final String message) {
         super(message);
     }
 }
