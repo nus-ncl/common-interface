@@ -17,6 +17,7 @@ public class ImageInfo implements Image {
     private String imageName;
     private String nodeId;
     private String description;
+    private String currentOS;
     private ImageVisibility visibility;
 
     @JsonCreator
@@ -26,6 +27,7 @@ public class ImageInfo implements Image {
             @JsonProperty("imageName") final String imageName,
             @JsonProperty("nodeId") final String nodeId,
             @JsonProperty("description") final String description,
+            @JsonProperty("currentOS") final String currentOS,
             @JsonProperty("visibility") final ImageVisibility visibility
             ) {
         this.id = id;
@@ -33,11 +35,12 @@ public class ImageInfo implements Image {
         this.imageName = imageName;
         this.nodeId = nodeId;
         this.description = description;
+        this.currentOS = currentOS;
         this.visibility = visibility;
     }
 
     public ImageInfo(final Image image) {
-        this(image.getId(), image.getTeamId(), image.getImageName(), image.getNodeId(), image.getDescription(), image.getVisibility());
+        this(image.getId(), image.getTeamId(), image.getImageName(), image.getNodeId(), image.getDescription(), image.getCurrentOS(), image.getVisibility());
     }
 
 }

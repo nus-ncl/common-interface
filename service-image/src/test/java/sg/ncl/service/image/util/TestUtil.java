@@ -10,10 +10,10 @@ import sg.ncl.service.image.domain.ImageVisibility;
 public class TestUtil {
 
     public static ImageEntity getImageEntity() {
-        return getImageEntity(Long.parseLong(RandomStringUtils.randomNumeric(15)), RandomStringUtils.randomAlphanumeric(20), RandomStringUtils.randomAlphanumeric(20), ImageVisibility.PRIVATE, RandomStringUtils.randomAlphanumeric(20), RandomStringUtils.randomAlphanumeric(20));
+        return getImageEntity(Long.parseLong(RandomStringUtils.randomNumeric(15)), RandomStringUtils.randomAlphanumeric(20), RandomStringUtils.randomAlphanumeric(20), ImageVisibility.PRIVATE, RandomStringUtils.randomAlphanumeric(20), RandomStringUtils.randomAlphanumeric(20), RandomStringUtils.randomAlphanumeric(20));
     }
 
-    public static ImageEntity getImageEntity(final Long id, final String imageName, final String description, final ImageVisibility visibility, final String nodeId, final String teamId) {
+    public static ImageEntity getImageEntity(final Long id, final String imageName, final String description, final ImageVisibility visibility, final String nodeId, final String teamId, final String currentOS) {
         final ImageEntity entity = new ImageEntity();
         entity.setId(id);
         entity.setImageName(imageName);
@@ -21,6 +21,7 @@ public class TestUtil {
         entity.setVisibility(visibility);
         entity.setNodeId(nodeId);
         entity.setTeamId(teamId);
+        entity.setCurrentOS(currentOS);
         return entity;
     }
 

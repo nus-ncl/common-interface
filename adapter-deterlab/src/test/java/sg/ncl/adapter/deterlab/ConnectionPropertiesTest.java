@@ -145,4 +145,39 @@ public class ConnectionPropertiesTest {
         assertThat(connectionProperties.getUserUrl()).isEqualTo("users.ncl.sg");
     }
 
+    @Test
+    public void testLogin() throws Exception {
+        assertThat(connectionProperties.login()).isNotNull();
+        assertThat(connectionProperties.login()).isEqualTo("http://127.0.0.1:22/login");
+    }
+
+    @Test
+    public void testGetTopoThumbnail() throws Exception {
+        assertThat(connectionProperties.getTopoThumbnail()).isNotNull();
+        assertThat(connectionProperties.getTopoThumbnail()).isEqualTo("http://127.0.0.1:22/getTopoThumbnail");
+    }
+
+    @Test
+    public void testGetUsageStatistics() throws Exception {
+        assertThat(connectionProperties.getUsageStatistics()).isNotNull();
+        assertThat(connectionProperties.getUsageStatistics()).isEqualTo("http://127.0.0.1:22/getUsageStatistics");
+    }
+
+    @Test
+    public void testGetResetPasswordURI() throws Exception {
+        assertThat(connectionProperties.getResetPasswordURI()).isNotNull();
+        assertThat(connectionProperties.getResetPasswordURI()).isEqualTo("http://127.0.0.1:22/resetPassword");
+    }
+
+    @Test
+    public void testGetSavedImages() throws Exception {
+        assertThat(connectionProperties.getSavedImages()).isNotNull();
+        assertThat(connectionProperties.getSavedImages()).isEqualTo("http://127.0.0.1:22/getSavedImages");
+    }
+
+    @Test
+    public void testSaveImage() throws Exception {
+        assertThat(connectionProperties.saveImage()).isNotNull();
+        assertThat(connectionProperties.saveImage()).isEqualTo("http://127.0.0.1:22/saveImage");
+    }
 }

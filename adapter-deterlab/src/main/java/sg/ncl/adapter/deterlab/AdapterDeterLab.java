@@ -688,6 +688,71 @@ public class AdapterDeterLab {
         return response.getBody().toString();
     }
 
+    public String getSavedImages(String teamId) {
+        final String pid = getDeterProjectIdByNclTeamId(teamId);
+        log.info("Getting list of saved images for project: {}", pid);
+
+        JSONObject json = new JSONObject();
+        json.put("pid", pid);
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        HttpEntity<String> request = new HttpEntity<>(json.toString(), headers);
+
+        ResponseEntity response;
+
+        try {
+            response = restTemplate.exchange(properties.getSavedImages(), HttpMethod.POST, request, String.class);
+        } catch (RestClientException e) {
+            log.warn("Adapter connection error get list of saved images by team: {}", e);
+            return "{}";
+        }
+
+        log.info("Get list of saved images OK, Deter response: {}", response.getBody().toString());
+
+        return response.getBody().toString();
+    }
+
+    public String saveImage(String nclTeamId, String nclUserId, String nodeId, String imageName, String currentOS) {
+        final String pid = getDeterProjectIdByNclTeamId(nclTeamId);
+        final String uid = getDeterUserIdByNclUserId(nclUserId);
+        log.info("Saving image: pid {}, uid {}, node ID {}, image name {}", pid, uid, nodeId, imageName);
+
+        JSONObject json = new JSONObject();
+        json.put("pid", pid);
+        json.put("uid", uid);
+        json.put("nodeId", nodeId);
+        json.put("imageName", imageName);
+        json.put("currentOS", currentOS);
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        HttpEntity<String> request = new HttpEntity<>(json.toString(), headers);
+
+        ResponseEntity response;
+
+        try {
+            response = restTemplate.exchange(properties.saveImage(), HttpMethod.POST, request, String.class);
+            String responseBody = response.getBody().toString();
+            String deterMessage = new JSONObject(responseBody).getString("msg");
+
+            if ("save image OK".equals(deterMessage)) {
+                log.info("Save image OK");
+                return responseBody;
+            } else {
+                log.warn("Save image FAIL");
+                throw new DeterLabOperationFailedException(deterMessage);
+            }
+
+        } catch (ResourceAccessException rae) {
+            log.warn("Save image error: {}", rae);
+            throw new AdapterConnectionException(rae.getMessage());
+        } catch (HttpServerErrorException hsee) {
+            log.warn("Save image error: Adapter DeterLab internal server error {}", hsee);
+            throw new AdapterInternalErrorException();
+        }
+    }
+
     /**
      * Checks the response from adapter deterlab when applying or joining a new project as a new user and determines the exception to be thrown
      * Use only if @applyProjectNewUsers and @joinProjectNewUsers are performing identical checks

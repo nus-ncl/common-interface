@@ -1,5 +1,6 @@
 package sg.ncl.service.image.logic;
 
+import io.jsonwebtoken.Claims;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -17,6 +18,7 @@ import sg.ncl.service.image.web.ImageInfo;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Matchers.any;
@@ -38,6 +40,8 @@ public class ImageServiceTest {
     private AdapterDeterLab adapterDeterLab;
     @Mock
     private ImageRepository imageRepository;
+    @Mock
+    private Claims claims;
 
     private ImageService imageService;
 
@@ -45,17 +49,18 @@ public class ImageServiceTest {
     public void before() {
         assertThat(mockingDetails(adapterDeterLab).isMock()).isTrue();
         assertThat(mockingDetails(imageRepository).isMock()).isTrue();
+        assertThat(mockingDetails(claims).isMock()).isTrue();
 
         imageService = new ImageServiceImpl(adapterDeterLab, imageRepository);
     }
 
     @Test
     public void testAddImageGood() {
-        final Image imageInfo = new ImageInfo(1L, "teamId", "imageName", "nodeId", "description", ImageVisibility.PRIVATE);
+        final Image imageInfo = new ImageInfo(1L, "teamId", "imageName", "nodeId", "description", "currentOS", ImageVisibility.PRIVATE);
 
         when(imageRepository.save(any(ImageEntity.class))).thenAnswer(i -> i.getArgumentAt(0, ImageEntity.class));
 
-        final Image image = imageService.addImage(imageInfo);
+        final Image image = imageService.addImage(imageInfo, claims);
 
         verify(imageRepository, times(1)).save(any(ImageEntity.class));
         assertThat(image.getTeamId()).isEqualTo(imageInfo.getTeamId());
@@ -63,6 +68,7 @@ public class ImageServiceTest {
         assertThat(image.getNodeId()).isEqualTo(imageInfo.getNodeId());
         assertThat(image.getDescription()).isEqualTo(imageInfo.getDescription());
         assertThat(image.getVisibility()).isEqualTo(imageInfo.getVisibility());
+        assertThat(image.getCurrentOS()).isEqualTo(imageInfo.getCurrentOS());
     }
 
     @Test
@@ -78,6 +84,7 @@ public class ImageServiceTest {
         assertThat(entity.getNodeId()).isEqualTo(result.getNodeId());
         assertThat(entity.getDescription()).isEqualTo(result.getDescription());
         assertThat(entity.getVisibility()).isEqualTo(result.getVisibility());
+        assertThat(entity.getCurrentOS()).isEqualTo(result.getCurrentOS());
     }
 
     @Test
@@ -130,5 +137,15 @@ public class ImageServiceTest {
 
         List<Image> result = imageService.getAll(null, ImageVisibility.PRIVATE);
         assertThat(expected).isEqualTo(result);
+    }
+
+    @Test
+    public void testGetSavedImages() {
+
+        when(adapterDeterLab.getSavedImages(anyString())).thenReturn("adapterResult");
+
+        Map<String, String> result = imageService.getSavedImages("teamId");
+        assertThat(result).hasSize(1);
+        assertThat(result).containsEntry("teamId", "adapterResult");
     }
 }
