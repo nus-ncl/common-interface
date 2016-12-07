@@ -49,4 +49,28 @@ public class DataResourceEntityTest {
         assertThat(toString).contains(entity.getId().toString());
         assertThat(toString).contains(entity.getUri());
     }
+
+    @Test
+    public void testEqualsNot() {
+        DataResourceEntity entity = new DataResourceEntity();
+        assertThat(entity.equals(null)).isFalse();
+    }
+
+    @Test
+    public void testEqualsUri() {
+        String link = RandomStringUtils.randomAlphanumeric(20);
+        DataResourceEntity entity1 = new DataResourceEntity();
+        DataResourceEntity entity2 = new DataResourceEntity();
+        entity1.setUri(link);
+        entity2.setUri(link);
+        assertThat(entity1.equals(entity2)).isTrue();
+    }
+
+    @Test
+    public void testHashCode() {
+        String link = RandomStringUtils.randomAlphanumeric(20);
+        DataResourceEntity entity = new DataResourceEntity();
+        entity.setUri(link);
+        assertThat(entity.hashCode()).isEqualTo(link.hashCode());
+    }
 }

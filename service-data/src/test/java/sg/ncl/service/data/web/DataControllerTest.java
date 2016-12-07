@@ -16,6 +16,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.web.context.WebApplicationContext;
 import sg.ncl.common.exception.ExceptionAutoConfiguration;
 import sg.ncl.common.exception.GlobalExceptionHandler;
@@ -25,6 +26,7 @@ import sg.ncl.service.data.domain.Data;
 import sg.ncl.service.data.domain.DataService;
 import sg.ncl.service.data.domain.DataVisibility;
 import sg.ncl.service.data.util.TestUtil;
+import sg.ncl.service.transmission.web.ResumableInfo;
 
 import javax.inject.Inject;
 import java.util.ArrayList;
@@ -33,7 +35,7 @@ import java.util.List;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.*;
 import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyLong;
+import static org.mockito.Matchers.*;
 import static org.mockito.Mockito.mockingDetails;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
@@ -79,6 +81,21 @@ public class DataControllerTest {
     public void testGetPublicDatasetsWithNothingInDb() throws Exception {
         mockMvc.perform(get(DataController.PATH + "?visibility=PUBLIC"))
                 .andExpect(status().isOk())
+                .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON));
+    }
+
+    @Test
+    public void testGetPublicDatasetsNotPublic() throws Exception {
+        final List<Data> dataSets = new ArrayList<>();
+        DataEntity publicDataSet1 = TestUtil.getDataEntity();
+        DataEntity publicDataSet2 = TestUtil.getDataEntity();
+        dataSets.add(publicDataSet1);
+        dataSets.add(publicDataSet2);
+
+        when(dataService.findByVisibility(any(DataVisibility.class))).thenReturn(dataSets);
+
+        mockMvc.perform(get(DataController.PATH + "?visibility=PRIVATE"))
+                .andExpect(status().isUnauthorized())
                 .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON));
     }
 
@@ -304,6 +321,69 @@ public class DataControllerTest {
                 .andExpect(jsonPath("visibility", is(equalTo(dataEntity.getVisibility().toString()))))
 
                 .andExpect(jsonPath("resources", hasSize(0)));
+    }
+
+    @Test
+    public void testCheckUpload() throws Exception {
+        when(dataService.checkChunk(anyString(), anyString())).thenReturn("Uploaded.");
+        MvcResult result = mockMvc.perform(get(DataController.PATH + "/1/chunks/1/files/identifier"))
+                .andExpect(status().isOk())
+                .andReturn();
+        String content = result.getResponse().getContentAsString();
+
+        assertThat(content).isEqualTo("Uploaded.");
+    }
+
+    @Test
+    public void testFileUploadUnauthorized() throws Exception {
+        final ResumableInfo resumableInfo = TestUtil.getResumableInfo();
+        final byte[] content = mapper.writeValueAsBytes(resumableInfo);
+
+        when(securityContext.getAuthentication()).thenReturn(authentication);
+        SecurityContextHolder.setContext(securityContext);
+        when(authentication.getPrincipal()).thenReturn(null);
+
+        mockMvc.perform(post(DataController.PATH + "/1/chunks/1")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(content))
+                .andExpect(status().isUnauthorized());
+    }
+
+    @Test
+    public void testFileUploadAuthorized() throws Exception {
+        final ResumableInfo resumableInfo = TestUtil.getResumableInfo();
+        final byte[] content = mapper.writeValueAsBytes(resumableInfo);
+
+        when(securityContext.getAuthentication()).thenReturn(authentication);
+        SecurityContextHolder.setContext(securityContext);
+        when(authentication.getPrincipal()).thenReturn(claims);
+        when(dataService.addChunk(any(ResumableInfo.class), anyString(), anyString(), any(Claims.class))).thenReturn("Upload");
+
+        MvcResult result = mockMvc.perform(post(DataController.PATH + "/1/chunks/1")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(content))
+                .andExpect(status().isAccepted())
+                .andReturn();
+        assertThat(result.getResponse().getContentAsString()).isEqualTo("Upload");
+    }
+
+    @Test
+    public void testDownloadResourceUnauthorized() throws Exception {
+        when(securityContext.getAuthentication()).thenReturn(authentication);
+        SecurityContextHolder.setContext(securityContext);
+        when(authentication.getPrincipal()).thenReturn(null);
+        mockMvc.perform(get(DataController.PATH + "/1/resources/1/download"))
+                .andExpect(status().isUnauthorized());
+    }
+
+    @Test
+    public void testDownloadResourceAuthorized() throws Exception {
+        when(securityContext.getAuthentication()).thenReturn(authentication);
+        SecurityContextHolder.setContext(securityContext);
+        when(authentication.getPrincipal()).thenReturn(claims);
+
+        mockMvc.perform(get(DataController.PATH + "/1/resources/1/download"))
+                .andExpect(status().isOk());
     }
 
 }
