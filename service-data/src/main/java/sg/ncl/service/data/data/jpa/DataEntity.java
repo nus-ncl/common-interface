@@ -64,8 +64,7 @@ public class DataEntity extends AbstractEntity implements Data {
     @Column(name = "released_date", nullable = false)
     private ZonedDateTime releasedDate;
 
-    @OneToMany(cascade = CascadeType.ALL)
-    @JoinColumn(name = "data_id")
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "dataEntity")
     private List<DataResourceEntity> resources = new ArrayList<>();
 
     @ElementCollection
@@ -89,6 +88,13 @@ public class DataEntity extends AbstractEntity implements Data {
         }
         approvedUsers.remove(userId);
         log.info("User {} removed from the approved list for data {}", userId, name);
+    }
+
+    public void addResource(DataResourceEntity dataResourceEntity) {
+        if (!resources.contains(dataResourceEntity)) {
+            resources.add(dataResourceEntity);
+            dataResourceEntity.setDataEntity(this);
+        }
     }
 
     @Override

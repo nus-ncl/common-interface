@@ -1,8 +1,10 @@
 package sg.ncl.service.image.web;
 
+import io.jsonwebtoken.Claims;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import sg.ncl.service.image.domain.Image;
 import sg.ncl.service.image.domain.ImageService;
@@ -12,8 +14,10 @@ import javax.inject.Inject;
 import javax.validation.constraints.NotNull;
 
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
+import static sg.ncl.common.validation.Validator.checkClaimsType;
 import static sg.ncl.service.image.web.ImageController.PATH;
 
 /**
@@ -46,6 +50,15 @@ public class ImageController {
     }
 
     /**
+     * Invokes the adapter to retrieve the list of saved images
+     */
+    @GetMapping(path = "/teams/{id}")
+    @ResponseStatus(HttpStatus.OK)
+    public Map<String, String> getSavedImages(@PathVariable final String id) {
+        return imageService.getSavedImages(id);
+    }
+
+    /**
      * Creates a saved image
      * status is ACCEPTED because creating an image is not an instant process
      * @param image
@@ -53,7 +66,8 @@ public class ImageController {
      */
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.ACCEPTED)
-    public Long addImage(@RequestBody final ImageInfo image) {
-        return new ImageInfo(imageService.addImage(image)).getId();
+    public Long addImage(@RequestBody final ImageInfo image,  @AuthenticationPrincipal Object claims) {
+        checkClaimsType(claims);
+        return new ImageInfo(imageService.addImage(image, (Claims) claims)).getId();
     }
 }

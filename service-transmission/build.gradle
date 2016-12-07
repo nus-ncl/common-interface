@@ -1,0 +1,9 @@
+version '1.0-SNAPSHOT'
+
+dependencies {
+    compile project(':common')
+
+    compileOnly 'org.springframework.boot:spring-boot-configuration-processor'
+
+    testCompile project(':common-test')
+}

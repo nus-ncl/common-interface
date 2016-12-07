@@ -7,9 +7,14 @@ import org.springframework.http.MediaType;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import sg.ncl.common.exception.base.UnauthorizedException;
-import sg.ncl.service.data.domain.*;
+import sg.ncl.service.data.domain.Data;
+import sg.ncl.service.data.domain.DataResource;
+import sg.ncl.service.data.domain.DataService;
+import sg.ncl.service.data.domain.DataVisibility;
+import sg.ncl.service.transmission.web.ResumableInfo;
 
 import javax.inject.Inject;
+import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import java.util.List;
@@ -139,7 +144,7 @@ public class DataController {
     }
 
     // Process request
-    @PutMapping(path = "{did}/requests/{rid}")
+    @PutMapping(path = "/{did}/requests/{rid}")
     @ResponseStatus(HttpStatus.OK)
     public String processRequest(@AuthenticationPrincipal Object claims, @PathVariable String did, @PathVariable String rid) {
         if (claims == null || !(claims instanceof Claims)) {
@@ -147,6 +152,36 @@ public class DataController {
         }
         // TODO: process request to add to approved users
         return "";
+    }
+
+    @GetMapping(value = "/{id}/chunks/{resumableChunkNumber}/files/{resumableIdentifier}")
+    @ResponseStatus(HttpStatus.OK)
+    public String checkUpload(@PathVariable String resumableIdentifier,
+                              @PathVariable String resumableChunkNumber,
+                              @PathVariable String id) {
+        return dataService.checkChunk(resumableIdentifier, resumableChunkNumber);
+    }
+
+    @PostMapping(value = "/{id}/chunks/{resumableChunkNumber}")
+    @ResponseStatus(HttpStatus.ACCEPTED)
+    public String fileUpload(@AuthenticationPrincipal Object claims,
+                             @RequestBody @Valid ResumableInfo resumableInfo,
+                             @PathVariable String resumableChunkNumber,
+                             @PathVariable String id) {
+        if (claims == null || !(claims instanceof Claims)) {
+            throw new UnauthorizedException();
+        }
+        return dataService.addChunk(resumableInfo, resumableChunkNumber, id, (Claims) claims);
+    }
+
+    @GetMapping(value = "/{did}/resources/{rid}/download")
+    public void downloadResource(@AuthenticationPrincipal Object claims,
+                                 @PathVariable Long did, @PathVariable Long rid,
+                                 HttpServletResponse response) {
+        if (claims == null || !(claims instanceof Claims)) {
+            throw new UnauthorizedException();
+        }
+        dataService.downloadResource(response, did, rid, (Claims) claims);
     }
 
 }

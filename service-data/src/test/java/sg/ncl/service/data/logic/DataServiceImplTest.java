@@ -24,7 +24,13 @@ import sg.ncl.service.data.domain.DataVisibility;
 import sg.ncl.service.data.exceptions.DataNameAlreadyExistsException;
 import sg.ncl.service.data.exceptions.DataNotFoundException;
 import sg.ncl.service.data.util.TestUtil;
+import sg.ncl.service.transmission.domain.DownloadService;
+import sg.ncl.service.transmission.domain.UploadService;
+import sg.ncl.service.transmission.domain.UploadStatus;
+import sg.ncl.service.transmission.web.ResumableInfo;
 
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -46,14 +52,22 @@ public class DataServiceImplTest extends AbstractTest {
     @Mock
     private DataRepository dataRepository;
     @Mock
+    private UploadService uploadService;
+    @Mock
+    private DownloadService downloadService;
+    @Mock
     private Claims claims;
+    @Mock
+    private HttpServletResponse response;
 
     private DataService dataService;
 
     @Before
     public void before() {
         assertThat(mockingDetails(dataRepository).isMock()).isTrue();
-        dataService = new DataServiceImpl(dataRepository);
+        assertThat(mockingDetails(uploadService).isMock()).isTrue();
+        assertThat(mockingDetails(downloadService).isMock()).isTrue();
+        dataService = new DataServiceImpl(dataRepository, uploadService, downloadService);
     }
 
     @Test
@@ -203,6 +217,86 @@ public class DataServiceImplTest extends AbstractTest {
 
         dataService.deleteResource(dataEntity.getId(), dataResourceEntity.getId(), claims);
         verify(dataRepository, times(1)).save(any(DataEntity.class));
+    }
+
+    @Test
+    public void testCheckChunkUploaded() {
+        String resumableIdentifier = "identifier";
+        String resumableChunkNumber = "1";
+
+        when(uploadService.checkChunk(anyString(), anyInt())).thenReturn(UploadStatus.UPLOADED);
+
+        String result = dataService.checkChunk(resumableIdentifier, resumableChunkNumber);
+        assertThat(result).isEqualTo("Uploaded.");
+    }
+
+    @Test
+    public void testCheckChunkNotFound() {
+        String resumableIdentifier = "identifier";
+        String resumableChunkNumber = "1";
+
+        when(uploadService.checkChunk(anyString(), anyInt())).thenReturn(UploadStatus.NOT_FOUND);
+
+        String result = dataService.checkChunk(resumableIdentifier, resumableChunkNumber);
+        assertThat(result).isEqualTo("Not found");
+    }
+
+    @Test
+    public void  testAddChunkDataNotFound() {
+        ResumableInfo resumableInfo = TestUtil.getResumableInfo();
+
+        when(uploadService.addChunk(any(ResumableInfo.class), anyInt(), anyString(), anyString())).thenReturn(UploadStatus.FINISHED);
+        exception.expect(DataNotFoundException.class);
+
+        dataService.addChunk(resumableInfo, "1", "1", claims);
+    }
+
+    @Test
+    public void testAddChunkFinished() {
+        ResumableInfo resumableInfo = TestUtil.getResumableInfo();
+        DataEntity dataEntity = TestUtil.getDataEntity();
+        final List<Role> roles = Collections.singletonList(Role.USER);
+
+        when(dataRepository.getOne(anyLong())).thenReturn(dataEntity);
+        when(claims.get(JwtToken.KEY)).thenReturn(roles);
+        when(claims.getSubject()).thenReturn(dataEntity.getContributorId());
+        when(uploadService.addChunk(any(ResumableInfo.class), anyInt(), anyString(), anyString())).thenReturn(UploadStatus.FINISHED);
+
+        String result = dataService.addChunk(resumableInfo, "1", "1", claims);
+        assertThat(result).isEqualTo("All finished.");
+    }
+
+    @Test
+    public void testAddChunkUpload() {
+        ResumableInfo resumableInfo = TestUtil.getResumableInfo();
+
+        when(uploadService.addChunk(any(ResumableInfo.class), anyInt(), anyString(), anyString())).thenReturn(UploadStatus.UPLOAD);
+
+        String result = dataService.addChunk(resumableInfo, "1", "1", claims);
+        assertThat(result).isEqualTo("Upload");
+    }
+
+    @Test
+    public void testDownloadResource() {
+        final List<Role> roles = Collections.singletonList(Role.USER);
+        DataEntity dataEntity = TestUtil.getDataEntity();
+        List<DataResourceEntity> dataResourceList = new ArrayList<>();
+        DataResourceEntity dataResourceEntity = TestUtil.getDataResourceEntity();
+        dataResourceEntity.setId(1L);
+        dataResourceList.add(dataResourceEntity);
+        dataEntity.setResources(dataResourceList);
+
+        when(dataRepository.getOne(anyLong())).thenReturn(dataEntity);
+        when(claims.get(JwtToken.KEY)).thenReturn(roles);
+        when(claims.getSubject()).thenReturn(dataEntity.getContributorId());
+        try {
+            doThrow(new IOException()).when(downloadService).getChunks(any(HttpServletResponse.class), anyString(), anyString(), anyString());
+        } catch (IOException e) {
+            throw new RuntimeException();
+        }
+
+        exception.expect(NotFoundException.class);
+        dataService.downloadResource(response, 1L, 1L, claims);
     }
 
 }

@@ -62,3 +62,7 @@ deterurl:
   bossurl: 172.18.178.10
   userurl: 172.18.178.11
   port: 80
+transmission:
+    baseDir: uploads # '/home/<user>/uploads'
+    subDirs:
+        dataDir: dataresources # '<base_dir>/dataresources/<dataset_id>/<file_name>'

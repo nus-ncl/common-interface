@@ -105,4 +105,20 @@ public class ImageEntityTest {
 
         assertThat(entity.getVisibility()).isEqualTo(ImageVisibility.PUBLIC);
     }
+
+    @Test
+    public void testGetCurrentOS() throws Exception {
+        final ImageEntity entity = new ImageEntity();
+
+        assertThat(entity.getCurrentOS()).isNull();
+    }
+
+    @Test
+    public void testSetCurrentOS() throws Exception {
+        final ImageEntity entity = new ImageEntity();
+        final String one = RandomStringUtils.randomAlphanumeric(15);
+        entity.setCurrentOS(one);
+
+        assertThat(entity.getCurrentOS()).isEqualTo(one);
+    }
 }
