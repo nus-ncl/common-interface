@@ -1,15 +1,18 @@
 package sg.ncl.service.user.web;
 
+import io.jsonwebtoken.Claims;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.tomcat.util.codec.binary.Base64;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
+import sg.ncl.common.exception.base.UnauthorizedException;
 import sg.ncl.service.user.domain.User;
 import sg.ncl.service.user.domain.UserService;
 import sg.ncl.service.user.domain.UserStatus;
@@ -18,7 +21,7 @@ import sg.ncl.service.user.exceptions.UserNotFoundException;
 import javax.inject.Inject;
 import java.util.List;
 
-
+import static sg.ncl.service.user.validations.Validator.isAdmin;
 /**
  * @author Christopher Zhong
  */
@@ -50,10 +53,28 @@ public class UsersController {
         return new UserInfo(one);
     }
 
+    // for an user to update his own personal details
     @PutMapping(path = "/users/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
     public User updateUser(@PathVariable String id, @RequestBody UserInfo user) {
         return new UserInfo(userService.updateUser(id, user));
+    }
+
+    // for admin to update user status
+    @PutMapping(path = "/users/{id}/status/{status}", produces = MediaType.APPLICATION_JSON_VALUE)
+    @ResponseStatus(HttpStatus.OK)
+    public User updateUserStatus(
+            @AuthenticationPrincipal final Object claims,
+            @PathVariable final String id,
+            @PathVariable final String status)
+    {
+        if (claims == null || !(claims instanceof Claims)) {
+            throw new UnauthorizedException();
+        }
+
+        isAdmin((Claims) claims);
+
+        return new UserInfo(userService.updateUserStatus(id, UserStatus.valueOf(status)));
     }
 
     @PutMapping(path = "/users/{id}/emails/{emailBase64}")

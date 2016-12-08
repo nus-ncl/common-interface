@@ -101,18 +101,9 @@ public class UserServiceImpl implements UserService {
             throw new UserNotFoundException(id);
         }
 
-        User result = one;
-
-        // will invoke save repository once
-        if (user.getStatus() != null && user.getStatus() != one.getStatus()) {
-            log.info("Updating user {} status to {}", id, user.getStatus());
-            result = updateUserStatus(id, user.getStatus());
-            log.info("Updated user {} status to {} OK", id, user.getStatus());
-        }
-
         if (user.getUserDetails() == null) {
             // return since no user details to update
-            return result;
+            return one;
         }
 
         if (user.getUserDetails().getFirstName() != null) {
@@ -176,7 +167,9 @@ public class UserServiceImpl implements UserService {
             }
         }
 
-        return userRepository.save(one);
+        final User saved = userRepository.save(one);
+        log.info("User details updated: {}", saved.getUserDetails());
+        return saved;
     }
 
     @Transactional
@@ -231,16 +224,14 @@ public class UserServiceImpl implements UserService {
                 } else {
                     throw new InvalidStatusTransitionException(one.getStatus() + " -> " + status);
                 }
-            case REJECTED:
-                if (one.getStatus().equals(UserStatus.PENDING)) {
-                    return updateUserStatusInternal(one, UserStatus.REJECTED);
+            case FROZEN:
+                if (one.getStatus().equals(UserStatus.APPROVED)) {
+                    return updateUserStatusInternal(one, UserStatus.FROZEN);
                 } else {
                     throw new InvalidStatusTransitionException(one.getStatus() + " -> " + status);
                 }
             case CLOSED:
                 return updateUserStatusInternal(one, UserStatus.CLOSED);
-            case FROZEN:
-                return updateUserStatusInternal(one, UserStatus.FROZEN);
             default:
                 log.warn("Update status failed for {}: unknown status {}", id, status);
                 throw new InvalidUserStatusException(status.toString());

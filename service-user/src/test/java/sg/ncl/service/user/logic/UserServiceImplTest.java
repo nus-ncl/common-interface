@@ -305,48 +305,16 @@ public class UserServiceImplTest {
     public void testUpdateUserNoException() throws Exception {
         String randomIdForTest = RandomStringUtils.randomAlphanumeric(20);
         UserEntity userEntity = Util.getUserEntity();
-        UserDetailsEntity userDetailsEntity = Util.getUserDetailsEntity();
+        userEntity.setId(randomIdForTest);
 
         when(userRepository.findOne(anyString())).thenReturn(userEntity);
+        when(userRepository.save(any(UserEntity.class))).thenReturn(userEntity);
+
         userServiceImpl.updateUser(randomIdForTest, (User) userEntity);
 
         verify(userRepository, times(1)).findOne(anyString());
         verify(userRepository, times(1)).save(any(UserEntity.class));
     }
-
-    @Test
-    public void testUpdateUserWithUpdatedStatus() throws Exception {
-        String randomIdForTest = RandomStringUtils.randomAlphanumeric(20);
-        UserEntity userEntity = Util.getUserEntity();
-
-        UserEntity updatedUserEntity = Util.getUserEntity();;
-        updatedUserEntity.setStatus(UserStatus.FROZEN);
-
-        when(userRepository.findOne(anyString())).thenReturn(userEntity);
-        when(userRepository.save(any(UserEntity.class))).thenReturn(updatedUserEntity);
-        userServiceImpl.updateUser(randomIdForTest, updatedUserEntity);
-
-        verify(userRepository, times(2)).findOne(anyString());
-        verify(userRepository, times(2)).save(any(UserEntity.class));
-    }
-
-    @Test
-    public void testUpdateUserWithUpdatedStatusFrozenToApproved() throws Exception {
-        String randomIdForTest = RandomStringUtils.randomAlphanumeric(20);
-        UserEntity userEntity = Util.getUserEntity();
-        userEntity.setStatus(UserStatus.FROZEN);
-
-        UserEntity updatedUserEntity = Util.getUserEntity();;
-        updatedUserEntity.setStatus(UserStatus.APPROVED);
-
-        when(userRepository.findOne(anyString())).thenReturn(userEntity);
-        when(userRepository.save(any(UserEntity.class))).thenReturn(updatedUserEntity);
-        userServiceImpl.updateUser(randomIdForTest, updatedUserEntity);
-
-        verify(userRepository, times(2)).findOne(anyString());
-        verify(userRepository, times(2)).save(any(UserEntity.class));
-    }
-
 
     //thrown UserNotFoundException
     @Test
@@ -555,38 +523,6 @@ public class UserServiceImplTest {
         verify(userRepository, times(1)).findOne(anyString());
     }
 
-    //case REJECTED- If branch
-    @Test
-    public void testUpdateUserStatusCaseRejected() throws Exception {
-        String randomIdForTest = RandomStringUtils.randomAlphanumeric(20);
-        UserEntity userEntity = Util.getUserEntity();
-        userEntity.setStatus(UserStatus.PENDING);
-
-        when(userRepository.findOne(anyString())).thenReturn(userEntity);
-        when(userRepository.save(any(UserEntity.class))).thenReturn(userEntity);
-        User actual = userServiceImpl.updateUserStatus(randomIdForTest, UserStatus.REJECTED);
-        User expected = new UserEntity();
-        expected = userEntity;
-
-        assertThat(actual).isEqualTo(expected);
-        verify(userRepository, times(1)).findOne(anyString());
-        verify(userRepository, times(1)).save(any(UserEntity.class));
-    }
-
-    //case REJECTEDD- else branch, throw InvalidStatusTransitionException
-    @Test
-    public void testUpdateUserStatusCaseRejectedElseBranch() throws Exception {
-        String randomIdForTest = RandomStringUtils.randomAlphanumeric(20);
-        UserEntity userEntity = Util.getUserEntity();
-        userEntity.setStatus(UserStatus.APPROVED);
-
-        exception.expect(InvalidStatusTransitionException.class);
-        when(userRepository.findOne(anyString())).thenReturn(userEntity);
-        User actual = userServiceImpl.updateUserStatus(randomIdForTest, UserStatus.REJECTED);
-
-        verify(userRepository, times(1)).findOne(anyString());
-    }
-
     //case CLOSED- else branch, throw InvalidStatusTransitionException
     @Test
     public void testUpdateUserStatusCaseClosed() throws Exception {
@@ -610,7 +546,7 @@ public class UserServiceImplTest {
     public void testUpdateUserStatusCaseFrozen() throws Exception {
         String randomIdForTest = RandomStringUtils.randomAlphanumeric(20);
         UserEntity userEntity = Util.getUserEntity();
-        userEntity.setStatus(UserStatus.CREATED);
+        userEntity.setStatus(UserStatus.APPROVED);
 
         when(userRepository.findOne(anyString())).thenReturn(userEntity);
         when(userRepository.save(any(UserEntity.class))).thenReturn(userEntity);
