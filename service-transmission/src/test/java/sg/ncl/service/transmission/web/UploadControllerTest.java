@@ -67,6 +67,21 @@ public class UploadControllerTest {
     }
 
     @Test
+    public void testDeleteUpload()throws Exception {
+        when(securityContext.getAuthentication()).thenReturn(authentication);
+        SecurityContextHolder.setContext(securityContext);
+        when(authentication.getPrincipal()).thenReturn(claims);
+        when(uploadService.deleteUpload(anyString(), anyString(), anyString())).thenReturn(true);
+
+        MvcResult result = mockMvc.perform(get(UploadController.PATH + "?filename=test.txt"))
+                .andExpect(status().isOk())
+                .andReturn();
+        String content = result.getResponse().getContentAsString();
+
+        assertThat(content).isEqualTo("Deleted");
+    }
+
+    @Test
     public void testCheckUploadUploaded() throws Exception {
         when(securityContext.getAuthentication()).thenReturn(authentication);
         SecurityContextHolder.setContext(securityContext);

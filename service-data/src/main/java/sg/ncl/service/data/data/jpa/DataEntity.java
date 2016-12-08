@@ -64,7 +64,7 @@ public class DataEntity extends AbstractEntity implements Data {
     @Column(name = "released_date", nullable = false)
     private ZonedDateTime releasedDate;
 
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "dataEntity")
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "dataEntity", orphanRemoval = true)
     private List<DataResourceEntity> resources = new ArrayList<>();
 
     @ElementCollection
@@ -94,6 +94,12 @@ public class DataEntity extends AbstractEntity implements Data {
         if (!resources.contains(dataResourceEntity)) {
             resources.add(dataResourceEntity);
             dataResourceEntity.setDataEntity(this);
+        }
+    }
+
+    public void removeResource(DataResourceEntity dataResourceEntity) {
+        if (resources.contains(dataResourceEntity)) {
+            resources.remove(dataResourceEntity);
         }
     }
 

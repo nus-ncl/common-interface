@@ -1,6 +1,5 @@
 package sg.ncl.service.transmission.logic;
 
-import io.jsonwebtoken.Claims;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.junit.Before;
 import org.junit.Rule;
@@ -43,8 +42,6 @@ public class UploadServiceImplTest extends AbstractTest {
     private ResumableStorage storage;
     @Mock
     private DirectoryProperties properties;
-    @Mock
-    private Claims claims;
 
     private UploadService uploadService;
 
@@ -53,6 +50,13 @@ public class UploadServiceImplTest extends AbstractTest {
         assertThat(mockingDetails(storage).isMock()).isTrue();
         assertThat(mockingDetails(properties).isMock()).isTrue();
         uploadService = new UploadServiceImpl(storage, properties);
+    }
+
+    @Test
+    public void testDeleteUpload() {
+        when(properties.getBaseDir()).thenReturn("uploads");
+        boolean result = uploadService.deleteUpload(null, null, "test.txt");
+        assertThat(result).isFalse();
     }
 
     @Test
