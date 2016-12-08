@@ -38,6 +38,7 @@ import static sg.ncl.service.data.validations.Validator.checkPermissions;
 public class DataServiceImpl implements DataService {
 
     private static final String INFO_TEXT = "Data saved: {}";
+    private static final String DATA_DIR_KEY = "dataDir";
 
     private final DataRepository dataRepository;
     private final UploadService uploadService;
@@ -237,7 +238,7 @@ public class DataServiceImpl implements DataService {
         DataResource dataResource = findResourceById(did, rid, claims);
         if (dataResource != null) {
             dataEntity.removeResource((DataResourceEntity) dataResource);
-            uploadService.deleteUpload("dataDir", did.toString(), dataResource.getUri());
+            uploadService.deleteUpload(DATA_DIR_KEY, did.toString(), dataResource.getUri());
         }
 
         DataEntity savedDataEntity = dataRepository.save(dataEntity);
@@ -259,7 +260,7 @@ public class DataServiceImpl implements DataService {
 
     @Override
     public String addChunk(ResumableInfo resumableInfo, String resumableChunkNumber, String dataId, Claims claims) {
-        switch (uploadService.addChunk(resumableInfo, Integer.parseInt(resumableChunkNumber), "dataDir", dataId)) {
+        switch (uploadService.addChunk(resumableInfo, Integer.parseInt(resumableChunkNumber), DATA_DIR_KEY, dataId)) {
             case FINISHED:
                 DataResourceInfo dataResourceInfo = new DataResourceInfo(null, resumableInfo.getResumableFilename());
                 createResource(Long.parseLong(dataId), dataResourceInfo, claims);
@@ -275,7 +276,7 @@ public class DataServiceImpl implements DataService {
     public void downloadResource(HttpServletResponse response, Long did, Long rid, Claims claims) {
         DataResource dataResource = findResourceById(did, rid, claims);
         try {
-            downloadService.getChunks(response, "dataDir", did.toString(), dataResource.getUri());
+            downloadService.getChunks(response, DATA_DIR_KEY, did.toString(), dataResource.getUri());
         } catch (IOException e) {
             log.error("Unable to download resource: {}", e);
             throw new NotFoundException();
