@@ -6,6 +6,7 @@ import sg.ncl.common.authentication.Role;
 import sg.ncl.common.exception.base.ForbiddenException;
 import sg.ncl.common.jwt.JwtToken;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -23,8 +24,8 @@ public class Validator {
         }
 
         String contextUserId = claims.getSubject();
-        List<Role> roles;
-        roles = (List) claims.get(JwtToken.KEY);
+        List<String> roles;
+        roles = (ArrayList<String>) claims.get(JwtToken.KEY);
 
         log.info("Context user id: {}, Context roles: {}", contextUserId, roles);
 
