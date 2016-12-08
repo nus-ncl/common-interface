@@ -94,12 +94,18 @@ public class UserServiceImpl implements UserService {
     }
 
     @Transactional
-    public void updateUser(final String id, final User user) {
+    public User updateUser(final String id, final User user) {
         final UserEntity one = findUser(id);
         if (one == null) {
             log.warn("User not found when updating: {}", id);
             throw new UserNotFoundException(id);
         }
+
+        if (user.getUserDetails() == null) {
+            // return since no user details to update
+            return one;
+        }
+
         if (user.getUserDetails().getFirstName() != null) {
             one.getUserDetails().setFirstName(user.getUserDetails().getFirstName());
         }
@@ -161,7 +167,9 @@ public class UserServiceImpl implements UserService {
             }
         }
 
-        userRepository.save(one);
+        final User saved = userRepository.save(one);
+        log.info("User details updated: {}", saved.getUserDetails());
+        return saved;
     }
 
     @Transactional
@@ -211,14 +219,14 @@ public class UserServiceImpl implements UserService {
                     throw new InvalidStatusTransitionException(one.getStatus() + " -> " + status);
                 }
             case APPROVED:
-                if (one.getStatus().equals(UserStatus.PENDING)) {
+                if (one.getStatus().equals(UserStatus.PENDING) || one.getStatus().equals(UserStatus.FROZEN)) {
                     return updateUserStatusInternal(one, UserStatus.APPROVED);
                 } else {
                     throw new InvalidStatusTransitionException(one.getStatus() + " -> " + status);
                 }
-            case REJECTED:
-                if (one.getStatus().equals(UserStatus.PENDING)) {
-                    return updateUserStatusInternal(one, UserStatus.REJECTED);
+            case FROZEN:
+                if (one.getStatus().equals(UserStatus.APPROVED)) {
+                    return updateUserStatusInternal(one, UserStatus.FROZEN);
                 } else {
                     throw new InvalidStatusTransitionException(one.getStatus() + " -> " + status);
                 }

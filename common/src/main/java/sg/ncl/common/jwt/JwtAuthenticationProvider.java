@@ -32,7 +32,7 @@ public class JwtAuthenticationProvider implements AuthenticationProvider {
 
     @Override
     public Authentication authenticate(Authentication authentication) {
-        log.info("Authenticating: {}", authentication);
+        log.debug("Authenticating: {}", authentication);
         try {
             final String token = authentication.getCredentials().toString();
             final Claims claims = jwtParser.parseClaimsJws(token).getBody();
