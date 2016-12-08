@@ -19,6 +19,7 @@ import sg.ncl.service.user.domain.UserStatus;
 import sg.ncl.service.user.exceptions.UserNotFoundException;
 
 import javax.inject.Inject;
+import javax.validation.constraints.NotNull;
 import java.util.List;
 
 import static sg.ncl.service.user.validations.Validator.isAdmin;
@@ -26,23 +27,26 @@ import static sg.ncl.service.user.validations.Validator.isAdmin;
  * @author Christopher Zhong
  */
 @RestController
+@RequestMapping(path = UsersController.PATH, produces = MediaType.APPLICATION_JSON_VALUE)
 @Slf4j
 public class UsersController {
+
+    static final String PATH = "/users";
 
     private final UserService userService;
 
     @Inject
-    UsersController(final UserService userService) {
+    UsersController(@NotNull final UserService userService) {
         this.userService = userService;
     }
 
-    @GetMapping(path = "/users", produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping
     @ResponseStatus(HttpStatus.OK)
     public List<User> getAllUsers() {
         return userService.getAll();
     }
 
-    @GetMapping(path = "/users/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(path = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
     public User getUser(@PathVariable String id) {
         User one = userService.getUser(id);
@@ -54,7 +58,7 @@ public class UsersController {
     }
 
     // for an user to update his own personal details
-    @PutMapping(path = "/users/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
+    @PutMapping(path = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
     public User updateUser(@PathVariable String id, @RequestBody UserInfo user) {
         return new UserInfo(userService.updateUser(id, user));
@@ -77,7 +81,7 @@ public class UsersController {
         return new UserInfo(userService.updateUserStatus(id, UserStatus.valueOf(status)));
     }
 
-    @PutMapping(path = "/users/{id}/emails/{emailBase64}")
+    @PutMapping(path = "/{id}/emails/{emailBase64}")
     public UserStatus verifyEmail(@PathVariable String id, @PathVariable String emailBase64, @RequestBody VerificationKeyInfo keyInfo) {
         final String email = new String(Base64.decodeBase64(emailBase64));
         return userService.verifyEmail(id, email, keyInfo.getKey());
