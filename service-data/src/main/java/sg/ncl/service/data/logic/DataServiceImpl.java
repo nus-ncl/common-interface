@@ -234,11 +234,10 @@ public class DataServiceImpl implements DataService {
         DataEntity dataEntity = (DataEntity) getDataset(did);
         checkPermissions(dataEntity, claims);
 
-        List<DataResource> dataResourceEntities = dataEntity.getResources();
-        DataResource dataResource = dataResourceEntities
-                .stream().filter(o -> o.getId().equals(rid)).findFirst().orElse(null);
+        DataResource dataResource = findResourceById(did, rid, claims);
         if (dataResource != null) {
-            dataResourceEntities.remove(dataResource);
+            dataEntity.removeResource((DataResourceEntity) dataResource);
+            uploadService.deleteUpload("dataDir", did.toString(), dataResource.getUri());
         }
 
         DataEntity savedDataEntity = dataRepository.save(dataEntity);

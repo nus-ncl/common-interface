@@ -13,6 +13,7 @@ import sg.ncl.service.transmission.util.HttpUtils;
 import sg.ncl.service.transmission.web.ResumableInfo;
 
 import javax.inject.Inject;
+import java.io.File;
 import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.nio.file.Files;
@@ -32,6 +33,19 @@ public class UploadServiceImpl implements UploadService {
     UploadServiceImpl(final ResumableStorage storage, final DirectoryProperties properties) {
         this.storage = storage;
         this.properties = properties;
+    }
+
+    @Override
+    public boolean deleteUpload(String subDirKey, String preDir, String fileName) {
+        Path path = HttpUtils.getPath(properties, subDirKey, preDir);
+        String filePath = path.toString() + "/" + fileName;
+        File file = new File(filePath);
+        try {
+            return Files.deleteIfExists(file.toPath());
+        } catch (IOException e) {
+            log.error("Unable to delete file: {}", e);
+            throw new BadRequestException();
+        }
     }
 
     @Override

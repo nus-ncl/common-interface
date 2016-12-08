@@ -33,6 +33,20 @@ public class UploadController {
         this.uploadService = uploadService;
     }
 
+    @GetMapping(params = {"filename"})
+    public String deleteUpload(@AuthenticationPrincipal Object claims, @RequestParam("filename") String filename) {
+        if (claims == null || !(claims instanceof Claims)) {
+            throw new UnauthorizedException();
+        }
+        if (uploadService.deleteUpload("", "", filename)) {
+            log.info("File {} deleted.", filename);
+            return "Deleted";
+        } else {
+            log.info("File {} not deleted.", filename);
+            return "Not Deleted";
+        }
+    }
+
     @GetMapping(value = "/chunks/{resumableChunkNumber}/files/{resumableIdentifier}")
     @ResponseStatus(HttpStatus.OK)
     public String checkUpload(@AuthenticationPrincipal Object claims,

@@ -7,6 +7,8 @@ import sg.ncl.service.transmission.web.ResumableInfo;
  */
 public interface UploadService {
 
+    boolean deleteUpload(String subDirKey, String preDir, String fileName);
+
     UploadStatus checkChunk(String resumableIdentifier, int resumableChunkNumber);
 
     UploadStatus addChunk(ResumableInfo resumableInfo, int resumableChunkNumber, String subDirKey, String preDir);
