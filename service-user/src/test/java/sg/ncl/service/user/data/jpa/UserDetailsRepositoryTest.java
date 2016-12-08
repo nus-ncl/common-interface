@@ -7,6 +7,7 @@ import org.junit.runner.RunWith;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
+import org.springframework.orm.jpa.JpaSystemException;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringRunner;
@@ -47,6 +48,18 @@ public class UserDetailsRepositoryTest {
         assertThat(repository.count()).isEqualTo(count + 1);
         assertThat(saved.getCreatedDate()).isNotNull();
         assertThat(saved.getLastModifiedDate()).isNotNull();
+    }
+
+    @Test
+    public void testSaveWithNullId() throws Exception {
+        final UserDetailsEntity entity = Util.getUserDetailsEntity();
+        entity.setId(null);
+        final long count = repository.count();
+
+        final UserDetailsEntity saved = repository.save(entity);
+
+        assertThat(repository.count()).isEqualTo(count + 1);
+        assertThat(saved.getId()).isNotNull();
     }
 
     @Test
