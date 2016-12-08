@@ -266,7 +266,7 @@ public class AdapterDeterLabTest {
         myobject.put("msg", "apply project request existing users success");
 
         exception.expect(AdapterConnectionException.class);
-        when(restTemplate.exchange(anyString(),eq(HttpMethod.POST),anyObject(),eq(String.class))).thenThrow(new RestClientException(""));
+        when(restTemplate.exchange(anyString(),eq(HttpMethod.POST),anyObject(),eq(String.class))).thenThrow(new ResourceAccessException(""));
         adapterDeterLab.applyProject(myobject.toString());
 
         verify(restTemplate,times(1)).exchange(anyString(),eq(HttpMethod.POST),anyObject(),eq(String.class));

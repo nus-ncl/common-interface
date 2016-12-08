@@ -137,22 +137,18 @@ public class AdapterDeterLab {
      *
      * @param jsonString Contains uid, project name, pid, project goals, project web, project organisation, project visibility
      */
-    public String applyProject( String jsonString) {
+    public String applyProject(String jsonString) {
         log.info("Applying project as existing user: {}", jsonString);
 
         HttpHeaders headers = new HttpHeaders();
-        headers.setContentType( MediaType.APPLICATION_JSON);
-        HttpEntity<String> request = new HttpEntity<>( jsonString, headers);
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        HttpEntity<String> request = new HttpEntity<>(jsonString, headers);
         ResponseEntity response;
 
         try {
-            response = restTemplate.exchange( properties.getApplyProject(), HttpMethod.POST, request, String.class);
-        } catch ( RestClientException e) {
-            log.warn( "DeterLab connection error apply project existing user: {}", e);
-            throw new AdapterConnectionException();
-        }
-        String responseBody = response.getBody().toString();
-        try {
+            response = restTemplate.exchange(properties.getApplyProject(), HttpMethod.POST, request, String.class);
+            final String responseBody = response.getBody().toString();
+            log.debug("Apply project existing user: Deter response -- {}", responseBody);
             String deterMessage = new JSONObject(responseBody).getString("msg");
             if ("apply project existing users ok".equalsIgnoreCase(deterMessage)) {
                 log.info("Apply project as existing user to DeterLab OK");
@@ -160,9 +156,12 @@ public class AdapterDeterLab {
             }
             log.warn("Apply project existing user error: {}", deterMessage);
             throw new DeterLabOperationFailedException(deterMessage);
-        } catch (JSONException e) {
-            log.warn("Error parsing response code existing user apply project: {}", responseBody);
-            throw e;
+        } catch (ResourceAccessException rae) {
+            log.warn("Apply project existing user: Adapter connection error {}", rae);
+            throw new AdapterConnectionException();
+        } catch (HttpServerErrorException hsee) {
+            log.warn("Apply project existing user: Adapter internal server error {}", hsee);
+            throw new AdapterInternalErrorException();
         }
     }
 
