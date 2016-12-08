@@ -208,14 +208,20 @@ public class DataServiceImplTest extends AbstractTest {
     @Test
     public void testDeleteResource() {
         DataEntity dataEntity = TestUtil.getDataEntity();
+        dataEntity.setId(1L);
+        List<DataResourceEntity> dataResourceList = new ArrayList<>();
         DataResourceEntity dataResourceEntity = TestUtil.getDataResourceEntity();
+        dataResourceEntity.setId(1L);
+        dataResourceList.add(dataResourceEntity);
+        dataEntity.setResources(dataResourceList);
         final List<Role> roles = Collections.singletonList(Role.USER);
 
         when(dataRepository.getOne(anyLong())).thenReturn(dataEntity);
         when(claims.get(JwtToken.KEY)).thenReturn(roles);
         when(claims.getSubject()).thenReturn(dataEntity.getContributorId());
+        when(uploadService.deleteUpload(anyString(), anyString(), anyString())).thenReturn(true);
 
-        dataService.deleteResource(dataEntity.getId(), dataResourceEntity.getId(), claims);
+        dataService.deleteResource(dataEntity.getId(), dataEntity.getResources().get(0).getId(), claims);
         verify(dataRepository, times(1)).save(any(DataEntity.class));
     }
 
