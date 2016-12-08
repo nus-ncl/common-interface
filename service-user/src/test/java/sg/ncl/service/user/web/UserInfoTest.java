@@ -2,12 +2,9 @@ package sg.ncl.service.user.web;
 
 import org.apache.commons.lang3.RandomStringUtils;
 import org.junit.Test;
-import sg.ncl.service.user.domain.LoginActivity;
 import sg.ncl.service.user.domain.UserStatus;
 
 import java.time.ZonedDateTime;
-import java.util.ArrayList;
-import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
