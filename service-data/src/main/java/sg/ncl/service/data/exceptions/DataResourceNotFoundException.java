@@ -9,4 +9,9 @@ import sg.ncl.common.exception.base.NotFoundException;
  */
 @ResponseStatus(code = HttpStatus.NOT_FOUND, reason = "There are no data resource.")
 public class DataResourceNotFoundException extends NotFoundException {
+
+    public DataResourceNotFoundException(final String message) {
+        super(message);
+    }
+
 }

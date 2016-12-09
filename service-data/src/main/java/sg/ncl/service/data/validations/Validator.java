@@ -29,7 +29,7 @@ public class Validator {
         log.info("Id of requester from web: {}", claims.getSubject());
         log.info("Role of requester from web: {}", claims.get(JwtToken.KEY));
         String contextUserId = claims.getSubject();
-        EnumSet<Role> roles = (((List<String>) claims.get(JwtToken.KEY)).stream().filter(Role::contains).map(Role::valueOf).collect(Collectors.toCollection(() -> EnumSet.noneOf(Role.class))));
+        EnumSet<Role> roles = ((List<String>) claims.get(JwtToken.KEY)).stream().filter(Role::contains).map(Role::valueOf).collect(Collectors.toCollection(() -> EnumSet.noneOf(Role.class)));
 
         log.info("Context user id: {}, Context role: {}", contextUserId, roles);
 

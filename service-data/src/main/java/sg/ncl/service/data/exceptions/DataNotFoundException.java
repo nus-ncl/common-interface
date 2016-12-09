@@ -9,4 +9,9 @@ import sg.ncl.common.exception.base.NotFoundException;
  */
 @ResponseStatus(code = HttpStatus.NOT_FOUND, reason = "There are no data.")
 public class DataNotFoundException extends NotFoundException {
+
+    public DataNotFoundException(final String message) {
+        super(message);
+    }
+
 }
