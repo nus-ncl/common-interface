@@ -206,7 +206,7 @@ public class DataServiceImplTest extends AbstractTest {
     }
 
     @Test
-    public void testDeleteResource() {
+    public void testDeleteResource() throws IOException {
         DataEntity dataEntity = TestUtil.getDataEntity();
         dataEntity.setId(1L);
         List<DataResourceEntity> dataResourceList = new ArrayList<>();

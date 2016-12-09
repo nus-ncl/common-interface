@@ -14,6 +14,7 @@ import sg.ncl.service.data.domain.DataService;
 import sg.ncl.service.data.domain.DataVisibility;
 import sg.ncl.service.data.exceptions.DataNameAlreadyExistsException;
 import sg.ncl.service.data.exceptions.DataNotFoundException;
+import sg.ncl.service.data.exceptions.DataResourceDeleteException;
 import sg.ncl.service.data.exceptions.DataResourceNotFoundException;
 import sg.ncl.service.data.web.DataResourceInfo;
 import sg.ncl.service.transmission.domain.DownloadService;
@@ -238,7 +239,14 @@ public class DataServiceImpl implements DataService {
         DataResource dataResource = findResourceById(did, rid, claims);
         if (dataResource != null) {
             dataEntity.removeResource((DataResourceEntity) dataResource);
-            uploadService.deleteUpload(DATA_DIR_KEY, did.toString(), dataResource.getUri());
+            try {
+                uploadService.deleteUpload(DATA_DIR_KEY, did.toString(), dataResource.getUri());
+            } catch (Exception e) {
+                log.error("Unable to delete {}: {}", dataResource.getUri(), e);
+                throw new DataResourceDeleteException();
+            }
+        } else {
+            throw new DataResourceNotFoundException();
         }
 
         DataEntity savedDataEntity = dataRepository.save(dataEntity);
