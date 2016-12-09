@@ -36,16 +36,11 @@ public class UploadServiceImpl implements UploadService {
     }
 
     @Override
-    public boolean deleteUpload(String subDirKey, String preDir, String fileName) {
+    public boolean deleteUpload(String subDirKey, String preDir, String fileName) throws IOException {
         Path path = HttpUtils.getPath(properties, subDirKey, preDir);
         String filePath = path.toString() + "/" + fileName;
         File file = new File(filePath);
-        try {
-            return Files.deleteIfExists(file.toPath());
-        } catch (IOException e) {
-            log.error("Unable to delete file: {}", e);
-            throw new BadRequestException();
-        }
+        return Files.deleteIfExists(file.toPath());
     }
 
     @Override

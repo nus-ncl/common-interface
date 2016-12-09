@@ -19,6 +19,7 @@ import sg.ncl.service.transmission.domain.UploadStatus;
 import sg.ncl.service.transmission.util.TestUtil;
 import sg.ncl.service.transmission.web.ResumableInfo;
 
+import java.io.IOException;
 import java.util.HashSet;
 import java.util.Random;
 
@@ -53,7 +54,7 @@ public class UploadServiceImplTest extends AbstractTest {
     }
 
     @Test
-    public void testDeleteUpload() {
+    public void testDeleteUpload() throws IOException {
         when(properties.getBaseDir()).thenReturn("uploads");
         boolean result = uploadService.deleteUpload(null, null, "test.txt");
         assertThat(result).isFalse();
