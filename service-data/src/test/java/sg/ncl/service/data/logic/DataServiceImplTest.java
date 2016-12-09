@@ -132,7 +132,7 @@ public class DataServiceImplTest extends AbstractTest {
     @Test
     public void testSaveUpdatedDatasetGood() {
         DataEntity dataEntity = TestUtil.getDataEntity();
-        final List<Role> roles = Collections.singletonList(Role.USER);
+        final List<String> roles = Collections.singletonList(Role.USER.getAuthority());
 
         when(dataRepository.getOne(anyLong())).thenReturn(dataEntity);
         when(claims.get(JwtToken.KEY)).thenReturn(roles);
@@ -145,7 +145,7 @@ public class DataServiceImplTest extends AbstractTest {
     @Test
     public void testDeleteDatasetGood() {
         DataEntity dataEntity = TestUtil.getDataEntity();
-        final List<Role> roles = Collections.singletonList(Role.USER);
+        final List<String> roles = Collections.singletonList(Role.USER.getAuthority());
 
         when(dataRepository.getOne(anyLong())).thenReturn(dataEntity);
         when(claims.get(JwtToken.KEY)).thenReturn(roles);
@@ -156,10 +156,23 @@ public class DataServiceImplTest extends AbstractTest {
     }
 
     @Test
+    public void testDeleteDatasetAdmin() {
+        DataEntity dataEntity = TestUtil.getDataEntity();
+        final List<String> roles = Collections.singletonList(Role.ADMIN.getAuthority());
+
+        when(dataRepository.getOne(anyLong())).thenReturn(dataEntity);
+        when(claims.get(JwtToken.KEY)).thenReturn(roles);
+        when(claims.getSubject()).thenReturn("id");
+
+        dataService.deleteDataset(dataEntity.getId(), claims);
+        verify(dataRepository, times(1)).delete(anyLong());
+    }
+
+    @Test
     public void testFindResourceByIdNotAccessible() {
         DataEntity dataEntity = TestUtil.getDataEntityWithResources();
         dataEntity.setAccessibility(DataAccessibility.RESTRICTED);
-        final List<Role> roles = Collections.singletonList(Role.USER);
+        final List<String> roles = Collections.singletonList(Role.USER.getAuthority());
 
         when(dataRepository.getOne(anyLong())).thenReturn(dataEntity);
         when(claims.get(JwtToken.KEY)).thenReturn(roles);
@@ -195,7 +208,7 @@ public class DataServiceImplTest extends AbstractTest {
     public void testSaveResource() {
         DataEntity dataEntity = TestUtil.getDataEntity();
         DataResourceEntity dataResourceEntity = TestUtil.getDataResourceEntity();
-        final List<Role> roles = Collections.singletonList(Role.USER);
+        final List<String> roles = Collections.singletonList(Role.USER.getAuthority());
 
         when(dataRepository.getOne(anyLong())).thenReturn(dataEntity);
         when(claims.get(JwtToken.KEY)).thenReturn(roles);
@@ -214,7 +227,7 @@ public class DataServiceImplTest extends AbstractTest {
         dataResourceEntity.setId(1L);
         dataResourceList.add(dataResourceEntity);
         dataEntity.setResources(dataResourceList);
-        final List<Role> roles = Collections.singletonList(Role.USER);
+        final List<String> roles = Collections.singletonList(Role.USER.getAuthority());
 
         when(dataRepository.getOne(anyLong())).thenReturn(dataEntity);
         when(claims.get(JwtToken.KEY)).thenReturn(roles);
@@ -261,7 +274,7 @@ public class DataServiceImplTest extends AbstractTest {
     public void testAddChunkFinished() {
         ResumableInfo resumableInfo = TestUtil.getResumableInfo();
         DataEntity dataEntity = TestUtil.getDataEntity();
-        final List<Role> roles = Collections.singletonList(Role.USER);
+        final List<String> roles = Collections.singletonList(Role.USER.getAuthority());
 
         when(dataRepository.getOne(anyLong())).thenReturn(dataEntity);
         when(claims.get(JwtToken.KEY)).thenReturn(roles);
@@ -284,7 +297,7 @@ public class DataServiceImplTest extends AbstractTest {
 
     @Test
     public void testDownloadResource() {
-        final List<Role> roles = Collections.singletonList(Role.USER);
+        final List<String> roles = Collections.singletonList(Role.USER.getAuthority());
         DataEntity dataEntity = TestUtil.getDataEntity();
         List<DataResourceEntity> dataResourceList = new ArrayList<>();
         DataResourceEntity dataResourceEntity = TestUtil.getDataResourceEntity();
