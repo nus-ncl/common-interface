@@ -8,7 +8,9 @@ import sg.ncl.common.jwt.JwtToken;
 import sg.ncl.service.data.domain.Data;
 import sg.ncl.service.data.domain.DataAccessibility;
 
+import java.util.EnumSet;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * Created by jng on 18/10/16.
@@ -27,8 +29,7 @@ public class Validator {
         log.info("Id of requester from web: {}", claims.getSubject());
         log.info("Role of requester from web: {}", claims.get(JwtToken.KEY));
         String contextUserId = claims.getSubject();
-        List<Role> roles;
-        roles = (List) claims.get(JwtToken.KEY);
+        EnumSet<Role> roles = (((List<String>) claims.get(JwtToken.KEY)).stream().filter(Role::contains).map(Role::valueOf).collect(Collectors.toCollection(() -> EnumSet.noneOf(Role.class))));
 
         log.info("Context user id: {}, Context role: {}", contextUserId, roles);
 
