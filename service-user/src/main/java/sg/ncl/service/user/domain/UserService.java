@@ -1,5 +1,6 @@
 package sg.ncl.service.user.domain;
 
+
 import java.util.List;
 
 /**
@@ -13,7 +14,7 @@ public interface UserService {
 
     User getUser(final String id);
 
-    void updateUser(final String id, final User user);
+    User updateUser(final String id, final User user);
 
     void addTeam(final String userId, final String teamId);
 
