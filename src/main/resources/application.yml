@@ -65,4 +65,4 @@ deterurl:
 transmission:
     baseDir: uploads # '/home/<user>/uploads'
     subDirs:
-        dataDir: dataresources # '<base_dir>/dataresources/<dataset_id>/<file_name>'
+dataDir: dataresources # '<base_dir>/dataresources/<dataset_id>/<file_name>'
