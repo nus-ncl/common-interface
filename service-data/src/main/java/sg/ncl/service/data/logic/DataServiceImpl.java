@@ -99,7 +99,7 @@ public class DataServiceImpl implements DataService {
             for (DataEntity dataEntity : dataEntities) {
                 if (dataEntity.getName().equals(data.getName())) {
                     log.warn("Data name is in use: {}", data.getName());
-                    throw new DataNameAlreadyExistsException(data.getName());
+                    throw new DataNameAlreadyExistsException("Data name is in use: " + data.getName());
                 }
             }
         }
@@ -156,7 +156,7 @@ public class DataServiceImpl implements DataService {
     public Data getDataset(Long id) {
         Data data = dataRepository.getOne(id);
         if (data == null) {
-            throw new DataNotFoundException();
+            throw new DataNotFoundException("Data not found.");
         }
         return data;
     }
@@ -197,7 +197,8 @@ public class DataServiceImpl implements DataService {
         List<DataResource> dataResourceEntities = dataEntity.getResources();
         DataResource dataResource = dataResourceEntities.stream().filter(o -> o.getId().equals(rid)).findFirst().orElse(null);
         if (dataResource == null) {
-            throw new DataResourceNotFoundException();
+            log.warn("Data resource not found.");
+            throw new DataResourceNotFoundException("Data resource not found.");
         }
         return dataResource;
     }
@@ -243,10 +244,9 @@ public class DataServiceImpl implements DataService {
                 uploadService.deleteUpload(DATA_DIR_KEY, did.toString(), dataResource.getUri());
             } catch (Exception e) {
                 log.error("Unable to delete {}: {}", dataResource.getUri(), e);
-                throw new DataResourceDeleteException();
+                throw new DataResourceDeleteException("Unable to delete " + dataResource.getUri());
             }
-        } else {
-            throw new DataResourceNotFoundException();
+            log.info("Data resource deleted: {}", dataResource);
         }
 
         DataEntity savedDataEntity = dataRepository.save(dataEntity);
