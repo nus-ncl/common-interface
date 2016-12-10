@@ -41,7 +41,7 @@ public class UsersController {
         return userService.getAll();
     }
 
-    @GetMapping(path = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(path = "/{id}")
     @ResponseStatus(HttpStatus.OK)
     public User getUser(@PathVariable String id) {
         User one = userService.getUser(id);
@@ -53,14 +53,14 @@ public class UsersController {
     }
 
     // for an user to update his own personal details
-    @PutMapping(path = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
+    @PutMapping(path = "/{id}", consumes = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
     public User updateUser(@PathVariable String id, @RequestBody UserInfo user) {
         return new UserInfo(userService.updateUser(id, user));
     }
 
     // for admin to update user status
-    @PutMapping(path = "/users/{id}/status/{status}", produces = MediaType.APPLICATION_JSON_VALUE)
+    @PutMapping(path = "/users/{id}/status/{status}")
     @ResponseStatus(HttpStatus.OK)
     public User updateUserStatus(
             @AuthenticationPrincipal final Object claims,
@@ -76,7 +76,7 @@ public class UsersController {
         return new UserInfo(userService.updateUserStatus(id, UserStatus.valueOf(status)));
     }
 
-    @PutMapping(path = "/{id}/emails/{emailBase64}")
+    @PutMapping(path = "/{id}/emails/{emailBase64}", consumes = MediaType.APPLICATION_JSON_VALUE)
     public UserStatus verifyEmail(@PathVariable String id, @PathVariable String emailBase64, @RequestBody VerificationKeyInfo keyInfo) {
         final String email = new String(Base64.decodeBase64(emailBase64));
         return userService.verifyEmail(id, email, keyInfo.getKey());
