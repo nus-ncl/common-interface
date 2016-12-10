@@ -11,7 +11,7 @@ import org.springframework.orm.jpa.JpaSystemException;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringRunner;
-import sg.ncl.service.user.Util;
+import sg.ncl.service.user.util.TestUtil;
 
 import javax.inject.Inject;
 
@@ -40,7 +40,7 @@ public class UserRepositoryTest {
 
     @Test
     public void testGood() throws Exception {
-        final UserEntity entity = Util.getUserEntity();
+        final UserEntity entity = TestUtil.getUserEntity();
 
         final long count = repository.count();
         final UserEntity persistedEntity = repository.save(entity);
@@ -52,7 +52,7 @@ public class UserRepositoryTest {
 
     @Test
     public void testSaveWithNullId() throws Exception {
-        final UserEntity entity = Util.getUserEntity();
+        final UserEntity entity = TestUtil.getUserEntity();
         entity.setId(null);
         final long count = repository.count();
 
@@ -64,7 +64,7 @@ public class UserRepositoryTest {
 
     @Test
     public void testSaveWithExistingEntityWithNullId() throws Exception {
-        final UserEntity entity = Util.getUserEntity();
+        final UserEntity entity = TestUtil.getUserEntity();
         final UserEntity saved = repository.saveAndFlush(entity);
         saved.setId(null);
 
@@ -75,7 +75,7 @@ public class UserRepositoryTest {
 
     @Test
     public void testNullUserDetails() throws Exception {
-        final UserEntity entity = Util.getUserEntity();
+        final UserEntity entity = TestUtil.getUserEntity();
         entity.setUserDetails(null);
 
         try {
@@ -89,7 +89,7 @@ public class UserRepositoryTest {
 
     @Test
     public void testNullApplicationDate() throws Exception {
-        final UserEntity entity = Util.getUserEntity();
+        final UserEntity entity = TestUtil.getUserEntity();
         entity.setApplicationDate(null);
 
         try {
@@ -103,7 +103,7 @@ public class UserRepositoryTest {
 
     @Test
     public void testNullUserDetailsEntity() throws Exception {
-        final UserEntity entity = Util.getUserEntity();
+        final UserEntity entity = TestUtil.getUserEntity();
         entity.setUserDetails(null);
 
         try {
@@ -117,7 +117,7 @@ public class UserRepositoryTest {
 
     @Test
     public void testNullUserStatus() throws Exception {
-        final UserEntity entity = Util.getUserEntity();
+        final UserEntity entity = TestUtil.getUserEntity();
         entity.setStatus(null);
 
         try {

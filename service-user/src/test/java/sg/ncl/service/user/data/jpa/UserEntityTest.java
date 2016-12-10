@@ -7,7 +7,7 @@ import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
-import sg.ncl.service.user.Util;
+import sg.ncl.service.user.util.TestUtil;
 import sg.ncl.service.user.domain.UserStatus;
 import sg.ncl.service.user.exceptions.UserAlreadyInTeamException;
 
@@ -60,7 +60,7 @@ public class UserEntityTest {
 
     @Test
     public void testGetVerificationKey() throws Exception {
-        final UserEntity userEntity = Util.getUserEntity();
+        final UserEntity userEntity = TestUtil.getUserEntity();
 
         assertThat(userEntity.getVerificationKey()).isNotEmpty();
     }
@@ -251,7 +251,7 @@ public class UserEntityTest {
 
     @Test
     public void testAddTeamAlreadyExist() throws Exception {
-        final UserEntity userEntity = Util.getUserEntity();
+        final UserEntity userEntity = TestUtil.getUserEntity();
         String teamId = RandomStringUtils.randomAlphanumeric(20);
         exception.expect(UserAlreadyInTeamException.class);
         userEntity.addTeam(teamId);
@@ -260,7 +260,7 @@ public class UserEntityTest {
 
     @Test
     public void testRemoveTeamNotFound() throws Exception {
-        final UserEntity userEntity = Util.getUserEntity();
+        final UserEntity userEntity = TestUtil.getUserEntity();
         String teamId_1 = RandomStringUtils.randomAlphanumeric(20);
         String teamId_2 = RandomStringUtils.randomAlphanumeric(20);
 
@@ -286,7 +286,7 @@ public class UserEntityTest {
 
     @Test
     public void testRemoveTeamGood() throws Exception {
-        final UserEntity userEntity = Util.getUserEntity();
+        final UserEntity userEntity = TestUtil.getUserEntity();
         String teamId_1 = RandomStringUtils.randomAlphanumeric(20);
         String teamId_2 = RandomStringUtils.randomAlphanumeric(20);
 

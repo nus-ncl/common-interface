@@ -7,11 +7,10 @@ import org.junit.runner.RunWith;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
-import org.springframework.orm.jpa.JpaSystemException;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringRunner;
-import sg.ncl.service.user.Util;
+import sg.ncl.service.user.util.TestUtil;
 
 import javax.inject.Inject;
 
@@ -40,7 +39,7 @@ public class AddressRepositoryTest {
 
     @Test
     public void testGood() throws Exception {
-        final AddressEntity entity = Util.getAddressEntity();
+        final AddressEntity entity = TestUtil.getAddressEntity();
 
         final long count = repository.count();
         final AddressEntity saved = repository.save(entity);
@@ -52,7 +51,7 @@ public class AddressRepositoryTest {
 
     @Test
     public void testSaveWithNullId() throws Exception {
-        final AddressEntity entity = Util.getAddressEntity();
+        final AddressEntity entity = TestUtil.getAddressEntity();
         entity.setId(null);
         final long count = repository.count();
 
@@ -64,7 +63,7 @@ public class AddressRepositoryTest {
 
     @Test
     public void testNullAddress1() throws Exception {
-        final AddressEntity entity = Util.getAddressEntity();
+        final AddressEntity entity = TestUtil.getAddressEntity();
         entity.setAddress1(null);
         try {
             repository.save(entity);
@@ -77,7 +76,7 @@ public class AddressRepositoryTest {
 
     @Test
     public void testNullCountry() throws Exception {
-        final AddressEntity entity = Util.getAddressEntity();
+        final AddressEntity entity = TestUtil.getAddressEntity();
         entity.setCountry(null);
         try {
             repository.save(entity);
@@ -90,7 +89,7 @@ public class AddressRepositoryTest {
 
     @Test
     public void testNullCity() throws Exception {
-        final AddressEntity entity = Util.getAddressEntity();
+        final AddressEntity entity = TestUtil.getAddressEntity();
         entity.setCity(null);
         try {
             repository.save(entity);
@@ -103,7 +102,7 @@ public class AddressRepositoryTest {
 
     @Test
     public void testNullZipCode() throws Exception {
-        final AddressEntity entity = Util.getAddressEntity();
+        final AddressEntity entity = TestUtil.getAddressEntity();
         entity.setZipCode(null);
         try {
             repository.save(entity);

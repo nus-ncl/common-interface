@@ -2,7 +2,7 @@ package sg.ncl.service.user.data.jpa;
 
 import org.apache.commons.lang3.RandomStringUtils;
 import org.junit.Test;
-import sg.ncl.service.user.Util;
+import sg.ncl.service.user.util.TestUtil;
 
 import java.util.Random;
 
@@ -128,7 +128,7 @@ public class AddressEntityTest {
 
     @Test
     public void testStaticGetAddress() {
-        final AddressEntity addressEntity = Util.getAddressEntity();
+        final AddressEntity addressEntity = TestUtil.getAddressEntity();
         AddressEntity returnAddressEntity = AddressEntity.get(addressEntity);
 
         assertThat(returnAddressEntity.getAddress1()).isEqualTo(addressEntity.getAddress1());

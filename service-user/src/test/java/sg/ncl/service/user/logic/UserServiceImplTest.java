@@ -9,7 +9,7 @@ import org.junit.rules.ExpectedException;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
-import sg.ncl.service.user.Util;
+import sg.ncl.service.user.util.TestUtil;
 import sg.ncl.service.user.data.jpa.UserDetailsEntity;
 import sg.ncl.service.user.data.jpa.UserEntity;
 import sg.ncl.service.user.data.jpa.UserRepository;
@@ -51,7 +51,7 @@ public class UserServiceImplTest {
     //throw UsernameAlreadyExistsException
     @Test
     public void createUserTest1() throws Exception {
-        UserEntity userEntity = Util.getUserEntity();
+        UserEntity userEntity = TestUtil.getUserEntity();
 
         exception.expect(UsernameAlreadyExistsException.class);
         when(userRepository.findByUserDetailsEmail(anyString())).thenReturn(userEntity);
@@ -64,12 +64,12 @@ public class UserServiceImplTest {
     //no exception thrown
     @Test
     public void createUserTest2() throws Exception {
-        UserDetailsEntity userDetailsEntity = Util.getUserDetailsEntity();
+        UserDetailsEntity userDetailsEntity = TestUtil.getUserDetailsEntity();
 
         userDetailsEntity.setEmail(null);
 
         User userEntity = new UserEntity();
-        userEntity = Util.getUserEntity();
+        userEntity = TestUtil.getUserEntity();
 
         when(userRepository.findByUserDetailsEmail(anyString())).thenReturn(null);
         when(userRepository.save(any(UserEntity.class))).thenReturn((UserEntity) userEntity);
@@ -163,8 +163,8 @@ public class UserServiceImplTest {
         String randomEmailStringForTest = RandomStringUtils.randomAlphanumeric(20);
         String randomKeyStringForTest = RandomStringUtils.randomAlphanumeric(20);
 
-        UserEntity userEntity = Util.getUserEntity();
-        UserDetailsEntity userDetailsEntity = Util.getUserDetailsEntity();
+        UserEntity userEntity = TestUtil.getUserEntity();
+        UserDetailsEntity userDetailsEntity = TestUtil.getUserDetailsEntity();
 
         exception.expect(VerificationEmailNotMatchException.class);
         when(userRepository.findOne(anyString())).thenReturn(userEntity);
@@ -180,8 +180,8 @@ public class UserServiceImplTest {
         String randomEmailForTest = RandomStringUtils.randomAlphanumeric(20);
         String randomKeyForTest = RandomStringUtils.randomAlphanumeric(20);
 
-        UserEntity userEntity = Util.getUserEntity();
-        UserDetailsEntity userDetailsEntity = Util.getUserDetailsEntity();
+        UserEntity userEntity = TestUtil.getUserEntity();
+        UserDetailsEntity userDetailsEntity = TestUtil.getUserDetailsEntity();
         userDetailsEntity.setEmail(randomEmailForTest);               //in order to pass mailNotMatchException exception
         userEntity.setUserDetails(userDetailsEntity);
         userEntity.setVerificationKey(randomKeyForTest);                //verificationKey is not null
@@ -203,8 +203,8 @@ public class UserServiceImplTest {
         String randomEmailForTest = RandomStringUtils.randomAlphanumeric(20);
         String randomKeyForTest = RandomStringUtils.randomAlphanumeric(20);
 
-        UserEntity userEntity = Util.getUserEntity();
-        UserDetailsEntity userDetailsEntity = Util.getUserDetailsEntity();
+        UserEntity userEntity = TestUtil.getUserEntity();
+        UserDetailsEntity userDetailsEntity = TestUtil.getUserDetailsEntity();
         userDetailsEntity.setEmail(randomEmailForTest);               //in order to pass mailNotMatchException exception
         userEntity.setUserDetails(userDetailsEntity);
         userEntity.setVerificationKey(randomKeyForTest);                //verificationKey is not null
@@ -226,8 +226,8 @@ public class UserServiceImplTest {
         String randomEmailForTest = RandomStringUtils.randomAlphanumeric(20);
         String randomKeyForTest = RandomStringUtils.randomAlphanumeric(20);
 
-        UserEntity userEntity = Util.getUserEntity();
-        UserDetailsEntity userDetailsEntity = Util.getUserDetailsEntity();
+        UserEntity userEntity = TestUtil.getUserEntity();
+        UserDetailsEntity userDetailsEntity = TestUtil.getUserDetailsEntity();
         userDetailsEntity.setEmail(randomEmailForTest);               //in order to pass mailNotMatchException exception
         userEntity.setUserDetails(userDetailsEntity);
         userEntity.setVerificationKey(null);                //verificationKey null
@@ -248,8 +248,8 @@ public class UserServiceImplTest {
         String randomKeyForTest = RandomStringUtils.randomAlphanumeric(20);
         String randomVerificationKeyForTest = RandomStringUtils.randomAlphanumeric(25);
 
-        UserEntity userEntity = Util.getUserEntity();
-        UserDetailsEntity userDetailsEntity = Util.getUserDetailsEntity();
+        UserEntity userEntity = TestUtil.getUserEntity();
+        UserDetailsEntity userDetailsEntity = TestUtil.getUserDetailsEntity();
         userDetailsEntity.setEmail(randomEmailForTest);               //in order to pass mailNotMatchException exception
         userEntity.setUserDetails(userDetailsEntity);
         userEntity.setVerificationKey(randomVerificationKeyForTest);             //verificationKey is not equal key
@@ -266,7 +266,7 @@ public class UserServiceImplTest {
     @Test
     public void testUpdateUserUserNotFoundException() throws Exception {
         String randomIdForTest = RandomStringUtils.randomAlphanumeric(20);
-        UserEntity userEntity = Util.getUserEntity();
+        UserEntity userEntity = TestUtil.getUserEntity();
 
         when(userRepository.findOne(anyString())).thenReturn(null);
         exception.expect(UserNotFoundException.class);
@@ -279,7 +279,7 @@ public class UserServiceImplTest {
     //throw UserIdNullOrEmptyException
     @Test
     public void testUpdateUserIdIsNull() throws Exception {
-        UserEntity userEntity = Util.getUserEntity();
+        UserEntity userEntity = TestUtil.getUserEntity();
 
         exception.expect(UserIdNullOrEmptyException.class);
 
@@ -291,7 +291,7 @@ public class UserServiceImplTest {
     //throw UserIdNullOrEmptyException
     @Test
     public void testUpdateUserIdIsEmpty() throws Exception {
-        UserEntity userEntity = Util.getUserEntity();
+        UserEntity userEntity = TestUtil.getUserEntity();
 
         exception.expect(UserIdNullOrEmptyException.class);
 
@@ -304,7 +304,7 @@ public class UserServiceImplTest {
     @Test
     public void testUpdateUserNoException() throws Exception {
         String randomIdForTest = RandomStringUtils.randomAlphanumeric(20);
-        UserEntity userEntity = Util.getUserEntity();
+        UserEntity userEntity = TestUtil.getUserEntity();
         userEntity.setId(randomIdForTest);
 
         when(userRepository.findOne(anyString())).thenReturn(userEntity);
@@ -357,7 +357,7 @@ public class UserServiceImplTest {
     public void testAddTeamNoException() throws Exception {
         String randomUserIdForTest = RandomStringUtils.randomAlphanumeric(20);
         String randomTeamIdForTest = RandomStringUtils.randomAlphanumeric(20);
-        UserEntity userEntity = Util.getUserEntity();
+        UserEntity userEntity = TestUtil.getUserEntity();
 
         when(userRepository.findOne(anyString())).thenReturn(userEntity);
         userServiceImpl.addTeam(randomUserIdForTest, randomTeamIdForTest);
@@ -407,7 +407,7 @@ public class UserServiceImplTest {
     public void testRemoveTeamNoException() throws Exception {
         String randomUserIdForTest = RandomStringUtils.randomAlphanumeric(20);
         String randomTeamIdForTest = RandomStringUtils.randomAlphanumeric(20);
-        UserEntity userEntity = Util.getUserEntity();
+        UserEntity userEntity = TestUtil.getUserEntity();
 
         when(userRepository.findOne(anyString())).thenReturn(userEntity);
         userServiceImpl.addTeam(randomUserIdForTest, randomTeamIdForTest);
@@ -449,7 +449,7 @@ public class UserServiceImplTest {
     @Test
     public void testUpdateUserStatusCaseCreated() throws Exception {
         String randomIdForTest = RandomStringUtils.randomAlphanumeric(20);
-        UserEntity userEntity=Util.getUserEntity();
+        UserEntity userEntity= TestUtil.getUserEntity();
 
         exception.expect(InvalidStatusTransitionException.class);
         when(userRepository.findOne(anyString())).thenReturn(userEntity);
@@ -462,7 +462,7 @@ public class UserServiceImplTest {
     @Test
     public void testUpdateUserStatusCasePendingIfBranch() throws Exception {
         String randomIdForTest = RandomStringUtils.randomAlphanumeric(20);
-        UserEntity userEntity = Util.getUserEntity();
+        UserEntity userEntity = TestUtil.getUserEntity();
         userEntity.setStatus(UserStatus.CREATED);
         User expected = new UserEntity();
         expected = userEntity;
@@ -481,7 +481,7 @@ public class UserServiceImplTest {
     @Test
     public void testUpdateUserStatusCasePendingElseBranch() throws Exception {
         String randomIdForTest = RandomStringUtils.randomAlphanumeric(20);
-        UserEntity userEntity = Util.getUserEntity();
+        UserEntity userEntity = TestUtil.getUserEntity();
         userEntity.setStatus(UserStatus.PENDING);
 
         exception.expect(InvalidStatusTransitionException.class);
@@ -495,7 +495,7 @@ public class UserServiceImplTest {
     @Test
     public void testUpdateUserStatusCaseApprove() throws Exception {
         String randomIdForTest = RandomStringUtils.randomAlphanumeric(20);
-        UserEntity userEntity = Util.getUserEntity();
+        UserEntity userEntity = TestUtil.getUserEntity();
         userEntity.setStatus(UserStatus.PENDING);
 
         when(userRepository.findOne(anyString())).thenReturn(userEntity);
@@ -513,7 +513,7 @@ public class UserServiceImplTest {
     @Test
     public void testUpdateUserStatusCaseApprovedElseBranch() throws Exception {
         String randomIdForTest = RandomStringUtils.randomAlphanumeric(20);
-        UserEntity userEntity = Util.getUserEntity();
+        UserEntity userEntity = TestUtil.getUserEntity();
         userEntity.setStatus(UserStatus.APPROVED);
 
         exception.expect(InvalidStatusTransitionException.class);
@@ -527,7 +527,7 @@ public class UserServiceImplTest {
     @Test
     public void testUpdateUserStatusCaseClosed() throws Exception {
         String randomIdForTest = RandomStringUtils.randomAlphanumeric(20);
-        UserEntity userEntity = Util.getUserEntity();
+        UserEntity userEntity = TestUtil.getUserEntity();
         userEntity.setStatus(UserStatus.CLOSED);
 
         when(userRepository.findOne(anyString())).thenReturn(userEntity);
@@ -545,7 +545,7 @@ public class UserServiceImplTest {
     @Test
     public void testUpdateUserStatusCaseFrozen() throws Exception {
         String randomIdForTest = RandomStringUtils.randomAlphanumeric(20);
-        UserEntity userEntity = Util.getUserEntity();
+        UserEntity userEntity = TestUtil.getUserEntity();
         userEntity.setStatus(UserStatus.APPROVED);
 
         when(userRepository.findOne(anyString())).thenReturn(userEntity);
@@ -558,12 +558,28 @@ public class UserServiceImplTest {
         verify(userRepository, times(1)).save(any(UserEntity.class));
     }
 
+    // case FROZEN - else branch, throw InvalidStatusTransitionException
+    @Test
+    public void testUpdateUserStatusCaseFrozenElseBranch() throws Exception {
+        String randomIdForTest = RandomStringUtils.randomAlphanumeric(20);
+        UserEntity userEntity = TestUtil.getUserEntity();
+        userEntity.setStatus(UserStatus.CLOSED);
+
+        exception.expect(InvalidStatusTransitionException.class);
+
+        when(userRepository.findOne(anyString())).thenReturn(userEntity);
+        when(userRepository.save(any(UserEntity.class))).thenReturn(userEntity);
+        userServiceImpl.updateUserStatus(randomIdForTest, UserStatus.FROZEN);
+
+        verify(userRepository, times(1)).findOne(anyString());
+    }
+
     //case FROZEN to APPROVED
     // should not throw InvalidStatusTransitionException
     @Test
     public void testUpdateUserStatusCaseFrozenToApproved() throws Exception {
         String randomIdForTest = RandomStringUtils.randomAlphanumeric(20);
-        UserEntity userEntity = Util.getUserEntity();
+        UserEntity userEntity = TestUtil.getUserEntity();
         userEntity.setStatus(UserStatus.FROZEN);
 
         when(userRepository.findOne(anyString())).thenReturn(userEntity);
