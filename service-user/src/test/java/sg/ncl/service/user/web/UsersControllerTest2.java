@@ -1,37 +1,33 @@
 package sg.ncl.service.user.web;
 
-import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
-import net.minidev.json.JSONObject;
+import io.jsonwebtoken.Claims;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.hamcrest.Matchers;
-import org.hamcrest.collection.IsIterableContainingInAnyOrder;
 import org.junit.*;
-import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
+import org.mockito.Mock;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
-import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringRunner;
-import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 import sg.ncl.common.exception.ExceptionAutoConfiguration;
 import sg.ncl.common.exception.GlobalExceptionHandler;
-import sg.ncl.service.user.AbstractTest;
 import sg.ncl.service.user.Util;
+import sg.ncl.service.user.data.jpa.UserDetailsEntity;
 import sg.ncl.service.user.data.jpa.UserEntity;
-import sg.ncl.service.user.data.jpa.UserRepository;
-import sg.ncl.service.user.domain.LoginActivity;
 import sg.ncl.service.user.domain.User;
 import sg.ncl.service.user.domain.UserService;
 import sg.ncl.service.user.domain.UserStatus;
+import sg.ncl.service.user.exceptions.UserNotFoundException;
 
 import javax.inject.Inject;
 import java.time.ZonedDateTime;
@@ -39,42 +35,52 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.hamcrest.Matchers.any;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasSize;
-import static org.hamcrest.core.Is.is;
+import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.mockingDetails;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
-import static org.springframework.test.web.servlet.setup.MockMvcBuilders.webAppContextSetup;
 
 /**
  * Created by Desmond
  */
 @RunWith(SpringRunner.class)
-@WebMvcTest(controllers = UsersController.class, secure = false)
+@WebMvcTest(controllers = UsersController.class, secure = true)
 @ContextConfiguration(classes = {UsersController.class, ExceptionAutoConfiguration.class, GlobalExceptionHandler.class})
-@TestPropertySource(properties = "flyway.enabled=false")
 public class UsersControllerTest2 {
+
+    @Mock
+    private Claims claims;
+    @Mock
+    private Authentication authentication;
+    @Mock
+    private SecurityContext securityContext;
 
     @Inject
     private ObjectMapper mapper;
     @Inject
-    private MockMvc mockMvc;
-    @Inject
     private WebApplicationContext webApplicationContext;
+
+    private MockMvc mockMvc;
 
     @MockBean
     private UserService userService;
 
     @Before
-    public void setup() {
+    public void before() {
+        assertThat(mockingDetails(claims).isMock()).isTrue();
+        assertThat(mockingDetails(securityContext).isMock()).isTrue();
+        assertThat(mockingDetails(authentication).isMock()).isTrue();
         assertThat(mockingDetails(userService).isMock()).isTrue();
         mockMvc = MockMvcBuilders.webAppContextSetup(webApplicationContext).build();
+
+        when(securityContext.getAuthentication()).thenReturn(authentication);
+        SecurityContextHolder.setContext(securityContext);
+        when(authentication.getPrincipal()).thenReturn(claims);
     }
 
     @Test
@@ -192,37 +198,87 @@ public class UsersControllerTest2 {
     }
 
     @Test
-    // FIXME update test when merge the one that reuturns something on update
     public void putUserTest() throws Exception {
-        final AddressInfo addressInfo = new AddressInfo("address1", "address2", "country", "region", "city", "zipCode");
-        final UserDetailsInfo userDetailsInfo = new UserDetailsInfo("firstName", "lastName", "jobTitle", addressInfo, "email", "phone", "institution", "institutionAbbreviation", "institutionWeb");
-        final UserInfo userInfo = new UserInfo("id", userDetailsInfo, true, "verificationKey", UserStatus.CREATED, ZonedDateTime.now(), ZonedDateTime.now(), new ArrayList<>(), new ArrayList<>());
-        final byte[] content = mapper.writeValueAsBytes(userInfo);
+        final UserEntity entity = Util.getUserEntity();
+        mapper.registerModule(new JavaTimeModule());
+        final byte[] content = mapper.writeValueAsBytes(new UserInfo(entity));
+
+        when(userService.updateUser(anyString(), any(UserInfo.class))).thenReturn(entity);
 
         mockMvc.perform(put(UsersController.PATH + "/id").contentType(MediaType.APPLICATION_JSON).content(content))
-                .andExpect(status().isOk());
+                .andExpect(status().isOk())
+                .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
+
+                .andExpect(jsonPath("$.id", Matchers.is(equalTo(entity.getId()))))
+                .andExpect(jsonPath("$.status", Matchers.is(equalTo(entity.getStatus().toString()))))
+                .andExpect(jsonPath("$.verificationKey", Matchers.is(equalTo(entity.getVerificationKey()))))
+                .andExpect(jsonPath("$.loginActivities", Matchers.is(equalTo(entity.getLoginActivities()))))
+                .andExpect(jsonPath("$.teams", Matchers.is(equalTo(entity.getTeams()))))
+
+                .andExpect(jsonPath("$.userDetails.email", Matchers.is(equalTo(entity.getUserDetails().getEmail()))))
+                .andExpect(jsonPath("$.userDetails.firstName", Matchers.is(equalTo(entity.getUserDetails().getFirstName()))))
+                .andExpect(jsonPath("$.userDetails.lastName", Matchers.is(equalTo(entity.getUserDetails().getLastName()))))
+                .andExpect(jsonPath("$.userDetails.institution", Matchers.is(equalTo(entity.getUserDetails().getInstitution()))))
+                .andExpect(jsonPath("$.userDetails.institutionAbbreviation", Matchers.is(equalTo(entity.getUserDetails().getInstitutionAbbreviation()))))
+                .andExpect(jsonPath("$.userDetails.institutionWeb", Matchers.is(equalTo(entity.getUserDetails().getInstitutionWeb()))))
+                .andExpect(jsonPath("$.userDetails.jobTitle", Matchers.is(equalTo(entity.getUserDetails().getJobTitle()))))
+                .andExpect(jsonPath("$.userDetails.phone", Matchers.is(equalTo(entity.getUserDetails().getPhone()))))
+
+                .andExpect(jsonPath("$.userDetails.address.address1", Matchers.is(equalTo(entity.getUserDetails().getAddress().getAddress1()))))
+                .andExpect(jsonPath("$.userDetails.address.address2", Matchers.is(equalTo(entity.getUserDetails().getAddress().getAddress2()))))
+                .andExpect(jsonPath("$.userDetails.address.city", Matchers.is(equalTo(entity.getUserDetails().getAddress().getCity()))))
+                .andExpect(jsonPath("$.userDetails.address.country", Matchers.is(equalTo(entity.getUserDetails().getAddress().getCountry()))))
+                .andExpect(jsonPath("$.userDetails.address.region", Matchers.is(equalTo(entity.getUserDetails().getAddress().getRegion()))))
+                .andExpect(jsonPath("$.userDetails.address.zipCode", Matchers.is(equalTo(entity.getUserDetails().getAddress().getZipCode()))));
     }
 
     @Test
-    // FIXME update test when merge the one that reuturns something on update
     public void putUserNullFirstNameTest() throws Exception {
-        final AddressInfo addressInfo = new AddressInfo("address1", "address2", "country", "region", "city", "zipCode");
-        final UserDetailsInfo userDetailsInfo = new UserDetailsInfo(null, "lastName", "jobTitle", addressInfo, "email", "phone", "institution", "institutionAbbreviation", "institutionWeb");
-        final UserInfo userInfo = new UserInfo("id", userDetailsInfo, true, "verificationKey", UserStatus.CREATED, ZonedDateTime.now(), ZonedDateTime.now(), new ArrayList<>(), new ArrayList<>());
-        final byte[] content = mapper.writeValueAsBytes(userInfo);
+        final UserEntity entity = new UserEntity();
+        final UserDetailsEntity userDetailsEntity = Util.getUserDetailsEntity();
+        userDetailsEntity.setFirstName(null);
+        entity.setUserDetails(userDetailsEntity);
+
+        mapper.registerModule(new JavaTimeModule());
+        final byte[] content = mapper.writeValueAsBytes(new UserInfo(entity));
+
+        when(userService.updateUser(anyString(), any(UserInfo.class))).thenReturn(entity);
 
         mockMvc.perform(put(UsersController.PATH + "/id").contentType(MediaType.APPLICATION_JSON).content(content))
-                .andExpect(status().isOk());
+                .andExpect(status().isOk())
+
+                .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
+
+                .andExpect(jsonPath("$.id", Matchers.is(equalTo(entity.getId()))))
+                .andExpect(jsonPath("$.status", Matchers.is(equalTo(entity.getStatus().toString()))))
+                .andExpect(jsonPath("$.verificationKey", Matchers.is(equalTo(entity.getVerificationKey()))))
+                .andExpect(jsonPath("$.loginActivities", Matchers.is(equalTo(entity.getLoginActivities()))))
+                .andExpect(jsonPath("$.teams", Matchers.is(equalTo(entity.getTeams()))))
+
+                .andExpect(jsonPath("$.userDetails.email", Matchers.is(equalTo(entity.getUserDetails().getEmail()))))
+                .andExpect(jsonPath("$.userDetails.firstName", Matchers.is(equalTo(entity.getUserDetails().getFirstName()))))
+                .andExpect(jsonPath("$.userDetails.lastName", Matchers.is(equalTo(entity.getUserDetails().getLastName()))))
+                .andExpect(jsonPath("$.userDetails.institution", Matchers.is(equalTo(entity.getUserDetails().getInstitution()))))
+                .andExpect(jsonPath("$.userDetails.institutionAbbreviation", Matchers.is(equalTo(entity.getUserDetails().getInstitutionAbbreviation()))))
+                .andExpect(jsonPath("$.userDetails.institutionWeb", Matchers.is(equalTo(entity.getUserDetails().getInstitutionWeb()))))
+                .andExpect(jsonPath("$.userDetails.jobTitle", Matchers.is(equalTo(entity.getUserDetails().getJobTitle()))))
+                .andExpect(jsonPath("$.userDetails.phone", Matchers.is(equalTo(entity.getUserDetails().getPhone()))))
+
+                .andExpect(jsonPath("$.userDetails.address.address1", Matchers.is(equalTo(entity.getUserDetails().getAddress().getAddress1()))))
+                .andExpect(jsonPath("$.userDetails.address.address2", Matchers.is(equalTo(entity.getUserDetails().getAddress().getAddress2()))))
+                .andExpect(jsonPath("$.userDetails.address.city", Matchers.is(equalTo(entity.getUserDetails().getAddress().getCity()))))
+                .andExpect(jsonPath("$.userDetails.address.country", Matchers.is(equalTo(entity.getUserDetails().getAddress().getCountry()))))
+                .andExpect(jsonPath("$.userDetails.address.region", Matchers.is(equalTo(entity.getUserDetails().getAddress().getRegion()))))
+                .andExpect(jsonPath("$.userDetails.address.zipCode", Matchers.is(equalTo(entity.getUserDetails().getAddress().getZipCode()))));
     }
 
-    @Ignore
     @Test
-    // FIXME update test when merge the one that reuturns something on update
     public void putUserWithWrongIdTest() throws Exception {
-        final AddressInfo addressInfo = new AddressInfo("address1", "address2", "country", "region", "city", "zipCode");
-        final UserDetailsInfo userDetailsInfo = new UserDetailsInfo("firstName", "lastName", "jobTitle", addressInfo, "email", "phone", "institution", "institutionAbbreviation", "institutionWeb");
-        final UserInfo userInfo = new UserInfo(null, userDetailsInfo, true, "verificationKey", UserStatus.CREATED, ZonedDateTime.now(), ZonedDateTime.now(), new ArrayList<>(), new ArrayList<>());
-        final byte[] content = mapper.writeValueAsBytes(userInfo);
+        final UserEntity entity = Util.getUserEntity();
+        mapper.registerModule(new JavaTimeModule());
+        final byte[] content = mapper.writeValueAsBytes(new UserInfo(entity));
+
+        when(userService.updateUser(anyString(), any(UserInfo.class))).thenThrow(new UserNotFoundException(entity.getId()));
 
         mockMvc.perform(put(UsersController.PATH + "/id").contentType(MediaType.APPLICATION_JSON).content(content))
                 .andExpect(status().isNotFound());
