@@ -60,7 +60,7 @@ public class UsersController {
     }
 
     // for admin to update user status
-    @PutMapping(path = "/users/{id}/status/{status}")
+    @PutMapping(path = "/{id}/status/{status}")
     @ResponseStatus(HttpStatus.OK)
     public User updateUserStatus(
             @AuthenticationPrincipal final Object claims,
