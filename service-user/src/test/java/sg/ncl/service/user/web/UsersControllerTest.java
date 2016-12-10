@@ -1,222 +1,363 @@
 package sg.ncl.service.user.web;
 
-import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
-import net.minidev.json.JSONObject;
+import io.jsonwebtoken.Claims;
 import org.apache.commons.lang3.RandomStringUtils;
-import org.hamcrest.collection.IsIterableContainingInAnyOrder;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.ExpectedException;
+import org.hamcrest.Matchers;
+import org.junit.*;
+import org.junit.runner.RunWith;
+import org.mockito.Mock;
+import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
-import org.springframework.test.context.TestPropertySource;
-import org.springframework.test.context.web.WebAppConfiguration;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.MvcResult;
+import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
-import sg.ncl.service.user.AbstractTest;
-import sg.ncl.service.user.Util;
+import sg.ncl.common.authentication.Role;
+import sg.ncl.common.exception.ExceptionAutoConfiguration;
+import sg.ncl.common.exception.GlobalExceptionHandler;
+import sg.ncl.common.jwt.JwtToken;
+import sg.ncl.service.user.util.TestUtil;
+import sg.ncl.service.user.data.jpa.UserDetailsEntity;
 import sg.ncl.service.user.data.jpa.UserEntity;
-import sg.ncl.service.user.data.jpa.UserRepository;
+import sg.ncl.service.user.domain.User;
+import sg.ncl.service.user.domain.UserService;
+import sg.ncl.service.user.domain.UserStatus;
+import sg.ncl.service.user.exceptions.UserNotFoundException;
 
 import javax.inject.Inject;
+import java.util.ArrayList;
 import java.util.List;
 
-import static org.hamcrest.core.Is.is;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.hasSize;
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyString;
+import static org.mockito.Mockito.mockingDetails;
+import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-import static org.springframework.test.web.servlet.setup.MockMvcBuilders.webAppContextSetup;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 /**
  * Created by Desmond
  */
-@WebAppConfiguration
-@TestPropertySource(properties = "flyway.enabled=false")
-public class UsersControllerTest extends AbstractTest {
+@RunWith(SpringRunner.class)
+@WebMvcTest(controllers = UsersController.class, secure = true)
+@ContextConfiguration(classes = {UsersController.class, ExceptionAutoConfiguration.class, GlobalExceptionHandler.class})
+public class UsersControllerTest {
 
-    @Rule
-    public final ExpectedException exception = ExpectedException.none();
+    @Mock
+    private Claims claims;
+    @Mock
+    private Authentication authentication;
+    @Mock
+    private SecurityContext securityContext;
 
     @Inject
-    private UserRepository userRepository;
-
-    private MockMvc mockMvc;
+    private ObjectMapper mapper;
     @Inject
     private WebApplicationContext webApplicationContext;
 
+    private MockMvc mockMvc;
+
+    @MockBean
+    private UserService userService;
+
     @Before
-    public void setup() {
-        mockMvc = webAppContextSetup(webApplicationContext).build();
+    public void before() {
+        assertThat(mockingDetails(claims).isMock()).isTrue();
+        assertThat(mockingDetails(securityContext).isMock()).isTrue();
+        assertThat(mockingDetails(authentication).isMock()).isTrue();
+        assertThat(mockingDetails(userService).isMock()).isTrue();
+        mockMvc = MockMvcBuilders.webAppContextSetup(webApplicationContext).build();
+
+        when(securityContext.getAuthentication()).thenReturn(authentication);
+        SecurityContextHolder.setContext(securityContext);
+        when(authentication.getPrincipal()).thenReturn(claims);
     }
 
     @Test
     public void getAllUserWithNoUserInDbTest() throws Exception {
-        MvcResult result = mockMvc.perform(get("/users")).andReturn();
-        Assert.assertTrue(result.getResponse().getContentLength() == 0);
+        mockMvc.perform(get(UsersController.PATH))
+                .andExpect(status().isOk())
+                .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON));
     }
 
     @Test
     public void getAllUsersTest() throws Exception {
-        MediaType contentType = new MediaType(MediaType.APPLICATION_JSON.getType(),
-                MediaType.APPLICATION_JSON.getSubtype());
+        final List<User> list = new ArrayList<>();
+        final UserEntity entity1 = TestUtil.getUserEntity();
+        final UserEntity entity2 = TestUtil.getUserEntity();
+        list.add(entity1);
+        list.add(entity2);
 
-        final UserEntity[] userEntityList = new UserEntity[3];
+        when(userService.getAll()).thenReturn(list);
 
-        for (int i = 0; i < 3; i++) {
-            Object[] objArray = addUser();
-            userEntityList[i] = (UserEntity) objArray[0];
-        }
-
-        MvcResult result = mockMvc.perform(get("/users"))
+        mockMvc.perform(get(UsersController.PATH))
                 .andExpect(status().isOk())
-                .andExpect(content().contentTypeCompatibleWith(contentType))
-                .andReturn();
+                .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
 
-        String allUserJsonString = result.getResponse().getContentAsString();
+                .andExpect(jsonPath("$", hasSize(2)))
 
-        ObjectMapper mapper = new ObjectMapper();
-        mapper.registerModule(new JavaTimeModule());
-        List<UserEntity> userEntityList2 = mapper.readValue(allUserJsonString, new TypeReference<List<UserEntity>>() {});
+                .andExpect(jsonPath("$[0].id", Matchers.is(equalTo(entity1.getId()))))
+                .andExpect(jsonPath("$[0].status", Matchers.is(equalTo(entity1.getStatus().toString()))))
+                .andExpect(jsonPath("$[0].verificationKey", Matchers.is(equalTo(entity1.getVerificationKey()))))
+                .andExpect(jsonPath("$[0].loginActivities", Matchers.is(equalTo(entity1.getLoginActivities()))))
+                .andExpect(jsonPath("$[0].teams", Matchers.is(equalTo(entity1.getTeams()))))
 
-        Assert.assertThat(userEntityList2, IsIterableContainingInAnyOrder.containsInAnyOrder(userEntityList));
+                .andExpect(jsonPath("$[0].userDetails.id", Matchers.is(equalTo(entity1.getUserDetails().getId()))))
+                .andExpect(jsonPath("$[0].userDetails.email", Matchers.is(equalTo(entity1.getUserDetails().getEmail()))))
+                .andExpect(jsonPath("$[0].userDetails.firstName", Matchers.is(equalTo(entity1.getUserDetails().getFirstName()))))
+                .andExpect(jsonPath("$[0].userDetails.lastName", Matchers.is(equalTo(entity1.getUserDetails().getLastName()))))
+                .andExpect(jsonPath("$[0].userDetails.institution", Matchers.is(equalTo(entity1.getUserDetails().getInstitution()))))
+                .andExpect(jsonPath("$[0].userDetails.institutionAbbreviation", Matchers.is(equalTo(entity1.getUserDetails().getInstitutionAbbreviation()))))
+                .andExpect(jsonPath("$[0].userDetails.institutionWeb", Matchers.is(equalTo(entity1.getUserDetails().getInstitutionWeb()))))
+                .andExpect(jsonPath("$[0].userDetails.jobTitle", Matchers.is(equalTo(entity1.getUserDetails().getJobTitle()))))
+                .andExpect(jsonPath("$[0].userDetails.phone", Matchers.is(equalTo(entity1.getUserDetails().getPhone()))))
+
+                .andExpect(jsonPath("$[0].userDetails.address.id", Matchers.is(equalTo(entity1.getUserDetails().getAddress().getId()))))
+                .andExpect(jsonPath("$[0].userDetails.address.address1", Matchers.is(equalTo(entity1.getUserDetails().getAddress().getAddress1()))))
+                .andExpect(jsonPath("$[0].userDetails.address.address2", Matchers.is(equalTo(entity1.getUserDetails().getAddress().getAddress2()))))
+                .andExpect(jsonPath("$[0].userDetails.address.city", Matchers.is(equalTo(entity1.getUserDetails().getAddress().getCity()))))
+                .andExpect(jsonPath("$[0].userDetails.address.country", Matchers.is(equalTo(entity1.getUserDetails().getAddress().getCountry()))))
+                .andExpect(jsonPath("$[0].userDetails.address.region", Matchers.is(equalTo(entity1.getUserDetails().getAddress().getRegion()))))
+                .andExpect(jsonPath("$[0].userDetails.address.zipCode", Matchers.is(equalTo(entity1.getUserDetails().getAddress().getZipCode()))))
+
+                .andExpect(jsonPath("$[1].id", Matchers.is(equalTo(entity2.getId()))))
+                .andExpect(jsonPath("$[1].status", Matchers.is(equalTo(entity2.getStatus().toString()))))
+                .andExpect(jsonPath("$[1].verificationKey", Matchers.is(equalTo(entity2.getVerificationKey()))))
+                .andExpect(jsonPath("$[1].loginActivities", Matchers.is(equalTo(entity2.getLoginActivities()))))
+                .andExpect(jsonPath("$[1].teams", Matchers.is(equalTo(entity2.getTeams()))))
+
+                .andExpect(jsonPath("$[1].userDetails.id", Matchers.is(equalTo(entity2.getUserDetails().getId()))))
+                .andExpect(jsonPath("$[1].userDetails.email", Matchers.is(equalTo(entity2.getUserDetails().getEmail()))))
+                .andExpect(jsonPath("$[1].userDetails.firstName", Matchers.is(equalTo(entity2.getUserDetails().getFirstName()))))
+                .andExpect(jsonPath("$[1].userDetails.lastName", Matchers.is(equalTo(entity2.getUserDetails().getLastName()))))
+                .andExpect(jsonPath("$[1].userDetails.institution", Matchers.is(equalTo(entity2.getUserDetails().getInstitution()))))
+                .andExpect(jsonPath("$[1].userDetails.institutionAbbreviation", Matchers.is(equalTo(entity2.getUserDetails().getInstitutionAbbreviation()))))
+                .andExpect(jsonPath("$[1].userDetails.institutionWeb", Matchers.is(equalTo(entity2.getUserDetails().getInstitutionWeb()))))
+                .andExpect(jsonPath("$[1].userDetails.jobTitle", Matchers.is(equalTo(entity2.getUserDetails().getJobTitle()))))
+                .andExpect(jsonPath("$[1].userDetails.phone", Matchers.is(equalTo(entity2.getUserDetails().getPhone()))))
+
+                .andExpect(jsonPath("$[1].userDetails.address.id", Matchers.is(equalTo(entity2.getUserDetails().getAddress().getId()))))
+                .andExpect(jsonPath("$[1].userDetails.address.address1", Matchers.is(equalTo(entity2.getUserDetails().getAddress().getAddress1()))))
+                .andExpect(jsonPath("$[1].userDetails.address.address2", Matchers.is(equalTo(entity2.getUserDetails().getAddress().getAddress2()))))
+                .andExpect(jsonPath("$[1].userDetails.address.city", Matchers.is(equalTo(entity2.getUserDetails().getAddress().getCity()))))
+                .andExpect(jsonPath("$[1].userDetails.address.country", Matchers.is(equalTo(entity2.getUserDetails().getAddress().getCountry()))))
+                .andExpect(jsonPath("$[1].userDetails.address.region", Matchers.is(equalTo(entity2.getUserDetails().getAddress().getRegion()))))
+                .andExpect(jsonPath("$[1].userDetails.address.zipCode", Matchers.is(equalTo(entity2.getUserDetails().getAddress().getZipCode()))));
+
     }
 
     @Test
     public void getUserWithNoUserInDbTest() throws Exception {
-        mockMvc.perform(get("/users/" + RandomStringUtils.randomAlphabetic(20)))
+        mockMvc.perform(get(UsersController.PATH + "/" + RandomStringUtils.randomAlphabetic(20)))
                 .andExpect(status().isNotFound())
-                .andExpect(status().reason("User not found"));
+                .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON));;
     }
 
     @Test
     public void getUserTest() throws Exception {
-        MediaType contentType = new MediaType(MediaType.APPLICATION_JSON.getType(),
-                MediaType.APPLICATION_JSON.getSubtype());
+        final User user = TestUtil.getUserEntity();
+        final String id = RandomStringUtils.randomAlphabetic(20);
 
-        final UserEntity[] userArray = addUser();
-        final String idString = userArray[0].getId();
-        final UserEntity originalEntity = userArray[1];
+        when(userService.getUser(anyString())).thenReturn(user);
 
-        mockMvc.perform(get("/users/" + idString))
+        mockMvc.perform(get(UsersController.PATH + "/" + id))
                 .andExpect(status().isOk())
-                .andExpect(content().contentTypeCompatibleWith(contentType))
-                .andExpect(jsonPath("$.userDetails.firstName", is(originalEntity.getUserDetails().getFirstName())))
-                .andExpect(jsonPath("$.userDetails.lastName", is(originalEntity.getUserDetails().getLastName())))
-                .andExpect(jsonPath("$.userDetails.jobTitle", is(originalEntity.getUserDetails().getJobTitle())))
-                .andExpect(jsonPath("$.userDetails.email", is(originalEntity.getUserDetails().getEmail())))
-                .andExpect(jsonPath("$.userDetails.phone", is(originalEntity.getUserDetails().getPhone())))
-                .andExpect(jsonPath("$.userDetails.institution", is(originalEntity.getUserDetails().getInstitution())))
-                .andExpect(jsonPath("$.userDetails.institutionAbbreviation", is(originalEntity.getUserDetails().getInstitutionAbbreviation())))
-                .andExpect(jsonPath("$.userDetails.institutionWeb", is(originalEntity.getUserDetails().getInstitutionWeb())))
-                .andExpect(jsonPath("$.userDetails.address.address1", is(originalEntity.getUserDetails().getAddress().getAddress1())))
-                .andExpect(jsonPath("$.userDetails.address.address2", is(originalEntity.getUserDetails().getAddress().getAddress2())))
-                .andExpect(jsonPath("$.userDetails.address.country", is(originalEntity.getUserDetails().getAddress().getCountry())))
-                .andExpect(jsonPath("$.userDetails.address.region", is(originalEntity.getUserDetails().getAddress().getRegion())))
-                .andExpect(jsonPath("$.userDetails.address.city", is(originalEntity.getUserDetails().getAddress().getCity())))
-                .andExpect(jsonPath("$.userDetails.address.zipCode", is(originalEntity.getUserDetails().getAddress().getZipCode())));
+                .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
+
+                .andExpect(jsonPath("$.id", Matchers.is(equalTo(user.getId()))))
+                .andExpect(jsonPath("$.status", Matchers.is(equalTo(user.getStatus().toString()))))
+                .andExpect(jsonPath("$.verificationKey", Matchers.is(equalTo(user.getVerificationKey()))))
+                .andExpect(jsonPath("$.loginActivities", Matchers.is(equalTo(user.getLoginActivities()))))
+                .andExpect(jsonPath("$.teams", Matchers.is(equalTo(user.getTeams()))))
+
+                .andExpect(jsonPath("$.userDetails.email", Matchers.is(equalTo(user.getUserDetails().getEmail()))))
+                .andExpect(jsonPath("$.userDetails.firstName", Matchers.is(equalTo(user.getUserDetails().getFirstName()))))
+                .andExpect(jsonPath("$.userDetails.lastName", Matchers.is(equalTo(user.getUserDetails().getLastName()))))
+                .andExpect(jsonPath("$.userDetails.institution", Matchers.is(equalTo(user.getUserDetails().getInstitution()))))
+                .andExpect(jsonPath("$.userDetails.institutionAbbreviation", Matchers.is(equalTo(user.getUserDetails().getInstitutionAbbreviation()))))
+                .andExpect(jsonPath("$.userDetails.institutionWeb", Matchers.is(equalTo(user.getUserDetails().getInstitutionWeb()))))
+                .andExpect(jsonPath("$.userDetails.jobTitle", Matchers.is(equalTo(user.getUserDetails().getJobTitle()))))
+                .andExpect(jsonPath("$.userDetails.phone", Matchers.is(equalTo(user.getUserDetails().getPhone()))))
+
+                .andExpect(jsonPath("$.userDetails.address.address1", Matchers.is(equalTo(user.getUserDetails().getAddress().getAddress1()))))
+                .andExpect(jsonPath("$.userDetails.address.address2", Matchers.is(equalTo(user.getUserDetails().getAddress().getAddress2()))))
+                .andExpect(jsonPath("$.userDetails.address.city", Matchers.is(equalTo(user.getUserDetails().getAddress().getCity()))))
+                .andExpect(jsonPath("$.userDetails.address.country", Matchers.is(equalTo(user.getUserDetails().getAddress().getCountry()))))
+                .andExpect(jsonPath("$.userDetails.address.region", Matchers.is(equalTo(user.getUserDetails().getAddress().getRegion()))))
+                .andExpect(jsonPath("$.userDetails.address.zipCode", Matchers.is(equalTo(user.getUserDetails().getAddress().getZipCode()))));
     }
 
     @Test
     public void putUserTest() throws Exception {
-        MediaType contentType = new MediaType(MediaType.APPLICATION_JSON.getType(),
-                MediaType.APPLICATION_JSON.getSubtype());
-
-        UserEntity[] userArray = addUser();
-        UserEntity userEntity = userArray[0];
-
-        final UserEntity[] userEntityArray = addUser();
-        final String idString = userEntityArray[0].getId();
-
-        // get user
-        MvcResult result = mockMvc.perform(get("/users/" + idString))
-                .andExpect(status().isOk())
-                .andExpect(content().contentTypeCompatibleWith(contentType))
-                .andReturn();
-
-        String jsonString = result.getResponse().getContentAsString();
-
-        ObjectMapper mapper = new ObjectMapper();
+        final UserEntity entity = TestUtil.getUserEntity();
         mapper.registerModule(new JavaTimeModule());
+        final byte[] content = mapper.writeValueAsBytes(new UserInfo(entity));
 
-        UserEntity userEntityFromDb = mapper.readValue(jsonString, UserEntity.class);
-        String originalLastName = userEntityFromDb.getUserDetails().getLastName();
+        when(userService.updateUser(anyString(), any(UserInfo.class))).thenReturn(entity);
 
-        // change first name
-        String newFirstName = RandomStringUtils.randomAlphabetic(20);
-        userEntityFromDb.getUserDetails().setFirstName(newFirstName);
-
-        String jsonInString = mapper.writeValueAsString(userEntityFromDb);
-
-        // put
-        mockMvc.perform(put("/users/" + idString).contentType(contentType).content(jsonInString))
-                .andExpect(status().isOk());
-
-        // check if first name is new first name and last name is the same
-        mockMvc.perform(get("/users/" + idString))
+        mockMvc.perform(put(UsersController.PATH + "/id").contentType(MediaType.APPLICATION_JSON).content(content))
                 .andExpect(status().isOk())
-                .andExpect(content().contentTypeCompatibleWith(contentType))
-                .andExpect(jsonPath("$.userDetails.firstName", is(newFirstName)))
-                .andExpect(jsonPath("$.userDetails.lastName", is(originalLastName)));
+                .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
+
+                .andExpect(jsonPath("$.id", Matchers.is(equalTo(entity.getId()))))
+                .andExpect(jsonPath("$.status", Matchers.is(equalTo(entity.getStatus().toString()))))
+                .andExpect(jsonPath("$.verificationKey", Matchers.is(equalTo(entity.getVerificationKey()))))
+                .andExpect(jsonPath("$.loginActivities", Matchers.is(equalTo(entity.getLoginActivities()))))
+                .andExpect(jsonPath("$.teams", Matchers.is(equalTo(entity.getTeams()))))
+
+                .andExpect(jsonPath("$.userDetails.email", Matchers.is(equalTo(entity.getUserDetails().getEmail()))))
+                .andExpect(jsonPath("$.userDetails.firstName", Matchers.is(equalTo(entity.getUserDetails().getFirstName()))))
+                .andExpect(jsonPath("$.userDetails.lastName", Matchers.is(equalTo(entity.getUserDetails().getLastName()))))
+                .andExpect(jsonPath("$.userDetails.institution", Matchers.is(equalTo(entity.getUserDetails().getInstitution()))))
+                .andExpect(jsonPath("$.userDetails.institutionAbbreviation", Matchers.is(equalTo(entity.getUserDetails().getInstitutionAbbreviation()))))
+                .andExpect(jsonPath("$.userDetails.institutionWeb", Matchers.is(equalTo(entity.getUserDetails().getInstitutionWeb()))))
+                .andExpect(jsonPath("$.userDetails.jobTitle", Matchers.is(equalTo(entity.getUserDetails().getJobTitle()))))
+                .andExpect(jsonPath("$.userDetails.phone", Matchers.is(equalTo(entity.getUserDetails().getPhone()))))
+
+                .andExpect(jsonPath("$.userDetails.address.address1", Matchers.is(equalTo(entity.getUserDetails().getAddress().getAddress1()))))
+                .andExpect(jsonPath("$.userDetails.address.address2", Matchers.is(equalTo(entity.getUserDetails().getAddress().getAddress2()))))
+                .andExpect(jsonPath("$.userDetails.address.city", Matchers.is(equalTo(entity.getUserDetails().getAddress().getCity()))))
+                .andExpect(jsonPath("$.userDetails.address.country", Matchers.is(equalTo(entity.getUserDetails().getAddress().getCountry()))))
+                .andExpect(jsonPath("$.userDetails.address.region", Matchers.is(equalTo(entity.getUserDetails().getAddress().getRegion()))))
+                .andExpect(jsonPath("$.userDetails.address.zipCode", Matchers.is(equalTo(entity.getUserDetails().getAddress().getZipCode()))));
     }
 
     @Test
-    public void putUserNullFieldTest() throws Exception {
-        MediaType contentType = new MediaType(MediaType.APPLICATION_JSON.getType(),
-                MediaType.APPLICATION_JSON.getSubtype());
+    public void putUserNullFirstNameTest() throws Exception {
+        final UserEntity entity = new UserEntity();
+        final UserDetailsEntity userDetailsEntity = TestUtil.getUserDetailsEntity();
+        userDetailsEntity.setFirstName(null);
+        entity.setUserDetails(userDetailsEntity);
 
-        final UserEntity[] userEntityArray = addUser();
-        final String idString = userEntityArray[0].getId();
-
-        // get user
-        MvcResult result = mockMvc.perform(get("/users/" + idString))
-                .andExpect(status().isOk())
-                .andExpect(content().contentTypeCompatibleWith(contentType))
-                .andReturn();
-
-        String jsonString = result.getResponse().getContentAsString();
-        ObjectMapper mapper = new ObjectMapper();
         mapper.registerModule(new JavaTimeModule());
+        final byte[] content = mapper.writeValueAsBytes(new UserInfo(entity));
 
-        UserEntity userEntity = mapper.readValue(jsonString, UserEntity.class);
-        userEntity.getUserDetails().setFirstName(null);
+        when(userService.updateUser(anyString(), any(UserInfo.class))).thenReturn(entity);
 
-        String jsonInString = mapper.writeValueAsString(userEntity);
+        mockMvc.perform(put(UsersController.PATH + "/id").contentType(MediaType.APPLICATION_JSON).content(content))
+                .andExpect(status().isOk())
 
-        // put
-        mockMvc.perform(put("/users/" + idString).contentType(contentType).content(jsonInString))
-                .andExpect(status().isOk());
+                .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
+
+                .andExpect(jsonPath("$.id", Matchers.is(equalTo(entity.getId()))))
+                .andExpect(jsonPath("$.status", Matchers.is(equalTo(entity.getStatus().toString()))))
+                .andExpect(jsonPath("$.verificationKey", Matchers.is(equalTo(entity.getVerificationKey()))))
+                .andExpect(jsonPath("$.loginActivities", Matchers.is(equalTo(entity.getLoginActivities()))))
+                .andExpect(jsonPath("$.teams", Matchers.is(equalTo(entity.getTeams()))))
+
+                .andExpect(jsonPath("$.userDetails.email", Matchers.is(equalTo(entity.getUserDetails().getEmail()))))
+                .andExpect(jsonPath("$.userDetails.firstName", Matchers.is(equalTo(entity.getUserDetails().getFirstName()))))
+                .andExpect(jsonPath("$.userDetails.lastName", Matchers.is(equalTo(entity.getUserDetails().getLastName()))))
+                .andExpect(jsonPath("$.userDetails.institution", Matchers.is(equalTo(entity.getUserDetails().getInstitution()))))
+                .andExpect(jsonPath("$.userDetails.institutionAbbreviation", Matchers.is(equalTo(entity.getUserDetails().getInstitutionAbbreviation()))))
+                .andExpect(jsonPath("$.userDetails.institutionWeb", Matchers.is(equalTo(entity.getUserDetails().getInstitutionWeb()))))
+                .andExpect(jsonPath("$.userDetails.jobTitle", Matchers.is(equalTo(entity.getUserDetails().getJobTitle()))))
+                .andExpect(jsonPath("$.userDetails.phone", Matchers.is(equalTo(entity.getUserDetails().getPhone()))))
+
+                .andExpect(jsonPath("$.userDetails.address.address1", Matchers.is(equalTo(entity.getUserDetails().getAddress().getAddress1()))))
+                .andExpect(jsonPath("$.userDetails.address.address2", Matchers.is(equalTo(entity.getUserDetails().getAddress().getAddress2()))))
+                .andExpect(jsonPath("$.userDetails.address.city", Matchers.is(equalTo(entity.getUserDetails().getAddress().getCity()))))
+                .andExpect(jsonPath("$.userDetails.address.country", Matchers.is(equalTo(entity.getUserDetails().getAddress().getCountry()))))
+                .andExpect(jsonPath("$.userDetails.address.region", Matchers.is(equalTo(entity.getUserDetails().getAddress().getRegion()))))
+                .andExpect(jsonPath("$.userDetails.address.zipCode", Matchers.is(equalTo(entity.getUserDetails().getAddress().getZipCode()))));
     }
 
     @Test
     public void putUserWithWrongIdTest() throws Exception {
-        MediaType contentType = new MediaType(MediaType.APPLICATION_JSON.getType(),
-                MediaType.APPLICATION_JSON.getSubtype());
+        final UserEntity entity = TestUtil.getUserEntity();
+        mapper.registerModule(new JavaTimeModule());
+        final byte[] content = mapper.writeValueAsBytes(new UserInfo(entity));
 
-        final String idString = "123456";
+        when(userService.updateUser(anyString(), any(UserInfo.class))).thenThrow(new UserNotFoundException(entity.getId()));
 
-        JSONObject object = new JSONObject();
-        object.put("id", idString);
-
-        // put
-        mockMvc.perform(put("/users/" + idString).contentType(contentType).content(object.toString()))
-                .andExpect(status().isNotFound())
-                .andExpect(status().reason("User not found"));
+        mockMvc.perform(put(UsersController.PATH + "/id").contentType(MediaType.APPLICATION_JSON).content(content))
+                .andExpect(status().isNotFound());
     }
 
-    private UserEntity[] addUser() throws Exception {
-        UserEntity userEntity = Util.getUserEntity();
-        UserEntity saveUser = userRepository.save(userEntity);
+    @Test
+    public void verifyEmail() throws Exception {
+        final VerificationKeyInfo verificationKeyInfo = new VerificationKeyInfo("key");
 
-        final UserEntity[] userArray = new UserEntity[2];
-        userArray[0] = saveUser;
-        userArray[1] = userEntity;
+        final byte[] content = mapper.writeValueAsBytes(verificationKeyInfo);
 
-        return userArray;
+        when(userService.verifyEmail(anyString(), anyString(), anyString())).thenReturn(UserStatus.PENDING);
+
+        mockMvc.perform(put(UsersController.PATH + "/id/emails/emailBase64").contentType(MediaType.APPLICATION_JSON).content(content))
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    public void updateUserStatusGood() throws Exception {
+        final UserEntity entity = TestUtil.getUserEntity();
+        entity.setStatus(UserStatus.CLOSED);
+        final List<String> roles = new ArrayList<>();
+        roles.add(Role.ADMIN.getAuthority());
+
+        mapper.registerModule(new JavaTimeModule());
+        final byte[] content = mapper.writeValueAsBytes(new UserInfo(entity));
+
+        when(claims.get(JwtToken.KEY)).thenReturn(roles);
+        when(userService.updateUserStatus(anyString(), any(UserStatus.class))).thenReturn(entity);
+
+        mockMvc.perform(put(UsersController.PATH + "/" + entity.getId() + "/status/" + UserStatus.CLOSED).contentType(MediaType.APPLICATION_JSON).content(content))
+                .andExpect(status().isOk())
+
+                .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
+
+                .andExpect(jsonPath("$.id", Matchers.is(equalTo(entity.getId()))))
+                .andExpect(jsonPath("$.status", Matchers.is(equalTo(UserStatus.CLOSED.toString()))));
+    }
+
+    @Test
+    public void updateUserStatusUnauthorizedException() throws Exception {
+        final UserEntity entity = TestUtil.getUserEntity();
+
+        mapper.registerModule(new JavaTimeModule());
+        final byte[] content = mapper.writeValueAsBytes(new UserInfo(entity));
+
+        when(authentication.getPrincipal()).thenReturn(null);
+
+        mockMvc.perform(put(UsersController.PATH + "/id/status/" + UserStatus.CLOSED).contentType(MediaType.APPLICATION_JSON).content(content))
+                .andExpect(status().isUnauthorized());
+    }
+
+    @Test
+    public void updateUserStatusBadClaimsType() throws Exception {
+        final UserEntity entity = TestUtil.getUserEntity();
+
+        mapper.registerModule(new JavaTimeModule());
+        final byte[] content = mapper.writeValueAsBytes(new UserInfo(entity));
+
+        when(claims.get(JwtToken.KEY)).thenReturn(null);
+
+        mockMvc.perform(put(UsersController.PATH + "/id/status/" + UserStatus.CLOSED).contentType(MediaType.APPLICATION_JSON).content(content))
+                .andExpect(status().isForbidden());
+    }
+
+    @Test
+    public void updateUserStatusNotAdmin() throws Exception {
+        final UserEntity entity = TestUtil.getUserEntity();
+        entity.setStatus(UserStatus.CLOSED);
+        final List<String> roles = new ArrayList<>();
+        roles.add(Role.USER.getAuthority());
+
+        mapper.registerModule(new JavaTimeModule());
+        final byte[] content = mapper.writeValueAsBytes(new UserInfo(entity));
+
+        when(claims.get(JwtToken.KEY)).thenReturn(roles);
+
+        mockMvc.perform(put(UsersController.PATH + "/" + entity.getId() + "/status/" + UserStatus.CLOSED).contentType(MediaType.APPLICATION_JSON).content(content))
+                .andExpect(status().isForbidden());
     }
 }
