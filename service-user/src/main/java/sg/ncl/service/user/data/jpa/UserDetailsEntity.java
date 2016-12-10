@@ -1,5 +1,7 @@
 package sg.ncl.service.user.data.jpa;
 
+import lombok.Getter;
+import lombok.Setter;
 import sg.ncl.common.jpa.AbstractEntity;
 import sg.ncl.service.user.domain.UserDetails;
 
@@ -18,6 +20,8 @@ import javax.persistence.Table;
  */
 @Entity
 @Table(name = "user_details", indexes = @Index(columnList = "email", unique = true))
+@Getter
+@Setter
 public class UserDetailsEntity extends AbstractEntity implements UserDetails {
 
     @Id
@@ -65,95 +69,6 @@ public class UserDetailsEntity extends AbstractEntity implements UserDetails {
         entity.setInstitutionAbbreviation(userDetails.getInstitutionAbbreviation());
         entity.setInstitutionWeb(userDetails.getInstitutionWeb());
         return entity;
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    void setId(final Long id) {
-        this.id = id;
-    }
-
-    @Override
-    public String getFirstName() {
-        return firstName;
-    }
-
-    public void setFirstName(final String firstName) {
-        this.firstName = firstName;
-    }
-
-    @Override
-    public String getLastName() {
-        return lastName;
-    }
-
-    public void setLastName(final String lastName) {
-        this.lastName = lastName;
-    }
-
-    @Override
-    public String getJobTitle() {
-        return jobTitle;
-    }
-
-    public void setJobTitle(String jobTitle) {
-        this.jobTitle = jobTitle;
-    }
-
-    @Override
-    public AddressEntity getAddress() {
-        return address;
-    }
-
-    public void setAddress(final AddressEntity address) {
-        this.address = address;
-    }
-
-    @Override
-    public String getEmail() {
-        return email;
-    }
-
-    public void setEmail(final String email) {
-        this.email = email;
-    }
-
-    @Override
-    public String getPhone() {
-        return phone;
-    }
-
-    public void setPhone(final String phone) {
-        this.phone = phone;
-    }
-
-    @Override
-    public String getInstitution() {
-        return institution;
-    }
-
-    public void setInstitution(String institution) {
-        this.institution = institution;
-    }
-
-    @Override
-    public String getInstitutionAbbreviation() {
-        return institutionAbbreviation;
-    }
-
-    public void setInstitutionAbbreviation(String institutionAbbreviation) {
-        this.institutionAbbreviation = institutionAbbreviation;
-    }
-
-    @Override
-    public String getInstitutionWeb() {
-        return institutionWeb;
-    }
-
-    public void setInstitutionWeb(String institutionWeb) {
-        this.institutionWeb = institutionWeb;
     }
 
     @Override

@@ -1,5 +1,7 @@
 package sg.ncl.service.user.data.jpa;
 
+import lombok.Getter;
+import lombok.Setter;
 import sg.ncl.common.jpa.AbstractEntity;
 import sg.ncl.service.user.domain.LoginActivity;
 
@@ -15,6 +17,8 @@ import java.time.ZonedDateTime;
  */
 @Entity
 @Table(name = "login_activities")
+@Getter
+@Setter
 public class LoginActivityEntity extends AbstractEntity implements LoginActivity {
 
     @Id
@@ -27,32 +31,6 @@ public class LoginActivityEntity extends AbstractEntity implements LoginActivity
 
     @Column(name = "date", nullable = false)
     private ZonedDateTime date;
-
-    public Long getId() {
-        return id;
-    }
-
-    void setId(final Long id) {
-        this.id = id;
-    }
-
-    @Override
-    public String getIpAddress() {
-        return ipAddress;
-    }
-
-    void setIpAddress(final String ipAddress) {
-        this.ipAddress = ipAddress;
-    }
-
-    @Override
-    public ZonedDateTime getDate() {
-        return date;
-    }
-
-    void setDate(final ZonedDateTime date) {
-        this.date = date;
-    }
 
     @Override
     public String toString() {
