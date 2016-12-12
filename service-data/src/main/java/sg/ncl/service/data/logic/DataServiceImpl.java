@@ -13,10 +13,7 @@ import sg.ncl.service.data.domain.Data;
 import sg.ncl.service.data.domain.DataResource;
 import sg.ncl.service.data.domain.DataService;
 import sg.ncl.service.data.domain.DataVisibility;
-import sg.ncl.service.data.exceptions.DataNameAlreadyExistsException;
-import sg.ncl.service.data.exceptions.DataNotFoundException;
-import sg.ncl.service.data.exceptions.DataResourceDeleteException;
-import sg.ncl.service.data.exceptions.DataResourceNotFoundException;
+import sg.ncl.service.data.exceptions.*;
 import sg.ncl.service.data.web.DataResourceInfo;
 import sg.ncl.service.transmission.domain.DownloadService;
 import sg.ncl.service.transmission.domain.UploadService;
@@ -127,7 +124,7 @@ public class DataServiceImpl implements DataService {
         checkPermissions(dataEntity, claims);
 
         DataEntity savedDataEntity = dataRepository.save(setUpDataEntity(data, dataEntity));
-        log.info(INFO_TEXT, savedDataEntity);
+        log.info("Data updated by {}: {}", claims.getSubject(), savedDataEntity);
         return savedDataEntity;
     }
 
@@ -146,7 +143,7 @@ public class DataServiceImpl implements DataService {
 
         uploadService.deleteDirectory(DATA_DIR_KEY, UriUtils.encode(dataEntity.getName(), UTF_ENCODING));
         dataRepository.delete(id);
-        log.info("Data deleted: {}", dataEntity.getName());
+        log.info("Data deleted by {}: {}", claims.getSubject(), dataEntity.getName());
 
         return dataEntity;
     }
@@ -221,6 +218,16 @@ public class DataServiceImpl implements DataService {
         DataEntity dataEntity = (DataEntity) getDataset(id);
         checkPermissions(dataEntity, claims);
 
+        List<DataResource> dataResourceEntities = dataEntity.getResources();
+        if (dataResourceEntities != null) {
+            for (DataResource dataResourceEntity : dataResourceEntities) {
+                if (dataResourceEntity.getUri().equals(dataResource.getUri())) {
+                    log.warn("Data resource already in use: {}", dataResource.getUri());
+                    throw new DataResourceAlreadyExistsException("Data resource already in use: " + dataResource.getUri());
+                }
+            }
+        }
+
         dataEntity.addResource(setUpResourceEntity(dataResource));
         DataEntity savedDataEntity = dataRepository.save(dataEntity);
         log.info(INFO_TEXT, savedDataEntity);
@@ -250,7 +257,7 @@ public class DataServiceImpl implements DataService {
                 log.error("Unable to delete {}: {}", dataResource.getUri(), e);
                 throw new DataResourceDeleteException("Unable to delete " + dataResource.getUri());
             }
-            log.info("Data resource deleted: {}", dataResource);
+            log.info("Data resource deleted by {}: {}", claims.getSubject(), dataResource);
         }
 
         DataEntity savedDataEntity = dataRepository.save(dataEntity);
@@ -277,6 +284,7 @@ public class DataServiceImpl implements DataService {
             case FINISHED:
                 DataResourceInfo dataResourceInfo = new DataResourceInfo(null, resumableInfo.getResumableFilename());
                 createResource(id, dataResourceInfo, claims);
+                log.info("Resource upload finished and saved: {}", dataResourceInfo);
                 return "All finished.";
             case UPLOAD:
                 return "Upload";

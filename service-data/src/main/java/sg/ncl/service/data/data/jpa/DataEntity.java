@@ -94,12 +94,18 @@ public class DataEntity extends AbstractEntity implements Data {
         if (!resources.contains(dataResourceEntity)) {
             resources.add(dataResourceEntity);
             dataResourceEntity.setDataEntity(this);
+            log.info("Resource {} added in the list for data {}", dataResourceEntity, name);
+        } else {
+            log.info("Resource {} is already in the list for data {}", dataResourceEntity, name);
         }
     }
 
     public void removeResource(DataResourceEntity dataResourceEntity) {
         if (resources.contains(dataResourceEntity)) {
             resources.remove(dataResourceEntity);
+            log.info("Resource {} removed from the list for data {}", dataResourceEntity, name);
+        } else {
+            log.info("Resource {} not in the list for data {}", dataResourceEntity, name);
         }
     }
 
