@@ -9,8 +9,6 @@ import java.io.IOException;
  */
 public interface UploadService {
 
-    void checkDuplicatedUpload(String subDirKey, String preDir, String fileName);
-
     void deleteDirectory(String subDirKey, String preDir);
 
     boolean deleteUpload(String subDirKey, String preDir, String fileName) throws IOException;

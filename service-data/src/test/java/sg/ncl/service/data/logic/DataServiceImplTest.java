@@ -23,6 +23,7 @@ import sg.ncl.service.data.domain.DataService;
 import sg.ncl.service.data.domain.DataVisibility;
 import sg.ncl.service.data.exceptions.DataNameAlreadyExistsException;
 import sg.ncl.service.data.exceptions.DataNotFoundException;
+import sg.ncl.service.data.exceptions.DataResourceNotFoundException;
 import sg.ncl.service.data.util.TestUtil;
 import sg.ncl.service.transmission.domain.DownloadService;
 import sg.ncl.service.transmission.domain.UploadService;
@@ -188,7 +189,7 @@ public class DataServiceImplTest extends AbstractTest {
     @Test
     public void testFindResourceByIdNotFound() {
         DataEntity dataEntity = TestUtil.getDataEntity();
-        exception.expect(NotFoundException.class);
+        exception.expect(DataNotFoundException.class);
         dataService.findResourceById(dataEntity.getId(), 2L, claims);
     }
 
@@ -205,6 +206,21 @@ public class DataServiceImplTest extends AbstractTest {
 
         DataResource dataResource = dataService.findResourceById(dataEntity.getId(), dataEntity.getResources().get(0).getId(), claims);
         assertThat(dataResource).isEqualTo(dataEntity.getResources().get(0));
+    }
+
+    @Test
+    public void testFindResourceNull() {
+        DataEntity dataEntity = TestUtil.getDataEntity();
+        List<DataResourceEntity> dataResourceList = new ArrayList<>();
+        DataResourceEntity dataResourceEntity = TestUtil.getDataResourceEntity();
+        dataResourceEntity.setId(1L);
+        dataResourceList.add(dataResourceEntity);
+        dataEntity.setResources(dataResourceList);
+
+        when(dataRepository.getOne(anyLong())).thenReturn(dataEntity);
+
+        exception.expect(DataResourceNotFoundException.class);
+        dataService.findResourceById(dataEntity.getId(), 2L, claims);
     }
 
     @Test

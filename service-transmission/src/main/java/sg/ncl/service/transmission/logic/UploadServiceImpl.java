@@ -40,15 +40,6 @@ public class UploadServiceImpl implements UploadService {
     }
 
     @Override
-    public void checkDuplicatedUpload(String subDirKey, String preDir, String fileName) {
-        Path path = HttpUtils.getPath(properties, subDirKey, preDir);
-        File file = new File(path.toString());
-        if (file.exists()) {
-            throw new UploadAlreadyExistsException("Upload file already exist in directory.");
-        }
-    }
-
-    @Override
     public void deleteDirectory(String subDirKey, String preDir) {
         Path path = HttpUtils.getPath(properties, subDirKey, preDir);
         HttpUtils.removeDirectory(new File(path.toString()));
@@ -82,6 +73,11 @@ public class UploadServiceImpl implements UploadService {
             } catch (IOException e) {
                 log.error("Unable to create directory path: {}", e);
                 throw new BadRequestException();
+            }
+        } else {
+            File file = new File(path.toString() + "/" + resumableInfo.getResumableFilename());
+            if (file.exists()) {
+                throw new UploadAlreadyExistsException("Upload file already exist in directory.");
             }
         }
 
