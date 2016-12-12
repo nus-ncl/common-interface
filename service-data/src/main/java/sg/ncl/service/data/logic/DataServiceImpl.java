@@ -42,6 +42,7 @@ public class DataServiceImpl implements DataService {
 
     private static final String INFO_TEXT = "Data saved: {}";
     private static final String DATA_DIR_KEY = "dataDir";
+    private static final String UTF_ENCODING = "UTF-8";
 
     private final DataRepository dataRepository;
     private final UploadService uploadService;
@@ -143,7 +144,7 @@ public class DataServiceImpl implements DataService {
         DataEntity dataEntity = (DataEntity) getDataset(id);
         checkPermissions(dataEntity, claims);
 
-        uploadService.deleteDirectory(DATA_DIR_KEY, UriUtils.encode(dataEntity.getName(), "UTF-8"));
+        uploadService.deleteDirectory(DATA_DIR_KEY, UriUtils.encode(dataEntity.getName(), UTF_ENCODING));
         dataRepository.delete(id);
         log.info("Data deleted: {}", dataEntity.getName());
 
@@ -244,7 +245,7 @@ public class DataServiceImpl implements DataService {
         if (dataResource != null) {
             dataEntity.removeResource((DataResourceEntity) dataResource);
             try {
-                uploadService.deleteUpload(DATA_DIR_KEY, UriUtils.encode(dataEntity.getName(), "UTF-8"), dataResource.getUri());
+                uploadService.deleteUpload(DATA_DIR_KEY, UriUtils.encode(dataEntity.getName(), UTF_ENCODING), dataResource.getUri());
             } catch (Exception e) {
                 log.error("Unable to delete {}: {}", dataResource.getUri(), e);
                 throw new DataResourceDeleteException("Unable to delete " + dataResource.getUri());
@@ -272,7 +273,7 @@ public class DataServiceImpl implements DataService {
     @Override
     public String addChunk(ResumableInfo resumableInfo, String resumableChunkNumber, Long id, Claims claims) throws UnsupportedEncodingException {
         DataEntity dataEntity = (DataEntity) getDataset(id);
-        switch (uploadService.addChunk(resumableInfo, Integer.parseInt(resumableChunkNumber), DATA_DIR_KEY, UriUtils.encode(dataEntity.getName(), "UTF-8"))) {
+        switch (uploadService.addChunk(resumableInfo, Integer.parseInt(resumableChunkNumber), DATA_DIR_KEY, UriUtils.encode(dataEntity.getName(), UTF_ENCODING))) {
             case FINISHED:
                 DataResourceInfo dataResourceInfo = new DataResourceInfo(null, resumableInfo.getResumableFilename());
                 createResource(id, dataResourceInfo, claims);
@@ -291,7 +292,7 @@ public class DataServiceImpl implements DataService {
 
         DataResource dataResource = findResourceById(did, rid, claims);
         try {
-            downloadService.getChunks(response, DATA_DIR_KEY, UriUtils.encode(dataEntity.getName(), "UTF-8"), dataResource.getUri());
+            downloadService.getChunks(response, DATA_DIR_KEY, UriUtils.encode(dataEntity.getName(), UTF_ENCODING), dataResource.getUri());
         } catch (IOException e) {
             log.error("Unable to download resource: {}", e);
             throw new NotFoundException();
