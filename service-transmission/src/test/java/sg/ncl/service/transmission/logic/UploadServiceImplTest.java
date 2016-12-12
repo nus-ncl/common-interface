@@ -1,6 +1,7 @@
 package sg.ncl.service.transmission.logic;
 
 import org.apache.commons.lang3.RandomStringUtils;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -20,6 +21,8 @@ import sg.ncl.service.transmission.util.TestUtil;
 import sg.ncl.service.transmission.web.ResumableInfo;
 
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.HashSet;
 import java.util.Random;
 
@@ -45,17 +48,30 @@ public class UploadServiceImplTest extends AbstractTest {
     private DirectoryProperties properties;
 
     private UploadService uploadService;
+    private String tempFolder;
 
     @Before
     public void before() {
         assertThat(mockingDetails(storage).isMock()).isTrue();
         assertThat(mockingDetails(properties).isMock()).isTrue();
         uploadService = new UploadServiceImpl(storage, properties);
+        tempFolder = "tempUploads";
+    }
+    
+    @After
+    public void after() throws IOException {
+        Files.deleteIfExists(Paths.get(System.getProperty("user.home"), tempFolder));
+    }
+
+    @Test
+    public void testDeleteDirectory() {
+        when(properties.getBaseDir()).thenReturn(tempFolder);
+        uploadService.deleteDirectory(null, null);
     }
 
     @Test
     public void testDeleteUpload() throws IOException {
-        when(properties.getBaseDir()).thenReturn("uploads");
+        when(properties.getBaseDir()).thenReturn(tempFolder);
         boolean result = uploadService.deleteUpload(null, null, "test.txt");
         assertThat(result).isFalse();
     }
@@ -99,7 +115,7 @@ public class UploadServiceImplTest extends AbstractTest {
         entity.setResumableFilename(RandomStringUtils.randomAlphanumeric(20));
         entity.setResumableRelativePath(RandomStringUtils.randomAlphanumeric(20));
 
-        when(properties.getBaseDir()).thenReturn("uploads");
+        when(properties.getBaseDir()).thenReturn(tempFolder);
         when(storage.get(anyInt(), anyLong(), anyString(), anyString(), anyString(), anyString())).thenReturn(entity);
 
         exception.expect(BadRequestException.class);
@@ -118,7 +134,7 @@ public class UploadServiceImplTest extends AbstractTest {
         entity.setResumableFilename(RandomStringUtils.randomAlphanumeric(20));
         entity.setResumableRelativePath(RandomStringUtils.randomAlphanumeric(20));
 
-        when(properties.getBaseDir()).thenReturn("uploads");
+        when(properties.getBaseDir()).thenReturn(tempFolder);
         when(storage.get(anyInt(), anyLong(), anyString(), anyString(), anyString(), anyString())).thenReturn(entity);
 
         exception.expect(BadRequestException.class);
