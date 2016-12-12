@@ -4,6 +4,7 @@ import io.jsonwebtoken.Claims;
 import sg.ncl.service.transmission.web.ResumableInfo;
 
 import javax.servlet.http.HttpServletResponse;
+import java.io.UnsupportedEncodingException;
 import java.util.List;
 
 /**
@@ -15,7 +16,7 @@ public interface DataService {
 
     Data updateDataset(Long id, Data data, Claims claims);
 
-    Data deleteDataset(Long id, Claims claims);
+    Data deleteDataset(Long id, Claims claims) throws UnsupportedEncodingException;
 
     Data getDataset(Long id);
 
@@ -31,7 +32,7 @@ public interface DataService {
 
     String checkChunk(String resumableIdentifier, String resumableChunkNumber);
 
-    String addChunk(ResumableInfo resumableInfo, String resumableChunkNumber, String dataId, Claims claims);
+    String addChunk(ResumableInfo resumableInfo, String resumableChunkNumber, Long id, Claims claims) throws UnsupportedEncodingException;
 
     void downloadResource(HttpServletResponse response, Long did, Long rid, Claims claims);
 

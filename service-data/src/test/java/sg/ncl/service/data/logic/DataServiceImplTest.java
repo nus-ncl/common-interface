@@ -31,6 +31,7 @@ import sg.ncl.service.transmission.web.ResumableInfo;
 
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -143,26 +144,28 @@ public class DataServiceImplTest extends AbstractTest {
     }
 
     @Test
-    public void testDeleteDatasetGood() {
+    public void testDeleteDatasetGood() throws UnsupportedEncodingException {
         DataEntity dataEntity = TestUtil.getDataEntity();
         final List<String> roles = Collections.singletonList(Role.USER.getAuthority());
 
         when(dataRepository.getOne(anyLong())).thenReturn(dataEntity);
         when(claims.get(JwtToken.KEY)).thenReturn(roles);
         when(claims.getSubject()).thenReturn(dataEntity.getContributorId());
+        doNothing().when(uploadService).deleteDirectory(anyString(), anyString());
 
         dataService.deleteDataset(dataEntity.getId(), claims);
         verify(dataRepository, times(1)).delete(anyLong());
     }
 
     @Test
-    public void testDeleteDatasetAdmin() {
+    public void testDeleteDatasetAdmin() throws UnsupportedEncodingException {
         DataEntity dataEntity = TestUtil.getDataEntity();
         final List<String> roles = Collections.singletonList(Role.ADMIN.getAuthority());
 
         when(dataRepository.getOne(anyLong())).thenReturn(dataEntity);
         when(claims.get(JwtToken.KEY)).thenReturn(roles);
         when(claims.getSubject()).thenReturn("id");
+        doNothing().when(uploadService).deleteDirectory(anyString(), anyString());
 
         dataService.deleteDataset(dataEntity.getId(), claims);
         verify(dataRepository, times(1)).delete(anyLong());
@@ -261,17 +264,17 @@ public class DataServiceImplTest extends AbstractTest {
     }
 
     @Test
-    public void  testAddChunkDataNotFound() {
+    public void  testAddChunkDataNotFound() throws UnsupportedEncodingException {
         ResumableInfo resumableInfo = TestUtil.getResumableInfo();
 
         when(uploadService.addChunk(any(ResumableInfo.class), anyInt(), anyString(), anyString())).thenReturn(UploadStatus.FINISHED);
         exception.expect(DataNotFoundException.class);
 
-        dataService.addChunk(resumableInfo, "1", "1", claims);
+        dataService.addChunk(resumableInfo, "1", 1L, claims);
     }
 
     @Test
-    public void testAddChunkFinished() {
+    public void testAddChunkFinished() throws UnsupportedEncodingException {
         ResumableInfo resumableInfo = TestUtil.getResumableInfo();
         DataEntity dataEntity = TestUtil.getDataEntity();
         final List<String> roles = Collections.singletonList(Role.USER.getAuthority());
@@ -281,17 +284,19 @@ public class DataServiceImplTest extends AbstractTest {
         when(claims.getSubject()).thenReturn(dataEntity.getContributorId());
         when(uploadService.addChunk(any(ResumableInfo.class), anyInt(), anyString(), anyString())).thenReturn(UploadStatus.FINISHED);
 
-        String result = dataService.addChunk(resumableInfo, "1", "1", claims);
+        String result = dataService.addChunk(resumableInfo, "1", 1L, claims);
         assertThat(result).isEqualTo("All finished.");
     }
 
     @Test
-    public void testAddChunkUpload() {
+    public void testAddChunkUpload() throws UnsupportedEncodingException {
         ResumableInfo resumableInfo = TestUtil.getResumableInfo();
+        DataEntity dataEntity = TestUtil.getDataEntity();
 
+        when(dataRepository.getOne(anyLong())).thenReturn(dataEntity);
         when(uploadService.addChunk(any(ResumableInfo.class), anyInt(), anyString(), anyString())).thenReturn(UploadStatus.UPLOAD);
 
-        String result = dataService.addChunk(resumableInfo, "1", "1", claims);
+        String result = dataService.addChunk(resumableInfo, "1", 1L, claims);
         assertThat(result).isEqualTo("Upload");
     }
 

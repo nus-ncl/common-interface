@@ -4,6 +4,7 @@ import io.jsonwebtoken.Claims;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.util.UriUtils;
 import sg.ncl.common.exception.base.NotFoundException;
 import sg.ncl.service.data.data.jpa.DataEntity;
 import sg.ncl.service.data.data.jpa.DataRepository;
@@ -25,6 +26,7 @@ import javax.inject.Inject;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.constraints.NotNull;
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -137,11 +139,11 @@ public class DataServiceImpl implements DataService {
      */
     @Transactional
     @Override
-    public Data deleteDataset(Long id, Claims claims) {
+    public Data deleteDataset(Long id, Claims claims) throws UnsupportedEncodingException {
         DataEntity dataEntity = (DataEntity) getDataset(id);
         checkPermissions(dataEntity, claims);
 
-        uploadService.deleteDirectory(DATA_DIR_KEY, id.toString());
+        uploadService.deleteDirectory(DATA_DIR_KEY, UriUtils.encode(dataEntity.getName(), "UTF-8"));
         dataRepository.delete(id);
         log.info("Data deleted: {}", dataEntity.getName());
 
@@ -242,7 +244,7 @@ public class DataServiceImpl implements DataService {
         if (dataResource != null) {
             dataEntity.removeResource((DataResourceEntity) dataResource);
             try {
-                uploadService.deleteUpload(DATA_DIR_KEY, did.toString(), dataResource.getUri());
+                uploadService.deleteUpload(DATA_DIR_KEY, UriUtils.encode(dataEntity.getName(), "UTF-8"), dataResource.getUri());
             } catch (Exception e) {
                 log.error("Unable to delete {}: {}", dataResource.getUri(), e);
                 throw new DataResourceDeleteException("Unable to delete " + dataResource.getUri());
@@ -268,11 +270,12 @@ public class DataServiceImpl implements DataService {
     }
 
     @Override
-    public String addChunk(ResumableInfo resumableInfo, String resumableChunkNumber, String dataId, Claims claims) {
-        switch (uploadService.addChunk(resumableInfo, Integer.parseInt(resumableChunkNumber), DATA_DIR_KEY, dataId)) {
+    public String addChunk(ResumableInfo resumableInfo, String resumableChunkNumber, Long id, Claims claims) throws UnsupportedEncodingException {
+        DataEntity dataEntity = (DataEntity) getDataset(id);
+        switch (uploadService.addChunk(resumableInfo, Integer.parseInt(resumableChunkNumber), DATA_DIR_KEY, UriUtils.encode(dataEntity.getName(), "UTF-8"))) {
             case FINISHED:
                 DataResourceInfo dataResourceInfo = new DataResourceInfo(null, resumableInfo.getResumableFilename());
-                createResource(Long.parseLong(dataId), dataResourceInfo, claims);
+                createResource(id, dataResourceInfo, claims);
                 return "All finished.";
             case UPLOAD:
                 return "Upload";
@@ -283,9 +286,12 @@ public class DataServiceImpl implements DataService {
 
     @Override
     public void downloadResource(HttpServletResponse response, Long did, Long rid, Claims claims) {
+        DataEntity dataEntity = (DataEntity) getDataset(did);
+        checkAccessibility(dataEntity, claims);
+
         DataResource dataResource = findResourceById(did, rid, claims);
         try {
-            downloadService.getChunks(response, DATA_DIR_KEY, did.toString(), dataResource.getUri());
+            downloadService.getChunks(response, DATA_DIR_KEY, UriUtils.encode(dataEntity.getName(), "UTF-8"), dataResource.getUri());
         } catch (IOException e) {
             log.error("Unable to download resource: {}", e);
             throw new NotFoundException();
