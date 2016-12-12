@@ -36,6 +36,12 @@ public class UploadServiceImpl implements UploadService {
     }
 
     @Override
+    public void deleteDirectory(String subDirKey, String preDir) {
+        Path path = HttpUtils.getPath(properties, subDirKey, preDir);
+        HttpUtils.removeDirectory(new File(path.toString()));
+    }
+
+    @Override
     public boolean deleteUpload(String subDirKey, String preDir, String fileName) throws IOException {
         Path path = HttpUtils.getPath(properties, subDirKey, preDir);
         String filePath = path.toString() + "/" + fileName;

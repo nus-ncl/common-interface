@@ -1,7 +1,9 @@
 package sg.ncl.service.transmission.util;
 
+import lombok.extern.slf4j.Slf4j;
 import sg.ncl.service.transmission.DirectoryProperties;
 
+import java.io.File;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
@@ -10,7 +12,9 @@ import java.nio.file.Paths;
  *
  * References:
  * [1] https://github.com/23/resumable.js/blob/master/samples/java/src/main/java/resumable/js/upload/HttpUtils.java
+ * [2] http://www.codejava.net/java-se/file-io/clean-and-remove-a-non-empty-directory
  */
+@Slf4j
 public class HttpUtils {
 
     private HttpUtils() {}
@@ -66,6 +70,23 @@ public class HttpUtils {
         }
 
         return Paths.get(System.getProperty("user.home"), baseDir);
+    }
+
+    public static void removeDirectory(File dir) {
+        boolean deleted;
+        if (dir.isDirectory()) {
+            File[] files = dir.listFiles();
+            if (files != null && files.length > 0) {
+                for (File aFile : files) {
+                    removeDirectory(aFile);
+                }
+            }
+            deleted = dir.delete();
+        } else {
+            deleted = dir.delete();
+        }
+
+        log.info("Deleted file {}: {}", dir, deleted);
     }
 
 }
