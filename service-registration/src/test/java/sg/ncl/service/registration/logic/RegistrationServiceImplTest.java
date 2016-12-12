@@ -95,7 +95,7 @@ public class RegistrationServiceImplTest {
 
         UserEntity userEntity = Util.getUserEntity();
         when(userService.getUser(anyString())).thenReturn(userEntity);
-        
+
         exception.expect(TeamNameNullOrEmptyException.class);
         registrationService.registerRequestToApplyTeam(RandomStringUtils.randomAlphanumeric(8), teamEntity);
     }
