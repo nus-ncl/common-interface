@@ -9,6 +9,7 @@ import sg.ncl.service.transmission.data.ResumableEntity;
 import sg.ncl.service.transmission.data.ResumableStorage;
 import sg.ncl.service.transmission.domain.UploadService;
 import sg.ncl.service.transmission.domain.UploadStatus;
+import sg.ncl.service.transmission.exceptions.UploadAlreadyExistsException;
 import sg.ncl.service.transmission.util.HttpUtils;
 import sg.ncl.service.transmission.web.ResumableInfo;
 
@@ -21,6 +22,9 @@ import java.nio.file.Path;
 
 /**
  * Created by dcsjnh on 11/24/2016.
+ *
+ * References:
+ * [1] http://alvinalexander.com/java/java-file-exists-directory-exists
  */
 @Service
 @Slf4j
@@ -33,6 +37,15 @@ public class UploadServiceImpl implements UploadService {
     UploadServiceImpl(final ResumableStorage storage, final DirectoryProperties properties) {
         this.storage = storage;
         this.properties = properties;
+    }
+
+    @Override
+    public void checkDuplicatedUpload(String subDirKey, String preDir, String fileName) {
+        Path path = HttpUtils.getPath(properties, subDirKey, preDir);
+        File file = new File(path.toString());
+        if (file.exists()) {
+            throw new UploadAlreadyExistsException("Upload file already exist in directory.");
+        }
     }
 
     @Override
