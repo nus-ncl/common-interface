@@ -86,12 +86,9 @@ public class RegistrationServiceImpl implements RegistrationService {
     @Override
     @Transactional
     // FIXME: the return type should be a proper Registration
-    // for existing users to apply create a new team
+    // for existing users to create a new team
     public Registration registerRequestToApplyTeam(String nclUserId, Team team) {
-        if (team.getName() == null || team.getName().isEmpty()) {
-            log.warn("Team name is empty or null");
-            throw new TeamNameNullOrEmptyException();
-        }
+
         if (nclUserId == null || nclUserId.isEmpty()) {
             log.warn("User id is empty or null");
             throw new UserIdNullOrEmptyException();
@@ -101,6 +98,10 @@ public class RegistrationServiceImpl implements RegistrationService {
             throw new UserNotFoundException(nclUserId);
         }
 
+        if (team.getName() == null || team.getName().isEmpty()) {
+            log.warn("Team name is empty or null");
+            throw new TeamNameNullOrEmptyException();
+        }
         // will throw exception if name already exists
         checkTeamNameDuplicate(team.getName());
 
@@ -135,13 +136,20 @@ public class RegistrationServiceImpl implements RegistrationService {
     @Transactional
     // for existing users to apply join an existing team
     public Registration registerRequestToJoinTeam(String nclUserId, Team team) {
-        if (team.getName() == null || team.getName().isEmpty()) {
-            log.warn("Team name is not found");
-            throw new TeamNameNullOrEmptyException();
-        }
+
         if (nclUserId == null || nclUserId.isEmpty()) {
             log.warn("Uid is empty or null");
             throw new UserIdNullOrEmptyException();
+        }
+
+        if (userService.getUser(nclUserId) == null) {
+            log.warn("User not found: {}", nclUserId);
+            throw new UserNotFoundException(nclUserId);
+        }
+
+        if (team.getName() == null || team.getName().isEmpty()) {
+            log.warn("Team name is null or empty");
+            throw new TeamNameNullOrEmptyException();
         }
 
         Team teamEntity = teamService.getTeamByName(team.getName());
