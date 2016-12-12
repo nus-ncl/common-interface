@@ -141,6 +141,7 @@ public class DataServiceImpl implements DataService {
         DataEntity dataEntity = (DataEntity) getDataset(id);
         checkPermissions(dataEntity, claims);
 
+        uploadService.deleteDirectory(DATA_DIR_KEY, id.toString());
         dataRepository.delete(id);
         log.info("Data deleted: {}", dataEntity.getName());
 

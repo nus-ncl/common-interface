@@ -9,6 +9,8 @@ import java.io.IOException;
  */
 public interface UploadService {
 
+    void deleteDirectory(String subDirKey, String preDir);
+
     boolean deleteUpload(String subDirKey, String preDir, String fileName) throws IOException;
 
     UploadStatus checkChunk(String resumableIdentifier, int resumableChunkNumber);
