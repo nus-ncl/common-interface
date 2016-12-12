@@ -17,6 +17,7 @@ import javax.inject.Inject;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
+import java.io.UnsupportedEncodingException;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -92,7 +93,7 @@ public class DataController {
     // Delete a data set
     @DeleteMapping(path = "/{id}")
     @ResponseStatus(HttpStatus.OK)
-    public boolean remove(@AuthenticationPrincipal Object claims, @PathVariable Long id) {
+    public boolean remove(@AuthenticationPrincipal Object claims, @PathVariable Long id) throws UnsupportedEncodingException {
         if (claims == null || !(claims instanceof Claims)) {
             throw new UnauthorizedException();
         }
@@ -158,7 +159,7 @@ public class DataController {
     @ResponseStatus(HttpStatus.OK)
     public String checkUpload(@PathVariable String resumableIdentifier,
                               @PathVariable String resumableChunkNumber,
-                              @PathVariable String id) {
+                              @PathVariable Long id) {
         return dataService.checkChunk(resumableIdentifier, resumableChunkNumber);
     }
 
@@ -167,7 +168,7 @@ public class DataController {
     public String fileUpload(@AuthenticationPrincipal Object claims,
                              @RequestBody @Valid ResumableInfo resumableInfo,
                              @PathVariable String resumableChunkNumber,
-                             @PathVariable String id) {
+                             @PathVariable Long id) throws UnsupportedEncodingException {
         if (claims == null || !(claims instanceof Claims)) {
             throw new UnauthorizedException();
         }
