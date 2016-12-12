@@ -3,25 +3,29 @@ package sg.ncl.service.user.data.jpa;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
+import org.junit.runner.RunWith;
+import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
+import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.TestPropertySource;
-import sg.ncl.service.user.AbstractTest;
-import sg.ncl.service.user.Util;
+import org.springframework.test.context.junit4.SpringRunner;
+import sg.ncl.service.user.util.TestUtil;
 
 import javax.inject.Inject;
 
-import static org.hamcrest.Matchers.equalTo;
-import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.not;
-import static org.hamcrest.Matchers.nullValue;
-import static org.junit.Assert.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 import static sg.ncl.common.test.Checks.checkException;
 
 /**
  * @author Christopher Zhong
  */
+@RunWith(SpringRunner.class)
+@DataJpaTest
+@EnableJpaAuditing
+@ContextConfiguration(classes = AddressRepository.class)
 @TestPropertySource(properties = "flyway.enabled=false")
-public class AddressRepositoryTest extends AbstractTest {
+public class AddressRepositoryTest {
 
     @Rule
     public final ExpectedException exception = ExpectedException.none();
@@ -30,22 +34,36 @@ public class AddressRepositoryTest extends AbstractTest {
 
     @Test
     public void testRepositoryExists() throws Exception {
-        assertThat(repository, is(not(nullValue(AddressRepository.class))));
+        assertThat(repository).isNotNull();
     }
 
     @Test
     public void testGood() throws Exception {
-        final AddressEntity entity = Util.getAddressEntity();
+        final AddressEntity entity = TestUtil.getAddressEntity();
 
         final long count = repository.count();
-        final AddressEntity persistedEntity = repository.save(entity);
-        assertThat(persistedEntity.getId(), is(not(nullValue(Long.class))));
-        assertThat(repository.count(), is(equalTo(count + 1)));
+        final AddressEntity saved = repository.save(entity);
+
+        assertThat(repository.count()).isEqualTo(count + 1);
+        assertThat(saved.getCreatedDate()).isNotNull();
+        assertThat(saved.getLastModifiedDate()).isNotNull();
+    }
+
+    @Test
+    public void testSaveWithNullId() throws Exception {
+        final AddressEntity entity = TestUtil.getAddressEntity();
+        entity.setId(null);
+        final long count = repository.count();
+
+        final AddressEntity saved = repository.save(entity);
+
+        assertThat(repository.count()).isEqualTo(count + 1);
+        assertThat(saved.getId()).isNotNull();
     }
 
     @Test
     public void testNullAddress1() throws Exception {
-        final AddressEntity entity = Util.getAddressEntity();
+        final AddressEntity entity = TestUtil.getAddressEntity();
         entity.setAddress1(null);
         try {
             repository.save(entity);
@@ -58,7 +76,7 @@ public class AddressRepositoryTest extends AbstractTest {
 
     @Test
     public void testNullCountry() throws Exception {
-        final AddressEntity entity = Util.getAddressEntity();
+        final AddressEntity entity = TestUtil.getAddressEntity();
         entity.setCountry(null);
         try {
             repository.save(entity);
@@ -71,7 +89,7 @@ public class AddressRepositoryTest extends AbstractTest {
 
     @Test
     public void testNullCity() throws Exception {
-        final AddressEntity entity = Util.getAddressEntity();
+        final AddressEntity entity = TestUtil.getAddressEntity();
         entity.setCity(null);
         try {
             repository.save(entity);
@@ -84,7 +102,7 @@ public class AddressRepositoryTest extends AbstractTest {
 
     @Test
     public void testNullZipCode() throws Exception {
-        final AddressEntity entity = Util.getAddressEntity();
+        final AddressEntity entity = TestUtil.getAddressEntity();
         entity.setZipCode(null);
         try {
             repository.save(entity);

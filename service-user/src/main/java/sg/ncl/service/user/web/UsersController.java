@@ -6,12 +6,7 @@ import org.apache.tomcat.util.codec.binary.Base64;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.ResponseStatus;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import sg.ncl.common.exception.base.UnauthorizedException;
 import sg.ncl.service.user.domain.User;
 import sg.ncl.service.user.domain.UserService;
@@ -19,6 +14,7 @@ import sg.ncl.service.user.domain.UserStatus;
 import sg.ncl.service.user.exceptions.UserNotFoundException;
 
 import javax.inject.Inject;
+import javax.validation.constraints.NotNull;
 import java.util.List;
 
 import static sg.ncl.service.user.validations.Validator.isAdmin;
@@ -26,23 +22,26 @@ import static sg.ncl.service.user.validations.Validator.isAdmin;
  * @author Christopher Zhong
  */
 @RestController
+@RequestMapping(path = UsersController.PATH, produces = MediaType.APPLICATION_JSON_VALUE)
 @Slf4j
 public class UsersController {
+
+    static final String PATH = "/users";
 
     private final UserService userService;
 
     @Inject
-    UsersController(final UserService userService) {
+    UsersController(@NotNull final UserService userService) {
         this.userService = userService;
     }
 
-    @GetMapping(path = "/users", produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping
     @ResponseStatus(HttpStatus.OK)
     public List<User> getAllUsers() {
         return userService.getAll();
     }
 
-    @GetMapping(path = "/users/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(path = "/{id}")
     @ResponseStatus(HttpStatus.OK)
     public User getUser(@PathVariable String id) {
         User one = userService.getUser(id);
@@ -54,14 +53,14 @@ public class UsersController {
     }
 
     // for an user to update his own personal details
-    @PutMapping(path = "/users/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
+    @PutMapping(path = "/{id}", consumes = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
     public User updateUser(@PathVariable String id, @RequestBody UserInfo user) {
         return new UserInfo(userService.updateUser(id, user));
     }
 
     // for admin to update user status
-    @PutMapping(path = "/users/{id}/status/{status}", produces = MediaType.APPLICATION_JSON_VALUE)
+    @PutMapping(path = "/{id}/status/{status}")
     @ResponseStatus(HttpStatus.OK)
     public User updateUserStatus(
             @AuthenticationPrincipal final Object claims,
@@ -77,7 +76,7 @@ public class UsersController {
         return new UserInfo(userService.updateUserStatus(id, UserStatus.valueOf(status)));
     }
 
-    @PutMapping(path = "/users/{id}/emails/{emailBase64}")
+    @PutMapping(path = "/{id}/emails/{emailBase64}", consumes = MediaType.APPLICATION_JSON_VALUE)
     public UserStatus verifyEmail(@PathVariable String id, @PathVariable String emailBase64, @RequestBody VerificationKeyInfo keyInfo) {
         final String email = new String(Base64.decodeBase64(emailBase64));
         return userService.verifyEmail(id, email, keyInfo.getKey());

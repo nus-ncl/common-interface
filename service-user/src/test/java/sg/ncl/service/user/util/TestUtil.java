@@ -1,4 +1,4 @@
-package sg.ncl.service.user;
+package sg.ncl.service.user.util;
 
 import org.apache.commons.lang3.RandomStringUtils;
 import sg.ncl.service.user.data.jpa.AddressEntity;
@@ -10,7 +10,7 @@ import java.time.ZonedDateTime;
 /**
  * Created by Te Ye on 20-Jun-16.
  */
-public class Util {
+public class TestUtil {
 
     public static UserEntity getUserEntity() throws Exception {
         final UserEntity userEntity = new UserEntity();
@@ -46,7 +46,7 @@ public class Util {
         entity.setFirstName(RandomStringUtils.randomAlphanumeric(20));
         entity.setLastName(RandomStringUtils.randomAlphanumeric(20));
         entity.setJobTitle(RandomStringUtils.randomAlphanumeric(20));
-        entity.setAddress(Util.getAddressEntity());
+        entity.setAddress(TestUtil.getAddressEntity());
         entity.setEmail(RandomStringUtils.randomAlphanumeric(20));
         entity.setPhone(RandomStringUtils.randomAlphanumeric(20));
         entity.setInstitution(RandomStringUtils.randomAlphabetic(20));

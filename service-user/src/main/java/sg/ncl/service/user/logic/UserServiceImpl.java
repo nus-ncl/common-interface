@@ -101,11 +101,6 @@ public class UserServiceImpl implements UserService {
             throw new UserNotFoundException(id);
         }
 
-        if (user.getUserDetails() == null) {
-            // return since no user details to update
-            return one;
-        }
-
         if (user.getUserDetails().getFirstName() != null) {
             one.getUserDetails().setFirstName(user.getUserDetails().getFirstName());
         }

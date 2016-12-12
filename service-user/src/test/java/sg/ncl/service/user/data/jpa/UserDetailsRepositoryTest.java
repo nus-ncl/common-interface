@@ -3,25 +3,29 @@ package sg.ncl.service.user.data.jpa;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
+import org.junit.runner.RunWith;
+import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
+import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.TestPropertySource;
-import sg.ncl.service.user.AbstractTest;
-import sg.ncl.service.user.Util;
+import org.springframework.test.context.junit4.SpringRunner;
+import sg.ncl.service.user.util.TestUtil;
 
 import javax.inject.Inject;
 
-import static org.hamcrest.Matchers.equalTo;
-import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.not;
-import static org.hamcrest.Matchers.nullValue;
-import static org.junit.Assert.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 import static sg.ncl.common.test.Checks.checkException;
 
 /**
  * @author Christopher Zhong
  */
+@RunWith(SpringRunner.class)
+@DataJpaTest
+@EnableJpaAuditing
+@ContextConfiguration(classes = UserDetailsRepository.class)
 @TestPropertySource(properties = "flyway.enabled=false")
-public class UserDetailsRepositoryTest extends AbstractTest {
+public class UserDetailsRepositoryTest {
 
     @Rule
     public final ExpectedException exception = ExpectedException.none();
@@ -30,22 +34,36 @@ public class UserDetailsRepositoryTest extends AbstractTest {
 
     @Test
     public void testRepositoryExists() throws Exception {
-        assertThat(repository, is(not(nullValue(UserDetailsRepository.class))));
+        assertThat(repository).isNotNull();
     }
 
     @Test
     public void testGood() throws Exception {
-        final UserDetailsEntity entity = Util.getUserDetailsEntity();
+        final UserDetailsEntity entity = TestUtil.getUserDetailsEntity();
 
         final long count = repository.count();
-        final UserDetailsEntity persistedEntity = repository.save(entity);
-        assertThat(persistedEntity.getId(), is(not(nullValue(Long.class))));
-        assertThat(repository.count(), is(equalTo(count + 1)));
+        final UserDetailsEntity saved = repository.save(entity);
+
+        assertThat(repository.count()).isEqualTo(count + 1);
+        assertThat(saved.getCreatedDate()).isNotNull();
+        assertThat(saved.getLastModifiedDate()).isNotNull();
+    }
+
+    @Test
+    public void testSaveWithNullId() throws Exception {
+        final UserDetailsEntity entity = TestUtil.getUserDetailsEntity();
+        entity.setId(null);
+        final long count = repository.count();
+
+        final UserDetailsEntity saved = repository.save(entity);
+
+        assertThat(repository.count()).isEqualTo(count + 1);
+        assertThat(saved.getId()).isNotNull();
     }
 
     @Test
     public void testNullFirstName() throws Exception {
-        final UserDetailsEntity entity = Util.getUserDetailsEntity();
+        final UserDetailsEntity entity = TestUtil.getUserDetailsEntity();
         entity.setFirstName(null);
         try {
             repository.save(entity);
@@ -58,7 +76,7 @@ public class UserDetailsRepositoryTest extends AbstractTest {
 
     @Test
     public void testNullLastName() throws Exception {
-        final UserDetailsEntity entity = Util.getUserDetailsEntity();
+        final UserDetailsEntity entity = TestUtil.getUserDetailsEntity();
         entity.setLastName(null);
         try {
             repository.save(entity);
@@ -71,7 +89,7 @@ public class UserDetailsRepositoryTest extends AbstractTest {
 
     @Test
     public void testNullJobTitle() throws Exception {
-        final UserDetailsEntity entity = Util.getUserDetailsEntity();
+        final UserDetailsEntity entity = TestUtil.getUserDetailsEntity();
         entity.setJobTitle(null);
         try {
             repository.save(entity);
@@ -84,7 +102,7 @@ public class UserDetailsRepositoryTest extends AbstractTest {
 
     @Test
     public void testNullAddress() throws Exception {
-        final UserDetailsEntity entity = Util.getUserDetailsEntity();
+        final UserDetailsEntity entity = TestUtil.getUserDetailsEntity();
         entity.setAddress(null);
         try {
             repository.save(entity);
@@ -97,7 +115,7 @@ public class UserDetailsRepositoryTest extends AbstractTest {
 
     @Test
     public void testNullEmail() throws Exception {
-        final UserDetailsEntity entity = Util.getUserDetailsEntity();
+        final UserDetailsEntity entity = TestUtil.getUserDetailsEntity();
         entity.setEmail(null);
         try {
             repository.save(entity);
@@ -110,7 +128,7 @@ public class UserDetailsRepositoryTest extends AbstractTest {
 
     @Test
     public void testNullPhone() throws Exception {
-        final UserDetailsEntity entity = Util.getUserDetailsEntity();
+        final UserDetailsEntity entity = TestUtil.getUserDetailsEntity();
         entity.setPhone(null);
         try {
             repository.save(entity);
@@ -123,7 +141,7 @@ public class UserDetailsRepositoryTest extends AbstractTest {
 
     @Test
     public void testNullInstitution() throws Exception {
-        final UserDetailsEntity entity = Util.getUserDetailsEntity();
+        final UserDetailsEntity entity = TestUtil.getUserDetailsEntity();
         entity.setInstitution(null);
         try {
             repository.save(entity);
@@ -136,7 +154,7 @@ public class UserDetailsRepositoryTest extends AbstractTest {
 
     @Test
     public void testNullInstitutionAbbreviation() throws Exception {
-        final UserDetailsEntity entity = Util.getUserDetailsEntity();
+        final UserDetailsEntity entity = TestUtil.getUserDetailsEntity();
         entity.setInstitutionAbbreviation(null);
         try {
             repository.save(entity);
@@ -149,7 +167,7 @@ public class UserDetailsRepositoryTest extends AbstractTest {
 
     @Test
     public void testNullInstitutionWeb() throws Exception {
-        final UserDetailsEntity entity = Util.getUserDetailsEntity();
+        final UserDetailsEntity entity = TestUtil.getUserDetailsEntity();
         entity.setInstitutionWeb(null);
         try {
             repository.save(entity);

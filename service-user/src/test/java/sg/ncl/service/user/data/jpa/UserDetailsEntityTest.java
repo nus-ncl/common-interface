@@ -2,7 +2,7 @@ package sg.ncl.service.user.data.jpa;
 
 import org.apache.commons.lang3.RandomStringUtils;
 import org.junit.Test;
-import sg.ncl.service.user.Util;
+import sg.ncl.service.user.util.TestUtil;
 import sg.ncl.service.user.domain.UserDetails;
 
 import java.time.ZonedDateTime;
@@ -24,7 +24,7 @@ public class UserDetailsEntityTest {
         final String randomTestFirstName = RandomStringUtils.randomAlphanumeric(20);
         final String randomTestLastName = RandomStringUtils.randomAlphanumeric(20);
         final String randomTestJobTitle = RandomStringUtils.randomAlphanumeric(20);
-        final AddressEntity randomTestAddress = Util.getAddressEntity();
+        final AddressEntity randomTestAddress = TestUtil.getAddressEntity();
         final String randomTestEmail = RandomStringUtils.randomAlphanumeric(20);
         final String randomTestPhone = RandomStringUtils.randomAlphanumeric(20);
         final String randomTestInstitution = RandomStringUtils.randomAlphanumeric(20);
@@ -271,7 +271,7 @@ public class UserDetailsEntityTest {
 
     @Test
     public void testEqualsInputEqualsInstanceWithRealValues(){
-        final UserDetailsEntity userDetailsEntity = Util.getUserDetailsEntity();
+        final UserDetailsEntity userDetailsEntity = TestUtil.getUserDetailsEntity();
         final UserDetailsEntity testObject = userDetailsEntity;
 
         boolean actual=userDetailsEntity.equals(testObject);
@@ -302,7 +302,7 @@ public class UserDetailsEntityTest {
     @Test
     public void testEqualsGetEmailIsNullForObJectAndInstance(){
         final UserDetailsEntity userDetailsEntity = new UserDetailsEntity();
-        final UserDetailsEntity testObject = Util.getUserDetailsEntity();
+        final UserDetailsEntity testObject = TestUtil.getUserDetailsEntity();
         testObject.setEmail(null);
 
         boolean actual=userDetailsEntity.equals(testObject);
@@ -314,7 +314,7 @@ public class UserDetailsEntityTest {
     @Test
     public void testEqualsGetEmailIsNullForInstanceAndNotNullForObJect(){
         final UserDetailsEntity userDetailsEntity = new UserDetailsEntity();
-        final UserDetailsEntity testObject = Util.getUserDetailsEntity();
+        final UserDetailsEntity testObject = TestUtil.getUserDetailsEntity();
 
         boolean actual=userDetailsEntity.equals(testObject);
 
@@ -326,7 +326,7 @@ public class UserDetailsEntityTest {
     public void testEqualsInstanceAndObjectGetEmailEqual(){
         final UserDetailsEntity userDetailsEntity = new UserDetailsEntity();
         userDetailsEntity.setEmail("testString");
-        final UserDetailsEntity testObject = Util.getUserDetailsEntity();
+        final UserDetailsEntity testObject = TestUtil.getUserDetailsEntity();
         testObject.setEmail("testString");
 
         boolean actual=userDetailsEntity.equals(testObject);
@@ -339,7 +339,7 @@ public class UserDetailsEntityTest {
     public void testEqualsInstanceAndObjectGetEmailNotEqual(){
         final UserDetailsEntity userDetailsEntity = new UserDetailsEntity();
         userDetailsEntity.setEmail("testString1");
-        final UserDetailsEntity testObject = Util.getUserDetailsEntity();
+        final UserDetailsEntity testObject = TestUtil.getUserDetailsEntity();
         testObject.setEmail("testString2");
 
         boolean actual=userDetailsEntity.equals(testObject);

@@ -2,15 +2,12 @@ package sg.ncl.service.user.data.jpa;
 
 import org.apache.commons.lang3.RandomStringUtils;
 import org.junit.Test;
-import sg.ncl.service.user.Util;
+import sg.ncl.service.user.util.TestUtil;
 
 import java.util.Random;
 
-import static org.hamcrest.Matchers.containsString;
-import static org.hamcrest.Matchers.equalTo;
-import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.nullValue;
-import static org.junit.Assert.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
+
 
 /**
  * @author Christopher Zhong
@@ -21,7 +18,7 @@ public class AddressEntityTest {
     public void testGetId() throws Exception {
         final AddressEntity addressEntity = new AddressEntity();
 
-        assertThat(addressEntity.getId(), is(nullValue()));
+        assertThat(addressEntity.getId()).isNull();
     }
 
     @Test
@@ -30,14 +27,14 @@ public class AddressEntityTest {
         final Long id = new Random().nextLong();
         addressEntity.setId(id);
 
-        assertThat(addressEntity.getId(), is(equalTo(id)));
+        assertThat(addressEntity.getId()).isEqualTo(id);
     }
 
     @Test
     public void testGetAddress1() throws Exception {
         final AddressEntity addressEntity = new AddressEntity();
 
-        assertThat(addressEntity.getAddress1(), is(nullValue()));
+        assertThat(addressEntity.getAddress1()).isNull();
     }
 
     @Test
@@ -46,14 +43,14 @@ public class AddressEntityTest {
         final String address1 = RandomStringUtils.randomAlphanumeric(20);
         addressEntity.setAddress1(address1);
 
-        assertThat(addressEntity.getAddress1(), is(equalTo(address1)));
+        assertThat(addressEntity.getAddress1()).isEqualTo(address1);
     }
 
     @Test
     public void testGetAddress2() throws Exception {
         final AddressEntity addressEntity = new AddressEntity();
 
-        assertThat(addressEntity.getAddress2(), is(nullValue()));
+        assertThat(addressEntity.getAddress2()).isNull();
     }
 
     @Test
@@ -62,14 +59,14 @@ public class AddressEntityTest {
         final String address2 = RandomStringUtils.randomAlphanumeric(20);
         addressEntity.setAddress2(address2);
 
-        assertThat(addressEntity.getAddress2(), is(equalTo(address2)));
+        assertThat(addressEntity.getAddress2()).isEqualTo(address2);
     }
 
     @Test
     public void testGetCountry() throws Exception {
         final AddressEntity addressEntity = new AddressEntity();
 
-        assertThat(addressEntity.getCountry(), is(nullValue()));
+        assertThat(addressEntity.getCountry()).isNull();
     }
 
     @Test
@@ -78,14 +75,14 @@ public class AddressEntityTest {
         final String country = RandomStringUtils.randomAlphanumeric(20);
         addressEntity.setCountry(country);
 
-        assertThat(addressEntity.getCountry(), is(equalTo(country)));
+        assertThat(addressEntity.getCountry()).isEqualTo(country);
     }
 
     @Test
     public void testGetRegion() throws Exception {
         final AddressEntity addressEntity = new AddressEntity();
 
-        assertThat(addressEntity.getRegion(), is(nullValue()));
+        assertThat(addressEntity.getRegion()).isNull();
     }
 
     @Test
@@ -94,14 +91,14 @@ public class AddressEntityTest {
         final String region = RandomStringUtils.randomAlphanumeric(20);
         addressEntity.setRegion(region);
 
-        assertThat(addressEntity.getRegion(), is(equalTo(region)));
+        assertThat(addressEntity.getRegion()).isEqualTo(region);
     }
 
     @Test
     public void testGetCity() throws Exception {
         final AddressEntity addressEntity = new AddressEntity();
 
-        assertThat(addressEntity.getCity(), is(nullValue()));
+        assertThat(addressEntity.getCity()).isNull();
     }
 
     @Test
@@ -110,14 +107,14 @@ public class AddressEntityTest {
         final String city = RandomStringUtils.randomAlphanumeric(20);
         addressEntity.setCity(city);
 
-        assertThat(addressEntity.getCity(), is(equalTo(city)));
+        assertThat(addressEntity.getCity()).isEqualTo(city);
     }
 
     @Test
     public void testGetZipCode() throws Exception {
         final AddressEntity addressEntity = new AddressEntity();
 
-        assertThat(addressEntity.getZipCode(), is(nullValue()));
+        assertThat(addressEntity.getZipCode()).isNull();
     }
 
     @Test
@@ -126,20 +123,20 @@ public class AddressEntityTest {
         final String zipCode = RandomStringUtils.randomAlphanumeric(20);
         addressEntity.setZipCode(zipCode);
 
-        assertThat(addressEntity.getZipCode(), is(equalTo(zipCode)));
+        assertThat(addressEntity.getZipCode()).isEqualTo(zipCode);
     }
 
     @Test
     public void testStaticGetAddress() {
-        final AddressEntity addressEntity = Util.getAddressEntity();
+        final AddressEntity addressEntity = TestUtil.getAddressEntity();
         AddressEntity returnAddressEntity = AddressEntity.get(addressEntity);
 
-        assertThat(returnAddressEntity.getAddress1(), is(equalTo(addressEntity.getAddress1())));
-        assertThat(returnAddressEntity.getAddress2(), is(equalTo(addressEntity.getAddress2())));
-        assertThat(returnAddressEntity.getCountry(), is(equalTo(addressEntity.getCountry())));
-        assertThat(returnAddressEntity.getRegion(), is(equalTo(addressEntity.getRegion())));
-        assertThat(returnAddressEntity.getCity(), is(equalTo(addressEntity.getCity())));
-        assertThat(returnAddressEntity.getZipCode(), is(equalTo(addressEntity.getZipCode())));
+        assertThat(returnAddressEntity.getAddress1()).isEqualTo(addressEntity.getAddress1());
+        assertThat(returnAddressEntity.getAddress2()).isEqualTo(addressEntity.getAddress2());
+        assertThat(returnAddressEntity.getCountry()).isEqualTo(addressEntity.getCountry());
+        assertThat(returnAddressEntity.getRegion()).isEqualTo(addressEntity.getRegion());
+        assertThat(returnAddressEntity.getCity()).isEqualTo(addressEntity.getCity());
+        assertThat(returnAddressEntity.getZipCode()).isEqualTo(addressEntity.getZipCode());
     }
 
     @Test
@@ -162,13 +159,13 @@ public class AddressEntityTest {
 
         final String toString = addressEntity.toString();
 
-        assertThat(toString, containsString(id.toString()));
-        assertThat(toString, containsString(address1));
-        assertThat(toString, containsString(address2));
-        assertThat(toString, containsString(country));
-        assertThat(toString, containsString(region));
-        assertThat(toString, containsString(city));
-        assertThat(toString, containsString(zipCode));
+        assertThat(toString).contains(id.toString());
+        assertThat(toString).contains(address1);
+        assertThat(toString).contains(address2);
+        assertThat(toString).contains(country);
+        assertThat(toString).contains(region);
+        assertThat(toString).contains(city);
+        assertThat(toString).contains(zipCode);
     }
 
 }

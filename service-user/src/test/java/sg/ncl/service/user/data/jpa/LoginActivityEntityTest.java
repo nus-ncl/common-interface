@@ -6,11 +6,7 @@ import org.junit.Test;
 import java.time.ZonedDateTime;
 import java.util.Random;
 
-import static org.hamcrest.Matchers.containsString;
-import static org.hamcrest.Matchers.equalTo;
-import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.nullValue;
-import static org.junit.Assert.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * @author Christopher Zhong
@@ -21,7 +17,7 @@ public class LoginActivityEntityTest {
     public void testGetId() throws Exception {
         final LoginActivityEntity loginActivityEntity = new LoginActivityEntity();
 
-        assertThat(loginActivityEntity.getId(), is(nullValue()));
+        assertThat(loginActivityEntity.getId()).isNull();
     }
 
     @Test
@@ -30,14 +26,14 @@ public class LoginActivityEntityTest {
         final Long id = new Random().nextLong();
         loginActivityEntity.setId(id);
 
-        assertThat(loginActivityEntity.getId(), is(equalTo(id)));
+        assertThat(loginActivityEntity.getId()).isEqualTo(id);
     }
 
     @Test
     public void testGetIpAddress() throws Exception {
         final LoginActivityEntity loginActivityEntity = new LoginActivityEntity();
 
-        assertThat(loginActivityEntity.getIpAddress(), is(nullValue()));
+        assertThat(loginActivityEntity.getIpAddress()).isNull();
     }
 
     @Test
@@ -46,14 +42,14 @@ public class LoginActivityEntityTest {
         final String ipAddress = RandomStringUtils.randomAlphanumeric(20);
         loginActivityEntity.setIpAddress(ipAddress);
 
-        assertThat(loginActivityEntity.getIpAddress(), is(equalTo(ipAddress)));
+        assertThat(loginActivityEntity.getIpAddress()).isEqualTo(ipAddress);
     }
 
     @Test
     public void testGetDate() throws Exception {
         final LoginActivityEntity loginActivityEntity = new LoginActivityEntity();
 
-        assertThat(loginActivityEntity.getDate(), is(nullValue()));
+        assertThat(loginActivityEntity.getDate()).isNull();
     }
 
     @Test
@@ -62,7 +58,7 @@ public class LoginActivityEntityTest {
         final ZonedDateTime now = ZonedDateTime.now();
         loginActivityEntity.setDate(now);
 
-        assertThat(loginActivityEntity.getDate(), is(equalTo(now)));
+        assertThat(loginActivityEntity.getDate()).isEqualTo(now);
     }
 
     @Test
@@ -77,9 +73,9 @@ public class LoginActivityEntityTest {
 
         final String toString = loginActivityEntity.toString();
 
-        assertThat(toString, containsString(id.toString()));
-        assertThat(toString, containsString(ipAddress));
-        assertThat(toString, containsString(now.toString()));
+        assertThat(toString).contains(id.toString());
+        assertThat(toString).contains(ipAddress);
+        assertThat(toString).contains(now.toString());
     }
 
 }
