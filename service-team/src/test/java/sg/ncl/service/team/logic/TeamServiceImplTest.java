@@ -1,5 +1,6 @@
 package sg.ncl.service.team.logic;
 
+import org.apache.commons.lang3.RandomStringUtils;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -331,8 +332,9 @@ public class TeamServiceImplTest {
         teamService.updateTeamStatus("", TeamStatus.PENDING);
     }
 
+    // case RESTRICTED
     @Test
-    public void testUpdateTeamStatusRestricted() {
+    public void testUpdateTeamStatusCaseRestricted() {
         TeamEntity entity = Util.getTeamEntityWithId();
         entity.setStatus(TeamStatus.APPROVED);
 
@@ -344,6 +346,22 @@ public class TeamServiceImplTest {
         assertThat(team.getStatus()).isEqualTo(TeamStatus.RESTRICTED);
     }
 
+    // case RESTRICTED- else branch, throw InvalidStatusTransitionException
+    @Test
+    public void testUpdateTeamStatusCaseRestrictedElseBranch() {
+        String randomIdForTest = RandomStringUtils.randomAlphanumeric(20);
+        TeamEntity entity = Util.getTeamEntityWithId();
+        entity.setStatus(TeamStatus.CLOSED);
+
+        exception.expect(InvalidStatusTransitionException.class);
+
+        when(teamRepository.findOne(anyString())).thenReturn(entity);
+        when(teamRepository.save(any(TeamEntity.class))).thenReturn(entity);
+        teamService.updateTeamStatus(randomIdForTest, TeamStatus.RESTRICTED);
+
+        verify(teamRepository, times(1)).findOne(anyString());
+    }
+
     @Test
     public void testUpdateMemberStatusUnknownId() {
         when(teamRepository.findOne(anyString())).thenReturn(null);
@@ -351,6 +369,7 @@ public class TeamServiceImplTest {
         teamService.updateTeamStatus(teamEntity.getId(), TeamStatus.PENDING);
     }
 
+    // case APPROVED
     @Test
     public void testUpdateMemberStatusTrueTeamOwner() {
         TeamEntity entity = Util.getTeamEntityWithId();
@@ -366,6 +385,36 @@ public class TeamServiceImplTest {
         Team team = teamService.updateTeamStatus(teamEntity.getId(), TeamStatus.APPROVED);
 
         assertThat(team.getStatus()).isEqualTo(TeamStatus.APPROVED);
+    }
+
+    // case APPROVED- else branch, throw InvalidStatusTransitionException
+    @Test
+    public void testUpdateTeamStatusCaseApprovedElseBranch() {
+        String randomIdForTest = RandomStringUtils.randomAlphanumeric(20);
+        TeamEntity entity = Util.getTeamEntityWithId();
+        entity.setStatus(TeamStatus.CLOSED);
+
+        exception.expect(InvalidStatusTransitionException.class);
+
+        when(teamRepository.findOne(anyString())).thenReturn(entity);
+        when(teamRepository.save(any(TeamEntity.class))).thenReturn(entity);
+        teamService.updateTeamStatus(randomIdForTest, TeamStatus.APPROVED);
+
+        verify(teamRepository, times(1)).findOne(anyString());
+    }
+
+    // case CLOSED
+    @Test
+    public void testUpdateTeamStatusCaseClosed() {
+        TeamEntity entity = Util.getTeamEntityWithId();
+        entity.setStatus(TeamStatus.CLOSED);
+
+        when(teamRepository.findOne(anyString())).thenReturn(entity);
+        when(teamRepository.save(any(TeamEntity.class))).thenReturn(entity);
+
+        Team team = teamService.updateTeamStatus("id", TeamStatus.CLOSED);
+
+        assertThat(team.getStatus()).isEqualTo(TeamStatus.CLOSED);
     }
 
 }

@@ -219,9 +219,9 @@ public class TeamServiceImpl implements TeamService {
                 }
             case CLOSED:
                 return updateTeamStatusInternal(entity, status.CLOSED);
-                default:
-                    log.warn("Update team status failed for {}: unknown status {}", id, status);
-                    throw new InvalidTeamStatusException(status.toString());
+            default:
+                log.warn("Update team status failed for {}: unknown status {}", id, status);
+                throw new InvalidTeamStatusException(status.toString());
         }
     }
 

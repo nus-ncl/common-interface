@@ -205,7 +205,7 @@ public class TeamsControllerTest extends AbstractTest {
     @Test
     public void testUpdateTeamStatusRestricted() throws Exception {
         TeamEntity origTeamEntity = Util.getTeamEntity();
-        origTeamEntity.setStatus(TeamStatus.RESTRICTED);
+        origTeamEntity.setStatus(TeamStatus.APPROVED);
         TeamEntity savedTeamEntity = teamRepository.save(origTeamEntity);
         final String id = savedTeamEntity.getId();
 
