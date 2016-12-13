@@ -210,7 +210,15 @@ public class TeamServiceImpl implements TeamService {
         log.info("Updating team status: team {}, new status {}", id, teamStatus);
 
         entity.setStatus(teamStatus);
-        entity.setProcessedDate(ZonedDateTime.now());
+
+        if (teamStatus.equals(TeamStatus.APPROVED)) {
+            // after approving new team application
+            // set the processed date
+            entity.setProcessedDate(ZonedDateTime.now());
+        } else {
+            // set the last modified date for other changes
+            entity.setLastModifiedDate(ZonedDateTime.now());
+        }
 
         final Team updatedTeam = teamRepository.save(entity);
         log.info("Team status updated: team {}, status {}", updatedTeam.getId(), updatedTeam.getStatus());
