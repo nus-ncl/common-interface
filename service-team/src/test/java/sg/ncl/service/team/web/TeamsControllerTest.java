@@ -203,9 +203,9 @@ public class TeamsControllerTest extends AbstractTest {
     }
 
     @Test
-    public void testUpdateTeamStatusFrozen() throws Exception {
+    public void testUpdateTeamStatusRestricted() throws Exception {
         TeamEntity origTeamEntity = Util.getTeamEntity();
-        origTeamEntity.setStatus(TeamStatus.FROZEN);
+        origTeamEntity.setStatus(TeamStatus.RESTRICTED);
         TeamEntity savedTeamEntity = teamRepository.save(origTeamEntity);
         final String id = savedTeamEntity.getId();
 
@@ -220,12 +220,12 @@ public class TeamsControllerTest extends AbstractTest {
         Gson gson = gsonBuilder.create();
 
         // put
-        mockMvc.perform(put("/teams/" + id + "/status/" + TeamStatus.FROZEN).contentType(MediaType.APPLICATION_JSON).content(gson.toJson(new TeamInfo(savedTeamEntity))))
+        mockMvc.perform(put("/teams/" + id + "/status/" + TeamStatus.RESTRICTED).contentType(MediaType.APPLICATION_JSON).content(gson.toJson(new TeamInfo(savedTeamEntity))))
                 .andExpect(status().isOk())
                 .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
 
                 .andExpect(jsonPath("$.id", Matchers.is(equalTo(id))))
-                .andExpect(jsonPath("$.status", Matchers.is(equalTo(TeamStatus.FROZEN.toString()))));;
+                .andExpect(jsonPath("$.status", Matchers.is(equalTo(TeamStatus.RESTRICTED.toString()))));;
     }
 
     @Test

@@ -6,5 +6,5 @@ package sg.ncl.service.team.domain;
  * @author Christopher Zhong
  */
 public enum TeamStatus {
-    PENDING, APPROVED, FROZEN, REJECTED, CLOSED
+    PENDING, APPROVED, RESTRICTED, REJECTED, CLOSED
 }

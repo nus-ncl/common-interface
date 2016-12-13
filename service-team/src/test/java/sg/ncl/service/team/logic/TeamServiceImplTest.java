@@ -332,16 +332,16 @@ public class TeamServiceImplTest {
     }
 
     @Test
-    public void testUpdateTeamStatusFrozen() {
+    public void testUpdateTeamStatusRestricted() {
         TeamEntity entity = Util.getTeamEntityWithId();
-        entity.setStatus(TeamStatus.FROZEN);
+        entity.setStatus(TeamStatus.APPROVED);
 
         when(teamRepository.findOne(anyString())).thenReturn(entity);
         when(teamRepository.save(any(TeamEntity.class))).thenReturn(entity);
 
-        Team team = teamService.updateTeamStatus("id", TeamStatus.FROZEN);
+        Team team = teamService.updateTeamStatus("id", TeamStatus.RESTRICTED);
 
-        assertThat(team.getStatus()).isEqualTo(entity.getStatus());
+        assertThat(team.getStatus()).isEqualTo(TeamStatus.RESTRICTED);
     }
 
     @Test
@@ -358,14 +358,14 @@ public class TeamServiceImplTest {
         entity.addMember(member);
 
         TeamEntity updatedEntity = entity;
-        updatedEntity.setStatus(TeamStatus.APPROVED);
+        updatedEntity.setStatus(TeamStatus.PENDING);
 
         when(teamRepository.findOne(anyString())).thenReturn(entity);
         when(teamRepository.save(any(TeamEntity.class))).thenReturn(updatedEntity);
 
         Team team = teamService.updateTeamStatus(teamEntity.getId(), TeamStatus.APPROVED);
 
-        assertThat(team.getStatus()).isEqualTo(updatedEntity.getStatus());
+        assertThat(team.getStatus()).isEqualTo(TeamStatus.APPROVED);
     }
 
 }
