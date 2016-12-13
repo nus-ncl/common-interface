@@ -150,7 +150,7 @@ public class UserEntity extends AbstractEntity implements User {
 
     public void addTeam(final String team) {
         if (teams.contains(team)) {
-            throw new UserAlreadyInTeamException("User " + id + " already in team " + team);
+            throw new UserAlreadyInTeamException("User is already in team");
         }
         log.info("Adding team on the user side: {}", team);
         teams.add(team);

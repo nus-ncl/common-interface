@@ -134,13 +134,13 @@ public class RegistrationServiceImpl implements RegistrationService {
 
         if (userService.getUser(nclUserId) == null) {
             log.warn("User not found: {}", nclUserId);
-            throw new UserNotFoundException(nclUserId);
+            throw new UserNotFoundException("User " + nclUserId + " is not found");
         }
 
         Team teamEntity = teamService.getTeamByName(team.getName());
         if (teamEntity == null) {
             log.warn("Team not found: {}", team.getName());
-            throw new TeamNotFoundException(team.getName());
+            throw new TeamNotFoundException("Team " + team.getName() + " is not found");
         }
 
         String teamId = teamEntity.getId();
@@ -510,7 +510,7 @@ public class RegistrationServiceImpl implements RegistrationService {
         Team one = teamService.getTeamByName(teamName);
         if (one != null) {
             log.warn("Team name duplicate entry found: {}", teamName);
-            throw new TeamNameAlreadyExistsException(teamName);
+            throw new TeamNameAlreadyExistsException("Team "+teamName + " already exists");
         }
     }
 
