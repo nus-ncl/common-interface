@@ -332,6 +332,19 @@ public class TeamServiceImplTest {
     }
 
     @Test
+    public void testUpdateTeamStatusFrozen() {
+        TeamEntity entity = Util.getTeamEntityWithId();
+        entity.setStatus(TeamStatus.FROZEN);
+
+        when(teamRepository.findOne(anyString())).thenReturn(entity);
+        when(teamRepository.save(any(TeamEntity.class))).thenReturn(entity);
+
+        Team team = teamService.updateTeamStatus("id", TeamStatus.FROZEN);
+
+        assertThat(team.getStatus()).isEqualTo(entity.getStatus());
+    }
+
+    @Test
     public void testUpdateMemberStatusUnknownId() {
         when(teamRepository.findOne(anyString())).thenReturn(null);
         exception.expect(TeamNotFoundException.class);
