@@ -13,12 +13,7 @@ import sg.ncl.service.team.domain.TeamMember;
 import sg.ncl.service.team.domain.TeamService;
 import sg.ncl.service.team.domain.TeamStatus;
 import sg.ncl.service.team.domain.TeamVisibility;
-import sg.ncl.service.team.exceptions.InvalidTeamNameException;
-import sg.ncl.service.team.exceptions.TeamMemberAlreadyExistsException;
-import sg.ncl.service.team.exceptions.TeamMemberNotFoundException;
-import sg.ncl.service.team.exceptions.TeamNameAlreadyExistsException;
-import sg.ncl.service.team.exceptions.TeamNameNullOrEmptyException;
-import sg.ncl.service.team.exceptions.TeamNotFoundException;
+import sg.ncl.service.team.exceptions.*;
 
 import javax.inject.Inject;
 import javax.validation.constraints.NotNull;
@@ -200,18 +195,41 @@ public class TeamServiceImpl implements TeamService {
     }
 
     @Transactional
-    public Team updateTeamStatus(@NotNull final String id, @NotNull final TeamStatus teamStatus) {
+    public Team updateTeamStatus(@NotNull final String id, @NotNull final TeamStatus status) {
         TeamEntity entity = findTeam(id);
         if (entity == null) {
             log.warn("Update team status error: team {} not found", id);
             throw new TeamNotFoundException(id);
         }
 
-        log.info("Updating team status: team {}, new status {}", id, teamStatus);
+        log.info("Updating team status: team {}, new status {}", id, status);
 
-        entity.setStatus(teamStatus);
+        switch (status) {
+            case APPROVED:
+                if (entity.getStatus().equals(status.PENDING) || entity.getStatus().equals(status.RESTRICTED)) {
+                    return updateTeamStatusInternal(entity, status.APPROVED);
+                } else {
+                    throw new InvalidStatusTransitionException(entity.getStatus() + " -> " + status);
+                }
+            case RESTRICTED:
+                if (entity.getStatus().equals(TeamStatus.APPROVED)) {
+                    return updateTeamStatusInternal(entity, status.RESTRICTED);
+                } else {
+                    throw new InvalidStatusTransitionException(entity.getStatus() + " -> " + status);
+                }
+            case CLOSED:
+                return updateTeamStatusInternal(entity, status.CLOSED);
+                default:
+                    log.warn("Update team status failed for {}: unknown status {}", id, status);
+                    throw new InvalidTeamStatusException(status.toString());
+        }
+    }
 
-        if (teamStatus.equals(TeamStatus.APPROVED)) {
+    private Team updateTeamStatusInternal(TeamEntity entity, TeamStatus status) {
+        TeamStatus oldStatus = entity.getStatus();
+        entity.setStatus(status);
+
+        if (status.equals(TeamStatus.APPROVED)) {
             // after approving new team application
             // set the processed date
             entity.setProcessedDate(ZonedDateTime.now());
@@ -220,9 +238,9 @@ public class TeamServiceImpl implements TeamService {
             entity.setLastModifiedDate(ZonedDateTime.now());
         }
 
-        final Team updatedTeam = teamRepository.save(entity);
-        log.info("Team status updated: team {}, status {}", updatedTeam.getId(), updatedTeam.getStatus());
-        return updatedTeam;
+        TeamEntity savedTeam = teamRepository.save(entity);
+        log.info("Status updated for team {}: {} -> {}", entity.getId(), oldStatus, entity.getStatus());
+        return savedTeam;
     }
 
     private TeamEntity findTeam(final String id) {
