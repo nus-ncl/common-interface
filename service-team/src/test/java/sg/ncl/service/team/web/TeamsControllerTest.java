@@ -3,12 +3,15 @@ package sg.ncl.service.team.web;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
+import io.jsonwebtoken.Claims;
 import org.apache.commons.lang3.RandomStringUtils;
+import org.hamcrest.Matchers;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
+import org.mockito.Mock;
 import org.springframework.http.MediaType;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
@@ -18,6 +21,8 @@ import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.web.context.WebApplicationContext;
+import sg.ncl.common.authentication.Role;
+import sg.ncl.common.jwt.JwtToken;
 import sg.ncl.service.team.AbstractTest;
 import sg.ncl.service.team.Util;
 import sg.ncl.service.team.data.jpa.TeamEntity;
@@ -35,6 +40,7 @@ import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
+import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.core.Is.is;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -60,6 +66,7 @@ public class TeamsControllerTest extends AbstractTest {
     private TeamRepository teamRepository;
 
     private MockMvc mockMvc;
+    private Claims claims;
 
     @Inject
     private WebApplicationContext webApplicationContext;
@@ -70,8 +77,10 @@ public class TeamsControllerTest extends AbstractTest {
         // need this because controller checks for authentication for some endpoints
         Authentication authentication = mock(Authentication.class);
         SecurityContext securityContext = mock(SecurityContext.class);
+        claims = mock(Claims.class);
         when(securityContext.getAuthentication()).thenReturn(authentication);
         SecurityContextHolder.setContext(securityContext);
+        when(securityContext.getAuthentication().getPrincipal()).thenReturn(claims);
     }
 
     @Test
@@ -191,6 +200,32 @@ public class TeamsControllerTest extends AbstractTest {
         // put
         mockMvc.perform(put("/teams/" + idString).contentType(MediaType.APPLICATION_JSON).content(gson.toJson(new TeamInfo(teamEntity))))
                 .andExpect(status().isNotFound());
+    }
+
+    @Test
+    public void testUpdateTeamStatusFrozen() throws Exception {
+        TeamEntity origTeamEntity = Util.getTeamEntity();
+        origTeamEntity.setStatus(TeamStatus.FROZEN);
+        TeamEntity savedTeamEntity = teamRepository.save(origTeamEntity);
+        final String id = savedTeamEntity.getId();
+
+        final List<String> roles = new ArrayList<>();
+        roles.add(Role.ADMIN.getAuthority());
+        when(claims.get(JwtToken.KEY)).thenReturn(roles);
+
+        // create GSON
+        GsonBuilder gsonBuilder = new GsonBuilder();
+        gsonBuilder.registerTypeAdapter(ZonedDateTime.class, new DateTimeSerializer());
+        gsonBuilder.registerTypeAdapter(ZonedDateTime.class, new DateTimeDeserializer());
+        Gson gson = gsonBuilder.create();
+
+        // put
+        mockMvc.perform(put("/teams/" + id + "/status/" + TeamStatus.FROZEN).contentType(MediaType.APPLICATION_JSON).content(gson.toJson(new TeamInfo(savedTeamEntity))))
+                .andExpect(status().isOk())
+                .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
+
+                .andExpect(jsonPath("$.id", Matchers.is(equalTo(id))))
+                .andExpect(jsonPath("$.status", Matchers.is(equalTo(TeamStatus.FROZEN.toString()))));;
     }
 
     @Test
