@@ -89,22 +89,16 @@ public class RegistrationServiceImpl implements RegistrationService {
     // for existing users to create a new team
     public Registration registerRequestToApplyTeam(String nclUserId, Team team) {
 
-        if (nclUserId == null || nclUserId.isEmpty()) {
-            log.warn("User id is empty or null");
-            throw new UserIdNullOrEmptyException();
-        }
+        checkUserId(nclUserId); //check if user id is null or empty
+        checkTeamName(team.getName()); //check if team name is null or empty
+        checkTeamNameDuplicate(team.getName()); // check if team name already exists
+
         if (userService.getUser(nclUserId) == null) {
             log.warn("User not found: {}", nclUserId);
             throw new UserNotFoundException("User " + nclUserId + " not found");
         }
 
-        checkTeamName(team.getName());
-
-        // will throw exception if name already exists
-        checkTeamNameDuplicate(team.getName());
-
-        // no problem with the team
-        // create the team
+        // no problem with the team, create the team
         Team createdTeam = teamService.createTeam(team);
         addNclTeamIdMapping(createdTeam.getName(), createdTeam.getId());
 
@@ -136,13 +130,12 @@ public class RegistrationServiceImpl implements RegistrationService {
     public Registration registerRequestToJoinTeam(String nclUserId, Team team) {
 
         checkUserId(nclUserId);
+        checkTeamName(team.getName());
 
         if (userService.getUser(nclUserId) == null) {
             log.warn("User not found: {}", nclUserId);
             throw new UserNotFoundException(nclUserId);
         }
-
-        checkTeamName(team.getName());
 
         Team teamEntity = teamService.getTeamByName(team.getName());
         if (teamEntity == null) {
