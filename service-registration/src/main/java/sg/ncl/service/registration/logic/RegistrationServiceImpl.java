@@ -98,10 +98,8 @@ public class RegistrationServiceImpl implements RegistrationService {
             throw new UserNotFoundException(nclUserId);
         }
 
-        if (team.getName() == null || team.getName().isEmpty()) {
-            log.warn("Team name is empty or null");
-            throw new TeamNameNullOrEmptyException();
-        }
+        checkTeamName(team.getName());
+
         // will throw exception if name already exists
         checkTeamNameDuplicate(team.getName());
 
@@ -137,20 +135,14 @@ public class RegistrationServiceImpl implements RegistrationService {
     // for existing users to apply join an existing team
     public Registration registerRequestToJoinTeam(String nclUserId, Team team) {
 
-        if (nclUserId == null || nclUserId.isEmpty()) {
-            log.warn("Uid is empty or null");
-            throw new UserIdNullOrEmptyException();
-        }
+        checkUserId(nclUserId);
 
         if (userService.getUser(nclUserId) == null) {
             log.warn("User not found: {}", nclUserId);
             throw new UserNotFoundException(nclUserId);
         }
 
-        if (team.getName() == null || team.getName().isEmpty()) {
-            log.warn("Team name is null or empty");
-            throw new TeamNameNullOrEmptyException();
-        }
+        checkTeamName(team.getName());
 
         Team teamEntity = teamService.getTeamByName(team.getName());
         if (teamEntity == null) {
@@ -529,6 +521,8 @@ public class RegistrationServiceImpl implements RegistrationService {
         }
     }
 
+
+
     private void sendVerificationEmail(User user) {
         final Map<String, String> map = new HashMap<>();
         map.put("firstname", user.getUserDetails().getFirstName());
@@ -568,6 +562,13 @@ public class RegistrationServiceImpl implements RegistrationService {
         if(id == null || id.trim().isEmpty()) {
             log.warn("Team ID is null or empty: {}", id);
             throw new TeamIdNullOrEmptyException();
+        }
+    }
+
+    private static void checkTeamName (final String name) {
+        if(name == null || name.trim().isEmpty()) {
+            log.warn("Team name is null or empty: {}", name);
+            throw new TeamNameNullOrEmptyException();
         }
     }
 }
