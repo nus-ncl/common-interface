@@ -49,7 +49,7 @@ public class TeamServiceImpl implements TeamService {
 
         if(!isTeamNameValid(team.getName())) {
             log.warn("Create team error: invalid team name {}", team.getName());
-            throw new InvalidTeamNameException("Team name " + team.getName() + " invalid");
+            throw new InvalidTeamNameException("Team name " + team.getName() + " is invalid");
         }
 
         if (teamRepository.findByName(team.getName()) != null) {
@@ -145,7 +145,7 @@ public class TeamServiceImpl implements TeamService {
         final TeamMember newMember = entity.addMember(teamMember);
         if(newMember == null) {
             log.warn("Add team member error: member {} already exists", teamMember.getUserId());
-            throw new TeamMemberAlreadyExistsException("Member " + teamMember.getUserId() + " already exists");
+            throw new TeamMemberAlreadyExistsException("Member already exists");
         }
         final Team updatedTeam = teamRepository.save(entity);
         log.info("New member {} added to team {}", teamMember.getUserId(), updatedTeam.getId());

@@ -53,6 +53,10 @@ import java.util.Map;
 @Slf4j
 public class RegistrationServiceImpl implements RegistrationService {
 
+    private static final String USER = "User";
+    private static final String TEAM = "Team";
+    private static final String NOT_FOUND = "not found";
+
     private final CredentialsService credentialsService;
     private final TeamService teamService;
     private final UserService userService;
@@ -86,26 +90,19 @@ public class RegistrationServiceImpl implements RegistrationService {
     @Override
     @Transactional
     // FIXME: the return type should be a proper Registration
-    // for existing users to apply create a new team
+    // for existing users to create a new team
     public Registration registerRequestToApplyTeam(String nclUserId, Team team) {
-        if (team.getName() == null || team.getName().isEmpty()) {
-            log.warn("Team name is empty or null");
-            throw new TeamNameNullOrEmptyException();
-        }
-        if (nclUserId == null || nclUserId.isEmpty()) {
-            log.warn("User id is empty or null");
-            throw new UserIdNullOrEmptyException();
-        }
+
+        checkUserId(nclUserId); //check if user id is null or empty
+        checkTeamName(team.getName()); //check if team name is null or empty
+        checkTeamNameDuplicate(team.getName()); // check if team name already exists
+
         if (userService.getUser(nclUserId) == null) {
             log.warn("User not found: {}", nclUserId);
-            throw new UserNotFoundException(nclUserId);
+            throw new UserNotFoundException(USER + " " + nclUserId + " " + NOT_FOUND);
         }
 
-        // will throw exception if name already exists
-        checkTeamNameDuplicate(team.getName());
-
-        // no problem with the team
-        // create the team
+        // no problem with the team, create the team
         Team createdTeam = teamService.createTeam(team);
         addNclTeamIdMapping(createdTeam.getName(), createdTeam.getId());
 
@@ -135,19 +132,19 @@ public class RegistrationServiceImpl implements RegistrationService {
     @Transactional
     // for existing users to apply join an existing team
     public Registration registerRequestToJoinTeam(String nclUserId, Team team) {
-        if (team.getName() == null || team.getName().isEmpty()) {
-            log.warn("Team name is not found");
-            throw new TeamNameNullOrEmptyException();
-        }
-        if (nclUserId == null || nclUserId.isEmpty()) {
-            log.warn("Uid is empty or null");
-            throw new UserIdNullOrEmptyException();
+
+        checkUserId(nclUserId);
+        checkTeamName(team.getName());
+
+        if (userService.getUser(nclUserId) == null) {
+            log.warn("User not found: {}", nclUserId);
+            throw new UserNotFoundException(USER + " " + nclUserId + " " + NOT_FOUND);
         }
 
         Team teamEntity = teamService.getTeamByName(team.getName());
         if (teamEntity == null) {
             log.warn("Team not found: {}", team.getName());
-            throw new TeamNotFoundException(team.getName());
+            throw new TeamNotFoundException(TEAM + " " + team.getName() + " " + NOT_FOUND);
         }
 
         String teamId = teamEntity.getId();
@@ -343,7 +340,7 @@ public class RegistrationServiceImpl implements RegistrationService {
             }
         }
         log.warn("Cannot process join request from User {} to Team {}: User is NOT a member of the team.", userId, teamId);
-        throw new UserIsNotTeamMemberException("User " + userId + " is not a member of team " + teamId);
+        throw new UserIsNotTeamMemberException(USER + " " + userId + " is not a member of team " + teamId);
     }
 
     @Override
@@ -517,9 +514,11 @@ public class RegistrationServiceImpl implements RegistrationService {
         Team one = teamService.getTeamByName(teamName);
         if (one != null) {
             log.warn("Team name duplicate entry found: {}", teamName);
-            throw new TeamNameAlreadyExistsException(teamName);
+            throw new TeamNameAlreadyExistsException(TEAM + " " + teamName + " already exists");
         }
     }
+
+
 
     private void sendVerificationEmail(User user) {
         final Map<String, String> map = new HashMap<>();
@@ -560,6 +559,13 @@ public class RegistrationServiceImpl implements RegistrationService {
         if(id == null || id.trim().isEmpty()) {
             log.warn("Team ID is null or empty: {}", id);
             throw new TeamIdNullOrEmptyException();
+        }
+    }
+
+    private static void checkTeamName (final String name) {
+        if(name == null || name.trim().isEmpty()) {
+            log.warn("Team name is null or empty: {}", name);
+            throw new TeamNameNullOrEmptyException();
         }
     }
 }

@@ -26,6 +26,7 @@ import javax.inject.Inject;
 /**
  * This is to invoke python scripts on the BOSS
  * Created by Te Ye on 15-Jun-16.
+ * Contributors: Vu , Teye
  */
 @Component
 @Slf4j
@@ -136,31 +137,40 @@ public class AdapterDeterLab {
      *
      * @param jsonString Contains uid, project name, pid, project goals, project web, project organisation, project visibility
      */
-    public String applyProject( String jsonString) {
+    public String applyProject(String jsonString) {
         log.info("Applying project as existing user: {}", jsonString);
 
         HttpHeaders headers = new HttpHeaders();
-        headers.setContentType( MediaType.APPLICATION_JSON);
-        HttpEntity<String> request = new HttpEntity<>( jsonString, headers);
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        HttpEntity<String> request = new HttpEntity<>(jsonString, headers);
         ResponseEntity response;
 
         try {
-            response = restTemplate.exchange( properties.getApplyProject(), HttpMethod.POST, request, String.class);
-        } catch ( RestClientException e) {
-            log.warn( "DeterLab connection error apply project existing user: {}", e);
-            throw new AdapterConnectionException();
-        }
-        String responseBody = response.getBody().toString();
-        try {
-            String jsonResult = new JSONObject(responseBody).getString("msg");
-            if (!"apply project request existing users success".equals(jsonResult)) {
-                log.warn("Apply project as existing user to DeterLab failed: {}", responseBody);
-                throw new DeterLabOperationFailedException(responseBody);
+            response = restTemplate.exchange(properties.getApplyProject(), HttpMethod.POST, request, String.class);
+
+            final String responseBody = response.getBody().toString();
+
+            log.debug("Apply project as existing user : Deter response -- {}", responseBody);
+
+            String deterMessage = new JSONObject(responseBody).getString("msg");
+
+            if ("apply project existing users ok".equalsIgnoreCase(deterMessage)) {
+                log.info("Apply project as existing user : OK");
+                return responseBody;
             }
-            log.info("Apply project as existing user to DeterLab OK");
-            return responseBody;
+            log.warn("Apply project as existing user : error: {}", deterMessage);
+            throw new DeterLabOperationFailedException(deterMessage);
+
+        } catch (ResourceAccessException rae) {
+            log.warn("Apply project as existing user : Adapter connection error {}", rae);
+            throw new AdapterConnectionException();
+
+        } catch (HttpServerErrorException hsee) {
+            log.warn("Apply project as existing user : Adapter internal server error {}", hsee);
+            throw new AdapterInternalErrorException();
+
         } catch (JSONException e) {
-            log.warn("Error parsing response code existing user apply project: {}", responseBody);
+            log.warn("Apply project as existing user : error parsing response body");
             throw e;
         }
     }
@@ -172,7 +182,7 @@ public class AdapterDeterLab {
      * @param jsonString Contains uid, pid
      */
     public String joinProject(String jsonString) {
-        log.info("Joining project as existing user: {}", jsonString);
+        log.info("Joining project as existing user : {}", jsonString);
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
@@ -181,29 +191,30 @@ public class AdapterDeterLab {
 
         try {
             response = restTemplate.exchange(properties.getJoinProject(), HttpMethod.POST, request, String.class);
-        } catch (ResourceAccessException rae) {
-            log.warn("Join project as existing user: adapter connection error {}", rae);
-            throw new AdapterConnectionException(rae.getMessage());
-        } catch (HttpServerErrorException hsee) {
-            log.warn("Join project as existing user: adapter internal server error {}", hsee);
-            throw new AdapterInternalErrorException();
-        }
 
-        String responseBody = response.getBody().toString();
-        log.info("Join project as existing user: adapter response body -- {}", responseBody);
+            String responseBody = response.getBody().toString();
 
-        try {
+            log.debug("Join project as existing user : adapter response body -- {}", responseBody);
+
             String deterMessage = new JSONObject(responseBody).getString("msg");
-            if("join project existing user ok".equalsIgnoreCase( deterMessage)) {
-                log.info("Join project as existing user to DeterLab OK");
+
+            if ("Join project existing user ok".equalsIgnoreCase(deterMessage)) {
+                log.info("Join project as existing user : OK");
                 return responseBody;
             }
-
-            log.warn("Join project as existing user: error on DeterLab -- {}", deterMessage);
+            log.warn("Join project as existing user : error on DeterLab -- {}", deterMessage);
             throw new DeterLabOperationFailedException(deterMessage);
 
+        } catch (ResourceAccessException rae) {
+            log.warn("Join project as existing user : adapter connection error {}", rae);
+            throw new AdapterConnectionException();
+
+        } catch (HttpServerErrorException hsee) {
+            log.warn("Join project as existing user : adapter internal server error {}", hsee);
+            throw new AdapterInternalErrorException();
+
         } catch (JSONException e) {
-            log.warn("Join project as existing user: error parsing response body {}", responseBody);
+            log.warn("Join project as existing user : error parsing response body");
             throw e;
         }
     }

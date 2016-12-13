@@ -247,7 +247,7 @@ public class AdapterDeterLabTest {
     @Test
     public void applyProjectTest1() {
         JSONObject myobject = new JSONObject();
-        myobject.put("msg", "apply project request existing users success");
+        myobject.put("msg", "apply project existing users ok");
 
         when(restTemplate.exchange(anyString(),eq(HttpMethod.POST),anyObject(),eq(String.class))).thenReturn(response);
         when(response.getBody()).thenReturn(myobject.toString());
@@ -266,7 +266,7 @@ public class AdapterDeterLabTest {
         myobject.put("msg", "apply project request existing users success");
 
         exception.expect(AdapterConnectionException.class);
-        when(restTemplate.exchange(anyString(),eq(HttpMethod.POST),anyObject(),eq(String.class))).thenThrow(new RestClientException(""));
+        when(restTemplate.exchange(anyString(),eq(HttpMethod.POST),anyObject(),eq(String.class))).thenThrow(new ResourceAccessException(""));
         adapterDeterLab.applyProject(myobject.toString());
 
         verify(restTemplate,times(1)).exchange(anyString(),eq(HttpMethod.POST),anyObject(),eq(String.class));

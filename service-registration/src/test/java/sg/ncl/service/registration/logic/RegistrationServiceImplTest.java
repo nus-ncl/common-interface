@@ -39,6 +39,10 @@ import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.*;
 
+/**
+ * Contributor : Vu
+ */
+
 public class RegistrationServiceImplTest {
 
     @Rule
@@ -88,6 +92,9 @@ public class RegistrationServiceImplTest {
     public void testRegisterRequestToApplyTeamEmptyTeamName() {
         TeamEntity teamEntity = Util.getTeamEntity();
         teamEntity.setName("");
+
+        UserEntity userEntity = Util.getUserEntity();
+        when(userService.getUser(anyString())).thenReturn(userEntity);
 
         exception.expect(TeamNameNullOrEmptyException.class);
         registrationService.registerRequestToApplyTeam(RandomStringUtils.randomAlphanumeric(8), teamEntity);
@@ -165,6 +172,9 @@ public class RegistrationServiceImplTest {
         TeamEntity teamEntity = Util.getTeamEntity();
         teamEntity.setName("");
 
+        UserEntity userEntity = Util.getUserEntity();
+        when(userService.getUser(anyString())).thenReturn(userEntity);
+
         exception.expect(TeamNameNullOrEmptyException.class);
         registrationService.registerRequestToJoinTeam(RandomStringUtils.randomAlphanumeric(8), teamEntity);
     }
@@ -181,8 +191,10 @@ public class RegistrationServiceImplTest {
     public void testRegisterRequestToJoinTeamNoTeam() {
         String uid = RandomStringUtils.randomAlphabetic(8);
         TeamEntity teamEntity = Util.getTeamEntity();
-
         when(teamService.getTeamByName(anyString())).thenReturn(null);
+
+        UserEntity userEntity = Util.getUserEntity();
+        when(userService.getUser(anyString())).thenReturn(userEntity);
 
         exception.expect(TeamNotFoundException.class);
         registrationService.registerRequestToJoinTeam(uid, teamEntity);
@@ -194,6 +206,8 @@ public class RegistrationServiceImplTest {
         TeamEntity teamEntity = Util.getTeamEntity();
 
         when(teamService.getTeamByName(anyString())).thenReturn(teamEntity);
+        UserEntity userEntity = Util.getUserEntity();
+        when(userService.getUser(anyString())).thenReturn(userEntity);
         registrationService.registerRequestToJoinTeam(uid, teamEntity);
 
         verify(adapterDeterLab, times(1)).getDeterUserIdByNclUserId(anyString());
