@@ -49,7 +49,7 @@ public class TeamServiceImpl implements TeamService {
 
         if(!isTeamNameValid(team.getName())) {
             log.warn("Create team error: invalid team name {}", team.getName());
-            throw new InvalidTeamNameException("Team name " + team.getName() + " invalid");
+            throw new InvalidTeamNameException("Team name " + team.getName() + " is invalid");
         }
 
         if (teamRepository.findByName(team.getName()) != null) {

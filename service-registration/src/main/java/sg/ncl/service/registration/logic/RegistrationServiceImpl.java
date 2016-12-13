@@ -95,7 +95,7 @@ public class RegistrationServiceImpl implements RegistrationService {
         }
         if (userService.getUser(nclUserId) == null) {
             log.warn("User not found: {}", nclUserId);
-            throw new UserNotFoundException(nclUserId);
+            throw new UserNotFoundException("User " + nclUserId + " not found");
         }
 
         checkTeamName(team.getName());

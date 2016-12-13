@@ -170,7 +170,7 @@ public class AdapterDeterLab {
             throw new AdapterInternalErrorException();
 
         } catch (JSONException e) {
-            log.warn("Join project as existing user : error parsing response body");
+            log.warn("Apply project as existing user : error parsing response body");
             throw e;
         }
     }
