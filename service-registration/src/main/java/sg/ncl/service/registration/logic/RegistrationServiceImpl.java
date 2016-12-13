@@ -53,6 +53,10 @@ import java.util.Map;
 @Slf4j
 public class RegistrationServiceImpl implements RegistrationService {
 
+    private static final String USER = "User";
+    private static final String TEAM = "Team";
+    private static final String NOT_FOUND = "not found";
+
     private final CredentialsService credentialsService;
     private final TeamService teamService;
     private final UserService userService;
@@ -95,7 +99,7 @@ public class RegistrationServiceImpl implements RegistrationService {
 
         if (userService.getUser(nclUserId) == null) {
             log.warn("User not found: {}", nclUserId);
-            throw new UserNotFoundException("User " + nclUserId + " not found");
+            throw new UserNotFoundException(USER + " " + nclUserId + " " + NOT_FOUND);
         }
 
         // no problem with the team, create the team
@@ -134,13 +138,13 @@ public class RegistrationServiceImpl implements RegistrationService {
 
         if (userService.getUser(nclUserId) == null) {
             log.warn("User not found: {}", nclUserId);
-            throw new UserNotFoundException("User " + nclUserId + " is not found");
+            throw new UserNotFoundException(USER + " " + nclUserId + " " + NOT_FOUND);
         }
 
         Team teamEntity = teamService.getTeamByName(team.getName());
         if (teamEntity == null) {
             log.warn("Team not found: {}", team.getName());
-            throw new TeamNotFoundException("Team " + team.getName() + " is not found");
+            throw new TeamNotFoundException(TEAM + " " + team.getName() + " " + NOT_FOUND);
         }
 
         String teamId = teamEntity.getId();
@@ -336,7 +340,7 @@ public class RegistrationServiceImpl implements RegistrationService {
             }
         }
         log.warn("Cannot process join request from User {} to Team {}: User is NOT a member of the team.", userId, teamId);
-        throw new UserIsNotTeamMemberException("User " + userId + " is not a member of team " + teamId);
+        throw new UserIsNotTeamMemberException(USER + " " + userId + " is not a member of team " + teamId);
     }
 
     @Override
@@ -510,7 +514,7 @@ public class RegistrationServiceImpl implements RegistrationService {
         Team one = teamService.getTeamByName(teamName);
         if (one != null) {
             log.warn("Team name duplicate entry found: {}", teamName);
-            throw new TeamNameAlreadyExistsException("Team "+teamName + " already exists");
+            throw new TeamNameAlreadyExistsException(TEAM + " " + teamName + " already exists");
         }
     }
 
