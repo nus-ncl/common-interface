@@ -4,6 +4,7 @@ import io.jsonwebtoken.Claims;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.util.UriUtils;
 import sg.ncl.common.exception.base.NotFoundException;
 import sg.ncl.service.data.data.jpa.DataEntity;
 import sg.ncl.service.data.data.jpa.DataRepository;
@@ -12,9 +13,7 @@ import sg.ncl.service.data.domain.Data;
 import sg.ncl.service.data.domain.DataResource;
 import sg.ncl.service.data.domain.DataService;
 import sg.ncl.service.data.domain.DataVisibility;
-import sg.ncl.service.data.exceptions.DataNameAlreadyExistsException;
-import sg.ncl.service.data.exceptions.DataNotFoundException;
-import sg.ncl.service.data.exceptions.DataResourceNotFoundException;
+import sg.ncl.service.data.exceptions.*;
 import sg.ncl.service.data.web.DataResourceInfo;
 import sg.ncl.service.transmission.domain.DownloadService;
 import sg.ncl.service.transmission.domain.UploadService;
@@ -24,6 +23,7 @@ import javax.inject.Inject;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.constraints.NotNull;
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -38,6 +38,8 @@ import static sg.ncl.service.data.validations.Validator.checkPermissions;
 public class DataServiceImpl implements DataService {
 
     private static final String INFO_TEXT = "Data saved: {}";
+    private static final String DATA_DIR_KEY = "dataDir";
+    private static final String UTF_ENCODING = "UTF-8";
 
     private final DataRepository dataRepository;
     private final UploadService uploadService;
@@ -97,7 +99,7 @@ public class DataServiceImpl implements DataService {
             for (DataEntity dataEntity : dataEntities) {
                 if (dataEntity.getName().equals(data.getName())) {
                     log.warn("Data name is in use: {}", data.getName());
-                    throw new DataNameAlreadyExistsException(data.getName());
+                    throw new DataNameAlreadyExistsException("Data name is in use: " + data.getName());
                 }
             }
         }
@@ -122,7 +124,7 @@ public class DataServiceImpl implements DataService {
         checkPermissions(dataEntity, claims);
 
         DataEntity savedDataEntity = dataRepository.save(setUpDataEntity(data, dataEntity));
-        log.info(INFO_TEXT, savedDataEntity);
+        log.info("Data updated by {}: {}", claims.getSubject(), savedDataEntity);
         return savedDataEntity;
     }
 
@@ -135,12 +137,13 @@ public class DataServiceImpl implements DataService {
      */
     @Transactional
     @Override
-    public Data deleteDataset(Long id, Claims claims) {
+    public Data deleteDataset(Long id, Claims claims) throws UnsupportedEncodingException {
         DataEntity dataEntity = (DataEntity) getDataset(id);
         checkPermissions(dataEntity, claims);
 
+        uploadService.deleteDirectory(DATA_DIR_KEY, UriUtils.encode(dataEntity.getName(), UTF_ENCODING));
         dataRepository.delete(id);
-        log.info("Data deleted: {}", dataEntity.getName());
+        log.info("Data deleted by {}: {}", claims.getSubject(), dataEntity.getName());
 
         return dataEntity;
     }
@@ -154,7 +157,7 @@ public class DataServiceImpl implements DataService {
     public Data getDataset(Long id) {
         Data data = dataRepository.getOne(id);
         if (data == null) {
-            throw new DataNotFoundException();
+            throw new DataNotFoundException("Data not found.");
         }
         return data;
     }
@@ -195,7 +198,8 @@ public class DataServiceImpl implements DataService {
         List<DataResource> dataResourceEntities = dataEntity.getResources();
         DataResource dataResource = dataResourceEntities.stream().filter(o -> o.getId().equals(rid)).findFirst().orElse(null);
         if (dataResource == null) {
-            throw new DataResourceNotFoundException();
+            log.warn("Data resource not found.");
+            throw new DataResourceNotFoundException("Data resource not found.");
         }
         return dataResource;
     }
@@ -213,6 +217,16 @@ public class DataServiceImpl implements DataService {
     public Data createResource(Long id, DataResource dataResource, Claims claims) {
         DataEntity dataEntity = (DataEntity) getDataset(id);
         checkPermissions(dataEntity, claims);
+
+        List<DataResource> dataResourceEntities = dataEntity.getResources();
+        if (dataResourceEntities != null) {
+            for (DataResource dataResourceEntity : dataResourceEntities) {
+                if (dataResourceEntity.getUri().equals(dataResource.getUri())) {
+                    log.warn("Data resource already in use: {}", dataResource.getUri());
+                    throw new DataResourceAlreadyExistsException("Data resource already in use: " + dataResource.getUri());
+                }
+            }
+        }
 
         dataEntity.addResource(setUpResourceEntity(dataResource));
         DataEntity savedDataEntity = dataRepository.save(dataEntity);
@@ -234,11 +248,16 @@ public class DataServiceImpl implements DataService {
         DataEntity dataEntity = (DataEntity) getDataset(did);
         checkPermissions(dataEntity, claims);
 
-        List<DataResource> dataResourceEntities = dataEntity.getResources();
-        DataResource dataResource = dataResourceEntities
-                .stream().filter(o -> o.getId().equals(rid)).findFirst().orElse(null);
+        DataResource dataResource = findResourceById(did, rid, claims);
         if (dataResource != null) {
-            dataResourceEntities.remove(dataResource);
+            dataEntity.removeResource((DataResourceEntity) dataResource);
+            try {
+                uploadService.deleteUpload(DATA_DIR_KEY, UriUtils.encode(dataEntity.getName(), UTF_ENCODING), dataResource.getUri());
+            } catch (Exception e) {
+                log.error("Unable to delete {}: {}", dataResource.getUri(), e);
+                throw new DataResourceDeleteException("Unable to delete " + dataResource.getUri());
+            }
+            log.info("Data resource deleted by {}: {}", claims.getSubject(), dataResource);
         }
 
         DataEntity savedDataEntity = dataRepository.save(dataEntity);
@@ -259,11 +278,13 @@ public class DataServiceImpl implements DataService {
     }
 
     @Override
-    public String addChunk(ResumableInfo resumableInfo, String resumableChunkNumber, String dataId, Claims claims) {
-        switch (uploadService.addChunk(resumableInfo, Integer.parseInt(resumableChunkNumber), "dataDir", dataId)) {
+    public String addChunk(ResumableInfo resumableInfo, String resumableChunkNumber, Long id, Claims claims) throws UnsupportedEncodingException {
+        DataEntity dataEntity = (DataEntity) getDataset(id);
+        switch (uploadService.addChunk(resumableInfo, Integer.parseInt(resumableChunkNumber), DATA_DIR_KEY, UriUtils.encode(dataEntity.getName(), UTF_ENCODING))) {
             case FINISHED:
                 DataResourceInfo dataResourceInfo = new DataResourceInfo(null, resumableInfo.getResumableFilename());
-                createResource(Long.parseLong(dataId), dataResourceInfo, claims);
+                createResource(id, dataResourceInfo, claims);
+                log.info("Resource upload finished and saved: {}", dataResourceInfo);
                 return "All finished.";
             case UPLOAD:
                 return "Upload";
@@ -274,9 +295,12 @@ public class DataServiceImpl implements DataService {
 
     @Override
     public void downloadResource(HttpServletResponse response, Long did, Long rid, Claims claims) {
+        DataEntity dataEntity = (DataEntity) getDataset(did);
+        checkAccessibility(dataEntity, claims);
+
         DataResource dataResource = findResourceById(did, rid, claims);
         try {
-            downloadService.getChunks(response, "dataDir", did.toString(), dataResource.getUri());
+            downloadService.getChunks(response, DATA_DIR_KEY, UriUtils.encode(dataEntity.getName(), UTF_ENCODING), dataResource.getUri());
         } catch (IOException e) {
             log.error("Unable to download resource: {}", e);
             throw new NotFoundException();

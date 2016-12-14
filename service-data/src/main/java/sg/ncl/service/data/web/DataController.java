@@ -17,6 +17,7 @@ import javax.inject.Inject;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
+import java.io.UnsupportedEncodingException;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -92,7 +93,7 @@ public class DataController {
     // Delete a data set
     @DeleteMapping(path = "/{id}")
     @ResponseStatus(HttpStatus.OK)
-    public boolean remove(@AuthenticationPrincipal Object claims, @PathVariable Long id) {
+    public boolean remove(@AuthenticationPrincipal Object claims, @PathVariable Long id) throws UnsupportedEncodingException {
         if (claims == null || !(claims instanceof Claims)) {
             throw new UnauthorizedException();
         }
@@ -103,39 +104,39 @@ public class DataController {
     // View resource in a data set
     @GetMapping(path = "/{did}/resources/{rid}")
     @ResponseStatus(HttpStatus.OK)
-    public DataResource getResource(@AuthenticationPrincipal Object claims, @PathVariable String did, @PathVariable String rid) {
+    public DataResource getResource(@AuthenticationPrincipal Object claims, @PathVariable Long did, @PathVariable Long rid) {
         if (claims == null || !(claims instanceof Claims)) {
             throw new UnauthorizedException();
         }
-        return dataService.findResourceById(Long.getLong(did), Long.getLong(rid), (Claims) claims);
+        return dataService.findResourceById(did, rid, (Claims) claims);
     }
 
     // Add a resource to a data set
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE, path = "/{id}/resources")
     @ResponseStatus(HttpStatus.CREATED)
     public Data addResource(@AuthenticationPrincipal Object claims,
-                            @PathVariable String id,
+                            @PathVariable Long id,
                             @RequestBody @Valid DataResourceInfo dataResourceInfo) {
         if (claims == null || !(claims instanceof Claims)) {
             throw new UnauthorizedException();
         }
-        return new DataInfo(dataService.createResource(Long.getLong(id), dataResourceInfo, (Claims) claims));
+        return new DataInfo(dataService.createResource(id, dataResourceInfo, (Claims) claims));
     }
 
     // Delete a resource from a data set
     @DeleteMapping(path = "/{did}/resources/{rid}")
     @ResponseStatus(HttpStatus.OK)
-    public Data removeResource(@AuthenticationPrincipal Object claims, @PathVariable String did, @PathVariable String rid) {
+    public Data removeResource(@AuthenticationPrincipal Object claims, @PathVariable Long did, @PathVariable Long rid) {
         if (claims == null || !(claims instanceof Claims)) {
             throw new UnauthorizedException();
         }
-        return new DataInfo(dataService.deleteResource(Long.getLong(did), Long.getLong(rid), (Claims) claims));
+        return new DataInfo(dataService.deleteResource(did, rid, (Claims) claims));
     }
 
     // Request access to a dataset
     @PostMapping(path = "/{id}/requests")
     @ResponseStatus(HttpStatus.CREATED)
-    public String addRequest(@AuthenticationPrincipal Object claims, @PathVariable String id) {
+    public String addRequest(@AuthenticationPrincipal Object claims, @PathVariable Long id) {
         if (claims == null || !(claims instanceof Claims)) {
             throw new UnauthorizedException();
         }
@@ -146,7 +147,7 @@ public class DataController {
     // Process request
     @PutMapping(path = "/{did}/requests/{rid}")
     @ResponseStatus(HttpStatus.OK)
-    public String processRequest(@AuthenticationPrincipal Object claims, @PathVariable String did, @PathVariable String rid) {
+    public String processRequest(@AuthenticationPrincipal Object claims, @PathVariable Long did, @PathVariable Long rid) {
         if (claims == null || !(claims instanceof Claims)) {
             throw new UnauthorizedException();
         }
@@ -158,7 +159,7 @@ public class DataController {
     @ResponseStatus(HttpStatus.OK)
     public String checkUpload(@PathVariable String resumableIdentifier,
                               @PathVariable String resumableChunkNumber,
-                              @PathVariable String id) {
+                              @PathVariable Long id) {
         return dataService.checkChunk(resumableIdentifier, resumableChunkNumber);
     }
 
@@ -167,7 +168,7 @@ public class DataController {
     public String fileUpload(@AuthenticationPrincipal Object claims,
                              @RequestBody @Valid ResumableInfo resumableInfo,
                              @PathVariable String resumableChunkNumber,
-                             @PathVariable String id) {
+                             @PathVariable Long id) throws UnsupportedEncodingException {
         if (claims == null || !(claims instanceof Claims)) {
             throw new UnauthorizedException();
         }

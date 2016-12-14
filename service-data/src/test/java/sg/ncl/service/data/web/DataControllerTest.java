@@ -357,7 +357,7 @@ public class DataControllerTest {
         when(securityContext.getAuthentication()).thenReturn(authentication);
         SecurityContextHolder.setContext(securityContext);
         when(authentication.getPrincipal()).thenReturn(claims);
-        when(dataService.addChunk(any(ResumableInfo.class), anyString(), anyString(), any(Claims.class))).thenReturn("Upload");
+        when(dataService.addChunk(any(ResumableInfo.class), anyString(), anyLong(), any(Claims.class))).thenReturn("Upload");
 
         MvcResult result = mockMvc.perform(post(DataController.PATH + "/1/chunks/1")
                 .contentType(MediaType.APPLICATION_JSON)

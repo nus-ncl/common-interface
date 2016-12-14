@@ -185,7 +185,7 @@ public class ExperimentServiceTest {
     public void testDeleteExperimentGood() throws Exception {
         ExperimentEntity experimentEntity = getExperimentEntity();
         RealizationEntity realizationEntity = getRealizationEntity();
-        final List<Role> roles = Collections.singletonList(Role.USER);
+        final List<String> roles = Collections.singletonList(Role.USER.getAuthority());
 
         when(experimentRepository.getOne(anyLong())).thenReturn(experimentEntity);
         when(realizationService.getByExperimentId(anyLong())).thenReturn(realizationEntity);
@@ -202,7 +202,7 @@ public class ExperimentServiceTest {
     public void testDeleteExperimentAdmin() throws Exception {
         ExperimentEntity experimentEntity = getExperimentEntity();
         RealizationEntity realizationEntity = getRealizationEntity();
-        final List<Role> roles = Collections.singletonList(Role.ADMIN);
+        final List<String> roles = Collections.singletonList(Role.ADMIN.getAuthority());
 
         when(experimentRepository.getOne(anyLong())).thenReturn(experimentEntity);
         when(realizationService.getByExperimentId(anyLong())).thenReturn(realizationEntity);
@@ -219,7 +219,7 @@ public class ExperimentServiceTest {
     public void testDeleteExperimentNotExpCreator() throws Exception {
         // to trigger the addCheck() in deleteExperiment
         RealizationEntity realizationEntity = getRealizationEntity();
-        final List<Role> roles = Collections.singletonList(Role.USER);
+        final List<String> roles = Collections.singletonList(Role.USER.getAuthority());
 
         when(realizationService.getByExperimentId(anyLong())).thenReturn(realizationEntity);
         when(claims.getSubject()).thenReturn("userId"); // trigger the add check

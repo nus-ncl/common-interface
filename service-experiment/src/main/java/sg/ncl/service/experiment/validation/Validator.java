@@ -7,7 +7,9 @@ import sg.ncl.common.exception.base.ForbiddenException;
 import sg.ncl.common.jwt.JwtToken;
 import sg.ncl.service.realization.data.jpa.RealizationEntity;
 
+import java.util.EnumSet;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * @author Te Ye
@@ -29,8 +31,7 @@ public class Validator {
         log.info("Id of requester from web: {}", claims.getSubject());
         log.info("Role of requester from web: {}", claims.get(JwtToken.KEY));
         String contextUserId = claims.getSubject();
-        List<Role> roles;
-        roles = (List) claims.get(JwtToken.KEY);
+        EnumSet<Role> roles = ((List<String>) claims.get(JwtToken.KEY)).stream().filter(Role::contains).map(Role::valueOf).collect(Collectors.toCollection(() -> EnumSet.noneOf(Role.class)));
 
         log.info("Context user id: {}, Context role: {}", contextUserId, roles);
 

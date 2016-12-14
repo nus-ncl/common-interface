@@ -9,10 +9,12 @@ import sg.ncl.service.transmission.data.ResumableEntity;
 import sg.ncl.service.transmission.data.ResumableStorage;
 import sg.ncl.service.transmission.domain.UploadService;
 import sg.ncl.service.transmission.domain.UploadStatus;
+import sg.ncl.service.transmission.exceptions.UploadAlreadyExistsException;
 import sg.ncl.service.transmission.util.HttpUtils;
 import sg.ncl.service.transmission.web.ResumableInfo;
 
 import javax.inject.Inject;
+import java.io.File;
 import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.nio.file.Files;
@@ -20,6 +22,9 @@ import java.nio.file.Path;
 
 /**
  * Created by dcsjnh on 11/24/2016.
+ *
+ * References:
+ * [1] http://alvinalexander.com/java/java-file-exists-directory-exists
  */
 @Service
 @Slf4j
@@ -35,6 +40,20 @@ public class UploadServiceImpl implements UploadService {
     }
 
     @Override
+    public void deleteDirectory(String subDirKey, String preDir) {
+        Path path = HttpUtils.getPath(properties, subDirKey, preDir);
+        HttpUtils.removeDirectory(new File(path.toString()));
+    }
+
+    @Override
+    public boolean deleteUpload(String subDirKey, String preDir, String fileName) throws IOException {
+        Path path = HttpUtils.getPath(properties, subDirKey, preDir);
+        String filePath = path.toString() + "/" + fileName;
+        File file = new File(filePath);
+        return Files.deleteIfExists(file.toPath());
+    }
+
+    @Override
     public UploadStatus checkChunk(String resumableIdentifier, int resumableChunkNumber) {
         ResumableEntity entity = storage.get(resumableIdentifier);
         if (entity != null && entity.uploadedChunks.contains(new ResumableEntity.ResumableChunkNumber(resumableChunkNumber))) {
@@ -47,15 +66,7 @@ public class UploadServiceImpl implements UploadService {
     @Override
     public UploadStatus addChunk(ResumableInfo resumableInfo, int resumableChunkNumber, String subDirKey, String preDir) {
         Path path = HttpUtils.getPath(properties, subDirKey, preDir);
-        //if directory exists?
-        if (!path.toFile().exists()) {
-            try {
-                Files.createDirectories(path);
-            } catch (IOException e) {
-                log.error("Unable to create directory path: {}", e);
-                throw new BadRequestException();
-            }
-        }
+        createDirectoryOrCheckFileExists(path, resumableInfo);
 
         //Here we add a ".temp" to every transmission file to indicate NON-FINISHED
         String resumableFilePath = path.toString() + "/" + resumableInfo.getResumableFilename() + ".temp";
@@ -83,6 +94,23 @@ public class UploadServiceImpl implements UploadService {
             return UploadStatus.FINISHED;
         } else {
             return UploadStatus.UPLOAD;
+        }
+    }
+    
+    private void createDirectoryOrCheckFileExists(Path path, ResumableInfo resumableInfo) {
+        //if directory exists?
+        if (!path.toFile().exists()) {
+            try {
+                Files.createDirectories(path);
+            } catch (IOException e) {
+                log.error("Unable to create directory path: {}", e);
+                throw new BadRequestException();
+            }
+        } else {
+            File file = new File(path.toString() + "/" + resumableInfo.getResumableFilename());
+            if (file.exists()) {
+                throw new UploadAlreadyExistsException("Upload file already exist in directory.");
+            }
         }
     }
 
