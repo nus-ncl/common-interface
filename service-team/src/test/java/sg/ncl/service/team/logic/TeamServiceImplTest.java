@@ -417,4 +417,21 @@ public class TeamServiceImplTest {
         assertThat(team.getStatus()).isEqualTo(TeamStatus.CLOSED);
     }
 
+    // case default
+    @Test
+    public void testUpdateTeamStatusCaseDefault() {
+        TeamEntity entity = Util.getTeamEntityWithId();
+        entity.setStatus(TeamStatus.PENDING);
+
+        exception.expect(InvalidTeamStatusException.class);
+
+        when(teamRepository.findOne(anyString())).thenReturn(entity);
+        when(teamRepository.save(any(TeamEntity.class))).thenReturn(entity);
+
+        teamService.updateTeamStatus("id", TeamStatus.PENDING);
+
+        verify(teamRepository, times(1)).findOne(anyString());
+
+    }
+
 }
