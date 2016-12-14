@@ -206,19 +206,19 @@ public class TeamServiceImpl implements TeamService {
 
         switch (status) {
             case APPROVED:
-                if (entity.getStatus().equals(status.PENDING) || entity.getStatus().equals(status.RESTRICTED)) {
-                    return updateTeamStatusInternal(entity, status.APPROVED);
+                if (entity.getStatus().equals(TeamStatus.PENDING) || entity.getStatus().equals(TeamStatus.RESTRICTED)) {
+                    return updateTeamStatusInternal(entity, TeamStatus.APPROVED);
                 } else {
                     throw new InvalidStatusTransitionException(entity.getStatus() + " -> " + status);
                 }
             case RESTRICTED:
                 if (entity.getStatus().equals(TeamStatus.APPROVED)) {
-                    return updateTeamStatusInternal(entity, status.RESTRICTED);
+                    return updateTeamStatusInternal(entity, TeamStatus.RESTRICTED);
                 } else {
                     throw new InvalidStatusTransitionException(entity.getStatus() + " -> " + status);
                 }
             case CLOSED:
-                return updateTeamStatusInternal(entity, status.CLOSED);
+                return updateTeamStatusInternal(entity, TeamStatus.CLOSED);
             default:
                 log.warn("Update team status failed for {}: unknown status {}", id, status);
                 throw new InvalidTeamStatusException(status.toString());
