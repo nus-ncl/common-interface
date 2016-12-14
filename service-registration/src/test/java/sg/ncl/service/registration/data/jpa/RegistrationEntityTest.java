@@ -5,9 +5,7 @@ import org.junit.Test;
 
 import java.util.Random;
 
-import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.nullValue;
-import static org.junit.Assert.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * Created by Desmond.
@@ -18,7 +16,7 @@ public class RegistrationEntityTest {
     public void testGetId() throws Exception {
         final RegistrationEntity entity = new RegistrationEntity();
 
-        assertThat(entity.getId(), is(nullValue()));
+        assertThat(entity.getId()).isNull();
     }
 
     @Test
@@ -27,14 +25,14 @@ public class RegistrationEntityTest {
         final Long id = new Random().nextLong();
         entity.setId(id);
 
-        assertThat(entity.getId(), is(id));
+        assertThat(entity.getId()).isEqualTo(id);
     }
 
     @Test
     public void testGetPid() throws Exception {
         final RegistrationEntity entity = new RegistrationEntity();
 
-        assertThat(entity.getPid(), is(nullValue()));
+        assertThat(entity.getPid()).isNull();
     }
 
     @Test
@@ -43,14 +41,14 @@ public class RegistrationEntityTest {
         final String id = RandomStringUtils.randomAlphanumeric(20);
         entity.setPid(id);
 
-        assertThat(entity.getPid(), is(id));
+        assertThat(entity.getPid()).isEqualTo(id);
     }
 
     @Test
     public void testGetUid() throws Exception {
         final RegistrationEntity entity = new RegistrationEntity();
 
-        assertThat(entity.getUid(), is(nullValue()));
+        assertThat(entity.getUid()).isNull();
     }
 
     @Test
@@ -59,14 +57,14 @@ public class RegistrationEntityTest {
         final String id = RandomStringUtils.randomAlphanumeric(20);
         entity.setUid(id);
 
-        assertThat(entity.getUid(), is(id));
+        assertThat(entity.getUid()).isEqualTo(id);
     }
 
     @Test
     public void testGetUserName() throws Exception {
         final RegistrationEntity entity = new RegistrationEntity();
 
-        assertThat(entity.getUsrName(), is(nullValue()));
+        assertThat(entity.getUsrName()).isNull();
     }
 
     @Test
@@ -75,14 +73,14 @@ public class RegistrationEntityTest {
         final String id = RandomStringUtils.randomAlphanumeric(20);
         entity.setUsrName(id);
 
-        assertThat(entity.getUsrName(), is(id));
+        assertThat(entity.getUsrName()).isEqualTo(id);
     }
 
     @Test
     public void testGetUserTitle() throws Exception {
         final RegistrationEntity entity = new RegistrationEntity();
 
-        assertThat(entity.getUsrTitle(), is(nullValue()));
+        assertThat(entity.getUsrTitle()).isNull();
     }
 
     @Test
@@ -91,14 +89,14 @@ public class RegistrationEntityTest {
         final String title = RandomStringUtils.randomAlphanumeric(20);
         entity.setUsrTitle(title);
 
-        assertThat(entity.getUsrTitle(), is(title));
+        assertThat(entity.getUsrTitle()).isEqualTo(title);
     }
 
     @Test
     public void testGetUserAffiliation() throws Exception {
         final RegistrationEntity entity = new RegistrationEntity();
 
-        assertThat(entity.getUsrAffil(), is(nullValue()));
+        assertThat(entity.getUsrAffil()).isNull();
     }
 
     @Test
@@ -107,14 +105,14 @@ public class RegistrationEntityTest {
         final String affiliation = RandomStringUtils.randomAlphanumeric(20);
         entity.setUsrAffil(affiliation);
 
-        assertThat(entity.getUsrAffil(), is(affiliation));
+        assertThat(entity.getUsrAffil()).isEqualTo(affiliation);
     }
 
     @Test
     public void testGetUserAffiliationAbbreviation() throws Exception {
         final RegistrationEntity entity = new RegistrationEntity();
 
-        assertThat(entity.getUsrAffilAbbrev(), is(nullValue()));
+        assertThat(entity.getUsrAffilAbbrev()).isNull();
     }
 
     @Test
@@ -123,14 +121,14 @@ public class RegistrationEntityTest {
         final String affiliationAbbreviation = RandomStringUtils.randomAlphanumeric(20);
         entity.setUsrAffilAbbrev(affiliationAbbreviation);
 
-        assertThat(entity.getUsrAffilAbbrev(), is(affiliationAbbreviation));
+        assertThat(entity.getUsrAffilAbbrev()).isEqualTo(affiliationAbbreviation);
     }
 
     @Test
     public void testGetUserEmail() throws Exception {
         final RegistrationEntity entity = new RegistrationEntity();
 
-        assertThat(entity.getUsrEmail(), is(nullValue()));
+        assertThat(entity.getUsrEmail()).isNull();
     }
 
     @Test
@@ -139,15 +137,15 @@ public class RegistrationEntityTest {
         final String email = RandomStringUtils.randomAlphanumeric(20);
         entity.setUsrEmail(email);
 
-        assertThat(entity.getUsrEmail(), is(email));
+        assertThat(entity.getUsrEmail()).isEqualTo(email);
     }
 
     @Test
     public void testGetUserAddress() throws Exception {
         final RegistrationEntity entity = new RegistrationEntity();
 
-        assertThat(entity.getUsrAddr(), is(nullValue()));
-        assertThat(entity.getUsrAddr2(), is(nullValue()));
+        assertThat(entity.getUsrAddr()).isNull();
+        assertThat(entity.getUsrAddr2()).isNull();
     }
 
     @Test
@@ -159,15 +157,15 @@ public class RegistrationEntityTest {
         final String address2 = RandomStringUtils.randomAlphanumeric(20);
         entity.setUsrAddr2(address2);
 
-        assertThat(entity.getUsrAddr(), is(address));
-        assertThat(entity.getUsrAddr2(), is(address2));
+        assertThat(entity.getUsrAddr()).isEqualTo(address);
+        assertThat(entity.getUsrAddr2()).isEqualTo(address2);
     }
 
     @Test
     public void testGetUserCity() throws Exception {
         final RegistrationEntity entity = new RegistrationEntity();
 
-        assertThat(entity.getUsrCity(), is(nullValue()));
+        assertThat(entity.getUsrCity()).isNull();
     }
 
     @Test
@@ -176,14 +174,14 @@ public class RegistrationEntityTest {
         final String city = RandomStringUtils.randomAlphanumeric(20);
         entity.setUsrCity(city);
 
-        assertThat(entity.getUsrCity(), is(city));
+        assertThat(entity.getUsrCity()).isEqualTo(city);
     }
 
     @Test
     public void testGetUserState() throws Exception {
         final RegistrationEntity entity = new RegistrationEntity();
 
-        assertThat(entity.getUsrState(), is(nullValue()));
+        assertThat(entity.getUsrState()).isNull();
     }
 
     @Test
@@ -192,14 +190,14 @@ public class RegistrationEntityTest {
         final String state = RandomStringUtils.randomAlphanumeric(20);
         entity.setUsrState(state);
 
-        assertThat(entity.getUsrState(), is(state));
+        assertThat(entity.getUsrState()).isEqualTo(state);
     }
 
     @Test
     public void testGetUserZip() throws Exception {
         final RegistrationEntity entity = new RegistrationEntity();
 
-        assertThat(entity.getUsrZip(), is(nullValue()));
+        assertThat(entity.getUsrZip()).isNull();
     }
 
     @Test
@@ -208,14 +206,14 @@ public class RegistrationEntityTest {
         final String zip = RandomStringUtils.randomAlphanumeric(20);
         entity.setUsrZip(zip);
 
-        assertThat(entity.getUsrZip(), is(zip));
+        assertThat(entity.getUsrZip()).isEqualTo(zip);
     }
 
     @Test
     public void testGetUserCountry() throws Exception {
         final RegistrationEntity entity = new RegistrationEntity();
 
-        assertThat(entity.getUsrCountry(), is(nullValue()));
+        assertThat(entity.getUsrCountry()).isNull();
     }
 
     @Test
@@ -224,14 +222,14 @@ public class RegistrationEntityTest {
         final String country = RandomStringUtils.randomAlphanumeric(20);
         entity.setUsrCountry(country);
 
-        assertThat(entity.getUsrCountry(), is(country));
+        assertThat(entity.getUsrCountry()).isEqualTo(country);
     }
 
     @Test
     public void testGetUserPhone() throws Exception {
         final RegistrationEntity entity = new RegistrationEntity();
 
-        assertThat(entity.getUsrPhone(), is(nullValue()));
+        assertThat(entity.getUsrPhone()).isNull();
     }
 
     @Test
@@ -240,6 +238,6 @@ public class RegistrationEntityTest {
         final String phone = RandomStringUtils.randomAlphanumeric(20);
         entity.setUsrPhone(phone);
 
-        assertThat(entity.getUsrPhone(), is(phone));
+        assertThat(entity.getUsrPhone()).isEqualTo(phone);
     }
 }
