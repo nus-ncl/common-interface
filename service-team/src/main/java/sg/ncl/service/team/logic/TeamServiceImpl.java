@@ -28,6 +28,8 @@ import java.util.stream.Collectors;
 @Slf4j
 public class TeamServiceImpl implements TeamService {
 
+    private static final String NOT_ALLOWED = "is not allowed";
+
     private final TeamRepository teamRepository;
 
     @Inject
@@ -209,37 +211,35 @@ public class TeamServiceImpl implements TeamService {
                 if (entity.getStatus().equals(TeamStatus.PENDING) || entity.getStatus().equals(TeamStatus.RESTRICTED)) {
                     return updateTeamStatusInternal(entity, TeamStatus.APPROVED);
                 } else {
-                    throw new InvalidStatusTransitionException(entity.getStatus() + " -> " + status);
+                    throw new InvalidStatusTransitionException(entity.getStatus() + " -> " + status + " " + NOT_ALLOWED);
                 }
             case RESTRICTED:
                 if (entity.getStatus().equals(TeamStatus.APPROVED)) {
                     return updateTeamStatusInternal(entity, TeamStatus.RESTRICTED);
                 } else {
-                    throw new InvalidStatusTransitionException(entity.getStatus() + " -> " + status);
+                    throw new InvalidStatusTransitionException(entity.getStatus() + " -> " + status + " " + NOT_ALLOWED);
                 }
             case CLOSED:
                 return updateTeamStatusInternal(entity, TeamStatus.CLOSED);
             default:
                 log.warn("Update team status failed for {}: unknown status {}", id, status);
-                throw new InvalidTeamStatusException(status.toString());
+                throw new InvalidTeamStatusException("Invalid team status " + status);
         }
     }
 
     private Team updateTeamStatusInternal(TeamEntity entity, TeamStatus status) {
-        TeamStatus oldStatus = entity.getStatus();
-        entity.setStatus(status);
+        final TeamStatus oldStatus = entity.getStatus();
+        final ZonedDateTime now = ZonedDateTime.now();
 
-        if (status.equals(TeamStatus.APPROVED)) {
-            // after approving new team application
-            // set the processed date
-            entity.setProcessedDate(ZonedDateTime.now());
-        } else {
-            // set the last modified date for other changes
-            entity.setLastModifiedDate(ZonedDateTime.now());
+        entity.setStatus(status);
+        entity.setLastModifiedDate(now);
+
+        if(oldStatus.equals(TeamStatus.PENDING) && status.equals(TeamStatus.APPROVED)) {
+            entity.setProcessedDate(now);
         }
 
-        TeamEntity savedTeam = teamRepository.save(entity);
-        log.info("Status updated for team {}: {} -> {}", entity.getId(), oldStatus, entity.getStatus());
+        final TeamEntity savedTeam = teamRepository.save(entity);
+        log.info("Status updated for team {}: {} -> {}", entity.getId(), oldStatus, savedTeam.getStatus());
         return savedTeam;
     }
 
