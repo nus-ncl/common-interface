@@ -373,23 +373,7 @@ public class TeamServiceImplTest {
 
         Team team = teamService.updateTeamStatus("id", TeamStatus.REJECTED);
 
-        assertThat(team.getStatus()).isEqualTo(TeamStatus.REJECTED);
-    }
-
-    // case RESTRICTED- else branch, throw InvalidStatusTransitionException
-    @Test
-    public void testUpdateTeamStatusCaseRejectedElseBranch() {
-        String randomIdForTest = RandomStringUtils.randomAlphanumeric(20);
-        TeamEntity entity = Util.getTeamEntityWithId();
-        entity.setStatus(TeamStatus.REJECTED);
-
-        exception.expect(InvalidStatusTransitionException.class);
-
-        when(teamRepository.findOne(anyString())).thenReturn(entity);
-        when(teamRepository.save(any(TeamEntity.class))).thenReturn(entity);
-        teamService.updateTeamStatus(randomIdForTest, TeamStatus.REJECTED);
-
-        verify(teamRepository, times(1)).findOne(anyString());
+        assertThat(team.getStatus()).isEqualTo(TeamStatus.CLOSED);
     }
 
     @Test

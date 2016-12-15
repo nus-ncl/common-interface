@@ -220,11 +220,6 @@ public class TeamServiceImpl implements TeamService {
                     throw new InvalidStatusTransitionException(entity.getStatus() + " -> " + status + " " + NOT_ALLOWED);
                 }
             case REJECTED:
-                if (entity.getStatus().equals(TeamStatus.PENDING)) {
-                    return updateTeamStatusInternal(entity, TeamStatus.REJECTED);
-                } else {
-                    throw new InvalidStatusTransitionException(entity.getStatus() + " -> " + status + " " + NOT_ALLOWED);
-                }
             case CLOSED:
                 return updateTeamStatusInternal(entity, TeamStatus.CLOSED);
             default:
