@@ -93,11 +93,11 @@ public class DataController {
     // Delete a data set
     @DeleteMapping(path = "/{id}")
     @ResponseStatus(HttpStatus.OK)
-    public Data remove(@AuthenticationPrincipal Object claims, @PathVariable Long id) throws UnsupportedEncodingException {
+    public String remove(@AuthenticationPrincipal Object claims, @PathVariable Long id) throws UnsupportedEncodingException {
         if (claims == null || !(claims instanceof Claims)) {
             throw new UnauthorizedException();
         }
-        return new DataInfo(dataService.deleteDataset(id, (Claims) claims));
+        return String.valueOf(dataService.deleteDataset(id, (Claims) claims).getName());
     }
 
     // View resource in a data set
