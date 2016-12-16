@@ -1438,4 +1438,31 @@ public class AdapterDeterLabTest {
         verify(restTemplate,times(1)).exchange(anyString(),eq(HttpMethod.POST),anyObject(),eq(String.class));
         verify(properties,times(1)).saveImage();
     }
+
+    @Test
+    public void getFreeNodesGood() {
+
+        String freeNodes = RandomStringUtils.randomNumeric(3);
+
+        when(restTemplate.exchange(anyString(),eq(HttpMethod.GET),anyObject(),eq(String.class))).thenReturn(response);
+        when(response.getBody()).thenReturn(freeNodes);
+
+        String result = adapterDeterLab.getFreeNodes();
+
+        verify(restTemplate,times(1)).exchange(anyString(),eq(HttpMethod.GET),anyObject(),eq(String.class));
+        verify(properties,times(1)).getFreeNodes();
+        assertThat(result).isEqualTo(freeNodes);
+    }
+
+    @Test
+    public void getFreeNodesDeterLabConnectionFailed() {
+
+        when(restTemplate.exchange(anyString(),eq(HttpMethod.GET),anyObject(),eq(String.class))).thenThrow(new RestClientException("error get free nodes"));
+
+        String result = adapterDeterLab.getFreeNodes();
+
+        verify(restTemplate,times(1)).exchange(anyString(),eq(HttpMethod.GET),anyObject(),eq(String.class));
+        verify(properties,times(1)).getFreeNodes();
+        assertThat(result).isEqualTo("0");
+    }
 }
