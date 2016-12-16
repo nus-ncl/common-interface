@@ -23,7 +23,6 @@ public class TelemetryServiceImpl implements TelemetryService {
     }
 
     public String getFreeNodes() {
-        log.info("Telemetry getting free nodes at: {}", connectionProperties.getFreeNodes());
-        return ;
+        return adapterDeterLab.getFreeNodes();
     }
 }
