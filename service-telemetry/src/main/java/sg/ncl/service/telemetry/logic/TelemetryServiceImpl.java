@@ -22,6 +22,7 @@ public class TelemetryServiceImpl implements TelemetryService {
         this.adapterDeterLab = adapterDeterLab;
     }
 
+    @Override
     public String getFreeNodes() {
         return adapterDeterLab.getFreeNodes();
     }

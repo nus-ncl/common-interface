@@ -12,6 +12,10 @@ import sg.ncl.adapter.deterlab.DeterLabAutoConfiguration;
 @Import({DeterLabAutoConfiguration.class})
 public class TelemetryApplication {
 
+    private TelemetryApplication() {
+
+    }
+
     public static void main(String[] args) {
         final SpringApplication application = new SpringApplication(TelemetryApplication.class);
         application.run(args);
