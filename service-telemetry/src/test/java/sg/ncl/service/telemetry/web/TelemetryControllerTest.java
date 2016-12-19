@@ -62,6 +62,6 @@ public class TelemetryControllerTest {
         mockMvc.perform(get(TelemetryController.PATH))
                 .andExpect(status().isOk())
                 .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
-                .andExpect(jsonPath("$.numberOfFreeNodes", is(equalTo(freeNodes))));
+                .andExpect(jsonPath("$.free", is(equalTo(freeNodes))));
     }
 }
