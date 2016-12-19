@@ -37,7 +37,7 @@ public class TelemetryController {
     @ResponseStatus(HttpStatus.OK)
     public Map<String, String> getFreeNodes() {
         Map<String, String> map = new HashMap<>();
-        map.put("numberOfFreeNodes", telemetryService.getFreeNodes());
+        map.put("free", telemetryService.getFreeNodes());
         return map;
     }
 }
