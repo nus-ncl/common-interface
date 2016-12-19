@@ -1,0 +1,10 @@
+version '1.0-SNAPSHOT'
+
+dependencies {
+    compile project(':common')
+    compile project(':adapter-deterlab')
+
+    compileOnly 'org.springframework.boot:spring-boot-configuration-processor'
+
+    testCompile project(':common-test')
+}
