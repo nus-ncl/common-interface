@@ -7,7 +7,7 @@ import sg.ncl.common.jpa.UseJpa;
 
 
 /**
- * @author Vu
+ * @author Tran Ly Vu
  */
 @SpringBootApplication
 @UseJpa

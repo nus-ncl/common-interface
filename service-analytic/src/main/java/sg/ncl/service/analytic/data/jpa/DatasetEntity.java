@@ -2,11 +2,10 @@ package sg.ncl.service.analytic.data.jpa;
 
 
 import sg.ncl.common.jpa.AbstractEntity;
-import sg.ncl.service.analytic.domain.DataSet;
+import sg.ncl.service.analytic.domain.Dataset;
 
 import javax.persistence.*;
 
-import static javax.persistence.GenerationType.SEQUENCE;
 
 /**
  * @author: Tran Ly Vu
@@ -14,10 +13,10 @@ import static javax.persistence.GenerationType.SEQUENCE;
 
 @Entity
 @Table(name = "datasets")
-public class DatasetEntity extends AbstractEntity implements DataSet {
+public class DatasetEntity extends AbstractEntity implements Dataset {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE)
+    @GeneratedValue
     @Column(name = "id", nullable = false, unique = true, updatable = false)
     private Long id;
 
