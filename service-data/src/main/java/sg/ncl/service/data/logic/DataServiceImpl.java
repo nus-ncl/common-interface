@@ -1,10 +1,14 @@
 package sg.ncl.service.data.logic;
 
+import freemarker.template.Template;
+import freemarker.template.TemplateException;
 import io.jsonwebtoken.Claims;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.ui.freemarker.FreeMarkerTemplateUtils;
 import org.springframework.web.util.UriUtils;
+import sg.ncl.common.DomainProperties;
 import sg.ncl.common.exception.base.NotFoundException;
 import sg.ncl.service.data.data.jpa.DataEntity;
 import sg.ncl.service.data.data.jpa.DataRepository;
@@ -15,16 +19,22 @@ import sg.ncl.service.data.domain.DataService;
 import sg.ncl.service.data.domain.DataVisibility;
 import sg.ncl.service.data.exceptions.*;
 import sg.ncl.service.data.web.DataResourceInfo;
+import sg.ncl.service.mail.domain.MailService;
 import sg.ncl.service.transmission.domain.DownloadService;
 import sg.ncl.service.transmission.domain.UploadService;
 import sg.ncl.service.transmission.web.ResumableInfo;
+import sg.ncl.service.user.domain.User;
+import sg.ncl.service.user.domain.UserService;
 
 import javax.inject.Inject;
+import javax.inject.Named;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.constraints.NotNull;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 import static sg.ncl.service.data.validations.Validator.checkAccessibility;
@@ -44,14 +54,26 @@ public class DataServiceImpl implements DataService {
     private final DataRepository dataRepository;
     private final UploadService uploadService;
     private final DownloadService downloadService;
+    private final UserService userService;
+    private final MailService mailService;
+    private final DomainProperties domainProperties;
+    private final Template requestAccessTemplate;
 
     @Inject
     DataServiceImpl(@NotNull final DataRepository dataRepository,
                     @NotNull final UploadService uploadService,
-                    @NotNull final DownloadService downloadService) {
+                    @NotNull final DownloadService downloadService,
+                    @NotNull final UserService userService,
+                    @NotNull final MailService mailService,
+                    @NotNull final DomainProperties domainProperties,
+                    @NotNull @Named("requestAccessTemplate") final Template requestAccessTemplate) {
         this.dataRepository = dataRepository;
         this.uploadService = uploadService;
         this.downloadService = downloadService;
+        this.userService = userService;
+        this.mailService = mailService;
+        this.domainProperties = domainProperties;
+        this.requestAccessTemplate = requestAccessTemplate;
     }
 
     private DataEntity setUpDataEntity(Data data, DataEntity... dataEntities) {
@@ -305,6 +327,41 @@ public class DataServiceImpl implements DataService {
             log.error("Unable to download resource: {}", e);
             throw new NotFoundException();
         }
+    }
+
+    @Override
+    public String createRequest(Long id, String reason, Claims claims) {
+        Data data = getDataset(id);
+        User owner = userService.getUser(data.getContributorId());
+        User requester = userService.getUser(claims.getSubject());
+
+        final Map<String, String> map = new HashMap<>();
+        map.put("firstname", owner.getUserDetails().getFirstName());
+        map.put("dataname", "<dataset name>");
+        map.put("fullname", requester.getUserDetails().getFirstName() + " " + requester.getUserDetails().getLastName());
+        map.put("email", requester.getUserDetails().getEmail());
+        map.put("phone", requester.getUserDetails().getPhone());
+        map.put("jobtitle", requester.getUserDetails().getJobTitle());
+        map.put("institution", requester.getUserDetails().getInstitution());
+        map.put("country", requester.getUserDetails().getAddress().getCountry());
+        map.put("reason", "<reason>");
+        map.put("domain", domainProperties.getDomain());
+        map.put("id", "<RequestId>");
+
+        try {
+            String[] to = new String[1];
+            to[0] = owner.getUserDetails().getEmail();
+            String[] cc = new String[2];
+            cc[0] = requester.getUserDetails().getEmail();
+            cc[1] = "support@ncl.sg";
+            String msgText = FreeMarkerTemplateUtils.processTemplateIntoString(requestAccessTemplate, map);
+            mailService.send("testbed-ops@ncl.sg", to, "Pending Dataset Access Request", msgText, false, cc, null);
+            log.debug("Email sent: {}", msgText);
+        } catch (IOException | TemplateException e) {
+            log.warn("{}", e);
+        }
+
+        return "";
     }
 
 }

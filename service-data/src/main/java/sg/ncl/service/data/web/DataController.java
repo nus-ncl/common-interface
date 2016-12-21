@@ -135,12 +135,11 @@ public class DataController {
     // Request access to a dataset
     @PostMapping(path = "/{id}/requests")
     @ResponseStatus(HttpStatus.CREATED)
-    public String addRequest(@AuthenticationPrincipal Object claims, @PathVariable Long id) {
+    public String addRequest(@AuthenticationPrincipal Object claims, @PathVariable Long id, @RequestBody String reason) {
         if (claims == null || !(claims instanceof Claims)) {
             throw new UnauthorizedException();
         }
-        // TODO: add request to database
-        return "";
+        return dataService.createRequest(id, reason, (Claims) claims);
     }
 
     // Process request

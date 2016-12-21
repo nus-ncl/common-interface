@@ -36,4 +36,6 @@ public interface DataService {
 
     void downloadResource(HttpServletResponse response, Long did, Long rid, Claims claims);
 
+    String createRequest(Long id, String reason, Claims claims);
+
 }
