@@ -1,18 +1,33 @@
 package sg.ncl.service.data;
 
+import freemarker.template.Configuration;
+import freemarker.template.Template;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.ConfigurableApplicationContext;
+import org.springframework.context.annotation.Bean;
 import sg.ncl.common.jpa.UseJpa;
+
+import java.io.IOException;
+
 /**
  * Created by dcszwang on 10/5/2016.
  */
 @SpringBootApplication
 @UseJpa
 public class DataApplication {
+
+    private static final String REQUEST_ACCESS_TEMPLATE = "requestAccessTemplate.ftl";
+
     public static void main(final String[] args) {
         try (final ConfigurableApplicationContext context = SpringApplication.run(DataApplication.class, args)) {
             // nothing to do
         }
     }
+
+    @Bean
+    Template requestAccessTemplate(final Configuration configuration) throws IOException {
+        return configuration.getTemplate(REQUEST_ACCESS_TEMPLATE);
+    }
+
 }
