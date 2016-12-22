@@ -1,6 +1,5 @@
 package sg.ncl.service.data.logic;
 
-import freemarker.template.Template;
 import io.jsonwebtoken.Claims;
 import org.junit.Before;
 import org.junit.Rule;
@@ -10,7 +9,6 @@ import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
 import org.springframework.test.context.TestPropertySource;
-import sg.ncl.common.DomainProperties;
 import sg.ncl.common.authentication.Role;
 import sg.ncl.common.exception.base.ForbiddenException;
 import sg.ncl.common.exception.base.NotFoundException;
@@ -27,12 +25,10 @@ import sg.ncl.service.data.exceptions.DataNameAlreadyExistsException;
 import sg.ncl.service.data.exceptions.DataNotFoundException;
 import sg.ncl.service.data.exceptions.DataResourceNotFoundException;
 import sg.ncl.service.data.util.TestUtil;
-import sg.ncl.service.mail.domain.MailService;
 import sg.ncl.service.transmission.domain.DownloadService;
 import sg.ncl.service.transmission.domain.UploadService;
 import sg.ncl.service.transmission.domain.UploadStatus;
 import sg.ncl.service.transmission.web.ResumableInfo;
-import sg.ncl.service.user.domain.UserService;
 
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
@@ -62,14 +58,6 @@ public class DataServiceImplTest extends AbstractTest {
     @Mock
     private DownloadService downloadService;
     @Mock
-    private UserService userService;
-    @Mock
-    private MailService mailService;
-    @Mock
-    private DomainProperties domainProperties;
-    @Mock
-    private Template freemarkerConfiguration;
-    @Mock
     private Claims claims;
     @Mock
     private HttpServletResponse response;
@@ -81,9 +69,7 @@ public class DataServiceImplTest extends AbstractTest {
         assertThat(mockingDetails(dataRepository).isMock()).isTrue();
         assertThat(mockingDetails(uploadService).isMock()).isTrue();
         assertThat(mockingDetails(downloadService).isMock()).isTrue();
-        assertThat(mockingDetails(userService).isMock()).isTrue();
-        assertThat(mockingDetails(mailService).isMock()).isTrue();
-        dataService = new DataServiceImpl(dataRepository, uploadService, downloadService, userService, mailService, domainProperties, freemarkerConfiguration);
+        dataService = new DataServiceImpl(dataRepository, uploadService, downloadService);
     }
 
     @Test

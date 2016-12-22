@@ -23,6 +23,7 @@ import sg.ncl.common.exception.GlobalExceptionHandler;
 import sg.ncl.service.data.data.jpa.DataEntity;
 import sg.ncl.service.data.data.jpa.DataResourceEntity;
 import sg.ncl.service.data.domain.Data;
+import sg.ncl.service.data.domain.DataAccessRequestService;
 import sg.ncl.service.data.domain.DataService;
 import sg.ncl.service.data.domain.DataVisibility;
 import sg.ncl.service.data.util.TestUtil;
@@ -60,6 +61,8 @@ public class DataControllerTest {
 
     @MockBean
     private DataService dataService;
+    @MockBean
+    private DataAccessRequestService dataAccessRequestService;
 
     @Inject
     private ObjectMapper mapper;
@@ -74,6 +77,7 @@ public class DataControllerTest {
         assertThat(mockingDetails(securityContext).isMock()).isTrue();
         assertThat(mockingDetails(authentication).isMock()).isTrue();
         assertThat(mockingDetails(dataService).isMock()).isTrue();
+        assertThat(mockingDetails(dataAccessRequestService).isMock()).isTrue();
         mockMvc = webAppContextSetup(webApplicationContext).build();
     }
 
