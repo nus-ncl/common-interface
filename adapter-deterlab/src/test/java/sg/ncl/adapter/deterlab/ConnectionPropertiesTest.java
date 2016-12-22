@@ -180,4 +180,10 @@ public class ConnectionPropertiesTest {
         assertThat(connectionProperties.saveImage()).isNotNull();
         assertThat(connectionProperties.saveImage()).isEqualTo("http://127.0.0.1:22/saveImage");
     }
+
+    @Test
+    public void testGetFreeNodes() throws Exception {
+        assertThat(connectionProperties.getFreeNodes()).isNotNull();
+        assertThat(connectionProperties.getFreeNodes()).isEqualTo("http://127.0.0.1:22/getFreeNodes");
+    }
 }

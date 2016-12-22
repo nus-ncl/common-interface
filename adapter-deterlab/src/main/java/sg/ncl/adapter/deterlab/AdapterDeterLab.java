@@ -662,6 +662,22 @@ public class AdapterDeterLab {
         }
     }
 
+    public String getFreeNodes() {
+        log.info("Getting free nodes...");
+
+        HttpHeaders headers = new HttpHeaders();
+        HttpEntity<String> request = new HttpEntity<>(headers);
+        ResponseEntity response;
+
+        try {
+            response = restTemplate.exchange(properties.getFreeNodes(), HttpMethod.GET, request, String.class);
+        } catch (RestClientException e) {
+            log.warn("DeterLab connection error get free nodes: {}", e);
+            return "0";
+        }
+        return response.getBody().toString();
+    }
+
     public String getTopologyThumbnail(String jsonString) {
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);

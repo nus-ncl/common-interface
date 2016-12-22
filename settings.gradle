@@ -16,5 +16,7 @@ include 'service-user'
 include 'service-version'
 include 'service-image'
 include 'service-transmission'
+include 'service-telemetry'
+
 include 'service-analytic'
 
