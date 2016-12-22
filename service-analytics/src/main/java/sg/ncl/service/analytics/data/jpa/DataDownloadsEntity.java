@@ -1,10 +1,10 @@
-package sg.ncl.service.analytic.data.jpa;
+package sg.ncl.service.analytics.data.jpa;
 
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import sg.ncl.common.jpa.AbstractEntity;
-import sg.ncl.service.analytic.domain.DatasetDownloads;
+import sg.ncl.service.analytics.domain.DataDownloads;
 
 import javax.persistence.Id;
 import javax.persistence.Entity;
@@ -21,11 +21,11 @@ import java.time.ZonedDateTime;
 
 
 @Entity
-@Table(name = "dataset_downloads")
+@Table(name = "data_downloads")
 @Getter
 @Setter
 @Slf4j
-public class DatasetDownloadsEntity extends AbstractEntity implements DatasetDownloads {
+public class DataDownloadsEntity extends AbstractEntity implements DataDownloads {
 
     @Id
     @GeneratedValue
@@ -50,7 +50,7 @@ public class DatasetDownloadsEntity extends AbstractEntity implements DatasetDow
                 "id='" + id + '\'' +
                 ", data_id=" + dataId +
                 ", resource_id=" + resourceId +
-                ", date=" + downloadDate +
+                ", download_date=" + downloadDate +
                 ", hashed_user_id=" + hashedUserId +
                 "} " + super.toString();
     }
