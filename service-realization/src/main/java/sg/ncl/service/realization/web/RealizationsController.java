@@ -18,6 +18,9 @@ import sg.ncl.service.realization.domain.RealizationService;
 import javax.inject.Inject;
 import javax.validation.constraints.NotNull;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 import static sg.ncl.common.validation.Validator.checkClaimsType;
 
 /**
@@ -35,6 +38,12 @@ public class RealizationsController {
     @Inject
     RealizationsController(@NotNull final RealizationService realizationService) {
         this.realizationService = realizationService;
+    }
+
+    @GetMapping
+    @ResponseStatus(HttpStatus.OK)
+    public List<Realization> getAll() {
+        return realizationService.getAll().stream().map(RealizationInfo::new).collect(Collectors.toList());
     }
 
     // will be replaced by the one requiring team name

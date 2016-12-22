@@ -3,10 +3,14 @@ package sg.ncl.service.realization.domain;
 import io.jsonwebtoken.Claims;
 import sg.ncl.service.realization.data.jpa.RealizationEntity;
 
+import java.util.List;
+
 /**
  * Created by Desmond.
  */
 public interface RealizationService {
+
+    List<Realization> getAll();
 
     RealizationEntity getById(Long id);
 
