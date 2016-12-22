@@ -39,7 +39,7 @@ public class DatasetDownloadsEntity extends AbstractEntity implements DatasetDow
     private Long resourceId;
 
     @Column(name = "download_date", nullable = false)
-    private ZonedDateTime downloadDate;
+    private transient ZonedDateTime downloadDate;
 
     @Column(name = "hashed_user_id", nullable = false)
     private String hashedUserId;
