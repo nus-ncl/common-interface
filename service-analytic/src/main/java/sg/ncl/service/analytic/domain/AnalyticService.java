@@ -3,5 +3,5 @@ package sg.ncl.service.analytic.domain;
 /**
  * @author: Tran Ly Vu
  */
-public interface Analytic {
+public interface AnalyticService {
 }

@@ -8,4 +8,6 @@ dependencies {
 
     testCompile project(':common-test')
     testCompile 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310'
+
+
 }
