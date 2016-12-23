@@ -35,7 +35,6 @@ public class RealizationServiceImpl implements RealizationService {
         this.adapterDeterLab = adapterDeterLab;
     }
 
-    @Transactional
     @Override
     public List<Realization> getAll() {
         return realizationRepository.findAll().stream().collect(Collectors.toList());
