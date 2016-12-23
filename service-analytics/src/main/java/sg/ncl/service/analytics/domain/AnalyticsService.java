@@ -5,7 +5,8 @@ import java.time.ZonedDateTime;
 /**
  * @author: Tran Ly Vu
  */
+@FunctionalInterface
 public interface AnalyticsService {
 
-    void addDataDownloadRecord(Long id, Long resourceId, Long Dataid, ZonedDateTime downloadDate);
+    void addDataDownloadRecord(Long id, Long resourceId, Long DataId, ZonedDateTime downloadDate);
 }

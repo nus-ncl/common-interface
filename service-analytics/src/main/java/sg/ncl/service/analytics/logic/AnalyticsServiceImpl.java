@@ -13,7 +13,8 @@ import java.time.ZonedDateTime;
 @Slf4j
 public class AnalyticsServiceImpl implements AnalyticsService {
 
-    public void addDataDownloadRecord(Long id, Long resourceId, Long Userid, ZonedDateTime date) {
+    @Override
+    public void addDataDownloadRecord(Long id, Long resourceId, Long UserId, ZonedDateTime date) {
 
     }
 
