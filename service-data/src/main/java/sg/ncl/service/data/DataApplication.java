@@ -18,6 +18,7 @@ import java.io.IOException;
 public class DataApplication {
 
     private static final String REQUEST_ACCESS_TEMPLATE = "requestAccessTemplate.ftl";
+    private static final String APPROVED_ACCESS_TEMPLATE = "approvedAccessTemplate.ftl";
 
     public static void main(final String[] args) {
         try (final ConfigurableApplicationContext context = SpringApplication.run(DataApplication.class, args)) {
@@ -28,6 +29,11 @@ public class DataApplication {
     @Bean
     Template requestAccessTemplate(final Configuration configuration) throws IOException {
         return configuration.getTemplate(REQUEST_ACCESS_TEMPLATE);
+    }
+
+    @Bean
+    Template approvedAccessTemplate(final Configuration configuration) throws IOException {
+        return configuration.getTemplate(APPROVED_ACCESS_TEMPLATE);
     }
 
 }
