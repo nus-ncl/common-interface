@@ -24,6 +24,7 @@ import javax.validation.constraints.NotNull;
 import java.io.IOException;
 import java.time.ZonedDateTime;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -65,9 +66,15 @@ public class DataAccessRequestServiceImpl implements DataAccessRequestService {
         User owner = userService.getUser(data.getContributorId());
         User requester = userService.getUser(claims.getSubject());
 
-        DataAccessRequestEntity newEntity = new DataAccessRequestEntity();
-        newEntity.setDataId(data.getId());
-        newEntity.setRequesterId(requester.getId());
+        DataAccessRequestEntity newEntity;
+        List<DataAccessRequestEntity> list = dataAccessRequestRepository.findByDataIdAndRequesterId(id, requester.getId());
+        if (list.isEmpty()) {
+            newEntity = new DataAccessRequestEntity();
+            newEntity.setDataId(data.getId());
+            newEntity.setRequesterId(requester.getId());
+        } else {
+            newEntity = list.get(0);
+        }
         newEntity.setReason(reason);
         newEntity.setRequestDate(ZonedDateTime.now());
         DataAccessRequestEntity savedEntity = dataAccessRequestRepository.save(newEntity);

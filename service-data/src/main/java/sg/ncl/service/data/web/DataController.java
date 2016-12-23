@@ -2,6 +2,7 @@ package sg.ncl.service.data.web;
 
 import io.jsonwebtoken.Claims;
 import lombok.extern.slf4j.Slf4j;
+import org.json.JSONObject;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -139,7 +140,8 @@ public class DataController {
         if (claims == null || !(claims instanceof Claims)) {
             throw new UnauthorizedException();
         }
-        return new DataAccessRequestInfo(dataAccessRequestService.createRequest(id, reason, (Claims) claims));
+        final JSONObject json = new JSONObject(reason);
+        return new DataAccessRequestInfo(dataAccessRequestService.createRequest(id, json.getString("reason"), (Claims) claims));
     }
 
     // Process request
