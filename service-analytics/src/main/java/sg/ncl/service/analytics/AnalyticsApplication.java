@@ -11,6 +11,11 @@ import sg.ncl.common.jpa.UseJpa;
 @SpringBootApplication
 @UseJpa
 public class AnalyticsApplication {
+
+    private AnalyticsApplication() {
+        throw new IllegalAccessError("");
+    }
+
     public static void main(final String[] args) {
         try (final ConfigurableApplicationContext context = SpringApplication.run(AnalyticsApplication.class, args)) {
             // nothing to do

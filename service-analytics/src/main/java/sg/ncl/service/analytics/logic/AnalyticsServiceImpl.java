@@ -14,8 +14,8 @@ import java.time.ZonedDateTime;
 public class AnalyticsServiceImpl implements AnalyticsService {
 
     @Override
-    public void addDataDownloadRecord(Long id, Long resourceId, Long UserId, ZonedDateTime date) {
-
+    public void addDataDownloadRecord(Long id, Long resourceId, Long userId, ZonedDateTime date) {
+        throw new UnsupportedOperationException();
     }
 
 }
