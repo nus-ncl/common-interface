@@ -3,6 +3,7 @@ package sg.ncl.service.data.web;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import io.jsonwebtoken.Claims;
+import org.json.JSONObject;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -20,6 +21,7 @@ import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.web.context.WebApplicationContext;
 import sg.ncl.common.exception.ExceptionAutoConfiguration;
 import sg.ncl.common.exception.GlobalExceptionHandler;
+import sg.ncl.service.data.data.jpa.DataAccessRequestEntity;
 import sg.ncl.service.data.data.jpa.DataEntity;
 import sg.ncl.service.data.data.jpa.DataResourceEntity;
 import sg.ncl.service.data.domain.Data;
@@ -387,6 +389,37 @@ public class DataControllerTest {
         when(authentication.getPrincipal()).thenReturn(claims);
 
         mockMvc.perform(get(DataController.PATH + "/1/resources/1/download"))
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    public void testAddRequest() throws Exception {
+        DataAccessRequestEntity entity = TestUtil.getDataAccessRequestEntity();
+
+        when(securityContext.getAuthentication()).thenReturn(authentication);
+        SecurityContextHolder.setContext(securityContext);
+        when(authentication.getPrincipal()).thenReturn(claims);
+        when(dataAccessRequestService.createRequest(anyLong(), asJsonString(anyString()), any(Claims.class))).thenReturn(entity);
+
+        JSONObject object = new JSONObject();
+        object.put("reason", "test");
+
+        mockMvc.perform(post(DataController.PATH + "/1/requests")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(object.toString()))
+                .andExpect(status().isCreated());
+    }
+
+    @Test
+    public void testProcessRequest() throws Exception {
+        DataAccessRequestEntity entity = TestUtil.getDataAccessRequestEntity();
+
+        when(securityContext.getAuthentication()).thenReturn(authentication);
+        SecurityContextHolder.setContext(securityContext);
+        when(authentication.getPrincipal()).thenReturn(claims);
+        when(dataAccessRequestService.approveRequest(anyLong(), anyLong(), any(Claims.class))).thenReturn(entity);
+
+        mockMvc.perform(put(DataController.PATH + "/1/requests/1"))
                 .andExpect(status().isOk());
     }
 
