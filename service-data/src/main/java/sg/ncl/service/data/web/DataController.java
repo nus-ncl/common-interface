@@ -147,12 +147,11 @@ public class DataController {
     // Process request
     @PutMapping(path = "/{did}/requests/{rid}")
     @ResponseStatus(HttpStatus.OK)
-    public String processRequest(@AuthenticationPrincipal Object claims, @PathVariable Long did, @PathVariable Long rid) {
+    public DataAccessRequest processRequest(@AuthenticationPrincipal Object claims, @PathVariable Long did, @PathVariable Long rid) {
         if (claims == null || !(claims instanceof Claims)) {
             throw new UnauthorizedException();
         }
-        // TODO: process request to add to approved users
-        return "";
+        return new DataAccessRequestInfo(dataAccessRequestService.approveRequest(did, rid, (Claims) claims));
     }
 
     @GetMapping(value = "/{id}/chunks/{resumableChunkNumber}/files/{resumableIdentifier}")

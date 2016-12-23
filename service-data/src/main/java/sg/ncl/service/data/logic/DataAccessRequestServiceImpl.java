@@ -13,6 +13,7 @@ import sg.ncl.service.data.data.jpa.DataRepository;
 import sg.ncl.service.data.domain.Data;
 import sg.ncl.service.data.domain.DataAccessRequest;
 import sg.ncl.service.data.domain.DataAccessRequestService;
+import sg.ncl.service.data.exceptions.DataAccessRequestNotFoundException;
 import sg.ncl.service.data.exceptions.DataNotFoundException;
 import sg.ncl.service.mail.domain.MailService;
 import sg.ncl.service.user.domain.User;
@@ -27,6 +28,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import static sg.ncl.service.data.validations.Validator.checkPermissions;
+
 /**
  * Created by dcsjnh on 12/22/2016.
  */
@@ -40,6 +43,7 @@ public class DataAccessRequestServiceImpl implements DataAccessRequestService {
     private final MailService mailService;
     private final DomainProperties domainProperties;
     private final Template requestAccessTemplate;
+    private final Template approvedAccessTemplate;
 
     @Inject
     DataAccessRequestServiceImpl(@NotNull final DataRepository dataRepository,
@@ -47,13 +51,15 @@ public class DataAccessRequestServiceImpl implements DataAccessRequestService {
                                  @NotNull final UserService userService,
                                  @NotNull final MailService mailService,
                                  @NotNull final DomainProperties domainProperties,
-                                 @NotNull @Named("requestAccessTemplate") final Template requestAccessTemplate) {
+                                 @NotNull @Named("requestAccessTemplate") final Template requestAccessTemplate,
+                                 @NotNull @Named("approvedAccessTemplate") final Template approvedAccessTemplate) {
         this.dataRepository = dataRepository;
         this.dataAccessRequestRepository = dataAccessRequestRepository;
         this.userService = userService;
         this.mailService = mailService;
         this.domainProperties = domainProperties;
         this.requestAccessTemplate = requestAccessTemplate;
+        this.approvedAccessTemplate = approvedAccessTemplate;
     }
 
     @Override
@@ -105,6 +111,46 @@ public class DataAccessRequestServiceImpl implements DataAccessRequestService {
             log.warn("{}", e);
         }
 
+        log.info("Data access request created: {}", savedEntity);
+        return savedEntity;
+    }
+
+    @Override
+    public DataAccessRequest approveRequest(Long did, Long rid, Claims claims) {
+        Data data = dataRepository.getOne(did);
+        if (data == null) {
+            throw new DataNotFoundException("Data not found.");
+        }
+        checkPermissions(data, claims);
+        DataAccessRequestEntity dataAccessRequestEntity = dataAccessRequestRepository.getOne(rid);
+        if (dataAccessRequestEntity == null) {
+            throw new DataAccessRequestNotFoundException("Data access request not found.");
+        }
+
+        dataAccessRequestEntity.setApprovedDate(ZonedDateTime.now());
+        DataAccessRequestEntity savedEntity = dataAccessRequestRepository.save(dataAccessRequestEntity);
+
+        User owner = userService.getUser(data.getContributorId());
+        User requester = userService.getUser(savedEntity.getRequesterId());
+
+        final Map<String, String> map = new HashMap<>();
+        map.put("firstname", requester.getUserDetails().getFirstName());
+        map.put("dataname", data.getName());
+
+        try {
+            String[] to = new String[1];
+            to[0] = requester.getUserDetails().getEmail();
+            String[] cc = new String[2];
+            cc[0] = owner.getUserDetails().getEmail();
+            cc[1] = "support@ncl.sg";
+            String msgText = FreeMarkerTemplateUtils.processTemplateIntoString(approvedAccessTemplate, map);
+            mailService.send("testbed-ops@ncl.sg", to, "Dataset Access Request Approved", msgText, false, cc, null);
+            log.debug("Email sent: {}", msgText);
+        } catch (IOException | TemplateException e) {
+            log.warn("{}", e);
+        }
+
+        log.info("Data access request approved: {}", savedEntity);
         return savedEntity;
     }
 
