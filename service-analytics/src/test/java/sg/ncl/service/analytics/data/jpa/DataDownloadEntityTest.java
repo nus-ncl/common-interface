@@ -47,7 +47,7 @@ public class DataDownloadEntityTest {
     @Test
     public void setIdTest() {
         final DataDownloadsEntity entity = new DataDownloadsEntity();
-        final Long randomId = Long.parseLong(RandomStringUtils.randomNumeric(20));
+        final Long randomId = Long.parseLong(RandomStringUtils.randomNumeric(10));
         entity.setId(randomId);
 
         Long actual = entity.getId();
@@ -59,7 +59,7 @@ public class DataDownloadEntityTest {
     @Test
     public void setDataIdTest() {
         final DataDownloadsEntity entity = new DataDownloadsEntity();
-        final Long randomDataId = Long.parseLong(RandomStringUtils.randomNumeric(20));
+        final Long randomDataId = Long.parseLong(RandomStringUtils.randomNumeric(10));
         entity.setDataId(randomDataId);
 
         Long actual = entity.getDataId();
@@ -71,7 +71,7 @@ public class DataDownloadEntityTest {
     @Test
     public void setResourceIdTest() {
         final DataDownloadsEntity entity = new DataDownloadsEntity();
-        final Long randomResourceId = Long.parseLong(RandomStringUtils.randomNumeric(20));
+        final Long randomResourceId = Long.parseLong(RandomStringUtils.randomNumeric(10));
         entity.setResourceId(randomResourceId);
 
         Long actual = entity.getResourceId();
@@ -107,9 +107,9 @@ public class DataDownloadEntityTest {
     @Test
     public void toStringTest() {
         final DataDownloadsEntity entity = new DataDownloadsEntity();
-        final Long randomId = Long.parseLong(RandomStringUtils.randomNumeric(20));
-        final Long randomDataId = Long.parseLong(RandomStringUtils.randomNumeric(20));
-        final Long randomResourceId = Long.parseLong(RandomStringUtils.randomNumeric(20));
+        final Long randomId = Long.parseLong(RandomStringUtils.randomNumeric(10));
+        final Long randomDataId = Long.parseLong(RandomStringUtils.randomNumeric(10));
+        final Long randomResourceId = Long.parseLong(RandomStringUtils.randomNumeric(10));
         final ZonedDateTime now = ZonedDateTime.now();
         final  String randomString = RandomStringUtils.randomAlphanumeric(20);
         entity.setId(randomId);
@@ -123,7 +123,7 @@ public class DataDownloadEntityTest {
                 "id='" + randomId + '\'' +
                 ", data_id=" + randomDataId +
                 ", resource_id=" + randomResourceId +
-                ", date=" + now +
+                ", download_date=" + now +
                 ", hashed_user_id=" + randomString +
                 "} " ;
 

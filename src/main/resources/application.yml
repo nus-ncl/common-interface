@@ -4,9 +4,9 @@ server:
   port: 8080
 spring:
   datasource:
-    url: ${jdbc.url:} # e.g., jdbc:mysql://localhost:3306/ncl?useSSL=false
-    username: ${jdbc.username:}
-    password: ${jdbc.password:}
+    url: jdbc:mysql://localhost:32769/prod?useSSL=false
+    username: root
+    password: 13061990
   jpa:
     hibernate:
       ddl-auto: validate
@@ -18,8 +18,8 @@ spring:
   mail:
     host: smtp-relay.gmail.com
     port: 465
-    username: ${gmail.username:}
-    password: ${gmail.password:}
+    username: testbed-ops@ncl.sg
+    password: deterinavm
     protocol: smtps
     properties:
       starttls:
@@ -29,9 +29,9 @@ flyway:
   # baseline-version: 1.1
   # baseline-on-migrate: true # for cases when the schema is non-empty and there is no metadata table
   schemas: flyway, prod
-  url: ${db.url:} # e.g., jdbc:mysql://localhost:3306?useSSL=false
-  user: ${db.user:}
-  password: ${db.password:}
+  url: jdbc:mysql://localhost:32769?useSSL=false
+  user: root
+  password: 13061990
 ncl:
   authentication:
     uri:
@@ -47,11 +47,11 @@ ncl:
   domain: dev.ncl.sg
   deterlab:
     adapter:
-      ip: test.ncl.sg
+      ip: testbed.dev.ncl.sg
       port: 8080
       bossUrl: ${deterlab.boss:}
       userUrl: ${deterlab.user:}
-      enabled: false
+      enabled: true
   jwt:
     api-key: ${jwt.key:}
     signing-algorithm: HS512
@@ -62,7 +62,3 @@ deterurl:
   bossurl: 172.18.178.10
   userurl: 172.18.178.11
   port: 80
-transmission:
-    baseDir: resources # '/home/<user>/uploads'
-    subDirs:
-        dataDir: data # '<base_dir>/data/<dataset_id>/<file_name>'
