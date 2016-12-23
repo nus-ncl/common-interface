@@ -16,7 +16,6 @@ import javax.inject.Inject;
 import javax.validation.constraints.NotNull;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -37,6 +36,7 @@ public class RealizationServiceImpl implements RealizationService {
     }
 
     @Transactional
+    @Override
     public List<Realization> getAll() {
         return realizationRepository.findAll().stream().collect(Collectors.toList());
     }
