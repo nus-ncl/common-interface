@@ -48,6 +48,8 @@ public class DataAccessRequestServiceImplTest extends AbstractTest {
     @Mock
     private Template requestAccessTemplate;
     @Mock
+    private Template approvedAccessTemplate;
+    @Mock
     private Claims claims;
 
     private DataAccessRequestService dataAccessRequestService;
@@ -58,7 +60,14 @@ public class DataAccessRequestServiceImplTest extends AbstractTest {
         assertThat(mockingDetails(dataAccessRequestRepository).isMock()).isTrue();
         assertThat(mockingDetails(userService).isMock()).isTrue();
         assertThat(mockingDetails(mailService).isMock()).isTrue();
-        dataAccessRequestService = new DataAccessRequestServiceImpl(dataRepository, dataAccessRequestRepository, userService, mailService, domainProperties, requestAccessTemplate);
+        dataAccessRequestService = new DataAccessRequestServiceImpl(
+                dataRepository,
+                dataAccessRequestRepository,
+                userService,
+                mailService,
+                domainProperties,
+                requestAccessTemplate,
+                approvedAccessTemplate);
     }
 
     @Test
