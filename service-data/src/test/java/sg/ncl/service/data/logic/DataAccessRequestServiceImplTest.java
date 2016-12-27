@@ -18,6 +18,7 @@ import sg.ncl.service.data.data.jpa.DataAccessRequestEntity;
 import sg.ncl.service.data.data.jpa.DataAccessRequestRepository;
 import sg.ncl.service.data.data.jpa.DataEntity;
 import sg.ncl.service.data.data.jpa.DataRepository;
+import sg.ncl.service.data.domain.DataAccessRequest;
 import sg.ncl.service.data.domain.DataAccessRequestService;
 import sg.ncl.service.data.exceptions.DataAccessRequestNotFoundException;
 import sg.ncl.service.data.exceptions.DataNotFoundException;
@@ -143,6 +144,25 @@ public class DataAccessRequestServiceImplTest extends AbstractTest {
 
         dataAccessRequestService.approveRequest(1L, claims);
         verify(dataAccessRequestRepository, times(1)).save(any(DataAccessRequestEntity.class));
+    }
+
+    @Test
+    public void testGetRequest() throws Exception {
+        DataEntity dataEntity = TestUtil.getDataEntity();
+        final List<String> roles = Collections.singletonList(Role.USER.getAuthority());
+        DataAccessRequestEntity dataAccessRequestEntity = TestUtil.getDataAccessRequestEntity();
+
+        when(dataRepository.getOne(anyLong())).thenReturn(dataEntity);
+        when(claims.get(JwtToken.KEY)).thenReturn(roles);
+        when(claims.getSubject()).thenReturn(dataEntity.getContributorId());
+        when(dataAccessRequestRepository.getOne(anyLong())).thenReturn(dataAccessRequestEntity);
+
+        DataAccessRequest request = dataAccessRequestService.getRequest(1L, claims);
+
+        assertThat(request.getId()).isEqualTo(dataAccessRequestEntity.getId());
+        assertThat(request.getDataId()).isEqualTo(dataAccessRequestEntity.getDataId());
+        assertThat(request.getRequesterId()).isEqualTo(dataAccessRequestEntity.getRequesterId());
+        assertThat(request.getReason()).isEqualTo(dataAccessRequestEntity.getReason());
     }
 
 }

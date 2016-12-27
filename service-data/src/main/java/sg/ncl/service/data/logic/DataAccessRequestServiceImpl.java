@@ -37,6 +37,8 @@ import static sg.ncl.service.data.validations.Validator.checkPermissions;
 @Slf4j
 public class DataAccessRequestServiceImpl implements DataAccessRequestService {
 
+    private static final String DATA_NOT_FOUND = "Data not found.";
+
     private final DataRepository dataRepository;
     private final DataAccessRequestRepository dataAccessRequestRepository;
     private final UserService userService;
@@ -66,7 +68,7 @@ public class DataAccessRequestServiceImpl implements DataAccessRequestService {
     public DataAccessRequest createRequest(Long id, String reason, Claims claims) {
         Data data = dataRepository.getOne(id);
         if (data == null) {
-            throw new DataNotFoundException("Data not found.");
+            throw new DataNotFoundException(DATA_NOT_FOUND);
         }
 
         User owner = userService.getUser(data.getContributorId());
@@ -124,7 +126,7 @@ public class DataAccessRequestServiceImpl implements DataAccessRequestService {
         Long did = dataAccessRequestEntity.getDataId();
         Data data = dataRepository.getOne(did);
         if (data == null) {
-            throw new DataNotFoundException("Data not found.");
+            throw new DataNotFoundException(DATA_NOT_FOUND);
         }
         checkPermissions(data, claims);
 
@@ -164,7 +166,7 @@ public class DataAccessRequestServiceImpl implements DataAccessRequestService {
         Long did = dataAccessRequestEntity.getDataId();
         Data data = dataRepository.getOne(did);
         if (data == null) {
-            throw new DataNotFoundException("Data not found.");
+            throw new DataNotFoundException(DATA_NOT_FOUND);
         }
         checkPermissions(data, claims);
         return dataAccessRequestEntity;
