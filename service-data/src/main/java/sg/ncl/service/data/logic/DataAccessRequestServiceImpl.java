@@ -15,6 +15,7 @@ import sg.ncl.service.data.domain.DataAccessRequest;
 import sg.ncl.service.data.domain.DataAccessRequestService;
 import sg.ncl.service.data.exceptions.DataAccessRequestNotFoundException;
 import sg.ncl.service.data.exceptions.DataNotFoundException;
+import sg.ncl.service.data.exceptions.DataNotMatchException;
 import sg.ncl.service.mail.domain.MailService;
 import sg.ncl.service.user.domain.User;
 import sg.ncl.service.user.domain.UserService;
@@ -119,12 +120,14 @@ public class DataAccessRequestServiceImpl implements DataAccessRequestService {
     }
 
     @Override
-    public DataAccessRequest approveRequest(Long rid, Claims claims) {
+    public DataAccessRequest approveRequest(Long did, Long rid, Claims claims) {
         DataAccessRequestEntity dataAccessRequestEntity = dataAccessRequestRepository.getOne(rid);
         if (dataAccessRequestEntity == null) {
             throw new DataAccessRequestNotFoundException("Data access request not found.");
         }
-        Long did = dataAccessRequestEntity.getDataId();
+        if (did != dataAccessRequestEntity.getDataId()) {
+            throw new DataNotMatchException("Request parent data id does not match the data id to retrieve.");
+        }
         Data data = dataRepository.getOne(did);
         if (data == null) {
             throw new DataNotFoundException(DATA_NOT_FOUND);
@@ -159,12 +162,14 @@ public class DataAccessRequestServiceImpl implements DataAccessRequestService {
     }
 
     @Override
-    public DataAccessRequest getRequest(Long rid, Claims claims) {
+    public DataAccessRequest getRequest(Long did, Long rid, Claims claims) {
         DataAccessRequestEntity dataAccessRequestEntity = dataAccessRequestRepository.getOne(rid);
         if (dataAccessRequestEntity == null) {
             throw new DataAccessRequestNotFoundException("Data access request not found.");
         }
-        Long did = dataAccessRequestEntity.getDataId();
+        if (did != dataAccessRequestEntity.getDataId()) {
+            throw new DataNotMatchException("Request parent data id does not match the data id to retrieve.");
+        }
         Data data = dataRepository.getOne(did);
         if (data == null) {
             throw new DataNotFoundException(DATA_NOT_FOUND);
