@@ -1325,16 +1325,77 @@ public class AdapterDeterLabTest {
         verify(properties,times(1)).login();
     }
 
+
     //throw AdapterConnectionException
     @Test
-    public void getTopoThumbnailTest() {
-        JSONObject myobject = new JSONObject();
-        myobject.put("thumbnail", "");
+    public void getTopologyThumbnailTest1() {
+        String randomString = RandomStringUtils.randomAlphanumeric(10);
 
         exception.expect(AdapterConnectionException.class);
-        when(restTemplate.exchange(anyString(),eq(HttpMethod.POST),anyObject(),eq(String.class)))
-                .thenThrow(new RestClientException(""));
-        adapterDeterLab.getTopologyThumbnail(myobject.toString());
+        when(restTemplate.exchange(anyString(),eq(HttpMethod.POST),anyObject(),eq(String.class))).
+                thenThrow(new RestClientException(""));
+
+        String actual = adapterDeterLab.getTopologyThumbnail(randomString);
+
+        verify(restTemplate,times(1)).exchange(anyString(),eq(HttpMethod.POST),anyObject(),eq(String.class));
+        verify(properties,times(1)).getTopoThumbnail();
+    }
+
+    @Test
+    public void getTopologyThumbnailTest2() {
+        String randomString1 = RandomStringUtils.randomAlphanumeric(10);
+        String expected = RandomStringUtils.randomAlphanumeric(10);
+
+        when(restTemplate.exchange(anyString(),eq(HttpMethod.POST),anyObject(),eq(String.class))).thenReturn(response);
+        when(response.getBody()).thenReturn(expected);
+
+        String actual = adapterDeterLab.getTopologyThumbnail(randomString1);
+
+        verify(restTemplate,times(1)).exchange(anyString(),eq(HttpMethod.POST),anyObject(),eq(String.class));
+        verify(properties,times(1)).getTopoThumbnail();
+        assertThat(actual).isEqualTo(expected);
+    }
+
+    //throw RestClientException
+    @Test
+    public void getUsageStatisticsTest1() {
+        String randomTeamId = RandomStringUtils.randomAlphanumeric(10);
+        String randomStartDate= RandomStringUtils.randomAlphanumeric(10);
+        String randomEndDate = RandomStringUtils.randomAlphanumeric(10);
+
+        DeterLabProjectEntity deterLabProjectEntity = new DeterLabProjectEntity();
+
+        when(restTemplate.exchange(anyString(),eq(HttpMethod.POST),anyObject(),eq(String.class))).
+                thenThrow(new RestClientException(""));
+        when(deterLabProjectRepository.findByNclTeamId(randomTeamId)).thenReturn(deterLabProjectEntity);
+
+        String actual = adapterDeterLab.getUsageStatistics(randomTeamId, randomStartDate, randomEndDate);
+
+        verify(restTemplate,times(1)).exchange(anyString(),eq(HttpMethod.POST),anyObject(),eq(String.class));
+        verify(properties,times(1)).getUsageStatistics();
+        assertThat(actual).isEqualTo("?");
+    }
+
+    @Test
+    public void getUsageStatisticsTest2() {
+        String randomTeamId = RandomStringUtils.randomAlphanumeric(10);
+        String randomStartDate= RandomStringUtils.randomAlphanumeric(10);
+        String randomEndDate = RandomStringUtils.randomAlphanumeric(10);
+        String expected = RandomStringUtils.randomAlphanumeric(10);
+
+        DeterLabProjectEntity deterLabProjectEntity = new DeterLabProjectEntity();
+
+        when(deterLabProjectRepository.findByNclTeamId(randomTeamId)).thenReturn(deterLabProjectEntity);
+        when(restTemplate.exchange(anyString(),eq(HttpMethod.POST),anyObject(),eq(String.class))).
+                thenReturn(response);
+        when(response.getBody()).thenReturn(expected);
+
+        String actual = adapterDeterLab.getUsageStatistics(randomTeamId, randomStartDate, randomEndDate);
+
+        verify(restTemplate,times(1)).exchange(anyString(),eq(HttpMethod.POST),anyObject(),eq(String.class));
+        verify(properties,times(1)).getUsageStatistics();
+        assertThat(actual).isEqualTo(expected);
+
     }
 
     @Test
@@ -1465,4 +1526,5 @@ public class AdapterDeterLabTest {
         verify(properties,times(1)).getFreeNodes();
         assertThat(result).isEqualTo("0");
     }
+
 }
