@@ -125,7 +125,7 @@ public class DataAccessRequestServiceImpl implements DataAccessRequestService {
         if (dataAccessRequestEntity == null) {
             throw new DataAccessRequestNotFoundException("Data access request not found.");
         }
-        if (did != dataAccessRequestEntity.getDataId()) {
+        if (!did.equals(dataAccessRequestEntity.getDataId())) {
             throw new DataNotMatchException("Request parent data id does not match the data id to retrieve.");
         }
         Data data = dataRepository.getOne(did);
@@ -167,7 +167,7 @@ public class DataAccessRequestServiceImpl implements DataAccessRequestService {
         if (dataAccessRequestEntity == null) {
             throw new DataAccessRequestNotFoundException("Data access request not found.");
         }
-        if (did != dataAccessRequestEntity.getDataId()) {
+        if (!did.equals(dataAccessRequestEntity.getDataId())) {
             throw new DataNotMatchException("Request parent data id does not match the data id to retrieve.");
         }
         Data data = dataRepository.getOne(did);
