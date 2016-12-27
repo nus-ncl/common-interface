@@ -98,7 +98,8 @@ public class DataAccessRequestServiceImpl implements DataAccessRequestService {
         map.put("country", requester.getUserDetails().getAddress().getCountry());
         map.put("reason", savedEntity.getReason());
         map.put("domain", domainProperties.getDomain());
-        map.put("id", savedEntity.getId().toString());
+        map.put("did", data.getId().toString());
+        map.put("rid", savedEntity.getId().toString());
 
         try {
             String[] to = new String[1];
