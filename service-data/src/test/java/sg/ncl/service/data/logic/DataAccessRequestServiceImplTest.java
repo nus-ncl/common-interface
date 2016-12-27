@@ -106,9 +106,11 @@ public class DataAccessRequestServiceImplTest extends AbstractTest {
 
     @Test
     public void testApproveRequestDataNotFound() {
+        DataAccessRequestEntity entity = TestUtil.getDataAccessRequestEntity();
+        when(dataAccessRequestRepository.getOne(anyLong())).thenReturn(entity);
         when(dataRepository.getOne(anyLong())).thenReturn(null);
         exception.expect(DataNotFoundException.class);
-        dataAccessRequestService.approveRequest(1L, 1L, claims);
+        dataAccessRequestService.approveRequest(1L, claims);
     }
 
     @Test
@@ -122,7 +124,7 @@ public class DataAccessRequestServiceImplTest extends AbstractTest {
         when(dataAccessRequestRepository.getOne(anyLong())).thenReturn(null);
 
         exception.expect(DataAccessRequestNotFoundException.class);
-        dataAccessRequestService.approveRequest(1L, 1L, claims);
+        dataAccessRequestService.approveRequest(1L, claims);
     }
 
     @Test
@@ -139,7 +141,7 @@ public class DataAccessRequestServiceImplTest extends AbstractTest {
         when(dataAccessRequestRepository.save(any(DataAccessRequestEntity.class))).thenReturn(dataAccessRequestEntity);
         when(userService.getUser(anyString())).thenReturn(userEntity);
 
-        dataAccessRequestService.approveRequest(1L, 1L, claims);
+        dataAccessRequestService.approveRequest(1L, claims);
         verify(dataAccessRequestRepository, times(1)).save(any(DataAccessRequestEntity.class));
     }
 

@@ -116,16 +116,17 @@ public class DataAccessRequestServiceImpl implements DataAccessRequestService {
     }
 
     @Override
-    public DataAccessRequest approveRequest(Long did, Long rid, Claims claims) {
+    public DataAccessRequest approveRequest(Long rid, Claims claims) {
+        DataAccessRequestEntity dataAccessRequestEntity = dataAccessRequestRepository.getOne(rid);
+        if (dataAccessRequestEntity == null) {
+            throw new DataAccessRequestNotFoundException("Data access request not found.");
+        }
+        Long did = dataAccessRequestEntity.getDataId();
         Data data = dataRepository.getOne(did);
         if (data == null) {
             throw new DataNotFoundException("Data not found.");
         }
         checkPermissions(data, claims);
-        DataAccessRequestEntity dataAccessRequestEntity = dataAccessRequestRepository.getOne(rid);
-        if (dataAccessRequestEntity == null) {
-            throw new DataAccessRequestNotFoundException("Data access request not found.");
-        }
 
         dataAccessRequestEntity.setApprovedDate(ZonedDateTime.now());
         DataAccessRequestEntity savedEntity = dataAccessRequestRepository.save(dataAccessRequestEntity);
@@ -152,6 +153,21 @@ public class DataAccessRequestServiceImpl implements DataAccessRequestService {
 
         log.info("Data access request approved: {}", savedEntity);
         return savedEntity;
+    }
+
+    @Override
+    public DataAccessRequest getRequest(Long rid, Claims claims) {
+        DataAccessRequestEntity dataAccessRequestEntity = dataAccessRequestRepository.getOne(rid);
+        if (dataAccessRequestEntity == null) {
+            throw new DataAccessRequestNotFoundException("Data access request not found.");
+        }
+        Long did = dataAccessRequestEntity.getDataId();
+        Data data = dataRepository.getOne(did);
+        if (data == null) {
+            throw new DataNotFoundException("Data not found.");
+        }
+        checkPermissions(data, claims);
+        return dataAccessRequestEntity;
     }
 
 }

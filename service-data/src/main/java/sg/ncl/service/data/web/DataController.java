@@ -134,14 +134,14 @@ public class DataController {
     }
 
     // Request access to a dataset
-    @PostMapping(path = "/{id}/requests")
+    @PostMapping(path = "/{did}/requests")
     @ResponseStatus(HttpStatus.CREATED)
-    public DataAccessRequest addRequest(@AuthenticationPrincipal Object claims, @PathVariable Long id, @RequestBody String reason) {
+    public DataAccessRequest addRequest(@AuthenticationPrincipal Object claims, @PathVariable Long did, @RequestBody String reason) {
         if (claims == null || !(claims instanceof Claims)) {
             throw new UnauthorizedException();
         }
         final JSONObject json = new JSONObject(reason);
-        return new DataAccessRequestInfo(dataAccessRequestService.createRequest(id, json.getString("reason"), (Claims) claims));
+        return new DataAccessRequestInfo(dataAccessRequestService.createRequest(did, json.getString("reason"), (Claims) claims));
     }
 
     // Process request
@@ -151,7 +151,17 @@ public class DataController {
         if (claims == null || !(claims instanceof Claims)) {
             throw new UnauthorizedException();
         }
-        return new DataAccessRequestInfo(dataAccessRequestService.approveRequest(did, rid, (Claims) claims));
+        return new DataAccessRequestInfo(dataAccessRequestService.approveRequest(rid, (Claims) claims));
+    }
+
+    // Get request
+    @GetMapping(path = "/{did}/requests/{rid}")
+    @ResponseStatus(HttpStatus.OK)
+    public DataAccessRequest getRequest(@AuthenticationPrincipal Object claims, @PathVariable Long did, @PathVariable Long rid) {
+        if (claims == null || !(claims instanceof Claims)) {
+            throw new UnauthorizedException();
+        }
+        return new DataAccessRequestInfo(dataAccessRequestService.getRequest(rid, (Claims) claims));
     }
 
     @GetMapping(value = "/{id}/chunks/{resumableChunkNumber}/files/{resumableIdentifier}")
