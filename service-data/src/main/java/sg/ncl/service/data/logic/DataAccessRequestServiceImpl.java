@@ -9,6 +9,7 @@ import org.springframework.ui.freemarker.FreeMarkerTemplateUtils;
 import sg.ncl.common.DomainProperties;
 import sg.ncl.service.data.data.jpa.DataAccessRequestEntity;
 import sg.ncl.service.data.data.jpa.DataAccessRequestRepository;
+import sg.ncl.service.data.data.jpa.DataEntity;
 import sg.ncl.service.data.data.jpa.DataRepository;
 import sg.ncl.service.data.domain.Data;
 import sg.ncl.service.data.domain.DataAccessRequest;
@@ -133,6 +134,10 @@ public class DataAccessRequestServiceImpl implements DataAccessRequestService {
             throw new DataNotFoundException(DATA_NOT_FOUND);
         }
         checkPermissions(data, claims);
+
+        DataEntity dataEntity = (DataEntity) data;
+        dataEntity.addApprovedUser(dataAccessRequestEntity.getRequesterId());
+        dataRepository.save(dataEntity);
 
         dataAccessRequestEntity.setApprovedDate(ZonedDateTime.now());
         DataAccessRequestEntity savedEntity = dataAccessRequestRepository.save(dataAccessRequestEntity);
