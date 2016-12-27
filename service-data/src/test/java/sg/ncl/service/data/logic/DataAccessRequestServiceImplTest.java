@@ -96,12 +96,14 @@ public class DataAccessRequestServiceImplTest extends AbstractTest {
         UserEntity userEntity = TestUtil.getUserEntity();
         DataAccessRequestEntity dataAccessRequestEntity = TestUtil.getDataAccessRequestEntity();
 
+        dataEntity.setId(1L);
+
         when(dataRepository.getOne(anyLong())).thenReturn(dataEntity);
         when(userService.getUser(anyString())).thenReturn(userEntity);
         when(dataAccessRequestRepository.findByDataIdAndRequesterId(anyLong(), anyString())).thenReturn(new ArrayList<DataAccessRequestEntity>());
         when(dataAccessRequestRepository.save(any(DataAccessRequestEntity.class))).thenReturn(dataAccessRequestEntity);
 
-        dataAccessRequestService.createRequest(1L, "", claims);
+        dataAccessRequestService.createRequest(dataEntity.getId(), "", claims);
         verify(dataAccessRequestRepository, times(1)).save(any(DataAccessRequestEntity.class));
     }
 
@@ -111,7 +113,7 @@ public class DataAccessRequestServiceImplTest extends AbstractTest {
         when(dataAccessRequestRepository.getOne(anyLong())).thenReturn(entity);
         when(dataRepository.getOne(anyLong())).thenReturn(null);
         exception.expect(DataNotFoundException.class);
-        dataAccessRequestService.approveRequest(1L, claims);
+        dataAccessRequestService.approveRequest(entity.getDataId(), 1L, claims);
     }
 
     @Test
@@ -125,7 +127,7 @@ public class DataAccessRequestServiceImplTest extends AbstractTest {
         when(dataAccessRequestRepository.getOne(anyLong())).thenReturn(null);
 
         exception.expect(DataAccessRequestNotFoundException.class);
-        dataAccessRequestService.approveRequest(1L, claims);
+        dataAccessRequestService.approveRequest(1L, 1L, claims);
     }
 
     @Test
@@ -142,7 +144,7 @@ public class DataAccessRequestServiceImplTest extends AbstractTest {
         when(dataAccessRequestRepository.save(any(DataAccessRequestEntity.class))).thenReturn(dataAccessRequestEntity);
         when(userService.getUser(anyString())).thenReturn(userEntity);
 
-        dataAccessRequestService.approveRequest(1L, claims);
+        dataAccessRequestService.approveRequest(dataAccessRequestEntity.getDataId(), 1L, claims);
         verify(dataAccessRequestRepository, times(1)).save(any(DataAccessRequestEntity.class));
     }
 
@@ -157,7 +159,7 @@ public class DataAccessRequestServiceImplTest extends AbstractTest {
         when(claims.getSubject()).thenReturn(dataEntity.getContributorId());
         when(dataAccessRequestRepository.getOne(anyLong())).thenReturn(dataAccessRequestEntity);
 
-        DataAccessRequest request = dataAccessRequestService.getRequest(1L, claims);
+        DataAccessRequest request = dataAccessRequestService.getRequest(dataAccessRequestEntity.getDataId(), 1L, claims);
 
         assertThat(request.getId()).isEqualTo(dataAccessRequestEntity.getId());
         assertThat(request.getDataId()).isEqualTo(dataAccessRequestEntity.getDataId());

@@ -151,7 +151,7 @@ public class DataController {
         if (claims == null || !(claims instanceof Claims)) {
             throw new UnauthorizedException();
         }
-        return new DataAccessRequestInfo(dataAccessRequestService.approveRequest(rid, (Claims) claims));
+        return new DataAccessRequestInfo(dataAccessRequestService.approveRequest(did, rid, (Claims) claims));
     }
 
     // Get request
@@ -161,7 +161,7 @@ public class DataController {
         if (claims == null || !(claims instanceof Claims)) {
             throw new UnauthorizedException();
         }
-        return new DataAccessRequestInfo(dataAccessRequestService.getRequest(rid, (Claims) claims));
+        return new DataAccessRequestInfo(dataAccessRequestService.getRequest(did, rid, (Claims) claims));
     }
 
     @GetMapping(value = "/{id}/chunks/{resumableChunkNumber}/files/{resumableIdentifier}")
