@@ -8,6 +8,8 @@ import org.junit.rules.ExpectedException;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
+import org.springframework.boot.test.mock.mockito.MockBean;
+import sg.ncl.adapter.deterlab.AdapterDeterLab;
 import sg.ncl.service.team.Util;
 import sg.ncl.service.team.data.jpa.TeamEntity;
 import sg.ncl.service.team.data.jpa.TeamRepository;
@@ -15,6 +17,7 @@ import sg.ncl.service.team.domain.*;
 import sg.ncl.service.team.exceptions.*;
 import sg.ncl.service.team.web.TeamInfo;
 import sg.ncl.service.team.web.TeamMemberInfo;
+import sg.ncl.service.user.domain.UserService;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -36,7 +39,11 @@ public class TeamServiceImplTest {
     public ExpectedException exception = ExpectedException.none();
 
     @Mock
+    private AdapterDeterLab adapterDeterLab;
+    @Mock
     private TeamRepository teamRepository;
+    @Mock
+    private UserService userService;
 
     private TeamService teamService;
     private List<TeamMember> members = new ArrayList<>();
@@ -45,8 +52,10 @@ public class TeamServiceImplTest {
 
     @Before
     public void before() {
+        assertThat(mockingDetails(adapterDeterLab).isMock()).isTrue();
         assertThat(mockingDetails(teamRepository).isMock()).isTrue();
-        teamService = new TeamServiceImpl(teamRepository);
+        assertThat(mockingDetails(userService).isMock()).isTrue();
+        teamService = new TeamServiceImpl(adapterDeterLab, teamRepository, userService);
     }
 
     @Test
