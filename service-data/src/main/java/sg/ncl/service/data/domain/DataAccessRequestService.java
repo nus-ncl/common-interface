@@ -10,21 +10,29 @@ public interface DataAccessRequestService {
     /**
      * Add a dataset access request entry into database.
      *
-     * @param id        Dataset Id
+     * @param did       Dataset Id
      * @param reason    Request Reason
      * @param claims    Authenticated User
      * @return          DataAccessRequestEntity
      */
-    DataAccessRequest createRequest(Long id, String reason, Claims claims);
+    DataAccessRequest createRequest(Long did, String reason, Claims claims);
 
     /**
      * Approve a dataset access request entry.
      *
-     * @param did        Dataset Id
-     * @param rid        Request Id
+     * @param rid       Request Id
      * @param claims    Authenticated User
      * @return          DataAccessRequestEntity
      */
-    DataAccessRequest approveRequest(Long did, Long rid, Claims claims);
+    DataAccessRequest approveRequest(Long rid, Claims claims);
+
+    /**
+     * Get a dataset access request entry.
+     *
+     * @param rid       Request Id
+     * @param claims    Authenticated User
+     * @return          DataAccessRequestEntity
+     */
+    DataAccessRequest getRequest(Long rid, Claims claims);
 
 }

@@ -417,7 +417,7 @@ public class DataControllerTest {
         when(securityContext.getAuthentication()).thenReturn(authentication);
         SecurityContextHolder.setContext(securityContext);
         when(authentication.getPrincipal()).thenReturn(claims);
-        when(dataAccessRequestService.approveRequest(anyLong(), anyLong(), any(Claims.class))).thenReturn(entity);
+        when(dataAccessRequestService.approveRequest(anyLong(), any(Claims.class))).thenReturn(entity);
 
         mockMvc.perform(put(DataController.PATH + "/1/requests/1"))
                 .andExpect(status().isOk());
