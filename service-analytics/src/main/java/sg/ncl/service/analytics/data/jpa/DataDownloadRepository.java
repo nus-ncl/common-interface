@@ -5,6 +5,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
 /**
  * @author: Tran Ly Vu
  */
-public interface DataDownloadsRepository extends JpaRepository<DataDownloadsEntity, Long> {
+public interface DataDownloadRepository extends JpaRepository<DataDownloadEntity, Long> {
 
 }

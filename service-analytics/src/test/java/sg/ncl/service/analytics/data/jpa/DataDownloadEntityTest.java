@@ -2,7 +2,6 @@ package sg.ncl.service.analytics.data.jpa;
 
 import org.apache.commons.lang3.RandomStringUtils;
 import org.junit.Test;
-import sg.ncl.service.analytics.data.jpa.DataDownloadsEntity;
 
 import java.time.ZonedDateTime;
 
@@ -16,37 +15,37 @@ public class DataDownloadEntityTest {
 
     @Test
     public void getIdTest() {
-        final DataDownloadsEntity entity = new DataDownloadsEntity();
+        final DataDownloadEntity entity = new DataDownloadEntity();
         assertThat(entity.getId()).isNull();
     }
 
     @Test
     public void getDataIdTest() {
-        final DataDownloadsEntity entity = new DataDownloadsEntity();
+        final DataDownloadEntity entity = new DataDownloadEntity();
         assertThat(entity. getDataId()).isNull();
     }
 
     @Test
     public void getResourceIdTest() {
-        final DataDownloadsEntity entity = new DataDownloadsEntity();
+        final DataDownloadEntity entity = new DataDownloadEntity();
         assertThat(entity. getResourceId()).isNull();
     }
 
     @Test
     public void getDownloadDateTest() {
-        final DataDownloadsEntity entity = new DataDownloadsEntity();
+        final DataDownloadEntity entity = new DataDownloadEntity();
         assertThat(entity.getDownloadDate()).isNull();
     }
 
     @Test
     public void gethashedUserIdTest() {
-        final DataDownloadsEntity entity = new DataDownloadsEntity();
+        final DataDownloadEntity entity = new DataDownloadEntity();
         assertThat(entity.getHashedUserId()).isNull();
     }
 
     @Test
     public void setIdTest() {
-        final DataDownloadsEntity entity = new DataDownloadsEntity();
+        final DataDownloadEntity entity = new DataDownloadEntity();
         final Long randomId = Long.parseLong(RandomStringUtils.randomNumeric(10));
         entity.setId(randomId);
 
@@ -58,7 +57,7 @@ public class DataDownloadEntityTest {
 
     @Test
     public void setDataIdTest() {
-        final DataDownloadsEntity entity = new DataDownloadsEntity();
+        final DataDownloadEntity entity = new DataDownloadEntity();
         final Long randomDataId = Long.parseLong(RandomStringUtils.randomNumeric(10));
         entity.setDataId(randomDataId);
 
@@ -70,7 +69,7 @@ public class DataDownloadEntityTest {
 
     @Test
     public void setResourceIdTest() {
-        final DataDownloadsEntity entity = new DataDownloadsEntity();
+        final DataDownloadEntity entity = new DataDownloadEntity();
         final Long randomResourceId = Long.parseLong(RandomStringUtils.randomNumeric(10));
         entity.setResourceId(randomResourceId);
 
@@ -82,7 +81,7 @@ public class DataDownloadEntityTest {
 
     @Test
     public void setDownloadDateTest() {
-        final DataDownloadsEntity entity = new DataDownloadsEntity();
+        final DataDownloadEntity entity = new DataDownloadEntity();
         final ZonedDateTime now = ZonedDateTime.now();
         entity.setDownloadDate(now);
 
@@ -94,7 +93,7 @@ public class DataDownloadEntityTest {
 
     @Test
     public void setHashedUserId () {
-        final DataDownloadsEntity entity = new DataDownloadsEntity();
+        final DataDownloadEntity entity = new DataDownloadEntity();
         final  String randomString = RandomStringUtils.randomAlphanumeric(20);
         entity.setHashedUserId(randomString);
 
@@ -106,7 +105,7 @@ public class DataDownloadEntityTest {
 
     @Test
     public void toStringTest() {
-        final DataDownloadsEntity entity = new DataDownloadsEntity();
+        final DataDownloadEntity entity = new DataDownloadEntity();
         final Long randomId = Long.parseLong(RandomStringUtils.randomNumeric(10));
         final Long randomDataId = Long.parseLong(RandomStringUtils.randomNumeric(10));
         final Long randomResourceId = Long.parseLong(RandomStringUtils.randomNumeric(10));

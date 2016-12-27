@@ -25,7 +25,7 @@ import java.time.ZonedDateTime;
 @Getter
 @Setter
 @Slf4j
-public class DataDownloadsEntity extends AbstractEntity implements DataDownloads {
+public class DataDownloadEntity extends AbstractEntity implements DataDownloads {
 
     @Id
     @GeneratedValue
