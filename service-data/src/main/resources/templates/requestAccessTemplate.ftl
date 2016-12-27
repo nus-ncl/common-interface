@@ -15,7 +15,7 @@ Request Reason: ${reason}
 
 To approve the request, please click on the link below:
 
-https://${domain}/data/requests/${id}
+https://${domain}/data/${did}/requests/${rid}
 
 Ignore this email if you do not agree to the request.
 
