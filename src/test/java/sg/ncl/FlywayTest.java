@@ -357,6 +357,63 @@ public class FlywayTest {
     }
 
     @Test
+    public void testDataDownloadsTable() throws Exception {
+        // make sure 'data_downloads' table has expected number of columns
+        List<Map<String, Object>> dataDownloadsTable = this.template.queryForList("SHOW COLUMNS FROM " + SCHEMA + "." + DATA_DOWNLOADS);
+        assertThat(dataDownloadsTable.size()).isEqualTo(8);
+
+        // make sure 'data_resources' table has expected column name and type
+        assertThat((String) dataDownloadsTable.get(0).get("FIELD")).isEqualTo("id");
+        assertThat((String) dataDownloadsTable.get(0).get("TYPE")).contains("bigint");
+        assertThat((String) dataDownloadsTable.get(0).get("NULL")).isEqualTo("NO");
+        assertThat((String) dataDownloadsTable.get(0).get("KEY")).isEqualTo("PRI");
+
+        assertThat((String) dataDownloadsTable.get(1).get("FIELD")).isEqualTo("created_date");
+        assertThat((String) dataDownloadsTable.get(1).get("TYPE")).contains("timestamp");
+        assertThat((String) dataDownloadsTable.get(1).get("NULL")).isEqualTo("NO");
+        assertThat((String) dataDownloadsTable.get(1).get("KEY")).isEmpty();
+
+        assertThat((String) dataDownloadsTable.get(2).get("FIELD")).isEqualTo("last_modified_date");
+        assertThat((String) dataDownloadsTable.get(2).get("TYPE")).contains("timestamp");
+        assertThat((String) dataDownloadsTable.get(2).get("NULL")).isEqualTo("NO");
+        assertThat((String) dataDownloadsTable.get(2).get("KEY")).isEmpty();
+
+        assertThat((String) dataDownloadsTable.get(3).get("FIELD")).isEqualTo("version");
+        assertThat((String) dataDownloadsTable.get(3).get("TYPE")).contains("bigint");
+        assertThat((String) dataDownloadsTable.get(3).get("NULL")).isEqualTo("NO");
+        assertThat((String) dataDownloadsTable.get(3).get("KEY")).isEmpty();
+
+        assertThat((String) dataDownloadsTable.get(4).get("FIELD")).isEqualTo("data_id");
+        assertThat((String) dataDownloadsTable.get(4).get("TYPE")).contains("bigint");
+        assertThat((String) dataDownloadsTable.get(4).get("NULL")).isEqualTo("NO");
+        assertThat((String) dataDownloadsTable.get(4).get("KEY")).isEmpty();
+
+        assertThat((String) dataDownloadsTable.get(5).get("FIELD")).isEqualTo("resource_id");
+        assertThat((String) dataDownloadsTable.get(5).get("TYPE")).contains("bigint");
+        assertThat((String) dataDownloadsTable.get(5).get("NULL")).isEqualTo("NO");
+        assertThat((String) dataDownloadsTable.get(5).get("KEY")).isEmpty();
+
+        assertThat((String) dataDownloadsTable.get(6).get("FIELD")).isEqualTo("download_date");
+        assertThat((String) dataDownloadsTable.get(6).get("TYPE")).contains("timestamp");
+        assertThat((String) dataDownloadsTable.get(6).get("NULL")).isEqualTo("NO");
+        assertThat((String) dataDownloadsTable.get(6).get("KEY")).isEmpty();
+
+        assertThat((String) dataDownloadsTable.get(7).get("FIELD")).isEqualTo("hashed_user_id");
+        assertThat((String) dataDownloadsTable.get(7).get("TYPE")).contains("varchar(255)");
+        assertThat((String) dataDownloadsTable.get(7).get("NULL")).isEqualTo("NO");
+        assertThat((String) dataDownloadsTable.get(7).get("KEY")).isEmpty();
+
+        List<Map<String, Object>> dataDownloadsConstraints = this.template.queryForList("SELECT * FROM INFORMATION_SCHEMA.CONSTRAINTS WHERE TABLE_NAME = 'data_downloads'");
+
+        assertThat((String) dataDownloadsConstraints.get(0).get("CONSTRAINT_TYPE")).isEqualTo("PRIMARY KEY");
+        assertThat((String) dataDownloadsConstraints.get(0).get("COLUMN_LIST")).isEqualTo("ID");
+        assertThat((String) dataDownloadsConstraints.get(1).get("CONSTRAINT_TYPE")).isEqualTo("REFERENTIAL");
+        assertThat((String) dataDownloadsConstraints.get(1).get("COLUMN_LIST")).isEqualTo("RESOURCE_ID");
+        assertThat((String) dataDownloadsConstraints.get(2).get("CONSTRAINT_TYPE")).isEqualTo("REFERENTIAL");
+        assertThat((String) dataDownloadsConstraints.get(2).get("COLUMN_LIST")).isEqualTo("DATA_ID");
+    }
+
+    @Test
     public void testDataUsersTable() throws Exception {
         // make sure 'data_users' table has expected number of columns
         List<Map<String, Object>> dataUsersTable = this.template.queryForList("SHOW COLUMNS FROM " + SCHEMA + "." + DATA_USERS);
@@ -1241,4 +1298,5 @@ public class FlywayTest {
         simpleDriverDataSource.setPassword("");
         return simpleDriverDataSource;
     }
+
 }
