@@ -17,6 +17,9 @@ import sg.ncl.service.realization.domain.Realization;
 import sg.ncl.service.realization.domain.RealizationService;
 import sg.ncl.service.realization.domain.RealizationState;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyLong;
@@ -52,6 +55,25 @@ public class RealizationServiceTest {
         assertThat(mockingDetails(claims).isMock()).isTrue();
 
         realizationService = new RealizationServiceImpl(realizationRepository, adapterDeterLab);
+    }
+
+    @Test
+    public void testGetAllRealizations() {
+        RealizationEntity entity1 = getRealizationEntity();
+        RealizationEntity entity2 = getRealizationEntity();
+        RealizationEntity entity3 = getRealizationEntity();
+
+        List<RealizationEntity> realizationList = new ArrayList<>();
+        realizationList.add(entity1);
+        realizationList.add(entity2);
+        realizationList.add(entity3);
+
+        when(realizationRepository.findAll()).thenReturn(realizationList);
+
+        List<Realization> result = realizationService.getAll();
+
+        assertThat(result).hasSize(3);
+        assertThat(result).isEqualTo(realizationList);
     }
 
     @Test

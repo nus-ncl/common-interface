@@ -10,6 +10,7 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.http.MediaType;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -22,15 +23,25 @@ import org.springframework.web.context.WebApplicationContext;
 import sg.ncl.common.exception.ExceptionAutoConfiguration;
 import sg.ncl.common.exception.GlobalExceptionHandler;
 import sg.ncl.service.realization.data.jpa.RealizationEntity;
+import sg.ncl.service.realization.domain.Realization;
 import sg.ncl.service.realization.domain.RealizationService;
 
 import javax.inject.Inject;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.hasSize;
+import static org.hamcrest.Matchers.is;
 import static org.mockito.Mockito.mockingDetails;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static sg.ncl.service.realization.util.TestUtil.getRealizationEntity;
 
 /**
  * Created by Desmond.
@@ -65,6 +76,34 @@ public class RealizationsControllerTest {
         Assertions.assertThat(mockingDetails(authentication).isMock()).isTrue();
         Assertions.assertThat(mockingDetails(realizationService).isMock()).isTrue();
         mockMvc = MockMvcBuilders.webAppContextSetup(webApplicationContext).build();
+    }
+
+    @Test
+    public void testGetAllRealizations() throws Exception {
+        final List<Realization> list = new ArrayList<>();
+        final RealizationEntity entity1 = getRealizationEntity();
+        final RealizationEntity entity2 = getRealizationEntity();
+
+        list.add(entity1);
+        list.add(entity2);
+
+        when(realizationService.getAll()).thenReturn(list);
+
+        mockMvc.perform(get(RealizationsController.PATH))
+                .andExpect(status().isOk())
+                .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
+
+                .andExpect(jsonPath("$", hasSize(2)))
+
+                .andExpect(jsonPath("$[0].experimentId").isNumber())
+                .andExpect(jsonPath("$[0].experimentName", is(equalTo(entity1.getExperimentName()))))
+                .andExpect(jsonPath("$[0].userId", is(equalTo(entity1.getUserId()))))
+                .andExpect(jsonPath("$[0].teamId", is(equalTo(entity1.getTeamId()))))
+                .andExpect(jsonPath("$[0].numberOfNodes", is(equalTo(entity1.getNumberOfNodes()))))
+                .andExpect(jsonPath("$[0].state", is(equalTo(entity1.getState().name()))))
+                .andExpect(jsonPath("$[0].idleMinutes").isNumber())
+                .andExpect(jsonPath("$[0].runningMinutes").isNumber())
+                .andExpect(jsonPath("$[0].details", is(equalTo(entity1.getDetails()))));
     }
 
     @Test

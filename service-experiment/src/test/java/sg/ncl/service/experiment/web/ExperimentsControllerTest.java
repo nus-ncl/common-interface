@@ -80,7 +80,7 @@ public class ExperimentsControllerTest {
 
     @Test
     public void testGetAllExperimentsWithNothingInDb() throws Exception {
-        mockMvc.perform(get(ExperimentsController.PATH + "/experiments"))
+        mockMvc.perform(get(ExperimentsController.PATH))
                 .andExpect(status().isOk())
                 .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON));
     }
@@ -118,7 +118,7 @@ public class ExperimentsControllerTest {
 
         when(experimentService.getAll()).thenReturn(list);
 
-        mockMvc.perform(get(ExperimentsController.PATH + "/experiments"))
+        mockMvc.perform(get(ExperimentsController.PATH))
                 .andExpect(status().isOk())
                 .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
 

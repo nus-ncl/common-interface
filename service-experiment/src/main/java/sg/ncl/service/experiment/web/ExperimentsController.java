@@ -41,8 +41,7 @@ public class ExperimentsController {
     }
 
     // return all experiments (for use by administration)
-    @GetMapping(path = "/experiments")
-    // FIXME: this path is wrong "/experiments/experiments" should be "/experiments"
+    @GetMapping
     @ResponseStatus(HttpStatus.OK)
     public List<Experiment> get() {
         return experimentService.getAll().stream().map(ExperimentInfo::new).collect(Collectors.toList());

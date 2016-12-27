@@ -8,6 +8,7 @@ import org.springframework.transaction.annotation.Transactional;
 import sg.ncl.adapter.deterlab.AdapterDeterLab;
 import sg.ncl.service.realization.data.jpa.RealizationEntity;
 import sg.ncl.service.realization.data.jpa.RealizationRepository;
+import sg.ncl.service.realization.domain.Realization;
 import sg.ncl.service.realization.domain.RealizationService;
 import sg.ncl.service.realization.domain.RealizationState;
 
@@ -15,6 +16,8 @@ import javax.inject.Inject;
 import javax.validation.constraints.NotNull;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * Created by Desmond.
@@ -30,6 +33,11 @@ public class RealizationServiceImpl implements RealizationService {
     RealizationServiceImpl(@NotNull final RealizationRepository realizationRepository, @NotNull final AdapterDeterLab adapterDeterLab) {
         this.realizationRepository = realizationRepository;
         this.adapterDeterLab = adapterDeterLab;
+    }
+
+    @Override
+    public List<Realization> getAll() {
+        return realizationRepository.findAll().stream().collect(Collectors.toList());
     }
 
     @Transactional
