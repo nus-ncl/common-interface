@@ -27,6 +27,8 @@ public interface TeamService {
 
     Team removeMember(String id, TeamMember teamMember);
 
+    Team removeMember(String id, TeamMember teamMember, String requesterId);
+
     Boolean isOwner(String teamId, String userId);
 
     TeamMember updateMemberStatus(String teamId, String userId, MemberStatus status);
