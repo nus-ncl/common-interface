@@ -118,7 +118,7 @@ public class DataDownloadEntityTest {
         entity.setHashedUserId(randomString);
 
         String actual = entity.toString();
-        String expected = "DataEntity{" +
+        String expected = "DataDownloadEntity{" +
                 "id='" + randomId + '\'' +
                 ", data_id=" + randomDataId +
                 ", resource_id=" + randomResourceId +

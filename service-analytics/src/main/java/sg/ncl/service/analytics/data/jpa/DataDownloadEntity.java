@@ -4,7 +4,7 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import sg.ncl.common.jpa.AbstractEntity;
-import sg.ncl.service.analytics.domain.DataDownloads;
+import sg.ncl.service.analytics.domain.DataDownload;
 
 import javax.persistence.Id;
 import javax.persistence.Entity;
@@ -25,7 +25,7 @@ import java.time.ZonedDateTime;
 @Getter
 @Setter
 @Slf4j
-public class DataDownloadEntity extends AbstractEntity implements DataDownloads {
+public class DataDownloadEntity extends AbstractEntity implements DataDownload {
 
     @Id
     @GeneratedValue
@@ -46,7 +46,7 @@ public class DataDownloadEntity extends AbstractEntity implements DataDownloads 
 
     @Override
     public String toString() {
-        return "DataEntity{" +
+        return "DataDownloadEntity{" +
                 "id='" + id + '\'' +
                 ", data_id=" + dataId +
                 ", resource_id=" + resourceId +

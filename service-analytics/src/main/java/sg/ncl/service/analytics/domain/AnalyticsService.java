@@ -8,5 +8,5 @@ import java.time.ZonedDateTime;
 @FunctionalInterface
 public interface AnalyticsService {
 
-    void addDataDownloadRecord( Long dataId, Long resourceId, ZonedDateTime downloadDate, String userId);
+    DataDownload addDataDownloadRecord(Long dataId, Long resourceId, ZonedDateTime downloadDate, String userId);
 }
