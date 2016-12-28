@@ -1,6 +1,7 @@
 package sg.ncl.service.team.logic;
 
 import org.apache.commons.lang3.RandomStringUtils;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -17,6 +18,8 @@ import sg.ncl.service.team.domain.*;
 import sg.ncl.service.team.exceptions.*;
 import sg.ncl.service.team.web.TeamInfo;
 import sg.ncl.service.team.web.TeamMemberInfo;
+import sg.ncl.service.user.data.jpa.UserEntity;
+import sg.ncl.service.user.data.jpa.UserRepository;
 import sg.ncl.service.user.domain.UserService;
 
 import java.util.ArrayList;
@@ -42,6 +45,8 @@ public class TeamServiceImplTest {
     private AdapterDeterLab adapterDeterLab;
     @Mock
     private TeamRepository teamRepository;
+    @Mock
+    private UserRepository userRepository;
     @Mock
     private UserService userService;
 
@@ -455,6 +460,25 @@ public class TeamServiceImplTest {
 
         verify(teamRepository, times(1)).findOne(anyString());
 
+    }
+
+    @Test
+    public void testRemoveMemberGood() {
+        TeamEntity teamEntity = Util.getTeamEntityWithId();
+        TeamMember teamMember1 = Util.getTeamMemberInfo(MemberType.MEMBER, MemberStatus.APPROVED);
+        TeamMember teamMember2 = Util.getTeamMemberInfo(MemberType.MEMBER, MemberStatus.APPROVED);
+        teamEntity.addMember(teamMember1);
+
+        when(userRepository.findOne(anyString())).thenReturn(any(UserEntity.class));
+        when(userRepository.save(any(UserEntity.class))).thenReturn(any(UserEntity.class));
+        when(teamRepository.findOne(anyString())).thenReturn(teamEntity);
+        when(teamRepository.save(any(TeamEntity.class))).thenReturn(teamEntity);
+        when(adapterDeterLab.removeUserFromTeam("teamId", teamMember2.getUserId(), "ownerId")).thenReturn("");
+
+        Team result = teamService.removeMember("teamId", teamMember2, "ownerId");
+
+        assertThat(result.getMembers().size()).isEqualTo(1);
+        assertThat(result.getMembers().get(0)).isEqualTo(teamMember1);
     }
 
 }
