@@ -67,6 +67,8 @@ public class DataEntity extends AbstractEntity implements Data {
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "dataEntity", orphanRemoval = true)
     private List<DataResourceEntity> resources = new ArrayList<>();
 
+
+
     @ElementCollection
     @CollectionTable(name = "data_users", joinColumns = @JoinColumn(name = "data_id", nullable = false, updatable = false), indexes = {@Index(columnList = "data_id"), @Index(columnList = "user_id")}, uniqueConstraints = @UniqueConstraint(columnNames = {"data_id", "user_id"}))
     @Column(name = "user_id", nullable = false, updatable = false)

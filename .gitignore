@@ -37,6 +37,7 @@ out/production/services-in-one/db/migration/V1_0__initial_schema.sql
 out/production/services-in-one/db/migration/V1_2__create_tables_for_data_repo.sql
 out/production/services-in-one/db/migration/V1_3__create_tables_for_image_repo.sql
 out/production/services-in-one/db/migration/V1_5__add_table_for_password_reset_request.sql
+out/production/services-in-one/db/migration/V1_8__add_table_for_data_downloads.sql
 out/test/adapter-deterlab/application.yml
 out/test/adapter-deterlab/logback-test.xml
 out/test/common/application.yml
@@ -59,3 +60,4 @@ out/test/service-user/application.yml
 out/test/service-user/logback-test.xml
 out/test/service-version/logback-test.xml
 out/test/services-in-one/logback-test.xml
+
