@@ -186,4 +186,10 @@ public class ConnectionPropertiesTest {
         assertThat(connectionProperties.getFreeNodes()).isNotNull();
         assertThat(connectionProperties.getFreeNodes()).isEqualTo("http://127.0.0.1:22/getFreeNodes");
     }
+
+    @Test
+    public void testRemoveUserFromTeam() throws Exception {
+        assertThat(connectionProperties.removeUserFromTeam()).isNotNull();
+        assertThat(connectionProperties.removeUserFromTeam()).isEqualTo("http://127.0.0.1:22/removeUserFromTeam");
+    }
 }
