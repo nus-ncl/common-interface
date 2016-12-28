@@ -184,11 +184,11 @@ public class TeamServiceImpl implements TeamService {
      */
     @Transactional
     public Team removeMember(@NotNull final String id, @NotNull final TeamMember teamMember, @NotNull final String requesterId) {
-        // userService.removeTeam(teamMember.getUserId(), id);
-        // Team team = removeMember(id, teamMember);
-        // FIXME call adapter
-        adapterDeterLab.removeUserFromTeam("a","a","a");
-        return null;
+        log.info("Removing member {} from team {} requested by {}", teamMember.getUserId(), id, requesterId);
+        userService.removeTeam(teamMember.getUserId(), id);
+        Team team = removeMember(id, teamMember);
+        adapterDeterLab.removeUserFromTeam(id, teamMember.getUserId(), requesterId);
+        return team;
     }
 
     public Boolean isOwner(@NotNull final String teamId, @NotNull final String userId) {

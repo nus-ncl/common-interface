@@ -781,7 +781,7 @@ public class AdapterDeterLab {
     }
 
     public String removeUserFromTeam(String nclTeamId, String nclUserId, String nclTeamOwnerId) {
-        log.info("Remove user {} from team {}", nclUserId, nclTeamId);
+        log.info("Remove user {} from team {} requested by owner {}", nclUserId, nclTeamId, nclTeamOwnerId);
 
         JSONObject json = new JSONObject();
         json.put("pid", "teamTeye02");
