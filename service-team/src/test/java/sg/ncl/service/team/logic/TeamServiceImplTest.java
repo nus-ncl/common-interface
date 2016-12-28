@@ -9,7 +9,6 @@ import org.junit.rules.ExpectedException;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import sg.ncl.adapter.deterlab.AdapterDeterLab;
 import sg.ncl.service.team.Util;
 import sg.ncl.service.team.data.jpa.TeamEntity;
@@ -18,8 +17,6 @@ import sg.ncl.service.team.domain.*;
 import sg.ncl.service.team.exceptions.*;
 import sg.ncl.service.team.web.TeamInfo;
 import sg.ncl.service.team.web.TeamMemberInfo;
-import sg.ncl.service.user.data.jpa.UserEntity;
-import sg.ncl.service.user.data.jpa.UserRepository;
 import sg.ncl.service.user.domain.UserService;
 
 import java.util.ArrayList;
@@ -45,8 +42,6 @@ public class TeamServiceImplTest {
     private AdapterDeterLab adapterDeterLab;
     @Mock
     private TeamRepository teamRepository;
-    @Mock
-    private UserRepository userRepository;
     @Mock
     private UserService userService;
 
@@ -469,16 +464,13 @@ public class TeamServiceImplTest {
         TeamMember teamMember2 = Util.getTeamMemberInfo(MemberType.MEMBER, MemberStatus.APPROVED);
         teamEntity.addMember(teamMember1);
 
-        when(userRepository.findOne(anyString())).thenReturn(any(UserEntity.class));
-        when(userRepository.save(any(UserEntity.class))).thenReturn(any(UserEntity.class));
         when(teamRepository.findOne(anyString())).thenReturn(teamEntity);
         when(teamRepository.save(any(TeamEntity.class))).thenReturn(teamEntity);
-        when(adapterDeterLab.removeUserFromTeam("teamId", teamMember2.getUserId(), "ownerId")).thenReturn("");
 
         Team result = teamService.removeMember("teamId", teamMember2, "ownerId");
 
         assertThat(result.getMembers().size()).isEqualTo(1);
-        assertThat(result.getMembers().get(0)).isEqualTo(teamMember1);
+        assertThat(result.getMembers().get(0).getUserId()).isEqualTo(teamMember1.getUserId());
     }
 
 }
