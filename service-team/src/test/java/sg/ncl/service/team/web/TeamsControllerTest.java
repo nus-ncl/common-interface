@@ -12,6 +12,7 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.mockito.Mock;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
@@ -21,18 +22,20 @@ import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.web.context.WebApplicationContext;
+import sg.ncl.adapter.deterlab.AdapterDeterLab;
 import sg.ncl.common.authentication.Role;
 import sg.ncl.common.jwt.JwtToken;
 import sg.ncl.service.team.AbstractTest;
 import sg.ncl.service.team.Util;
 import sg.ncl.service.team.data.jpa.TeamEntity;
 import sg.ncl.service.team.data.jpa.TeamRepository;
-import sg.ncl.service.team.domain.MemberType;
-import sg.ncl.service.team.domain.Team;
-import sg.ncl.service.team.domain.TeamStatus;
-import sg.ncl.service.team.domain.TeamVisibility;
+import sg.ncl.service.team.domain.*;
 import sg.ncl.service.team.serializers.DateTimeDeserializer;
 import sg.ncl.service.team.serializers.DateTimeSerializer;
+import sg.ncl.service.team.util.TestUserUtil;
+import sg.ncl.service.user.data.jpa.UserEntity;
+import sg.ncl.service.user.data.jpa.UserRepository;
+import sg.ncl.service.user.domain.UserService;
 
 import javax.inject.Inject;
 import java.lang.reflect.Type;
@@ -40,13 +43,14 @@ import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
+import static org.hamcrest.Matchers.any;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.core.Is.is;
+import static org.mockito.Matchers.anyString;
+import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -67,9 +71,13 @@ public class TeamsControllerTest extends AbstractTest {
 
     private MockMvc mockMvc;
     private Claims claims;
+    private AdapterDeterLab adapterDeterLab;
 
     @Inject
     private WebApplicationContext webApplicationContext;
+
+    @MockBean
+    private UserService userService;
 
     @Before
     public void setup() {
@@ -78,6 +86,7 @@ public class TeamsControllerTest extends AbstractTest {
         Authentication authentication = mock(Authentication.class);
         SecurityContext securityContext = mock(SecurityContext.class);
         claims = mock(Claims.class);
+        adapterDeterLab = mock(AdapterDeterLab.class);
         when(securityContext.getAuthentication()).thenReturn(authentication);
         SecurityContextHolder.setContext(securityContext);
         when(securityContext.getAuthentication().getPrincipal()).thenReturn(claims);
@@ -288,6 +297,37 @@ public class TeamsControllerTest extends AbstractTest {
         Team entity = gson.fromJson(list, TeamInfo.class);
 
         Assert.assertThat(entity.getName(), is(name));
+    }
+
+    @Test
+    public void testRemoveUserFromTeamGood() throws Exception {
+        TeamEntity teamEntity = Util.getTeamEntity();
+        TeamMember teamOwner = Util.getTeamMemberInfo(MemberType.OWNER, MemberStatus.APPROVED);
+        TeamMember teamMember2 = Util.getTeamMemberInfo(MemberType.MEMBER, MemberStatus.APPROVED);
+        TeamMember teamMember3 = Util.getTeamMemberInfo(MemberType.MEMBER, MemberStatus.APPROVED);
+        teamEntity.addMember(teamOwner);
+        teamEntity.addMember(teamMember2);
+        teamEntity.addMember(teamMember3);
+
+        TeamEntity savedTeam = teamRepository.save(teamEntity);
+
+        // create GSON
+        GsonBuilder gsonBuilder = new GsonBuilder();
+        gsonBuilder.registerTypeAdapter(ZonedDateTime.class, new DateTimeSerializer());
+        gsonBuilder.registerTypeAdapter(ZonedDateTime.class, new DateTimeDeserializer());
+        Gson gson = gsonBuilder.create();
+
+        when(claims.getSubject()).thenReturn(teamOwner.getUserId());
+        when(adapterDeterLab.removeUserFromTeam(anyString(), anyString(), anyString())).thenReturn("");
+
+        MediaType contentType = new MediaType(MediaType.APPLICATION_JSON.getType(),
+                MediaType.APPLICATION_JSON.getSubtype());
+
+        MvcResult mvcResult = mockMvc.perform(delete("/teams/" + savedTeam.getId() + "/members")
+                .contentType(MediaType.APPLICATION_JSON).content(gson.toJson(teamMember3)))
+                .andExpect(status().isOk())
+                .andExpect(content().contentTypeCompatibleWith(contentType))
+                .andReturn();
     }
 }
 
