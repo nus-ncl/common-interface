@@ -13,6 +13,7 @@ import java.nio.file.Paths;
  * References:
  * [1] https://github.com/23/resumable.js/blob/master/samples/java/src/main/java/resumable/js/upload/HttpUtils.java
  * [2] http://www.codejava.net/java-se/file-io/clean-and-remove-a-non-empty-directory
+ * [3] https://docs.oracle.com/javase/tutorial/essential/io/pathOps.html
  */
 @Slf4j
 public class HttpUtils {
@@ -69,7 +70,8 @@ public class HttpUtils {
             baseDir = baseDir + "/" + preDir;
         }
 
-        return Paths.get(System.getProperty("user.home"), baseDir);
+        Path path = Paths.get(System.getProperty("user.home"));
+        return Paths.get(path.getRoot().toString(), baseDir);
     }
 
     public static void removeDirectory(File dir) {

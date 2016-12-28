@@ -63,6 +63,6 @@ deterurl:
   userurl: 172.18.178.11
   port: 80
 transmission:
-    baseDir: resources # '/home/<user>/uploads'
+    baseDir: mnt/resources # '/mnt/resources'
     subDirs:
         dataDir: data # '<base_dir>/data/<dataset_id>/<file_name>'
