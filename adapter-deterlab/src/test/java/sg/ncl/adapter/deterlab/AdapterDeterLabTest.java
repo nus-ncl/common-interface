@@ -1465,4 +1465,60 @@ public class AdapterDeterLabTest {
         verify(properties,times(1)).getFreeNodes();
         assertThat(result).isEqualTo("0");
     }
+
+    @Test
+    public void removeUserFromTeamGood() {
+        JSONObject myobject = new JSONObject();
+        myobject.put("msg", "remove user from team ok");
+
+        when(restTemplate.exchange(anyString(),eq(HttpMethod.POST),anyObject(),eq(String.class))).thenReturn(response);
+        when(response.getBody()).thenReturn(myobject.toString());
+
+        String result = adapterDeterLab.removeUserFromTeam("teamId", "userId", "ownerId");
+
+        verify(restTemplate,times(1)).exchange(anyString(),eq(HttpMethod.POST),anyObject(),eq(String.class));
+        verify(properties,times(1)).removeUserFromTeam();
+        assertThat(result).isEqualTo(myobject.toString());
+    }
+
+    @Test
+    public void removeUserFromTeamDeterLabOperationFailed() {
+        JSONObject myobject = new JSONObject();
+        myobject.put("msg", "remove user from team fail");
+
+        exception.expect(DeterLabOperationFailedException.class);
+        exception.expectMessage(is(equalTo("remove user from team fail")));
+
+        when(restTemplate.exchange(anyString(),eq(HttpMethod.POST),anyObject(),eq(String.class))).thenReturn(response);
+        when(response.getBody()).thenReturn(myobject.toString());
+
+        adapterDeterLab.removeUserFromTeam("teamId", "userId", "ownerId");
+
+        verify(restTemplate,times(1)).exchange(anyString(),eq(HttpMethod.POST),anyObject(),eq(String.class));
+        verify(properties,times(1)).removeUserFromTeam();
+    }
+
+    @Test
+    public void removeUserFromTeamAdapterConnectionException() {
+        exception.expect(AdapterConnectionException.class);
+        exception.expectMessage(is(equalTo("rae")));
+
+        when(restTemplate.exchange(anyString(),eq(HttpMethod.POST),anyObject(),eq(String.class))).thenThrow(new ResourceAccessException("rae"));
+
+        adapterDeterLab.removeUserFromTeam("teamId", "userId", "ownerId");
+
+        verify(restTemplate,times(1)).exchange(anyString(),eq(HttpMethod.POST),anyObject(),eq(String.class));
+        verify(properties,times(1)).removeUserFromTeam();
+    }
+
+    @Test
+    public void removeUserFromTeamAdapterInternalErrorException() {
+        exception.expect(AdapterInternalErrorException.class);
+        when(restTemplate.exchange(anyString(),eq(HttpMethod.POST),anyObject(),eq(String.class))).thenThrow(new HttpServerErrorException(HttpStatus.INTERNAL_SERVER_ERROR));
+
+        adapterDeterLab.removeUserFromTeam("teamId", "userId", "ownerId");
+
+        verify(restTemplate,times(1)).exchange(anyString(),eq(HttpMethod.POST),anyObject(),eq(String.class));
+        verify(properties,times(1)).removeUserFromTeam();
+    }
 }
