@@ -7,6 +7,9 @@ import sg.ncl.service.analytics.data.jpa.DataDownloadRepository;
 import sg.ncl.service.analytics.data.jpa.DataDownloadStatistics;
 import sg.ncl.service.analytics.domain.AnalyticsService;
 import sg.ncl.service.analytics.domain.DataDownload;
+import sg.ncl.adapter.deterlab.AdapterDeterLab;
+
+
 
 import javax.inject.Inject;
 import javax.validation.constraints.NotNull;
@@ -22,9 +25,12 @@ public class AnalyticsServiceImpl implements AnalyticsService {
 
     private final DataDownloadRepository dataDownloadRepository;
 
+    private final AdapterDeterLab adapterDeterLab;
+
     @Inject
-    AnalyticsServiceImpl(@NotNull DataDownloadRepository dataDownloadRepository) {
+    AnalyticsServiceImpl(@NotNull DataDownloadRepository dataDownloadRepository, @NotNull final AdapterDeterLab adapterDeterLab) {
         this.dataDownloadRepository = dataDownloadRepository;
+        this.adapterDeterLab = adapterDeterLab;
     }
 
     @Override
@@ -81,6 +87,13 @@ public class AnalyticsServiceImpl implements AnalyticsService {
         if (endDate != null)
             flags += 1;
         return flags;
+    }
+
+    @Override
+    public String getUsageStatistics(String startDate, String endDate, String id ) {
+        log.info("Getting usage statistics for team {}, start {}, end {}", id, startDate, endDate);
+        return adapterDeterLab.getUsageStatistics(id, startDate, endDate);
+
     }
 
 }

@@ -15,6 +15,7 @@ import javax.inject.Inject;
 import javax.validation.constraints.NotNull;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 /**
@@ -76,4 +77,12 @@ public class AnalyticsController {
         return null;
     }
 
+    @GetMapping("/usage/team/{id}")
+    @ResponseStatus(HttpStatus.OK)
+    public String getUsageStatistics(@RequestParam(value = "startDate", required = false) String startDate, @RequestParam(value = "endDate", required = false) String endDate, @PathVariable final String id) {
+        if (endDate == null) {
+            endDate =  ZonedDateTime.now().toLocalDate().format(DateTimeFormatter.ofPattern("MM/dd/uu"));
+        }
+        return analyticsService.getUsageStatistics(id, startDate, endDate);
+    }
 }
