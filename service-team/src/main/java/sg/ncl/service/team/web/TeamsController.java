@@ -21,14 +21,17 @@ import java.util.stream.Collectors;
 
 import static sg.ncl.common.validation.Validator.checkClaimsType;
 import static sg.ncl.service.team.validations.Validator.isAdmin;
+import static sg.ncl.service.team.web.TeamsController.PATH;
 
 /**
  * @author Christopher Zhong
  */
 @RestController
-@RequestMapping(path = "/teams", produces = MediaType.APPLICATION_JSON_VALUE)
+@RequestMapping(path = PATH, produces = MediaType.APPLICATION_JSON_VALUE)
 @Slf4j
 public class TeamsController {
+
+    static final String PATH = "/teams";
 
     private final TeamService teamService;
 
