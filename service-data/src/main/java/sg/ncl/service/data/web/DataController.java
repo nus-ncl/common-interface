@@ -2,15 +2,13 @@ package sg.ncl.service.data.web;
 
 import io.jsonwebtoken.Claims;
 import lombok.extern.slf4j.Slf4j;
+import org.json.JSONObject;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import sg.ncl.common.exception.base.UnauthorizedException;
-import sg.ncl.service.data.domain.Data;
-import sg.ncl.service.data.domain.DataResource;
-import sg.ncl.service.data.domain.DataService;
-import sg.ncl.service.data.domain.DataVisibility;
+import sg.ncl.service.data.domain.*;
 import sg.ncl.service.transmission.web.ResumableInfo;
 
 import javax.inject.Inject;
@@ -32,10 +30,13 @@ public class DataController {
     static final String PATH = "/datasets";
 
     private final DataService dataService;
+    private final DataAccessRequestService dataAccessRequestService;
 
     @Inject
-    DataController(@NotNull final DataService dataService) {
+    DataController(@NotNull final DataService dataService,
+                   @NotNull final DataAccessRequestService dataAccessRequestService) {
         this.dataService = dataService;
+        this.dataAccessRequestService = dataAccessRequestService;
     }
 
     // Get a list of all available data sets
@@ -133,25 +134,34 @@ public class DataController {
     }
 
     // Request access to a dataset
-    @PostMapping(path = "/{id}/requests")
+    @PostMapping(path = "/{did}/requests")
     @ResponseStatus(HttpStatus.CREATED)
-    public String addRequest(@AuthenticationPrincipal Object claims, @PathVariable Long id) {
+    public DataAccessRequest addRequest(@AuthenticationPrincipal Object claims, @PathVariable Long did, @RequestBody String reason) {
         if (claims == null || !(claims instanceof Claims)) {
             throw new UnauthorizedException();
         }
-        // TODO: add request to database
-        return "";
+        final JSONObject json = new JSONObject(reason);
+        return new DataAccessRequestInfo(dataAccessRequestService.createRequest(did, json.getString("reason"), (Claims) claims));
     }
 
     // Process request
     @PutMapping(path = "/{did}/requests/{rid}")
     @ResponseStatus(HttpStatus.OK)
-    public String processRequest(@AuthenticationPrincipal Object claims, @PathVariable Long did, @PathVariable Long rid) {
+    public DataAccessRequest processRequest(@AuthenticationPrincipal Object claims, @PathVariable Long did, @PathVariable Long rid) {
         if (claims == null || !(claims instanceof Claims)) {
             throw new UnauthorizedException();
         }
-        // TODO: process request to add to approved users
-        return "";
+        return new DataAccessRequestInfo(dataAccessRequestService.approveRequest(did, rid, (Claims) claims));
+    }
+
+    // Get request
+    @GetMapping(path = "/{did}/requests/{rid}")
+    @ResponseStatus(HttpStatus.OK)
+    public DataAccessRequest getRequest(@AuthenticationPrincipal Object claims, @PathVariable Long did, @PathVariable Long rid) {
+        if (claims == null || !(claims instanceof Claims)) {
+            throw new UnauthorizedException();
+        }
+        return new DataAccessRequestInfo(dataAccessRequestService.getRequest(did, rid, (Claims) claims));
     }
 
     @GetMapping(value = "/{id}/chunks/{resumableChunkNumber}/files/{resumableIdentifier}")
