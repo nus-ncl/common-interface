@@ -106,9 +106,8 @@ public class DataAccessRequestServiceImpl implements DataAccessRequestService {
         try {
             String[] to = new String[1];
             to[0] = owner.getUserDetails().getEmail();
-            String[] cc = new String[2];
-            cc[0] = requester.getUserDetails().getEmail();
-            cc[1] = "support@ncl.sg";
+            String[] cc = new String[1];
+            cc[0] = "support@ncl.sg";
             String msgText = FreeMarkerTemplateUtils.processTemplateIntoString(requestAccessTemplate, map);
             mailService.send("testbed-ops@ncl.sg", to, "Pending Dataset Access Request", msgText, false, cc, null);
             log.debug("Email sent: {}", msgText);
