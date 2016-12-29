@@ -227,11 +227,11 @@ public class RealizationServiceImpl implements RealizationService {
      * @param id: team id
      * @return usage in node x hour, or "?"
      */
-    public String getUsageStatistics(String id) {
+    //public String getUsageStatistics(String id ) {
         // current implementation gets usage statistics for current month only
-        String end = ZonedDateTime.now().toLocalDate().format(DateTimeFormatter.ofPattern("MM/dd/uu"));
-        String start = end.substring(0, 3) + "01" + end.substring(5);
-        log.info("Getting usage statistics for team {}, start {}, end {}", id, start, end);
-        return adapterDeterLab.getUsageStatistics(id, start, end);
-    }
+    //    String end = ZonedDateTime.now().toLocalDate().format(DateTimeFormatter.ofPattern("MM/dd/uu"));
+    //    String start = end.substring(0, 3) + "01" + end.substring(5);
+    //    log.info("Getting usage statistics for team {}, start {}, end {}", id, start, end);
+    //    return adapterDeterLab.getUsageStatistics(id, start, end);
+   // }
 }

@@ -6,6 +6,9 @@ import sg.ncl.service.analytics.data.jpa.DataDownloadEntity;
 import sg.ncl.service.analytics.data.jpa.DataDownloadRepository;
 import sg.ncl.service.analytics.domain.AnalyticsService;
 import sg.ncl.service.analytics.domain.DataDownload;
+import sg.ncl.adapter.deterlab.AdapterDeterLab;
+
+
 
 import javax.inject.Inject;
 import javax.validation.constraints.NotNull;
@@ -19,6 +22,8 @@ import java.time.ZonedDateTime;
 public class AnalyticsServiceImpl implements AnalyticsService {
 
     private final DataDownloadRepository dataDownloadRepository;
+
+    private final AdapterDeterLab adapterDeterLab;
 
     @Inject
     AnalyticsServiceImpl(@NotNull DataDownloadRepository dataDownloadRepository) {
@@ -37,6 +42,13 @@ public class AnalyticsServiceImpl implements AnalyticsService {
         log.info("New data download record saved: {}", savedEntity.toString());
 
         return savedEntity;
+    }
+
+    @Override
+    public String getUsageStatistics(String startDate, String endDate, String id ) {
+        log.info("Getting usage statistics for team {}, start {}, end {}", id, startDate, endDate);
+        return adapterDeterLab.getUsageStatistics(id, startDate, endDate);
+
     }
 
 }
