@@ -46,9 +46,9 @@ public class AnalyticsServiceImpl implements AnalyticsService {
     }
 
     @Override
-    public String getUsageStatistics(String startDate, String endDate, String id ) {
-        log.info("Getting usage statistics for team {}, start {}, end {}", id, startDate, endDate);
-        return adapterDeterLab.getUsageStatistics(id, startDate, endDate);
+    public String getUsageStatistics(String teamId, String startDate, String endDate) {
+        log.info("Getting usage statistics for team {}, start {}, end {}", teamId, startDate, endDate);
+        return adapterDeterLab.getUsageStatistics(teamId, startDate, endDate);
 
     }
 
