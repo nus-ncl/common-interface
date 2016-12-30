@@ -4,12 +4,14 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import sg.ncl.service.analytics.data.jpa.DataDownloadEntity;
 import sg.ncl.service.analytics.data.jpa.DataDownloadRepository;
+import sg.ncl.service.analytics.data.jpa.DataDownloadStatistics;
 import sg.ncl.service.analytics.domain.AnalyticsService;
 import sg.ncl.service.analytics.domain.DataDownload;
 
 import javax.inject.Inject;
 import javax.validation.constraints.NotNull;
 import java.time.ZonedDateTime;
+import java.util.List;
 
 /**
  * @author: Tran Ly Vu
@@ -37,6 +39,29 @@ public class AnalyticsServiceImpl implements AnalyticsService {
         log.info("New data download record saved: {}", savedEntity.toString());
 
         return savedEntity;
+    }
+
+    @Override
+    public List<DataDownloadStatistics> getDataDownloadCount(Long dataId, ZonedDateTime startDate, ZonedDateTime endDate) {
+        List<DataDownloadStatistics> statisticsList;
+        if (dataId == null && startDate == null && endDate == null) {
+            statisticsList = dataDownloadRepository.findDownloadCount();
+        } else if (dataId == null && startDate == null) {
+            statisticsList = dataDownloadRepository.findDownloadCountByDownloadDateBefore(endDate);
+        } else if (dataId == null && endDate == null) {
+            statisticsList = dataDownloadRepository.findDownloadCountByDownloadDateAfter(startDate);
+        } else if (startDate == null && endDate == null) {
+            statisticsList = dataDownloadRepository.findDownloadCountByDataId(dataId);
+        } else if (dataId == null) {
+            statisticsList = dataDownloadRepository.findDownloadCountByDownloadDateBetween(startDate, endDate);
+        } else if (startDate == null) {
+            statisticsList = dataDownloadRepository.findDownloadCountByDataIdAndDownloadDateBefore(dataId, endDate);
+        } else if (endDate == null) {
+            statisticsList = dataDownloadRepository.findDownloadCountByDataIdAndDownloadDateAfter(dataId, startDate);
+        } else {
+            statisticsList = dataDownloadRepository.findDownloadCountByDataIdAndDownloadDateBetween(dataId, startDate, endDate);
+        }
+        return statisticsList;
     }
 
 }

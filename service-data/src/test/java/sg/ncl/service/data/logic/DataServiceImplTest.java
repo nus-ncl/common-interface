@@ -13,6 +13,7 @@ import sg.ncl.common.authentication.Role;
 import sg.ncl.common.exception.base.ForbiddenException;
 import sg.ncl.common.exception.base.NotFoundException;
 import sg.ncl.common.jwt.JwtToken;
+import sg.ncl.service.analytics.domain.AnalyticsService;
 import sg.ncl.service.data.AbstractTest;
 import sg.ncl.service.data.data.jpa.DataEntity;
 import sg.ncl.service.data.data.jpa.DataRepository;
@@ -58,6 +59,8 @@ public class DataServiceImplTest extends AbstractTest {
     @Mock
     private DownloadService downloadService;
     @Mock
+    private AnalyticsService analyticsService;
+    @Mock
     private Claims claims;
     @Mock
     private HttpServletResponse response;
@@ -69,7 +72,8 @@ public class DataServiceImplTest extends AbstractTest {
         assertThat(mockingDetails(dataRepository).isMock()).isTrue();
         assertThat(mockingDetails(uploadService).isMock()).isTrue();
         assertThat(mockingDetails(downloadService).isMock()).isTrue();
-        dataService = new DataServiceImpl(dataRepository, uploadService, downloadService);
+        assertThat(mockingDetails(analyticsService).isMock()).isTrue();
+        dataService = new DataServiceImpl(dataRepository, uploadService, downloadService, analyticsService);
     }
 
     @Test
