@@ -9,6 +9,7 @@ import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
 import org.springframework.test.context.TestPropertySource;
+import sg.ncl.adapter.deterlab.AdapterDeterLab;
 import sg.ncl.service.analytics.data.jpa.DataDownloadEntity;
 import sg.ncl.service.analytics.data.jpa.DataDownloadRepository;
 import sg.ncl.service.analytics.data.jpa.DataDownloadStatistics;
@@ -35,13 +36,15 @@ public class AnalyticsServiceImplTest {
 
     @Mock
     private DataDownloadRepository dataDownloadRepository;
+    @Mock
+    private AdapterDeterLab adapterDeterLab;
 
     private AnalyticsService analyticsService;
 
     @Before
     public void before() {
         assertThat(mockingDetails(dataDownloadRepository).isMock()).isTrue();
-        analyticsService = new AnalyticsServiceImpl(dataDownloadRepository);
+        analyticsService = new AnalyticsServiceImpl(dataDownloadRepository, adapterDeterLab);
     }
 
     @Test

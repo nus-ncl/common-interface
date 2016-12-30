@@ -26,11 +26,10 @@ public interface AnalyticsService {
 
     /**
      *
-     * @param id: team id
+     * @param teamId: team id
      * @param startDate: starting date
      * @param endDate: ending date
      * @return usage in node x hour, or "?"
      */
-    String getUsageStatistics(String startDate, String endDate, String id );
-
+    String getUsageStatistics(String teamId, String startDate, String endDate);
 }
