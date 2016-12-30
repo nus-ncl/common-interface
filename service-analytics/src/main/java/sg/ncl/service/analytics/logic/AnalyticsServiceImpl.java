@@ -18,6 +18,7 @@ import java.util.List;
 
 /**
  * @author: Tran Ly Vu
+ * @version: 1.0
  */
 @Service
 @Slf4j
@@ -93,7 +94,6 @@ public class AnalyticsServiceImpl implements AnalyticsService {
     public String getUsageStatistics(String startDate, String endDate, String id ) {
         log.info("Getting usage statistics for team {}, start {}, end {}", id, startDate, endDate);
         return adapterDeterLab.getUsageStatistics(id, startDate, endDate);
-
     }
 
 }

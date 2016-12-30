@@ -7,6 +7,7 @@ import java.util.List;
 
 /**
  * @author: Tran Ly Vu
+ * @version: 1.0
  */
 
 public interface AnalyticsService {
@@ -19,17 +20,17 @@ public interface AnalyticsService {
      * @param userId: user id
      * @return
      */
-
     DataDownload addDataDownloadRecord(Long dataId, Long resourceId, ZonedDateTime downloadDate, String userId);
 
     List<DataDownloadStatistics> getDataDownloadCount(Long dataId, ZonedDateTime startDate, ZonedDateTime endDate);
 
-
     /**
      *
      * @param id: team id
+     * @param startDate: starting date
+     * @param endDate: ending date
      * @return usage in node x hour, or "?"
      */
+    String getUsageStatistics(String startDate, String endDate, String id );
 
-    String getUsageStatistics(String startDate, String startEnd,String id );
 }

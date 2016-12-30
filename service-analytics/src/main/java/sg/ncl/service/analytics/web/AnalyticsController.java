@@ -10,16 +10,21 @@ import sg.ncl.common.exception.base.BadRequestException;
 import sg.ncl.common.exception.base.UnauthorizedException;
 import sg.ncl.service.analytics.data.jpa.DataDownloadStatistics;
 import sg.ncl.service.analytics.domain.AnalyticsService;
+import sg.ncl.service.analytics.exceptions.StartDateAfterEndDateException;
 
 import javax.inject.Inject;
 import javax.validation.constraints.NotNull;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.Date;
 import java.util.List;
 
 /**
- * Created by dcsjnh on 12/30/2016.
+ * @author: Tran Ly Vu, James Ng
+ * @version: 1.0
  *
  * References:
  * [1] http://stackoverflow.com/questions/12296642/is-it-possible-to-have-empty-requestparam-values-use-the-defaultvalue
@@ -81,8 +86,35 @@ public class AnalyticsController {
     @ResponseStatus(HttpStatus.OK)
     public String getUsageStatistics(@RequestParam(value = "startDate", required = false) String startDate, @RequestParam(value = "endDate", required = false) String endDate, @PathVariable final String id) {
         if (endDate == null) {
-            endDate =  ZonedDateTime.now().toLocalDate().format(DateTimeFormatter.ofPattern("MM/dd/uu"));
+            endDate = ZonedDateTime.now().toLocalDate().format(DateTimeFormatter.ofPattern("MM/dd/uu"));
         }
+
+        if (startDate == null) {
+            startDate = endDate.substring(0, 3) + "01" + endDate.substring(5);
+        }
+
+        compareDate(startDate, endDate);
+
         return analyticsService.getUsageStatistics(id, startDate, endDate);
     }
+
+    private void compareDate (String startDate, String endDate) {
+
+        SimpleDateFormat format = new SimpleDateFormat("MM/dd/yy");
+        try {
+
+            Date start = format.parse(startDate);
+            Date end = format.parse(endDate);
+
+            if (start.compareTo(end) > 0) {
+                log.warn("Start date is after end date");
+                throw new StartDateAfterEndDateException();
+            }
+
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+
+    }
+
 }
