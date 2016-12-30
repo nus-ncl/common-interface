@@ -34,7 +34,7 @@ public class AnalyticsController {
         this. analyticsService =  analyticsService;
     }
 
-    @GetMapping("/usage/team/{id}")
+    @GetMapping("/usage/teams/{id}")
     @ResponseStatus(HttpStatus.OK)
     public String getUsageStatistics(@RequestParam(value = "startDate", required = false) String startDate, @RequestParam(value = "endDate", required = false) String endDate, @PathVariable final String id) {
 
