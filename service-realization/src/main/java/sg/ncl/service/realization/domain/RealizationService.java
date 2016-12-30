@@ -26,5 +26,4 @@ public interface RealizationService {
 
     void deleteRealization(Long realizationId);
 
-  //  String getUsageStatistics(String id);
 }
