@@ -4,6 +4,7 @@ import java.time.ZonedDateTime;
 
 /**
  * @author: Tran Ly Vu
+ * @version: 1.0
  */
 
 public interface AnalyticsService {
@@ -22,8 +23,10 @@ public interface AnalyticsService {
     /**
      *
      * @param id: team id
+     * @param startDate: starting date
+     * @param endDate: ending date
      * @return usage in node x hour, or "?"
      */
 
-    String getUsageStatistics(String startDate, String startEnd,String id );
+    String getUsageStatistics(String startDate, String endDate, String id );
 }

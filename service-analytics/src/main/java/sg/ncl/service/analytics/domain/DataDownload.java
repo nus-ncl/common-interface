@@ -4,6 +4,7 @@ import java.time.ZonedDateTime;
 
 /**
  * @author: Tran Ly Vu
+ * @version: 1.0
  */
 public interface DataDownload {
 

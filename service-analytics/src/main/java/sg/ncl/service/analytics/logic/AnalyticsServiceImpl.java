@@ -16,6 +16,7 @@ import java.time.ZonedDateTime;
 
 /**
  * @author: Tran Ly Vu
+ * @version: 1.0
  */
 @Service
 @Slf4j
@@ -26,8 +27,10 @@ public class AnalyticsServiceImpl implements AnalyticsService {
     private final AdapterDeterLab adapterDeterLab;
 
     @Inject
-    AnalyticsServiceImpl(@NotNull DataDownloadRepository dataDownloadRepository) {
+    AnalyticsServiceImpl(@NotNull DataDownloadRepository dataDownloadRepository, @NotNull final AdapterDeterLab adapterDeterLab) {
         this.dataDownloadRepository = dataDownloadRepository;
+        this.adapterDeterLab = adapterDeterLab;
+
     }
 
     @Override
