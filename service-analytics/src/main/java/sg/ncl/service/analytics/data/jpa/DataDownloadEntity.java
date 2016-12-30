@@ -39,7 +39,7 @@ public class DataDownloadEntity extends AbstractEntity implements DataDownload {
     private Long resourceId;
 
     @Column(name = "download_date", nullable = false)
-    private transient ZonedDateTime downloadDate;
+    private ZonedDateTime downloadDate;
 
     @Column(name = "hashed_user_id", nullable = false)
     private String hashedUserId;

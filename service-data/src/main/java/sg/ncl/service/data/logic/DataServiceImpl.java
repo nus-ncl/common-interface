@@ -6,6 +6,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.util.UriUtils;
 import sg.ncl.common.exception.base.NotFoundException;
+import sg.ncl.service.analytics.domain.AnalyticsService;
 import sg.ncl.service.data.data.jpa.DataEntity;
 import sg.ncl.service.data.data.jpa.DataRepository;
 import sg.ncl.service.data.data.jpa.DataResourceEntity;
@@ -24,6 +25,7 @@ import javax.servlet.http.HttpServletResponse;
 import javax.validation.constraints.NotNull;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
+import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -44,14 +46,17 @@ public class DataServiceImpl implements DataService {
     private final DataRepository dataRepository;
     private final UploadService uploadService;
     private final DownloadService downloadService;
+    private final AnalyticsService analyticsService;
 
     @Inject
     DataServiceImpl(@NotNull final DataRepository dataRepository,
                     @NotNull final UploadService uploadService,
-                    @NotNull final DownloadService downloadService) {
+                    @NotNull final DownloadService downloadService,
+                    @NotNull final AnalyticsService analyticsService) {
         this.dataRepository = dataRepository;
         this.uploadService = uploadService;
         this.downloadService = downloadService;
+        this.analyticsService = analyticsService;
     }
 
     private DataEntity setUpDataEntity(Data data, DataEntity... dataEntities) {
@@ -301,6 +306,7 @@ public class DataServiceImpl implements DataService {
         DataResource dataResource = findResourceById(did, rid, claims);
         try {
             downloadService.getChunks(response, DATA_DIR_KEY, UriUtils.encode(dataEntity.getName(), UTF_ENCODING), dataResource.getUri());
+            analyticsService.addDataDownloadRecord(did, rid, ZonedDateTime.now(), claims.getSubject());
         } catch (IOException e) {
             log.error("Unable to download resource: {}", e);
             throw new NotFoundException();
