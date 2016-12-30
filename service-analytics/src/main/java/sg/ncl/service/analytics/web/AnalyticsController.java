@@ -112,6 +112,7 @@ public class AnalyticsController {
             }
 
         } catch (ParseException e) {
+            log.warn("Error in parsing startDate or endDate");
             e.printStackTrace();
         }
 
