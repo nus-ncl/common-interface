@@ -18,7 +18,7 @@ public interface AnalyticsService {
      * @param resourceId: resource id
      * @param downloadDate: download date
      * @param userId: user id
-     * @return
+     * @return data downloads
      */
     DataDownload addDataDownloadRecord(Long dataId, Long resourceId, ZonedDateTime downloadDate, String userId);
 

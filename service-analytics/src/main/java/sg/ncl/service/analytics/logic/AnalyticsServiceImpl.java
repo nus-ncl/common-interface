@@ -9,8 +9,6 @@ import sg.ncl.service.analytics.domain.AnalyticsService;
 import sg.ncl.service.analytics.domain.DataDownload;
 import sg.ncl.adapter.deterlab.AdapterDeterLab;
 
-
-
 import javax.inject.Inject;
 import javax.validation.constraints.NotNull;
 import java.time.ZonedDateTime;
