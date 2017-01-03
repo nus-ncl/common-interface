@@ -39,7 +39,8 @@ public class AnalyticsController {
     }
 
     // Get number of download times for datasets
-    @GetMapping(value = "/datasets/downloads", params = {"id", "startDate", "endDate"})
+    // @GetMapping(value = "/datasets/downloads", params = {"id", "startDate", "endDate"})
+    @GetMapping("/datasets/downloads")
     @ResponseStatus(HttpStatus.OK)
     public List<DataDownloadStatistics> getDataDownloadCount(@AuthenticationPrincipal Object claims,
                                                              @RequestParam(value = "id", required = false) Long id,
