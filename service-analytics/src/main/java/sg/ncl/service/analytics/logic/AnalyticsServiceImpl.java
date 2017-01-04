@@ -44,11 +44,7 @@ public class AnalyticsServiceImpl implements AnalyticsService {
     @Override
     public List<DataDownloadStatistics> getDataDownloadCount(Long dataId, ZonedDateTime startDate, ZonedDateTime endDate) {
         List<DataDownloadStatistics> statisticsList;
-        int flags = 0;
-        if (dataId != null) flags += 100;
-        if (startDate != null) flags += 10;
-        if (endDate != null) flags += 1;
-        switch (flags) {
+        switch (getFlags(dataId, startDate, endDate)) {
             case 111:
                 statisticsList = dataDownloadRepository.findDownloadCountByDataIdAndDownloadDateBetween(dataId, startDate, endDate);
                 break;
@@ -74,6 +70,17 @@ public class AnalyticsServiceImpl implements AnalyticsService {
                 statisticsList = dataDownloadRepository.findDownloadCount();
         }
         return statisticsList;
+    }
+
+    private int getFlags(Long dataId, ZonedDateTime startDate, ZonedDateTime endDate) {
+        int flags = 0;
+        if (dataId != null)
+            flags += 100;
+        if (startDate != null)
+            flags += 10;
+        if (endDate != null)
+            flags += 1;
+        return flags;
     }
 
 }
