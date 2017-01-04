@@ -44,22 +44,34 @@ public class AnalyticsServiceImpl implements AnalyticsService {
     @Override
     public List<DataDownloadStatistics> getDataDownloadCount(Long dataId, ZonedDateTime startDate, ZonedDateTime endDate) {
         List<DataDownloadStatistics> statisticsList;
-        if (dataId == null && startDate == null && endDate == null) {
-            statisticsList = dataDownloadRepository.findDownloadCount();
-        } else if (dataId == null && startDate == null) {
-            statisticsList = dataDownloadRepository.findDownloadCountByDownloadDateBefore(endDate);
-        } else if (dataId == null && endDate == null) {
-            statisticsList = dataDownloadRepository.findDownloadCountByDownloadDateAfter(startDate);
-        } else if (startDate == null && endDate == null) {
-            statisticsList = dataDownloadRepository.findDownloadCountByDataId(dataId);
-        } else if (dataId == null) {
-            statisticsList = dataDownloadRepository.findDownloadCountByDownloadDateBetween(startDate, endDate);
-        } else if (startDate == null) {
-            statisticsList = dataDownloadRepository.findDownloadCountByDataIdAndDownloadDateBefore(dataId, endDate);
-        } else if (endDate == null) {
-            statisticsList = dataDownloadRepository.findDownloadCountByDataIdAndDownloadDateAfter(dataId, startDate);
-        } else {
-            statisticsList = dataDownloadRepository.findDownloadCountByDataIdAndDownloadDateBetween(dataId, startDate, endDate);
+        int flags = 0;
+        if (dataId != null) flags += 100;
+        if (startDate != null) flags += 10;
+        if (endDate != null) flags += 1;
+        switch (flags) {
+            case 111:
+                statisticsList = dataDownloadRepository.findDownloadCountByDataIdAndDownloadDateBetween(dataId, startDate, endDate);
+                break;
+            case 110:
+                statisticsList = dataDownloadRepository.findDownloadCountByDataIdAndDownloadDateAfter(dataId, startDate);
+                break;
+            case 101:
+                statisticsList = dataDownloadRepository.findDownloadCountByDataIdAndDownloadDateBefore(dataId, endDate);
+                break;
+            case 100:
+                statisticsList = dataDownloadRepository.findDownloadCountByDataId(dataId);
+                break;
+            case 11:
+                statisticsList = dataDownloadRepository.findDownloadCountByDownloadDateBetween(startDate, endDate);
+                break;
+            case 10:
+                statisticsList = dataDownloadRepository.findDownloadCountByDownloadDateAfter(startDate);
+                break;
+            case 1:
+                statisticsList = dataDownloadRepository.findDownloadCountByDownloadDateBefore(endDate);
+                break;
+            default:
+                statisticsList = dataDownloadRepository.findDownloadCount();
         }
         return statisticsList;
     }
