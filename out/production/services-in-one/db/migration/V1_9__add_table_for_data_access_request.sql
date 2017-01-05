@@ -11,11 +11,7 @@ CREATE TABLE IF NOT EXISTS `prod`.`data_access_requests` (
   `reason`             LONGTEXT     NOT NULL,
   `request_date`       DATETIME     NOT NULL,
   `approved_date`      DATETIME     NULL DEFAULT NULL,
-  PRIMARY KEY (`id`),
-  INDEX `FKa3f976f65cf02795a1823a40e9acb1de` (`data_id` ASC),
-  CONSTRAINT `FKa3f976f65cf02795a1823a40e9acb1de`
-  FOREIGN KEY (`data_id`)
-  REFERENCES `prod`.`data` (`id`)
+  PRIMARY KEY (`id`)
 )
   ENGINE = InnoDB
 /*!  DEFAULT CHARACTER SET = latin1 */;
