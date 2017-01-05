@@ -372,8 +372,6 @@ public class FlywayTest {
 
         List<Map<String, Object>> dataAccessRequestsConstraints = this.template.queryForList("SELECT * FROM INFORMATION_SCHEMA.CONSTRAINTS WHERE TABLE_NAME = 'data_access_requests'");
 
-        assertThat((String) dataAccessRequestsConstraints.get(1).get("CONSTRAINT_TYPE")).isEqualTo("REFERENTIAL");
-        assertThat((String) dataAccessRequestsConstraints.get(1).get("COLUMN_LIST")).isEqualTo("DATA_ID");
         assertThat((String) dataAccessRequestsConstraints.get(0).get("CONSTRAINT_TYPE")).isEqualTo("PRIMARY KEY");
         assertThat((String) dataAccessRequestsConstraints.get(0).get("COLUMN_LIST")).isEqualTo("ID");
     }
@@ -474,10 +472,6 @@ public class FlywayTest {
 
         assertThat((String) dataDownloadsConstraints.get(0).get("CONSTRAINT_TYPE")).isEqualTo("PRIMARY KEY");
         assertThat((String) dataDownloadsConstraints.get(0).get("COLUMN_LIST")).isEqualTo("ID");
-        assertThat((String) dataDownloadsConstraints.get(1).get("CONSTRAINT_TYPE")).isEqualTo("REFERENTIAL");
-        assertThat((String) dataDownloadsConstraints.get(1).get("COLUMN_LIST")).isEqualTo("RESOURCE_ID");
-        assertThat((String) dataDownloadsConstraints.get(2).get("CONSTRAINT_TYPE")).isEqualTo("REFERENTIAL");
-        assertThat((String) dataDownloadsConstraints.get(2).get("COLUMN_LIST")).isEqualTo("DATA_ID");
     }
 
     @Test
