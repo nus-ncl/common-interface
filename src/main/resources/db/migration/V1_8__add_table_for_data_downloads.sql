@@ -10,9 +10,7 @@ CREATE TABLE IF NOT EXISTS `prod`.`data_downloads` (
   `resource_id`        BIGINT(20)   NOT NULL,
   `download_date`      DATETIME     NOT NULL,
   `hashed_user_id`     VARCHAR(255) NOT NULL,
-  PRIMARY KEY (`id`),
-  FOREIGN KEY (`data_id`) REFERENCES `prod`.`data` (`id`),
-  FOREIGN KEY (`resource_id`) REFERENCES `prod`.`data_resources` (`id`)
+  PRIMARY KEY (`id`)
 )
   ENGINE = InnoDB
   /*!  DEFAULT CHARACTER SET = latin1 */;
