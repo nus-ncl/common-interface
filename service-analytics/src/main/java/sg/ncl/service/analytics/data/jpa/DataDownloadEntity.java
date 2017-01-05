@@ -13,14 +13,10 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.Column;
 import java.time.ZonedDateTime;
 
-
-
 /**
  * @author: Tran Ly Vu
  * @version: 1.0
  */
-
-
 @Entity
 @Table(name = "data_downloads")
 @Getter

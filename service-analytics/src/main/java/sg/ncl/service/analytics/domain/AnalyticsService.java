@@ -32,4 +32,5 @@ public interface AnalyticsService {
      * @return usage in node x hour, or "?"
      */
     String getUsageStatistics(String teamId, String startDate, String endDate);
+
 }
