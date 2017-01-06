@@ -161,6 +161,7 @@ public class TeamServiceImpl implements TeamService {
      * @param teamMember The team member details to be remove
      * @return The updated team with the specific user removed
      */
+    @Override
     @Transactional
     public Team removeMember(@NotNull final String id, @NotNull final TeamMember teamMember) {
         TeamEntity entity = findTeam(id);

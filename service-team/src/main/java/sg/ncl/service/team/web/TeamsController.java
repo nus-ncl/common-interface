@@ -125,7 +125,6 @@ public class TeamsController {
     @ResponseStatus(HttpStatus.OK)
     public Team removeTeamMember(@PathVariable final String id, @RequestBody final TeamMemberInfo teamMember, @AuthenticationPrincipal final Object claims) {
         checkClaimsType(claims);
-        // FIXME check if requester id is the team owner
         return new TeamInfo(teamService.removeMember(id, teamMember, ((Claims) claims).getSubject()));
     }
 }

@@ -13,7 +13,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
-import sg.ncl.common.exception.base.ForbiddenException;
 import sg.ncl.service.experiment.domain.Experiment;
 import sg.ncl.service.experiment.domain.ExperimentService;
 
