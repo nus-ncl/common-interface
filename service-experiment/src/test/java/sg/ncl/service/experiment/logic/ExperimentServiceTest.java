@@ -22,6 +22,7 @@ import sg.ncl.service.experiment.exceptions.TeamIdNullOrEmptyException;
 import sg.ncl.service.experiment.exceptions.UserIdNullOrEmptyException;
 import sg.ncl.service.realization.data.jpa.RealizationEntity;
 import sg.ncl.service.realization.domain.RealizationService;
+import sg.ncl.service.team.domain.TeamService;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -51,6 +52,8 @@ public class ExperimentServiceTest {
     @Mock
     private RealizationService realizationService;
     @Mock
+    private TeamService teamService;
+    @Mock
     private ConnectionProperties adapterConnectionProperties;
     @Mock
     private Claims claims;
@@ -63,8 +66,9 @@ public class ExperimentServiceTest {
         assertThat(mockingDetails(adapterDeterLab).isMock()).isTrue();
         assertThat(mockingDetails(realizationService).isMock()).isTrue();
         assertThat(mockingDetails(adapterConnectionProperties).isMock()).isTrue();
+        assertThat(mockingDetails(teamService).isMock()).isTrue();
 
-        experimentService = new ExperimentServiceImpl(experimentRepository, adapterDeterLab, realizationService, adapterConnectionProperties);
+        experimentService = new ExperimentServiceImpl(experimentRepository, adapterDeterLab, realizationService, adapterConnectionProperties, teamService);
     }
 
     @Test
