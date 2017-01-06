@@ -781,12 +781,16 @@ public class AdapterDeterLab {
     }
 
     public String removeUserFromTeam(String nclTeamId, String nclUserId, String nclTeamOwnerId) {
-        log.info("Remove user {} from team {} requested by owner {}", nclUserId, nclTeamId, nclTeamOwnerId);
+        final String pid = getDeterProjectIdByNclTeamId(nclTeamId);
+        final String uid = getDeterUserIdByNclUserId(nclUserId);
+        final String ownerUid = getDeterUserIdByNclUserId(nclTeamOwnerId);
+
+        log.info("Removing user {} from team {} requested by owner {}", uid, pid, ownerUid);
 
         JSONObject json = new JSONObject();
-        json.put("pid", "teamTeye02");
-        json.put("uidToBeRemoved", "tyeo9204");
-        json.put("ownerUid", "tyeo9203");
+        json.put("pid", pid);
+        json.put("uidToBeRemoved", uid);
+        json.put("ownerUid", ownerUid);
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
