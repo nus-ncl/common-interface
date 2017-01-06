@@ -203,6 +203,43 @@ public class ExperimentServiceTest {
     }
 
     @Test
+    public void testDeleteExperimentZeroRealizationId() throws Exception {
+        ExperimentEntity experimentEntity = getExperimentEntity();
+        RealizationEntity realizationEntity = getRealizationEntity();
+        realizationEntity.setId(0L); // set zero to trigger another branch
+
+        final List<String> roles = Collections.singletonList(Role.USER.getAuthority());
+
+        when(experimentRepository.getOne(anyLong())).thenReturn(experimentEntity);
+        when(realizationService.getByExperimentId(anyLong())).thenReturn(realizationEntity);
+        when(claims.getSubject()).thenReturn(realizationEntity.getUserId()); // claims user id should be identical to realizationEntity user id
+        when(claims.get(JwtToken.KEY)).thenReturn(roles);
+
+        Experiment result = experimentService.deleteExperiment(1L, "teamName", claims);
+
+        verify(experimentRepository, times(0)).delete(anyLong());
+        assertThat(result).isNull();
+    }
+
+    @Test
+    public void testDeleteExperimentTeamOwner() throws Exception {
+        ExperimentEntity experimentEntity = getExperimentEntity();
+        RealizationEntity realizationEntity = getRealizationEntity();
+        final List<String> roles = Collections.singletonList(Role.USER.getAuthority());
+
+        when(experimentRepository.getOne(anyLong())).thenReturn(experimentEntity);
+        when(realizationService.getByExperimentId(anyLong())).thenReturn(realizationEntity);
+        when(teamService.isOwner(anyString(), anyString())).thenReturn(true);
+        when(claims.getSubject()).thenReturn("ownerId"); // claims user id should be the team owner
+        when(claims.get(JwtToken.KEY)).thenReturn(roles);
+
+        Experiment result = experimentService.deleteExperiment(1L, "teamName", claims);
+
+        verify(experimentRepository, times(1)).delete(anyLong());
+        assertThat(experimentEntity).isEqualTo(result);
+    }
+
+    @Test
     public void testDeleteExperimentAdmin() throws Exception {
         ExperimentEntity experimentEntity = getExperimentEntity();
         RealizationEntity realizationEntity = getRealizationEntity();
