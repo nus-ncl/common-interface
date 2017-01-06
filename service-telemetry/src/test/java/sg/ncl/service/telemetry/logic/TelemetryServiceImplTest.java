@@ -9,6 +9,7 @@ import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
 import sg.ncl.adapter.deterlab.AdapterDeterLab;
+import sg.ncl.service.telemetry.domain.NodeType;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mockingDetails;
@@ -41,7 +42,17 @@ public class TelemetryServiceImplTest {
 
         when(adapterDeterLab.getFreeNodes()).thenReturn(freeNodes);
 
-        String result = telemetryServiceImpl.getFreeNodes();
+        String result = telemetryServiceImpl.getNodes(NodeType.FREE);
         assertThat(result).isEqualTo(freeNodes);
+    }
+
+    @Test
+    public void getTotalNodes() throws Exception {
+        String totalNodes = RandomStringUtils.randomNumeric(3);
+
+        when(adapterDeterLab.getTotalNodes()).thenReturn(totalNodes);
+
+        String result = telemetryServiceImpl.getNodes(NodeType.TOTAL);
+        assertThat(result).isEqualTo(totalNodes);
     }
 }
