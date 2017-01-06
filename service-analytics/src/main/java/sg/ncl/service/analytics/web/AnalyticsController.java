@@ -14,13 +14,12 @@ import sg.ncl.service.analytics.exceptions.StartDateAfterEndDateException;
 
 import javax.inject.Inject;
 import javax.validation.constraints.NotNull;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
-import java.time.format.DateTimeFormatter;
-import java.util.Date;
 import java.util.List;
+
+import static java.time.temporal.TemporalAdjusters.firstDayOfMonth;
+import static java.time.temporal.TemporalAdjusters.lastDayOfMonth;
 
 /**
  * @author: Tran Ly Vu, James Ng
@@ -29,6 +28,7 @@ import java.util.List;
  * References:
  * [1] http://stackoverflow.com/questions/12296642/is-it-possible-to-have-empty-requestparam-values-use-the-defaultvalue
  * [2] http://www.logicbig.com/tutorials/spring-framework/spring-web-mvc/spring-mvc-request-param/
+ * [3] https://blog.stackhunter.com/2014/11/14/new-date-time-apis-java-8/
  */
 @RestController
 @RequestMapping(path = AnalyticsController.PATH, produces = MediaType.APPLICATION_JSON_VALUE)
@@ -84,38 +84,24 @@ public class AnalyticsController {
 
     @GetMapping("/usage/teams/{id}")
     @ResponseStatus(HttpStatus.OK)
-    public String getUsageStatistics(@RequestParam(value = "startDate", required = false) String startDate, @RequestParam(value = "endDate", required = false) String endDate, @PathVariable final String id) {
-        if (endDate == null) {
-            endDate = ZonedDateTime.now().toLocalDate().format(DateTimeFormatter.ofPattern("MM/dd/uu"));
+    public String getUsageStatistics(@AuthenticationPrincipal Object claims,
+                                     @PathVariable final String id,
+                                     @RequestParam(value = "startDate", required = false) String startDate,
+                                     @RequestParam(value = "endDate", required = false) String endDate) {
+        if (claims == null || !(claims instanceof Claims)) {
+            log.warn("Access denied for: /analytics/usage/teams GET");
+            throw new UnauthorizedException();
         }
-
-        if (startDate == null) {
-            startDate = endDate.substring(0, 3) + "01" + endDate.substring(5);
-        }
-
-        compareDate(startDate, endDate);
-
-        return analyticsService.getUsageStatistics(id, startDate, endDate);
-    }
-
-    private void compareDate (String startDate, String endDate) {
-
-        SimpleDateFormat format = new SimpleDateFormat("MM/dd/yy");
-        try {
-
-            Date start = format.parse(startDate);
-            Date end = format.parse(endDate);
-
-            if (start.compareTo(end) > 0) {
-                log.warn("Start date is after end date");
-                throw new StartDateAfterEndDateException();
-            }
-
-        } catch (ParseException e) {
-            log.warn("Error in parsing startDate or endDate");
-            e.printStackTrace();
-        }
-
+        ZonedDateTime start = getZonedDateTime(startDate);
+        ZonedDateTime end = getZonedDateTime(endDate);
+        ZonedDateTime now = ZonedDateTime.now();
+        if (start == null)
+            start = now.with(firstDayOfMonth());
+        if (end == null)
+            end = now.with(lastDayOfMonth());
+        if (start.isAfter(end))
+            throw new StartDateAfterEndDateException();
+        return analyticsService.getUsageStatistics(id, start, end);
     }
 
 }

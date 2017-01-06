@@ -44,6 +44,7 @@ public class AnalyticsServiceImplTest {
     @Before
     public void before() {
         assertThat(mockingDetails(dataDownloadRepository).isMock()).isTrue();
+        assertThat(mockingDetails(adapterDeterLab).isMock()).isTrue();
         analyticsService = new AnalyticsServiceImpl(dataDownloadRepository, adapterDeterLab);
     }
 

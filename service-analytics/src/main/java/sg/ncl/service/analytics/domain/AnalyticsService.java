@@ -12,25 +12,10 @@ import java.util.List;
 
 public interface AnalyticsService {
 
-    /**
-     *
-     * @param dataId: data id
-     * @param resourceId: resource id
-     * @param downloadDate: download date
-     * @param userId: user id
-     * @return data downloads
-     */
     DataDownload addDataDownloadRecord(Long dataId, Long resourceId, ZonedDateTime downloadDate, String userId);
 
     List<DataDownloadStatistics> getDataDownloadCount(Long dataId, ZonedDateTime startDate, ZonedDateTime endDate);
 
-    /**
-     *
-     * @param teamId: team id
-     * @param startDate: starting date
-     * @param endDate: ending date
-     * @return usage in node x hour, or "?"
-     */
-    String getUsageStatistics(String teamId, String startDate, String endDate);
+    String getUsageStatistics(String teamId, ZonedDateTime startDate, ZonedDateTime endDate);
 
 }

@@ -2,16 +2,17 @@ package sg.ncl.service.analytics.logic;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import sg.ncl.adapter.deterlab.AdapterDeterLab;
 import sg.ncl.service.analytics.data.jpa.DataDownloadEntity;
 import sg.ncl.service.analytics.data.jpa.DataDownloadRepository;
 import sg.ncl.service.analytics.data.jpa.DataDownloadStatistics;
 import sg.ncl.service.analytics.domain.AnalyticsService;
 import sg.ncl.service.analytics.domain.DataDownload;
-import sg.ncl.adapter.deterlab.AdapterDeterLab;
 
 import javax.inject.Inject;
 import javax.validation.constraints.NotNull;
 import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 /**
@@ -89,9 +90,12 @@ public class AnalyticsServiceImpl implements AnalyticsService {
     }
 
     @Override
-    public String getUsageStatistics(String teamId, String startDate, String endDate) {
-        log.info("Getting usage statistics for team {}, start {}, end {}", teamId, startDate, endDate);
-        return adapterDeterLab.getUsageStatistics(teamId, startDate, endDate);
+    public String getUsageStatistics(String teamId, ZonedDateTime startDate, ZonedDateTime endDate) {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MM/dd/yy");
+        String start = startDate.format(formatter);
+        String end = endDate.format(formatter);
+        log.info("Getting usage statistics for team {}, start {}, end {}", teamId, start, end);
+        return adapterDeterLab.getUsageStatistics(teamId, start, end);
     }
 
 }
