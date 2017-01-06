@@ -105,4 +105,8 @@ public class ConnectionProperties {
         return HTTP_MODE + ip + ":" + port + "/saveImage";
     }
 
+    public String removeUserFromTeam() {
+        return HTTP_MODE + ip + ":" + port + "/removeUserFromTeam";
+    }
+
 }

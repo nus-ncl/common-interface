@@ -8,13 +8,15 @@ import org.junit.rules.ExpectedException;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
-import sg.ncl.service.team.Util;
+import sg.ncl.adapter.deterlab.AdapterDeterLab;
+import sg.ncl.service.team.util.TestUtil;
 import sg.ncl.service.team.data.jpa.TeamEntity;
 import sg.ncl.service.team.data.jpa.TeamRepository;
 import sg.ncl.service.team.domain.*;
 import sg.ncl.service.team.exceptions.*;
 import sg.ncl.service.team.web.TeamInfo;
 import sg.ncl.service.team.web.TeamMemberInfo;
+import sg.ncl.service.user.domain.UserService;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -24,6 +26,8 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.*;
+import static sg.ncl.service.team.util.TestUtil.getTeamEntityWithId;
+import static sg.ncl.service.team.util.TestUtil.getTeamMemberInfo;
 
 /**
  * @author James Ng
@@ -36,17 +40,23 @@ public class TeamServiceImplTest {
     public ExpectedException exception = ExpectedException.none();
 
     @Mock
+    private AdapterDeterLab adapterDeterLab;
+    @Mock
     private TeamRepository teamRepository;
+    @Mock
+    private UserService userService;
 
     private TeamService teamService;
     private List<TeamMember> members = new ArrayList<>();
-    private TeamEntity teamEntity = Util.getTeamEntityWithId();
-    private TeamMemberInfo teamMemberInfo = Util.getTeamMemberInfo(MemberType.MEMBER);
+    private TeamEntity teamEntity = getTeamEntityWithId();
+    private TeamMemberInfo teamMemberInfo = getTeamMemberInfo(MemberType.MEMBER);
 
     @Before
     public void before() {
+        assertThat(mockingDetails(adapterDeterLab).isMock()).isTrue();
         assertThat(mockingDetails(teamRepository).isMock()).isTrue();
-        teamService = new TeamServiceImpl(teamRepository);
+        assertThat(mockingDetails(userService).isMock()).isTrue();
+        teamService = new TeamServiceImpl(adapterDeterLab, teamRepository, userService);
     }
 
     @Test
@@ -212,7 +222,7 @@ public class TeamServiceImplTest {
 
     @Test
     public void testAddMemberKnownId() {
-        TeamEntity team2 = Util.getTeamEntityWithId();
+        TeamEntity team2 = getTeamEntityWithId();
         team2.addMember(teamMemberInfo);
 
         when(teamRepository.findOne(anyString())).thenReturn(teamEntity);
@@ -266,8 +276,8 @@ public class TeamServiceImplTest {
 
     @Test
     public void testIsOwnerTrue() {
-        TeamEntity entity = Util.getTeamEntityWithId();
-        TeamMember member = Util.getTeamMemberInfo(MemberType.OWNER);
+        TeamEntity entity = getTeamEntityWithId();
+        TeamMember member = getTeamMemberInfo(MemberType.OWNER);
         entity.addMember(member);
         when(teamRepository.findOne(anyString())).thenReturn(entity);
         Boolean flag = teamService.isOwner(teamEntity.getId(), member.getUserId());
@@ -276,8 +286,8 @@ public class TeamServiceImplTest {
 
     @Test
     public void testIsOwnerFalse() {
-        TeamEntity entity = Util.getTeamEntityWithId();
-        TeamMember member = Util.getTeamMemberInfo(MemberType.MEMBER);
+        TeamEntity entity = getTeamEntityWithId();
+        TeamMember member = getTeamMemberInfo(MemberType.MEMBER);
         entity.addMember(member);
         when(teamRepository.findOne(anyString())).thenReturn(entity);
         Boolean flag = teamService.isOwner(teamEntity.getId(), member.getUserId());
@@ -286,8 +296,8 @@ public class TeamServiceImplTest {
 
     @Test
     public void testUpdateMemberStatusEmptyUserId() {
-        TeamEntity entity = Util.getTeamEntityWithId();
-        TeamMember member = Util.getTeamMemberInfo(MemberType.MEMBER);
+        TeamEntity entity = getTeamEntityWithId();
+        TeamMember member = getTeamMemberInfo(MemberType.MEMBER);
         entity.addMember(member);
         when(teamRepository.findOne(anyString())).thenReturn(entity);
         exception.expect(TeamMemberNotFoundException.class);
@@ -309,8 +319,8 @@ public class TeamServiceImplTest {
 
     @Test
     public void testUpdateMemberStatusUnknownUserId() {
-        TeamEntity entity = Util.getTeamEntityWithId();
-        TeamMember member = Util.getTeamMemberInfo(MemberType.MEMBER);
+        TeamEntity entity = getTeamEntityWithId();
+        TeamMember member = getTeamMemberInfo(MemberType.MEMBER);
         entity.addMember(member);
         when(teamRepository.findOne(anyString())).thenReturn(entity);
         exception.expect(TeamMemberNotFoundException.class);
@@ -319,8 +329,8 @@ public class TeamServiceImplTest {
 
     @Test
     public void testUpdateMemberStatusKnownUserId() {
-        TeamEntity entity = Util.getTeamEntityWithId();
-        TeamMember member = Util.getTeamMemberInfo(MemberType.MEMBER);
+        TeamEntity entity = getTeamEntityWithId();
+        TeamMember member = getTeamMemberInfo(MemberType.MEMBER);
         entity.addMember(member);
         when(teamRepository.findOne(anyString())).thenReturn(entity);
         teamService.updateMemberStatus(entity.getId(), member.getUserId(), MemberStatus.PENDING);
@@ -335,7 +345,7 @@ public class TeamServiceImplTest {
     // case RESTRICTED
     @Test
     public void testUpdateTeamStatusCaseRestricted() {
-        TeamEntity entity = Util.getTeamEntityWithId();
+        TeamEntity entity = getTeamEntityWithId();
         entity.setStatus(TeamStatus.APPROVED);
 
         when(teamRepository.findOne(anyString())).thenReturn(entity);
@@ -350,7 +360,7 @@ public class TeamServiceImplTest {
     @Test
     public void testUpdateTeamStatusCaseRestrictedElseBranch() {
         String randomIdForTest = RandomStringUtils.randomAlphanumeric(20);
-        TeamEntity entity = Util.getTeamEntityWithId();
+        TeamEntity entity = getTeamEntityWithId();
         entity.setStatus(TeamStatus.CLOSED);
 
         exception.expect(InvalidStatusTransitionException.class);
@@ -365,7 +375,7 @@ public class TeamServiceImplTest {
     // case REJECTED
     @Test
     public void testUpdateTeamStatusCaseRejected() {
-        TeamEntity entity = Util.getTeamEntityWithId();
+        TeamEntity entity = getTeamEntityWithId();
         entity.setStatus(TeamStatus.PENDING);
 
         when(teamRepository.findOne(anyString())).thenReturn(entity);
@@ -386,8 +396,8 @@ public class TeamServiceImplTest {
     // case APPROVED
     @Test
     public void testUpdateMemberStatusTrueTeamOwner() {
-        TeamEntity entity = Util.getTeamEntityWithId();
-        TeamMember member = Util.getTeamMemberInfo(MemberType.OWNER);
+        TeamEntity entity = getTeamEntityWithId();
+        TeamMember member = getTeamMemberInfo(MemberType.OWNER);
         entity.addMember(member);
 
         TeamEntity updatedEntity = entity;
@@ -405,7 +415,7 @@ public class TeamServiceImplTest {
     @Test
     public void testUpdateTeamStatusCaseApprovedElseBranch() {
         String randomIdForTest = RandomStringUtils.randomAlphanumeric(20);
-        TeamEntity entity = Util.getTeamEntityWithId();
+        TeamEntity entity = getTeamEntityWithId();
         entity.setStatus(TeamStatus.CLOSED);
 
         exception.expect(InvalidStatusTransitionException.class);
@@ -420,7 +430,7 @@ public class TeamServiceImplTest {
     // case CLOSED
     @Test
     public void testUpdateTeamStatusCaseClosed() {
-        TeamEntity entity = Util.getTeamEntityWithId();
+        TeamEntity entity = getTeamEntityWithId();
         entity.setStatus(TeamStatus.CLOSED);
 
         when(teamRepository.findOne(anyString())).thenReturn(entity);
@@ -434,7 +444,7 @@ public class TeamServiceImplTest {
     // case default
     @Test
     public void testUpdateTeamStatusCaseDefault() {
-        TeamEntity entity = Util.getTeamEntityWithId();
+        TeamEntity entity = getTeamEntityWithId();
         entity.setStatus(TeamStatus.PENDING);
 
         exception.expect(InvalidTeamStatusException.class);
@@ -446,6 +456,22 @@ public class TeamServiceImplTest {
 
         verify(teamRepository, times(1)).findOne(anyString());
 
+    }
+
+    @Test
+    public void testRemoveMemberGood() {
+        TeamEntity teamEntity = getTeamEntityWithId();
+        TeamMember teamMember1 = getTeamMemberInfo(MemberType.MEMBER, MemberStatus.APPROVED);
+        TeamMember teamMember2 = getTeamMemberInfo(MemberType.MEMBER, MemberStatus.APPROVED);
+        teamEntity.addMember(teamMember1);
+
+        when(teamRepository.findOne(anyString())).thenReturn(teamEntity);
+        when(teamRepository.save(any(TeamEntity.class))).thenReturn(teamEntity);
+
+        Team result = teamService.removeMember("teamId", teamMember2, "ownerId");
+
+        assertThat(result.getMembers().size()).isEqualTo(1);
+        assertThat(result.getMembers().get(0).getUserId()).isEqualTo(teamMember1.getUserId());
     }
 
 }

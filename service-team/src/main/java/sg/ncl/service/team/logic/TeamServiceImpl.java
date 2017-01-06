@@ -3,6 +3,7 @@ package sg.ncl.service.team.logic;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import sg.ncl.adapter.deterlab.AdapterDeterLab;
 import sg.ncl.service.team.data.jpa.TeamEntity;
 import sg.ncl.service.team.data.jpa.TeamMemberEntity;
 import sg.ncl.service.team.data.jpa.TeamRepository;
@@ -14,6 +15,7 @@ import sg.ncl.service.team.domain.TeamService;
 import sg.ncl.service.team.domain.TeamStatus;
 import sg.ncl.service.team.domain.TeamVisibility;
 import sg.ncl.service.team.exceptions.*;
+import sg.ncl.service.user.domain.UserService;
 
 import javax.inject.Inject;
 import javax.validation.constraints.NotNull;
@@ -30,11 +32,15 @@ public class TeamServiceImpl implements TeamService {
 
     private static final String NOT_ALLOWED = "is not allowed";
 
+    private final AdapterDeterLab adapterDeterLab;
     private final TeamRepository teamRepository;
+    private final UserService userService;
 
     @Inject
-    TeamServiceImpl(final TeamRepository teamRepository) {
+    TeamServiceImpl(final AdapterDeterLab adapterDeterLab, final TeamRepository teamRepository, final UserService userService) {
+        this.adapterDeterLab = adapterDeterLab;
         this.teamRepository = teamRepository;
+        this.userService = userService;
     }
 
     @Transactional
@@ -149,6 +155,12 @@ public class TeamServiceImpl implements TeamService {
         return updatedTeam;
     }
 
+    /**
+     * Remove users from team by updating the team member status; only affects the service-team
+     * @param id The team id to remove users from
+     * @param teamMember The team member details to be remove
+     * @return The updated team with the specific user removed
+     */
     @Transactional
     public Team removeMember(@NotNull final String id, @NotNull final TeamMember teamMember) {
         TeamEntity entity = findTeam(id);
@@ -161,6 +173,22 @@ public class TeamServiceImpl implements TeamService {
         final Team updatedTeam = teamRepository.save(entity);
         log.info("Member {} removed from team {}", teamMember.getUserId(), updatedTeam.getId());
         return updatedTeam;
+    }
+
+    /**
+     * Remove users from team by also invoking service-user; for the web-service team profile page
+     * @param id The team id to remove users from
+     * @param teamMember The team member details to be removed
+     * @param requesterId The user id of the one requesting to remove the particular user; this must be the team owner
+     * @return The updated team with the specific user removed
+     */
+    @Transactional
+    public Team removeMember(@NotNull final String id, @NotNull final TeamMember teamMember, @NotNull final String requesterId) {
+        log.info("Removing member {} from team {} requested by {}", teamMember.getUserId(), id, requesterId);
+        userService.removeTeam(teamMember.getUserId(), id);
+        Team team = removeMember(id, teamMember);
+        adapterDeterLab.removeUserFromTeam(id, teamMember.getUserId(), requesterId);
+        return team;
     }
 
     public Boolean isOwner(@NotNull final String teamId, @NotNull final String userId) {

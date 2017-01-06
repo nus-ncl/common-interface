@@ -2,7 +2,7 @@ package sg.ncl.service.team.data.jpa;
 
 import org.apache.commons.lang3.RandomStringUtils;
 import org.junit.Test;
-import sg.ncl.service.team.Util;
+import sg.ncl.service.team.util.TestUtil;
 import sg.ncl.service.team.domain.*;
 import sg.ncl.service.team.web.TeamMemberInfo;
 
@@ -185,8 +185,8 @@ public class TeamEntityTest {
 
     @Test
     public void testGetMemberById() throws Exception {
-        TeamEntity teamEntity = Util.getTeamEntity();
-        TeamMember teamMember = Util.getTeamMemberInfo(MemberType.MEMBER);
+        TeamEntity teamEntity = TestUtil.getTeamEntity();
+        TeamMember teamMember = TestUtil.getTeamMemberInfo(MemberType.MEMBER);
         teamEntity.addMember(teamMember);
         String userId = teamMember.getUserId();
 
@@ -199,8 +199,8 @@ public class TeamEntityTest {
 
     @Test
     public void testGetMemberByUnknownId() {
-        TeamEntity teamEntity = Util.getTeamEntity();
-        TeamMember teamMember = Util.getTeamMemberInfo(MemberType.MEMBER);
+        TeamEntity teamEntity = TestUtil.getTeamEntity();
+        TeamMember teamMember = TestUtil.getTeamMemberInfo(MemberType.MEMBER);
         teamEntity.addMember(teamMember);
         String userId = teamMember.getUserId() + "0";
 
@@ -211,8 +211,8 @@ public class TeamEntityTest {
 
     @Test
     public void testChangeMemberStatus() throws Exception {
-        TeamEntity teamEntity = Util.getTeamEntity();
-        TeamMember teamMember = Util.getTeamMemberInfo(MemberType.MEMBER);
+        TeamEntity teamEntity = TestUtil.getTeamEntity();
+        TeamMember teamMember = TestUtil.getTeamMemberInfo(MemberType.MEMBER);
         teamEntity.addMember(teamMember);
 
         TeamMember result = teamEntity.changeMemberStatus(teamMember, MemberStatus.APPROVED);
@@ -224,9 +224,9 @@ public class TeamEntityTest {
 
     @Test
     public void testChangeMemberStatusUnknownId() {
-        TeamEntity teamEntity = Util.getTeamEntity();
-        TeamMember teamMember1 = Util.getTeamMemberInfo(MemberType.MEMBER);
-        TeamMember teamMember2 = Util.getTeamMemberInfo(MemberType.MEMBER);
+        TeamEntity teamEntity = TestUtil.getTeamEntity();
+        TeamMember teamMember1 = TestUtil.getTeamMemberInfo(MemberType.MEMBER);
+        TeamMember teamMember2 = TestUtil.getTeamMemberInfo(MemberType.MEMBER);
         teamEntity.addMember(teamMember1);
 
         TeamMember result = teamEntity.changeMemberStatus(teamMember2, MemberStatus.APPROVED);
@@ -237,7 +237,7 @@ public class TeamEntityTest {
     @Test
     public void testAddMember() throws Exception {
         final TeamEntity entity = new TeamEntity();
-        final TeamMemberInfo teamMemberInfo = Util.getTeamMemberInfo(MemberType.MEMBER);
+        final TeamMemberInfo teamMemberInfo = TestUtil.getTeamMemberInfo(MemberType.MEMBER);
         entity.addMember(teamMemberInfo);
 
         assertThat(entity.getMembers().get(0).getUserId(), is(teamMemberInfo.getUserId()));
@@ -246,7 +246,7 @@ public class TeamEntityTest {
     @Test
     public void testAddMemberExistingMemberRejectedStatus() {
         final TeamEntity entity = new TeamEntity();
-        final TeamMemberInfo teamMemberInfo = Util.getTeamMemberInfo(MemberType.MEMBER, MemberStatus.REJECTED);
+        final TeamMemberInfo teamMemberInfo = TestUtil.getTeamMemberInfo(MemberType.MEMBER, MemberStatus.REJECTED);
         entity.addMember(teamMemberInfo);
         entity.addMember(teamMemberInfo);
 
@@ -257,7 +257,7 @@ public class TeamEntityTest {
     @Test
     public void testAddMemberExistingMemberNonRejectedStatus() {
         final TeamEntity entity = new TeamEntity();
-        final TeamMemberInfo teamMemberInfo = Util.getTeamMemberInfo(MemberType.MEMBER, MemberStatus.APPROVED);
+        final TeamMemberInfo teamMemberInfo = TestUtil.getTeamMemberInfo(MemberType.MEMBER, MemberStatus.APPROVED);
         entity.addMember(teamMemberInfo);
         entity.addMember(teamMemberInfo);
 
@@ -267,30 +267,30 @@ public class TeamEntityTest {
 
     @Test
     public void testEqual() throws Exception {
-        final TeamEntity entity1 = Util.getTeamEntityWithId();
-        final TeamEntity entity2 = Util.getTeamEntityWithId();
+        final TeamEntity entity1 = TestUtil.getTeamEntityWithId();
+        final TeamEntity entity2 = TestUtil.getTeamEntityWithId();
 
         assertThat(entity1, not(entity2));
     }
 
     @Test
     public void testEqualThis() {
-        final TeamEntity entity1 = Util.getTeamEntityWithId();
+        final TeamEntity entity1 = TestUtil.getTeamEntityWithId();
         final TeamEntity entity2 = entity1;
         assertTrue(entity1.equals(entity2));
     }
 
     @Test
     public void testEqualNull() {
-        final TeamEntity entity1 = Util.getTeamEntityWithId();
+        final TeamEntity entity1 = TestUtil.getTeamEntityWithId();
         final TeamEntity entity2 = null;
         assertFalse(entity1.equals(entity2));
     }
 
     @Test
     public void testEqualDifferent() {
-        final TeamEntity entity1 = Util.getTeamEntityWithId();
-        final TeamEntity entity2 = Util.getTeamEntityWithId();
+        final TeamEntity entity1 = TestUtil.getTeamEntityWithId();
+        final TeamEntity entity2 = TestUtil.getTeamEntityWithId();
         assertFalse(entity1.equals(entity2));
     }
 
@@ -318,7 +318,7 @@ public class TeamEntityTest {
 
     @Test
     public void testToString() throws Exception {
-        final TeamEntity entity = Util.getTeamEntity();
+        final TeamEntity entity = TestUtil.getTeamEntity();
 
         final String toString = entity.toString();
 

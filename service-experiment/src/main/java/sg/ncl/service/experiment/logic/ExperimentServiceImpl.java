@@ -17,6 +17,7 @@ import sg.ncl.service.experiment.exceptions.TeamIdNullOrEmptyException;
 import sg.ncl.service.experiment.exceptions.UserIdNullOrEmptyException;
 import sg.ncl.service.realization.data.jpa.RealizationEntity;
 import sg.ncl.service.realization.domain.RealizationService;
+import sg.ncl.service.team.domain.TeamService;
 
 import javax.inject.Inject;
 import javax.validation.constraints.NotNull;
@@ -40,14 +41,16 @@ public class ExperimentServiceImpl implements ExperimentService {
     private final AdapterDeterLab adapterDeterLab;
     private final RealizationService realizationService;
     private final ConnectionProperties adapterConnectionProperties;
+    private final TeamService teamService;
 
     @Inject
-    ExperimentServiceImpl(@NotNull final ExperimentRepository experimentRepository, @NotNull final AdapterDeterLab adapterDeterLab, @NotNull final RealizationService realizationService, @NotNull final ConnectionProperties connectionProperties) {
+    ExperimentServiceImpl(@NotNull final ExperimentRepository experimentRepository, @NotNull final AdapterDeterLab adapterDeterLab, @NotNull final RealizationService realizationService, @NotNull final ConnectionProperties connectionProperties, @NotNull final TeamService teamService) {
         this.experimentRepository = experimentRepository;
         this.adapterDeterLab = adapterDeterLab;
         this.realizationService = realizationService;
         this.adapterConnectionProperties = connectionProperties;
         // FIXME Do not expose the internal workings of the DeterLab adapter to the experiment service; i.e., should not need to inject ConnectionProperties
+        this.teamService = teamService;
     }
 
     /**
@@ -234,7 +237,8 @@ public class ExperimentServiceImpl implements ExperimentService {
         RealizationEntity realizationEntity = realizationService.getByExperimentId(id);
         Long realizationId = realizationEntity.getId();
 
-        checkPermissions(realizationEntity, claims);
+        // put the check inside here because we do not want to add the realization service and team service on the controller
+        checkPermissions(realizationEntity, teamService.isOwner(teamId, claims.getSubject()), claims);
 
         if (realizationId != null && realizationId > 0) {
             realizationService.deleteRealization(realizationId);

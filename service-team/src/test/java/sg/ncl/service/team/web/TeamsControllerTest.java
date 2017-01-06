@@ -1,294 +1,406 @@
 package sg.ncl.service.team.web;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import com.google.gson.reflect.TypeToken;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import io.jsonwebtoken.Claims;
 import org.apache.commons.lang3.RandomStringUtils;
-import org.hamcrest.Matchers;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
+import org.junit.runner.RunWith;
 import org.mockito.Mock;
+import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.test.context.TestPropertySource;
-import org.springframework.test.context.web.WebAppConfiguration;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.MvcResult;
+import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 import sg.ncl.common.authentication.Role;
+import sg.ncl.common.exception.base.UnauthorizedException;
 import sg.ncl.common.jwt.JwtToken;
-import sg.ncl.service.team.AbstractTest;
-import sg.ncl.service.team.Util;
 import sg.ncl.service.team.data.jpa.TeamEntity;
-import sg.ncl.service.team.data.jpa.TeamRepository;
-import sg.ncl.service.team.domain.MemberType;
-import sg.ncl.service.team.domain.Team;
-import sg.ncl.service.team.domain.TeamStatus;
-import sg.ncl.service.team.domain.TeamVisibility;
-import sg.ncl.service.team.serializers.DateTimeDeserializer;
-import sg.ncl.service.team.serializers.DateTimeSerializer;
+import sg.ncl.service.team.domain.*;
 
 import javax.inject.Inject;
-import java.lang.reflect.Type;
-import java.time.ZonedDateTime;
+
 import java.util.ArrayList;
 import java.util.List;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.equalTo;
-import static org.hamcrest.core.Is.is;
-import static org.mockito.Mockito.mock;
+import static org.hamcrest.Matchers.hasSize;
+import static org.hamcrest.Matchers.is;
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyString;
+import static org.mockito.Mockito.mockingDetails;
 import static org.mockito.Mockito.when;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-import static org.springframework.test.web.servlet.setup.MockMvcBuilders.webAppContextSetup;
+import static sg.ncl.service.team.util.TestUtil.getTeamEntityWithId;
+import static sg.ncl.service.team.util.TestUtil.getTeamMemberInfo;
 
 /**
- * Created by Desmond / Te Ye
+ * Created by dcsyeoty on 29-Dec-16.
  */
-@WebAppConfiguration
-@TestPropertySource(properties = "flyway.enabled=false")
-public class TeamsControllerTest extends AbstractTest {
+@RunWith(SpringRunner.class)
+@WebMvcTest(controllers = TeamsController.class, secure = true)
+@ContextConfiguration(classes = {TeamsController.class})
+public class TeamsControllerTest {
 
     @Rule
-    public final ExpectedException exception = ExpectedException.none();
+    public ExpectedException exception = ExpectedException.none();
 
     @Inject
-    private TeamRepository teamRepository;
-
-    private MockMvc mockMvc;
-    private Claims claims;
+    private ObjectMapper mapper;
 
     @Inject
     private WebApplicationContext webApplicationContext;
 
+    @Mock
+    private Claims claims;
+    @Mock
+    private Authentication authentication;
+    @Mock
+    private SecurityContext securityContext;
+
+    private MockMvc mockMvc;
+
+    @MockBean
+    private TeamService teamService;
+
     @Before
-    public void setup() {
-        mockMvc = webAppContextSetup(webApplicationContext).build();
-        // need this because controller checks for authentication for some endpoints
-        Authentication authentication = mock(Authentication.class);
-        SecurityContext securityContext = mock(SecurityContext.class);
-        claims = mock(Claims.class);
+    public void before() {
+        assertThat(mockingDetails(claims).isMock()).isTrue();
+        assertThat(mockingDetails(securityContext).isMock()).isTrue();
+        assertThat(mockingDetails(authentication).isMock()).isTrue();
+        assertThat(mockingDetails(teamService).isMock()).isTrue();
+
         when(securityContext.getAuthentication()).thenReturn(authentication);
         SecurityContextHolder.setContext(securityContext);
-        when(securityContext.getAuthentication().getPrincipal()).thenReturn(claims);
+        when(authentication.getPrincipal()).thenReturn(claims);
+
+        mockMvc = MockMvcBuilders.webAppContextSetup(webApplicationContext).build();
     }
 
     @Test
     public void testGetAllTeamsWithNoUserInDb() throws Exception {
-        MvcResult result = mockMvc.perform(get("/teams")).andReturn();
-        Assert.assertTrue(result.getResponse().getContentLength() == 0);
-    }
-
-    @Test
-    public void testGetTeamWithNoUserInDb() throws Exception {
-        mockMvc.perform(get("/teams/" + RandomStringUtils.randomAlphabetic(20)))
-                .andExpect(status().isNotFound());
-    }
-
-    @Test
-    public void testGetTeam() throws Exception {
-        MediaType contentType = new MediaType(MediaType.APPLICATION_JSON.getType(),
-                MediaType.APPLICATION_JSON.getSubtype());
-
-        TeamEntity teamEntity = Util.getTeamEntity();
-        teamEntity = teamRepository.save(teamEntity);
-
-        final String idString = teamEntity.getId();
-        final TeamEntity originalEntity = teamEntity;
-
-        mockMvc.perform(get("/teams/" + idString))
+        mockMvc.perform(get(TeamsController.PATH))
                 .andExpect(status().isOk())
-                .andExpect(content().contentTypeCompatibleWith(contentType))
-                .andExpect(jsonPath("$.name", is(originalEntity.getName())));
+                .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON));
     }
 
     @Test
-    public void testGetTeamAfterAddUsertoTeam() throws Exception {
-        TeamEntity origTeamEntity = Util.getTeamEntity();
-        TeamEntity teamEntity = teamRepository.save(origTeamEntity);
-        String teamId = teamEntity.getId();
+    public void testGetAllTeamsForbiddenException() throws Exception {
+        when(securityContext.getAuthentication()).thenReturn(null);
 
-        TeamMemberInfo teamMemberInfo = Util.getTeamMemberInfo(MemberType.MEMBER);
-        GsonBuilder gsonBuilder = new GsonBuilder();
-        gsonBuilder.registerTypeAdapter(ZonedDateTime.class, new DateTimeSerializer());
-        gsonBuilder.registerTypeAdapter(ZonedDateTime.class, new DateTimeDeserializer());
-        Gson gson = gsonBuilder.create();
-        String jsonInString = gson.toJson(teamMemberInfo);
-
-        // get team before add user
-        mockMvc.perform(get("/teams/" + teamId))
-                .andExpect(status().isOk());
-
-        // add user to team
-        mockMvc.perform(post("/teams/" + teamId + "/members").contentType(MediaType.APPLICATION_JSON).content(jsonInString))
-                .andExpect(status().isCreated());
-
-        // assert that team has a member
-        // get team after add user
-        MvcResult mvcResult = mockMvc.perform(get("/teams/" + teamId))
-                .andExpect(status().isOk())
-                .andReturn();
-
-        String response = mvcResult.getResponse().getContentAsString();
-        Team resultTeam = gson.fromJson(response, TeamInfo.class);
-
-        Assert.assertThat(teamId, is(resultTeam.getId()));
-        Assert.assertThat(teamMemberInfo.getUserId(), is(resultTeam.getMembers().get(0).getUserId()));
-//        Assert.assertThat(teamMemberInfo.getJoinedDate(), is(resultTeam.getMembers().get(0).getJoinedDate()));
-        Assert.assertThat(teamMemberInfo.getMemberType(), is(resultTeam.getMembers().get(0).getMemberType()));
+        mockMvc.perform(get(TeamsController.PATH))
+                .andExpect(status().isForbidden());
     }
 
     @Test
-    public void testUpdateTeamDetailsGood() throws Exception {
-        TeamEntity origTeamEntity = Util.getTeamEntity();
-        TeamEntity savedTeamEntity = teamRepository.save(origTeamEntity);
-        final String id = savedTeamEntity.getId();
+    public void testGetAll() throws Exception {
+        final List<Team> list = new ArrayList<>();
+        final TeamEntity entity1 = getTeamEntityWithId();
+        final TeamEntity entity2 = getTeamEntityWithId();
+        list.add(entity1);
+        list.add(entity2);
 
-        TeamEntity teamEntityFromDb = teamRepository.findOne(id);
+        when(teamService.getAllTeams()).thenReturn(list);
 
-        // change name
-        String editedName = RandomStringUtils.randomAlphanumeric(20);
-        String editedDescription = RandomStringUtils.randomAlphanumeric(20);
-        String editedWebsite = "http://" + RandomStringUtils.randomAlphabetic(8) + ".com";
-        teamEntityFromDb.setName(editedName);
-        teamEntityFromDb.setDescription(editedDescription);
-        teamEntityFromDb.setWebsite(editedWebsite);
-
-        // create GSON
-        GsonBuilder gsonBuilder = new GsonBuilder();
-        gsonBuilder.registerTypeAdapter(ZonedDateTime.class, new DateTimeSerializer());
-        gsonBuilder.registerTypeAdapter(ZonedDateTime.class, new DateTimeDeserializer());
-        Gson gson = gsonBuilder.create();
-
-        // convert to TeamInfo
-        // put
-        String jsonString = gson.toJson(new TeamInfo(teamEntityFromDb));
-
-        mockMvc.perform(put("/teams/" + id).contentType(MediaType.APPLICATION_JSON).content(jsonString))
-                .andExpect(status().isOk());
-
-        // check if name is new name and description is the same
-        mockMvc.perform(get("/teams/" + id))
+        mockMvc.perform(get(TeamsController.PATH))
                 .andExpect(status().isOk())
                 .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
-                .andExpect(jsonPath("$.name", is(editedName)))
-                .andExpect(jsonPath("$.description", is(editedDescription)))
-                .andExpect(jsonPath("$.website", is(editedWebsite)));
+
+                .andExpect(jsonPath("$", hasSize(2)))
+
+                .andExpect(jsonPath("$[0].id", is(equalTo(entity1.getId()))))
+                .andExpect(jsonPath("$[0].name", is(equalTo(entity1.getName()))))
+                .andExpect(jsonPath("$[0].description", is(equalTo(entity1.getDescription()))))
+                .andExpect(jsonPath("$[0].website", is(equalTo(entity1.getWebsite()))))
+                .andExpect(jsonPath("$[0].organisationType", is(equalTo(entity1.getOrganisationType()))))
+                .andExpect(jsonPath("$[0].visibility", is(equalTo(entity1.getVisibility().name()))))
+                .andExpect(jsonPath("$[0].privacy", is(equalTo(entity1.getPrivacy().name()))))
+                .andExpect(jsonPath("$[0].status", is(equalTo(entity1.getStatus().name()))))
+
+                .andExpect(jsonPath("$[1].id", is(equalTo(entity2.getId()))))
+                .andExpect(jsonPath("$[1].name", is(equalTo(entity2.getName()))))
+                .andExpect(jsonPath("$[1].description", is(equalTo(entity2.getDescription()))))
+                .andExpect(jsonPath("$[1].website", is(equalTo(entity2.getWebsite()))))
+                .andExpect(jsonPath("$[1].organisationType", is(equalTo(entity2.getOrganisationType()))))
+                .andExpect(jsonPath("$[1].visibility", is(equalTo(entity2.getVisibility().name()))))
+                .andExpect(jsonPath("$[1].privacy", is(equalTo(entity2.getPrivacy().name()))))
+                .andExpect(jsonPath("$[1].status", is(equalTo(entity2.getStatus().name()))));
     }
 
     @Test
-    public void testUpdateTeamDetailsWithWrongTeamId() throws Exception {
-        TeamEntity teamEntity = Util.getTeamEntity();
-        final String idString = "123456";
+    public void testGetTeamByVisibilityPrivateWithNoAuthentication() throws Exception {
+        when(securityContext.getAuthentication()).thenReturn(null);
 
-        // create GSON
-        GsonBuilder gsonBuilder = new GsonBuilder();
-        gsonBuilder.registerTypeAdapter(ZonedDateTime.class, new DateTimeSerializer());
-        gsonBuilder.registerTypeAdapter(ZonedDateTime.class, new DateTimeDeserializer());
-        Gson gson = gsonBuilder.create();
-
-        // put
-        mockMvc.perform(put("/teams/" + idString).contentType(MediaType.APPLICATION_JSON).content(gson.toJson(new TeamInfo(teamEntity))))
-                .andExpect(status().isNotFound());
+        mockMvc.perform(get(TeamsController.PATH + "?visibility=" + TeamVisibility.PRIVATE))
+                .andExpect(status().isForbidden());
     }
 
     @Test
-    public void testUpdateTeamStatusRestricted() throws Exception {
-        TeamEntity origTeamEntity = Util.getTeamEntity();
-        origTeamEntity.setStatus(TeamStatus.APPROVED);
-        TeamEntity savedTeamEntity = teamRepository.save(origTeamEntity);
-        final String id = savedTeamEntity.getId();
+    public void testGetTeamByVisibilityPublicWithNoAuthentication() throws Exception {
+        final List<Team> list = new ArrayList<>();
+        final TeamEntity entity = getTeamEntityWithId();
+        list.add(entity);
+
+        when(securityContext.getAuthentication()).thenReturn(null);
+        when(teamService.getTeamsByVisibility(any(TeamVisibility.class))).thenReturn(list);
+
+        mockMvc.perform(get(TeamsController.PATH + "?visibility=" + TeamVisibility.PUBLIC))
+                .andExpect(status().isOk())
+                .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
+
+                .andExpect(jsonPath("$", hasSize(1)))
+
+                .andExpect(jsonPath("$[0].id", is(equalTo(entity.getId()))))
+                .andExpect(jsonPath("$[0].name", is(equalTo(entity.getName()))))
+                .andExpect(jsonPath("$[0].description", is(equalTo(entity.getDescription()))))
+                .andExpect(jsonPath("$[0].website", is(equalTo(entity.getWebsite()))))
+                .andExpect(jsonPath("$[0].organisationType", is(equalTo(entity.getOrganisationType()))))
+                .andExpect(jsonPath("$[0].visibility", is(equalTo(TeamVisibility.PUBLIC.name()))))
+                .andExpect(jsonPath("$[0].privacy", is(equalTo(entity.getPrivacy().name()))))
+                .andExpect(jsonPath("$[0].status", is(equalTo(entity.getStatus().name()))));
+    }
+
+    @Test
+    public void testGetTeamByVisibilityPrivateWithAuthentication() throws Exception {
+        final List<Team> list = new ArrayList<>();
+        final TeamEntity entity = getTeamEntityWithId();
+        entity.setVisibility(TeamVisibility.PRIVATE);
+        list.add(entity);
+
+        when(teamService.getTeamsByVisibility(any(TeamVisibility.class))).thenReturn(list);
+
+        mockMvc.perform(get(TeamsController.PATH + "?visibility=" + TeamVisibility.PUBLIC))
+                .andExpect(status().isOk())
+                .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
+
+                .andExpect(jsonPath("$", hasSize(1)))
+
+                .andExpect(jsonPath("$[0].id", is(equalTo(entity.getId()))))
+                .andExpect(jsonPath("$[0].name", is(equalTo(entity.getName()))))
+                .andExpect(jsonPath("$[0].description", is(equalTo(entity.getDescription()))))
+                .andExpect(jsonPath("$[0].website", is(equalTo(entity.getWebsite()))))
+                .andExpect(jsonPath("$[0].organisationType", is(equalTo(entity.getOrganisationType()))))
+                .andExpect(jsonPath("$[0].visibility", is(equalTo(TeamVisibility.PRIVATE.name()))))
+                .andExpect(jsonPath("$[0].privacy", is(equalTo(entity.getPrivacy().name()))))
+                .andExpect(jsonPath("$[0].status", is(equalTo(entity.getStatus().name()))));
+    }
+
+    @Test
+    public void testGetTeamByNameTeamNotFoundException() throws Exception {
+        String name = RandomStringUtils.randomAlphanumeric(20);
+
+        mockMvc.perform(get(TeamsController.PATH + "?name=" + name))
+                .andExpect(status().isNotFound())
+                .andExpect(status().reason("Team not found"));
+    }
+
+    @Test
+    public void testGetTeamByName() throws Exception {
+        TeamInfo teamInfo = new TeamInfo(getTeamEntityWithId());
+
+        String name = RandomStringUtils.randomAlphanumeric(20);
+
+        when(teamService.getTeamByName(anyString())).thenReturn(teamInfo);
+
+        mockMvc.perform(get(TeamsController.PATH + "?name=" + name))
+                .andExpect(status().isOk())
+                .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
+
+                .andExpect(jsonPath("$.id", is(equalTo(teamInfo.getId()))))
+                .andExpect(jsonPath("$.name", is(equalTo(teamInfo.getName()))))
+                .andExpect(jsonPath("$.description", is(equalTo(teamInfo.getDescription()))))
+                .andExpect(jsonPath("$.website", is(equalTo(teamInfo.getWebsite()))))
+                .andExpect(jsonPath("$.organisationType", is(equalTo(teamInfo.getOrganisationType()))))
+                .andExpect(jsonPath("$.visibility", is(equalTo(teamInfo.getVisibility().name()))))
+                .andExpect(jsonPath("$.privacy", is(equalTo(teamInfo.getPrivacy().name()))))
+                .andExpect(jsonPath("$.status", is(equalTo(teamInfo.getStatus().name()))));
+    }
+
+    @Test
+    public void testGetTeamByIdForbiddenException() throws Exception {
+        when(securityContext.getAuthentication()).thenReturn(null);
+
+        mockMvc.perform(get(TeamsController.PATH + "/" + "id"))
+                .andExpect(status().isForbidden());
+    }
+
+    @Test
+    public void testGetTeamByIdTeamNotFoundException() throws Exception {
+        when(securityContext.getAuthentication()).thenReturn(authentication);
+
+        mockMvc.perform(get(TeamsController.PATH + "/id"))
+                .andExpect(status().isNotFound())
+                .andExpect(status().reason("Team not found"));
+    }
+
+    @Test
+    public void testGetTeamById() throws Exception {
+        TeamInfo teamInfo = new TeamInfo(getTeamEntityWithId());
+
+        String id = RandomStringUtils.randomAlphanumeric(20);
+
+        when(teamService.getTeamById(anyString())).thenReturn(teamInfo);
+
+        mockMvc.perform(get(TeamsController.PATH + "/" + id))
+                .andExpect(status().isOk())
+                .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
+
+                .andExpect(jsonPath("$.id", is(equalTo(teamInfo.getId()))))
+                .andExpect(jsonPath("$.name", is(equalTo(teamInfo.getName()))))
+                .andExpect(jsonPath("$.description", is(equalTo(teamInfo.getDescription()))))
+                .andExpect(jsonPath("$.website", is(equalTo(teamInfo.getWebsite()))))
+                .andExpect(jsonPath("$.organisationType", is(equalTo(teamInfo.getOrganisationType()))))
+                .andExpect(jsonPath("$.visibility", is(equalTo(teamInfo.getVisibility().name()))))
+                .andExpect(jsonPath("$.privacy", is(equalTo(teamInfo.getPrivacy().name()))))
+                .andExpect(jsonPath("$.status", is(equalTo(teamInfo.getStatus().name()))));
+    }
+
+    @Test
+    public void testUpdateTeamForbiddenException() throws Exception {
+        final byte[] content = mapper.writeValueAsBytes(new TeamInfo(getTeamEntityWithId()));
+
+        when(securityContext.getAuthentication()).thenReturn(null);
+
+        mockMvc.perform(put(TeamsController.PATH + "/id").contentType(MediaType.APPLICATION_JSON).content(content))
+                .andExpect(status().isForbidden());
+    }
+
+    @Test
+    public void testUpdateTeam() throws Exception {
+        TeamInfo teamInfo = new TeamInfo(getTeamEntityWithId());
+        final byte[] content = mapper.writeValueAsBytes(teamInfo);
+
+        when(securityContext.getAuthentication()).thenReturn(authentication);
+        when(teamService.updateTeam(anyString(), any(Team.class))).thenReturn(teamInfo);
+
+        mockMvc.perform(put(TeamsController.PATH + "/id").contentType(MediaType.APPLICATION_JSON).content(content))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id", is(equalTo(teamInfo.getId()))))
+                .andExpect(jsonPath("$.name", is(equalTo(teamInfo.getName()))))
+                .andExpect(jsonPath("$.description", is(equalTo(teamInfo.getDescription()))))
+                .andExpect(jsonPath("$.website", is(equalTo(teamInfo.getWebsite()))))
+                .andExpect(jsonPath("$.organisationType", is(equalTo(teamInfo.getOrganisationType()))))
+                .andExpect(jsonPath("$.visibility", is(equalTo(teamInfo.getVisibility().name()))))
+                .andExpect(jsonPath("$.privacy", is(equalTo(teamInfo.getPrivacy().name()))))
+                .andExpect(jsonPath("$.status", is(equalTo(teamInfo.getStatus().name()))));
+    }
+
+    @Test
+    public void testUpdateTeamStatusUnauthorizedException() throws Exception {
+        when(securityContext.getAuthentication()).thenReturn(null);
+
+        try {
+            mockMvc.perform(put(TeamsController.PATH + "/id/status/" + TeamStatus.RESTRICTED));
+        } catch (Exception e) {
+            assertThat(e.getCause().getClass()).isEqualTo(UnauthorizedException.class);
+        }
+    }
+
+    @Test
+    public void testUpdateTeamStatusNotAdmin() throws Exception {
+        final List<String> roles = new ArrayList<>();
+        roles.add(Role.USER.getAuthority());
+
+        when(securityContext.getAuthentication()).thenReturn(authentication);
+        when(claims.get(JwtToken.KEY)).thenReturn(roles);
+
+        mockMvc.perform(put(TeamsController.PATH + "/id/status/" + TeamStatus.RESTRICTED))
+                .andExpect(status().isForbidden());
+    }
+
+    @Test
+    public void testUpdateTeamStatus() throws Exception {
+        TeamEntity entity = getTeamEntityWithId();
+        entity.setStatus(TeamStatus.RESTRICTED);
+        TeamInfo teamInfo = new TeamInfo(entity);
+        final byte[] content = mapper.writeValueAsBytes(teamInfo);
 
         final List<String> roles = new ArrayList<>();
         roles.add(Role.ADMIN.getAuthority());
+
+        when(securityContext.getAuthentication()).thenReturn(authentication);
         when(claims.get(JwtToken.KEY)).thenReturn(roles);
+        when(teamService.updateTeamStatus(anyString(), any(TeamStatus.class))).thenReturn(teamInfo);
 
-        // create GSON
-        GsonBuilder gsonBuilder = new GsonBuilder();
-        gsonBuilder.registerTypeAdapter(ZonedDateTime.class, new DateTimeSerializer());
-        gsonBuilder.registerTypeAdapter(ZonedDateTime.class, new DateTimeDeserializer());
-        Gson gson = gsonBuilder.create();
-
-        // put
-        mockMvc.perform(put("/teams/" + id + "/status/" + TeamStatus.RESTRICTED).contentType(MediaType.APPLICATION_JSON).content(gson.toJson(new TeamInfo(savedTeamEntity))))
+        mockMvc.perform(put(TeamsController.PATH + "/id/status/" + TeamStatus.RESTRICTED).contentType(MediaType.APPLICATION_JSON).content(content))
                 .andExpect(status().isOk())
-                .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
-
-                .andExpect(jsonPath("$.id", Matchers.is(equalTo(id))))
-                .andExpect(jsonPath("$.status", Matchers.is(equalTo(TeamStatus.RESTRICTED.toString()))));;
+                .andExpect(jsonPath("$.id", is(equalTo(teamInfo.getId()))))
+                .andExpect(jsonPath("$.status", is(equalTo(TeamStatus.RESTRICTED.name()))));;
     }
 
     @Test
-    public void testGetPublicTeams() throws Exception {
-        TeamEntity origTeamEntity = Util.getTeamEntity();
+    public void testAddTeamMemberForbiddenException() throws Exception {
+        final byte[] content = mapper.writeValueAsBytes(getTeamMemberInfo(MemberType.MEMBER, MemberStatus.APPROVED));
 
-        TeamEntity privateTeamEntity = Util.getTeamEntity();
-        privateTeamEntity.setVisibility(TeamVisibility.PRIVATE);
+        when(securityContext.getAuthentication()).thenReturn(null);
 
-        teamRepository.save(origTeamEntity);
-        teamRepository.save(privateTeamEntity);
-
-        MediaType contentType = new MediaType(MediaType.APPLICATION_JSON.getType(),
-                MediaType.APPLICATION_JSON.getSubtype());
-
-        MvcResult mvcResult = mockMvc.perform(get("/teams/?visibility=PUBLIC"))
-                .andExpect(status().isOk())
-                .andExpect(content().contentTypeCompatibleWith(contentType))
-                .andReturn();
-
-        // create GSON
-        GsonBuilder gsonBuilder = new GsonBuilder();
-        gsonBuilder.registerTypeAdapter(ZonedDateTime.class, new DateTimeSerializer());
-        gsonBuilder.registerTypeAdapter(ZonedDateTime.class, new DateTimeDeserializer());
-        Gson gson = gsonBuilder.create();
-
-        String list = mvcResult.getResponse().getContentAsString();
-
-        Type listType = new TypeToken<ArrayList<TeamInfo>>() {
-        }.getType();
-        List<Team> teamList = gson.fromJson(list, listType);
-
-        Assert.assertThat(teamList.size(), is(1));
-        Assert.assertThat(teamList.get(0).getVisibility(), is(TeamVisibility.PUBLIC));
+        mockMvc.perform(post(TeamsController.PATH + "/id/members").contentType(MediaType.APPLICATION_JSON).content(content))
+                .andExpect(status().isForbidden());
     }
 
     @Test
-    public void testGetByName() throws Exception {
-        TeamEntity teamEntity = Util.getTeamEntity();
-        String name = RandomStringUtils.randomAlphanumeric(20);
-        teamEntity.setName(name);
+    public void testAddTeamMember() throws Exception {
+        Team team = getTeamEntityWithId();
+        final byte[] content = mapper.writeValueAsBytes(getTeamMemberInfo(MemberType.MEMBER, MemberStatus.APPROVED));
 
-        teamRepository.save(teamEntity);
+        when(securityContext.getAuthentication()).thenReturn(authentication);
+        when(teamService.addMember(anyString(), any(TeamMember.class))).thenReturn(team);
 
-        MediaType contentType = new MediaType(MediaType.APPLICATION_JSON.getType(),
-                MediaType.APPLICATION_JSON.getSubtype());
-
-        MvcResult mvcResult = mockMvc.perform(get("/teams?name=" + name))
-                .andExpect(status().isOk())
-                .andExpect(content().contentTypeCompatibleWith(contentType))
-                .andReturn();
-
-        // create GSON
-        GsonBuilder gsonBuilder = new GsonBuilder();
-        gsonBuilder.registerTypeAdapter(ZonedDateTime.class, new DateTimeSerializer());
-        gsonBuilder.registerTypeAdapter(ZonedDateTime.class, new DateTimeDeserializer());
-        Gson gson = gsonBuilder.create();
-
-        String list = mvcResult.getResponse().getContentAsString();
-        Team entity = gson.fromJson(list, TeamInfo.class);
-
-        Assert.assertThat(entity.getName(), is(name));
+        mockMvc.perform(post(TeamsController.PATH + "/id/members").contentType(MediaType.APPLICATION_JSON).content(content))
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.id", is(equalTo(team.getId()))))
+                .andExpect(jsonPath("$.name", is(equalTo(team.getName()))))
+                .andExpect(jsonPath("$.description", is(equalTo(team.getDescription()))))
+                .andExpect(jsonPath("$.website", is(equalTo(team.getWebsite()))))
+                .andExpect(jsonPath("$.organisationType", is(equalTo(team.getOrganisationType()))))
+                .andExpect(jsonPath("$.visibility", is(equalTo(team.getVisibility().name()))))
+                .andExpect(jsonPath("$.privacy", is(equalTo(team.getPrivacy().name()))))
+                .andExpect(jsonPath("$.status", is(equalTo(team.getStatus().name()))))
+                .andExpect(jsonPath("$.members", is(equalTo(team.getMembers()))));
     }
+
+    @Test
+    public void testRemoveTeamMemberForbiddenException() throws Exception {
+        final byte[] content = mapper.writeValueAsBytes(getTeamMemberInfo(MemberType.MEMBER, MemberStatus.APPROVED));
+
+        when(securityContext.getAuthentication()).thenReturn(null);
+
+        mockMvc.perform(delete(TeamsController.PATH + "/id/members").contentType(MediaType.APPLICATION_JSON).content(content))
+                .andExpect(status().isForbidden());
+    }
+
+    @Test
+    public void testRemoveTeamMember() throws Exception {
+        Team team = getTeamEntityWithId();
+        final byte[] content = mapper.writeValueAsBytes(getTeamMemberInfo(MemberType.MEMBER, MemberStatus.APPROVED));
+
+        when(securityContext.getAuthentication()).thenReturn(authentication);
+        when(claims.getSubject()).thenReturn("ownerId");
+        when(teamService.removeMember(anyString(), any(TeamMember.class), anyString())).thenReturn(team);
+
+        mockMvc.perform(delete(TeamsController.PATH + "/id/members").contentType(MediaType.APPLICATION_JSON).content(content))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id", is(equalTo(team.getId()))))
+                .andExpect(jsonPath("$.name", is(equalTo(team.getName()))))
+                .andExpect(jsonPath("$.description", is(equalTo(team.getDescription()))))
+                .andExpect(jsonPath("$.website", is(equalTo(team.getWebsite()))))
+                .andExpect(jsonPath("$.organisationType", is(equalTo(team.getOrganisationType()))))
+                .andExpect(jsonPath("$.visibility", is(equalTo(team.getVisibility().name()))))
+                .andExpect(jsonPath("$.privacy", is(equalTo(team.getPrivacy().name()))))
+                .andExpect(jsonPath("$.status", is(equalTo(team.getStatus().name()))))
+                .andExpect(jsonPath("$.members", is(equalTo(team.getMembers()))));
+    }
+
 }
-
-
