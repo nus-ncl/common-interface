@@ -180,6 +180,20 @@ public class ImageControllerTest {
     }
 
     @Test
+    public void testGetGlobalImages() throws Exception {
+        Map<String, String> result = new HashMap<>();
+        result.put("images", "{imageA: {os: Linux, description: image description}}");
+
+        when(imageService.getGlobalImages()).thenReturn(result);
+
+        mockMvc.perform(get(ImageController.PATH + "/global"))
+                .andExpect(status().isOk())
+                .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
+
+                .andExpect(jsonPath("$.images", is(equalTo("{imageA: {os: Linux, description: image description}}"))));
+    }
+
+    @Test
     public void testGetSavedImages() throws Exception {
         Map<String, String> result = new HashMap<>();
         result.put("teamId", "{imageA:created}");
