@@ -17,4 +17,6 @@ public interface ImageService {
     Image addImage(Image image, Claims claims);
 
     Map<String, String> getSavedImages(String teamId);
+
+    Map<String, String> getGlobalImages();
 }
