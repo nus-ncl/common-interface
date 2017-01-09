@@ -6,7 +6,7 @@ import org.junit.rules.ExpectedException;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.test.context.TestPropertySource;
 import sg.ncl.service.team.AbstractTest;
-import sg.ncl.service.team.Util;
+import sg.ncl.service.team.util.TestUtil;
 
 import javax.inject.Inject;
 
@@ -36,7 +36,7 @@ public class TeamRepositoryTest extends AbstractTest {
 
     @Test
     public void testGoodSave() throws Exception {
-        final TeamEntity entity = Util.getTeamEntity();
+        final TeamEntity entity = TestUtil.getTeamEntity();
 
         final long count = repository.count();
         final TeamEntity savedEntity = repository.save(entity);
@@ -46,7 +46,7 @@ public class TeamRepositoryTest extends AbstractTest {
 
     @Test
     public void testSaveNullUsername() throws Exception {
-        final TeamEntity entity = Util.getTeamEntity();
+        final TeamEntity entity = TestUtil.getTeamEntity();
         entity.setName(null);
 
         try {
@@ -59,7 +59,7 @@ public class TeamRepositoryTest extends AbstractTest {
 
     @Test
     public void testSaveNullWebsite() throws Exception {
-        final TeamEntity entity = Util.getTeamEntity();
+        final TeamEntity entity = TestUtil.getTeamEntity();
         entity.setWebsite(null);
 
         try {
@@ -72,7 +72,7 @@ public class TeamRepositoryTest extends AbstractTest {
 
     @Test
     public void testSaveNullOrganisationType() throws Exception {
-        final TeamEntity entity = Util.getTeamEntity();
+        final TeamEntity entity = TestUtil.getTeamEntity();
         entity.setOrganisationType(null);
 
         try {
@@ -85,7 +85,7 @@ public class TeamRepositoryTest extends AbstractTest {
 
     @Test
     public void testDeleteTeam() throws Exception {
-        final TeamEntity entity = Util.getTeamEntity();
+        final TeamEntity entity = TestUtil.getTeamEntity();
 
         final long count = repository.count();
         final TeamEntity savedEntity = repository.save(entity);

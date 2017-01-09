@@ -780,6 +780,46 @@ public class AdapterDeterLab {
         }
     }
 
+    public String removeUserFromTeam(String nclTeamId, String nclUserId, String nclTeamOwnerId) {
+        final String pid = getDeterProjectIdByNclTeamId(nclTeamId);
+        final String uid = getDeterUserIdByNclUserId(nclUserId);
+        final String ownerUid = getDeterUserIdByNclUserId(nclTeamOwnerId);
+
+        log.info("Removing user {} from team {} requested by owner {}", uid, pid, ownerUid);
+
+        JSONObject json = new JSONObject();
+        json.put("pid", pid);
+        json.put("uidToBeRemoved", uid);
+        json.put("ownerUid", ownerUid);
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        HttpEntity<String> request = new HttpEntity<>(json.toString(), headers);
+
+        ResponseEntity response;
+
+        try {
+            response = restTemplate.exchange(properties.removeUserFromTeam(), HttpMethod.POST, request, String.class);
+            String responseBody = response.getBody().toString();
+            String deterMessage = new JSONObject(responseBody).getString("msg");
+
+            if ("remove user from team ok".equals(deterMessage)) {
+                log.info("Remove user from team OK");
+                return responseBody;
+            } else {
+                log.warn("Remove user from team FAIL");
+                throw new DeterLabOperationFailedException(deterMessage);
+            }
+
+        } catch (ResourceAccessException rae) {
+            log.warn("Remove user from team: {}", rae);
+            throw new AdapterConnectionException(rae.getMessage());
+        } catch (HttpServerErrorException hsee) {
+            log.warn("Remove user from team: Adapter DeterLab internal server error {}", hsee);
+            throw new AdapterInternalErrorException();
+        }
+    }
+
     /**
      * Checks the response from adapter deterlab when applying or joining a new project as a new user and determines the exception to be thrown
      * Use only if @applyProjectNewUsers and @joinProjectNewUsers are performing identical checks

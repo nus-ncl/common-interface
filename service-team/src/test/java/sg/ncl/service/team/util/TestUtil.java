@@ -1,4 +1,4 @@
-package sg.ncl.service.team;
+package sg.ncl.service.team.util;
 
 import org.apache.commons.lang3.RandomStringUtils;
 import sg.ncl.service.team.data.jpa.TeamEntity;
@@ -12,7 +12,7 @@ import java.time.ZonedDateTime;
 /**
  * Created by Desmond
  */
-public class Util {
+public class TestUtil {
 
     public static TeamEntity getTeamEntityWithId() {
         final TeamEntity entity = new TeamEntity();

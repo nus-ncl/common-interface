@@ -5,7 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import sg.ncl.common.authentication.Role;
 import sg.ncl.common.exception.base.ForbiddenException;
 import sg.ncl.common.jwt.JwtToken;
-import sg.ncl.service.realization.data.jpa.RealizationEntity;
+import sg.ncl.service.realization.domain.Realization;
 
 import java.util.EnumSet;
 import java.util.List;
@@ -22,7 +22,7 @@ public class Validator {
 
     }
 
-    public static void checkPermissions(final RealizationEntity realizationEntity, final Claims claims) {
+    public static void checkPermissions(final Realization realization, final boolean isOwner, final Claims claims) {
         if (!(claims.get(JwtToken.KEY) instanceof List<?>)) {
             log.warn("Bad claims type found: {}", claims);
             throw new ForbiddenException();
@@ -36,10 +36,9 @@ public class Validator {
         log.info("Context user id: {}, Context role: {}", contextUserId, roles);
 
         // FIXME too strict, we might want users on the same team to remove them also
-        if (!contextUserId.equals(realizationEntity.getUserId()) && !roles.contains(Role.ADMIN)) {
-            log.warn("Access denied for delete experiment: /{}/ ", realizationEntity.getExperimentId());
+        if (!roles.contains(Role.ADMIN) && !isOwner  && !contextUserId.equals(realization.getUserId())) {
+            log.warn("Access denied for delete experiment: /{}/ ", realization.getExperimentId());
             throw new ForbiddenException();
         }
     }
-
 }

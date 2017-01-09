@@ -13,7 +13,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
-import sg.ncl.common.exception.base.ForbiddenException;
 import sg.ncl.service.experiment.domain.Experiment;
 import sg.ncl.service.experiment.domain.ExperimentService;
 
@@ -22,6 +21,8 @@ import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import java.util.List;
 import java.util.stream.Collectors;
+
+import static sg.ncl.common.validation.Validator.checkClaimsType;
 
 /**
  * Created by Desmond Lim
@@ -71,17 +72,12 @@ public class ExperimentsController {
     }
 
     // delete experiment
-//    @DeleteMapping(path = "/{expId}/teams/{teamId}")
     @DeleteMapping(path = "/teams/{teamId}/experiments/{expId}")
     // FIXME: should be DELETE instead of POST and path should be "/experiments/{id}"
     @ResponseStatus(HttpStatus.OK)
     public Experiment deleteExperiment(@PathVariable Long expId, @PathVariable String teamId, @AuthenticationPrincipal Object claims) {
-        log.info("User principal: " + claims);
-        if ( !(claims instanceof Claims) ) {
-            // throw forbidden
-            log.warn("Access denied for delete experiment: expid: {} claims: {} ", expId, claims);
-            throw new ForbiddenException();
-        }
+        log.info("Delete experiment User principal: " + claims);
+        checkClaimsType(claims);
         return new ExperimentInfo(experimentService.deleteExperiment(expId, teamId, (Claims) claims));
     }
 
