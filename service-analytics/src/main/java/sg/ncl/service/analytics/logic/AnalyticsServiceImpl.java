@@ -2,6 +2,7 @@ package sg.ncl.service.analytics.logic;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import sg.ncl.adapter.deterlab.AdapterDeterLab;
 import sg.ncl.service.analytics.data.jpa.DataDownloadEntity;
 import sg.ncl.service.analytics.data.jpa.DataDownloadRepository;
 import sg.ncl.service.analytics.data.jpa.DataDownloadStatistics;
@@ -11,10 +12,12 @@ import sg.ncl.service.analytics.domain.DataDownload;
 import javax.inject.Inject;
 import javax.validation.constraints.NotNull;
 import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 /**
  * @author: Tran Ly Vu
+ * @version: 1.0
  */
 @Service
 @Slf4j
@@ -22,9 +25,12 @@ public class AnalyticsServiceImpl implements AnalyticsService {
 
     private final DataDownloadRepository dataDownloadRepository;
 
+    private final AdapterDeterLab adapterDeterLab;
+
     @Inject
-    AnalyticsServiceImpl(@NotNull DataDownloadRepository dataDownloadRepository) {
+    AnalyticsServiceImpl(@NotNull DataDownloadRepository dataDownloadRepository, @NotNull final AdapterDeterLab adapterDeterLab) {
         this.dataDownloadRepository = dataDownloadRepository;
+        this.adapterDeterLab = adapterDeterLab;
     }
 
     @Override
@@ -81,6 +87,15 @@ public class AnalyticsServiceImpl implements AnalyticsService {
         if (endDate != null)
             flags += 1;
         return flags;
+    }
+
+    @Override
+    public String getUsageStatistics(String teamId, ZonedDateTime startDate, ZonedDateTime endDate) {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MM/dd/yy");
+        String start = startDate.format(formatter);
+        String end = endDate.format(formatter);
+        log.info("Getting usage statistics for team {}, start {}, end {}", teamId, start, end);
+        return adapterDeterLab.getUsageStatistics(teamId, start, end);
     }
 
 }

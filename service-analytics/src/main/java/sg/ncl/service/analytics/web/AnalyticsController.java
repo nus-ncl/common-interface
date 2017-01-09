@@ -10,6 +10,7 @@ import sg.ncl.common.exception.base.BadRequestException;
 import sg.ncl.common.exception.base.UnauthorizedException;
 import sg.ncl.service.analytics.data.jpa.DataDownloadStatistics;
 import sg.ncl.service.analytics.domain.AnalyticsService;
+import sg.ncl.service.analytics.exceptions.StartDateAfterEndDateException;
 
 import javax.inject.Inject;
 import javax.validation.constraints.NotNull;
@@ -17,12 +18,17 @@ import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.List;
 
+import static java.time.temporal.TemporalAdjusters.firstDayOfMonth;
+import static java.time.temporal.TemporalAdjusters.lastDayOfMonth;
+
 /**
- * Created by dcsjnh on 12/30/2016.
+ * @author: Tran Ly Vu, James Ng
+ * @version: 1.0
  *
  * References:
  * [1] http://stackoverflow.com/questions/12296642/is-it-possible-to-have-empty-requestparam-values-use-the-defaultvalue
  * [2] http://www.logicbig.com/tutorials/spring-framework/spring-web-mvc/spring-mvc-request-param/
+ * [3] https://blog.stackhunter.com/2014/11/14/new-date-time-apis-java-8/
  */
 @RestController
 @RequestMapping(path = AnalyticsController.PATH, produces = MediaType.APPLICATION_JSON_VALUE)
@@ -74,6 +80,28 @@ public class AnalyticsController {
                     0, 0, 0, 0, ZoneId.of("Asia/Singapore"));
         }
         return null;
+    }
+
+    @GetMapping("/usage/teams/{id}")
+    @ResponseStatus(HttpStatus.OK)
+    public String getUsageStatistics(@AuthenticationPrincipal Object claims,
+                                     @PathVariable final String id,
+                                     @RequestParam(value = "startDate", required = false) String startDate,
+                                     @RequestParam(value = "endDate", required = false) String endDate) {
+        if (claims == null || !(claims instanceof Claims)) {
+            log.warn("Access denied for: /analytics/usage/teams GET");
+            throw new UnauthorizedException();
+        }
+        ZonedDateTime start = getZonedDateTime(startDate);
+        ZonedDateTime end = getZonedDateTime(endDate);
+        ZonedDateTime now = ZonedDateTime.now();
+        if (start == null)
+            start = now.with(firstDayOfMonth());
+        if (end == null)
+            end = now.with(lastDayOfMonth());
+        if (start.isAfter(end))
+            throw new StartDateAfterEndDateException();
+        return analyticsService.getUsageStatistics(id, start, end);
     }
 
 }

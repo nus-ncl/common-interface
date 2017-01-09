@@ -10,6 +10,7 @@ import static org.junit.Assert.assertEquals;
 
 /**
  * @author: Tran Ly Vu
+ * @version: 1.0
  */
 public class DataDownloadEntityTest {
 
