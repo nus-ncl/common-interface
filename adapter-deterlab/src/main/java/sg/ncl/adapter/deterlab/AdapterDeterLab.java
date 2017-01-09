@@ -728,6 +728,7 @@ public class AdapterDeterLab {
             log.warn("DeterLab connection error get global images: {}", e);
             return "{}";
         }
+        log.info("Get list of global images OK");
         return response.getBody().toString();
     }
 
