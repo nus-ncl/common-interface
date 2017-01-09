@@ -44,8 +44,8 @@ ncl:
       '/teams\?name=(\w|-)+': GET # for retrieving teams by name
       '/credentials/password/resets': POST
       '/credentials/password': PUT
-      '/telemetry\?type=FREE': GET # for retrieving free nodes count
-      '/telemetry\?type=TOTAL': GET # for retrieving total nodes count
+      '/telemetry/nodes/counts\?type=FREE': GET # for retrieving free nodes count
+      '/telemetry/nodes/counts\?type=TOTAL': GET # for retrieving total nodes count
   domain: dev.ncl.sg
   deterlab:
     adapter:
