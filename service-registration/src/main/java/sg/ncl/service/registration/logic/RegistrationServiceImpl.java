@@ -64,6 +64,7 @@ public class RegistrationServiceImpl implements RegistrationService {
     private final MailService mailService;
     private final AdapterDeterLab adapterDeterLab;
     private final Template emailValidationTemplate;
+    private final Template applyTeamRequestTemplate;
     private final DomainProperties domainProperties;
 
     @Inject
@@ -75,7 +76,8 @@ public class RegistrationServiceImpl implements RegistrationService {
             @NotNull final AdapterDeterLab adapterDeterLab,
             @NotNull final MailService mailService,
             @NotNull final DomainProperties domainProperties,
-            @NotNull @Named("emailValidationTemplate") final Template emailValidationTemplate
+            @NotNull @Named("emailValidationTemplate") final Template emailValidationTemplate,
+            @NotNull @Named("applyTeamRequestTemplate") final Template applyTeamRequestTemplate
     ) {
         this.credentialsService = credentialsService;
         this.teamService = teamService;
@@ -85,6 +87,7 @@ public class RegistrationServiceImpl implements RegistrationService {
         this.mailService = mailService;
         this.domainProperties = domainProperties;
         this.emailValidationTemplate = emailValidationTemplate;
+        this.applyTeamRequestTemplate = applyTeamRequestTemplate;
     }
 
     @Override
@@ -123,8 +126,9 @@ public class RegistrationServiceImpl implements RegistrationService {
 
         userService.addTeam(nclUserId, createdTeam.getId());
         teamService.addMember(createdTeam.getId(), teamMemberInfo);
-
         adapterDeterLab.applyProject(mainObject.toString());
+
+        sendApplyTeamEmail(userService.getUser(nclUserId), createdTeam);
         return null;
     }
 
@@ -161,8 +165,8 @@ public class RegistrationServiceImpl implements RegistrationService {
 
         userService.addTeam(nclUserId, teamId);
         teamService.addMember(teamId, teamMemberInfo);
-
         adapterDeterLab.joinProject(userObject.toString());
+
         return null;
     }
 
@@ -518,7 +522,28 @@ public class RegistrationServiceImpl implements RegistrationService {
         }
     }
 
+    private void sendApplyTeamEmail(User user, Team team) {
+        final Map<String, String> map = new HashMap<>();
+        map.put("firstname", "NCL Support");
+        map.put("teamname", team.getName());
+        map.put("fullname", user.getUserDetails().getFirstName() + " " + user.getUserDetails().getLastName());
+        map.put("email", user.getUserDetails().getEmail());
+        map.put("phone", user.getUserDetails().getPhone());
+        map.put("jobtitle", user.getUserDetails().getJobTitle());
+        map.put("institution", user.getUserDetails().getInstitution());
+        map.put("country", user.getUserDetails().getAddress().getCountry());
+        map.put("domain", domainProperties.getDomain());
 
+        try {
+            String msgText = FreeMarkerTemplateUtils.processTemplateIntoString(
+                    applyTeamRequestTemplate, map);
+            mailService.send("NCL Testbed <testbed-ops@ncl.sg>",
+                    "support@ncl.sg",
+                    "Please Approve New Team Request", msgText, false, null, null);
+        } catch (IOException | TemplateException e) {
+            log.warn("{}", e);
+        }
+    }
 
     private void sendVerificationEmail(User user) {
         final Map<String, String> map = new HashMap<>();
@@ -538,7 +563,7 @@ public class RegistrationServiceImpl implements RegistrationService {
         try {
             String msgText = FreeMarkerTemplateUtils.processTemplateIntoString(
                     emailValidationTemplate, map);
-            mailService.send("testbed-ops@ncl.sg",
+            mailService.send("NCL Testbed <testbed-ops@ncl.sg>",
                     user.getUserDetails().getEmail(),
                     "Please Verify Your Email Account", msgText, false, null, null);
             log.debug("Email sent: {}", msgText);

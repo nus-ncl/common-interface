@@ -33,6 +33,7 @@ import java.io.IOException;
 public class RegistrationApplication {
 
     private static final String VERIFICATION_EMAIL_TEMPLATE_NAME = "verificationEmailTemplate.ftl";
+    private static final String APPLY_TEAM_REQUEST_TEMPLATE_NAME = "applyTeamRequestTemplate.ftl";
 
     public static void main(final String[] args) {
         try (final ConfigurableApplicationContext context = SpringApplication.run(RegistrationApplication.class, args)) {
@@ -43,6 +44,11 @@ public class RegistrationApplication {
     @Bean
     Template emailValidationTemplate(final Configuration configuration) throws IOException {
         return configuration.getTemplate(VERIFICATION_EMAIL_TEMPLATE_NAME);
+    }
+
+    @Bean
+    Template applyTeamRequestTemplate(final Configuration configuration) throws IOException {
+        return configuration.getTemplate(APPLY_TEAM_REQUEST_TEMPLATE_NAME);
     }
 
 }
