@@ -85,6 +85,10 @@ public class ConnectionProperties {
         return HTTP_MODE + ip + ":" + port + "/getFreeNodes";
     }
 
+    public String getTotalNodes() {
+        return HTTP_MODE + ip + ":" + port + "/getTotalNodes";
+    }
+
     public String getTopoThumbnail() {
         return HTTP_MODE + ip + ":" + port + "/getTopoThumbnail";
     }

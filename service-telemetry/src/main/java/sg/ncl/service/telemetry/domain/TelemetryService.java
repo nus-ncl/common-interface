@@ -6,5 +6,5 @@ package sg.ncl.service.telemetry.domain;
 @FunctionalInterface
 public interface TelemetryService {
 
-    String getFreeNodes();
+    String getNodes(NodeType nodeType);
 }

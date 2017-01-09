@@ -188,8 +188,15 @@ public class ConnectionPropertiesTest {
     }
 
     @Test
+    public void testGetTotalNodes() throws Exception {
+        assertThat(connectionProperties.getTotalNodes()).isNotNull();
+        assertThat(connectionProperties.getTotalNodes()).isEqualTo("http://127.0.0.1:22/getTotalNodes");
+    }
+
+    @Test
     public void testRemoveUserFromTeam() throws Exception {
         assertThat(connectionProperties.removeUserFromTeam()).isNotNull();
         assertThat(connectionProperties.removeUserFromTeam()).isEqualTo("http://127.0.0.1:22/removeUserFromTeam");
     }
+
 }

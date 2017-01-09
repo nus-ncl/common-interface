@@ -3,6 +3,7 @@ package sg.ncl.service.telemetry.logic;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import sg.ncl.adapter.deterlab.AdapterDeterLab;
+import sg.ncl.service.telemetry.domain.NodeType;
 import sg.ncl.service.telemetry.domain.TelemetryService;
 
 import javax.inject.Inject;
@@ -23,7 +24,11 @@ public class TelemetryServiceImpl implements TelemetryService {
     }
 
     @Override
-    public String getFreeNodes() {
-        return adapterDeterLab.getFreeNodes();
+    public String getNodes(NodeType nodeType) {
+        if (nodeType.equals(NodeType.FREE)) {
+            return adapterDeterLab.getFreeNodes();
+        } else {
+            return adapterDeterLab.getTotalNodes();
+        }
     }
 }

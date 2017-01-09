@@ -3,15 +3,13 @@ package sg.ncl.service.telemetry.web;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseStatus;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+import sg.ncl.service.telemetry.domain.NodeType;
 import sg.ncl.service.telemetry.domain.TelemetryService;
 
 import javax.inject.Inject;
 import javax.validation.constraints.NotNull;
-import java.util.HashMap;
+import java.util.EnumMap;
 import java.util.Map;
 
 import static sg.ncl.service.telemetry.web.TelemetryController.PATH;
@@ -33,11 +31,11 @@ public class TelemetryController {
         this.telemetryService = telemetryService;
     }
 
-    @GetMapping
+    @GetMapping(path = "/nodes/counts", params = {"type"})
     @ResponseStatus(HttpStatus.OK)
-    public Map<String, String> getFreeNodes() {
-        Map<String, String> map = new HashMap<>();
-        map.put("free", telemetryService.getFreeNodes());
+    public Map<NodeType, String> getNodes(@RequestParam("type") final NodeType nodeType) {
+        EnumMap<NodeType, String> map = new EnumMap<>(NodeType.class);
+        map.put(nodeType, telemetryService.getNodes(nodeType));
         return map;
     }
 }

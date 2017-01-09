@@ -13,6 +13,7 @@ import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
+import sg.ncl.service.telemetry.domain.NodeType;
 import sg.ncl.service.telemetry.domain.TelemetryService;
 
 import javax.inject.Inject;
@@ -57,11 +58,23 @@ public class TelemetryControllerTest {
     public void testGetFreeNodes() throws Exception {
         String freeNodes = RandomStringUtils.randomNumeric(3);
 
-        when(telemetryService.getFreeNodes()).thenReturn(freeNodes);
+        when(telemetryService.getNodes(NodeType.FREE)).thenReturn(freeNodes);
 
-        mockMvc.perform(get(TelemetryController.PATH))
+        mockMvc.perform(get(TelemetryController.PATH + "/nodes/counts?type=" + NodeType.FREE))
                 .andExpect(status().isOk())
                 .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
-                .andExpect(jsonPath("$.free", is(equalTo(freeNodes))));
+                .andExpect(jsonPath("$.FREE", is(equalTo(freeNodes))));
+    }
+
+    @Test
+    public void testGetTotalNodes() throws Exception {
+        String totalNodes = RandomStringUtils.randomNumeric(3);
+
+        when(telemetryService.getNodes(NodeType.TOTAL)).thenReturn(totalNodes);
+
+        mockMvc.perform(get(TelemetryController.PATH + "/nodes/counts?type=" + NodeType.TOTAL))
+                .andExpect(status().isOk())
+                .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$.TOTAL", is(equalTo(totalNodes))));
     }
 }
