@@ -66,6 +66,13 @@ public class ImageServiceImpl implements ImageService {
     }
 
     @Override
+    public Map<String, String> getGlobalImages() {
+        Map<String, String> globalImage = new HashMap<>();
+        globalImage.put("images", adapterDeterLab.getGlobalImages());
+        return globalImage;
+    }
+
+    @Override
     public Map<String, String> getSavedImages(String teamId) {
         Map<String, String> result = new HashMap<>();
         result.put(teamId, adapterDeterLab.getSavedImages(teamId));

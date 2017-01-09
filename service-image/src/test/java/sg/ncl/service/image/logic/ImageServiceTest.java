@@ -140,6 +140,15 @@ public class ImageServiceTest {
     }
 
     @Test
+    public void testGetGlobalImages() {
+        when(adapterDeterLab.getGlobalImages()).thenReturn("adapterResult");
+
+        Map<String, String> result = imageService.getGlobalImages();
+        assertThat(result).hasSize(1);
+        assertThat(result).containsEntry("images", "adapterResult");
+    }
+
+    @Test
     public void testGetSavedImages() {
 
         when(adapterDeterLab.getSavedImages(anyString())).thenReturn("adapterResult");

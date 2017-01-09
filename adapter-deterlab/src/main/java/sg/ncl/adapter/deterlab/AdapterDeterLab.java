@@ -731,6 +731,23 @@ public class AdapterDeterLab {
         return response.getBody().toString();
     }
 
+    public String getGlobalImages() {
+        log.info("Getting list of global images from the system");
+
+        HttpHeaders headers = new HttpHeaders();
+        HttpEntity<String> request = new HttpEntity<>(headers);
+        ResponseEntity response;
+
+        try {
+            response = restTemplate.exchange(properties.getGlobalImages(), HttpMethod.GET, request, String.class);
+        } catch (RestClientException e) {
+            log.warn("DeterLab connection error get global images: {}", e);
+            return "{}";
+        }
+        log.info("Get list of global images OK");
+        return response.getBody().toString();
+    }
+
     public String getSavedImages(String teamId) {
         final String pid = getDeterProjectIdByNclTeamId(teamId);
         log.info("Getting list of saved images for project: {}", pid);

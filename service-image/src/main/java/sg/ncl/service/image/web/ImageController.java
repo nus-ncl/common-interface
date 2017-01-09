@@ -58,6 +58,17 @@ public class ImageController {
         return imageService.getSavedImages(id);
     }
 
+
+    /**
+     * Invokes the adapter to retrieve the list of global images
+     * @return a hashmap in the for 'images' : '{'imageA': {'osname' : '', 'description': ''}, 'imageB'}'
+     */
+    @GetMapping(path = "/global")
+    @ResponseStatus(HttpStatus.OK)
+    public Map<String, String> getGlobalImages() {
+        return imageService.getGlobalImages();
+    }
+
     /**
      * Creates a saved image
      * status is ACCEPTED because creating an image is not an instant process
