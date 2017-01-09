@@ -97,6 +97,10 @@ public class ConnectionProperties {
         return HTTP_MODE + ip + ":" + port + "/resetPassword";
     }
 
+    public String getGlobalImages() {
+        return HTTP_MODE + ip + ":" + port + "/getCveImages";
+    }
+
     public String getSavedImages() {
         return HTTP_MODE + ip + ":" + port + "/getSavedImages";
     }
