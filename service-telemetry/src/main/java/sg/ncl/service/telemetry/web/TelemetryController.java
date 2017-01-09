@@ -31,7 +31,7 @@ public class TelemetryController {
         this.telemetryService = telemetryService;
     }
 
-    @GetMapping(params = {"type"})
+    @GetMapping(path = "/nodes/counts", params = {"type"})
     @ResponseStatus(HttpStatus.OK)
     public Map<NodeType, String> getNodes(@RequestParam("type") final NodeType nodeType) {
         EnumMap<NodeType, String> map = new EnumMap<>(NodeType.class);

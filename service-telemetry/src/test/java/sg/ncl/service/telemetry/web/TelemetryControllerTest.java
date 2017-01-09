@@ -60,7 +60,7 @@ public class TelemetryControllerTest {
 
         when(telemetryService.getNodes(NodeType.FREE)).thenReturn(freeNodes);
 
-        mockMvc.perform(get(TelemetryController.PATH + "?type=" + NodeType.FREE))
+        mockMvc.perform(get(TelemetryController.PATH + "/nodes/counts?type=" + NodeType.FREE))
                 .andExpect(status().isOk())
                 .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$.FREE", is(equalTo(freeNodes))));
@@ -72,7 +72,7 @@ public class TelemetryControllerTest {
 
         when(telemetryService.getNodes(NodeType.TOTAL)).thenReturn(totalNodes);
 
-        mockMvc.perform(get(TelemetryController.PATH + "?type=" + NodeType.TOTAL))
+        mockMvc.perform(get(TelemetryController.PATH + "/nodes/counts?type=" + NodeType.TOTAL))
                 .andExpect(status().isOk())
                 .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$.TOTAL", is(equalTo(totalNodes))));
