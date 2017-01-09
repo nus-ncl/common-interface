@@ -170,6 +170,13 @@ public class ConnectionPropertiesTest {
     }
 
     @Test
+    public void testGetGlobalImages() throws Exception {
+        assertThat(connectionProperties.getGlobalImages()).isNotNull();
+        assertThat(connectionProperties.getGlobalImages()).isEqualTo("http://127.0.0.1:22/getCveImages");
+    }
+
+
+    @Test
     public void testGetSavedImages() throws Exception {
         assertThat(connectionProperties.getSavedImages()).isNotNull();
         assertThat(connectionProperties.getSavedImages()).isEqualTo("http://127.0.0.1:22/getSavedImages");

@@ -1399,6 +1399,33 @@ public class AdapterDeterLabTest {
     }
 
     @Test
+    public void getGlobalImagesTestBad() {
+        when(restTemplate.exchange(anyString(),eq(HttpMethod.GET),anyObject(),eq(String.class))).thenThrow(new RestClientException(""));
+
+        String result = adapterDeterLab.getGlobalImages();
+
+        assertThat(result).isEqualTo("{}");
+    }
+
+    @Test
+    public void getGlobalImagesGood() {
+        JSONObject myobject = new JSONObject();
+        myobject.put("imageA", "os, description");
+        myobject.put("imageB", "os, description");
+        myobject.put("imageC", "os, description");
+
+        when(restTemplate.exchange(anyString(),eq(HttpMethod.GET),anyObject(),eq(String.class))).thenReturn(response);
+        when(response.getBody()).thenReturn(myobject.toString());
+        when(response.getBody().toString()).thenReturn(myobject.toString());
+
+        String result = adapterDeterLab.getGlobalImages();
+
+        verify(restTemplate,times(1)).exchange(anyString(),eq(HttpMethod.GET),anyObject(),eq(String.class));
+        verify(properties,times(1)).getGlobalImages();
+        assertThat(result).isEqualTo(myobject.toString());
+    }
+
+    @Test
     public void getSavedImagesTestBad() {
         when(deterLabProjectRepository.findByNclTeamId(anyString())).thenReturn(new DeterLabProjectEntity());
         when(restTemplate.exchange(anyString(),eq(HttpMethod.POST),anyObject(),eq(String.class))).thenThrow(new RestClientException(""));
