@@ -35,6 +35,7 @@ public class RegistrationApplication {
     private static final String VERIFICATION_EMAIL_TEMPLATE_NAME = "verificationEmailTemplate.ftl";
     private static final String APPLY_TEAM_REQUEST_TEMPLATE_NAME = "applyTeamRequestTemplate.ftl";
     private static final String REPLY_TEAM_REQUEST_TEMPLATE_NAME = "replyTeamRequestTemplate.ftl";
+    private static final String APPLY_JOIN_TEAM_REQUEST_TEMPLATE_NAME = "applyJoinTeamRequestTemplate.ftl";
 
     public static void main(final String[] args) {
         try (final ConfigurableApplicationContext context = SpringApplication.run(RegistrationApplication.class, args)) {
@@ -55,6 +56,11 @@ public class RegistrationApplication {
     @Bean
     Template replyTeamRequestTemplate(final Configuration configuration) throws IOException {
         return configuration.getTemplate(REPLY_TEAM_REQUEST_TEMPLATE_NAME);
+    }
+
+    @Bean
+    Template applyJoinTeamRequestTemplate(final Configuration configuration) throws IOException {
+        return configuration.getTemplate(APPLY_JOIN_TEAM_REQUEST_TEMPLATE_NAME);
     }
 
 }

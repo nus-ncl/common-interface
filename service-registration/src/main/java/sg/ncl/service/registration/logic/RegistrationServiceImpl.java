@@ -66,6 +66,7 @@ public class RegistrationServiceImpl implements RegistrationService {
     private final Template emailValidationTemplate;
     private final Template applyTeamRequestTemplate;
     private final Template replyTeamRequestTemplate;
+    private final Template applyJoinTeamRequestTemplate;
     private final DomainProperties domainProperties;
 
     @Inject
@@ -79,7 +80,8 @@ public class RegistrationServiceImpl implements RegistrationService {
             @NotNull final DomainProperties domainProperties,
             @NotNull @Named("emailValidationTemplate") final Template emailValidationTemplate,
             @NotNull @Named("applyTeamRequestTemplate") final Template applyTeamRequestTemplate,
-            @NotNull @Named("replyTeamRequestTemplate") final Template replyTeamRequestTemplate
+            @NotNull @Named("replyTeamRequestTemplate") final Template replyTeamRequestTemplate,
+            @NotNull @Named("applyJoinTeamRequestTemplate") final Template applyJoinTeamRequestTemplate
     ) {
         this.credentialsService = credentialsService;
         this.teamService = teamService;
@@ -91,6 +93,7 @@ public class RegistrationServiceImpl implements RegistrationService {
         this.emailValidationTemplate = emailValidationTemplate;
         this.applyTeamRequestTemplate = applyTeamRequestTemplate;
         this.replyTeamRequestTemplate = replyTeamRequestTemplate;
+        this.applyJoinTeamRequestTemplate = applyJoinTeamRequestTemplate;
     }
 
     @Override
@@ -170,6 +173,7 @@ public class RegistrationServiceImpl implements RegistrationService {
         teamService.addMember(teamId, teamMemberInfo);
         adapterDeterLab.joinProject(userObject.toString());
 
+        sendApplyJoinTeamEmail(userService.getUser(nclUserId), userService.getUser(teamService.findTeamOwner(teamId)), teamEntity);
         return null;
     }
 
@@ -529,6 +533,32 @@ public class RegistrationServiceImpl implements RegistrationService {
         }
     }
 
+    private void sendApplyJoinTeamEmail(User requester, User owner, Team team) {
+        final Map<String, String> map = new HashMap<>();
+        map.put("firstname", owner.getUserDetails().getFirstName());
+        map.put("teamname", team.getName());
+        map.put("fullname", requester.getUserDetails().getFirstName() + " " + requester.getUserDetails().getLastName());
+        map.put("email", requester.getUserDetails().getEmail());
+        map.put("phone", requester.getUserDetails().getPhone());
+        map.put("jobtitle", requester.getUserDetails().getJobTitle());
+        map.put("institution", requester.getUserDetails().getInstitution());
+        map.put("country", requester.getUserDetails().getAddress().getCountry());
+        map.put("domain", domainProperties.getDomain());
+
+        try {
+            String[] to = new String[1];
+            to[0] = owner.getUserDetails().getEmail();
+            String[] cc = new String[1];
+            cc[0] = "support@ncl.sg";
+            String msgText = FreeMarkerTemplateUtils.processTemplateIntoString(applyJoinTeamRequestTemplate, map);
+            mailService.send("NCL Testbed <testbed-ops@ncl.sg>", to,
+                    "Please Approve/Reject Join Team Request",
+                    msgText, false, cc, null);
+        } catch (IOException | TemplateException e) {
+            log.warn("{}", e);
+        }
+    }
+
     private void sendReplyTeamEmail(User user, Team team, TeamStatus status) {
         final Map<String, String> map = new HashMap<>();
         map.put("firstname", user.getUserDetails().getFirstName());
@@ -543,7 +573,7 @@ public class RegistrationServiceImpl implements RegistrationService {
             String msgText = FreeMarkerTemplateUtils.processTemplateIntoString(replyTeamRequestTemplate, map);
             mailService.send("NCL Testbed <testbed-ops@ncl.sg>", to,
                     "Apply For New Team " + (status == TeamStatus.APPROVED ? "Approved" : "Rejected"),
-                    msgText, false, null, null);
+                    msgText, false, cc, null);
         } catch (IOException | TemplateException e) {
             log.warn("{}", e);
         }

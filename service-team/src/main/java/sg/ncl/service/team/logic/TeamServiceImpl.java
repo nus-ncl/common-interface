@@ -280,7 +280,7 @@ public class TeamServiceImpl implements TeamService {
         return teamRepository.findOne(id);
     }
 
-    private boolean hasTeamOwner(@NotNull final String teamId) {
+    public String findTeamOwner(@NotNull final String teamId) {
         TeamEntity entity = findTeam(teamId);
         if (entity == null) {
             log.warn("Check has team owner error: team {} not found", teamId);
@@ -290,10 +290,10 @@ public class TeamServiceImpl implements TeamService {
         List<TeamMemberEntity> teamMembersList = entity.getMembers();
         for (TeamMember teamMember : teamMembersList) {
             if (teamMember.getMemberType().equals(MemberType.OWNER)) {
-                return true;
+                return teamMember.getUserId();
             }
         }
-        return false;
+        return null;
     }
 
     private boolean isTeamNameValid(@NotNull final String name) {
