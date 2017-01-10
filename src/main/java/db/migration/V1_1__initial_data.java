@@ -72,15 +72,15 @@ public class V1_1__initial_data implements SpringJdbcMigration {
     @Override
     public void migrate(final JdbcTemplate jdbcTemplate) throws Exception {
         log.debug("Adding initial data to database");
-        final String teamId = createTeam(jdbcTemplate, "ncl", "NCL Administrative Team", "Academic", "https://ncl.sg", TeamPrivacy.OPEN, TeamStatus.APPROVED, TeamVisibility.PRIVATE);
+        final String teamId = createTeam(jdbcTemplate, "testbed-ncl", "NCL Administrative Team", "Academic", "https://ncl.sg", TeamPrivacy.OPEN, TeamStatus.APPROVED, TeamVisibility.PRIVATE);
 
         final int addressId = createAddress(jdbcTemplate, "13 Computing Drive", "COM1-01-16", "Singapore", "SG", "SG", "117417");
 
-        final int detailsId = createDetails(jdbcTemplate, "Admin", "admin@ncl.sg", addressId, "National Cybersecurity R&D Lab", "NCL", "https://ncl.sg", "Research Lab", "NCL", "12345678");
+        final int detailsId = createDetails(jdbcTemplate, "Admin", "ncl-admin@ncl.sg", addressId, "National Cybersecurity R&D Lab", "NCL", "https://ncl.sg", "Research Lab", "NCL", "12345678");
 
         final String userId = createUser(jdbcTemplate, "Y", UserStatus.APPROVED, detailsId);
 
-        createCredentials(jdbcTemplate, "admin@ncl.sg", "nclenvfinal", userId, CredentialsStatus.ACTIVE);
+        createCredentials(jdbcTemplate, "ncl-admin@ncl.sg", "deterinavm", userId, CredentialsStatus.ACTIVE);
 
         createRoles(jdbcTemplate, userId, Collections.singletonList(Role.ADMIN));
 
@@ -88,7 +88,7 @@ public class V1_1__initial_data implements SpringJdbcMigration {
 
         createDeterLabUser(jdbcTemplate, "ncl", userId);
 
-        createDeterLabProject(jdbcTemplate, "ncl", teamId);
+        createDeterLabProject(jdbcTemplate, "testbed-ncl", teamId);
     }
 
     private String createTeam(final JdbcTemplate jdbcTemplate, final String teamName, final String description, final String organizationType, final String url, final TeamPrivacy privacy, final TeamStatus status, final TeamVisibility visibility) throws SQLException {
