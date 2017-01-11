@@ -3,7 +3,6 @@ package sg.ncl.service.registration.web;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import org.apache.commons.lang3.RandomStringUtils;
-import org.json.JSONArray;
 import org.json.JSONObject;
 import org.junit.Assert;
 import org.junit.Before;
@@ -24,11 +23,7 @@ import sg.ncl.service.registration.AbstractTest;
 import sg.ncl.service.registration.Util;
 import sg.ncl.service.registration.serializers.DateTimeDeserializer;
 import sg.ncl.service.registration.serializers.DateTimeSerializer;
-import sg.ncl.service.team.domain.MemberType;
-import sg.ncl.service.team.domain.Team;
-import sg.ncl.service.team.domain.TeamMember;
-import sg.ncl.service.team.domain.TeamService;
-import sg.ncl.service.team.domain.TeamStatus;
+import sg.ncl.service.team.domain.*;
 import sg.ncl.service.team.web.TeamMemberInfo;
 import sg.ncl.service.user.domain.User;
 import sg.ncl.service.user.domain.UserService;
@@ -41,10 +36,7 @@ import static org.hamcrest.core.Is.is;
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.method;
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.requestTo;
 import static org.springframework.test.web.client.response.MockRestResponseCreators.withSuccess;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.springframework.test.web.servlet.setup.MockMvcBuilders.webAppContextSetup;
 
@@ -108,6 +100,10 @@ public class RegistrationControllerTest extends AbstractTest {
 
         JSONObject predefinedResultJson = new JSONObject();
         predefinedResultJson.put("msg", "join project existing user ok");
+
+        User owner = userService.createUser(Util.getUserEntity());
+        TeamMemberInfo memberInfo = Util.getTeamMemberInfo(owner.getId(), MemberType.OWNER);
+        teamService.addMember(teamEntity.getId(), memberInfo);
 
         mockServer.expect(requestTo(properties.getJoinProject()))
                 .andExpect(method(HttpMethod.POST))

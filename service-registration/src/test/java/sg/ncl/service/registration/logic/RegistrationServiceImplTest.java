@@ -69,7 +69,15 @@ public class RegistrationServiceImplTest {
     @Mock
     private DomainProperties domainProperties;
     @Mock
-    private Template freemarkerConfiguration;
+    private Template emailValidationTemplate;
+    @Mock
+    private Template applyTeamRequestTemplate;
+    @Mock
+    private Template replyTeamRequestTemplate;
+    @Mock
+    private Template applyJoinTeamRequestTemplate;
+    @Mock
+    private Template replyJoinTeamRequestTemplate;
 
     private RegistrationService registrationService;
     private boolean isJoinTeam = true;
@@ -83,9 +91,9 @@ public class RegistrationServiceImplTest {
         assertThat(mockingDetails(adapterDeterLab).isMock()).isTrue();
         assertThat(mockingDetails(mailService).isMock()).isTrue();
 
-        registrationService = new RegistrationServiceImpl(credentialsService,
-                teamService, userService, registrationRepository, adapterDeterLab, mailService,
-                domainProperties, freemarkerConfiguration);
+        registrationService = new RegistrationServiceImpl(
+                credentialsService, teamService, userService, registrationRepository, adapterDeterLab, mailService, domainProperties,
+                emailValidationTemplate, applyTeamRequestTemplate, replyTeamRequestTemplate, applyJoinTeamRequestTemplate, replyJoinTeamRequestTemplate);
     }
 
     @Test
@@ -444,6 +452,7 @@ public class RegistrationServiceImplTest {
 
         when(teamService.isOwner(anyString(), anyString())).thenReturn(true);
         when(teamService.getTeamById(anyString())).thenReturn(teamEntity);
+        when(userService.getUser(anyString())).thenReturn(userEntity);
 
         registrationService.rejectJoinRequest(teamEntity.getId(), userEntity.getId(), userEntity);
 
