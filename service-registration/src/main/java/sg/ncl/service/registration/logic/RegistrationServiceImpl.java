@@ -56,6 +56,16 @@ public class RegistrationServiceImpl implements RegistrationService {
     private static final String USER = "User";
     private static final String TEAM = "Team";
     private static final String NOT_FOUND = "not found";
+    private static final String FIRST_NAME = "firstname";
+    private static final String TEAM_NAME = "teamname";
+    private static final String FULL_NAME = "fullname";
+    private static final String EMAIL = "email";
+    private static final String PHONE = "phone";
+    private static final String JOB_TITLE = "jobtitle";
+    private static final String INSTITUTION = "institution";
+    private static final String COUNTRY = "country";
+    private static final String SUPPORT_EMAIL = "support@ncl.sg";
+    private static final String TESTBED_EMAIL = "NCL Testbed <testbed-ops@ncl.sg>";
 
     private final CredentialsService credentialsService;
     private final TeamService teamService;
@@ -243,19 +253,19 @@ public class RegistrationServiceImpl implements RegistrationService {
         log.info("Register new user: added user {} to team {}", user.getUserDetails().getEmail(), teamEntity.getName());
 
         JSONObject userObject = new JSONObject();
-        userObject.put("firstName", user.getUserDetails().getFirstName());
+        userObject.put(FIRST_NAME, user.getUserDetails().getFirstName());
         userObject.put("lastName", user.getUserDetails().getLastName());
-        userObject.put("jobTitle", user.getUserDetails().getJobTitle());
+        userObject.put(JOB_TITLE, user.getUserDetails().getJobTitle());
         userObject.put("password", credentials.getPassword()); // cannot get from credentialsEntity else will be hashed
-        userObject.put("email", user.getUserDetails().getEmail());
-        userObject.put("phone", user.getUserDetails().getPhone());
-        userObject.put("institution", user.getUserDetails().getInstitution());
+        userObject.put(EMAIL, user.getUserDetails().getEmail());
+        userObject.put(PHONE, user.getUserDetails().getPhone());
+        userObject.put(INSTITUTION, user.getUserDetails().getInstitution());
         userObject.put("institutionAbbreviation", user.getUserDetails().getInstitutionAbbreviation());
         userObject.put("institutionWeb", user.getUserDetails().getInstitutionWeb());
 
         userObject.put("address1", user.getUserDetails().getAddress().getAddress1());
         userObject.put("address2", user.getUserDetails().getAddress().getAddress2());
-        userObject.put("country", user.getUserDetails().getAddress().getCountry());
+        userObject.put(COUNTRY, user.getUserDetails().getAddress().getCountry());
         userObject.put("region", user.getUserDetails().getAddress().getRegion());
         userObject.put("city", user.getUserDetails().getAddress().getCity());
         userObject.put("zipCode", user.getUserDetails().getAddress().getZipCode());
@@ -542,17 +552,17 @@ public class RegistrationServiceImpl implements RegistrationService {
 
     private void sendReplyJoinTeamEmail(User user, Team team, TeamStatus status) {
         final Map<String, String> map = new HashMap<>();
-        map.put("firstname", user.getUserDetails().getFirstName());
-        map.put("teamname", team.getName());
-        map.put("status", (status == TeamStatus.APPROVED ? "approved" : "rejected"));
+        map.put(FIRST_NAME, user.getUserDetails().getFirstName());
+        map.put(TEAM_NAME, team.getName());
+        map.put("status", status == TeamStatus.APPROVED ? "approved" : "rejected");
 
         try {
             String[] to = new String[1];
             to[0] = user.getUserDetails().getEmail();
             String[] cc = new String[1];
-            cc[0] = "support@ncl.sg";
+            cc[0] = SUPPORT_EMAIL;
             String msgText = FreeMarkerTemplateUtils.processTemplateIntoString(replyJoinTeamRequestTemplate, map);
-            mailService.send("NCL Testbed <testbed-ops@ncl.sg>", to,
+            mailService.send(TESTBED_EMAIL, to,
                     "Apply To Join Team " + (status == TeamStatus.APPROVED ? "Approved" : "Rejected"),
                     msgText, false, cc, null);
         } catch (IOException | TemplateException e) {
@@ -562,23 +572,22 @@ public class RegistrationServiceImpl implements RegistrationService {
 
     private void sendApplyJoinTeamEmail(User requester, User owner, Team team) {
         final Map<String, String> map = new HashMap<>();
-        map.put("firstname", owner.getUserDetails().getFirstName());
-        map.put("teamname", team.getName());
-        map.put("fullname", requester.getUserDetails().getFirstName() + " " + requester.getUserDetails().getLastName());
-        map.put("email", requester.getUserDetails().getEmail());
-        map.put("phone", requester.getUserDetails().getPhone());
-        map.put("jobtitle", requester.getUserDetails().getJobTitle());
-        map.put("institution", requester.getUserDetails().getInstitution());
-        map.put("country", requester.getUserDetails().getAddress().getCountry());
-        map.put("domain", domainProperties.getDomain());
+        map.put(FIRST_NAME, owner.getUserDetails().getFirstName());
+        map.put(TEAM_NAME, team.getName());
+        map.put(FULL_NAME, requester.getUserDetails().getFirstName() + " " + requester.getUserDetails().getLastName());
+        map.put(EMAIL, requester.getUserDetails().getEmail());
+        map.put(PHONE, requester.getUserDetails().getPhone());
+        map.put(JOB_TITLE, requester.getUserDetails().getJobTitle());
+        map.put(INSTITUTION, requester.getUserDetails().getInstitution());
+        map.put(COUNTRY, requester.getUserDetails().getAddress().getCountry());
 
         try {
             String[] to = new String[1];
             to[0] = owner.getUserDetails().getEmail();
             String[] cc = new String[1];
-            cc[0] = "support@ncl.sg";
+            cc[0] = SUPPORT_EMAIL;
             String msgText = FreeMarkerTemplateUtils.processTemplateIntoString(applyJoinTeamRequestTemplate, map);
-            mailService.send("NCL Testbed <testbed-ops@ncl.sg>", to,
+            mailService.send(TESTBED_EMAIL, to,
                     "Please Approve/Reject Join Team Request",
                     msgText, false, cc, null);
         } catch (IOException | TemplateException e) {
@@ -588,17 +597,17 @@ public class RegistrationServiceImpl implements RegistrationService {
 
     private void sendReplyTeamEmail(User user, Team team, TeamStatus status) {
         final Map<String, String> map = new HashMap<>();
-        map.put("firstname", user.getUserDetails().getFirstName());
-        map.put("teamname", team.getName());
-        map.put("status", (status == TeamStatus.APPROVED ? "approved" : "rejected"));
+        map.put(FIRST_NAME, user.getUserDetails().getFirstName());
+        map.put(TEAM_NAME, team.getName());
+        map.put("status", status == TeamStatus.APPROVED ? "approved" : "rejected");
 
         try {
             String[] to = new String[1];
             to[0] = user.getUserDetails().getEmail();
             String[] cc = new String[1];
-            cc[0] = "support@ncl.sg";
+            cc[0] = SUPPORT_EMAIL;
             String msgText = FreeMarkerTemplateUtils.processTemplateIntoString(replyTeamRequestTemplate, map);
-            mailService.send("NCL Testbed <testbed-ops@ncl.sg>", to,
+            mailService.send(TESTBED_EMAIL, to,
                     "Apply For New Team " + (status == TeamStatus.APPROVED ? "Approved" : "Rejected"),
                     msgText, false, cc, null);
         } catch (IOException | TemplateException e) {
@@ -608,20 +617,18 @@ public class RegistrationServiceImpl implements RegistrationService {
 
     private void sendApplyTeamEmail(User user, Team team) {
         final Map<String, String> map = new HashMap<>();
-        map.put("firstname", "NCL Support");
-        map.put("teamname", team.getName());
-        map.put("fullname", user.getUserDetails().getFirstName() + " " + user.getUserDetails().getLastName());
-        map.put("email", user.getUserDetails().getEmail());
-        map.put("phone", user.getUserDetails().getPhone());
-        map.put("jobtitle", user.getUserDetails().getJobTitle());
-        map.put("institution", user.getUserDetails().getInstitution());
-        map.put("country", user.getUserDetails().getAddress().getCountry());
-        map.put("domain", domainProperties.getDomain());
+        map.put(FIRST_NAME, "NCL Support");
+        map.put(TEAM_NAME, team.getName());
+        map.put(FULL_NAME, user.getUserDetails().getFirstName() + " " + user.getUserDetails().getLastName());
+        map.put(EMAIL, user.getUserDetails().getEmail());
+        map.put(PHONE, user.getUserDetails().getPhone());
+        map.put(JOB_TITLE, user.getUserDetails().getJobTitle());
+        map.put(INSTITUTION, user.getUserDetails().getInstitution());
+        map.put(COUNTRY, user.getUserDetails().getAddress().getCountry());
 
         try {
             String msgText = FreeMarkerTemplateUtils.processTemplateIntoString(applyTeamRequestTemplate, map);
-            mailService.send("NCL Testbed <testbed-ops@ncl.sg>",
-                    "support@ncl.sg",
+            mailService.send(TESTBED_EMAIL, SUPPORT_EMAIL,
                     "Please Approve New Team Request", msgText, false, null, null);
         } catch (IOException | TemplateException e) {
             log.warn("{}", e);
@@ -630,11 +637,11 @@ public class RegistrationServiceImpl implements RegistrationService {
 
     private void sendVerificationEmail(User user) {
         final Map<String, String> map = new HashMap<>();
-        map.put("firstname", user.getUserDetails().getFirstName());
+        map.put(FIRST_NAME, user.getUserDetails().getFirstName());
         map.put("domain", domainProperties.getDomain());
         map.put("id", user.getId());
         // email address may contain special characters (e.g. '+') which does not form a valid URI
-        map.put("email", Base64.encodeBase64String(user.getUserDetails().getEmail().getBytes()));
+        map.put(EMAIL, Base64.encodeBase64String(user.getUserDetails().getEmail().getBytes()));
         map.put("key", user.getVerificationKey());
 
         /*
@@ -646,8 +653,7 @@ public class RegistrationServiceImpl implements RegistrationService {
         try {
             String msgText = FreeMarkerTemplateUtils.processTemplateIntoString(
                     emailValidationTemplate, map);
-            mailService.send("NCL Testbed <testbed-ops@ncl.sg>",
-                    user.getUserDetails().getEmail(),
+            mailService.send(TESTBED_EMAIL, user.getUserDetails().getEmail(),
                     "Please Verify Your Email Account", msgText, false, null, null);
             log.debug("Email sent: {}", msgText);
         } catch (IOException | TemplateException e) {

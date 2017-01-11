@@ -43,6 +43,7 @@ public class TeamServiceImpl implements TeamService {
         this.userService = userService;
     }
 
+    @Override
     @Transactional
     public Team createTeam(@NotNull final Team team) {
         if (team.getName() == null || team.getName().isEmpty()) {
@@ -77,6 +78,7 @@ public class TeamServiceImpl implements TeamService {
         return savedTeam;
     }
 
+    @Override
     @Transactional
     public void removeTeam(@NotNull final String id) {
         TeamEntity entity = findTeam(id);
@@ -88,23 +90,28 @@ public class TeamServiceImpl implements TeamService {
         log.info("Team {} removed", id);
     }
 
+    @Override
     public List<Team> getAllTeams() {
         return teamRepository.findAll().stream().collect(Collectors.toList());
     }
 
+    @Override
     public List<Team> getTeamsByVisibility(@NotNull final TeamVisibility visibility) {
         return teamRepository.findByVisibility(visibility).stream().collect(Collectors.toList());
     }
 
+    @Override
     public Team getTeamById(@NotNull final String id) {
         return findTeam(id);
     }
 
+    @Override
     public Team getTeamByName(@NotNull final String name) {
         return teamRepository.findByName(name);
     }
 
     // for user to update team profile
+    @Override
     @Transactional
     public Team updateTeam(@NotNull final String id, @NotNull final Team team) {
         // Note: team name should be unchangeable
@@ -137,6 +144,7 @@ public class TeamServiceImpl implements TeamService {
         return updatedTeam;
     }
 
+    @Override
     @Transactional
     public Team addMember(@NotNull final String id, @NotNull final TeamMember teamMember) {
         TeamEntity entity = findTeam(id);
@@ -183,6 +191,7 @@ public class TeamServiceImpl implements TeamService {
      * @param requesterId The user id of the one requesting to remove the particular user; this must be the team owner
      * @return The updated team with the specific user removed
      */
+    @Override
     @Transactional
     public Team removeMember(@NotNull final String id, @NotNull final TeamMember teamMember, @NotNull final String requesterId) {
         log.info("Removing member {} from team {} requested by {}", teamMember.getUserId(), id, requesterId);
@@ -207,6 +216,7 @@ public class TeamServiceImpl implements TeamService {
         return false;
     }
 
+    @Override
     @Transactional
     public TeamMember updateMemberStatus(@NotNull final String teamId, @NotNull final String userId, @NotNull final MemberStatus status) {
         TeamEntity entity = findTeam(teamId);
@@ -225,6 +235,7 @@ public class TeamServiceImpl implements TeamService {
         return entity.changeMemberStatus(member, status);
     }
 
+    @Override
     @Transactional
     public Team updateTeamStatus(@NotNull final String id, @NotNull final TeamStatus status) {
         TeamEntity entity = findTeam(id);
@@ -280,6 +291,7 @@ public class TeamServiceImpl implements TeamService {
         return teamRepository.findOne(id);
     }
 
+    @Override
     public String findTeamOwner(@NotNull final String teamId) {
         TeamEntity entity = findTeam(teamId);
         if (entity == null) {
