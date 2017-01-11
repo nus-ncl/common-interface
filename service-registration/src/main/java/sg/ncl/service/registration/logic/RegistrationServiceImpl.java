@@ -67,6 +67,7 @@ public class RegistrationServiceImpl implements RegistrationService {
     private final Template applyTeamRequestTemplate;
     private final Template replyTeamRequestTemplate;
     private final Template applyJoinTeamRequestTemplate;
+    private final Template replyJoinTeamRequestTemplate;
     private final DomainProperties domainProperties;
 
     @Inject
@@ -81,7 +82,8 @@ public class RegistrationServiceImpl implements RegistrationService {
             @NotNull @Named("emailValidationTemplate") final Template emailValidationTemplate,
             @NotNull @Named("applyTeamRequestTemplate") final Template applyTeamRequestTemplate,
             @NotNull @Named("replyTeamRequestTemplate") final Template replyTeamRequestTemplate,
-            @NotNull @Named("applyJoinTeamRequestTemplate") final Template applyJoinTeamRequestTemplate
+            @NotNull @Named("applyJoinTeamRequestTemplate") final Template applyJoinTeamRequestTemplate,
+            @NotNull @Named("replyJoinTeamRequestTemplate") final Template replyJoinTeamRequestTemplate
     ) {
         this.credentialsService = credentialsService;
         this.teamService = teamService;
@@ -94,6 +96,7 @@ public class RegistrationServiceImpl implements RegistrationService {
         this.applyTeamRequestTemplate = applyTeamRequestTemplate;
         this.replyTeamRequestTemplate = replyTeamRequestTemplate;
         this.applyJoinTeamRequestTemplate = applyJoinTeamRequestTemplate;
+        this.replyJoinTeamRequestTemplate = replyJoinTeamRequestTemplate;
     }
 
     @Override
@@ -313,7 +316,9 @@ public class RegistrationServiceImpl implements RegistrationService {
             userService.updateUserStatus(userId, UserStatus.APPROVED);
         }
         teamService.updateMemberStatus(teamId, userId, MemberStatus.APPROVED);
-        return adapterDeterLab.processJoinRequest(one.toString());
+        String adapterResult = adapterDeterLab.processJoinRequest(one.toString());
+        sendReplyJoinTeamEmail(user, team, TeamStatus.APPROVED);
+        return adapterResult;
     }
 
     @Override
@@ -347,7 +352,9 @@ public class RegistrationServiceImpl implements RegistrationService {
                 object.put("pid", pid);
                 object.put("gid", pid);
                 object.put("action", "deny");
-                return adapterDeterLab.processJoinRequest(object.toString());
+                String adapterResult = adapterDeterLab.processJoinRequest(object.toString());
+                sendReplyJoinTeamEmail(userService.getUser(userId), one, TeamStatus.REJECTED);
+                return adapterResult;
             }
         }
         log.warn("Cannot process join request from User {} to Team {}: User is NOT a member of the team.", userId, teamId);
@@ -530,6 +537,26 @@ public class RegistrationServiceImpl implements RegistrationService {
         if (one != null) {
             log.warn("Team name duplicate entry found: {}", teamName);
             throw new TeamNameAlreadyExistsException(TEAM + " " + teamName + " already exists");
+        }
+    }
+
+    private void sendReplyJoinTeamEmail(User user, Team team, TeamStatus status) {
+        final Map<String, String> map = new HashMap<>();
+        map.put("firstname", user.getUserDetails().getFirstName());
+        map.put("teamname", team.getName());
+        map.put("status", (status == TeamStatus.APPROVED ? "approved" : "rejected"));
+
+        try {
+            String[] to = new String[1];
+            to[0] = user.getUserDetails().getEmail();
+            String[] cc = new String[1];
+            cc[0] = "support@ncl.sg";
+            String msgText = FreeMarkerTemplateUtils.processTemplateIntoString(replyJoinTeamRequestTemplate, map);
+            mailService.send("NCL Testbed <testbed-ops@ncl.sg>", to,
+                    "Apply To Join Team " + (status == TeamStatus.APPROVED ? "Approved" : "Rejected"),
+                    msgText, false, cc, null);
+        } catch (IOException | TemplateException e) {
+            log.warn("{}", e);
         }
     }
 
