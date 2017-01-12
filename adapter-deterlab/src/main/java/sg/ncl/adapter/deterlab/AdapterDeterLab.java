@@ -287,7 +287,7 @@ public class AdapterDeterLab {
      */
     public void login(String nclUserId, String password) {
         if (!properties.isEnabled()) {
-            log.info("Bypass login");
+            log.info("Bypass DeterLab login");
             return;
         }
 
@@ -295,9 +295,9 @@ public class AdapterDeterLab {
         adapterObject.put("uid", getDeterUserIdByNclUserId(nclUserId));
         adapterObject.put("password", password);
 
-        log.info("Now attempting to invoke adapter to login and create cookie file");
+        //log.info("Now attempting to invoke adapter to login and create cookie file");
 
-        log.info("Login on deterlab");
+        log.info("Logging into DeterLab");
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
         HttpEntity<String> request = new HttpEntity<>(adapterObject.toString(), headers);
@@ -306,7 +306,7 @@ public class AdapterDeterLab {
         try {
             response = restTemplate.exchange(properties.login(), HttpMethod.POST, request, String.class);
         } catch (RestClientException e) {
-            log.warn("DeterLab connection error login on deterlab: {}", e);
+            log.warn("Adapter connection error login on deterlab: {}", e);
             throw new AdapterConnectionException();
         }
 
