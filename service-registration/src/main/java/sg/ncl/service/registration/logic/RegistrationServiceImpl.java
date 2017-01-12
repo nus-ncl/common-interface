@@ -637,11 +637,11 @@ public class RegistrationServiceImpl implements RegistrationService {
 
     private void sendVerificationEmail(User user) {
         final Map<String, String> map = new HashMap<>();
-        map.put(FIRST_NAME, user.getUserDetails().getFirstName());
+        map.put("firstname", user.getUserDetails().getFirstName());
         map.put("domain", domainProperties.getDomain());
         map.put("id", user.getId());
         // email address may contain special characters (e.g. '+') which does not form a valid URI
-        map.put(EMAIL, Base64.encodeBase64String(user.getUserDetails().getEmail().getBytes()));
+        map.put("email", Base64.encodeBase64String(user.getUserDetails().getEmail().getBytes()));
         map.put("key", user.getVerificationKey());
 
         /*
