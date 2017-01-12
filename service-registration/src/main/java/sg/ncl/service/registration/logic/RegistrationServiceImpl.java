@@ -253,19 +253,19 @@ public class RegistrationServiceImpl implements RegistrationService {
         log.info("Register new user: added user {} to team {}", user.getUserDetails().getEmail(), teamEntity.getName());
 
         JSONObject userObject = new JSONObject();
-        userObject.put(FIRST_NAME, user.getUserDetails().getFirstName());
+        userObject.put("firstName", user.getUserDetails().getFirstName());
         userObject.put("lastName", user.getUserDetails().getLastName());
-        userObject.put(JOB_TITLE, user.getUserDetails().getJobTitle());
+        userObject.put("jobTitle", user.getUserDetails().getJobTitle());
         userObject.put("password", credentials.getPassword()); // cannot get from credentialsEntity else will be hashed
-        userObject.put(EMAIL, user.getUserDetails().getEmail());
-        userObject.put(PHONE, user.getUserDetails().getPhone());
-        userObject.put(INSTITUTION, user.getUserDetails().getInstitution());
+        userObject.put("email", user.getUserDetails().getEmail());
+        userObject.put("phone", user.getUserDetails().getPhone());
+        userObject.put("institution", user.getUserDetails().getInstitution());
         userObject.put("institutionAbbreviation", user.getUserDetails().getInstitutionAbbreviation());
         userObject.put("institutionWeb", user.getUserDetails().getInstitutionWeb());
 
         userObject.put("address1", user.getUserDetails().getAddress().getAddress1());
         userObject.put("address2", user.getUserDetails().getAddress().getAddress2());
-        userObject.put(COUNTRY, user.getUserDetails().getAddress().getCountry());
+        userObject.put("country", user.getUserDetails().getAddress().getCountry());
         userObject.put("region", user.getUserDetails().getAddress().getRegion());
         userObject.put("city", user.getUserDetails().getAddress().getCity());
         userObject.put("zipCode", user.getUserDetails().getAddress().getZipCode());
