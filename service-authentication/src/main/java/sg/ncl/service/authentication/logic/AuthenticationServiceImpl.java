@@ -75,6 +75,8 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 
             adapterDeterLab.login(credentials.getId(), password);
 
+            log.info("User {} logged in, Role {}", username, credentials.getRoles());
+
             return new AuthorizationInfo(credentials.getId(), jwt, credentials.getRoles());
         }
         // TODO lockout behavior
