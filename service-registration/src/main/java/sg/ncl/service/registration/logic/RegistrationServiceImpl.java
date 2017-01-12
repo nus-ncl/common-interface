@@ -56,6 +56,16 @@ public class RegistrationServiceImpl implements RegistrationService {
     private static final String USER = "User";
     private static final String TEAM = "Team";
     private static final String NOT_FOUND = "not found";
+    private static final String FIRST_NAME = "firstname";
+    private static final String TEAM_NAME = "teamname";
+    private static final String FULL_NAME = "fullname";
+    private static final String EMAIL = "emailaddr";
+    private static final String PHONE = "phone";
+    private static final String JOB_TITLE = "jobtitle";
+    private static final String INSTITUTION = "institution";
+    private static final String COUNTRY = "country";
+    private static final String SUPPORT_EMAIL = "support@ncl.sg";
+    private static final String TESTBED_EMAIL = "NCL Testbed <testbed-ops@ncl.sg>";
 
     private final CredentialsService credentialsService;
     private final TeamService teamService;
@@ -64,6 +74,10 @@ public class RegistrationServiceImpl implements RegistrationService {
     private final MailService mailService;
     private final AdapterDeterLab adapterDeterLab;
     private final Template emailValidationTemplate;
+    private final Template applyTeamRequestTemplate;
+    private final Template replyTeamRequestTemplate;
+    private final Template applyJoinTeamRequestTemplate;
+    private final Template replyJoinTeamRequestTemplate;
     private final DomainProperties domainProperties;
 
     @Inject
@@ -75,7 +89,11 @@ public class RegistrationServiceImpl implements RegistrationService {
             @NotNull final AdapterDeterLab adapterDeterLab,
             @NotNull final MailService mailService,
             @NotNull final DomainProperties domainProperties,
-            @NotNull @Named("emailValidationTemplate") final Template emailValidationTemplate
+            @NotNull @Named("emailValidationTemplate") final Template emailValidationTemplate,
+            @NotNull @Named("applyTeamRequestTemplate") final Template applyTeamRequestTemplate,
+            @NotNull @Named("replyTeamRequestTemplate") final Template replyTeamRequestTemplate,
+            @NotNull @Named("applyJoinTeamRequestTemplate") final Template applyJoinTeamRequestTemplate,
+            @NotNull @Named("replyJoinTeamRequestTemplate") final Template replyJoinTeamRequestTemplate
     ) {
         this.credentialsService = credentialsService;
         this.teamService = teamService;
@@ -85,6 +103,10 @@ public class RegistrationServiceImpl implements RegistrationService {
         this.mailService = mailService;
         this.domainProperties = domainProperties;
         this.emailValidationTemplate = emailValidationTemplate;
+        this.applyTeamRequestTemplate = applyTeamRequestTemplate;
+        this.replyTeamRequestTemplate = replyTeamRequestTemplate;
+        this.applyJoinTeamRequestTemplate = applyJoinTeamRequestTemplate;
+        this.replyJoinTeamRequestTemplate = replyJoinTeamRequestTemplate;
     }
 
     @Override
@@ -123,8 +145,9 @@ public class RegistrationServiceImpl implements RegistrationService {
 
         userService.addTeam(nclUserId, createdTeam.getId());
         teamService.addMember(createdTeam.getId(), teamMemberInfo);
-
         adapterDeterLab.applyProject(mainObject.toString());
+
+        sendApplyTeamEmail(userService.getUser(nclUserId), createdTeam);
         return null;
     }
 
@@ -161,8 +184,9 @@ public class RegistrationServiceImpl implements RegistrationService {
 
         userService.addTeam(nclUserId, teamId);
         teamService.addMember(teamId, teamMemberInfo);
-
         adapterDeterLab.joinProject(userObject.toString());
+
+        sendApplyJoinTeamEmail(userService.getUser(nclUserId), userService.getUser(teamService.findTeamOwner(teamId)), teamEntity);
         return null;
     }
 
@@ -302,7 +326,9 @@ public class RegistrationServiceImpl implements RegistrationService {
             userService.updateUserStatus(userId, UserStatus.APPROVED);
         }
         teamService.updateMemberStatus(teamId, userId, MemberStatus.APPROVED);
-        return adapterDeterLab.processJoinRequest(one.toString());
+        String adapterResult = adapterDeterLab.processJoinRequest(one.toString());
+        sendReplyJoinTeamEmail(user, team, TeamStatus.APPROVED);
+        return adapterResult;
     }
 
     @Override
@@ -336,7 +362,9 @@ public class RegistrationServiceImpl implements RegistrationService {
                 object.put("pid", pid);
                 object.put("gid", pid);
                 object.put("action", "deny");
-                return adapterDeterLab.processJoinRequest(object.toString());
+                String adapterResult = adapterDeterLab.processJoinRequest(object.toString());
+                sendReplyJoinTeamEmail(userService.getUser(userId), one, TeamStatus.REJECTED);
+                return adapterResult;
             }
         }
         log.warn("Cannot process join request from User {} to Team {}: User is NOT a member of the team.", userId, teamId);
@@ -369,6 +397,7 @@ public class RegistrationServiceImpl implements RegistrationService {
         one.put("pid", team.getName());
         one.put("uid", adapterDeterLab.getDeterUserIdByNclUserId(ownerId));
 
+        String adapterResult;
         if (status.equals(TeamStatus.APPROVED)) {
             User user = userService.getUser(ownerId);
             if ((UserStatus.PENDING).equals(user.getStatus())) {
@@ -376,7 +405,8 @@ public class RegistrationServiceImpl implements RegistrationService {
             }
             // change team owner member status
             teamService.updateMemberStatus(teamId, ownerId, MemberStatus.APPROVED);
-            return adapterDeterLab.approveProject(one.toString());
+            adapterResult = adapterDeterLab.approveProject(one.toString());
+            sendReplyTeamEmail(user, team, status);
         } else {
             // FIXME may need to be more specific and check if TeamStatus is REJECTED
             Team existingTeam = teamService.getTeamById(teamId);
@@ -387,8 +417,10 @@ public class RegistrationServiceImpl implements RegistrationService {
             }
             // remove from team side
             teamService.removeTeam(teamId);
-            return adapterDeterLab.rejectProject(one.toString());
+            adapterResult = adapterDeterLab.rejectProject(one.toString());
+            sendReplyTeamEmail(userService.getUser(ownerId), team, status);
         }
+        return adapterResult;
     }
 
     private boolean userFormFieldsHasErrors(User user) {
@@ -518,7 +550,90 @@ public class RegistrationServiceImpl implements RegistrationService {
         }
     }
 
+    private void sendReplyJoinTeamEmail(User user, Team team, TeamStatus status) {
+        final Map<String, String> map = new HashMap<>();
+        map.put(FIRST_NAME, user.getUserDetails().getFirstName());
+        map.put(TEAM_NAME, team.getName());
+        map.put("status", status == TeamStatus.APPROVED ? "approved" : "rejected");
 
+        try {
+            String[] to = new String[1];
+            to[0] = user.getUserDetails().getEmail();
+            String[] cc = new String[1];
+            cc[0] = SUPPORT_EMAIL;
+            String msgText = FreeMarkerTemplateUtils.processTemplateIntoString(replyJoinTeamRequestTemplate, map);
+            mailService.send(TESTBED_EMAIL, to,
+                    "Apply To Join Team " + (status == TeamStatus.APPROVED ? "Approved" : "Rejected"),
+                    msgText, false, cc, null);
+        } catch (IOException | TemplateException e) {
+            log.warn("{}", e);
+        }
+    }
+
+    private void sendApplyJoinTeamEmail(User requester, User owner, Team team) {
+        final Map<String, String> map = new HashMap<>();
+        map.put(FIRST_NAME, owner.getUserDetails().getFirstName());
+        map.put(TEAM_NAME, team.getName());
+        map.put(FULL_NAME, requester.getUserDetails().getFirstName() + " " + requester.getUserDetails().getLastName());
+        map.put(EMAIL, requester.getUserDetails().getEmail());
+        map.put(PHONE, requester.getUserDetails().getPhone());
+        map.put(JOB_TITLE, requester.getUserDetails().getJobTitle());
+        map.put(INSTITUTION, requester.getUserDetails().getInstitution());
+        map.put(COUNTRY, requester.getUserDetails().getAddress().getCountry());
+
+        try {
+            String[] to = new String[1];
+            to[0] = owner.getUserDetails().getEmail();
+            String[] cc = new String[1];
+            cc[0] = SUPPORT_EMAIL;
+            String msgText = FreeMarkerTemplateUtils.processTemplateIntoString(applyJoinTeamRequestTemplate, map);
+            mailService.send(TESTBED_EMAIL, to,
+                    "Please Approve/Reject Join Team Request",
+                    msgText, false, cc, null);
+        } catch (IOException | TemplateException e) {
+            log.warn("{}", e);
+        }
+    }
+
+    private void sendReplyTeamEmail(User user, Team team, TeamStatus status) {
+        final Map<String, String> map = new HashMap<>();
+        map.put(FIRST_NAME, user.getUserDetails().getFirstName());
+        map.put(TEAM_NAME, team.getName());
+        map.put("status", status == TeamStatus.APPROVED ? "approved" : "rejected");
+
+        try {
+            String[] to = new String[1];
+            to[0] = user.getUserDetails().getEmail();
+            String[] cc = new String[1];
+            cc[0] = SUPPORT_EMAIL;
+            String msgText = FreeMarkerTemplateUtils.processTemplateIntoString(replyTeamRequestTemplate, map);
+            mailService.send(TESTBED_EMAIL, to,
+                    "Apply For New Team " + (status == TeamStatus.APPROVED ? "Approved" : "Rejected"),
+                    msgText, false, cc, null);
+        } catch (IOException | TemplateException e) {
+            log.warn("{}", e);
+        }
+    }
+
+    private void sendApplyTeamEmail(User user, Team team) {
+        final Map<String, String> map = new HashMap<>();
+        map.put(FIRST_NAME, "NCL Support");
+        map.put(TEAM_NAME, team.getName());
+        map.put(FULL_NAME, user.getUserDetails().getFirstName() + " " + user.getUserDetails().getLastName());
+        map.put(EMAIL, user.getUserDetails().getEmail());
+        map.put(PHONE, user.getUserDetails().getPhone());
+        map.put(JOB_TITLE, user.getUserDetails().getJobTitle());
+        map.put(INSTITUTION, user.getUserDetails().getInstitution());
+        map.put(COUNTRY, user.getUserDetails().getAddress().getCountry());
+
+        try {
+            String msgText = FreeMarkerTemplateUtils.processTemplateIntoString(applyTeamRequestTemplate, map);
+            mailService.send(TESTBED_EMAIL, SUPPORT_EMAIL,
+                    "Please Approve New Team Request", msgText, false, null, null);
+        } catch (IOException | TemplateException e) {
+            log.warn("{}", e);
+        }
+    }
 
     private void sendVerificationEmail(User user) {
         final Map<String, String> map = new HashMap<>();
@@ -538,8 +653,7 @@ public class RegistrationServiceImpl implements RegistrationService {
         try {
             String msgText = FreeMarkerTemplateUtils.processTemplateIntoString(
                     emailValidationTemplate, map);
-            mailService.send("testbed-ops@ncl.sg",
-                    user.getUserDetails().getEmail(),
+            mailService.send(TESTBED_EMAIL, user.getUserDetails().getEmail(),
                     "Please Verify Your Email Account", msgText, false, null, null);
             log.debug("Email sent: {}", msgText);
         } catch (IOException | TemplateException e) {
