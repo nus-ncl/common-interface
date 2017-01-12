@@ -59,7 +59,7 @@ public class RegistrationServiceImpl implements RegistrationService {
     private static final String FIRST_NAME = "firstname";
     private static final String TEAM_NAME = "teamname";
     private static final String FULL_NAME = "fullname";
-    private static final String EMAIL = "email";
+    private static final String EMAIL = "emailaddr";
     private static final String PHONE = "phone";
     private static final String JOB_TITLE = "jobtitle";
     private static final String INSTITUTION = "institution";

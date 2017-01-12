@@ -6,7 +6,7 @@ The details of the request are as follows:
 Team Name: ${teamname}
 Requester:
     ${fullname}
-    ${email}
+    ${emailaddr}
     ${phone}
     ${jobtitle}
     ${institution}
