@@ -11,6 +11,7 @@ Requester:
     ${jobtitle}
     ${institution}
     ${country}
+Notes: ${notes}
 
 Please login to the NCL website to approve the request.
 

@@ -46,6 +46,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 
+import static org.hibernate.annotations.common.util.StringHelper.isEmpty;
+
 /**
  * @author Christopher Zhong
  */
@@ -66,6 +68,7 @@ public class RegistrationServiceImpl implements RegistrationService {
     private static final String COUNTRY = "country";
     private static final String SUPPORT_EMAIL = "support@ncl.sg";
     private static final String TESTBED_EMAIL = "NCL Testbed <testbed-ops@ncl.sg>";
+    private static final String NOTES = "notes";
 
     private final CredentialsService credentialsService;
     private final TeamService teamService;
@@ -154,7 +157,7 @@ public class RegistrationServiceImpl implements RegistrationService {
     @Override
     @Transactional
     // for existing users to apply join an existing team
-    public Registration registerRequestToJoinTeam(String nclUserId, Team team) {
+    public Registration registerRequestToJoinTeam(String nclUserId, Team team, String notes) {
 
         checkUserId(nclUserId);
         checkTeamName(team.getName());
@@ -180,20 +183,21 @@ public class RegistrationServiceImpl implements RegistrationService {
         teamMemberEntity.setUserId(nclUserId);
         teamMemberEntity.setJoinedDate(ZonedDateTime.now());
         teamMemberEntity.setMemberType(MemberType.MEMBER);
+        teamMemberEntity.setNotes(notes);
         TeamMemberInfo teamMemberInfo = new TeamMemberInfo(teamMemberEntity);
 
         userService.addTeam(nclUserId, teamId);
         teamService.addMember(teamId, teamMemberInfo);
         adapterDeterLab.joinProject(userObject.toString());
 
-        sendApplyJoinTeamEmail(userService.getUser(nclUserId), userService.getUser(teamService.findTeamOwner(teamId)), teamEntity);
+        sendApplyJoinTeamEmail(userService.getUser(nclUserId), userService.getUser(teamService.findTeamOwner(teamId)), teamEntity, teamMemberInfo);
         return null;
     }
 
     @Override
     @Transactional
     // for a new user to register and create a new team or join an existing team
-    public Registration register(Credentials credentials, User user, Team team, boolean isJoinTeam) {
+    public Registration register(Credentials credentials, User user, Team team, boolean isJoinTeam, String notes) {
         if (userFormFieldsHasErrors(user)) {
             log.warn("User form fields has errors {}", user);
             throw new IncompleteRegistrationFormException();
@@ -246,6 +250,11 @@ public class RegistrationServiceImpl implements RegistrationService {
         teamMemberEntity.setUserId(userId);
         teamMemberEntity.setJoinedDate(ZonedDateTime.now());
         teamMemberEntity.setMemberType(isJoinTeam ? MemberType.MEMBER : MemberType.OWNER);
+
+        if (isEmpty(notes.trim()))
+            notes = null;
+        teamMemberEntity.setNotes(notes);
+
         teamMemberInfo = new TeamMemberInfo(teamMemberEntity);
 
         userService.addTeam(userId, teamId);
@@ -293,6 +302,7 @@ public class RegistrationServiceImpl implements RegistrationService {
 
             // send verification email
             sendVerificationEmail(createdUser);
+            registerRequestToJoinTeam(userId, teamEntity, notes);
 
             return one;
         } else {
@@ -570,7 +580,7 @@ public class RegistrationServiceImpl implements RegistrationService {
         }
     }
 
-    private void sendApplyJoinTeamEmail(User requester, User owner, Team team) {
+    private void sendApplyJoinTeamEmail(User requester, User owner, Team team, TeamMember teamMember ) {
         final Map<String, String> map = new HashMap<>();
         map.put(FIRST_NAME, owner.getUserDetails().getFirstName());
         map.put(TEAM_NAME, team.getName());
@@ -580,6 +590,7 @@ public class RegistrationServiceImpl implements RegistrationService {
         map.put(JOB_TITLE, requester.getUserDetails().getJobTitle());
         map.put(INSTITUTION, requester.getUserDetails().getInstitution());
         map.put(COUNTRY, requester.getUserDetails().getAddress().getCountry());
+        map.put(NOTES, teamMember.getNotes());
 
         try {
             String[] to = new String[1];

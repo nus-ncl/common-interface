@@ -35,4 +35,6 @@ public interface Registration {
 
     String getUsrPhone();
 
+    String getNotes();
+
 }

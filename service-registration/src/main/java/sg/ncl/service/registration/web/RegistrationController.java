@@ -41,7 +41,7 @@ public class RegistrationController {
     @ResponseStatus(HttpStatus.OK)
     public Map<String, String> register(@RequestBody final RegistrationInfo registrationInfo) {
         Map<String, String> map = new HashMap<>();
-        Registration one = registrationService.register(registrationInfo.getCredentials(), registrationInfo.getUser(), registrationInfo.getTeam(), registrationInfo.getIsJoinTeam());
+        Registration one = registrationService.register(registrationInfo.getCredentials(), registrationInfo.getUser(), registrationInfo.getTeam(), registrationInfo.getIsJoinTeam(), registrationInfo.getNotes() );
         if (one != null) {
             map.put("id", one.getId().toString());
         }
@@ -66,7 +66,7 @@ public class RegistrationController {
     @ResponseStatus(HttpStatus.ACCEPTED)
     public Map<String, String> registerRequestToJoinTeam(@RequestBody RegistrationInfo registrationInfo) {
         Map<String, String> map = new HashMap<>();
-        Registration one = registrationService.registerRequestToJoinTeam(registrationInfo.getUser().getId(), registrationInfo.getTeam());
+        Registration one = registrationService.registerRequestToJoinTeam(registrationInfo.getUser().getId(), registrationInfo.getTeam(), registrationInfo.getNotes());
         if (one != null) {
             map.put("id", one.getId().toString());
         }

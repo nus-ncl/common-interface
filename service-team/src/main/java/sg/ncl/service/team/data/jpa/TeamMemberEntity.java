@@ -52,4 +52,7 @@ public class TeamMemberEntity extends AbstractEntity implements TeamMember {
     @Enumerated(EnumType.STRING)
     private MemberStatus memberStatus = MemberStatus.PENDING;
 
+    @Column(name = "notes")
+    private String notes;
+
 }

@@ -19,6 +19,8 @@ public class TeamMemberInfo implements TeamMember {
     private final ZonedDateTime joinedDate;
     private final MemberType memberType;
     private final MemberStatus memberStatus;
+    private final String notes;
+
 
     @JsonCreator
     public TeamMemberInfo(
@@ -26,12 +28,14 @@ public class TeamMemberInfo implements TeamMember {
             @JsonProperty("userId") final String userId,
             @JsonProperty("joinedDate") final ZonedDateTime joinedDate,
             @JsonProperty("memberType") final MemberType memberType,
-            @JsonProperty("memberStatus") final MemberStatus memberStatus) {
+            @JsonProperty("memberStatus") final MemberStatus memberStatus,
+            @JsonProperty("notes") final String notes) {
         this.id = id;
         this.userId = userId;
         this.joinedDate = joinedDate;
         this.memberType = memberType;
         this.memberStatus = memberStatus;
+        this.notes =  notes;
     }
 
     public TeamMemberInfo(final TeamMember teamMember) {
@@ -39,7 +43,8 @@ public class TeamMemberInfo implements TeamMember {
                 teamMember.getUserId(),
                 teamMember.getJoinedDate(),
                 teamMember.getMemberType(),
-                teamMember.getMemberStatus());
+                teamMember.getMemberStatus(),
+                teamMember.getNotes());
     }
 
 }
