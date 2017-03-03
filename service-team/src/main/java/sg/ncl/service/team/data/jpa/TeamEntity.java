@@ -4,6 +4,7 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.hibernate.annotations.GenericGenerator;
+import org.hibernate.annotations.Type;
 import sg.ncl.common.jpa.AbstractEntity;
 import sg.ncl.service.team.domain.MemberStatus;
 import sg.ncl.service.team.domain.Team;
@@ -47,6 +48,7 @@ public class TeamEntity extends AbstractEntity implements Team {
     @Column(name = "name", nullable = false, unique = true)
     private String name;
 
+    @Type(type = "text")
     @Column(name = "description")
     private String description;
 

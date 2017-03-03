@@ -53,7 +53,7 @@ public class RegistrationController {
     @ResponseStatus(HttpStatus.CREATED)
     public Map<String, String> registerRequestToApplyTeam(@PathVariable String nclUserId, @RequestBody RegistrationInfo registrationInfo) {
         Map<String, String> map = new HashMap<>();
-        Registration one = registrationService.registerRequestToApplyTeam(nclUserId, registrationInfo.getTeam());
+        Registration one = registrationService.registerRequestToApplyTeam(nclUserId, registrationInfo.getTeam(), registrationInfo.getNotes());
         if (one != null) {
             map.put("id", one.getId().toString());
         }

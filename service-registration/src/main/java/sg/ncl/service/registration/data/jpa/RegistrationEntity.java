@@ -202,6 +202,9 @@ public class RegistrationEntity extends AbstractEntity implements Registration {
         this.usrPhone = usrPhone;
     }
 
+
+
+
     /*
     @Override
     public boolean equals(final Object o) {

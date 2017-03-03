@@ -116,7 +116,7 @@ public class RegistrationServiceImpl implements RegistrationService {
     @Transactional
     // FIXME: the return type should be a proper Registration
     // for existing users to create a new team
-    public Registration registerRequestToApplyTeam(String nclUserId, Team team) {
+    public Registration registerRequestToApplyTeam(String nclUserId, Team team, String notes) {
 
         checkUserId(nclUserId); //check if user id is null or empty
         checkTeamName(team.getName()); //check if team name is null or empty
@@ -135,6 +135,9 @@ public class RegistrationServiceImpl implements RegistrationService {
         teamMemberEntity.setUserId(nclUserId);
         teamMemberEntity.setJoinedDate(ZonedDateTime.now());
         teamMemberEntity.setMemberType(MemberType.OWNER);
+        teamMemberEntity.setNotes(notes);
+
+
         TeamMemberInfo teamMemberInfo = new TeamMemberInfo(teamMemberEntity);
 
         JSONObject mainObject = new JSONObject();
