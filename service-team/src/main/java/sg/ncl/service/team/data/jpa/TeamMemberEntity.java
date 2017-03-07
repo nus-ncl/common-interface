@@ -54,7 +54,7 @@ public class TeamMemberEntity extends AbstractEntity implements TeamMember {
     private MemberStatus memberStatus = MemberStatus.PENDING;
 
     @Type(type = "text")
-    @Column(name = "notes")
+    @Column(name = "notes", nullable = false)
     private String notes;
 
 }

@@ -254,14 +254,15 @@ public class RegistrationServiceImpl implements RegistrationService {
         teamMemberEntity.setJoinedDate(ZonedDateTime.now());
         teamMemberEntity.setMemberType(isJoinTeam ? MemberType.MEMBER : MemberType.OWNER);
 
-        if (isEmpty(notes.trim()))
-            notes = null;
-        teamMemberEntity.setNotes(notes);
+        if (notes == null)
+            notes = "";
 
+        teamMemberEntity.setNotes(notes);
         teamMemberInfo = new TeamMemberInfo(teamMemberEntity);
 
         userService.addTeam(userId, teamId);
         teamService.addMember(teamId, teamMemberInfo);
+
         log.info("Register new user: added user {} to team {}", user.getUserDetails().getEmail(), teamEntity.getName());
 
         JSONObject userObject = new JSONObject();
@@ -305,8 +306,12 @@ public class RegistrationServiceImpl implements RegistrationService {
 
             // send verification email
             sendVerificationEmail(createdUser);
-            registerRequestToJoinTeam(userId, teamEntity, notes);
-
+            if (isJoinTeam){
+                // send email to team owner asking for approval
+                String teamOwner = teamService.findTeamOwner(teamId);
+                User owner = userService.getUser(teamOwner);
+                sendApplyJoinTeamEmail(createdUser, owner, teamEntity, teamMemberEntity);
+            }
             return one;
         } else {
             log.warn("Register new users: unreachable branch, result of registration is {}", resultJSON);
