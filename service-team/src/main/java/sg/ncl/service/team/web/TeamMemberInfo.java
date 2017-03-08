@@ -10,7 +10,7 @@ import sg.ncl.service.team.domain.TeamMember;
 import java.time.ZonedDateTime;
 
 /**
- * Created by Desmond
+ * @Authors: Desmond, Vu
  */
 @Getter
 public class TeamMemberInfo implements TeamMember {

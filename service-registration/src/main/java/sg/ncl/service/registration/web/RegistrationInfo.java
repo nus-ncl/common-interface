@@ -6,7 +6,7 @@ import sg.ncl.service.team.data.jpa.TeamEntity;
 import sg.ncl.service.user.data.jpa.UserEntity;
 
 /**
- * @author Christopher Zhong
+ * @author Christopher Zhong, Vu
  */
 // FIXME: this class is not inline with the Registration interface
 @Getter
@@ -46,7 +46,7 @@ public class RegistrationInfo {
         this.uid = uid;
     }
 
-    public void setNotes(String reason) {
+    public void setNotes(String notes) {
         this.notes = notes;
     }
 }

@@ -48,6 +48,7 @@ public class Util {
         teamMemberEntity.setUserId(RandomStringUtils.randomAlphanumeric(20));
         teamMemberEntity.setJoinedDate(ZonedDateTime.now());
         teamMemberEntity.setMemberType(memberType);
+        teamMemberEntity.setNotes(RandomStringUtils.randomAlphanumeric(20));
         return new TeamMemberInfo(teamMemberEntity);
     }
 
@@ -58,6 +59,7 @@ public class Util {
         teamMemberEntity.setUserId(userId);
         teamMemberEntity.setJoinedDate(ZonedDateTime.now());
         teamMemberEntity.setMemberType(memberType);
+        teamMemberEntity.setNotes(RandomStringUtils.randomAlphanumeric(20));
         return new TeamMemberInfo(teamMemberEntity);
     }
 

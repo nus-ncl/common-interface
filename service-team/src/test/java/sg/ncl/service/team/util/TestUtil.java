@@ -9,6 +9,8 @@ import sg.ncl.service.team.web.TeamMemberInfo;
 
 import java.time.ZonedDateTime;
 
+import static org.mockito.Matchers.anyString;
+
 /**
  * Created by Desmond
  */
@@ -43,6 +45,7 @@ public class TestUtil {
         teamMemberEntity.setUserId(RandomStringUtils.randomAlphanumeric(20));
         teamMemberEntity.setJoinedDate(ZonedDateTime.now());
         teamMemberEntity.setMemberType(memberType);
+        teamMemberEntity.setNotes(RandomStringUtils.randomAlphanumeric(20));
         if (memberStatuses.length > 0) {
             teamMemberEntity.setMemberStatus(memberStatuses[0]);
         }

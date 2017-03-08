@@ -22,7 +22,7 @@ import javax.persistence.UniqueConstraint;
 import java.time.ZonedDateTime;
 
 /**
- * @author Christopher Zhong
+ * @author Christopher Zhong, Vu
  */
 @Getter
 @Setter

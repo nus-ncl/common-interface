@@ -135,6 +135,10 @@ public class RegistrationServiceImpl implements RegistrationService {
         teamMemberEntity.setUserId(nclUserId);
         teamMemberEntity.setJoinedDate(ZonedDateTime.now());
         teamMemberEntity.setMemberType(MemberType.OWNER);
+
+        if (notes == null)
+            notes = "";
+
         teamMemberEntity.setNotes(notes);
 
 
@@ -186,6 +190,10 @@ public class RegistrationServiceImpl implements RegistrationService {
         teamMemberEntity.setUserId(nclUserId);
         teamMemberEntity.setJoinedDate(ZonedDateTime.now());
         teamMemberEntity.setMemberType(MemberType.MEMBER);
+
+        if (notes == null)
+            notes = "";
+
         teamMemberEntity.setNotes(notes);
         TeamMemberInfo teamMemberInfo = new TeamMemberInfo(teamMemberEntity);
 

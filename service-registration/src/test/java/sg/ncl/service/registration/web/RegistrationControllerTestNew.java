@@ -38,6 +38,7 @@ import static org.hamcrest.core.IsEqual.equalTo;
 import static org.junit.Assert.assertThat;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyBoolean;
+import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.mockingDetails;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -104,7 +105,7 @@ public class RegistrationControllerTestNew extends AbstractTest {
         RegistrationEntity regInfo = new RegistrationEntity();
         regInfo.setId(Long.parseLong("1234567890"));
         when(registrationService.register(
-                any(CredentialsEntity.class), any(UserEntity.class), any(TeamEntity.class), anyBoolean()
+                any(CredentialsEntity.class), any(UserEntity.class), any(TeamEntity.class), anyBoolean(), anyString()
         )).thenReturn(regInfo);
 
         MvcResult mvcResult = mockMvc.perform(post.contentType(MediaType.APPLICATION_JSON).content(mainJSON.toString()))
@@ -139,7 +140,7 @@ public class RegistrationControllerTestNew extends AbstractTest {
         RegistrationEntity regInfo = new RegistrationEntity();
         regInfo.setId(Long.parseLong("1234567890"));
         when(registrationService.register(
-                any(CredentialsEntity.class), any(UserEntity.class), any(TeamEntity.class), anyBoolean()
+                any(CredentialsEntity.class), any(UserEntity.class), any(TeamEntity.class), anyBoolean(), anyString()
         )).thenReturn(regInfo);
 
         MvcResult mvcResult = mockMvc.perform(post.contentType(MediaType.APPLICATION_JSON).content(mainJSON.toString()))

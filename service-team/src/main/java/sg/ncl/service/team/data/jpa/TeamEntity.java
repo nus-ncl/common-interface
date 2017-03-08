@@ -93,6 +93,7 @@ public class TeamEntity extends AbstractEntity implements Team {
             if (teamMemberEntity.getMemberStatus() == MemberStatus.REJECTED) {
                 teamMemberEntity.setMemberStatus(MemberStatus.PENDING);
                 teamMemberEntity.setJoinedDate(ZonedDateTime.now());
+                teamMemberEntity.setNotes(member.getNotes());
                 members.put(userId, teamMemberEntity);
                 return members.get(userId);
             } else {
