@@ -46,10 +46,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 
-import static org.hibernate.annotations.common.util.StringHelper.isEmpty;
-
 /**
- * @author Christopher Zhong
+ * @author Christopher Zhong, Vu
  */
 @Service
 @Slf4j
@@ -140,8 +138,6 @@ public class RegistrationServiceImpl implements RegistrationService {
             notes = "";
 
         teamMemberEntity.setNotes(notes);
-
-
         TeamMemberInfo teamMemberInfo = new TeamMemberInfo(teamMemberEntity);
 
         JSONObject mainObject = new JSONObject();

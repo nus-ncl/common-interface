@@ -35,5 +35,4 @@ public interface Registration {
 
     String getUsrPhone();
 
-
 }
