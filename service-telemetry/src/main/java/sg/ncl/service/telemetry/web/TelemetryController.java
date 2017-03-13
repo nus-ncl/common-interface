@@ -10,6 +10,7 @@ import sg.ncl.service.telemetry.domain.TelemetryService;
 import javax.inject.Inject;
 import javax.validation.constraints.NotNull;
 import java.util.EnumMap;
+import java.util.HashMap;
 import java.util.Map;
 
 import static sg.ncl.service.telemetry.web.TelemetryController.PATH;
@@ -36,6 +37,18 @@ public class TelemetryController {
     public Map<NodeType, String> getNodes(@RequestParam("type") final NodeType nodeType) {
         EnumMap<NodeType, String> map = new EnumMap<>(NodeType.class);
         map.put(nodeType, telemetryService.getNodes(nodeType));
+        return map;
+    }
+
+    /**
+     * Retrieves the number of logged in users and running experiments at the current time
+     * @return a json in the format { users: X, experiments: X }
+     */
+    @GetMapping(path = "/testbed/stats")
+    @ResponseStatus(HttpStatus.OK)
+    public Map<String, String> getTestbedStats() {
+        Map<String, String> map = new HashMap<>();
+        map.put("users", telemetryService.getLoggedInUsers());
         return map;
     }
 }

@@ -55,4 +55,14 @@ public class TelemetryServiceImplTest {
         String result = telemetryServiceImpl.getNodes(NodeType.TOTAL);
         assertThat(result).isEqualTo(totalNodes);
     }
+
+    @Test
+    public void getLoggedInUsers() throws Exception {
+        String one = RandomStringUtils.randomNumeric(3);
+
+        when(adapterDeterLab.getLoggedInUsers()).thenReturn(one);
+
+        String result = telemetryServiceImpl.getLoggedInUsers();
+        assertThat(result).isEqualTo(one);
+    }
 }
