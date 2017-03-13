@@ -8,4 +8,6 @@ public interface TelemetryService {
     String getNodes(NodeType nodeType);
 
     String getLoggedInUsersCount();
+
+    String getRunningExperimentsCount();
 }

@@ -49,6 +49,7 @@ public class TelemetryController {
     public Map<String, String> getTestbedStats() {
         Map<String, String> map = new HashMap<>();
         map.put("users", telemetryService.getLoggedInUsersCount());
+        map.put("experiments", telemetryService.getRunningExperimentsCount());
         return map;
     }
 }

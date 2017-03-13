@@ -67,6 +67,21 @@ public class TelemetryControllerTest {
     }
 
     @Test
+    public void testGetTestbedStats() throws Exception {
+        String usersCount = RandomStringUtils.randomNumeric(3);
+        String runningExperimentsCount = RandomStringUtils.randomNumeric(3);
+
+        when(telemetryService.getLoggedInUsersCount()).thenReturn(usersCount);
+        when(telemetryService.getRunningExperimentsCount()).thenReturn(runningExperimentsCount);
+
+        mockMvc.perform(get(TelemetryController.PATH + "/testbed/stats"))
+                .andExpect(status().isOk())
+                .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$.users", is(equalTo(usersCount))))
+                .andExpect(jsonPath("$.experiments", is(equalTo(runningExperimentsCount))));
+    }
+
+    @Test
     public void testGetTotalNodes() throws Exception {
         String totalNodes = RandomStringUtils.randomNumeric(3);
 
