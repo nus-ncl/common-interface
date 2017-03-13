@@ -201,6 +201,12 @@ public class ConnectionPropertiesTest {
     }
 
     @Test
+    public void testGetRunningExperimentsCount() throws Exception {
+        assertThat(connectionProperties.getRunningExperimentsCount()).isNotNull();
+        assertThat(connectionProperties.getRunningExperimentsCount()).isEqualTo("http://127.0.0.1:22/getRunningExperimentsCount");
+    }
+
+    @Test
     public void testGetNodesStatus() throws Exception {
         assertThat(connectionProperties.getNodesStatus()).isNotNull();
         assertThat(connectionProperties.getNodesStatus()).isEqualTo("http://127.0.0.1:22/getNodesStatus");

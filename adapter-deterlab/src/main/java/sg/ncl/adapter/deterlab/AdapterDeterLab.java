@@ -707,7 +707,26 @@ public class AdapterDeterLab {
         try {
             response = restTemplate.exchange(properties.getLoggedInUsersCount(), HttpMethod.GET, request, String.class);
         } catch (RestClientException e) {
-            log.warn("DeterLab connection error get free nodes: {}", e);
+            log.warn("DeterLab connection error get number of logged in users: {}", e);
+            return "0";
+        }
+        return response.getBody().toString();
+    }
+
+    /**
+     * @return number of running experiments
+     */
+    public String getRunningExperimentsCount() {
+        log.info("Getting number of running experiments...");
+
+        HttpHeaders headers = new HttpHeaders();
+        HttpEntity<String> request = new HttpEntity<>(headers);
+        ResponseEntity response;
+
+        try {
+            response = restTemplate.exchange(properties.getRunningExperimentsCount(), HttpMethod.GET, request, String.class);
+        } catch (RestClientException e) {
+            log.warn("DeterLab connection error get number of running experiments: {}", e);
             return "0";
         }
         return response.getBody().toString();

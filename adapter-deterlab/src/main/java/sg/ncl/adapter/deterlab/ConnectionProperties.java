@@ -93,6 +93,10 @@ public class ConnectionProperties {
         return HTTP_MODE + ip + ":" + port + "/getNodesStatus";
     }
 
+    public String getRunningExperimentsCount() {
+        return HTTP_MODE + ip + ":" + port + "/getRunningExperimentsCount";
+    }
+
     public String getTotalNodes() {
         return HTTP_MODE + ip + ":" + port + "/getTotalNodes";
     }
