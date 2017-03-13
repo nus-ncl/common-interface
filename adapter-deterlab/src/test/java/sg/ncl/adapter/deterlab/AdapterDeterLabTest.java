@@ -1620,7 +1620,7 @@ public class AdapterDeterLabTest {
     }
 
     @Test
-    public void getLoggedInUsersGood() {
+    public void getLoggedInUsersCountGood() {
 
         String nodes = RandomStringUtils.randomNumeric(3);
 
@@ -1635,9 +1635,9 @@ public class AdapterDeterLabTest {
     }
 
     @Test
-    public void getLoggedInUsersDeterLabConnectionFailed() {
+    public void getLoggedInUsersCountDeterLabConnectionFailed() {
 
-        when(restTemplate.exchange(anyString(),eq(HttpMethod.GET),anyObject(),eq(String.class))).thenThrow(new RestClientException("error get free nodes"));
+        when(restTemplate.exchange(anyString(),eq(HttpMethod.GET),anyObject(),eq(String.class))).thenThrow(new RestClientException("error get number of logged in users"));
 
         String result = adapterDeterLab.getLoggedInUsersCount();
 

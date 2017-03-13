@@ -195,7 +195,7 @@ public class ConnectionPropertiesTest {
     }
 
     @Test
-    public void testGetLoggedInUsers() throws Exception {
+    public void testGetLoggedInUsersCount() throws Exception {
         assertThat(connectionProperties.getLoggedInUsersCount()).isNotNull();
         assertThat(connectionProperties.getLoggedInUsersCount()).isEqualTo("http://127.0.0.1:22/getLoggedInUsersCount");
     }
