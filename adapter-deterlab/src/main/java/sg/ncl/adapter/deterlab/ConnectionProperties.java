@@ -91,6 +91,10 @@ public class ConnectionProperties {
         return HTTP_MODE + ip + ":" + port + "/getLoggedInUsersCount";
     }
 
+    public String getRunningExperimentsCount() {
+        return HTTP_MODE + ip + ":" + port + "/getRunningExperimentsCount";
+    }
+
     public String getTotalNodes() {
         return HTTP_MODE + ip + ":" + port + "/getTotalNodes";
     }
@@ -122,4 +126,5 @@ public class ConnectionProperties {
     public String removeUserFromTeam() {
         return HTTP_MODE + ip + ":" + port + "/removeUserFromTeam";
     }
+
 }

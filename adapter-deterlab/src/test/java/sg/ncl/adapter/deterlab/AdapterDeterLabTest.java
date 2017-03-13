@@ -1647,6 +1647,33 @@ public class AdapterDeterLabTest {
     }
 
     @Test
+    public void getRunningExperimentsCountGood() {
+
+        String nodes = RandomStringUtils.randomNumeric(3);
+
+        when(restTemplate.exchange(anyString(),eq(HttpMethod.GET),anyObject(),eq(String.class))).thenReturn(response);
+        when(response.getBody()).thenReturn(nodes);
+
+        String result = adapterDeterLab.getRunningExperimentsCount();
+
+        verify(restTemplate,times(1)).exchange(anyString(),eq(HttpMethod.GET),anyObject(),eq(String.class));
+        verify(properties,times(1)).getRunningExperimentsCount();
+        assertThat(result).isEqualTo(nodes);
+    }
+
+    @Test
+    public void getRunningExperimentsCountDeterLabConnectionFailed() {
+
+        when(restTemplate.exchange(anyString(),eq(HttpMethod.GET),anyObject(),eq(String.class))).thenThrow(new RestClientException("error get number of running experiments"));
+
+        String result = adapterDeterLab.getRunningExperimentsCount();
+
+        verify(restTemplate,times(1)).exchange(anyString(),eq(HttpMethod.GET),anyObject(),eq(String.class));
+        verify(properties,times(1)).getRunningExperimentsCount();
+        assertThat(result).isEqualTo("0");
+    }
+
+    @Test
     public void getTotalNodesGood() {
 
         String nodes = RandomStringUtils.randomNumeric(3);
