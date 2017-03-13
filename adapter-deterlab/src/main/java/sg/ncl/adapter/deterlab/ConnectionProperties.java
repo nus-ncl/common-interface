@@ -87,8 +87,8 @@ public class ConnectionProperties {
         return HTTP_MODE + ip + ":" + port + "/getFreeNodes";
     }
 
-    public String getLoggedInUsers() {
-        return HTTP_MODE + ip + ":" + port + "/getLoggedInUsers";
+    public String getLoggedInUsersCount() {
+        return HTTP_MODE + ip + ":" + port + "/getLoggedInUsersCount";
     }
 
     public String getTotalNodes() {

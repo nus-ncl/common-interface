@@ -60,7 +60,7 @@ public class TelemetryServiceImplTest {
     public void getLoggedInUsers() throws Exception {
         String one = RandomStringUtils.randomNumeric(3);
 
-        when(adapterDeterLab.getLoggedInUsers()).thenReturn(one);
+        when(adapterDeterLab.getLoggedInUsersCount()).thenReturn(one);
 
         String result = telemetryServiceImpl.getLoggedInUsers();
         assertThat(result).isEqualTo(one);

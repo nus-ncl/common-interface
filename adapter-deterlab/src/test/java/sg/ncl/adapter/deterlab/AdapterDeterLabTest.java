@@ -1627,10 +1627,10 @@ public class AdapterDeterLabTest {
         when(restTemplate.exchange(anyString(),eq(HttpMethod.GET),anyObject(),eq(String.class))).thenReturn(response);
         when(response.getBody()).thenReturn(nodes);
 
-        String result = adapterDeterLab.getLoggedInUsers();
+        String result = adapterDeterLab.getLoggedInUsersCount();
 
         verify(restTemplate,times(1)).exchange(anyString(),eq(HttpMethod.GET),anyObject(),eq(String.class));
-        verify(properties,times(1)).getLoggedInUsers();
+        verify(properties,times(1)).getLoggedInUsersCount();
         assertThat(result).isEqualTo(nodes);
     }
 
@@ -1639,10 +1639,10 @@ public class AdapterDeterLabTest {
 
         when(restTemplate.exchange(anyString(),eq(HttpMethod.GET),anyObject(),eq(String.class))).thenThrow(new RestClientException("error get free nodes"));
 
-        String result = adapterDeterLab.getLoggedInUsers();
+        String result = adapterDeterLab.getLoggedInUsersCount();
 
         verify(restTemplate,times(1)).exchange(anyString(),eq(HttpMethod.GET),anyObject(),eq(String.class));
-        verify(properties,times(1)).getLoggedInUsers();
+        verify(properties,times(1)).getLoggedInUsersCount();
         assertThat(result).isEqualTo("0");
     }
 
