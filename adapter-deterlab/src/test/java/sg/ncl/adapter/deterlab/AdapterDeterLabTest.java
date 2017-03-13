@@ -1620,6 +1620,33 @@ public class AdapterDeterLabTest {
     }
 
     @Test
+    public void getLoggedInUsersGood() {
+
+        String nodes = RandomStringUtils.randomNumeric(3);
+
+        when(restTemplate.exchange(anyString(),eq(HttpMethod.GET),anyObject(),eq(String.class))).thenReturn(response);
+        when(response.getBody()).thenReturn(nodes);
+
+        String result = adapterDeterLab.getLoggedInUsers();
+
+        verify(restTemplate,times(1)).exchange(anyString(),eq(HttpMethod.GET),anyObject(),eq(String.class));
+        verify(properties,times(1)).getLoggedInUsers();
+        assertThat(result).isEqualTo(nodes);
+    }
+
+    @Test
+    public void getLoggedInUsersDeterLabConnectionFailed() {
+
+        when(restTemplate.exchange(anyString(),eq(HttpMethod.GET),anyObject(),eq(String.class))).thenThrow(new RestClientException("error get free nodes"));
+
+        String result = adapterDeterLab.getLoggedInUsers();
+
+        verify(restTemplate,times(1)).exchange(anyString(),eq(HttpMethod.GET),anyObject(),eq(String.class));
+        verify(properties,times(1)).getLoggedInUsers();
+        assertThat(result).isEqualTo("0");
+    }
+
+    @Test
     public void getNodesStatusGood() {
         String status = "{ \"type\" : [ { \"status\" : \"up\" } ] }";
 
