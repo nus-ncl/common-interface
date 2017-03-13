@@ -48,7 +48,7 @@ public class TelemetryController {
     @ResponseStatus(HttpStatus.OK)
     public Map<String, String> getTestbedStats() {
         Map<String, String> map = new HashMap<>();
-        map.put("users", telemetryService.getLoggedInUsers());
+        map.put("users", telemetryService.getLoggedInUsersCount());
         return map;
     }
 }
