@@ -46,4 +46,13 @@ public class TelemetryServiceImpl implements TelemetryService {
         return adapterDeterLab.getNodesStatus();
     }
 
+
+    /**
+     * Retrieves the number of logged in users at the current time
+     * @return 0 if the number of logged in users is empty or error
+     */
+    @Override
+    public String getLoggedInUsers() {
+        return adapterDeterLab.getLoggedInUsers();
+    }
 }
