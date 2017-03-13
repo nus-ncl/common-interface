@@ -47,6 +47,7 @@ ncl:
       '/credentials/password': PUT
       '/telemetry/nodes/counts\?type=FREE': GET # for retrieving free nodes count
       '/telemetry/nodes/counts\?type=TOTAL': GET # for retrieving total nodes count
+      '/telemetry/testbed/stats': GET # for retrieving number of logged in users and running experiments
   domain: dev.ncl.sg
   deterlab:
     adapter:
