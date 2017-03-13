@@ -4,6 +4,8 @@ import lombok.Getter;
 import lombok.Setter;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
+import java.net.URI;
+
 import static sg.ncl.adapter.deterlab.ConnectionProperties.PREFIX;
 
 /**
@@ -85,6 +87,10 @@ public class ConnectionProperties {
         return HTTP_MODE + ip + ":" + port + "/getFreeNodes";
     }
 
+    public String getLoggedInUsers() {
+        return HTTP_MODE + ip + ":" + port + "/getLoggedInUsers";
+    }
+
     public String getTotalNodes() {
         return HTTP_MODE + ip + ":" + port + "/getTotalNodes";
     }
@@ -116,5 +122,4 @@ public class ConnectionProperties {
     public String removeUserFromTeam() {
         return HTTP_MODE + ip + ":" + port + "/removeUserFromTeam";
     }
-
 }
