@@ -41,6 +41,10 @@ public class TelemetryServiceImpl implements TelemetryService {
         return adapterDeterLab.getLoggedInUsersCount();
     }
 
+    /**
+     * Retrieves the number of running experiments at the current time
+     * @return 0 if the number of running experiments is empty or error
+     */
     @Override
     public String getRunningExperimentsCount() {
         return adapterDeterLab.getRunningExperimentsCount();
