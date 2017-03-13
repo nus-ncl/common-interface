@@ -67,12 +67,22 @@ public class TelemetryServiceImplTest {
     }
 
     @Test
-    public void getLoggedInUsers() throws Exception {
+    public void getLoggedInUsersCount() throws Exception {
         String one = RandomStringUtils.randomNumeric(3);
 
         when(adapterDeterLab.getLoggedInUsersCount()).thenReturn(one);
 
-        String result = telemetryServiceImpl.getLoggedInUsers();
+        String result = telemetryServiceImpl.getLoggedInUsersCount();
+        assertThat(result).isEqualTo(one);
+    }
+
+    @Test
+    public void getRunningExperimentsCount() throws Exception {
+        String one = RandomStringUtils.randomNumeric(3);
+
+        when(adapterDeterLab.getRunningExperimentsCount()).thenReturn(one);
+
+        String result = telemetryServiceImpl.getRunningExperimentsCount();
         assertThat(result).isEqualTo(one);
     }
 }

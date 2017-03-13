@@ -52,7 +52,12 @@ public class TelemetryServiceImpl implements TelemetryService {
      * @return 0 if the number of logged in users is empty or error
      */
     @Override
-    public String getLoggedInUsers() {
+    public String getLoggedInUsersCount() {
         return adapterDeterLab.getLoggedInUsersCount();
+    }
+
+    @Override
+    public String getRunningExperimentsCount() {
+        return adapterDeterLab.getRunningExperimentsCount();
     }
 }
