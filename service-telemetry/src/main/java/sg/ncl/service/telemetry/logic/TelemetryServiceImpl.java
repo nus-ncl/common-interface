@@ -53,6 +53,6 @@ public class TelemetryServiceImpl implements TelemetryService {
      */
     @Override
     public String getLoggedInUsers() {
-        return adapterDeterLab.getLoggedInUsers();
+        return adapterDeterLab.getLoggedInUsersCount();
     }
 }

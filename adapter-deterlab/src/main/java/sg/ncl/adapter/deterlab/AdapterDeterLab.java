@@ -697,7 +697,7 @@ public class AdapterDeterLab {
     /**
      * @return number of logged in users at the current time
      */
-    public String getLoggedInUsers() {
+    public String getLoggedInUsersCount() {
         log.info("Getting number of logged in users...");
 
         HttpHeaders headers = new HttpHeaders();
@@ -705,7 +705,7 @@ public class AdapterDeterLab {
         ResponseEntity response;
 
         try {
-            response = restTemplate.exchange(properties.getLoggedInUsers(), HttpMethod.GET, request, String.class);
+            response = restTemplate.exchange(properties.getLoggedInUsersCount(), HttpMethod.GET, request, String.class);
         } catch (RestClientException e) {
             log.warn("DeterLab connection error get free nodes: {}", e);
             return "0";
