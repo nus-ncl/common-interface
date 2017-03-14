@@ -19,8 +19,7 @@ import sg.ncl.service.telemetry.domain.TelemetryService;
 import javax.inject.Inject;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.hamcrest.Matchers.equalTo;
-import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.*;
 import static org.mockito.Mockito.mockingDetails;
 import static org.mockito.Mockito.when;
 
@@ -76,5 +75,19 @@ public class TelemetryControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$.TOTAL", is(equalTo(totalNodes))));
+    }
+
+    @Test
+    public void testGetNodesStatus() throws Exception {
+        String status = "{ \"type\" : [ { \"status\" : \"up\" } ] }";
+
+        when(telemetryService.getNodesStatus()).thenReturn(status);
+
+        mockMvc.perform(get(TelemetryController.PATH + "/nodes/status"))
+                .andExpect(status().isOk())
+                .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$", hasKey("type")))
+                .andExpect(jsonPath("$.type", hasSize(1)))
+                .andExpect(jsonPath("$.type[0].status", is(equalTo("up"))));
     }
 }

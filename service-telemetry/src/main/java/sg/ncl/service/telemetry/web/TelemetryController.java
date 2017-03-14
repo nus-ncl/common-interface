@@ -38,4 +38,10 @@ public class TelemetryController {
         map.put(nodeType, telemetryService.getNodes(nodeType));
         return map;
     }
+
+    @GetMapping(path = "/nodes/status")
+    @ResponseStatus(HttpStatus.OK)
+    public String getNodesStatus() {
+        return telemetryService.getNodesStatus();
+    }
 }

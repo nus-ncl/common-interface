@@ -31,4 +31,19 @@ public class TelemetryServiceImpl implements TelemetryService {
             return adapterDeterLab.getTotalNodes();
         }
     }
+
+    /**
+     * Retrieves the list of testbed nodes status, including node id, status, machine type.
+     * Status inlclude "up", "possibly down", "down", "unpingable".
+     * "up" - particular node is in use
+     * "down" - particular node is free to be allocated
+     * "possibly down" - particular node is currently being freed
+     * "unpingable" - particular node may be dead
+     * @return a json dump of the nodes status in the format { type : [ { id : A, status : B, type : C }, ... {} ]  }
+     */
+    @Override
+    public String getNodesStatus() {
+        return adapterDeterLab.getNodesStatus();
+    }
+
 }

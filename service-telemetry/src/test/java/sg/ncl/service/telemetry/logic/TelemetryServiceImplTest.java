@@ -55,4 +55,14 @@ public class TelemetryServiceImplTest {
         String result = telemetryServiceImpl.getNodes(NodeType.TOTAL);
         assertThat(result).isEqualTo(totalNodes);
     }
+
+    @Test
+    public void getNodesStatus() throws Exception {
+        String status = "{ \"type\" : [ { \"status\" : \"up\" } ] }";
+
+        when(adapterDeterLab.getNodesStatus()).thenReturn(status);
+
+        String result = telemetryServiceImpl.getNodesStatus();
+        assertThat(result).isEqualTo(status);
+    }
 }
