@@ -678,6 +678,22 @@ public class AdapterDeterLab {
         return response.getBody().toString();
     }
 
+    public String getNodesStatus() {
+        log.info("Getting nodes status...");
+
+        HttpHeaders headers = new HttpHeaders();
+        HttpEntity<String> request = new HttpEntity<>(headers);
+        ResponseEntity response;
+
+        try {
+            response = restTemplate.exchange(properties.getNodesStatus(), HttpMethod.GET, request, String.class);
+        } catch (RestClientException e) {
+            log.warn("DeterLab connection error get nodes status: {}", e);
+            return "{}";
+        }
+        return response.getBody().toString();
+    }
+
     public String getTotalNodes() {
         log.info("Getting total nodes...");
 

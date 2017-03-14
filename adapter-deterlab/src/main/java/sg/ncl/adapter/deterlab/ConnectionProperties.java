@@ -4,6 +4,8 @@ import lombok.Getter;
 import lombok.Setter;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
+import java.net.URI;
+
 import static sg.ncl.adapter.deterlab.ConnectionProperties.PREFIX;
 
 /**
@@ -83,6 +85,10 @@ public class ConnectionProperties {
 
     public String getFreeNodes() {
         return HTTP_MODE + ip + ":" + port + "/getFreeNodes";
+    }
+
+    public String getNodesStatus() {
+        return HTTP_MODE + ip + ":" + port + "/getNodesStatus";
     }
 
     public String getTotalNodes() {

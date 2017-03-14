@@ -1620,6 +1620,31 @@ public class AdapterDeterLabTest {
     }
 
     @Test
+    public void getNodesStatusGood() {
+        String status = "{ \"type\" : [ { \"status\" : \"up\" } ] }";
+
+        when(restTemplate.exchange(anyString(),eq(HttpMethod.GET),anyObject(),eq(String.class))).thenReturn(response);
+        when(response.getBody()).thenReturn(status);
+
+        String result = adapterDeterLab.getNodesStatus();
+
+        verify(restTemplate,times(1)).exchange(anyString(),eq(HttpMethod.GET),anyObject(),eq(String.class));
+        verify(properties,times(1)).getNodesStatus();
+        assertThat(result).isEqualTo(status);
+    }
+
+    @Test
+    public void getNodesStatusDeterLabConnectionFailed() {
+        when(restTemplate.exchange(anyString(),eq(HttpMethod.GET),anyObject(),eq(String.class))).thenThrow(new RestClientException("error get nodes status"));
+
+        String result = adapterDeterLab.getNodesStatus();
+
+        verify(restTemplate,times(1)).exchange(anyString(),eq(HttpMethod.GET),anyObject(),eq(String.class));
+        verify(properties,times(1)).getNodesStatus();
+        assertThat(result).isEqualTo("{}");
+    }
+
+    @Test
     public void getTotalNodesGood() {
 
         String nodes = RandomStringUtils.randomNumeric(3);
