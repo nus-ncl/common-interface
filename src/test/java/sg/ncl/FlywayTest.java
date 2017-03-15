@@ -1090,7 +1090,7 @@ public class FlywayTest {
         assertThat((String) teamsTable.get(4).get("KEY")).isEmpty();
 
         assertThat((String) teamsTable.get(5).get("FIELD")).isEqualTo("description");
-        assertThat((String) teamsTable.get(5).get("TYPE")).isEqualTo("varchar(255)");
+        assertThat((String) teamsTable.get(5).get("TYPE")).contains("clob");
         assertThat((String) teamsTable.get(5).get("NULL")).isEqualTo("YES");
         assertThat((String) teamsTable.get(5).get("KEY")).isEmpty();
 
