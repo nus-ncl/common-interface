@@ -31,26 +31,20 @@ import sg.ncl.service.team.exceptions.TeamNotFoundException;
 import sg.ncl.service.team.exceptions.TeamQuotaOutOfRangeException;
 
 import javax.inject.Inject;
-
 import java.math.BigDecimal;
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.hamcrest.Matchers.equalTo;
-import static org.hamcrest.Matchers.hasSize;
-import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.*;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.mockingDetails;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-import static sg.ncl.service.team.util.TestUtil.getTeamEntityWithId;
-import static sg.ncl.service.team.util.TestUtil.getTeamMemberInfo;
-import static sg.ncl.service.team.util.TestUtil.getTeamQuotaEntity;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static sg.ncl.service.team.util.TestUtil.*;
 
 /**
  * @Author dcsyeoty, Tran Ly Vu
@@ -373,7 +367,6 @@ public class TeamsControllerTest {
         }
     }
 
-    /*
     @Test
     public void testUpdateTeamQuota() throws Exception {
         final String randomUsage = RandomStringUtils.randomNumeric(10);
@@ -389,9 +382,11 @@ public class TeamsControllerTest {
 
         mockMvc.perform(put(TeamsController.PATH + "/teamId/quota").contentType(MediaType.APPLICATION_JSON).content(content))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.id", is(equalTo(teamQuotaInfo.getId()))));
+                .andExpect(jsonPath("$.id", is(equalTo(teamQuotaInfo.getId()))))
+                .andExpect(jsonPath("$.teamId", is(equalTo(teamQuotaInfo.getTeamId()))))
+                .andExpect(jsonPath("$.quota", is(equalTo(teamQuotaInfo.getQuota().intValue()))));
     }
-    */
+
     @Test
     public void testUpdateTeamStatusUnauthorizedException() throws Exception {
         when(securityContext.getAuthentication()).thenReturn(null);
