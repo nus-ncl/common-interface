@@ -146,7 +146,7 @@ public class TeamsController {
 
         //check if budget is negative or exceed limit
         if (teamQuotaInfo.getQuota().compareTo(BigDecimal.valueOf(0)) < 0 ||
-                teamQuotaInfo.getQuota().compareTo(BigDecimal.valueOf(99999999.99)) == 1) {
+                teamQuotaInfo.getQuota().compareTo(BigDecimal.valueOf(99999999.99)) > 0) {
             throw new TeamQuotaOutOfRangeException(teamId);
         }
 

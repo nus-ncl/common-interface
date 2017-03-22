@@ -6,7 +6,6 @@ import lombok.Getter;
 import sg.ncl.service.team.domain.TeamQuota;
 import java.math.BigDecimal;
 
-
 /**
  * @author Tran Ly Vu
  */
