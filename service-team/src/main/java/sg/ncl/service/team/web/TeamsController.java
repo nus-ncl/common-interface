@@ -10,7 +10,6 @@ import org.springframework.web.bind.annotation.*;
 import sg.ncl.common.exception.base.ForbiddenException;
 import sg.ncl.common.exception.base.UnauthorizedException;
 import sg.ncl.service.analytics.domain.AnalyticsService;
-import sg.ncl.service.analytics.web.AnalyticsController;
 import sg.ncl.service.team.data.jpa.TeamQuotaEntity;
 import sg.ncl.service.team.domain.*;
 import sg.ncl.service.team.exceptions.TeamNotFoundException;
@@ -22,7 +21,6 @@ import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static java.time.temporal.TemporalAdjusters.lastDayOfMonth;
 import static sg.ncl.common.validation.Validator.checkClaimsType;
 import static sg.ncl.service.team.validations.Validator.isAdmin;
 import static sg.ncl.service.team.web.TeamsController.PATH;
@@ -147,7 +145,7 @@ public class TeamsController {
         }
 
         //check if budget is negative or exceed limit
-        if (teamQuotaInfo.getQuota().compareTo(BigDecimal.valueOf(0)) == -1 ||
+        if (teamQuotaInfo.getQuota().compareTo(BigDecimal.valueOf(0)) < 0 ||
                 teamQuotaInfo.getQuota().compareTo(BigDecimal.valueOf(99999999.99)) == 1) {
             throw new TeamQuotaOutOfRangeException(teamId);
         }
@@ -162,9 +160,7 @@ public class TeamsController {
         ZonedDateTime endDate = ZonedDateTime.now();
         String usage = analyticsService.getUsageStatistics(teamId, startDate, endDate);
 
-        TeamQuota teamQuota = new TeamQuotaInfo(teamService.updateTeamQuota(teamId, teamQuotaInfo), usage);
-
-        return teamQuota;
+        return new TeamQuotaInfo(teamService.updateTeamQuota(teamId, teamQuotaInfo), usage);
     }
 
     // for admin to update team status

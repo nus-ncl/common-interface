@@ -3,7 +3,6 @@ package sg.ncl.service.team.web;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Getter;
-import sg.ncl.service.team.domain.Team;
 import sg.ncl.service.team.domain.TeamQuota;
 import java.math.BigDecimal;
 
