@@ -4,16 +4,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import sg.ncl.adapter.deterlab.AdapterDeterLab;
-import sg.ncl.service.team.data.jpa.TeamEntity;
-import sg.ncl.service.team.data.jpa.TeamMemberEntity;
-import sg.ncl.service.team.data.jpa.TeamRepository;
-import sg.ncl.service.team.domain.MemberStatus;
-import sg.ncl.service.team.domain.MemberType;
-import sg.ncl.service.team.domain.Team;
-import sg.ncl.service.team.domain.TeamMember;
-import sg.ncl.service.team.domain.TeamService;
-import sg.ncl.service.team.domain.TeamStatus;
-import sg.ncl.service.team.domain.TeamVisibility;
+import sg.ncl.service.team.data.jpa.*;
+import sg.ncl.service.team.domain.*;
 import sg.ncl.service.team.exceptions.*;
 import sg.ncl.service.user.domain.UserService;
 
@@ -35,12 +27,14 @@ public class TeamServiceImpl implements TeamService {
     private final AdapterDeterLab adapterDeterLab;
     private final TeamRepository teamRepository;
     private final UserService userService;
+    private final TeamQuotaRepository teamQuotaRepository;
 
     @Inject
-    TeamServiceImpl(final AdapterDeterLab adapterDeterLab, final TeamRepository teamRepository, final UserService userService) {
+    TeamServiceImpl(final AdapterDeterLab adapterDeterLab, final TeamRepository teamRepository, final UserService userService, final TeamQuotaRepository teamQuotaRepository) {
         this.adapterDeterLab = adapterDeterLab;
         this.teamRepository = teamRepository;
         this.userService = userService;
+        this.teamQuotaRepository = teamQuotaRepository;
     }
 
     @Override
@@ -313,5 +307,33 @@ public class TeamServiceImpl implements TeamService {
                 name.trim().length() <= 12 &&
                 name.matches("^([-\\w]+)$") &&
                 !name.trim().startsWith("-");
+    }
+
+    @Override
+    public TeamQuota getTeamQuotaByTeamId(@NotNull String teamId) {
+        return teamQuotaRepository.findByTeamId(teamId);
+    }
+
+    @Override
+    @Transactional //allow database to roll back in case of error
+    public TeamQuota updateTeamQuota(@NotNull String teamId, @NotNull TeamQuota teamQuota){
+        if (teamId == null || teamId.isEmpty()) {
+            log.warn("Update team quota error: team id is null or empty");
+            return null;
+        }
+
+        TeamQuotaEntity teamQuotaEntity = teamQuotaRepository.findByTeamId(teamId);
+        if (teamQuotaEntity == null) {
+            teamQuotaEntity = new TeamQuotaEntity();
+            teamQuotaEntity.setTeamId(teamId);
+        }
+
+        log.info("Updating team quota: team to update {}, quota {}", teamId, teamQuota);
+        teamQuotaEntity.setQuota(teamQuota.getQuota());
+
+        final TeamQuota updatedTeamQuota = teamQuotaRepository.save(teamQuotaEntity);
+        log.info("Team quota updated: {}",  updatedTeamQuota);
+
+        return updatedTeamQuota;
     }
 }

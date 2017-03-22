@@ -23,6 +23,7 @@ import org.springframework.web.context.WebApplicationContext;
 import sg.ncl.common.authentication.Role;
 import sg.ncl.common.exception.base.UnauthorizedException;
 import sg.ncl.common.jwt.JwtToken;
+import sg.ncl.service.analytics.domain.AnalyticsService;
 import sg.ncl.service.team.data.jpa.TeamEntity;
 import sg.ncl.service.team.domain.*;
 
@@ -75,12 +76,16 @@ public class TeamsControllerTest {
     @MockBean
     private TeamService teamService;
 
+    @MockBean
+    private AnalyticsService analyticsService;
+
     @Before
     public void before() {
         assertThat(mockingDetails(claims).isMock()).isTrue();
         assertThat(mockingDetails(securityContext).isMock()).isTrue();
         assertThat(mockingDetails(authentication).isMock()).isTrue();
         assertThat(mockingDetails(teamService).isMock()).isTrue();
+        assertThat(mockingDetails(analyticsService).isMock()).isTrue();
 
         when(securityContext.getAuthentication()).thenReturn(authentication);
         SecurityContextHolder.setContext(securityContext);

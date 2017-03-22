@@ -9,22 +9,26 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 import sg.ncl.common.exception.base.ForbiddenException;
 import sg.ncl.common.exception.base.UnauthorizedException;
-import sg.ncl.service.team.domain.Team;
-import sg.ncl.service.team.domain.TeamService;
-import sg.ncl.service.team.domain.TeamStatus;
-import sg.ncl.service.team.domain.TeamVisibility;
+import sg.ncl.service.analytics.domain.AnalyticsService;
+import sg.ncl.service.analytics.web.AnalyticsController;
+import sg.ncl.service.team.data.jpa.TeamQuotaEntity;
+import sg.ncl.service.team.domain.*;
 import sg.ncl.service.team.exceptions.TeamNotFoundException;
+import sg.ncl.service.team.exceptions.TeamQuotaOutOfRangeException;
 
 import javax.inject.Inject;
+import java.math.BigDecimal;
+import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import static java.time.temporal.TemporalAdjusters.lastDayOfMonth;
 import static sg.ncl.common.validation.Validator.checkClaimsType;
 import static sg.ncl.service.team.validations.Validator.isAdmin;
 import static sg.ncl.service.team.web.TeamsController.PATH;
 
 /**
- * @author Christopher Zhong
+ * @author Christopher Zhong, Tran Ly Vu
  */
 @RestController
 @RequestMapping(path = PATH, produces = MediaType.APPLICATION_JSON_VALUE)
@@ -34,10 +38,13 @@ public class TeamsController {
     static final String PATH = "/teams";
 
     private final TeamService teamService;
+    private final AnalyticsService analyticsService;
 
     @Inject
-    TeamsController(final TeamService teamService) {
+    TeamsController(final TeamService teamService,
+                    final AnalyticsService analyticsService) {
         this.teamService = teamService;
+        this.analyticsService = analyticsService;
     }
 
     @GetMapping
@@ -88,6 +95,39 @@ public class TeamsController {
         return new TeamInfo(team);
     }
 
+    @GetMapping(path = "/{teamId}/quota")
+    @ResponseStatus(HttpStatus.OK)
+    public TeamQuota getTeamQuotaByTeamId(@PathVariable final String teamId) {
+        if (SecurityContextHolder.getContext().getAuthentication() == null) {
+            // throw forbidden
+            log.warn("Access denied for: /teams/{}/quota GET", teamId);
+            throw new ForbiddenException();
+        }
+
+        //check if team exists
+        Team team = teamService.getTeamById(teamId);
+        if (team == null) {
+            throw new TeamNotFoundException(teamId);
+        }
+
+        // applicationDate and processedDate are not different here
+        ZonedDateTime startDate = team.getApplicationDate();
+        ZonedDateTime endDate = ZonedDateTime.now();
+
+        String usage = analyticsService.getUsageStatistics(teamId, startDate, endDate);
+        TeamQuota teamQuota = teamService.getTeamQuotaByTeamId(teamId);
+
+        if (teamQuota == null) {
+            TeamQuotaEntity teamQuotaEntity = new TeamQuotaEntity();
+            teamQuotaEntity.setTeamId(teamId);
+            teamQuotaEntity.setQuota(null);
+            teamQuotaEntity.setId(null);
+            return new TeamQuotaInfo(teamQuotaEntity, usage);
+        }
+
+        return new TeamQuotaInfo(teamQuota, usage);
+    }
+
     @PutMapping(path = "/{id}")
     @ResponseStatus(HttpStatus.OK)
     public Team updateTeam(@PathVariable final String id, @RequestBody final TeamInfo team) {
@@ -96,6 +136,35 @@ public class TeamsController {
             throw new ForbiddenException();
         }
         return new TeamInfo(teamService.updateTeam(id, team));
+    }
+
+    @PutMapping(path = "/{teamId}/quota")
+    @ResponseStatus(HttpStatus.OK)
+    public TeamQuota updateTeamQuota(@PathVariable final String teamId, @RequestBody final TeamQuotaInfo teamQuotaInfo){
+        if (SecurityContextHolder.getContext().getAuthentication() == null) {
+            log.warn("Access denied for: /teams/{} PUT", teamId);
+            throw new ForbiddenException();
+        }
+
+        //check if budget is negative or exceed limit
+        if (teamQuotaInfo.getQuota().compareTo(BigDecimal.valueOf(0)) == -1 ||
+                teamQuotaInfo.getQuota().compareTo(BigDecimal.valueOf(99999999.99)) == 1) {
+            throw new TeamQuotaOutOfRangeException(teamId);
+        }
+
+        //check if team exists
+        Team team = teamService.getTeamById(teamId);
+        if (team == null) {
+            throw new TeamNotFoundException(teamId);
+        }
+
+        ZonedDateTime startDate = team.getApplicationDate();
+        ZonedDateTime endDate = ZonedDateTime.now();
+        String usage = analyticsService.getUsageStatistics(teamId, startDate, endDate);
+
+        TeamQuota teamQuota = new TeamQuotaInfo(teamService.updateTeamQuota(teamId, teamQuotaInfo), usage);
+
+        return teamQuota;
     }
 
     // for admin to update team status
