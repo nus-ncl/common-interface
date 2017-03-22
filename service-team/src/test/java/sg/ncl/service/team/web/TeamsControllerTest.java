@@ -25,10 +25,14 @@ import sg.ncl.common.exception.base.UnauthorizedException;
 import sg.ncl.common.jwt.JwtToken;
 import sg.ncl.service.analytics.domain.AnalyticsService;
 import sg.ncl.service.team.data.jpa.TeamEntity;
+import sg.ncl.service.team.data.jpa.TeamQuotaEntity;
 import sg.ncl.service.team.domain.*;
+import sg.ncl.service.team.exceptions.TeamNotFoundException;
+import sg.ncl.service.team.exceptions.TeamQuotaOutOfRangeException;
 
 import javax.inject.Inject;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -46,9 +50,10 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static sg.ncl.service.team.util.TestUtil.getTeamEntityWithId;
 import static sg.ncl.service.team.util.TestUtil.getTeamMemberInfo;
+import static sg.ncl.service.team.util.TestUtil.getTeamQuotaEntity;
 
 /**
- * Created by dcsyeoty on 29-Dec-16.
+ * @Author dcsyeoty, Tran Ly Vu
  */
 @RunWith(SpringRunner.class)
 @WebMvcTest(controllers = TeamsController.class, secure = true)
@@ -301,7 +306,92 @@ public class TeamsControllerTest {
                 .andExpect(jsonPath("$.privacy", is(equalTo(teamInfo.getPrivacy().name()))))
                 .andExpect(jsonPath("$.status", is(equalTo(teamInfo.getStatus().name()))));
     }
+    @Test
+    public void testUpdateTeamQuotaForbiddenException() throws Exception{
+        final String randomUsage = RandomStringUtils.randomNumeric(10);
+        TeamQuotaInfo teamQuotaInfo = new TeamQuotaInfo(getTeamQuotaEntity(),randomUsage);
+        final byte[] content = mapper.writeValueAsBytes(teamQuotaInfo);
 
+        when(securityContext.getAuthentication()).thenReturn(null);
+
+        mockMvc.perform(put(TeamsController.PATH + "/teamId/quota").contentType(MediaType.APPLICATION_JSON).content(content))
+                .andExpect(status().isForbidden());
+    }
+
+
+    @Test
+    public void testUpdateTeamQuotaTeamQuotaOutOfRangeException1() throws Exception {
+        final String randomUsage = RandomStringUtils.randomNumeric(10);
+        TeamQuotaEntity teamQuotaEntity = getTeamQuotaEntity();
+        teamQuotaEntity.setQuota(BigDecimal.valueOf(0));
+        TeamQuotaInfo teamQuotaInfo = new TeamQuotaInfo(getTeamQuotaEntity(),randomUsage);
+        final byte[] content = mapper.writeValueAsBytes(teamQuotaInfo);
+
+        when(securityContext.getAuthentication()).thenReturn(authentication);
+
+
+        try {
+            mockMvc.perform(put(TeamsController.PATH + "/teamId/quota").contentType(MediaType.APPLICATION_JSON).content(content));
+        } catch (Exception e) {
+            assertThat(e.getCause().getClass()).isEqualTo(TeamQuotaOutOfRangeException.class);
+        }
+    }
+
+    @Test
+    public void testUpdateTeamQuotaTeamQuotaOutOfRangeException2() throws Exception {
+        final String randomUsage = RandomStringUtils.randomNumeric(10);
+        TeamQuotaEntity teamQuotaEntity = getTeamQuotaEntity();
+
+        teamQuotaEntity.setQuota(BigDecimal.valueOf(100000000));
+        TeamQuotaInfo teamQuotaInfo = new TeamQuotaInfo(getTeamQuotaEntity(),randomUsage);
+        final byte[] content = mapper.writeValueAsBytes(teamQuotaInfo);
+
+        when(securityContext.getAuthentication()).thenReturn(authentication);
+
+
+        try {
+            mockMvc.perform(put(TeamsController.PATH + "/teamId/quota" ).contentType(MediaType.APPLICATION_JSON).content(content));
+        } catch (Exception e) {
+            assertThat(e.getCause().getClass()).isEqualTo(TeamQuotaOutOfRangeException.class);
+        }
+    }
+
+    @Test
+    public void testUpdateTeamQuotaTeamNotFoundException() throws Exception {
+        final String randomUsage = RandomStringUtils.randomNumeric(10);
+        TeamQuotaInfo teamQuotaInfo = new TeamQuotaInfo(getTeamQuotaEntity(),randomUsage);
+        final byte[] content = mapper.writeValueAsBytes(teamQuotaInfo);
+
+        final String randomTeamId =  RandomStringUtils.randomNumeric(10);
+        when(securityContext.getAuthentication()).thenReturn(authentication);
+        when(teamService.getTeamById(randomTeamId)).thenReturn(null);
+
+        try {
+            mockMvc.perform(put(TeamsController.PATH + "/teamId/quota").contentType(MediaType.APPLICATION_JSON).content(content));
+        } catch (Exception e) {
+            assertThat(e.getCause().getClass()).isEqualTo(TeamNotFoundException.class);
+        }
+    }
+
+    /*
+    @Test
+    public void testUpdateTeamQuota() throws Exception {
+        final String randomUsage = RandomStringUtils.randomNumeric(10);
+        final TeamQuotaEntity teamQuotaEntity = getTeamQuotaEntity();
+        final TeamQuotaInfo teamQuotaInfo = new TeamQuotaInfo(teamQuotaEntity,randomUsage);
+        final byte[] content = mapper.writeValueAsBytes(teamQuotaInfo);
+
+        Team team = getTeamEntityWithId();
+        when(securityContext.getAuthentication()).thenReturn(authentication);
+        when(teamService.getTeamById(anyString())).thenReturn(team);
+        when(analyticsService.getUsageStatistics(anyString(), any(ZonedDateTime.class), any(ZonedDateTime.class))).thenReturn(randomUsage);
+        when(teamService.updateTeamQuota(anyString(), any(TeamQuota.class))).thenReturn(teamQuotaEntity);
+
+        mockMvc.perform(put(TeamsController.PATH + "/teamId/quota").contentType(MediaType.APPLICATION_JSON).content(content))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id", is(equalTo(teamQuotaInfo.getId()))));
+    }
+    */
     @Test
     public void testUpdateTeamStatusUnauthorizedException() throws Exception {
         when(securityContext.getAuthentication()).thenReturn(null);
