@@ -330,7 +330,6 @@ public class TeamServiceImpl implements TeamService {
 
         log.info("Updating team quota: team to update {}, quota {}", teamId, teamQuota);
         teamQuotaEntity.setQuota(teamQuota.getQuota());
-
         final TeamQuota updatedTeamQuota = teamQuotaRepository.save(teamQuotaEntity);
         log.info("Team quota updated: {}",  updatedTeamQuota);
 
