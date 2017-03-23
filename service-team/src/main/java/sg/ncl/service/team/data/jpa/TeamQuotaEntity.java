@@ -5,7 +5,11 @@ import lombok.Setter;
 import sg.ncl.common.jpa.AbstractEntity;
 import sg.ncl.service.team.domain.TeamQuota;
 
-import javax.persistence.*;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.Id;
+import javax.persistence.Table;
+import javax.persistence.GeneratedValue;
 import java.math.BigDecimal;
 
 /**
@@ -14,7 +18,7 @@ import java.math.BigDecimal;
 @Getter
 @Setter
 @Entity
-@Table(name = "team_quotas", schema = "prod")
+@Table(name = "team_quotas")
 public class TeamQuotaEntity extends AbstractEntity implements TeamQuota {
 
     @Id
@@ -27,4 +31,13 @@ public class TeamQuotaEntity extends AbstractEntity implements TeamQuota {
 
     @Column(name = "quota", nullable = true)
     private BigDecimal quota;
+
+    @Override
+    public String toString() {
+        return "TeamQuotaEntity{" +
+                "id='" + id + '\'' +
+                ", teamId='" + teamId + '\'' +
+                ", quota='" + quota + '\'' +
+                "} " + super.toString();
+    }
 }

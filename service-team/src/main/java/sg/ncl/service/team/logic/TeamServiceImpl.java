@@ -328,10 +328,10 @@ public class TeamServiceImpl implements TeamService {
             teamQuotaEntity.setTeamId(teamId);
         }
 
-        log.info("Updating team quota: team to update {}, quota {}", teamId, teamQuota);
+        log.info("Updating team quota: team to be update {}, team quota to be updated {}", teamId, teamQuotaEntity);
         teamQuotaEntity.setQuota(teamQuota.getQuota());
         final TeamQuota updatedTeamQuota = teamQuotaRepository.save(teamQuotaEntity);
-        log.info("Team quota updated: {}",  updatedTeamQuota);
+        log.info("Team quota has been updated: {}",  updatedTeamQuota);
 
         return updatedTeamQuota;
     }

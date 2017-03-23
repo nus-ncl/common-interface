@@ -13,6 +13,7 @@ import sg.ncl.service.analytics.domain.AnalyticsService;
 import sg.ncl.service.team.data.jpa.TeamQuotaEntity;
 import sg.ncl.service.team.domain.*;
 import sg.ncl.service.team.exceptions.TeamNotFoundException;
+import sg.ncl.service.team.exceptions.TeamOwnerException;
 import sg.ncl.service.team.exceptions.TeamQuotaOutOfRangeException;
 
 import javax.inject.Inject;
@@ -138,10 +139,13 @@ public class TeamsController {
 
     @PutMapping(path = "/{teamId}/quota")
     @ResponseStatus(HttpStatus.OK)
-    public TeamQuota updateTeamQuota(@PathVariable final String teamId, @RequestBody final TeamQuotaInfo teamQuotaInfo){
-        if (SecurityContextHolder.getContext().getAuthentication() == null) {
-            log.warn("Access denied for: /teams/{} PUT", teamId);
-            throw new ForbiddenException();
+    public TeamQuota updateTeamQuota(@AuthenticationPrincipal final Object claims, @PathVariable final String teamId, @RequestBody final TeamQuotaInfo teamQuotaInfo){
+        checkClaimsType(claims);
+        String userId = ((Claims) claims).getSubject();
+        log.info(userId);
+        if (!teamService.isOwner(teamId, userId)) {
+            log.warn("Access denied for {} : /teams/{}/quota PUT", userId, teamId);
+            throw new TeamOwnerException(userId);
         }
 
         //check if budget is negative or exceed limit

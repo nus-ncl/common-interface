@@ -14,4 +14,5 @@ public interface TeamQuota {
 
     BigDecimal getQuota();
 
+    String toString();
 }
