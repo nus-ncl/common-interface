@@ -14,10 +14,14 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import sg.ncl.service.realization.domain.Realization;
 import sg.ncl.service.realization.domain.RealizationService;
+import sg.ncl.service.realization.exceptions.InsufficientQuotaException;
+import sg.ncl.service.team.domain.Team;
+import sg.ncl.service.team.domain.TeamService;
 
 import javax.inject.Inject;
 import javax.validation.constraints.NotNull;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -34,10 +38,12 @@ public class RealizationsController {
     static final String PATH = "/realizations";
 
     private final RealizationService realizationService;
+    private final TeamService teamService;
 
     @Inject
-    RealizationsController(@NotNull final RealizationService realizationService) {
+    RealizationsController(@NotNull final RealizationService realizationService, final TeamService teamService) {
         this.realizationService = realizationService;
+        this.teamService = teamService;
     }
 
     @GetMapping
@@ -69,6 +75,17 @@ public class RealizationsController {
     @ResponseStatus(HttpStatus.ACCEPTED)
     public Realization startExperiment(@PathVariable String teamName, @PathVariable String expId, @AuthenticationPrincipal Object claims) {
         checkClaimsType(claims);
+
+        Team team = teamService.getTeamByName(teamName);
+        String teamId = team.getId();
+        TeamQuota  teamQuota = teamService.getTeamQuotaByTeamId(teamId);
+        BigDecimal usageInBD = BigDecimal.valueOf(teamQuota.getUsage());
+        amountUsed = amountUsed.multiply(new BigDecimal(0.12));
+        if (teamName.getQuota().compareTo(amountUsed) <= 0) {
+            log.warn("Insufficient quata to start experiment for {}", teamName);
+            throw new InsufficientQuotaException(teamName);
+        }
+
         return realizationService.startExperimentInDeter(teamName, expId, (Claims) claims);
     }
 
