@@ -142,7 +142,7 @@ public class TeamsController {
     public TeamQuota updateTeamQuota(@AuthenticationPrincipal final Object claims, @PathVariable final String teamId, @RequestBody final TeamQuotaInfo teamQuotaInfo){
         checkClaimsType(claims);
         String userId = ((Claims) claims).getSubject();
-        log.info(userId);
+
         if (!teamService.isOwner(teamId, userId)) {
             log.warn("Access denied for {} : /teams/{}/quota PUT", userId, teamId);
             throw new TeamOwnerException(userId);
