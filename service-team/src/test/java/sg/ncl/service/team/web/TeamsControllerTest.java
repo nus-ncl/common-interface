@@ -379,7 +379,6 @@ public class TeamsControllerTest {
 
         mockMvc.perform(put(TeamsController.PATH + "/teamId/quota").contentType(MediaType.APPLICATION_JSON).content(content))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.id", is(equalTo(teamQuotaInfo.getId()))))
                 .andExpect(jsonPath("$.teamId", is(equalTo(teamQuotaInfo.getTeamId()))))
                 .andExpect(jsonPath("$.quota", is(equalTo(teamQuotaInfo.getQuota().intValue()))));
     }
