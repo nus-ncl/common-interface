@@ -4,8 +4,6 @@ import lombok.Getter;
 import lombok.Setter;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
-import java.net.URI;
-
 import static sg.ncl.adapter.deterlab.ConnectionProperties.PREFIX;
 
 /**
