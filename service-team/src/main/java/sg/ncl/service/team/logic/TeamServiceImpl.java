@@ -322,7 +322,7 @@ public class TeamServiceImpl implements TeamService {
         //check if team exists
         Team team = teamRepository.findOne(teamId);
         if (team == null) {
-            log.warn("Update team quota error: team {} not found", teamId);
+            log.warn("Get team quota error: team {} not found", teamId);
             throw new TeamNotFoundException(teamId);
         }
 
