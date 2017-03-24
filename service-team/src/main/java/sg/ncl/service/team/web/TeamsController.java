@@ -10,7 +10,6 @@ import org.springframework.web.bind.annotation.*;
 import sg.ncl.common.exception.base.ForbiddenException;
 import sg.ncl.common.exception.base.UnauthorizedException;
 import sg.ncl.service.analytics.domain.AnalyticsService;
-import sg.ncl.service.team.data.jpa.TeamRepository;
 import sg.ncl.service.team.domain.*;
 import sg.ncl.service.team.exceptions.TeamNotFoundException;
 
@@ -35,15 +34,12 @@ public class TeamsController {
 
     private final TeamService teamService;
     private final AnalyticsService analyticsService;
-    private final TeamRepository teamRepository;
 
     @Inject
     TeamsController(final TeamService teamService,
-                    final AnalyticsService analyticsService,
-                    final TeamRepository teamRepository) {
+                    final AnalyticsService analyticsService) {
         this.teamService = teamService;
         this.analyticsService = analyticsService;
-        this.teamRepository = teamRepository;
     }
 
     @GetMapping
@@ -99,7 +95,7 @@ public class TeamsController {
     public TeamQuota getTeamQuotaByTeamId(@PathVariable final String teamId) {
         TeamQuota teamQuota = teamService.getTeamQuotaByTeamId(teamId);
 
-        Team team = teamRepository.findOne(teamId);
+        Team team = teamService.getTeamById(teamId);
         ZonedDateTime startDate = team.getApplicationDate();
         ZonedDateTime endDate = ZonedDateTime.now();
         String usage = analyticsService.getUsageStatistics(teamId, startDate, endDate);
@@ -129,7 +125,7 @@ public class TeamsController {
 
         TeamQuota teamQuota = teamService.updateTeamQuota(teamId, teamQuotaInfo);
 
-        Team team = teamRepository.findOne(teamId);
+        Team team = teamService.getTeamById(teamId);
         ZonedDateTime startDate = team.getApplicationDate();
         ZonedDateTime endDate = ZonedDateTime.now();
         String usage = analyticsService.getUsageStatistics(teamId, startDate, endDate);

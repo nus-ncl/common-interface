@@ -80,8 +80,6 @@ public class TeamsControllerTest {
     @MockBean
     private AnalyticsService analyticsService;
 
-    @MockBean
-    private TeamRepository teamRepository;
 
     @Before
     public void before() {
@@ -90,7 +88,6 @@ public class TeamsControllerTest {
         assertThat(mockingDetails(authentication).isMock()).isTrue();
         assertThat(mockingDetails(teamService).isMock()).isTrue();
         assertThat(mockingDetails(analyticsService).isMock()).isTrue();
-        assertThat(mockingDetails(teamRepository).isMock()).isTrue();
 
         when(securityContext.getAuthentication()).thenReturn(authentication);
         SecurityContextHolder.setContext(securityContext);
@@ -316,7 +313,7 @@ public class TeamsControllerTest {
 
         TeamEntity team = getTeamEntityWithId();
         when(teamService.getTeamQuotaByTeamId(anyString())).thenReturn(teamQuota);
-        when(teamRepository.findOne(anyString())).thenReturn(team);
+        when(teamService.getTeamById(anyString())).thenReturn(team);
         when(analyticsService.getUsageStatistics(anyString(), any(ZonedDateTime.class), any(ZonedDateTime.class))).thenReturn(randomUsage);
 
         mockMvc.perform(get(TeamsController.PATH + "/teamId/quota").contentType(MediaType.APPLICATION_JSON).content(content))
@@ -365,7 +362,7 @@ public class TeamsControllerTest {
         TeamEntity team = getTeamEntityWithId();
         when(teamService.isOwner(anyString(),anyString())).thenReturn(true);
         when(teamService.updateTeamQuota(anyString(), any(TeamQuota.class))).thenReturn(teamQuotaEntity);
-        when(teamRepository.findOne(anyString())).thenReturn(team);
+        when(teamService.getTeamById(anyString())).thenReturn(team);
         when(analyticsService.getUsageStatistics(anyString(), any(ZonedDateTime.class), any(ZonedDateTime.class))).thenReturn(randomUsage);
         try {
             mockMvc.perform(put(TeamsController.PATH + "/teamId/quota").contentType(MediaType.APPLICATION_JSON).content(content));
@@ -383,8 +380,8 @@ public class TeamsControllerTest {
         final byte[] content = mapper.writeValueAsBytes(teamQuotaInfo);
 
         TeamEntity team = getTeamEntityWithId();
-        when(teamService.isOwner(anyString(),anyString())).thenReturn(true);
-        when(teamRepository.findOne(anyString())).thenReturn(team);
+        when(teamService.updateTeamQuota(anyString(), any(TeamQuota.class))).thenReturn(teamQuotaEntity);
+        when(teamService.updateTeamQuota(anyString(), any(TeamQuota.class))).thenReturn(teamQuotaEntity);
         when(analyticsService.getUsageStatistics(anyString(), any(ZonedDateTime.class), any(ZonedDateTime.class))).thenReturn(randomUsage);
         when(teamService.updateTeamQuota(anyString(), any(TeamQuota.class))).thenReturn(teamQuotaEntity);
         try {
@@ -404,7 +401,7 @@ public class TeamsControllerTest {
         TeamEntity team = getTeamEntityWithId();
         when(teamService.isOwner(anyString(),anyString())).thenReturn(true);
         when(teamService.getTeamById(anyString())).thenReturn(team);
-        when(teamRepository.findOne(anyString())).thenReturn(team);
+        when(teamService.updateTeamQuota(anyString(), any(TeamQuota.class))).thenReturn(teamQuotaEntity);
         when(analyticsService.getUsageStatistics(anyString(), any(ZonedDateTime.class), any(ZonedDateTime.class))).thenReturn(randomUsage);
         when(teamService.updateTeamQuota(anyString(), any(TeamQuota.class))).thenReturn(teamQuotaEntity);
 
