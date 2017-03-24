@@ -21,6 +21,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 import sg.ncl.common.authentication.Role;
+import sg.ncl.common.exception.base.ForbiddenException;
 import sg.ncl.common.exception.base.UnauthorizedException;
 import sg.ncl.common.jwt.JwtToken;
 import sg.ncl.service.analytics.domain.AnalyticsService;
@@ -307,11 +308,31 @@ public class TeamsControllerTest {
     }
 
     @Test
-    public void testUpdateTeamQuotaTeamOwnerException() throws Exception{
+    public void testGetTeamQuotaByTeamId() throws Exception {
+        final String randomUsage = RandomStringUtils.randomNumeric(10);
+        TeamQuota teamQuota = getTeamQuotaEntity();
+        TeamQuotaInfo teamQuotaInfo = new TeamQuotaInfo(teamQuota,randomUsage);
+        final byte[] content = mapper.writeValueAsBytes(teamQuotaInfo);
+
+        TeamEntity team = getTeamEntityWithId();
+        when(teamService.getTeamQuotaByTeamId(anyString())).thenReturn(teamQuota);
+        when(teamRepository.findOne(anyString())).thenReturn(team);
+        when(analyticsService.getUsageStatistics(anyString(), any(ZonedDateTime.class), any(ZonedDateTime.class))).thenReturn(randomUsage);
+
+        mockMvc.perform(get(TeamsController.PATH + "/teamId/quota").contentType(MediaType.APPLICATION_JSON).content(content))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id", is(equalTo(teamQuotaInfo.getId()))))
+                .andExpect(jsonPath("$.teamId", is(equalTo(teamQuotaInfo.getTeamId()))))
+                .andExpect(jsonPath("$.quota", is(equalTo(teamQuotaInfo.getQuota().intValue()))))
+                .andExpect(jsonPath("$.usage", is(equalTo(randomUsage))));
+    }
+
+    @Test
+    public void testUpdateTeamQuotaUnauthorizedException() throws Exception{
         final String randomUsage = RandomStringUtils.randomNumeric(10);
         TeamQuotaInfo teamQuotaInfo = new TeamQuotaInfo(getTeamQuotaEntity(),randomUsage);
         final byte[] content = mapper.writeValueAsBytes(teamQuotaInfo);
-        when(teamService.isOwner(anyString(),anyString())).thenReturn(false);
+
         try {
             mockMvc.perform(put(TeamsController.PATH + "/teamId/quota").contentType(MediaType.APPLICATION_JSON).content(content));
         } catch (Exception e) {
@@ -319,15 +340,34 @@ public class TeamsControllerTest {
         }
     }
 
+
     @Test
-    public void testUpdateTeamQuotaTeamQuotaOutOfRangeException1() throws Exception {
+    public void testUpdateTeamQuotaForbiddenException() throws Exception {
+        final String randomUsage = RandomStringUtils.randomNumeric(10);
+        TeamQuotaInfo teamQuotaInfo = new TeamQuotaInfo(getTeamQuotaEntity(),randomUsage);
+        final byte[] content = mapper.writeValueAsBytes(teamQuotaInfo);
+
+        when(teamService.isOwner(anyString(),anyString())).thenReturn(false);
+        try {
+            mockMvc.perform(put(TeamsController.PATH + "/teamId/quota").contentType(MediaType.APPLICATION_JSON).content(content));
+        } catch (Exception e) {
+            assertThat(e.getCause().getClass()).isEqualTo(ForbiddenException.class);
+        }
+    }
+
+    @Test
+    public void testUpdateTeamQuotaTeamQuotaOutOfRangeExceptionException1() throws Exception {
         final String randomUsage = RandomStringUtils.randomNumeric(10);
         TeamQuotaEntity teamQuotaEntity = getTeamQuotaEntity();
         teamQuotaEntity.setQuota(BigDecimal.valueOf(0));
-        TeamQuotaInfo teamQuotaInfo = new TeamQuotaInfo(getTeamQuotaEntity(),randomUsage);
+        TeamQuotaInfo teamQuotaInfo = new TeamQuotaInfo(teamQuotaEntity,randomUsage);
         final byte[] content = mapper.writeValueAsBytes(teamQuotaInfo);
+
+        TeamEntity team = getTeamEntityWithId();
         when(teamService.isOwner(anyString(),anyString())).thenReturn(true);
-        when(analyticsService.getUsageStatistics(anyString(),any(ZonedDateTime.class), any(ZonedDateTime.class))).thenReturn()
+        when(teamService.updateTeamQuota(anyString(), any(TeamQuota.class))).thenReturn(teamQuotaEntity);
+        when(teamRepository.findOne(anyString())).thenReturn(team);
+        when(analyticsService.getUsageStatistics(anyString(), any(ZonedDateTime.class), any(ZonedDateTime.class))).thenReturn(randomUsage);
         try {
             mockMvc.perform(put(TeamsController.PATH + "/teamId/quota").contentType(MediaType.APPLICATION_JSON).content(content));
         } catch (Exception e) {
@@ -339,32 +379,19 @@ public class TeamsControllerTest {
     public void testUpdateTeamQuotaTeamQuotaOutOfRangeException2() throws Exception {
         final String randomUsage = RandomStringUtils.randomNumeric(10);
         TeamQuotaEntity teamQuotaEntity = getTeamQuotaEntity();
-
         teamQuotaEntity.setQuota(BigDecimal.valueOf(100000000));
         TeamQuotaInfo teamQuotaInfo = new TeamQuotaInfo(getTeamQuotaEntity(),randomUsage);
         final byte[] content = mapper.writeValueAsBytes(teamQuotaInfo);
+
+        TeamEntity team = getTeamEntityWithId();
         when(teamService.isOwner(anyString(),anyString())).thenReturn(true);
+        when(teamRepository.findOne(anyString())).thenReturn(team);
+        when(analyticsService.getUsageStatistics(anyString(), any(ZonedDateTime.class), any(ZonedDateTime.class))).thenReturn(randomUsage);
+        when(teamService.updateTeamQuota(anyString(), any(TeamQuota.class))).thenReturn(teamQuotaEntity);
         try {
             mockMvc.perform(put(TeamsController.PATH + "/teamId/quota" ).contentType(MediaType.APPLICATION_JSON).content(content));
         } catch (Exception e) {
             assertThat(e.getCause().getClass()).isEqualTo(TeamQuotaOutOfRangeException.class);
-        }
-    }
-
-    @Test
-    public void testUpdateTeamQuotaTeamNotFoundException() throws Exception {
-        final String randomUsage = RandomStringUtils.randomNumeric(10);
-        TeamQuotaInfo teamQuotaInfo = new TeamQuotaInfo(getTeamQuotaEntity(),randomUsage);
-        final byte[] content = mapper.writeValueAsBytes(teamQuotaInfo);
-
-        final String randomTeamId =  RandomStringUtils.randomNumeric(10);
-        when(teamService.isOwner(anyString(),anyString())).thenReturn(true);
-        when(teamService.getTeamById(randomTeamId)).thenReturn(null);
-
-        try {
-            mockMvc.perform(put(TeamsController.PATH + "/teamId/quota").contentType(MediaType.APPLICATION_JSON).content(content));
-        } catch (Exception e) {
-            assertThat(e.getCause().getClass()).isEqualTo(TeamNotFoundException.class);
         }
     }
 
@@ -375,14 +402,16 @@ public class TeamsControllerTest {
         final TeamQuotaInfo teamQuotaInfo = new TeamQuotaInfo(teamQuotaEntity,randomUsage);
         final byte[] content = mapper.writeValueAsBytes(teamQuotaInfo);
 
-        Team team = getTeamEntityWithId();
+        TeamEntity team = getTeamEntityWithId();
         when(teamService.isOwner(anyString(),anyString())).thenReturn(true);
         when(teamService.getTeamById(anyString())).thenReturn(team);
+        when(teamRepository.findOne(anyString())).thenReturn(team);
         when(analyticsService.getUsageStatistics(anyString(), any(ZonedDateTime.class), any(ZonedDateTime.class))).thenReturn(randomUsage);
         when(teamService.updateTeamQuota(anyString(), any(TeamQuota.class))).thenReturn(teamQuotaEntity);
 
         mockMvc.perform(put(TeamsController.PATH + "/teamId/quota").contentType(MediaType.APPLICATION_JSON).content(content))
                 .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id", is(equalTo(teamQuotaInfo.getId()))))
                 .andExpect(jsonPath("$.teamId", is(equalTo(teamQuotaInfo.getTeamId()))))
                 .andExpect(jsonPath("$.quota", is(equalTo(teamQuotaInfo.getQuota().intValue()))));
     }
