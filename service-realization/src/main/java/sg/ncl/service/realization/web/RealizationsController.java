@@ -76,16 +76,6 @@ public class RealizationsController {
     public Realization startExperiment(@PathVariable String teamName, @PathVariable String expId, @AuthenticationPrincipal Object claims) {
         checkClaimsType(claims);
 
-        Team team = teamService.getTeamByName(teamName);
-        String teamId = team.getId();
-        TeamQuota  teamQuota = teamService.getTeamQuotaByTeamId(teamId);
-        BigDecimal usageInBD = BigDecimal.valueOf(teamQuota.getUsage());
-        amountUsed = amountUsed.multiply(new BigDecimal(0.12));
-        if (teamName.getQuota().compareTo(amountUsed) <= 0) {
-            log.warn("Insufficient quata to start experiment for {}", teamName);
-            throw new InsufficientQuotaException(teamName);
-        }
-
         return realizationService.startExperimentInDeter(teamName, expId, (Claims) claims);
     }
 

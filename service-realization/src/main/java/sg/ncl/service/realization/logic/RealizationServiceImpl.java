@@ -11,9 +11,13 @@ import sg.ncl.service.realization.data.jpa.RealizationRepository;
 import sg.ncl.service.realization.domain.Realization;
 import sg.ncl.service.realization.domain.RealizationService;
 import sg.ncl.service.realization.domain.RealizationState;
+import sg.ncl.service.realization.exceptions.InsufficientQuotaException;
+import sg.ncl.service.team.domain.Team;
+import sg.ncl.service.team.domain.TeamService;
 
 import javax.inject.Inject;
 import javax.validation.constraints.NotNull;
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -26,11 +30,13 @@ public class RealizationServiceImpl implements RealizationService {
 
     private final RealizationRepository realizationRepository;
     private final AdapterDeterLab adapterDeterLab;
+    private final TeamService teamService;
 
     @Inject
-    RealizationServiceImpl(@NotNull final RealizationRepository realizationRepository, @NotNull final AdapterDeterLab adapterDeterLab) {
+    RealizationServiceImpl(@NotNull final RealizationRepository realizationRepository, @NotNull final AdapterDeterLab adapterDeterLab,  @NotNull final TeamService teamService) {
         this.realizationRepository = realizationRepository;
         this.adapterDeterLab = adapterDeterLab;
+        this.teamService = teamService;
     }
 
     @Override
@@ -155,6 +161,19 @@ public class RealizationServiceImpl implements RealizationService {
      */
     @Transactional
     public RealizationEntity startExperimentInDeter(final String teamName, final String expId, final Claims claims) {
+
+        //checking quota
+        Team team = teamService.getTeamByName(teamName);
+        String teamId = team.getId();
+        TeamQuota  teamQuota = teamService.getTeamQuotaByTeamId(teamId);
+        BigDecimal usageInBD = BigDecimal.valueOf(teamQuota.getUsage());
+        amountUsed = amountUsed.multiply(new BigDecimal(0.12));
+        if (teamName.getQuota().compareTo(amountUsed) <= 0) {
+            log.warn("Insufficient quata to start experiment for {}", teamName);
+            throw new InsufficientQuotaException(teamName);
+        }
+
+        //Starting experiment
         log.info("Starting experiment: {} for team: ", expId, teamName);
         RealizationEntity realizationEntityDb = realizationRepository.findByExperimentId(Long.parseLong(expId));
         String experimentName = realizationEntityDb.getExperimentName();
