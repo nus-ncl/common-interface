@@ -9,10 +9,11 @@ import sg.ncl.common.authentication.AuthenticationAutoConfiguration;
 import sg.ncl.common.exception.ExceptionAutoConfiguration;
 import sg.ncl.common.jpa.UseJpa;
 import sg.ncl.common.jwt.JwtAutoConfiguration;
+import sg.ncl.service.analytics.AnalyticsApplication;
 import sg.ncl.service.user.UserApplication;
 
 /**
- * @author Christopher Zhong
+ * @author Christopher Zhong, Tran Ly Vu
  */
 @SpringBootApplication
 @UseJpa
@@ -21,7 +22,8 @@ import sg.ncl.service.user.UserApplication;
         DeterLabAutoConfiguration.class,
         ExceptionAutoConfiguration.class,
         JwtAutoConfiguration.class,
-        UserApplication.class
+        UserApplication.class,
+        AnalyticsApplication.class
 })
 public class TeamApplication {
 

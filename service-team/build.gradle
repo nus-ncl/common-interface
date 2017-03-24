@@ -5,6 +5,7 @@ dependencies {
     compile project(':common')
     compile 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310'
     compile project(':service-user')
+    compile project(':service-analytics')
     // FIXME: jsr310 should not be needed
 
     runtime 'mysql:mysql-connector-java'

@@ -41,6 +41,7 @@ public class AnalyticsController {
 
     @Inject
     AnalyticsController(@NotNull final AnalyticsService analyticsService) {
+
         this.analyticsService = analyticsService;
     }
 

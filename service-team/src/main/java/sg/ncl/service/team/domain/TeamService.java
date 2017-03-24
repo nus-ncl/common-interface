@@ -3,7 +3,7 @@ package sg.ncl.service.team.domain;
 import java.util.List;
 
 /**
- * Created by Desmond/Te Ye
+ * @Author Desmond, Te Ye, Tran Ly Vu
  */
 public interface TeamService {
 
@@ -23,6 +23,8 @@ public interface TeamService {
 
     Team updateTeamStatus(String id, TeamStatus status);
 
+    TeamQuota updateTeamQuota(String teamId, TeamQuota teamQuota);
+
     Team addMember(String id, TeamMember teamMember);
 
     Team removeMember(String id, TeamMember teamMember);
@@ -34,5 +36,7 @@ public interface TeamService {
     String findTeamOwner(String teamId);
 
     TeamMember updateMemberStatus(String teamId, String userId, MemberStatus status);
+
+    TeamQuota getTeamQuotaByTeamId(String teamId);
 
 }

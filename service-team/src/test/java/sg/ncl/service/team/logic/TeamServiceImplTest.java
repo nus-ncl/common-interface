@@ -9,6 +9,8 @@ import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
 import sg.ncl.adapter.deterlab.AdapterDeterLab;
+import sg.ncl.service.team.data.jpa.TeamQuotaEntity;
+import sg.ncl.service.team.data.jpa.TeamQuotaRepository;
 import sg.ncl.service.team.util.TestUtil;
 import sg.ncl.service.team.data.jpa.TeamEntity;
 import sg.ncl.service.team.data.jpa.TeamRepository;
@@ -45,6 +47,8 @@ public class TeamServiceImplTest {
     private TeamRepository teamRepository;
     @Mock
     private UserService userService;
+    @Mock
+    private TeamQuotaRepository teamQuotaRepository;
 
     private TeamService teamService;
     private List<TeamMember> members = new ArrayList<>();
@@ -56,7 +60,8 @@ public class TeamServiceImplTest {
         assertThat(mockingDetails(adapterDeterLab).isMock()).isTrue();
         assertThat(mockingDetails(teamRepository).isMock()).isTrue();
         assertThat(mockingDetails(userService).isMock()).isTrue();
-        teamService = new TeamServiceImpl(adapterDeterLab, teamRepository, userService);
+        assertThat(mockingDetails(teamQuotaRepository).isMock()).isTrue();
+        teamService = new TeamServiceImpl(adapterDeterLab, teamRepository, userService, teamQuotaRepository);
     }
 
     @Test
