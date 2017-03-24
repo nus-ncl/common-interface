@@ -321,7 +321,6 @@ public class TeamsControllerTest {
 
         mockMvc.perform(get(TeamsController.PATH + "/teamId/quota").contentType(MediaType.APPLICATION_JSON).content(content))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.id", is(equalTo(teamQuotaInfo.getId()))))
                 .andExpect(jsonPath("$.teamId", is(equalTo(teamQuotaInfo.getTeamId()))))
                 .andExpect(jsonPath("$.quota", is(equalTo(teamQuotaInfo.getQuota().intValue()))))
                 .andExpect(jsonPath("$.usage", is(equalTo(randomUsage))));
@@ -411,7 +410,6 @@ public class TeamsControllerTest {
 
         mockMvc.perform(put(TeamsController.PATH + "/teamId/quota").contentType(MediaType.APPLICATION_JSON).content(content))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.id", is(equalTo(teamQuotaInfo.getId()))))
                 .andExpect(jsonPath("$.teamId", is(equalTo(teamQuotaInfo.getTeamId()))))
                 .andExpect(jsonPath("$.quota", is(equalTo(teamQuotaInfo.getQuota().intValue()))));
     }
