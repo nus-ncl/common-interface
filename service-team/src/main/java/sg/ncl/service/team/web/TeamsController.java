@@ -7,7 +7,6 @@ import org.springframework.http.MediaType;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
-import sg.ncl.common.exception.base.BadRequestException;
 import sg.ncl.common.exception.base.ForbiddenException;
 import sg.ncl.common.exception.base.UnauthorizedException;
 import sg.ncl.service.analytics.domain.AnalyticsService;
@@ -36,7 +35,7 @@ public class TeamsController {
 
     private final TeamService teamService;
     private final AnalyticsService analyticsService;
-    private final TeamRepository teamRepository ;
+    private final TeamRepository teamRepository;
 
     @Inject
     TeamsController(final TeamService teamService,
@@ -98,12 +97,6 @@ public class TeamsController {
     @GetMapping(path = "/{teamId}/quota")
     @ResponseStatus(HttpStatus.OK)
     public TeamQuota getTeamQuotaByTeamId(@PathVariable final String teamId) {
-        if (SecurityContextHolder.getContext().getAuthentication() == null) {
-            // throw forbidden
-            log.warn("Access denied for: /teams/{}/quota GET", teamId);
-            throw new ForbiddenException();
-        }
-
         TeamQuota teamQuota = teamService.getTeamQuotaByTeamId(teamId);
 
         Team team = teamRepository.findOne(teamId);
@@ -127,16 +120,11 @@ public class TeamsController {
     @PutMapping(path = "/{teamId}/quota")
     @ResponseStatus(HttpStatus.OK)
     public TeamQuota updateTeamQuota(@AuthenticationPrincipal final Object claims, @PathVariable final String teamId, @RequestBody final TeamQuotaInfo teamQuotaInfo){
-
-        if (SecurityContextHolder.getContext().getAuthentication() == null) {
-            log.warn("Access denied for: /teams/{}/quota PUT", teamId);
-            throw new ForbiddenException();
-        }
-
+        //check if team owner
         String userId = ((Claims) claims).getSubject();
         if (!teamService.isOwner(teamId, userId)) {
             log.warn("Access denied for {} : /teams/{}/quota PUT", userId, teamId);
-            throw new BadRequestException("Only Team owner can update team quota");
+            throw new ForbiddenException();
         }
 
         TeamQuota teamQuota = teamService.updateTeamQuota(teamId, teamQuotaInfo);

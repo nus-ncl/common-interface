@@ -26,6 +26,7 @@ import sg.ncl.common.jwt.JwtToken;
 import sg.ncl.service.analytics.domain.AnalyticsService;
 import sg.ncl.service.team.data.jpa.TeamEntity;
 import sg.ncl.service.team.data.jpa.TeamQuotaEntity;
+import sg.ncl.service.team.data.jpa.TeamRepository;
 import sg.ncl.service.team.domain.*;
 import sg.ncl.service.team.exceptions.TeamNotFoundException;
 import sg.ncl.service.team.exceptions.TeamQuotaOutOfRangeException;
@@ -78,6 +79,9 @@ public class TeamsControllerTest {
     @MockBean
     private AnalyticsService analyticsService;
 
+    @MockBean
+    private TeamRepository teamRepository;
+
     @Before
     public void before() {
         assertThat(mockingDetails(claims).isMock()).isTrue();
@@ -85,6 +89,7 @@ public class TeamsControllerTest {
         assertThat(mockingDetails(authentication).isMock()).isTrue();
         assertThat(mockingDetails(teamService).isMock()).isTrue();
         assertThat(mockingDetails(analyticsService).isMock()).isTrue();
+        assertThat(mockingDetails(teamRepository).isMock()).isTrue();
 
         when(securityContext.getAuthentication()).thenReturn(authentication);
         SecurityContextHolder.setContext(securityContext);
@@ -322,6 +327,7 @@ public class TeamsControllerTest {
         TeamQuotaInfo teamQuotaInfo = new TeamQuotaInfo(getTeamQuotaEntity(),randomUsage);
         final byte[] content = mapper.writeValueAsBytes(teamQuotaInfo);
         when(teamService.isOwner(anyString(),anyString())).thenReturn(true);
+        when(analyticsService.getUsageStatistics(anyString(),any(ZonedDateTime.class), any(ZonedDateTime.class))).thenReturn()
         try {
             mockMvc.perform(put(TeamsController.PATH + "/teamId/quota").contentType(MediaType.APPLICATION_JSON).content(content));
         } catch (Exception e) {
