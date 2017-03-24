@@ -6,6 +6,7 @@ import org.json.JSONObject;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import sg.ncl.adapter.deterlab.AdapterDeterLab;
+import sg.ncl.service.analytics.domain.AnalyticsService;
 import sg.ncl.service.realization.data.jpa.RealizationEntity;
 import sg.ncl.service.realization.data.jpa.RealizationRepository;
 import sg.ncl.service.realization.domain.Realization;
@@ -13,11 +14,14 @@ import sg.ncl.service.realization.domain.RealizationService;
 import sg.ncl.service.realization.domain.RealizationState;
 import sg.ncl.service.realization.exceptions.InsufficientQuotaException;
 import sg.ncl.service.team.domain.Team;
+import sg.ncl.service.team.domain.TeamQuota;
 import sg.ncl.service.team.domain.TeamService;
+import sg.ncl.service.team.web.TeamQuotaInfo;
 
 import javax.inject.Inject;
 import javax.validation.constraints.NotNull;
 import java.math.BigDecimal;
+import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -31,12 +35,14 @@ public class RealizationServiceImpl implements RealizationService {
     private final RealizationRepository realizationRepository;
     private final AdapterDeterLab adapterDeterLab;
     private final TeamService teamService;
+    private final AnalyticsService analyticsService;
 
     @Inject
-    RealizationServiceImpl(@NotNull final RealizationRepository realizationRepository, @NotNull final AdapterDeterLab adapterDeterLab,  @NotNull final TeamService teamService) {
+    RealizationServiceImpl(@NotNull final RealizationRepository realizationRepository, @NotNull final AdapterDeterLab adapterDeterLab,  @NotNull final TeamService teamService, @NotNull final AnalyticsService analyticsService) {
         this.realizationRepository = realizationRepository;
         this.adapterDeterLab = adapterDeterLab;
         this.teamService = teamService;
+        this.analyticsService = analyticsService;
     }
 
     @Override
@@ -163,18 +169,29 @@ public class RealizationServiceImpl implements RealizationService {
     public RealizationEntity startExperimentInDeter(final String teamName, final String expId, final Claims claims) {
 
         //checking quota
-        //Double charges =
         log.info("Starting getting team quota to start experiment for {}", teamName);
+
+        //getting team quota
         Team team = teamService.getTeamByName(teamName);
         String teamId = team.getId();
         TeamQuota teamQuota = teamService.getTeamQuotaByTeamId(teamId);
-        BigDecimal usageInBD = BigDecimal.valueOf(teamQuota.getUsage());
-        usageInBD = usageInBD.multiply(new BigDecimal(0.12));
-        BigDecimal quota = teamName.getQuota();
-        if (quota != null && quota.compareTo(usageInBD) <= 0) {
-            log.warn("Insufficient quata to start experiment for {}", teamName);
-            throw new InsufficientQuotaException(teamName);
+        BigDecimal quota = teamQuota.getQuota();
+
+        //getting usage
+        if (quota != null) {
+            ZonedDateTime startDate = team.getApplicationDate();
+            ZonedDateTime endDate = ZonedDateTime.now();
+            String usageinString = analyticsService.getUsageStatistics(teamId, startDate, endDate);
+            BigDecimal usageInBD = new BigDecimal(usageinString);
+            usageInBD = usageInBD.multiply(new BigDecimal(0.12));
+
+            //comparing quota and usage
+            if (quota.compareTo(usageInBD) <= 0) {
+                log.warn("Insufficient quata to start experiment for {}", teamName);
+                throw new InsufficientQuotaException(teamName);
+            }
         }
+
         log.info("Finish getting team quota to start experiment for {}", teamName);
 
         //Starting experiment
