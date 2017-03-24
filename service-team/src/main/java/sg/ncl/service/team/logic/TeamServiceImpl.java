@@ -1,5 +1,6 @@
 package sg.ncl.service.team.logic;
 
+
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -11,6 +12,7 @@ import sg.ncl.service.user.domain.UserService;
 
 import javax.inject.Inject;
 import javax.validation.constraints.NotNull;
+import java.math.BigDecimal;
 import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -311,7 +313,29 @@ public class TeamServiceImpl implements TeamService {
 
     @Override
     public TeamQuota getTeamQuotaByTeamId(@NotNull String teamId) {
-        return teamQuotaRepository.findByTeamId(teamId);
+
+        if (teamId == null || teamId.isEmpty()) {
+            log.warn("Update team quota error: team id is null or empty");
+            return null;
+        }
+
+        //check if team exists
+        Team team = teamRepository.findOne(teamId);
+        if (team == null) {
+            log.warn("Update team quota error: team {} not found", teamId);
+            throw new TeamNotFoundException(teamId);
+        }
+
+        TeamQuotaEntity teamQuotaEntity = teamQuotaRepository.findByTeamId(teamId);
+        if (teamQuotaEntity == null) {
+            teamQuotaEntity = new TeamQuotaEntity();
+            teamQuotaEntity.setTeamId(teamId);
+            teamQuotaEntity.setQuota(null);
+            teamQuotaEntity.setId(null);
+            return teamQuotaEntity;
+        }
+
+        return teamQuotaEntity;
     }
 
     @Override
@@ -320,6 +344,21 @@ public class TeamServiceImpl implements TeamService {
         if (teamId == null || teamId.isEmpty()) {
             log.warn("Update team quota error: team id is null or empty");
             return null;
+        }
+
+        //check if team exists
+        Team team = teamRepository.findOne(teamId);
+        if (team == null) {
+            log.warn("Update team quota error: team {} not found", teamId);
+            throw new TeamNotFoundException(teamId);
+        }
+
+        //check if budget is negative or exceed limit
+        if (teamQuota.getQuota() != null) {
+            if (teamQuota.getQuota().compareTo(BigDecimal.valueOf(0)) < 0 ||
+                    teamQuota.getQuota().compareTo(BigDecimal.valueOf(99999999.99)) > 0) {
+                throw new TeamQuotaOutOfRangeException(teamId);
+            }
         }
 
         TeamQuotaEntity teamQuotaEntity = teamQuotaRepository.findByTeamId(teamId);

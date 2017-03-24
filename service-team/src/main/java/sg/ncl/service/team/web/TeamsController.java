@@ -7,17 +7,15 @@ import org.springframework.http.MediaType;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
+import sg.ncl.common.exception.base.BadRequestException;
 import sg.ncl.common.exception.base.ForbiddenException;
 import sg.ncl.common.exception.base.UnauthorizedException;
 import sg.ncl.service.analytics.domain.AnalyticsService;
-import sg.ncl.service.team.data.jpa.TeamQuotaEntity;
+import sg.ncl.service.team.data.jpa.TeamRepository;
 import sg.ncl.service.team.domain.*;
 import sg.ncl.service.team.exceptions.TeamNotFoundException;
-import sg.ncl.service.team.exceptions.TeamOwnerException;
-import sg.ncl.service.team.exceptions.TeamQuotaOutOfRangeException;
 
 import javax.inject.Inject;
-import java.math.BigDecimal;
 import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -38,12 +36,15 @@ public class TeamsController {
 
     private final TeamService teamService;
     private final AnalyticsService analyticsService;
+    private final TeamRepository teamRepository ;
 
     @Inject
     TeamsController(final TeamService teamService,
-                    final AnalyticsService analyticsService) {
+                    final AnalyticsService analyticsService,
+                    final TeamRepository teamRepository) {
         this.teamService = teamService;
         this.analyticsService = analyticsService;
+        this.teamRepository = teamRepository;
     }
 
     @GetMapping
@@ -103,26 +104,12 @@ public class TeamsController {
             throw new ForbiddenException();
         }
 
-        //check if team exists
-        Team team = teamService.getTeamById(teamId);
-        if (team == null) {
-            throw new TeamNotFoundException(teamId);
-        }
-
-        // applicationDate and processedDate are not different here
-        ZonedDateTime startDate = team.getApplicationDate();
-        ZonedDateTime endDate = ZonedDateTime.now();
-
-        String usage = analyticsService.getUsageStatistics(teamId, startDate, endDate);
         TeamQuota teamQuota = teamService.getTeamQuotaByTeamId(teamId);
 
-        if (teamQuota == null) {
-            TeamQuotaEntity teamQuotaEntity = new TeamQuotaEntity();
-            teamQuotaEntity.setTeamId(teamId);
-            teamQuotaEntity.setQuota(null);
-            teamQuotaEntity.setId(null);
-            return new TeamQuotaInfo(teamQuotaEntity, usage);
-        }
+        Team team = teamRepository.findOne(teamId);
+        ZonedDateTime startDate = team.getApplicationDate();
+        ZonedDateTime endDate = ZonedDateTime.now();
+        String usage = analyticsService.getUsageStatistics(teamId, startDate, endDate);
 
         return new TeamQuotaInfo(teamQuota, usage);
     }
@@ -140,33 +127,26 @@ public class TeamsController {
     @PutMapping(path = "/{teamId}/quota")
     @ResponseStatus(HttpStatus.OK)
     public TeamQuota updateTeamQuota(@AuthenticationPrincipal final Object claims, @PathVariable final String teamId, @RequestBody final TeamQuotaInfo teamQuotaInfo){
-        checkClaimsType(claims);
-        String userId = ((Claims) claims).getSubject();
 
+        if (SecurityContextHolder.getContext().getAuthentication() == null) {
+            log.warn("Access denied for: /teams/{}/quota PUT", teamId);
+            throw new ForbiddenException();
+        }
+
+        String userId = ((Claims) claims).getSubject();
         if (!teamService.isOwner(teamId, userId)) {
             log.warn("Access denied for {} : /teams/{}/quota PUT", userId, teamId);
-            throw new TeamOwnerException(userId);
+            throw new BadRequestException("Only Team owner can update team quota");
         }
 
-        //check if budget is negative or exceed limit
-        if (teamQuotaInfo.getQuota() != null) {
-            if (teamQuotaInfo.getQuota().compareTo(BigDecimal.valueOf(0)) < 0 ||
-                    teamQuotaInfo.getQuota().compareTo(BigDecimal.valueOf(99999999.99)) > 0) {
-                throw new TeamQuotaOutOfRangeException(teamId);
-            }
-        }
+        TeamQuota teamQuota = teamService.updateTeamQuota(teamId, teamQuotaInfo);
 
-        //check if team exists
-        Team team = teamService.getTeamById(teamId);
-        if (team == null) {
-            throw new TeamNotFoundException(teamId);
-        }
-
+        Team team = teamRepository.findOne(teamId);
         ZonedDateTime startDate = team.getApplicationDate();
         ZonedDateTime endDate = ZonedDateTime.now();
         String usage = analyticsService.getUsageStatistics(teamId, startDate, endDate);
 
-        return new TeamQuotaInfo(teamService.updateTeamQuota(teamId, teamQuotaInfo), usage);
+        return new TeamQuotaInfo(teamQuota, usage);
     }
 
     // for admin to update team status

@@ -28,7 +28,6 @@ import sg.ncl.service.team.data.jpa.TeamEntity;
 import sg.ncl.service.team.data.jpa.TeamQuotaEntity;
 import sg.ncl.service.team.domain.*;
 import sg.ncl.service.team.exceptions.TeamNotFoundException;
-import sg.ncl.service.team.exceptions.TeamOwnerException;
 import sg.ncl.service.team.exceptions.TeamQuotaOutOfRangeException;
 
 import javax.inject.Inject;
@@ -45,7 +44,6 @@ import static org.mockito.Mockito.mockingDetails;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
-import static sg.ncl.common.validation.Validator.checkClaimsType;
 import static sg.ncl.service.team.util.TestUtil.*;
 
 /**
@@ -312,7 +310,7 @@ public class TeamsControllerTest {
         try {
             mockMvc.perform(put(TeamsController.PATH + "/teamId/quota").contentType(MediaType.APPLICATION_JSON).content(content));
         } catch (Exception e) {
-            assertThat(e.getCause().getClass()).isEqualTo(TeamOwnerException.class);
+            assertThat(e.getCause().getClass()).isEqualTo(UnauthorizedException.class);
         }
     }
 
