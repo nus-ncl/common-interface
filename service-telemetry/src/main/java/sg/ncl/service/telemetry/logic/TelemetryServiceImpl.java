@@ -34,11 +34,10 @@ public class TelemetryServiceImpl implements TelemetryService {
 
     /**
      * Retrieves the list of testbed nodes status, including node id, status, machine type.
-     * Status inlclude "up", "possibly down", "down", "unpingable".
-     * "up" - particular node is in use
-     * "down" - particular node is free to be allocated
-     * "possibly down" - particular node is currently being freed
-     * "unpingable" - particular node may be dead
+     * Status inlclude "free", "in_use", "reload"
+     * "free" - particular node free to be allocated
+     * "in_use" - particular node is currently used by a project
+     * "reload" - particular node is reloading or maybe dead
      * @return a json dump of the nodes status in the format { type : [ { id : A, status : B, type : C }, ... {} ]  }
      */
     @Override
