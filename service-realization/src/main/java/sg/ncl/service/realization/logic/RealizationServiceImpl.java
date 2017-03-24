@@ -163,15 +163,19 @@ public class RealizationServiceImpl implements RealizationService {
     public RealizationEntity startExperimentInDeter(final String teamName, final String expId, final Claims claims) {
 
         //checking quota
+        //Double charges =
+        log.info("Starting getting team quota to start experiment for {}", teamName);
         Team team = teamService.getTeamByName(teamName);
         String teamId = team.getId();
-        TeamQuota  teamQuota = teamService.getTeamQuotaByTeamId(teamId);
+        TeamQuota teamQuota = teamService.getTeamQuotaByTeamId(teamId);
         BigDecimal usageInBD = BigDecimal.valueOf(teamQuota.getUsage());
-        amountUsed = amountUsed.multiply(new BigDecimal(0.12));
-        if (teamName.getQuota().compareTo(amountUsed) <= 0) {
+        usageInBD = usageInBD.multiply(new BigDecimal(0.12));
+        BigDecimal quota = teamName.getQuota();
+        if (quota != null && quota.compareTo(usageInBD) <= 0) {
             log.warn("Insufficient quata to start experiment for {}", teamName);
             throw new InsufficientQuotaException(teamName);
         }
+        log.info("Finish getting team quota to start experiment for {}", teamName);
 
         //Starting experiment
         log.info("Starting experiment: {} for team: ", expId, teamName);
