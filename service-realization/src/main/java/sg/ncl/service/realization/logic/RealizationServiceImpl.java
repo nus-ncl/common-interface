@@ -3,10 +3,12 @@ package sg.ncl.service.realization.logic;
 import io.jsonwebtoken.Claims;
 import lombok.extern.slf4j.Slf4j;
 import org.json.JSONObject;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import sg.ncl.adapter.deterlab.AdapterDeterLab;
 import sg.ncl.service.analytics.domain.AnalyticsService;
+import sg.ncl.service.realization.RealizationAccountingProperties;
 import sg.ncl.service.realization.data.jpa.RealizationEntity;
 import sg.ncl.service.realization.data.jpa.RealizationRepository;
 import sg.ncl.service.realization.domain.Realization;
@@ -16,7 +18,6 @@ import sg.ncl.service.realization.exceptions.InsufficientQuotaException;
 import sg.ncl.service.team.domain.Team;
 import sg.ncl.service.team.domain.TeamQuota;
 import sg.ncl.service.team.domain.TeamService;
-import sg.ncl.service.team.web.TeamQuotaInfo;
 
 import javax.inject.Inject;
 import javax.validation.constraints.NotNull;
@@ -30,19 +31,22 @@ import java.util.stream.Collectors;
  */
 @Service
 @Slf4j
+@EnableConfigurationProperties(RealizationAccountingProperties.class)
 public class RealizationServiceImpl implements RealizationService {
 
     private final RealizationRepository realizationRepository;
     private final AdapterDeterLab adapterDeterLab;
     private final TeamService teamService;
     private final AnalyticsService analyticsService;
+    private final RealizationAccountingProperties realizationAccountingProperties;
 
     @Inject
-    RealizationServiceImpl(@NotNull final RealizationRepository realizationRepository, @NotNull final AdapterDeterLab adapterDeterLab,  @NotNull final TeamService teamService, @NotNull final AnalyticsService analyticsService) {
+    RealizationServiceImpl(@NotNull final RealizationRepository realizationRepository, @NotNull final AdapterDeterLab adapterDeterLab,  @NotNull final TeamService teamService, @NotNull final AnalyticsService analyticsService, @NotNull final RealizationAccountingProperties realizationAccountingProperties) {
         this.realizationRepository = realizationRepository;
         this.adapterDeterLab = adapterDeterLab;
         this.teamService = teamService;
         this.analyticsService = analyticsService;
+        this.realizationAccountingProperties = realizationAccountingProperties;
     }
 
     @Override
@@ -176,6 +180,8 @@ public class RealizationServiceImpl implements RealizationService {
         String teamId = team.getId();
         TeamQuota teamQuota = teamService.getTeamQuotaByTeamId(teamId);
         BigDecimal quota = teamQuota.getQuota();
+        log.info("charges in string is {}",realizationAccountingProperties.getCharges());
+        BigDecimal charges = new BigDecimal(realizationAccountingProperties.getCharges());
 
         //getting usage , if quota is null => unlimited quota
         if (quota != null) {
@@ -183,11 +189,11 @@ public class RealizationServiceImpl implements RealizationService {
             ZonedDateTime endDate = ZonedDateTime.now();
             String usageinString = analyticsService.getUsageStatistics(teamId, startDate, endDate);
             BigDecimal usageInBD = new BigDecimal(usageinString);
-            usageInBD = usageInBD.multiply(new BigDecimal(0.12));
+            usageInBD = usageInBD.multiply(charges);
 
             //comparing quota and usage
             if (quota.compareTo(usageInBD) <= 0) {
-                log.warn("Insufficient quota to start experiment for {}", teamName);
+                log.warn("Insufficient quota to start experiment for team {}", teamName);
                 throw new InsufficientQuotaException(teamName);
             }
         }

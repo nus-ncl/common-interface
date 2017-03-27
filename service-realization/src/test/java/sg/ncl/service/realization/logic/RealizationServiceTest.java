@@ -12,6 +12,7 @@ import org.mockito.junit.MockitoRule;
 import org.springframework.test.context.TestPropertySource;
 import sg.ncl.adapter.deterlab.AdapterDeterLab;
 import sg.ncl.service.analytics.domain.AnalyticsService;
+import sg.ncl.service.realization.RealizationAccountingProperties;
 import sg.ncl.service.realization.data.jpa.RealizationEntity;
 import sg.ncl.service.realization.data.jpa.RealizationRepository;
 import sg.ncl.service.realization.domain.Realization;
@@ -54,6 +55,8 @@ public class RealizationServiceTest {
     @Mock
     private AnalyticsService analyticsService;
     @Mock
+    private RealizationAccountingProperties realizationAccountingProperties;
+    @Mock
     private Claims claims;
 
     private RealizationService realizationService;
@@ -64,9 +67,10 @@ public class RealizationServiceTest {
         assertThat(mockingDetails(adapterDeterLab).isMock()).isTrue();
         assertThat(mockingDetails(teamService).isMock()).isTrue();
         assertThat(mockingDetails(analyticsService).isMock()).isTrue();
+        assertThat(mockingDetails(realizationAccountingProperties).isMock()).isTrue();
         assertThat(mockingDetails(claims).isMock()).isTrue();
 
-        realizationService = new RealizationServiceImpl(realizationRepository, adapterDeterLab, teamService, analyticsService);
+        realizationService = new RealizationServiceImpl(realizationRepository, adapterDeterLab, teamService, analyticsService, realizationAccountingProperties);
     }
 
     @Test
