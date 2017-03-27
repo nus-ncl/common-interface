@@ -14,14 +14,11 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import sg.ncl.service.realization.domain.Realization;
 import sg.ncl.service.realization.domain.RealizationService;
-import sg.ncl.service.realization.exceptions.InsufficientQuotaException;
-import sg.ncl.service.team.domain.Team;
 import sg.ncl.service.team.domain.TeamService;
 
 import javax.inject.Inject;
 import javax.validation.constraints.NotNull;
 
-import java.math.BigDecimal;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -38,12 +35,10 @@ public class RealizationsController {
     static final String PATH = "/realizations";
 
     private final RealizationService realizationService;
-    private final TeamService teamService;
 
     @Inject
-    RealizationsController(@NotNull final RealizationService realizationService, @NotNull final TeamService teamService) {
+    RealizationsController(@NotNull final RealizationService realizationService) {
         this.realizationService = realizationService;
-        this.teamService = teamService;
     }
 
     @GetMapping
