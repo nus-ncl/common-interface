@@ -1,6 +1,7 @@
 package sg.ncl.service.realization.logic;
 
 import io.jsonwebtoken.Claims;
+import org.apache.commons.lang3.RandomStringUtils;
 import org.json.JSONObject;
 import org.junit.Before;
 import org.junit.Rule;
@@ -9,6 +10,7 @@ import org.junit.rules.ExpectedException;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.test.context.TestPropertySource;
 import sg.ncl.adapter.deterlab.AdapterDeterLab;
 import sg.ncl.service.analytics.domain.AnalyticsService;
@@ -39,6 +41,7 @@ import static sg.ncl.service.realization.util.TestUtil.getTeamQuotaEntity;
  * Created by Desmond.
  */
 @TestPropertySource(properties = "flyway.enabled=false")
+@EnableConfigurationProperties(RealizationAccountingProperties.class)
 public class RealizationServiceTest {
 
     @Rule
@@ -180,6 +183,7 @@ public class RealizationServiceTest {
 
         when(teamService.getTeamByName(anyString())).thenReturn(team);
         when(teamService.getTeamQuotaByTeamId(anyString())).thenReturn(teamQuota);
+        when(realizationAccountingProperties.getCharges()).thenReturn("0.12");
         when(realizationRepository.findByExperimentId(anyLong())).thenReturn(entity);
         when(realizationRepository.save(any(RealizationEntity.class))).thenReturn(entity);
         when(adapterDeterLab.startExperiment(anyString(), anyString(), anyString())).thenReturn(predefinedResultJson.toString());

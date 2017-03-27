@@ -180,7 +180,6 @@ public class RealizationServiceImpl implements RealizationService {
         String teamId = team.getId();
         TeamQuota teamQuota = teamService.getTeamQuotaByTeamId(teamId);
         BigDecimal quota = teamQuota.getQuota();
-        log.info("charges in string is {}",realizationAccountingProperties.getCharges());
         BigDecimal charges = new BigDecimal(realizationAccountingProperties.getCharges());
 
         //getting usage , if quota is null => unlimited quota
