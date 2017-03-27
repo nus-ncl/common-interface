@@ -169,7 +169,7 @@ public class RealizationServiceImpl implements RealizationService {
     public RealizationEntity startExperimentInDeter(final String teamName, final String expId, final Claims claims) {
 
         //checking quota
-        log.info("Starting getting team quota to start experiment for {}", teamName);
+        log.info("Starting checking team quota to start experiment for {}", teamName);
 
         //getting team quota
         Team team = teamService.getTeamByName(teamName);
@@ -177,7 +177,7 @@ public class RealizationServiceImpl implements RealizationService {
         TeamQuota teamQuota = teamService.getTeamQuotaByTeamId(teamId);
         BigDecimal quota = teamQuota.getQuota();
 
-        //getting usage
+        //getting usage , if quota is null => unlimited quota
         if (quota != null) {
             ZonedDateTime startDate = team.getApplicationDate();
             ZonedDateTime endDate = ZonedDateTime.now();
@@ -187,12 +187,12 @@ public class RealizationServiceImpl implements RealizationService {
 
             //comparing quota and usage
             if (quota.compareTo(usageInBD) <= 0) {
-                log.warn("Insufficient quata to start experiment for {}", teamName);
+                log.warn("Insufficient quota to start experiment for {}", teamName);
                 throw new InsufficientQuotaException(teamName);
             }
         }
 
-        log.info("Finish getting team quota to start experiment for {}", teamName);
+        log.info("Finished checking team quota to start experiment for {}", teamName);
 
         //Starting experiment
         log.info("Starting experiment: {} for team: ", expId, teamName);

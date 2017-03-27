@@ -11,11 +11,15 @@ import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
 import org.springframework.test.context.TestPropertySource;
 import sg.ncl.adapter.deterlab.AdapterDeterLab;
+import sg.ncl.service.analytics.domain.AnalyticsService;
 import sg.ncl.service.realization.data.jpa.RealizationEntity;
 import sg.ncl.service.realization.data.jpa.RealizationRepository;
 import sg.ncl.service.realization.domain.Realization;
 import sg.ncl.service.realization.domain.RealizationService;
 import sg.ncl.service.realization.domain.RealizationState;
+import sg.ncl.service.team.domain.Team;
+import sg.ncl.service.team.domain.TeamQuota;
+import sg.ncl.service.team.domain.TeamService;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -27,6 +31,8 @@ import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.mockingDetails;
 import static org.mockito.Mockito.when;
 import static sg.ncl.service.realization.util.TestUtil.getRealizationEntity;
+import static sg.ncl.service.realization.util.TestUtil.getTeamEntityWithId;
+import static sg.ncl.service.realization.util.TestUtil.getTeamQuotaEntity;
 
 /**
  * Created by Desmond.
@@ -44,6 +50,10 @@ public class RealizationServiceTest {
     @Mock
     private AdapterDeterLab adapterDeterLab;
     @Mock
+    private TeamService teamService;
+    @Mock
+    private AnalyticsService analyticsService;
+    @Mock
     private Claims claims;
 
     private RealizationService realizationService;
@@ -52,9 +62,11 @@ public class RealizationServiceTest {
     public void before() throws Exception {
         assertThat(mockingDetails(realizationRepository).isMock()).isTrue();
         assertThat(mockingDetails(adapterDeterLab).isMock()).isTrue();
+        assertThat(mockingDetails(teamService).isMock()).isTrue();
+        assertThat(mockingDetails(analyticsService).isMock()).isTrue();
         assertThat(mockingDetails(claims).isMock()).isTrue();
 
-        realizationService = new RealizationServiceImpl(realizationRepository, adapterDeterLab);
+        realizationService = new RealizationServiceImpl(realizationRepository, adapterDeterLab, teamService, analyticsService);
     }
 
     @Test
@@ -159,7 +171,11 @@ public class RealizationServiceTest {
         predefinedResultJson.put("status", "active");
         predefinedResultJson.put("report", "");
         RealizationEntity entity = getRealizationEntity();
+        Team team =  getTeamEntityWithId();
+        TeamQuota teamQuota = getTeamQuotaEntity();
 
+        when(teamService.getTeamByName(anyString())).thenReturn(team);
+        when(teamService.getTeamQuotaByTeamId(anyString())).thenReturn(teamQuota);
         when(realizationRepository.findByExperimentId(anyLong())).thenReturn(entity);
         when(realizationRepository.save(any(RealizationEntity.class))).thenReturn(entity);
         when(adapterDeterLab.startExperiment(anyString(), anyString(), anyString())).thenReturn(predefinedResultJson.toString());

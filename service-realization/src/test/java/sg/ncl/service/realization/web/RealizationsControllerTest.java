@@ -25,6 +25,7 @@ import sg.ncl.common.exception.GlobalExceptionHandler;
 import sg.ncl.service.realization.data.jpa.RealizationEntity;
 import sg.ncl.service.realization.domain.Realization;
 import sg.ncl.service.realization.domain.RealizationService;
+import sg.ncl.service.team.domain.TeamService;
 
 import javax.inject.Inject;
 
@@ -69,12 +70,16 @@ public class RealizationsControllerTest {
     @MockBean
     private RealizationService realizationService;
 
+    @MockBean
+    private TeamService teamService;
+
     @Before
     public void before() {
         Assertions.assertThat(mockingDetails(claims).isMock()).isTrue();
         Assertions.assertThat(mockingDetails(securityContext).isMock()).isTrue();
         Assertions.assertThat(mockingDetails(authentication).isMock()).isTrue();
         Assertions.assertThat(mockingDetails(realizationService).isMock()).isTrue();
+        Assertions.assertThat(mockingDetails(teamService).isMock()).isTrue();
         mockMvc = MockMvcBuilders.webAppContextSetup(webApplicationContext).build();
     }
 
