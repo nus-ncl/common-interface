@@ -41,7 +41,7 @@ public class RealizationsController {
     private final TeamService teamService;
 
     @Inject
-    RealizationsController(@NotNull final RealizationService realizationService, final TeamService teamService) {
+    RealizationsController(@NotNull final RealizationService realizationService, @NotNull final TeamService teamService) {
         this.realizationService = realizationService;
         this.teamService = teamService;
     }
