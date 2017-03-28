@@ -374,6 +374,7 @@ public class RegistrationServiceImplTest {
         Team createdTeam = Util.getTeamEntity();
         User createdUser = Util.getUserEntity();
 
+        when(userService.getUser(anyString())).thenReturn(createdUser);
         when(teamService.isOwner(anyString(), anyString())).thenReturn(false);
 
         exception.expect(UserIsNotTeamOwnerException.class);
@@ -385,6 +386,7 @@ public class RegistrationServiceImplTest {
         Team createdTeam = Util.getTeamEntity();
         User createdUser = Util.getUserEntity();
 
+        when(userService.getUser(anyString())).thenReturn(createdUser);
         when(teamService.isOwner(anyString(), anyString())).thenReturn(true);
         when(teamService.getTeamById(anyString())).thenReturn(null);
 

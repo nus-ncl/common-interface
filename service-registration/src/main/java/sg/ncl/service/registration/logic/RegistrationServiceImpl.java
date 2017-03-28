@@ -304,6 +304,11 @@ public class RegistrationServiceImpl implements RegistrationService {
     @Override
     @Transactional
     public String approveJoinRequest(String teamId, String userId, User approver) {
+        User user = userService.getUser(userId);
+        if (!user.isEmailVerified()) {
+            log.warn("Email not verified for {}", user.getId());
+            throw new EmailNotVerifiedException(user.getId());
+        }
         if (!teamService.isOwner(teamId, approver.getId())) {
             log.warn("User {} is not a team owner of Team {}", approver.getId(), teamId);
             throw new UserIsNotTeamOwnerException();
@@ -321,7 +326,6 @@ public class RegistrationServiceImpl implements RegistrationService {
         one.put("pid", pid);
         one.put("gid", pid);
         one.put("action", "approve");
-        User user = userService.getUser(userId);
         if ((UserStatus.PENDING).equals(user.getStatus())) {
             userService.updateUserStatus(userId, UserStatus.APPROVED);
         }
