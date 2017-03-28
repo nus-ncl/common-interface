@@ -39,4 +39,5 @@ public interface TeamService {
 
     TeamQuota getTeamQuotaByTeamId(String teamId);
 
+    int checkTeamQuota(String teamName);
 }

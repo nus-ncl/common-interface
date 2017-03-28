@@ -1,7 +1,6 @@
 package sg.ncl.service.realization.logic;
 
 import io.jsonwebtoken.Claims;
-import org.apache.commons.lang3.RandomStringUtils;
 import org.json.JSONObject;
 import org.junit.Before;
 import org.junit.Rule;
@@ -10,11 +9,8 @@ import org.junit.rules.ExpectedException;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
-import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.test.context.TestPropertySource;
 import sg.ncl.adapter.deterlab.AdapterDeterLab;
-import sg.ncl.service.analytics.domain.AnalyticsService;
-import sg.ncl.service.realization.RealizationAccountingProperties;
 import sg.ncl.service.realization.data.jpa.RealizationEntity;
 import sg.ncl.service.realization.data.jpa.RealizationRepository;
 import sg.ncl.service.realization.domain.Realization;
@@ -41,7 +37,6 @@ import static sg.ncl.service.realization.util.TestUtil.getTeamQuotaEntity;
  * Created by Desmond.
  */
 @TestPropertySource(properties = "flyway.enabled=false")
-@EnableConfigurationProperties(RealizationAccountingProperties.class)
 public class RealizationServiceTest {
 
     @Rule
@@ -56,10 +51,6 @@ public class RealizationServiceTest {
     @Mock
     private TeamService teamService;
     @Mock
-    private AnalyticsService analyticsService;
-    @Mock
-    private RealizationAccountingProperties realizationAccountingProperties;
-    @Mock
     private Claims claims;
 
     private RealizationService realizationService;
@@ -69,11 +60,9 @@ public class RealizationServiceTest {
         assertThat(mockingDetails(realizationRepository).isMock()).isTrue();
         assertThat(mockingDetails(adapterDeterLab).isMock()).isTrue();
         assertThat(mockingDetails(teamService).isMock()).isTrue();
-        assertThat(mockingDetails(analyticsService).isMock()).isTrue();
-        assertThat(mockingDetails(realizationAccountingProperties).isMock()).isTrue();
         assertThat(mockingDetails(claims).isMock()).isTrue();
 
-        realizationService = new RealizationServiceImpl(realizationRepository, adapterDeterLab, teamService, analyticsService, realizationAccountingProperties);
+        realizationService = new RealizationServiceImpl(realizationRepository, adapterDeterLab, teamService);
     }
 
     @Test
@@ -183,7 +172,6 @@ public class RealizationServiceTest {
 
         when(teamService.getTeamByName(anyString())).thenReturn(team);
         when(teamService.getTeamQuotaByTeamId(anyString())).thenReturn(teamQuota);
-        when(realizationAccountingProperties.getCharges()).thenReturn("0.12");
         when(realizationRepository.findByExperimentId(anyLong())).thenReturn(entity);
         when(realizationRepository.save(any(RealizationEntity.class))).thenReturn(entity);
         when(adapterDeterLab.startExperiment(anyString(), anyString(), anyString())).thenReturn(predefinedResultJson.toString());
