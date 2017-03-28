@@ -503,6 +503,23 @@ public class RegistrationServiceImplTest {
     }
 
     @Test
+    public void testApproveOrRejectNewTeamEmailNotVerified() {
+        TeamEntity teamEntity = Util.getTeamEntity();
+        UserEntity userEntity = Util.getUserEntity();
+
+        teamEntity.setStatus(TeamStatus.APPROVED);
+        userEntity.setId(RandomStringUtils.randomAlphanumeric(20));
+        userEntity.setStatus(UserStatus.PENDING);
+        userEntity.setEmailVerified(false);
+
+        when(teamService.updateTeamStatus(anyString(), any(TeamStatus.class))).thenReturn(teamEntity);
+        when(userService.getUser(anyString())).thenReturn(userEntity);
+
+        exception.expect(EmailNotVerifiedException.class);
+        registrationService.approveOrRejectNewTeam(teamEntity.getId(), userEntity.getId(), TeamStatus.APPROVED);
+    }
+
+    @Test
     public void testApproveOrRejectNewTeamApprovedTeamStatusPendingUserStatus() {
         TeamEntity teamEntity = Util.getTeamEntity();
         UserEntity userEntity = Util.getUserEntity();
@@ -510,6 +527,7 @@ public class RegistrationServiceImplTest {
         teamEntity.setStatus(TeamStatus.APPROVED);
         userEntity.setId(RandomStringUtils.randomAlphanumeric(20));
         userEntity.setStatus(UserStatus.PENDING);
+        userEntity.setEmailVerified(true);
 
         when(teamService.updateTeamStatus(anyString(), any(TeamStatus.class))).thenReturn(teamEntity);
         when(userService.getUser(anyString())).thenReturn(userEntity);

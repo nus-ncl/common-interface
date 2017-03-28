@@ -25,6 +25,7 @@ import sg.ncl.service.registration.serializers.DateTimeDeserializer;
 import sg.ncl.service.registration.serializers.DateTimeSerializer;
 import sg.ncl.service.team.domain.*;
 import sg.ncl.service.team.web.TeamMemberInfo;
+import sg.ncl.service.user.data.jpa.UserEntity;
 import sg.ncl.service.user.domain.User;
 import sg.ncl.service.user.domain.UserService;
 
@@ -115,11 +116,15 @@ public class RegistrationControllerTest extends AbstractTest {
 
     @Test
     public void approveTeam() throws Exception {
-        Team one = Util.getTeamEntity();
-        User user = userService.createUser(Util.getUserEntity());
-        Team createdTeam = teamService.createTeam(one);
+        Team teamEntity = Util.getTeamEntity();
+        UserEntity userEntity = Util.getUserEntity();
+
+        User user = userService.createUser(userEntity);
+        Team team = teamService.createTeam(teamEntity);
         TeamMemberInfo owner = Util.getTeamMemberInfo(user.getId(), MemberType.OWNER);
-        teamService.addMember(createdTeam.getId(), owner);
+
+        userService.verifyEmail(user.getId(), user.getUserDetails().getEmail(), user.getVerificationKey());
+        teamService.addMember(team.getId(), owner);
 
         JSONObject predefinedResultJson = new JSONObject();
         predefinedResultJson.put("msg", "approve project OK");
@@ -131,7 +136,7 @@ public class RegistrationControllerTest extends AbstractTest {
         String deterUserIdOne = RandomStringUtils.randomAlphabetic(8);
         adapterDeterLab.saveDeterUserIdMapping(deterUserIdOne, owner.getUserId());
 
-        mockMvc.perform(post("/registrations/teams/" + createdTeam.getId() + "/owner/" + owner.getUserId() + "?status=" + TeamStatus.APPROVED))
+        mockMvc.perform(post("/registrations/teams/" + team.getId() + "/owner/" + owner.getUserId() + "?status=" + TeamStatus.APPROVED))
                 .andExpect(status().isOk());
     }
 
