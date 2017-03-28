@@ -527,6 +527,7 @@ public class RegistrationServiceImplTest {
         teamEntity.setStatus(TeamStatus.APPROVED);
         userEntity.setId(RandomStringUtils.randomAlphanumeric(20));
         userEntity.setStatus(UserStatus.PENDING);
+        userEntity.setEmailVerified(true);
 
         when(teamService.updateTeamStatus(anyString(), any(TeamStatus.class))).thenReturn(teamEntity);
         when(userService.getUser(anyString())).thenReturn(userEntity);
