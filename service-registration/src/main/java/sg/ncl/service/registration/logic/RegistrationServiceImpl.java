@@ -10,10 +10,10 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.ui.freemarker.FreeMarkerTemplateUtils;
 import sg.ncl.adapter.deterlab.AdapterDeterLab;
 import sg.ncl.common.DomainProperties;
+import sg.ncl.common.authentication.Role;
 import sg.ncl.service.authentication.domain.Credentials;
 import sg.ncl.service.authentication.domain.CredentialsService;
 import sg.ncl.service.authentication.domain.CredentialsStatus;
-import sg.ncl.common.authentication.Role;
 import sg.ncl.service.authentication.web.CredentialsInfo;
 import sg.ncl.service.mail.domain.MailService;
 import sg.ncl.service.registration.data.jpa.RegistrationEntity;
@@ -22,17 +22,13 @@ import sg.ncl.service.registration.domain.Registration;
 import sg.ncl.service.registration.domain.RegistrationService;
 import sg.ncl.service.registration.exceptions.*;
 import sg.ncl.service.team.data.jpa.TeamMemberEntity;
-import sg.ncl.service.team.domain.MemberStatus;
-import sg.ncl.service.team.domain.MemberType;
-import sg.ncl.service.team.domain.Team;
-import sg.ncl.service.team.domain.TeamMember;
-import sg.ncl.service.team.domain.TeamService;
-import sg.ncl.service.team.domain.TeamStatus;
+import sg.ncl.service.team.domain.*;
 import sg.ncl.service.team.exceptions.TeamNotFoundException;
 import sg.ncl.service.team.web.TeamMemberInfo;
 import sg.ncl.service.user.domain.User;
 import sg.ncl.service.user.domain.UserService;
 import sg.ncl.service.user.domain.UserStatus;
+import sg.ncl.service.registration.exceptions.EmailNotVerifiedException;
 import sg.ncl.service.user.exceptions.UserNotFoundException;
 
 import javax.inject.Inject;
@@ -40,11 +36,7 @@ import javax.inject.Named;
 import javax.validation.constraints.NotNull;
 import java.io.IOException;
 import java.time.ZonedDateTime;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * @author Christopher Zhong
@@ -400,6 +392,11 @@ public class RegistrationServiceImpl implements RegistrationService {
         String adapterResult;
         if (status.equals(TeamStatus.APPROVED)) {
             User user = userService.getUser(ownerId);
+            // check user email has been verified
+            if (!user.isEmailVerified()) {
+                log.warn("Email not verified for {}", user.getId());
+                throw new EmailNotVerifiedException(user.getId());
+            }
             if ((UserStatus.PENDING).equals(user.getStatus())) {
                 userService.updateUserStatus(ownerId, UserStatus.APPROVED);
             }
