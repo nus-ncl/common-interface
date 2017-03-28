@@ -69,6 +69,7 @@ public class RealizationsController {
     @ResponseStatus(HttpStatus.ACCEPTED)
     public Realization startExperiment(@PathVariable String teamName, @PathVariable String expId, @AuthenticationPrincipal Object claims) {
         checkClaimsType(claims);
+
         return realizationService.startExperimentInDeter(teamName, expId, (Claims) claims);
     }
 

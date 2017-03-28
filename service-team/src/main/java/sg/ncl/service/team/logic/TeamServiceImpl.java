@@ -2,9 +2,12 @@ package sg.ncl.service.team.logic;
 
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import sg.ncl.adapter.deterlab.AdapterDeterLab;
+import sg.ncl.common.AccountingProperties;
+import sg.ncl.service.analytics.domain.AnalyticsService;
 import sg.ncl.service.team.data.jpa.*;
 import sg.ncl.service.team.domain.*;
 import sg.ncl.service.team.exceptions.*;
@@ -22,6 +25,7 @@ import java.util.stream.Collectors;
  */
 @Service
 @Slf4j
+@EnableConfigurationProperties(AccountingProperties.class)
 public class TeamServiceImpl implements TeamService {
 
     private static final String NOT_ALLOWED = "is not allowed";
@@ -30,13 +34,17 @@ public class TeamServiceImpl implements TeamService {
     private final TeamRepository teamRepository;
     private final UserService userService;
     private final TeamQuotaRepository teamQuotaRepository;
+    private final AnalyticsService analyticsService;
+    private final AccountingProperties accountingProperties;
 
     @Inject
-    TeamServiceImpl(final AdapterDeterLab adapterDeterLab, final TeamRepository teamRepository, final UserService userService, final TeamQuotaRepository teamQuotaRepository) {
+    TeamServiceImpl(final AdapterDeterLab adapterDeterLab, final TeamRepository teamRepository, final UserService userService, final TeamQuotaRepository teamQuotaRepository, @NotNull final AnalyticsService analyticsService, @NotNull final AccountingProperties accountingProperties) {
         this.adapterDeterLab = adapterDeterLab;
         this.teamRepository = teamRepository;
         this.userService = userService;
         this.teamQuotaRepository = teamQuotaRepository;
+        this.analyticsService = analyticsService;
+        this.accountingProperties = accountingProperties;
     }
 
     @Override
@@ -374,4 +382,32 @@ public class TeamServiceImpl implements TeamService {
 
         return updatedTeamQuota;
     }
+
+    @Override
+    public int checkTeamQuota(String teamName) {
+
+        //getting team quota
+        Team team = getTeamByName(teamName);
+        String teamId = team.getId();
+        TeamQuota teamQuota = getTeamQuotaByTeamId(teamId);
+        BigDecimal quota = teamQuota.getQuota();
+        BigDecimal charges = new BigDecimal(accountingProperties.getCharges());
+
+        //getting usage , if quota is null => unlimited quota
+        if (quota != null) {
+            ZonedDateTime startDate = team.getApplicationDate();
+            ZonedDateTime endDate = ZonedDateTime.now();
+            String usageinString = analyticsService.getUsageStatistics(teamId, startDate, endDate);
+            BigDecimal usageInBD = new BigDecimal(usageinString);
+            usageInBD = usageInBD.multiply(charges);
+
+            //comparing quota and usage
+            if (quota.compareTo(usageInBD) <= 0) {
+                return -1;
+            }
+        }
+
+        return 1;
+    }
+
 }
