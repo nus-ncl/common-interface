@@ -65,7 +65,7 @@ public class Util {
         final UserEntity userEntity = new UserEntity();
         userEntity.setApplicationDate(ZonedDateTime.now());
         userEntity.setVerificationKey(RandomStringUtils.randomAlphanumeric(20));
-
+        userEntity.setEmailVerified(true);
         userEntity.setStatus(UserStatus.PENDING);
         final UserDetailsEntity userDetailsEntity = new UserDetailsEntity();
         userDetailsEntity.setFirstName(RandomStringUtils.randomAlphabetic(20));
