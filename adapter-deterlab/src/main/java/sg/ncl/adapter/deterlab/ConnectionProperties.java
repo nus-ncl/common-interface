@@ -85,6 +85,10 @@ public class ConnectionProperties {
         return HTTP_MODE + ip + ":" + port + "/getFreeNodes";
     }
 
+    public String getNodesStatus() {
+        return HTTP_MODE + ip + ":" + port + "/getNodesStatus";
+    }
+
     public String getTotalNodes() {
         return HTTP_MODE + ip + ":" + port + "/getTotalNodes";
     }

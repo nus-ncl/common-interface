@@ -195,6 +195,12 @@ public class ConnectionPropertiesTest {
     }
 
     @Test
+    public void testGetNodesStatus() throws Exception {
+        assertThat(connectionProperties.getNodesStatus()).isNotNull();
+        assertThat(connectionProperties.getNodesStatus()).isEqualTo("http://127.0.0.1:22/getNodesStatus");
+    }
+
+    @Test
     public void testGetTotalNodes() throws Exception {
         assertThat(connectionProperties.getTotalNodes()).isNotNull();
         assertThat(connectionProperties.getTotalNodes()).isEqualTo("http://127.0.0.1:22/getTotalNodes");
