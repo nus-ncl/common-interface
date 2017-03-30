@@ -114,9 +114,8 @@ public class AnalyticsController {
 
         //check admin using validator class from common
         isAdmin((Claims) claims);
-        
 
-        return null;
+        return analyticsService.getEnergyStatistics(startDate, endDate);
     }
 
 }

@@ -3,17 +3,23 @@ package sg.ncl.service.analytics.logic;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import sg.ncl.adapter.deterlab.AdapterDeterLab;
+import sg.ncl.common.exception.base.BadRequestException;
 import sg.ncl.service.analytics.data.jpa.DataDownloadEntity;
 import sg.ncl.service.analytics.data.jpa.DataDownloadRepository;
 import sg.ncl.service.analytics.data.jpa.DataDownloadStatistics;
 import sg.ncl.service.analytics.domain.AnalyticsService;
 import sg.ncl.service.analytics.domain.DataDownload;
+import sg.ncl.service.analytics.exceptions.StartDateAfterEndDateException;
 
 import javax.inject.Inject;
 import javax.validation.constraints.NotNull;
+import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
+
+import static java.time.temporal.TemporalAdjusters.firstDayOfMonth;
+import static java.time.temporal.TemporalAdjusters.lastDayOfMonth;
 
 /**
  * @author: Tran Ly Vu
@@ -98,4 +104,45 @@ public class AnalyticsServiceImpl implements AnalyticsService {
         return adapterDeterLab.getUsageStatistics(teamId, start, end);
     }
 
+    @Override
+    public double[] getEnergyStatistics(String startDate, String endDate) {
+        ZonedDateTime start = getZonedDateTime(startDate);
+        ZonedDateTime end = getZonedDateTime(endDate);
+        ZonedDateTime now = ZonedDateTime.now();
+        if (start == null) {
+            start = now.with(firstDayOfMonth());
+        }
+        if (end == null) {
+            end = now.with(lastDayOfMonth());
+        }
+        if (start.isAfter(end))
+            throw new StartDateAfterEndDateException();
+
+
+
+        return null;
+    }
+
+
+
+    /**
+     * Get simple ZonedDateTime from date string in the format 'YYYY-MM-DD'.
+     *
+     * @param date  date string to convert
+     * @return      ZonedDateTime of
+     */
+    private ZonedDateTime getZonedDateTime(String date) {
+        if (date != null) {
+            String[] result = date.split("-");
+            if (result.length != 3) {
+                throw new BadRequestException();
+            }
+            return ZonedDateTime.of(
+                    Integer.parseInt(result[0]),
+                    Integer.parseInt(result[1]),
+                    Integer.parseInt(result[2]),
+                    0, 0, 0, 0, ZoneId.of("Asia/Singapore"));
+        }
+        return null;
+    }
 }
