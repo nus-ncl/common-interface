@@ -20,6 +20,7 @@ import java.util.List;
 
 import static java.time.temporal.TemporalAdjusters.firstDayOfMonth;
 import static java.time.temporal.TemporalAdjusters.lastDayOfMonth;
+import static sg.ncl.common.validation.Validator.isAdmin;
 
 /**
  * @author: Tran Ly Vu, James Ng
@@ -103,6 +104,19 @@ public class AnalyticsController {
         if (start.isAfter(end))
             throw new StartDateAfterEndDateException();
         return analyticsService.getUsageStatistics(id, start, end);
+    }
+
+    @GetMapping("/energy")
+    @ResponseStatus(HttpStatus.OK)
+    public double[] getEnergyStatistics(@AuthenticationPrincipal Object claims,
+                                        @PathVariable final String startDate,
+                                        @PathVariable final String endDate) {
+
+        //check admin using validator class from common
+        isAdmin((Claims) claims);
+        
+
+        return null;
     }
 
 }
