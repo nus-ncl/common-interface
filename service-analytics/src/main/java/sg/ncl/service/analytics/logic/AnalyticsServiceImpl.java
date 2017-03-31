@@ -125,11 +125,15 @@ public class AnalyticsServiceImpl implements AnalyticsService {
     }
 
     @Override
-    public double[] getEnergyStatistics(ZonedDateTime startDate, ZonedDateTime endDate) {
+    public List<Double> getEnergyStatistics(ZonedDateTime startDate, ZonedDateTime endDate) {
         if (startDate.isAfter(endDate))
             throw new StartDateAfterEndDateException();
 
         List<Energy> energyList = new ArrayList<>();
+        List<String> filenameList = new ArrayList<>();
+        List<String> distinctList = new ArrayList<>();
+        List<Double> energyStatistics = new ArrayList<>();
+
         Path path = Paths.get(System.getProperty("user.home"));
         path = Paths.get(path.getRoot().toString(), analyticsProperties.getEnergyDir());
         File dir = new File(path.toString());
@@ -139,24 +143,44 @@ public class AnalyticsServiceImpl implements AnalyticsService {
             File[] files = dir.listFiles();
             for (int i =0; i < files.length; i++) {
                 if (p.matcher(files[i].getName()).matches()) {
-                   try {
-                       energyList.add(readFile(files[i].toString()));
-                   } catch (IOException e) {
-                       e.printStackTrace();
-                   }
+                    filenameList.add(files[i].toString());
                 }
             }
         }
 
+        // retrieve first log of each day
+        Collections.sort(filenameList);
+        String previous = "";
+        for (String filename : filenameList) {
+            String[] parts = filename.split("\\.");
+            String subString = parts[1].substring(0, 8);
+            if (!previous.equals(subString)) {
+                distinctList.add(filename);
+                previous = subString;
+            }
+        }
+
+        for (String distinct : distinctList) {
+            try {
+                Energy energy = readFile(distinct);
+                energyList.add(energy);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+
+        /*
         Collections.sort(energyList, new Comparator<Energy>() {
             @Override
-            public int compare(Energy p1, Energy p2) {
-                return p1.filename.compareTo(p2.filename); // Ascending
+            public int compare(Energy energy1, Energy energy2) {
+                return energy1.filename.compareTo(energy2.filename); // Ascending
             }
         });
+        */
 
         return null;
     }
+
 
     private Energy readFile(String filename) throws IOException {
 

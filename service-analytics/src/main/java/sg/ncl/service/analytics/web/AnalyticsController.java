@@ -108,7 +108,7 @@ public class AnalyticsController {
 
     @GetMapping("/energy")
     @ResponseStatus(HttpStatus.OK)
-    public double[] getEnergyStatistics(@AuthenticationPrincipal Object claims,
+    public List<Double> getEnergyStatistics(@AuthenticationPrincipal Object claims,
                                         @RequestParam(value = "startDate", required = false) String startDate,
                                         @RequestParam(value = "endDate", required = false) String endDate) {
 
