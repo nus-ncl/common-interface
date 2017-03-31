@@ -139,6 +139,7 @@ public class AnalyticsServiceImpl implements AnalyticsService {
         File dir = new File(path.toString());
         Pattern p = Pattern.compile("(nclenergy\\.)\\d{12}(\\.out)");
 
+        //add all the log inside filenameList
         if (dir.isDirectory()) {
             File[] files = dir.listFiles();
             for (int i =0; i < files.length; i++) {
@@ -148,7 +149,7 @@ public class AnalyticsServiceImpl implements AnalyticsService {
             }
         }
 
-        // retrieve first log of each day
+        // retrieve only first log of each day into distinctList
         Collections.sort(filenameList);
         String previous = "";
         for (String filename : filenameList) {
@@ -160,6 +161,7 @@ public class AnalyticsServiceImpl implements AnalyticsService {
             }
         }
 
+        //add up or energy and put into energyList
         for (String distinct : distinctList) {
             try {
                 Energy energy = readFile(distinct);
@@ -169,6 +171,11 @@ public class AnalyticsServiceImpl implements AnalyticsService {
             }
         }
 
+
+        for (int i =0; i < energyList.size(); i++) {
+            double difference = energyList.get(i+1).getUsage() - energyList.get(i).getUsage();
+            energyStatistics.add(difference);
+        }
         /*
         Collections.sort(energyList, new Comparator<Energy>() {
             @Override
