@@ -94,6 +94,7 @@ public class AnalyticsController {
             log.warn("Access denied for: /analytics/usage/teams GET");
             throw new UnauthorizedException();
         }
+
         ZonedDateTime start = getZonedDateTime(startDate);
         ZonedDateTime end = getZonedDateTime(endDate);
         ZonedDateTime now = ZonedDateTime.now();
@@ -101,21 +102,30 @@ public class AnalyticsController {
             start = now.with(firstDayOfMonth());
         if (end == null)
             end = now.with(lastDayOfMonth());
-        if (start.isAfter(end))
-            throw new StartDateAfterEndDateException();
+
         return analyticsService.getUsageStatistics(id, start, end);
     }
 
     @GetMapping("/energy")
     @ResponseStatus(HttpStatus.OK)
     public double[] getEnergyStatistics(@AuthenticationPrincipal Object claims,
-                                        @PathVariable final String startDate,
-                                        @PathVariable final String endDate) {
+                                        @RequestParam(value = "startDate", required = false) String startDate,
+                                        @RequestParam(value = "endDate", required = false) String endDate) {
 
         //check admin using validator class from common
-        isAdmin((Claims) claims);
+        //isAdmin((Claims) claims);
 
-        return analyticsService.getEnergyStatistics(startDate, endDate);
+        ZonedDateTime start = getZonedDateTime(startDate);
+        ZonedDateTime end = getZonedDateTime(endDate);
+        ZonedDateTime now = ZonedDateTime.now();
+        if (start == null) {
+            start = now.with(firstDayOfMonth());
+        }
+        if (end == null) {
+            end = now.with(lastDayOfMonth());
+        }
+
+        return analyticsService.getEnergyStatistics(start, end);
     }
 
 }
