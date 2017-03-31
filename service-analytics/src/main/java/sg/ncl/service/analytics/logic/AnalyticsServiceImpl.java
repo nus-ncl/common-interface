@@ -1,5 +1,6 @@
 package sg.ncl.service.analytics.logic;
 
+import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.stereotype.Service;
@@ -25,6 +26,9 @@ import java.nio.file.Paths;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.regex.Pattern;
 
@@ -125,52 +129,68 @@ public class AnalyticsServiceImpl implements AnalyticsService {
         if (startDate.isAfter(endDate))
             throw new StartDateAfterEndDateException();
 
+        List<Energy> energyList = new ArrayList<>();
         Path path = Paths.get(System.getProperty("user.home"));
         path = Paths.get(path.getRoot().toString(), analyticsProperties.getEnergyDir());
         File dir = new File(path.toString());
-
         Pattern p = Pattern.compile("(nclenergy\\.)\\d{12}(\\.out)");
+
         if (dir.isDirectory()) {
             File[] files = dir.listFiles();
             for (int i =0; i < files.length; i++) {
                 if (p.matcher(files[i].getName()).matches()) {
                    try {
-                       log.info(readFile(files[i].toString()));
+                       energyList.add(readFile(files[i].toString()));
                    } catch (IOException e) {
                        e.printStackTrace();
                    }
                 }
             }
         }
+
+        Collections.sort(energyList, new Comparator<Energy>() {
+            @Override
+            public int compare(Energy p1, Energy p2) {
+                return p1.filename.compareTo(p2.filename); // Ascending
+            }
+        });
+
         return null;
     }
 
-    private String readFile(String fileName) throws IOException {
-        BufferedReader br = new BufferedReader(new FileReader(fileName));
+    private Energy readFile(String filename) throws IOException {
+
+        Energy energy = new Energy(filename);
+
+        BufferedReader br = new BufferedReader(new FileReader(filename));
         try {
             StringBuilder sb = new StringBuilder();
             String line = br.readLine();
 
             while (line != null) {
-                sb.append(line);
-                sb.append("\n");
+                String[] parts = line.split(" ");
+                String usage = parts[3];
+                energy.addUsage(Double.parseDouble(usage));
                 line = br.readLine();
             }
-            return sb.toString();
+            return energy;
         } finally {
             br.close();
         }
     }
 
+    @Getter
     private class Energy {
         private String filename;
         private double usage; //accumulated usage
 
-        public double calculateUsage() {
-
-
-            return null;
+        public void addUsage(double newUsage) {
+            usage += newUsage;
         }
 
+        public Energy(String filename) {
+            this.filename = filename;
+            this.usage = 0;
+        }
     }
 }
