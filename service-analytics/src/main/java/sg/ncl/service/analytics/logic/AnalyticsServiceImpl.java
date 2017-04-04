@@ -23,9 +23,12 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.time.DayOfWeek;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
+import java.time.temporal.TemporalAdjuster;
+import java.time.temporal.TemporalAdjusters;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -149,15 +152,27 @@ public class AnalyticsServiceImpl implements AnalyticsService {
             }
         }
 
+        // get the next day of end date
+        ZonedDateTime nextDayAfterEndDate = endDate.plusDays(1);
+
+        //format into string
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMdd");
+        String start = startDate.format(formatter);
+        log.info("start date is {}", start);
+        String end = nextDayAfterEndDate.format(formatter);
+        log.info("end date is {}", end);
+
         // retrieve only first log of each day into distinctList
         Collections.sort(filenameList);
         String previous = "";
         for (String filename : filenameList) {
             String[] parts = filename.split("\\.");
             String subString = parts[1].substring(0, 8);
-            if (!previous.equals(subString)) {
-                distinctList.add(filename);
-                previous = subString;
+            if (subString.compareTo(start) >= 0 && subString.compareTo(end) <= 0) {
+                if (!previous.equals(subString)) {
+                    distinctList.add(filename);
+                    previous = subString;
+                }
             }
         }
 
