@@ -185,8 +185,6 @@ public class AnalyticsServiceImpl implements AnalyticsService {
                 e.printStackTrace();
             }
         }
-
-        log.info(Integer.toString(energyList.size()));
         //sort energy list based on file name
         Collections.sort(energyList, new Comparator<Energy>() {
             @Override
@@ -194,6 +192,7 @@ public class AnalyticsServiceImpl implements AnalyticsService {
                 return energy1.filename.compareTo(energy2.filename); // Ascending
             }
         });
+
 
         //if every files are missing
         if (energyList.isEmpty()) {
@@ -203,7 +202,7 @@ public class AnalyticsServiceImpl implements AnalyticsService {
                 i++;
             }
         }
-        
+
         //check all the missing files up to the first available file
         if (!energyList.isEmpty()) {
             ZonedDateTime firstDateAvailable = energyList.get(0).getZonedDateTime();   // First date that is available
@@ -212,13 +211,13 @@ public class AnalyticsServiceImpl implements AnalyticsService {
                 startDate = startDate.plusDays(1);
             }
         }
-
+        log.info(" energyStatistics size is {}", Integer.toString(energyStatistics.size()));
         // list of energy up to the last file that is available
-        for (int i = 0; i < energyList.size(); i++) {
+        for (int i = 0; i < energyList.size() - 1; i++) {
             Energy energyI = energyList.get(i);
             Energy energyIPlus1 = energyList.get(i+1);
             int numberOfDays = (int)ChronoUnit.DAYS.between(energyI.getZonedDateTime(), energyIPlus1.getZonedDateTime());
-            double difference = energyI.getUsage() - energyIPlus1.getUsage();
+            double difference =  energyIPlus1.getUsage() - energyI.getUsage();
             double averageValue = difference/numberOfDays;
             for (int j = i; j < numberOfDays; j++) {
                 energyStatistics.add(averageValue);
@@ -228,9 +227,9 @@ public class AnalyticsServiceImpl implements AnalyticsService {
         //check all the missing files starting from the last available files
         if (!energyList.isEmpty()) {
             ZonedDateTime lastDateAvailable = energyList.get(energyList.size() - 1).getZonedDateTime();   // First date that is available
-            ZonedDateTime lastDateToConsider = lastDateAvailable.plusDays(1);
-            while (comparator.compare(endDate, lastDateToConsider) != 0) {
+            while (comparator.compare(realEndDate, lastDateAvailable) != 0) {
                 energyStatistics.add(0.00);
+                lastDateAvailable = lastDateAvailable.plusDays(1);
             }
         }
 
