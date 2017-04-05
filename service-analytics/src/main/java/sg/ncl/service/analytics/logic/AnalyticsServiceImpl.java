@@ -24,9 +24,11 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.DayOfWeek;
+import java.time.Period;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
+import java.time.temporal.ChronoUnit;
 import java.time.temporal.TemporalAdjuster;
 import java.time.temporal.TemporalAdjusters;
 import java.util.ArrayList;
@@ -132,17 +134,25 @@ public class AnalyticsServiceImpl implements AnalyticsService {
         if (startDate.isAfter(endDate))
             throw new StartDateAfterEndDateException();
 
-        List<Energy> energyList = new ArrayList<>();
+        //preparation
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMdd");  //format into string
+        Comparator<ZonedDateTime> comparator = Comparator.comparing(zdt -> zdt.truncatedTo(ChronoUnit.DAYS));  // to compare 2 ZonedTimeDate's
         List<String> filenameList = new ArrayList<>();
         List<String> distinctList = new ArrayList<>();
+        List<Energy> energyList = new ArrayList<>();
         List<Double> energyStatistics = new ArrayList<>();
 
+        // The real end date to use is the next day of the end date retrieve from WS
+        ZonedDateTime realEndDate = endDate.plusDays(1);
+        String start = startDate.format(formatter);
+        String end = realEndDate.format(formatter);
+
+        //add all the log inside filenameList
         Path path = Paths.get(System.getProperty("user.home"));
         path = Paths.get(path.getRoot().toString(), analyticsProperties.getEnergyDir());
         File dir = new File(path.toString());
         Pattern p = Pattern.compile("(nclenergy\\.)\\d{12}(\\.out)");
 
-        //add all the log inside filenameList
         if (dir.isDirectory()) {
             File[] files = dir.listFiles();
             for (int i =0; i < files.length; i++) {
@@ -152,17 +162,7 @@ public class AnalyticsServiceImpl implements AnalyticsService {
             }
         }
 
-        // get the next day of end date
-        ZonedDateTime nextDayAfterEndDate = endDate.plusDays(1);
-
-        //format into string
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMdd");
-        String start = startDate.format(formatter);
-        log.info("start date is {}", start);
-        String end = nextDayAfterEndDate.format(formatter);
-        log.info("end date is {}", end);
-
-        // retrieve only first log of each day into distinctList
+        // retrieve only first log of each day (morning) into distinctList
         Collections.sort(filenameList);
         String previous = "";
         for (String filename : filenameList) {
@@ -186,23 +186,56 @@ public class AnalyticsServiceImpl implements AnalyticsService {
             }
         }
 
-
-        for (int i =0; i < energyList.size(); i++) {
-            double difference = energyList.get(i+1).getUsage() - energyList.get(i).getUsage();
-            energyStatistics.add(difference);
-        }
-        /*
+        log.info(Integer.toString(energyList.size()));
+        //sort energy list based on file name
         Collections.sort(energyList, new Comparator<Energy>() {
             @Override
             public int compare(Energy energy1, Energy energy2) {
                 return energy1.filename.compareTo(energy2.filename); // Ascending
             }
         });
-        */
 
-        return null;
+        //if every files are missing
+        if (energyList.isEmpty()) {
+            int numberOfDays = (int)ChronoUnit.DAYS.between(startDate, realEndDate);
+            for (int i =0; i< numberOfDays; i++) {
+                energyStatistics.add(0.00);
+                i++;
+            }
+        }
+        
+        //check all the missing files up to the first available file
+        if (!energyList.isEmpty()) {
+            ZonedDateTime firstDateAvailable = energyList.get(0).getZonedDateTime();   // First date that is available
+            while (comparator.compare(startDate, firstDateAvailable) != 0) {
+                energyStatistics.add(0.00);
+                startDate = startDate.plusDays(1);
+            }
+        }
+
+        // list of energy up to the last file that is available
+        for (int i = 0; i < energyList.size(); i++) {
+            Energy energyI = energyList.get(i);
+            Energy energyIPlus1 = energyList.get(i+1);
+            int numberOfDays = (int)ChronoUnit.DAYS.between(energyI.getZonedDateTime(), energyIPlus1.getZonedDateTime());
+            double difference = energyI.getUsage() - energyIPlus1.getUsage();
+            double averageValue = difference/numberOfDays;
+            for (int j = i; j < numberOfDays; j++) {
+                energyStatistics.add(averageValue);
+            }
+        }
+
+        //check all the missing files starting from the last available files
+        if (!energyList.isEmpty()) {
+            ZonedDateTime lastDateAvailable = energyList.get(energyList.size() - 1).getZonedDateTime();   // First date that is available
+            ZonedDateTime lastDateToConsider = lastDateAvailable.plusDays(1);
+            while (comparator.compare(endDate, lastDateToConsider) != 0) {
+                energyStatistics.add(0.00);
+            }
+        }
+
+        return energyStatistics;
     }
-
 
     private Energy readFile(String filename) throws IOException {
 
@@ -227,7 +260,7 @@ public class AnalyticsServiceImpl implements AnalyticsService {
 
     @Getter
     private class Energy {
-        private String filename;
+        private String filename; //nclenergy.YYYYMMDDHHMM.out
         private double usage; //accumulated usage
 
         public void addUsage(double newUsage) {
@@ -237,6 +270,23 @@ public class AnalyticsServiceImpl implements AnalyticsService {
         public Energy(String filename) {
             this.filename = filename;
             this.usage = 0;
+        }
+
+        public ZonedDateTime getZonedDateTime() {
+            if (filename!= null) {
+                String[] parts = filename.split("\\.");
+                String subString = parts[1].substring(0, 8);
+                String year = subString.substring(0,4);
+                String month = subString.substring(4,6);
+                String day = subString.substring(6,8);
+
+                return ZonedDateTime.of(
+                        Integer.parseInt(year),
+                        Integer.parseInt(month),
+                        Integer.parseInt(day),
+                        0, 0, 0, 0, ZoneId.of("Asia/Singapore"));
+            } else
+                return null;
         }
     }
 }

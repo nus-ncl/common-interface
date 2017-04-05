@@ -124,7 +124,6 @@ public class AnalyticsController {
         if (end == null) {
             end = now.with(lastDayOfMonth());
         }
-
         return analyticsService.getEnergyStatistics(start, end);
     }
 
