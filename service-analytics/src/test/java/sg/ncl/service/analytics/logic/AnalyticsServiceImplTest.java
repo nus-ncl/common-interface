@@ -8,8 +8,10 @@ import org.junit.rules.ExpectedException;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.test.context.TestPropertySource;
 import sg.ncl.adapter.deterlab.AdapterDeterLab;
+import sg.ncl.service.analytics.AnalyticsProperties;
 import sg.ncl.service.analytics.data.jpa.DataDownloadEntity;
 import sg.ncl.service.analytics.data.jpa.DataDownloadRepository;
 import sg.ncl.service.analytics.data.jpa.DataDownloadStatistics;
@@ -27,6 +29,7 @@ import static org.mockito.Mockito.*;
  * Created by dcszwang on 12/28/2016.
  */
 @TestPropertySource(properties = "flyway.enabled=false")
+@EnableConfigurationProperties(AnalyticsProperties.class)
 public class AnalyticsServiceImplTest {
 
     @Rule
@@ -40,12 +43,15 @@ public class AnalyticsServiceImplTest {
     private AdapterDeterLab adapterDeterLab;
 
     private AnalyticsService analyticsService;
+    @Mock
+    private AnalyticsProperties analyticsProperties;
 
     @Before
     public void before() {
         assertThat(mockingDetails(dataDownloadRepository).isMock()).isTrue();
         assertThat(mockingDetails(adapterDeterLab).isMock()).isTrue();
-        analyticsService = new AnalyticsServiceImpl(dataDownloadRepository, adapterDeterLab);
+        assertThat(mockingDetails(analyticsProperties).isMock()).isTrue();
+        analyticsService = new AnalyticsServiceImpl(dataDownloadRepository, adapterDeterLab, analyticsProperties);
     }
 
     @Test

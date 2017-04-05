@@ -10,7 +10,6 @@ import sg.ncl.common.exception.base.BadRequestException;
 import sg.ncl.common.exception.base.UnauthorizedException;
 import sg.ncl.service.analytics.data.jpa.DataDownloadStatistics;
 import sg.ncl.service.analytics.domain.AnalyticsService;
-import sg.ncl.service.analytics.exceptions.StartDateAfterEndDateException;
 
 import javax.inject.Inject;
 import javax.validation.constraints.NotNull;
@@ -113,8 +112,7 @@ public class AnalyticsController {
                                         @RequestParam(value = "endDate", required = false) String endDate) {
 
         //check admin using validator class from common
-        //Fixme
-        //isAdmin((Claims) claims);
+        isAdmin((Claims) claims);
 
         ZonedDateTime start = getZonedDateTime(startDate);
         ZonedDateTime end = getZonedDateTime(endDate);
