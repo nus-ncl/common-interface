@@ -10,13 +10,7 @@ import sg.ncl.service.user.domain.Address;
 import sg.ncl.service.user.domain.User;
 import sg.ncl.service.user.domain.UserService;
 import sg.ncl.service.user.domain.UserStatus;
-import sg.ncl.service.user.exceptions.VerificationEmailNotMatchException;
-import sg.ncl.service.user.exceptions.InvalidStatusTransitionException;
-import sg.ncl.service.user.exceptions.InvalidUserStatusException;
-import sg.ncl.service.user.exceptions.UserIdNullOrEmptyException;
-import sg.ncl.service.user.exceptions.UserNotFoundException;
-import sg.ncl.service.user.exceptions.UsernameAlreadyExistsException;
-import sg.ncl.service.user.exceptions.VerificationKeyNotMatchException;
+import sg.ncl.service.user.exceptions.*;
 
 import javax.inject.Inject;
 import javax.transaction.Transactional;
@@ -240,5 +234,25 @@ public class UserServiceImpl implements UserService {
         UserEntity savedUser = userRepository.save(user);
         log.info("Status updated for {}: {} -> {}", user.getId(), oldStatus, savedUser.getStatus());
         return savedUser;
+    }
+
+    @Transactional
+    public User removeUser(@NotNull final String id) {
+        UserEntity one = findUser(id);
+        if (one == null) {
+            log.warn("User not found when deleting: {}", id);
+            throw new UserNotFoundException(id);
+        }
+
+        List<String> teamList = one.getTeams();
+        UserStatus userStatus = one.getStatus();
+        if (!((teamList == null || teamList.isEmpty()) &&
+                (userStatus == UserStatus.CREATED || userStatus == UserStatus.PENDING))) {
+            log.warn("User is not deletable: {}", id);
+            throw new UserIsNotDeletableException(id);
+        }
+
+        userRepository.delete(id);
+        return one;
     }
 }

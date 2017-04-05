@@ -343,6 +343,7 @@ public class UserServiceImplTest {
     }
 
     //throw UserIdNullOrEmptyException
+    @Test
     public void testAddTeamIdIsEmpty() {
         String randomTeamIdForTest = RandomStringUtils.randomAlphanumeric(20);
 
@@ -378,6 +379,7 @@ public class UserServiceImplTest {
     }
 
     //throw UserIdNullOrEmptyException
+    @Test
     public void testRemoveTeamIdIsEmpty() {
         String randomTeamIdForTest = RandomStringUtils.randomAlphanumeric(20);
 
@@ -592,7 +594,41 @@ public class UserServiceImplTest {
         verify(userRepository, times(1)).findOne(anyString());
         verify(userRepository, times(1)).save(any(UserEntity.class));
     }
+
+    @Test
+    public void testRemoveUserWhereUserIsNotFound() {
+        String randomIdForTest = RandomStringUtils.randomAlphanumeric(20);
+
+        when(userRepository.findOne(anyString())).thenReturn(null);
+
+        exception.expect(UserNotFoundException.class);
+        userServiceImpl.removeUser(randomIdForTest);
+    }
+
+    @Test
+    public void testRemoveUserWhereUserHasTeam() throws Exception {
+        String randomUserIdForTest = RandomStringUtils.randomAlphanumeric(20);
+        String randomTeamIdForTest = RandomStringUtils.randomAlphanumeric(20);
+        UserEntity userEntity = TestUtil.getUserEntity();
+
+        when(userRepository.findOne(anyString())).thenReturn(userEntity);
+        userServiceImpl.addTeam(randomUserIdForTest, randomTeamIdForTest);
+
+        exception.expect(UserIsNotDeletableException.class);
+        userServiceImpl.removeUser(randomUserIdForTest);
+    }
+
+    @Test
+    public void testRemoveUserWhereUserStatusNotCreatedOrPending() throws Exception {
+        String randomIdForTest = RandomStringUtils.randomAlphanumeric(20);
+        UserEntity userEntity = TestUtil.getUserEntity();
+        userEntity.setStatus(UserStatus.PENDING);
+
+        when(userRepository.findOne(anyString())).thenReturn(userEntity);
+        when(userRepository.save(any(UserEntity.class))).thenReturn(userEntity);
+        userServiceImpl.updateUserStatus(randomIdForTest, UserStatus.APPROVED);
+
+        exception.expect(UserIsNotDeletableException.class);
+        userServiceImpl.removeUser(randomIdForTest);
+    }
 }
-
-
-

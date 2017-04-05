@@ -18,6 +18,7 @@ import javax.validation.constraints.NotNull;
 import java.util.List;
 
 import static sg.ncl.service.user.validations.Validator.isAdmin;
+
 /**
  * @author Christopher Zhong
  */
@@ -65,8 +66,7 @@ public class UsersController {
     public User updateUserStatus(
             @AuthenticationPrincipal final Object claims,
             @PathVariable final String id,
-            @PathVariable final String status)
-    {
+            @PathVariable final String status) {
         if (claims == null || !(claims instanceof Claims)) {
             throw new UnauthorizedException();
         }
@@ -74,6 +74,17 @@ public class UsersController {
         isAdmin((Claims) claims);
 
         return new UserInfo(userService.updateUserStatus(id, UserStatus.valueOf(status)));
+    }
+
+    @DeleteMapping(path = "/{id}")
+    public String removeUser(@AuthenticationPrincipal final Object claims, @PathVariable String id) {
+        if (claims == null || !(claims instanceof Claims)) {
+            throw new UnauthorizedException();
+        }
+
+        isAdmin((Claims) claims);
+
+        return String.valueOf(userService.removeUser(id));
     }
 
     @PutMapping(path = "/{id}/emails/{emailBase64}", consumes = MediaType.APPLICATION_JSON_VALUE)
