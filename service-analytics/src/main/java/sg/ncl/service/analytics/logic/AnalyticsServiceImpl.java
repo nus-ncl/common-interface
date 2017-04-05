@@ -5,8 +5,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.stereotype.Service;
 import sg.ncl.adapter.deterlab.AdapterDeterLab;
-import sg.ncl.common.AccountingProperties;
-import sg.ncl.common.exception.base.BadRequestException;
 import sg.ncl.service.analytics.AnalyticsProperties;
 import sg.ncl.service.analytics.data.jpa.DataDownloadEntity;
 import sg.ncl.service.analytics.data.jpa.DataDownloadRepository;
@@ -23,22 +21,15 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.time.DayOfWeek;
-import java.time.Period;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
-import java.time.temporal.TemporalAdjuster;
-import java.time.temporal.TemporalAdjusters;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.regex.Pattern;
-
-import static java.time.temporal.TemporalAdjusters.firstDayOfMonth;
-import static java.time.temporal.TemporalAdjusters.lastDayOfMonth;
 
 /**
  * @author: Tran Ly Vu
@@ -205,13 +196,13 @@ public class AnalyticsServiceImpl implements AnalyticsService {
 
         //check all the missing files up to the first available file
         if (!energyList.isEmpty()) {
-            ZonedDateTime firstDateAvailable = energyList.get(0).getZonedDateTime();   // First date that is available
+            ZonedDateTime firstDateAvailable = energyList.get(0).getZonedDateTime();   // First available date
             while (comparator.compare(startDate, firstDateAvailable) != 0) {
                 energyStatistics.add(0.00);
                 startDate = startDate.plusDays(1);
             }
         }
-        log.info(" energyStatistics size is {}", Integer.toString(energyStatistics.size()));
+
         // list of energy up to the last file that is available
         for (int i = 0; i < energyList.size() - 1; i++) {
             Energy energyI = energyList.get(i);
@@ -226,7 +217,7 @@ public class AnalyticsServiceImpl implements AnalyticsService {
 
         //check all the missing files starting from the last available files
         if (!energyList.isEmpty()) {
-            ZonedDateTime lastDateAvailable = energyList.get(energyList.size() - 1).getZonedDateTime();   // First date that is available
+            ZonedDateTime lastDateAvailable = energyList.get(energyList.size() - 1).getZonedDateTime();   // last available date
             while (comparator.compare(realEndDate, lastDateAvailable) != 0) {
                 energyStatistics.add(0.00);
                 lastDateAvailable = lastDateAvailable.plusDays(1);

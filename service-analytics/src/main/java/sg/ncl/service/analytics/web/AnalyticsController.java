@@ -113,6 +113,7 @@ public class AnalyticsController {
                                         @RequestParam(value = "endDate", required = false) String endDate) {
 
         //check admin using validator class from common
+        //Fixme
         //isAdmin((Claims) claims);
 
         ZonedDateTime start = getZonedDateTime(startDate);
