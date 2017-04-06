@@ -138,53 +138,7 @@ public class AnalyticsServiceImpl implements AnalyticsService {
         String start = startDate.format(formatter);
         String end = realEndDate.format(formatter);
 
-        //add all the log inside filenameList
-        Path path = Paths.get(System.getProperty("user.home"));
-        path = Paths.get(path.getRoot().toString(), analyticsProperties.getEnergyDir());
-        File dir = new File(path.toString());
-        Pattern p = Pattern.compile("(nclenergy\\.)\\d{12}(\\.out)");
-
-        if (dir.isDirectory()) {
-            File[] files = dir.listFiles();
-            for (int i =0; i < files.length; i++) {
-                if (p.matcher(files[i].getName()).matches()) {
-                    filenameList.add(files[i].toString());
-                }
-            }
-        }
-
-        // retrieve only first log of each day (morning) into distinctList
-        Collections.sort(filenameList);
-        String previous = "";
-        for (String filename : filenameList) {
-            String[] parts = filename.split("\\.");
-            String subString = parts[1].substring(0, 8);
-            if (subString.compareTo(start) >= 0 && subString.compareTo(end) <= 0 && !previous.equals(subString)) {
-                    distinctList.add(filename);
-                    previous = subString;
-            }
-        }
-
-        //add up or energy and put into energyList
-        for (String distinct : distinctList) {
-            try {
-                Energy energy = readFile(distinct);
-                energyList.add(energy);
-            } catch (IOException e) {
-                log.error("Getting energy statistics: {}", e);
-                e.printStackTrace();
-            }
-        }
-
-
-        /*
-        Collections.sort(energyList, new Comparator<Energy>() {
-            @Override
-            public int compare(Energy energy1, Energy energy2) {
-                return energy1.filename.compareTo(energy2.filename); // Ascending
-            }
-        });
-        */
+        energyList = getEnergyList(start, end);
 
         //sort energy list based on file name
         energyList.sort(
@@ -233,6 +187,53 @@ public class AnalyticsServiceImpl implements AnalyticsService {
         log.info("Getting energy statistics : number of date retrieve is {} ", energyStatistics.size());
 
         return energyStatistics;
+    }
+    
+    private List<Energy> getEnergyList(String start, String end){
+
+        List<String> filenameList = new ArrayList<>();
+        List<String> distinctList = new ArrayList<>();
+        List<Energy> energyList = new ArrayList<>();
+        List<Double> energyStatistics = new ArrayList<>();
+
+        //add all the log inside filenameList
+        Path path = Paths.get(System.getProperty("user.home"));
+        path = Paths.get(path.getRoot().toString(), analyticsProperties.getEnergyDir());
+        File dir = new File(path.toString());
+        Pattern p = Pattern.compile("(nclenergy\\.)\\d{12}(\\.out)");
+
+        if (dir.isDirectory()) {
+            File[] files = dir.listFiles();
+            for (int i =0; i < files.length; i++) {
+                if (p.matcher(files[i].getName()).matches()) {
+                    filenameList.add(files[i].toString());
+                }
+            }
+        }
+
+        // retrieve only first log of each day (morning) into distinctList
+        Collections.sort(filenameList);
+        String previous = "";
+        for (String filename : filenameList) {
+            String[] parts = filename.split("\\.");
+            String subString = parts[1].substring(0, 8);
+            if (subString.compareTo(start) >= 0 && subString.compareTo(end) <= 0 && !previous.equals(subString)) {
+                distinctList.add(filename);
+                previous = subString;
+            }
+        }
+
+        //add up or energy and put into energyList
+        for (String distinct : distinctList) {
+            try {
+                Energy energy = readFile(distinct);
+                energyList.add(energy);
+            } catch (IOException e) {
+                log.error("Getting energy statistics: {}", e);
+                e.printStackTrace();
+            }
+        }
+        return  energyList;
     }
 
     private Energy readFile(String filename) throws IOException {
@@ -285,4 +286,5 @@ public class AnalyticsServiceImpl implements AnalyticsService {
                 return null;
         }
     }
+
 }
