@@ -159,11 +159,9 @@ public class AnalyticsServiceImpl implements AnalyticsService {
         for (String filename : filenameList) {
             String[] parts = filename.split("\\.");
             String subString = parts[1].substring(0, 8);
-            if (subString.compareTo(start) >= 0 && subString.compareTo(end) <= 0) {
-                if (!previous.equals(subString)) {
+            if (subString.compareTo(start) >= 0 && subString.compareTo(end) <= 0 && !previous.equals(subString)) {
                     distinctList.add(filename);
                     previous = subString;
-                }
             }
         }
 
@@ -173,33 +171,41 @@ public class AnalyticsServiceImpl implements AnalyticsService {
                 Energy energy = readFile(distinct);
                 energyList.add(energy);
             } catch (IOException e) {
+                log.error("Getting energy statistics: {}", e);
                 e.printStackTrace();
             }
         }
-        //sort energy list based on file name
+
+
+        /*
         Collections.sort(energyList, new Comparator<Energy>() {
             @Override
             public int compare(Energy energy1, Energy energy2) {
                 return energy1.filename.compareTo(energy2.filename); // Ascending
             }
         });
+        */
 
+        //sort energy list based on file name
+        energyList.sort(
+                (Energy energy1, Energy energy2) -> energy1.filename.compareTo(energy2.filename)
+                );
 
         //if every files are missing
         if (energyList.isEmpty()) {
             int numberOfDays = (int)ChronoUnit.DAYS.between(startDate, realEndDate);
             for (int i =0; i< numberOfDays; i++) {
                 energyStatistics.add(0.00);
-                i++;
             }
         }
 
         //check all the missing files up to the first available file
+        ZonedDateTime dateToStartCount =  startDate;
         if (!energyList.isEmpty()) {
             ZonedDateTime firstDateAvailable = energyList.get(0).getZonedDateTime();   // First available date
-            while (comparator.compare(startDate, firstDateAvailable) != 0) {
+            while (comparator.compare(dateToStartCount, firstDateAvailable) != 0) {
                 energyStatistics.add(0.00);
-                startDate = startDate.plusDays(1);
+                dateToStartCount = dateToStartCount.plusDays(1);
             }
         }
 
@@ -210,7 +216,7 @@ public class AnalyticsServiceImpl implements AnalyticsService {
             int numberOfDays = (int)ChronoUnit.DAYS.between(energyI.getZonedDateTime(), energyIPlus1.getZonedDateTime());
             double difference =  energyIPlus1.getUsage() - energyI.getUsage();
             double averageValue = difference/numberOfDays;
-            for (int j = i; j < numberOfDays; j++) {
+            for (int j = 0; j < numberOfDays; j++) {
                 energyStatistics.add(averageValue);
             }
         }
@@ -224,6 +230,8 @@ public class AnalyticsServiceImpl implements AnalyticsService {
             }
         }
 
+        log.info("Getting energy statistics : number of date retrieve is {} ", energyStatistics.size());
+
         return energyStatistics;
     }
 
@@ -233,9 +241,7 @@ public class AnalyticsServiceImpl implements AnalyticsService {
 
         BufferedReader br = new BufferedReader(new FileReader(filename));
         try {
-            StringBuilder sb = new StringBuilder();
             String line = br.readLine();
-
             while (line != null) {
                 String[] parts = line.split(" ");
                 String usage = parts[3];
