@@ -128,9 +128,6 @@ public class AnalyticsServiceImpl implements AnalyticsService {
         //preparation
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMdd");  //format into string
         Comparator<ZonedDateTime> comparator = Comparator.comparing(zdt -> zdt.truncatedTo(ChronoUnit.DAYS));  // to compare 2 ZonedTimeDate's
-        List<String> filenameList = new ArrayList<>();
-        List<String> distinctList = new ArrayList<>();
-        List<Energy> energyList = new ArrayList<>();
         List<Double> energyStatistics = new ArrayList<>();
 
         // The real end date to use is the next day of the end date retrieve from WS
@@ -138,7 +135,7 @@ public class AnalyticsServiceImpl implements AnalyticsService {
         String start = startDate.format(formatter);
         String end = realEndDate.format(formatter);
 
-        energyList = getEnergyList(start, end);
+        List<Energy> energyList = getEnergyList(start, end);
 
         //sort energy list based on file name
         energyList.sort(
@@ -192,7 +189,6 @@ public class AnalyticsServiceImpl implements AnalyticsService {
         List<String> filenameList = new ArrayList<>();
         List<String> distinctList = new ArrayList<>();
         List<Energy> energyList = new ArrayList<>();
-        List<Double> energyStatistics = new ArrayList<>();
 
         //add all the log inside filenameList
         Path path = Paths.get(System.getProperty("user.home"));

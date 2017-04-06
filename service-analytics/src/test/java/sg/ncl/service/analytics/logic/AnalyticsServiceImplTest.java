@@ -16,6 +16,7 @@ import sg.ncl.service.analytics.data.jpa.DataDownloadEntity;
 import sg.ncl.service.analytics.data.jpa.DataDownloadRepository;
 import sg.ncl.service.analytics.data.jpa.DataDownloadStatistics;
 import sg.ncl.service.analytics.domain.AnalyticsService;
+import sg.ncl.service.analytics.exceptions.StartDateAfterEndDateException;
 
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
@@ -136,4 +137,5 @@ public class AnalyticsServiceImplTest {
         analyticsService.getDataDownloadCount(Long.parseLong(RandomStringUtils.randomNumeric(10)), ZonedDateTime.now(), ZonedDateTime.now());
         verify(dataDownloadRepository, times(1)).findDownloadCountByDataIdAndDownloadDateBetween(anyLong(), any(ZonedDateTime.class), any(ZonedDateTime.class));
     }
+
 }
