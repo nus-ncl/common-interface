@@ -151,44 +151,42 @@ public class AnalyticsServiceImpl implements AnalyticsService {
             for (int i =0; i< numberOfDays; i++) {
                 energyStatistics.add(0.00);
             }
-        }
+        } else {
 
-        //check all the missing files up to the first available file
-        ZonedDateTime dateToStartCount =  startDate;
-        if (!energyList.isEmpty()) {
+            //check all the missing files up to the first available file
+            ZonedDateTime dateToStartCount = startDate;
             ZonedDateTime firstDateAvailable = energyList.get(0).getZonedDateTime();   // First available date
             while (comparator.compare(dateToStartCount, firstDateAvailable) != 0) {
                 energyStatistics.add(0.00);
                 dateToStartCount = dateToStartCount.plusDays(1);
             }
-        }
 
-        // list of energy up to the last file that is available
-        for (int i = 0; i < energyList.size() - 1; i++) {
-            Energy energyI = energyList.get(i);
-            Energy energyIPlus1 = energyList.get(i+1);
-            int numberOfDays = (int)ChronoUnit.DAYS.between(energyI.getZonedDateTime(), energyIPlus1.getZonedDateTime());
-            double difference =  energyIPlus1.getUsage() - energyI.getUsage();
-            double averageValue = difference/numberOfDays;
-            for (int j = 0; j < numberOfDays; j++) {
-                energyStatistics.add(averageValue);
+
+            // list of energy up to the last file that is available
+            for (int i = 0; i < energyList.size() - 1; i++) {
+                Energy energyI = energyList.get(i);
+                Energy energyIPlus1 = energyList.get(i + 1);
+                int numberOfDays = (int) ChronoUnit.DAYS.between(energyI.getZonedDateTime(), energyIPlus1.getZonedDateTime());
+                double difference = energyIPlus1.getUsage() - energyI.getUsage();
+                double averageValue = difference / numberOfDays;
+                for (int j = 0; j < numberOfDays; j++) {
+                    energyStatistics.add(averageValue);
+                }
             }
-        }
 
-        //check all the missing files starting from the last available files
-        if (!energyList.isEmpty()) {
+            //check all the missing files starting from the last available files
             ZonedDateTime lastDateAvailable = energyList.get(energyList.size() - 1).getZonedDateTime();   // last available date
             while (comparator.compare(realEndDate, lastDateAvailable) != 0) {
                 energyStatistics.add(0.00);
                 lastDateAvailable = lastDateAvailable.plusDays(1);
             }
+
         }
 
         log.info("Getting energy statistics : number of date retrieve is {} ", energyStatistics.size());
-
         return energyStatistics;
     }
-    
+
     private List<Energy> getEnergyList(String start, String end){
 
         List<String> filenameList = new ArrayList<>();
