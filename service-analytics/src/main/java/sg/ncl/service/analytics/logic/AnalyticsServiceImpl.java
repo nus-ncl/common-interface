@@ -186,7 +186,6 @@ public class AnalyticsServiceImpl implements AnalyticsService {
             }
 
         }
-
         log.info("Getting energy statistics : number of date retrieve is {} ", energyStatistics.size());
         return energyStatistics;
     }

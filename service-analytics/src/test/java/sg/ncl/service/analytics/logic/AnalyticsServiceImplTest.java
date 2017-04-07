@@ -27,7 +27,9 @@ import java.time.ZonedDateTime;
 import java.util.*;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.*;
 
@@ -176,8 +178,6 @@ public class AnalyticsServiceImplTest {
 
         List<Double> actual =  analyticsService.getEnergyStatistics(startDate, endDate);
         assertEquals(expected.size(), actual.size());
-
+        assertTrue(expected.equals(actual));
     }
-
-
 }
