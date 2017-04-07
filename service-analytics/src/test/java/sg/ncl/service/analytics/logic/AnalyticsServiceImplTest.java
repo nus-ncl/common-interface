@@ -18,9 +18,12 @@ import sg.ncl.service.analytics.data.jpa.DataDownloadStatistics;
 import sg.ncl.service.analytics.domain.AnalyticsService;
 import sg.ncl.service.analytics.exceptions.StartDateAfterEndDateException;
 
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Matchers.any;
@@ -46,6 +49,9 @@ public class AnalyticsServiceImplTest {
     private AnalyticsService analyticsService;
     @Mock
     private AnalyticsProperties analyticsProperties;
+
+    @Mock
+    private Paths paths;
 
     @Before
     public void before() {
@@ -137,5 +143,31 @@ public class AnalyticsServiceImplTest {
         analyticsService.getDataDownloadCount(Long.parseLong(RandomStringUtils.randomNumeric(10)), ZonedDateTime.now(), ZonedDateTime.now());
         verify(dataDownloadRepository, times(1)).findDownloadCountByDataIdAndDownloadDateBetween(anyLong(), any(ZonedDateTime.class), any(ZonedDateTime.class));
     }
+
+    @Test
+    public void testGetEnergyStatisticsStartDateAfterEndDateException() {
+
+        ZonedDateTime startDate =  ZonedDateTime.now();
+        ZonedDateTime endDate = startDate.minusDays(1);
+        exception.expect(StartDateAfterEndDateException.class);
+        List<Double> actual =  analyticsService.getEnergyStatistics(startDate, endDate);
+    }
+
+    /*
+    @Test
+    public void testGetFilename() {
+        Random rand = new Random();
+        int randomNumberOfDays = rand.nextInt(10) + 1;;
+        ZonedDateTime startDate =  ZonedDateTime.now();
+        ZonedDateTime endDate = startDate.plusDays(randomNumberOfDays);
+
+        String randomHome =   RandomStringUtils.randomAlphanumeric(10);
+        Path path =
+        when(paths.get(anyString())).thenReturn(randomHome);
+
+        List<Double> actual =  analyticsService.getEnergyStatistics(startDate, endDate);
+    }
+
+*/
 
 }
