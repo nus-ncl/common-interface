@@ -26,6 +26,7 @@ import sg.ncl.common.exception.ExceptionAutoConfiguration;
 import sg.ncl.common.exception.GlobalExceptionHandler;
 import sg.ncl.common.exception.base.UnauthorizedException;
 import sg.ncl.common.jwt.JwtToken;
+import sg.ncl.service.analytics.data.jpa.DataDownloadStatistics;
 import sg.ncl.service.analytics.domain.AnalyticsService;
 
 
@@ -38,6 +39,8 @@ import java.util.Random;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyLong;
+import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.mockingDetails;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
@@ -100,8 +103,23 @@ public class AnalyticsControllerTest {
 
     @Test
     public void getDataDownloadCountGood() throws Exception {
-        
 
+        List<DataDownloadStatistics> randomList = new ArrayList<>();
+        Random rand = new Random();
+        int randomSize = rand.nextInt(10) + 1;;
+
+        for (int i =0; i <  randomSize; i++) {
+            Long randomId =  new Random().nextLong();
+            Long randomCount = new Random().nextLong();
+            DataDownloadStatistics dataDownloadStatistics = new DataDownloadStatistics(randomId, randomCount);
+            randomList.add(dataDownloadStatistics);
+        }
+
+        when(analyticsService.getDataDownloadCount(anyLong(),any(ZonedDateTime.class), any(ZonedDateTime.class)))
+                .thenReturn(randomList);
+
+        mockMvc.perform(get(AnalyticsController.PATH + "/datasets/downloads"))
+                .andExpect(status().isOk());
     }
 
 
