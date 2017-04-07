@@ -11,6 +11,7 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.http.MediaType;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -28,6 +29,7 @@ import sg.ncl.common.exception.base.UnauthorizedException;
 import sg.ncl.common.jwt.JwtToken;
 import sg.ncl.service.analytics.data.jpa.DataDownloadStatistics;
 import sg.ncl.service.analytics.domain.AnalyticsService;
+import sg.ncl.service.analytics.exceptions.StartDateAfterEndDateException;
 
 
 import javax.inject.Inject;
@@ -55,7 +57,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @ContextConfiguration(classes = {AnalyticsController.class, ExceptionAutoConfiguration.class, GlobalExceptionHandler.class})
 @TestPropertySource(properties = "flyway.enabled=false")
 public class AnalyticsControllerTest {
-
 
     @Rule
     public ExpectedException exception = ExpectedException.none();
@@ -119,6 +120,31 @@ public class AnalyticsControllerTest {
                 .thenReturn(randomList);
 
         mockMvc.perform(get(AnalyticsController.PATH + "/datasets/downloads"))
+                .andExpect(status().isOk())
+                .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON));
+    }
+
+    @Test
+    public void testGetUsageStatisticsUnauthorizedException() throws Exception {
+        when(authentication.getPrincipal()).thenReturn(claims);
+
+        try {
+            mockMvc.perform(get(AnalyticsController.PATH + "/usage/teams"));
+        } catch (Exception e) {
+            assertThat(e.getCause().getClass()).isEqualTo(UnauthorizedException.class);
+        }
+    }
+
+    @Test
+    public void testGetUsageStatisticsGood() throws Exception {
+
+        String randomUsage = RandomStringUtils.randomAlphanumeric(10);
+        String randomId =  RandomStringUtils.randomAlphanumeric(10);
+
+        when(analyticsService.getUsageStatistics(anyString(),any(ZonedDateTime.class), any(ZonedDateTime.class)))
+                .thenReturn(randomUsage);
+
+        mockMvc.perform(get(AnalyticsController.PATH + "/usage/teams/" + randomId))
                 .andExpect(status().isOk());
     }
 
@@ -142,7 +168,8 @@ public class AnalyticsControllerTest {
                     .thenReturn(randomList);
 
         mockMvc.perform(get(AnalyticsController.PATH + "/energy"))
-                .andExpect(status().isOk());
+                .andExpect(status().isOk())
+                .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON));
     }
 
     @Test
