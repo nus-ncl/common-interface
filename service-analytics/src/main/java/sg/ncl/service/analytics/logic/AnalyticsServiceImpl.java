@@ -256,7 +256,8 @@ public class AnalyticsServiceImpl implements AnalyticsService {
     }
 
     @Getter
-    public class Energy {
+    @Setter
+    static class Energy {
         private String filename; //nclenergy.YYYYMMDDHHMM.out
         private double usage; //accumulated usage
 
