@@ -145,8 +145,28 @@ public class AnalyticsServiceImplTest {
     }
 
     @Test
-    public void testGetEnergyStatisticsStartDateAfterEndDateException() {
+    public void testgetUsageStatisticsStartDateAfterEndDateException () throws Exception {
+        String randomTeamId = RandomStringUtils.randomNumeric(10);
+        ZonedDateTime startDate = ZonedDateTime.now();
+        ZonedDateTime endDate = startDate.minusDays(1);
+        exception.expect(StartDateAfterEndDateException.class);
+        String actual = analyticsService.getUsageStatistics(randomTeamId, startDate , endDate);
+    }
 
+    @Test
+    public void testgetUsageStatisticsGood () throws Exception {
+        String randomTeamId = RandomStringUtils.randomNumeric(10);
+        Random rand = new Random();
+        int randomNumberOfDays = rand.nextInt(10) + 1;;
+        ZonedDateTime startDate =  ZonedDateTime.now();
+        ZonedDateTime endDate = startDate.plusDays(randomNumberOfDays);
+        String actual = analyticsService.getUsageStatistics(randomTeamId, startDate , endDate);
+        verify(adapterDeterLab, times(1)).getUsageStatistics(anyString(), anyString(), anyString());
+
+    }
+
+    @Test
+    public void testGetEnergyStatisticsStartDateAfterEndDateException() throws Exception {
         ZonedDateTime startDate = ZonedDateTime.now();
         ZonedDateTime endDate = startDate.minusDays(1);
         exception.expect(StartDateAfterEndDateException.class);
@@ -154,7 +174,7 @@ public class AnalyticsServiceImplTest {
     }
 
     @Test
-    public void testGetEnergyStatisticsEmptyEnergyList() throws Exception{
+    public void testGetEnergyStatisticsEmptyEnergyList() throws Exception {
 
         Random rand = new Random();
         int randomNumberOfDays = rand.nextInt(10) + 1;;
@@ -180,7 +200,7 @@ public class AnalyticsServiceImplTest {
     }
 
     @Test
-    public void testGetEnergyStatisticsListof3() throws Exception{
+    public void testGetEnergyStatistics2Days() throws Exception {
 
         ZoneId zoneId = ZoneId.of("Asia/Singapore");
         ZonedDateTime startDate =  ZonedDateTime.of(2017, 03, 28, 0, 0, 0, 0, zoneId);
