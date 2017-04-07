@@ -1,11 +1,14 @@
 package sg.ncl.service.analytics.logic;
 
+import mockit.MockUp;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
+import org.junit.runner.RunWith;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
@@ -21,17 +24,17 @@ import sg.ncl.service.analytics.exceptions.StartDateAfterEndDateException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.ZonedDateTime;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Random;
+import java.util.*;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.Assert.assertEquals;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.*;
 
 /**
  * Created by dcszwang on 12/28/2016.
  */
+
 @TestPropertySource(properties = "flyway.enabled=false")
 @EnableConfigurationProperties(AnalyticsProperties.class)
 public class AnalyticsServiceImplTest {
@@ -144,27 +147,37 @@ public class AnalyticsServiceImplTest {
     @Test
     public void testGetEnergyStatisticsStartDateAfterEndDateException() {
 
-        ZonedDateTime startDate =  ZonedDateTime.now();
+        ZonedDateTime startDate = ZonedDateTime.now();
         ZonedDateTime endDate = startDate.minusDays(1);
         exception.expect(StartDateAfterEndDateException.class);
-        List<Double> actual =  analyticsService.getEnergyStatistics(startDate, endDate);
+        List<Double> actual = analyticsService.getEnergyStatistics(startDate, endDate);
     }
 
-    /*
     @Test
-    public void testGetFilename() {
+    public void testGetEnergyStatisticsEmptyEnergyList() throws Exception{
+
         Random rand = new Random();
         int randomNumberOfDays = rand.nextInt(10) + 1;;
         ZonedDateTime startDate =  ZonedDateTime.now();
         ZonedDateTime endDate = startDate.plusDays(randomNumberOfDays);
 
-        String randomHome =   RandomStringUtils.randomAlphanumeric(10);
-        Path path =
-        when(paths.get(anyString())).thenReturn(randomHome);
+        new MockUp<AnalyticsServiceImpl>() {
+            @mockit.Mock
+            List<AnalyticsServiceImpl.Energy> getEnergyList (String start, String end) {
+                List<AnalyticsServiceImpl.Energy> emptyList = new ArrayList<>();
+                return emptyList;
+            }
+        };
+
+        List<Double> expected = new ArrayList<>();
+        for (int i = 0; i < randomNumberOfDays + 1; i++) {
+            expected.add(0.00);
+        }
 
         List<Double> actual =  analyticsService.getEnergyStatistics(startDate, endDate);
+        assertEquals(expected.size(), actual.size());
+
     }
 
-*/
 
 }

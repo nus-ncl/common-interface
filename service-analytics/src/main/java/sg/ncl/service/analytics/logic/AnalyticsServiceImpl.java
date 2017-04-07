@@ -1,6 +1,7 @@
 package sg.ncl.service.analytics.logic;
 
 import lombok.Getter;
+import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.stereotype.Service;
@@ -45,6 +46,12 @@ public class AnalyticsServiceImpl implements AnalyticsService {
     private final AdapterDeterLab adapterDeterLab;
 
     private final AnalyticsProperties analyticsProperties;
+
+    public AnalyticsServiceImpl( ) {
+        dataDownloadRepository = null;
+        adapterDeterLab = null;
+        analyticsProperties = null;
+    }
 
     @Inject
     AnalyticsServiceImpl(@NotNull DataDownloadRepository dataDownloadRepository, @NotNull final AdapterDeterLab adapterDeterLab, @NotNull final AnalyticsProperties analyticsProperties) {
@@ -137,18 +144,18 @@ public class AnalyticsServiceImpl implements AnalyticsService {
 
         List<Energy> energyList = getEnergyList(start, end);
 
-        //sort energy list based on file name
-        energyList.sort(
-                (Energy energy1, Energy energy2) -> energy1.filename.compareTo(energy2.filename)
-                );
-
         //if every files are missing
-        if (energyList.isEmpty()) {
+        if (energyList.isEmpty() || energyList == null) {
             int numberOfDays = (int)ChronoUnit.DAYS.between(startDate, realEndDate);
             for (int i =0; i< numberOfDays; i++) {
                 energyStatistics.add(0.00);
             }
         } else {
+
+            //sort energy list based on file name
+            energyList.sort(
+                    (Energy energy1, Energy energy2) -> energy1.filename.compareTo(energy2.filename)
+            );
 
             //check all the missing files up to the first available file
             ZonedDateTime dateToStartCount = startDate;
@@ -250,7 +257,7 @@ public class AnalyticsServiceImpl implements AnalyticsService {
     }
 
     @Getter
-    private class Energy {
+    public class Energy {
         private String filename; //nclenergy.YYYYMMDDHHMM.out
         private double usage; //accumulated usage
 
