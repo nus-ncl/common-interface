@@ -24,6 +24,7 @@ import org.springframework.web.context.WebApplicationContext;
 import sg.ncl.common.authentication.Role;
 import sg.ncl.common.exception.ExceptionAutoConfiguration;
 import sg.ncl.common.exception.GlobalExceptionHandler;
+import sg.ncl.common.exception.base.UnauthorizedException;
 import sg.ncl.common.jwt.JwtToken;
 import sg.ncl.service.analytics.domain.AnalyticsService;
 
@@ -85,6 +86,24 @@ public class AnalyticsControllerTest {
 
         mockMvc = MockMvcBuilders.webAppContextSetup(webApplicationContext).build();
     }
+
+    @Test
+    public void getDataDownloadCountUnauthorizedException() throws Exception {
+        when(authentication.getPrincipal()).thenReturn(claims);
+
+        try {
+            mockMvc.perform(get(AnalyticsController.PATH + "/datasets/downloads"));
+        } catch (Exception e) {
+            assertThat(e.getCause().getClass()).isEqualTo(UnauthorizedException.class);
+        }
+    }
+
+    @Test
+    public void getDataDownloadCountGood() throws Exception {
+        
+
+    }
+
 
     @Test
     public void testGetEnergyStatistics() throws Exception {
