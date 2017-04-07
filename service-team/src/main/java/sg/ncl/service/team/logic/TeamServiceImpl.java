@@ -182,7 +182,8 @@ public class TeamServiceImpl implements TeamService {
             throw new TeamNotFoundException(id);
         }
         log.info("Removing member {} from team {}", teamMember.getUserId(), id);
-        entity.changeMemberStatus(teamMember, MemberStatus.REJECTED);
+        // entity.changeMemberStatus(teamMember, MemberStatus.REJECTED);
+        entity.removeMember(teamMember);
         final Team updatedTeam = teamRepository.save(entity);
         log.info("Member {} removed from team {}", teamMember.getUserId(), updatedTeam.getId());
         return updatedTeam;
