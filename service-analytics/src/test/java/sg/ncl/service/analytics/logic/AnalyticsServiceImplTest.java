@@ -50,6 +50,7 @@ public class AnalyticsServiceImplTest {
     private AdapterDeterLab adapterDeterLab;
 
     private AnalyticsService analyticsService;
+
     @Mock
     private AnalyticsProperties analyticsProperties;
 

@@ -12,7 +12,6 @@ import sg.ncl.adapter.deterlab.ConnectionPropertiesTest.TestConfig;
 import javax.inject.Inject;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assert.assertEquals;
 
 /**
  * @Author Tran Ly Vu on 10/3/2016.
