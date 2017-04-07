@@ -9,19 +9,20 @@ import org.junit.rules.ExpectedException;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
-import sg.ncl.service.user.util.TestUtil;
+import sg.ncl.service.authentication.data.jpa.CredentialsRepository;
 import sg.ncl.service.user.data.jpa.UserDetailsEntity;
 import sg.ncl.service.user.data.jpa.UserEntity;
 import sg.ncl.service.user.data.jpa.UserRepository;
 import sg.ncl.service.user.domain.User;
 import sg.ncl.service.user.domain.UserStatus;
 import sg.ncl.service.user.exceptions.*;
-
+import sg.ncl.service.user.util.TestUtil;
 
 import java.util.List;
 
-import static org.mockito.Matchers.*;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.*;
 
 /**
@@ -38,14 +39,18 @@ public class UserServiceImplTest {
     public ExpectedException exception = ExpectedException.none();
 
     @Mock
+    private CredentialsRepository credentialsRepository;
+
+    @Mock
     private UserRepository userRepository;
 
     private UserServiceImpl userServiceImpl;
 
     @Before
     public void setup() {
+        assertThat(mockingDetails(credentialsRepository).isMock()).isTrue();
         assertThat(mockingDetails(userRepository).isMock()).isTrue();
-        userServiceImpl = new UserServiceImpl(userRepository);
+        userServiceImpl = new UserServiceImpl(userRepository, credentialsRepository);
     }
 
     //throw UsernameAlreadyExistsException
