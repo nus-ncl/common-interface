@@ -50,9 +50,6 @@ public class AnalyticsServiceImplTest {
     @Mock
     private AnalyticsProperties analyticsProperties;
 
-    @Mock
-    private Paths paths;
-
     @Before
     public void before() {
         assertThat(mockingDetails(dataDownloadRepository).isMock()).isTrue();
