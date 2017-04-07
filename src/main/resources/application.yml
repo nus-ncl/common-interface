@@ -65,6 +65,8 @@ ncl:
     delay: 10_000
   accounting:
     charges: 0.12
+  analytics:
+    energyDir: home/sio/energylog
 deterurl:
   bossurl: 172.18.178.10
   userurl: 172.18.178.11

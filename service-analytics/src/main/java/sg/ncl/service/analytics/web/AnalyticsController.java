@@ -10,7 +10,6 @@ import sg.ncl.common.exception.base.BadRequestException;
 import sg.ncl.common.exception.base.UnauthorizedException;
 import sg.ncl.service.analytics.data.jpa.DataDownloadStatistics;
 import sg.ncl.service.analytics.domain.AnalyticsService;
-import sg.ncl.service.analytics.exceptions.StartDateAfterEndDateException;
 
 import javax.inject.Inject;
 import javax.validation.constraints.NotNull;
@@ -20,6 +19,7 @@ import java.util.List;
 
 import static java.time.temporal.TemporalAdjusters.firstDayOfMonth;
 import static java.time.temporal.TemporalAdjusters.lastDayOfMonth;
+import static sg.ncl.common.validation.Validator.isAdmin;
 
 /**
  * @author: Tran Ly Vu, James Ng
@@ -93,6 +93,7 @@ public class AnalyticsController {
             log.warn("Access denied for: /analytics/usage/teams GET");
             throw new UnauthorizedException();
         }
+
         ZonedDateTime start = getZonedDateTime(startDate);
         ZonedDateTime end = getZonedDateTime(endDate);
         ZonedDateTime now = ZonedDateTime.now();
@@ -100,9 +101,29 @@ public class AnalyticsController {
             start = now.with(firstDayOfMonth());
         if (end == null)
             end = now.with(lastDayOfMonth());
-        if (start.isAfter(end))
-            throw new StartDateAfterEndDateException();
+
         return analyticsService.getUsageStatistics(id, start, end);
+    }
+
+    @GetMapping("/energy")
+    @ResponseStatus(HttpStatus.OK)
+    public List<Double> getEnergyStatistics(@AuthenticationPrincipal Object claims,
+                                        @RequestParam(value = "startDate", required = false) String startDate,
+                                        @RequestParam(value = "endDate", required = false) String endDate) {
+
+        //check admin using validator class from common
+        isAdmin((Claims) claims);
+
+        ZonedDateTime start = getZonedDateTime(startDate);
+        ZonedDateTime end = getZonedDateTime(endDate);
+        ZonedDateTime now = ZonedDateTime.now();
+        if (start == null) {
+            start = now.with(firstDayOfMonth());
+        }
+        if (end == null) {
+            end = now.with(lastDayOfMonth());
+        }
+        return analyticsService.getEnergyStatistics(start, end);
     }
 
 }

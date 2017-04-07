@@ -1,32 +1,42 @@
 package sg.ncl.service.analytics.logic;
 
+import mockit.MockUp;
+import mockit.integration.junit4.JMockit;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
+import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.test.context.TestPropertySource;
 import sg.ncl.adapter.deterlab.AdapterDeterLab;
+import sg.ncl.service.analytics.AnalyticsProperties;
 import sg.ncl.service.analytics.data.jpa.DataDownloadEntity;
 import sg.ncl.service.analytics.data.jpa.DataDownloadRepository;
 import sg.ncl.service.analytics.data.jpa.DataDownloadStatistics;
 import sg.ncl.service.analytics.domain.AnalyticsService;
+import sg.ncl.service.analytics.exceptions.StartDateAfterEndDateException;
 
+import java.time.ZoneId;
 import java.time.ZonedDateTime;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.*;
 
 /**
- * Created by dcszwang on 12/28/2016.
+ * @Author dcszwang, Tran Ly Vu
  */
+@RunWith(JMockit.class)
 @TestPropertySource(properties = "flyway.enabled=false")
+@EnableConfigurationProperties(AnalyticsProperties.class)
 public class AnalyticsServiceImplTest {
 
     @Rule
@@ -41,11 +51,15 @@ public class AnalyticsServiceImplTest {
 
     private AnalyticsService analyticsService;
 
+    @Mock
+    private AnalyticsProperties analyticsProperties;
+
     @Before
     public void before() {
         assertThat(mockingDetails(dataDownloadRepository).isMock()).isTrue();
         assertThat(mockingDetails(adapterDeterLab).isMock()).isTrue();
-        analyticsService = new AnalyticsServiceImpl(dataDownloadRepository, adapterDeterLab);
+        assertThat(mockingDetails(analyticsProperties).isMock()).isTrue();
+        analyticsService = new AnalyticsServiceImpl(dataDownloadRepository, adapterDeterLab, analyticsProperties);
     }
 
     @Test
@@ -129,5 +143,98 @@ public class AnalyticsServiceImplTest {
         when(dataDownloadRepository.findDownloadCountByDataIdAndDownloadDateBetween(anyLong(), any(ZonedDateTime.class), any(ZonedDateTime.class))).thenReturn(statisticsList);
         analyticsService.getDataDownloadCount(Long.parseLong(RandomStringUtils.randomNumeric(10)), ZonedDateTime.now(), ZonedDateTime.now());
         verify(dataDownloadRepository, times(1)).findDownloadCountByDataIdAndDownloadDateBetween(anyLong(), any(ZonedDateTime.class), any(ZonedDateTime.class));
+    }
+
+    @Test
+    public void testgetUsageStatisticsStartDateAfterEndDateException () throws Exception {
+        String randomTeamId = RandomStringUtils.randomNumeric(10);
+        ZonedDateTime startDate = ZonedDateTime.now();
+        ZonedDateTime endDate = startDate.minusDays(1);
+        exception.expect(StartDateAfterEndDateException.class);
+        String actual = analyticsService.getUsageStatistics(randomTeamId, startDate , endDate);
+    }
+
+    @Test
+    public void testgetUsageStatisticsGood () throws Exception {
+        String randomTeamId = RandomStringUtils.randomNumeric(10);
+        Random rand = new Random();
+        int randomNumberOfDays = rand.nextInt(10) + 1;;
+        ZonedDateTime startDate =  ZonedDateTime.now();
+        ZonedDateTime endDate = startDate.plusDays(randomNumberOfDays);
+        String actual = analyticsService.getUsageStatistics(randomTeamId, startDate , endDate);
+        verify(adapterDeterLab, times(1)).getUsageStatistics(anyString(), anyString(), anyString());
+
+    }
+
+    @Test
+    public void testGetEnergyStatisticsStartDateAfterEndDateException() throws Exception {
+        ZonedDateTime startDate = ZonedDateTime.now();
+        ZonedDateTime endDate = startDate.minusDays(1);
+        exception.expect(StartDateAfterEndDateException.class);
+        List<Double> actual = analyticsService.getEnergyStatistics(startDate, endDate);
+    }
+
+    @Test
+    public void testGetEnergyStatisticsEmptyEnergyList() throws Exception {
+
+        Random rand = new Random();
+        int randomNumberOfDays = rand.nextInt(10) + 1;;
+        ZonedDateTime startDate =  ZonedDateTime.now();
+        ZonedDateTime endDate = startDate.plusDays(randomNumberOfDays);
+
+        new MockUp<AnalyticsServiceImpl>() {
+            @mockit.Mock
+            List<AnalyticsServiceImpl.Energy> getEnergyList (String start, String end) {
+                List<AnalyticsServiceImpl.Energy> emptyList = new ArrayList<>();
+                return emptyList;
+            }
+        };
+
+        List<Double> expected = new ArrayList<>();
+        for (int i = 0; i < randomNumberOfDays + 1; i++) {
+            expected.add(0.00);
+        }
+
+        List<Double> actual =  analyticsService.getEnergyStatistics(startDate, endDate);
+        assertEquals(expected.size(), actual.size());
+        assertTrue(expected.equals(actual));
+    }
+
+    @Test
+    public void testGetEnergyStatistics2Days() throws Exception {
+
+        ZoneId zoneId = ZoneId.of("Asia/Singapore");
+        ZonedDateTime startDate =  ZonedDateTime.of(2017, 03, 28, 0, 0, 0, 0, zoneId);
+        ZonedDateTime endDate = ZonedDateTime.of(2017, 03, 29, 0, 0, 0, 0, zoneId);
+
+
+        new MockUp<AnalyticsServiceImpl>() {
+            @mockit.Mock
+            List<AnalyticsServiceImpl.Energy> getEnergyList (String start, String end) {
+                List<AnalyticsServiceImpl.Energy> energyList = new ArrayList<>();
+
+                AnalyticsServiceImpl.Energy energy1 = new AnalyticsServiceImpl.Energy("nclenergy.201703280000.out");
+                energy1.setUsage(200.0);
+                energyList.add(energy1);
+
+                AnalyticsServiceImpl.Energy energy2 = new AnalyticsServiceImpl.Energy("nclenergy.201703290000.out");
+                energy2.setUsage(300.0);
+                energyList.add(energy2);
+
+                AnalyticsServiceImpl.Energy energy3 = new AnalyticsServiceImpl.Energy("nclenergy.201703300000.out");
+                energy3.setUsage(450.0);
+                energyList.add(energy3);
+
+                return energyList;
+            }
+        };
+
+        List<Double> expected = new ArrayList<>();
+        expected.add(100.0);
+        expected.add(150.0);
+
+        List<Double> actual =  analyticsService.getEnergyStatistics(startDate, endDate);
+        assertEquals(expected.size(), actual.size());
+        assertTrue(expected.equals(actual));
     }
 }
