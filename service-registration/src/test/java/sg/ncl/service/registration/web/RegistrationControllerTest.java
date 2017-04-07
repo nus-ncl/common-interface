@@ -191,7 +191,7 @@ public class RegistrationControllerTest extends AbstractTest {
 
         // owner should be in team
         Assert.assertThat(resultUser.getTeams().get(0), is(createdTeam.getId()));
-        Assert.assertThat(membersList.size(), is(2));
+        Assert.assertThat(membersList.size(), is(1));
         // member should be deleted from team
         Assert.assertThat(resultUser2.getTeams().isEmpty(), is(true));
     }
