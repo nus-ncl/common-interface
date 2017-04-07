@@ -3,6 +3,10 @@ package sg.ncl.service.user.logic;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.springframework.stereotype.Service;
+import sg.ncl.common.authentication.Role;
+import sg.ncl.service.authentication.data.jpa.CredentialsEntity;
+import sg.ncl.service.authentication.data.jpa.CredentialsRepository;
+import sg.ncl.service.authentication.exceptions.CredentialsNotFoundException;
 import sg.ncl.service.user.data.jpa.UserDetailsEntity;
 import sg.ncl.service.user.data.jpa.UserEntity;
 import sg.ncl.service.user.data.jpa.UserRepository;
@@ -15,7 +19,10 @@ import sg.ncl.service.user.exceptions.*;
 import javax.inject.Inject;
 import javax.transaction.Transactional;
 import javax.validation.constraints.NotNull;
+import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
@@ -26,10 +33,12 @@ import java.util.stream.Collectors;
 public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
+    private final CredentialsRepository credentialsRepository;
 
     @Inject
-    UserServiceImpl(final UserRepository userRepository) {
+    UserServiceImpl(final UserRepository userRepository, final CredentialsRepository credentialsRepository) {
         this.userRepository = userRepository;
+        this.credentialsRepository = credentialsRepository;
     }
 
     @Transactional
@@ -244,13 +253,23 @@ public class UserServiceImpl implements UserService {
             throw new UserNotFoundException(id);
         }
 
-        List<String> teamList = one.getTeams();
+        List<String> teams = new ArrayList<>(one.getTeams());
         UserStatus userStatus = one.getStatus();
-        if (!((teamList == null || teamList.isEmpty()) &&
-                (userStatus == UserStatus.CREATED || userStatus == UserStatus.PENDING))) {
+        if (!(teams.isEmpty() && (userStatus == UserStatus.CREATED || userStatus == UserStatus.PENDING))) {
             log.warn("User is not deletable: {}", id);
             throw new UserIsNotDeletableException(id);
         }
+
+        // clear roles for user
+        CredentialsEntity entity = credentialsRepository.findOne(id);
+        if (entity == null) {
+            log.warn("Credentials for '{}' not found", id);
+            throw new CredentialsNotFoundException(id);
+        }
+        Set<Role> roles = new HashSet<>(entity.getRoles());
+        roles.forEach(entity::removeRole);
+        credentialsRepository.save(entity);
+        credentialsRepository.delete(entity);
 
         userRepository.delete(id);
         return one;
