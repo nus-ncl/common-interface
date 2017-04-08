@@ -227,5 +227,4 @@ public class RegistrationEntity extends AbstractEntity implements Registration {
                 "} " + super.toString();
     }
     */
-
 }

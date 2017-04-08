@@ -2,6 +2,7 @@ package sg.ncl.service.team.data.jpa;
 
 import lombok.Getter;
 import lombok.Setter;
+import org.hibernate.annotations.Type;
 import sg.ncl.common.jpa.AbstractEntity;
 import sg.ncl.service.team.domain.MemberStatus;
 import sg.ncl.service.team.domain.MemberType;
@@ -21,7 +22,7 @@ import javax.persistence.UniqueConstraint;
 import java.time.ZonedDateTime;
 
 /**
- * @author Christopher Zhong
+ * @author Christopher Zhong, Vu
  */
 @Getter
 @Setter
@@ -51,5 +52,9 @@ public class TeamMemberEntity extends AbstractEntity implements TeamMember {
     @Column(name = "status", nullable = false)
     @Enumerated(EnumType.STRING)
     private MemberStatus memberStatus = MemberStatus.PENDING;
+
+    @Type(type = "text")
+    @Column(name = "notes", nullable = false)
+    private String notes;
 
 }

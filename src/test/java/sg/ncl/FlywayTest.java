@@ -1002,7 +1002,7 @@ public class FlywayTest {
     public void testTeamMembersTable() throws Exception {
         // make sure 'team_members' table has expected number of columns
         List<Map<String, Object>> teamMembersTable = this.template.queryForList("SHOW COLUMNS FROM " + SCHEMA + "." + TEAM_MEMBERS);
-        assertThat(teamMembersTable.size()).isEqualTo(9);
+        assertThat(teamMembersTable.size()).isEqualTo(10);
 
         // make sure 'team_members' table has expected column name and type
         assertThat((String) teamMembersTable.get(0).get("FIELD")).isEqualTo("id");

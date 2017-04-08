@@ -25,7 +25,7 @@ import java.util.List;
 import static org.hamcrest.core.Is.is;
 
 /**
- * Created by Desmond/Te Ye
+ * @Authors: Desmond,Te Ye, Vu
  */
 @TestPropertySource(properties = "flyway.enabled=false")
 public class TeamServiceTest extends AbstractTest {

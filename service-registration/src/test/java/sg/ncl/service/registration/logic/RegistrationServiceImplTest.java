@@ -40,7 +40,7 @@ import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.*;
 
 /**
- * Contributor : Vu
+ * @Autors : Vu
  */
 
 public class RegistrationServiceImplTest {
@@ -98,6 +98,7 @@ public class RegistrationServiceImplTest {
 
     @Test
     public void testRegisterRequestToApplyTeamEmptyTeamName() {
+        String randomNotes = RandomStringUtils.randomAlphanumeric(20);
         TeamEntity teamEntity = Util.getTeamEntity();
         teamEntity.setName("");
 
@@ -105,29 +106,32 @@ public class RegistrationServiceImplTest {
         when(userService.getUser(anyString())).thenReturn(userEntity);
 
         exception.expect(TeamNameNullOrEmptyException.class);
-        registrationService.registerRequestToApplyTeam(RandomStringUtils.randomAlphanumeric(8), teamEntity);
+        registrationService.registerRequestToApplyTeam(RandomStringUtils.randomAlphanumeric(8), teamEntity, randomNotes);
     }
 
     @Test
     public void testRegisterRequestToApplyTeamEmptyUserId() {
+        String randomNotes = RandomStringUtils.randomAlphanumeric(20);
         TeamEntity teamEntity = Util.getTeamEntity();
 
         exception.expect(UserIdNullOrEmptyException.class);
-        registrationService.registerRequestToApplyTeam("", teamEntity);
+        registrationService.registerRequestToApplyTeam("", teamEntity, randomNotes);
     }
 
     @Test
     public void testRegisterRequestToApplyTeamNoUser() {
+        String randomNotes = RandomStringUtils.randomAlphanumeric(20);
         TeamEntity teamEntity = Util.getTeamEntity();
 
         when(userService.getUser(anyString())).thenReturn(null);
 
         exception.expect(UserNotFoundException.class);
-        registrationService.registerRequestToApplyTeam(RandomStringUtils.randomAlphanumeric(8), teamEntity);
+        registrationService.registerRequestToApplyTeam(RandomStringUtils.randomAlphanumeric(8), teamEntity, randomNotes);
     }
 
     @Test
     public void testRegisterRequestToApplyTeamDuplicateTeam() {
+        String randomNotes = RandomStringUtils.randomAlphanumeric(20);
         UserEntity userEntity = Util.getUserEntity();
         TeamEntity teamEntity = Util.getTeamEntity();
 
@@ -137,11 +141,12 @@ public class RegistrationServiceImplTest {
         when(teamService.getTeamByName(anyString())).thenReturn(teamEntity);
 
         exception.expect(TeamNameAlreadyExistsException.class);
-        registrationService.registerRequestToApplyTeam(userEntity.getId(), teamEntity);
+        registrationService.registerRequestToApplyTeam(userEntity.getId(), teamEntity, randomNotes);
     }
 
     @Test
     public void testRegisterRequestToApplyTeam() {
+        String randomNotes = RandomStringUtils.randomAlphanumeric(20);
         UserEntity userEntity = Util.getUserEntity();
         TeamEntity teamEntity = Util.getTeamEntity();
 
@@ -151,7 +156,7 @@ public class RegistrationServiceImplTest {
         when(teamService.getTeamByName(anyString())).thenReturn(null);
         when(teamService.createTeam(any(Team.class))).thenReturn(teamEntity);
 
-        registrationService.registerRequestToApplyTeam(userEntity.getId(), teamEntity);
+        registrationService.registerRequestToApplyTeam(userEntity.getId(), teamEntity, randomNotes);
 
         verify(teamService, times(1)).createTeam(any(Team.class));
         verify(userService, times(1)).addTeam(anyString(), anyString());
@@ -161,6 +166,7 @@ public class RegistrationServiceImplTest {
     // to test mapping from ncl team id to deter project id
     @Test
     public void testRegisterRequestToApplyTeamNullTeamIdMapping() {
+        String randomNotes = RandomStringUtils.randomAlphanumeric(20);
         UserEntity userEntity = Util.getUserEntity();
         TeamEntity teamEntity = Util.getTeamEntity();
         teamEntity.setId(null);
@@ -172,11 +178,12 @@ public class RegistrationServiceImplTest {
 
         exception.expect(TeamIdNullOrEmptyException.class);
 
-        registrationService.registerRequestToApplyTeam(userEntity.getId(), teamEntity);
+        registrationService.registerRequestToApplyTeam(userEntity.getId(), teamEntity, randomNotes);
     }
 
     @Test
     public void testRegisterRequestToJoinTeamEmptyTeamName() {
+        String randomNotes = RandomStringUtils.randomAlphanumeric(20);
         TeamEntity teamEntity = Util.getTeamEntity();
         teamEntity.setName("");
 
@@ -184,20 +191,23 @@ public class RegistrationServiceImplTest {
         when(userService.getUser(anyString())).thenReturn(userEntity);
 
         exception.expect(TeamNameNullOrEmptyException.class);
-        registrationService.registerRequestToJoinTeam(RandomStringUtils.randomAlphanumeric(8), teamEntity);
+        registrationService.registerRequestToJoinTeam(RandomStringUtils.randomAlphanumeric(8), teamEntity, randomNotes);
     }
 
     @Test
     public void testRegisterRequestToJoinTeamEmptyUserId() {
         TeamEntity teamEntity = Util.getTeamEntity();
+        String randomNotes = RandomStringUtils.randomAlphanumeric(20);
 
         exception.expect(UserIdNullOrEmptyException.class);
-        registrationService.registerRequestToJoinTeam("", teamEntity);
+        registrationService.registerRequestToJoinTeam("", teamEntity, randomNotes);
     }
 
     @Test
     public void testRegisterRequestToJoinTeamNoTeam() {
         String uid = RandomStringUtils.randomAlphabetic(8);
+        String randomNotes = RandomStringUtils.randomAlphanumeric(20);
+
         TeamEntity teamEntity = Util.getTeamEntity();
         when(teamService.getTeamByName(anyString())).thenReturn(null);
 
@@ -205,18 +215,19 @@ public class RegistrationServiceImplTest {
         when(userService.getUser(anyString())).thenReturn(userEntity);
 
         exception.expect(TeamNotFoundException.class);
-        registrationService.registerRequestToJoinTeam(uid, teamEntity);
+        registrationService.registerRequestToJoinTeam(uid, teamEntity, randomNotes);
     }
 
     @Test
     public void testRegisterRequestToJoinTeam() {
         String uid = RandomStringUtils.randomAlphabetic(8);
+        String randomNotes = RandomStringUtils.randomAlphanumeric(20);
         TeamEntity teamEntity = Util.getTeamEntity();
 
         when(teamService.getTeamByName(anyString())).thenReturn(teamEntity);
         UserEntity userEntity = Util.getUserEntity();
         when(userService.getUser(anyString())).thenReturn(userEntity);
-        registrationService.registerRequestToJoinTeam(uid, teamEntity);
+        registrationService.registerRequestToJoinTeam(uid, teamEntity, randomNotes);
 
         verify(adapterDeterLab, times(1)).getDeterUserIdByNclUserId(anyString());
         verify(userService, times(1)).addTeam(anyString(), anyString());
@@ -226,6 +237,7 @@ public class RegistrationServiceImplTest {
 
     @Test
     public void testRegisterEmptyPassword() {
+        String randomNotes = RandomStringUtils.randomAlphanumeric(20);
         CredentialsEntity credentialsEntity = Util.getCredentialsEntity();
         UserEntity userEntity = Util.getUserEntity();
         TeamEntity teamEntity = Util.getTeamEntity();
@@ -233,11 +245,12 @@ public class RegistrationServiceImplTest {
         credentialsEntity.setPassword("");
 
         exception.expect(IncompleteRegistrationFormException.class);
-        registrationService.register(credentialsEntity, userEntity, teamEntity, isJoinTeam);
+        registrationService.register(credentialsEntity, userEntity, teamEntity, isJoinTeam, randomNotes);
     }
 
     @Test
     public void testRegisterJoinTeamEmptyTeamID() {
+        String randomNotes = RandomStringUtils.randomAlphanumeric(20);
         CredentialsEntity credentialsEntity = Util.getCredentialsEntity();
         User user = Util.getUserEntity();
         isJoinTeam = true;
@@ -246,11 +259,12 @@ public class RegistrationServiceImplTest {
         teamEntity.setId("");
 
         exception.expect(IncompleteRegistrationFormException.class);
-        registrationService.register(credentialsEntity, user, teamEntity, isJoinTeam);
+        registrationService.register(credentialsEntity, user, teamEntity, isJoinTeam, randomNotes);
     }
 
     @Test
     public void testRegisterNotJoinTeamEmptyTeamName() {
+        String randomNotes = RandomStringUtils.randomAlphanumeric(20);
         CredentialsEntity credentialsEntity = Util.getCredentialsEntity();
         User user = Util.getUserEntity();
         isJoinTeam = false;
@@ -260,11 +274,12 @@ public class RegistrationServiceImplTest {
         teamEntity.setName("");
 
         exception.expect(IncompleteRegistrationFormException.class);
-        registrationService.register(credentialsEntity, user, teamEntity, isJoinTeam);
+        registrationService.register(credentialsEntity, user, teamEntity, isJoinTeam, randomNotes);
     }
 
     @Test
     public void testRegisterApplyDuplicateTeamName() {
+        String randomNotes = RandomStringUtils.randomAlphanumeric(20);
         CredentialsEntity credentialsEntity = Util.getCredentialsEntity();
         User user = Util.getUserEntity();
         isJoinTeam = false;
@@ -276,11 +291,12 @@ public class RegistrationServiceImplTest {
         when(teamService.getTeamByName(teamName)).thenReturn(teamEntity);
 
         exception.expect(TeamNameAlreadyExistsException.class);
-        registrationService.register(credentialsEntity, user, teamEntity, isJoinTeam);
+        registrationService.register(credentialsEntity, user, teamEntity, isJoinTeam, randomNotes);
     }
 
     @Test
     public void testRegister() {
+        String randomNotes = RandomStringUtils.randomAlphanumeric(20);
         CredentialsEntity credentialsEntity = Util.getCredentialsEntity();
         UserEntity user = Util.getUserEntity();
         UserEntity userWithId = user;
@@ -298,14 +314,16 @@ public class RegistrationServiceImplTest {
         Mockito.doReturn(userWithId).when(userService).createUser(any(User.class));
         Mockito.doReturn(predefinedResultJson.toString()).when(adapterDeterLab).joinProjectNewUsers(anyString());
         Mockito.doReturn(registrationEntity).when(registrationRepository).save(any(RegistrationEntity.class));
+        Mockito.doReturn(user).when(userService).getUser(anyString());
 
-        Registration result = registrationService.register(credentialsEntity, user, team, isJoinTeam);
+        Registration result = registrationService.register(credentialsEntity, user, team, isJoinTeam, randomNotes);
 
         assertThat(result.getId()).isEqualTo(registrationEntity.getId());
     }
 
     @Test
     public void testRegisterReturnNull() {
+        String randomNotes = RandomStringUtils.randomAlphanumeric(20);
         CredentialsEntity credentialsEntity = Util.getCredentialsEntity();
         UserEntity user = Util.getUserEntity();
         UserEntity userWithId = user;
@@ -324,13 +342,14 @@ public class RegistrationServiceImplTest {
         Mockito.doReturn(predefinedResultJson.toString()).when(adapterDeterLab).joinProjectNewUsers(anyString());
         Mockito.doReturn(registrationEntity).when(registrationRepository).save(any(RegistrationEntity.class));
 
-        Registration result = registrationService.register(credentialsEntity, user, team, isJoinTeam);
+        Registration result = registrationService.register(credentialsEntity, user, team, isJoinTeam, randomNotes);
 
         assertThat(result).isNull();
     }
 
     @Test
     public void testRegisterApplyNewProject() {
+        String randomNotes = RandomStringUtils.randomAlphanumeric(20);
         CredentialsEntity credentialsEntity = Util.getCredentialsEntity();
         UserEntity userEntity = Util.getUserEntity();
         userEntity.setId("12345678");
@@ -349,13 +368,14 @@ public class RegistrationServiceImplTest {
         Mockito.doReturn(predefinedResultJson.toString()).when(adapterDeterLab).applyProjectNewUsers(anyString());
         Mockito.doReturn(registrationEntity).when(registrationRepository).save(any(RegistrationEntity.class));
 
-        Registration result = registrationService.register(credentialsEntity, userEntity, teamEntity, isJoinTeam);
+        Registration result = registrationService.register(credentialsEntity, userEntity, teamEntity, isJoinTeam, randomNotes);
         assertThat(result.getId()).isEqualTo(registrationEntity.getId());
     }
 
     // to test mapping from ncl team id to deter project id
     @Test
     public void testRegisterNulLTeamIdMapping() {
+        String randomNotes = RandomStringUtils.randomAlphanumeric(20);
         CredentialsEntity credentialsEntity = Util.getCredentialsEntity();
         UserEntity userEntity = Util.getUserEntity();
         TeamEntity teamEntity = Util.getTeamEntity();
@@ -366,7 +386,7 @@ public class RegistrationServiceImplTest {
 
         exception.expect(TeamIdNullOrEmptyException.class);
 
-        registrationService.register(credentialsEntity, userEntity, teamEntity, isJoinTeam);
+        registrationService.register(credentialsEntity, userEntity, teamEntity, isJoinTeam, randomNotes);
     }
 
     @Test
@@ -501,7 +521,7 @@ public class RegistrationServiceImplTest {
         userEntity.setId(RandomStringUtils.randomAlphanumeric(20));
 
         exception.expect(InvalidTeamStatusException.class);
-        registrationService.approveOrRejectNewTeam(teamEntity.getId(), userEntity.getId(), null);
+        registrationService.approveOrRejectNewTeam(teamEntity.getId(), userEntity.getId(), TeamStatus.PENDING);
     }
 
     @Test
@@ -574,14 +594,16 @@ public class RegistrationServiceImplTest {
 
     @Test
     public void testUserFormFieldsHasErrorsNullUser() {
+        String randomNotes = RandomStringUtils.randomAlphanumeric(20);
         CredentialsEntity credentialsEntity = Util.getCredentialsEntity();
         Team team = Util.getTeamEntity();
         exception.expect(IncompleteRegistrationFormException.class);
-        registrationService.register(credentialsEntity, null, team, true);
+        registrationService.register(credentialsEntity, null, team, true, randomNotes);
     }
 
     @Test
     public void testUserFormFieldsHasErrorsEmptyUserFirstName() {
+        String randomNotes = RandomStringUtils.randomAlphanumeric(20);
         CredentialsEntity credentialsEntity = Util.getCredentialsEntity();
         Team team = Util.getTeamEntity();
 
@@ -589,11 +611,12 @@ public class RegistrationServiceImplTest {
         userEntity.getUserDetails().setFirstName("");
 
         exception.expect(IncompleteRegistrationFormException.class);
-        registrationService.register(credentialsEntity, userEntity, team, true);
+        registrationService.register(credentialsEntity, userEntity, team, true, randomNotes);
     }
 
     @Test
     public void testUserFormFieldsHasErrorsEmptyUserLastName() {
+        String randomNotes = RandomStringUtils.randomAlphanumeric(20);
         CredentialsEntity credentialsEntity = Util.getCredentialsEntity();
         Team team = Util.getTeamEntity();
 
@@ -601,11 +624,12 @@ public class RegistrationServiceImplTest {
         userEntity.getUserDetails().setLastName("");
 
         exception.expect(IncompleteRegistrationFormException.class);
-        registrationService.register(credentialsEntity, userEntity, team, true);
+        registrationService.register(credentialsEntity, userEntity, team, true, randomNotes);
     }
 
     @Test
     public void testUserFormFieldsHasErrorsEmptyUserJobTitle() {
+        String randomNotes = RandomStringUtils.randomAlphanumeric(20);
         CredentialsEntity credentialsEntity = Util.getCredentialsEntity();
         Team team = Util.getTeamEntity();
 
@@ -613,11 +637,12 @@ public class RegistrationServiceImplTest {
         userEntity.getUserDetails().setJobTitle("");
 
         exception.expect(IncompleteRegistrationFormException.class);
-        registrationService.register(credentialsEntity, userEntity, team, true);
+        registrationService.register(credentialsEntity, userEntity, team, true, randomNotes);
     }
 
     @Test
     public void testUserFormFieldsHasErrorsEmptyUserEmail() {
+        String randomNotes = RandomStringUtils.randomAlphanumeric(20);
         CredentialsEntity credentialsEntity = Util.getCredentialsEntity();
         Team team = Util.getTeamEntity();
 
@@ -625,11 +650,12 @@ public class RegistrationServiceImplTest {
         userEntity.getUserDetails().setEmail("");
 
         exception.expect(IncompleteRegistrationFormException.class);
-        registrationService.register(credentialsEntity, userEntity, team, true);
+        registrationService.register(credentialsEntity, userEntity, team, true, randomNotes);
     }
 
     @Test
     public void testUserFormFieldsHasErrorsEmptyUserPhone() {
+        String randomNotes = RandomStringUtils.randomAlphanumeric(20);
         CredentialsEntity credentialsEntity = Util.getCredentialsEntity();
         Team team = Util.getTeamEntity();
 
@@ -637,11 +663,12 @@ public class RegistrationServiceImplTest {
         userEntity.getUserDetails().setPhone("");
 
         exception.expect(IncompleteRegistrationFormException.class);
-        registrationService.register(credentialsEntity, userEntity, team, true);
+        registrationService.register(credentialsEntity, userEntity, team, true, randomNotes);
     }
 
     @Test
     public void testUserFormFieldsHasErrorsEmptyUserInstitution() {
+        String randomNotes = RandomStringUtils.randomAlphanumeric(20);
         CredentialsEntity credentialsEntity = Util.getCredentialsEntity();
         Team team = Util.getTeamEntity();
 
@@ -649,11 +676,12 @@ public class RegistrationServiceImplTest {
         userEntity.getUserDetails().setInstitution("");
 
         exception.expect(IncompleteRegistrationFormException.class);
-        registrationService.register(credentialsEntity, userEntity, team, true);
+        registrationService.register(credentialsEntity, userEntity, team, true, randomNotes);
     }
 
     @Test
     public void testUserFormFieldsHasErrorsEmptyUserInstitutionAbbreviation() {
+        String randomNotes = RandomStringUtils.randomAlphanumeric(20);
         CredentialsEntity credentialsEntity = Util.getCredentialsEntity();
         Team team = Util.getTeamEntity();
 
@@ -661,11 +689,12 @@ public class RegistrationServiceImplTest {
         userEntity.getUserDetails().setInstitutionAbbreviation("");
 
         exception.expect(IncompleteRegistrationFormException.class);
-        registrationService.register(credentialsEntity, userEntity, team, true);
+        registrationService.register(credentialsEntity, userEntity, team, true, randomNotes);
     }
 
     @Test
     public void testUserFormFieldsHasErrorsEmptyUserInstitutionWeb() {
+        String randomNotes = RandomStringUtils.randomAlphanumeric(20);
         CredentialsEntity credentialsEntity = Util.getCredentialsEntity();
         Team team = Util.getTeamEntity();
 
@@ -673,11 +702,12 @@ public class RegistrationServiceImplTest {
         userEntity.getUserDetails().setInstitutionWeb("");
 
         exception.expect(IncompleteRegistrationFormException.class);
-        registrationService.register(credentialsEntity, userEntity, team, true);
+        registrationService.register(credentialsEntity, userEntity, team, true, randomNotes);
     }
 
     @Test
     public void testUserFormFieldsHasErrorsEmptyUserAddress1() {
+        String randomNotes = RandomStringUtils.randomAlphanumeric(20);
         CredentialsEntity credentialsEntity = Util.getCredentialsEntity();
         Team team = Util.getTeamEntity();
 
@@ -685,11 +715,12 @@ public class RegistrationServiceImplTest {
         userEntity.getUserDetails().getAddress().setAddress1("");
 
         exception.expect(IncompleteRegistrationFormException.class);
-        registrationService.register(credentialsEntity, userEntity, team, true);
+        registrationService.register(credentialsEntity, userEntity, team, true, randomNotes);
     }
 
     @Test
     public void testUserFormFieldsHasErrorsEmptyUserCountry() {
+        String randomNotes = RandomStringUtils.randomAlphanumeric(20);
         CredentialsEntity credentialsEntity = Util.getCredentialsEntity();
         Team team = Util.getTeamEntity();
 
@@ -697,11 +728,12 @@ public class RegistrationServiceImplTest {
         userEntity.getUserDetails().getAddress().setCountry("");
 
         exception.expect(IncompleteRegistrationFormException.class);
-        registrationService.register(credentialsEntity, userEntity, team, true);
+        registrationService.register(credentialsEntity, userEntity, team, true, randomNotes);
     }
 
     @Test
     public void testUserFormFieldsHasErrorsEmptyUserRegion() {
+        String randomNotes = RandomStringUtils.randomAlphanumeric(20);
         CredentialsEntity credentialsEntity = Util.getCredentialsEntity();
         Team team = Util.getTeamEntity();
 
@@ -709,11 +741,12 @@ public class RegistrationServiceImplTest {
         userEntity.getUserDetails().getAddress().setRegion("");
 
         exception.expect(IncompleteRegistrationFormException.class);
-        registrationService.register(credentialsEntity, userEntity, team, true);
+        registrationService.register(credentialsEntity, userEntity, team, true, randomNotes);
     }
 
     @Test
     public void testUserFormFieldsHasErrorsEmptyUserCity() {
+        String randomNotes = RandomStringUtils.randomAlphanumeric(20);
         CredentialsEntity credentialsEntity = Util.getCredentialsEntity();
         Team team = Util.getTeamEntity();
 
@@ -721,11 +754,12 @@ public class RegistrationServiceImplTest {
         userEntity.getUserDetails().getAddress().setCity("");
 
         exception.expect(IncompleteRegistrationFormException.class);
-        registrationService.register(credentialsEntity, userEntity, team, true);
+        registrationService.register(credentialsEntity, userEntity, team, true, randomNotes);
     }
 
     @Test
     public void testUserFormFieldsHasErrorsEmptyUserZipCode() {
+        String randomNotes = RandomStringUtils.randomAlphanumeric(20);
         CredentialsEntity credentialsEntity = Util.getCredentialsEntity();
         Team team = Util.getTeamEntity();
 
@@ -733,7 +767,7 @@ public class RegistrationServiceImplTest {
         userEntity.getUserDetails().getAddress().setZipCode("");
 
         exception.expect(IncompleteRegistrationFormException.class);
-        registrationService.register(credentialsEntity, userEntity, team, true);
+        registrationService.register(credentialsEntity, userEntity, team, true, randomNotes);
     }
 
 }

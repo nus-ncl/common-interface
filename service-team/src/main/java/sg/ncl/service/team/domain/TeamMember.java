@@ -44,4 +44,6 @@ public interface TeamMember {
      */
     MemberStatus getMemberStatus();
 
+    String getNotes();
+
 }
