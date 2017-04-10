@@ -13,7 +13,6 @@ import org.springframework.test.context.TestPropertySource;
 import sg.ncl.common.DomainProperties;
 import sg.ncl.common.authentication.Role;
 import sg.ncl.common.jwt.JwtToken;
-import sg.ncl.service.data.AbstractTest;
 import sg.ncl.service.data.data.jpa.DataAccessRequestEntity;
 import sg.ncl.service.data.data.jpa.DataAccessRequestRepository;
 import sg.ncl.service.data.data.jpa.DataEntity;
@@ -41,7 +40,7 @@ import static org.mockito.Mockito.*;
  * Created by dcsjnh on 12/22/2016.
  */
 @TestPropertySource(properties = "flyway.enabled=false")
-public class DataAccessRequestServiceImplTest extends AbstractTest {
+public class DataAccessRequestServiceImplTest {
 
     @Rule
     public MockitoRule mockito = MockitoJUnit.rule();
