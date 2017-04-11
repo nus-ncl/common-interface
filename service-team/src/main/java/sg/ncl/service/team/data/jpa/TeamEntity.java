@@ -3,6 +3,7 @@ package sg.ncl.service.team.data.jpa;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
+import org.hibernate.annotations.Cascade;
 import org.hibernate.annotations.GenericGenerator;
 import org.hibernate.annotations.Type;
 import sg.ncl.common.jpa.AbstractEntity;
@@ -76,8 +77,16 @@ public class TeamEntity extends AbstractEntity implements Team {
     @Column(name = "processed_date")
     private ZonedDateTime processedDate;
 
+    /**
+     * Added DELETE_ORPHAN to resolve problem of hibernate not deleting child in database.
+     *
+     * References:
+     * [1] http://stackoverflow.com/questions/7197181/jpa-unidirectional-many-to-one-and-cascading-delete
+     * [2] http://stackoverflow.com/questions/306144/jpa-cascadetype-all-does-not-delete-orphans
+     */
     @ManyToMany(cascade = CascadeType.ALL, mappedBy = "team")
     @MapKey(name = "userId")
+    @Cascade(org.hibernate.annotations.CascadeType.DELETE_ORPHAN)
     private final Map<String, TeamMemberEntity> members = new HashMap<>();
 
     @Override
