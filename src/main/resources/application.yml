@@ -4,9 +4,9 @@ server:
   port: 8080
 spring:
   datasource:
-    url: jdbc:mysql://localhost:32781/prod?useSSL=false
-    username: root
-    password: 13061990
+    url: ${jdbc.url:} # e.g., jdbc:mysql://localhost:3306/ncl?useSSL=false
+    username: ${jdbc.username:}
+    password: ${jdbc.password:}
   jpa:
     hibernate:
       ddl-auto: validate
@@ -18,8 +18,8 @@ spring:
   mail:
     host: smtp-relay.gmail.com
     port: 465
-    username: testbed-ops@ncl.sg
-    password: deterinavm
+    username: ${gmail.username:}
+    password: ${gmail.password:}
     protocol: smtps
     properties:
       starttls:
@@ -29,9 +29,9 @@ flyway:
   # baseline-version: 1.1
   # baseline-on-migrate: true # for cases when the schema is non-empty and there is no metadata table
   schemas: flyway, prod
-  url: jdbc:mysql://localhost:32781?useSSL=false # e.g., jdbc:mysql://localhost:3306?useSSL=false
-  user: root
-  password: 13061990
+  url: ${db.url:} # e.g., jdbc:mysql://localhost:3306?useSSL=false
+  user: ${db.user:}
+  password: ${db.password:}
 ncl:
   authentication:
     uri:
@@ -47,6 +47,8 @@ ncl:
       '/credentials/password': PUT
       '/telemetry/nodes/counts\?type=FREE': GET # for retrieving free nodes count
       '/telemetry/nodes/counts\?type=TOTAL': GET # for retrieving total nodes count
+      '/telemetry/nodes/status': GET # for retrieving all nodes' statuses
+      '/telemetry/testbed/stats': GET # for retrieving number of logged in users and running experiments
   domain: dev.ncl.sg
   deterlab:
     adapter:
@@ -54,7 +56,7 @@ ncl:
       port: 8080
       bossUrl: ${deterlab.boss:}
       userUrl: ${deterlab.user:}
-      enabled: true
+      enabled: false
   jwt:
     api-key: ${jwt.key:}
     signing-algorithm: HS512
@@ -64,7 +66,7 @@ ncl:
   accounting:
     charges: 0.12
   analytics:
-    energyDir: ~/energylog
+    energyDir: home/sio/energylog
 deterurl:
   bossurl: 172.18.178.10
   userurl: 172.18.178.11
@@ -72,4 +74,4 @@ deterurl:
 transmission:
     baseDir: mnt/resources # '/mnt/resources'
     subDirs:
-        dataDir: data # '<base_dir>/data/<dataset_id>/<file_name>'
+dataDir: data # '<base_dir>/data/<dataset_id>/<file_name>'
