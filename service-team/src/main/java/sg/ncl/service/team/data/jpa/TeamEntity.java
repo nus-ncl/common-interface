@@ -3,27 +3,12 @@ package sg.ncl.service.team.data.jpa;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
-import org.hibernate.annotations.Cascade;
 import org.hibernate.annotations.GenericGenerator;
 import org.hibernate.annotations.Type;
 import sg.ncl.common.jpa.AbstractEntity;
-import sg.ncl.service.team.domain.MemberStatus;
-import sg.ncl.service.team.domain.Team;
-import sg.ncl.service.team.domain.TeamMember;
-import sg.ncl.service.team.domain.TeamPrivacy;
-import sg.ncl.service.team.domain.TeamStatus;
-import sg.ncl.service.team.domain.TeamVisibility;
+import sg.ncl.service.team.domain.*;
 
-import javax.persistence.CascadeType;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.persistence.ManyToMany;
-import javax.persistence.MapKey;
-import javax.persistence.Table;
+import javax.persistence.*;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -78,15 +63,10 @@ public class TeamEntity extends AbstractEntity implements Team {
     private ZonedDateTime processedDate;
 
     /**
-     * Added DELETE_ORPHAN to resolve problem of hibernate not deleting child in database.
-     *
-     * References:
-     * [1] http://stackoverflow.com/questions/7197181/jpa-unidirectional-many-to-one-and-cascading-delete
-     * [2] http://stackoverflow.com/questions/306144/jpa-cascadetype-all-does-not-delete-orphans
+     * Changed to @OneToMany and added orphanRemoval to resolve problem of hibernate not deleting child in database.
      */
-    @ManyToMany(cascade = CascadeType.ALL, mappedBy = "team")
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "team", orphanRemoval = true)
     @MapKey(name = "userId")
-    @Cascade(org.hibernate.annotations.CascadeType.DELETE_ORPHAN)
     private final Map<String, TeamMemberEntity> members = new HashMap<>();
 
     @Override
