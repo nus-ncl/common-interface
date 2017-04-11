@@ -74,4 +74,4 @@ deterurl:
 transmission:
     baseDir: mnt/resources # '/mnt/resources'
     subDirs:
-dataDir: data # '<base_dir>/data/<dataset_id>/<file_name>'
+        dataDir: data # '<base_dir>/data/<dataset_id>/<file_name>'
