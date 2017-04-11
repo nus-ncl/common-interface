@@ -713,7 +713,7 @@ public class FlywayTest {
         assertThat((String) experimentsTable.get(3).get("KEY")).isEmpty();
 
         assertThat((String) experimentsTable.get(4).get("FIELD")).isEqualTo("description");
-        assertThat((String) experimentsTable.get(4).get("TYPE")).isEqualTo("varchar(255)");
+        assertThat((String) experimentsTable.get(4).get("TYPE")).contains("slob");
         assertThat((String) experimentsTable.get(4).get("NULL")).isEqualTo("NO");
         assertThat((String) experimentsTable.get(4).get("KEY")).isEmpty();
 
