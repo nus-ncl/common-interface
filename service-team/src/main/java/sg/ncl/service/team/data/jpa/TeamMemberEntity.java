@@ -34,7 +34,7 @@ public class TeamMemberEntity extends AbstractEntity implements TeamMember {
     @Column(name = "id", nullable = false, unique = true, updatable = false)
     private Long id;
 
-    @ManyToOne(cascade = CascadeType.ALL, optional = false)
+    @ManyToOne(optional = false)
     @JoinColumn(name = "team_id", nullable = false, updatable = false)
     private TeamEntity team;
 
