@@ -372,7 +372,8 @@ public class RegistrationServiceImpl implements RegistrationService {
     public String approveOrRejectNewTeam(
             final String teamId,
             final String ownerId,
-            final TeamStatus status
+            final TeamStatus status,
+            final String reason
     ) {
         // FIXME required additional parameters to validate if approver is of admin or ordinary user
 
@@ -407,7 +408,7 @@ public class RegistrationServiceImpl implements RegistrationService {
             // change team owner member status
             teamService.updateMemberStatus(teamId, ownerId, MemberStatus.APPROVED);
             adapterResult = adapterDeterLab.approveProject(one.toString());
-            sendReplyTeamEmail(user, team, status);
+            sendReplyTeamEmail(user, team, status, reason);
         } else {
             // FIXME may need to be more specific and check if TeamStatus is REJECTED
             Team existingTeam = teamService.getTeamById(teamId);
@@ -419,7 +420,7 @@ public class RegistrationServiceImpl implements RegistrationService {
             // remove from team side
             teamService.removeTeam(teamId);
             adapterResult = adapterDeterLab.rejectProject(one.toString());
-            sendReplyTeamEmail(userService.getUser(ownerId), team, status);
+            sendReplyTeamEmail(userService.getUser(ownerId), team, status, reason);
         }
         return adapterResult;
     }
@@ -596,11 +597,13 @@ public class RegistrationServiceImpl implements RegistrationService {
         }
     }
 
-    private void sendReplyTeamEmail(User user, Team team, TeamStatus status) {
+    private void sendReplyTeamEmail(User user, Team team, TeamStatus status, String reason) {
         final Map<String, String> map = new HashMap<>();
         map.put(FIRST_NAME, user.getUserDetails().getFirstName());
         map.put(TEAM_NAME, team.getName());
         map.put("status", status == TeamStatus.APPROVED ? "approved" : "rejected");
+        if (reason != null)
+            map.put("reason", reason);
 
         try {
             String[] to = new String[1];
