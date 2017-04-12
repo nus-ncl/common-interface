@@ -34,7 +34,6 @@ public class ExperimentEntity extends AbstractEntity implements Experiment {
     @Column(name = "name", nullable = false)
     private String name;
 
-    @Type(type = "text")
     @Column(name = "description", nullable = false)
     private String description;
 
