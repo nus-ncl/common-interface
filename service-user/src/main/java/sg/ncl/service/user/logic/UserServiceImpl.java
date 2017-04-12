@@ -3,10 +3,7 @@ package sg.ncl.service.user.logic;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.springframework.stereotype.Service;
-import sg.ncl.common.authentication.Role;
-import sg.ncl.service.authentication.data.jpa.CredentialsEntity;
-import sg.ncl.service.authentication.data.jpa.CredentialsRepository;
-import sg.ncl.service.authentication.exceptions.CredentialsNotFoundException;
+import sg.ncl.service.authentication.domain.CredentialsService;
 import sg.ncl.service.user.data.jpa.UserDetailsEntity;
 import sg.ncl.service.user.data.jpa.UserEntity;
 import sg.ncl.service.user.data.jpa.UserRepository;
@@ -20,9 +17,7 @@ import javax.inject.Inject;
 import javax.transaction.Transactional;
 import javax.validation.constraints.NotNull;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
@@ -33,12 +28,12 @@ import java.util.stream.Collectors;
 public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
-    private final CredentialsRepository credentialsRepository;
+    private final CredentialsService credentialsService;
 
     @Inject
-    UserServiceImpl(final UserRepository userRepository, final CredentialsRepository credentialsRepository) {
+    UserServiceImpl(final UserRepository userRepository, final CredentialsService credentialsService) {
         this.userRepository = userRepository;
-        this.credentialsRepository = credentialsRepository;
+        this.credentialsService = credentialsService;
     }
 
     @Transactional
@@ -261,15 +256,7 @@ public class UserServiceImpl implements UserService {
         }
 
         // clear roles for user
-        CredentialsEntity entity = credentialsRepository.findOne(id);
-        if (entity == null) {
-            log.warn("Credentials for '{}' not found", id);
-            throw new CredentialsNotFoundException(id);
-        }
-        Set<Role> roles = new HashSet<>(entity.getRoles());
-        roles.forEach(entity::removeRole);
-        credentialsRepository.save(entity);
-        credentialsRepository.delete(entity);
+        credentialsService.removeCredentials(id);
 
         userRepository.delete(id);
         return one;

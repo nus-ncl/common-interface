@@ -7,7 +7,6 @@ import sg.ncl.service.team.domain.MemberStatus;
 import sg.ncl.service.team.domain.MemberType;
 import sg.ncl.service.team.domain.TeamMember;
 
-import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;

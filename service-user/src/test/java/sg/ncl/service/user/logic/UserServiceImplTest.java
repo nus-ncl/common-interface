@@ -9,7 +9,7 @@ import org.junit.rules.ExpectedException;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
-import sg.ncl.service.authentication.data.jpa.CredentialsRepository;
+import sg.ncl.service.authentication.domain.CredentialsService;
 import sg.ncl.service.user.data.jpa.UserDetailsEntity;
 import sg.ncl.service.user.data.jpa.UserEntity;
 import sg.ncl.service.user.data.jpa.UserRepository;
@@ -39,7 +39,7 @@ public class UserServiceImplTest {
     public ExpectedException exception = ExpectedException.none();
 
     @Mock
-    private CredentialsRepository credentialsRepository;
+    private CredentialsService credentialsService;
 
     @Mock
     private UserRepository userRepository;
@@ -48,9 +48,8 @@ public class UserServiceImplTest {
 
     @Before
     public void setup() {
-        assertThat(mockingDetails(credentialsRepository).isMock()).isTrue();
         assertThat(mockingDetails(userRepository).isMock()).isTrue();
-        userServiceImpl = new UserServiceImpl(userRepository, credentialsRepository);
+        userServiceImpl = new UserServiceImpl(userRepository, credentialsService);
     }
 
     //throw UsernameAlreadyExistsException
@@ -60,7 +59,7 @@ public class UserServiceImplTest {
 
         exception.expect(UsernameAlreadyExistsException.class);
         when(userRepository.findByUserDetailsEmail(anyString())).thenReturn(userEntity);
-        User actual = userServiceImpl.createUser(userEntity);
+        userServiceImpl.createUser(userEntity);
 
         verify(userRepository, times(1)).findByUserDetailsEmail(anyString());
     }
