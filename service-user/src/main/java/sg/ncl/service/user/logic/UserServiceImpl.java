@@ -3,6 +3,7 @@ package sg.ncl.service.user.logic;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.springframework.stereotype.Service;
+import sg.ncl.service.authentication.domain.CredentialsService;
 import sg.ncl.service.user.data.jpa.UserDetailsEntity;
 import sg.ncl.service.user.data.jpa.UserEntity;
 import sg.ncl.service.user.data.jpa.UserRepository;
@@ -10,17 +11,12 @@ import sg.ncl.service.user.domain.Address;
 import sg.ncl.service.user.domain.User;
 import sg.ncl.service.user.domain.UserService;
 import sg.ncl.service.user.domain.UserStatus;
-import sg.ncl.service.user.exceptions.VerificationEmailNotMatchException;
-import sg.ncl.service.user.exceptions.InvalidStatusTransitionException;
-import sg.ncl.service.user.exceptions.InvalidUserStatusException;
-import sg.ncl.service.user.exceptions.UserIdNullOrEmptyException;
-import sg.ncl.service.user.exceptions.UserNotFoundException;
-import sg.ncl.service.user.exceptions.UsernameAlreadyExistsException;
-import sg.ncl.service.user.exceptions.VerificationKeyNotMatchException;
+import sg.ncl.service.user.exceptions.*;
 
 import javax.inject.Inject;
 import javax.transaction.Transactional;
 import javax.validation.constraints.NotNull;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -32,10 +28,12 @@ import java.util.stream.Collectors;
 public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
+    private final CredentialsService credentialsService;
 
     @Inject
-    UserServiceImpl(final UserRepository userRepository) {
+    UserServiceImpl(final UserRepository userRepository, final CredentialsService credentialsService) {
         this.userRepository = userRepository;
+        this.credentialsService = credentialsService;
     }
 
     @Transactional
@@ -240,5 +238,27 @@ public class UserServiceImpl implements UserService {
         UserEntity savedUser = userRepository.save(user);
         log.info("Status updated for {}: {} -> {}", user.getId(), oldStatus, savedUser.getStatus());
         return savedUser;
+    }
+
+    @Transactional
+    public User removeUser(@NotNull final String id) {
+        UserEntity one = findUser(id);
+        if (one == null) {
+            log.warn("User not found when deleting: {}", id);
+            throw new UserNotFoundException(id);
+        }
+
+        List<String> teams = new ArrayList<>(one.getTeams());
+        UserStatus userStatus = one.getStatus();
+        if (!(teams.isEmpty() && (userStatus == UserStatus.CREATED || userStatus == UserStatus.PENDING))) {
+            log.warn("User is not deletable: {}", id);
+            throw new UserIsNotDeletableException(id);
+        }
+
+        // clear roles for user
+        credentialsService.removeCredentials(id);
+
+        userRepository.delete(id);
+        return one;
     }
 }

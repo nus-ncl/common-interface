@@ -6,23 +6,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.hibernate.annotations.GenericGenerator;
 import org.hibernate.annotations.Type;
 import sg.ncl.common.jpa.AbstractEntity;
-import sg.ncl.service.team.domain.MemberStatus;
-import sg.ncl.service.team.domain.Team;
-import sg.ncl.service.team.domain.TeamMember;
-import sg.ncl.service.team.domain.TeamPrivacy;
-import sg.ncl.service.team.domain.TeamStatus;
-import sg.ncl.service.team.domain.TeamVisibility;
+import sg.ncl.service.team.domain.*;
 
-import javax.persistence.CascadeType;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.persistence.ManyToMany;
-import javax.persistence.MapKey;
-import javax.persistence.Table;
+import javax.persistence.*;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -76,7 +62,10 @@ public class TeamEntity extends AbstractEntity implements Team {
     @Column(name = "processed_date")
     private ZonedDateTime processedDate;
 
-    @ManyToMany(cascade = CascadeType.ALL, mappedBy = "team")
+    /**
+     * Changed to @OneToMany and added orphanRemoval to resolve problem of hibernate not deleting child in database.
+     */
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "team", orphanRemoval = true)
     @MapKey(name = "userId")
     private final Map<String, TeamMemberEntity> members = new HashMap<>();
 
@@ -108,6 +97,14 @@ public class TeamEntity extends AbstractEntity implements Team {
             members.put(userId, entity);
             return members.get(userId);
         }
+    }
+
+    public TeamMember removeMember(final TeamMember member) {
+        final String userId = member.getUserId();
+        if (members.containsKey(userId)) {
+            return members.remove(userId);
+        }
+        return null;
     }
 
     public TeamMember getMember(final String userId) {

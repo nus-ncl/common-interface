@@ -3,25 +3,30 @@ package sg.ncl.service.team.data.jpa;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
+import org.junit.runner.RunWith;
+import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
+import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.TestPropertySource;
-import sg.ncl.service.team.AbstractTest;
+import org.springframework.test.context.junit4.SpringRunner;
 import sg.ncl.service.team.util.TestUtil;
 
 import javax.inject.Inject;
 
-import static org.hamcrest.Matchers.equalTo;
-import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.not;
-import static org.hamcrest.Matchers.nullValue;
+import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.assertThat;
 import static sg.ncl.common.test.Checks.checkException;
 
 /**
  * Created by Desmond.
  */
+@RunWith(SpringRunner.class)
+@DataJpaTest
+@EnableJpaAuditing
+@ContextConfiguration(classes = TeamRepository.class)
 @TestPropertySource(properties = "flyway.enabled=false")
-public class TeamRepositoryTest extends AbstractTest {
+public class TeamRepositoryTest {
 
     @Rule
     public final ExpectedException exception = ExpectedException.none();

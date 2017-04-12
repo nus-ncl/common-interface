@@ -14,7 +14,6 @@ import sg.ncl.common.exception.base.ForbiddenException;
 import sg.ncl.common.exception.base.NotFoundException;
 import sg.ncl.common.jwt.JwtToken;
 import sg.ncl.service.analytics.domain.AnalyticsService;
-import sg.ncl.service.data.AbstractTest;
 import sg.ncl.service.data.data.jpa.DataEntity;
 import sg.ncl.service.data.data.jpa.DataRepository;
 import sg.ncl.service.data.data.jpa.DataResourceEntity;
@@ -45,7 +44,7 @@ import static org.mockito.Mockito.*;
  * Created by jng on 17/10/16.
  */
 @TestPropertySource(properties = "flyway.enabled=false")
-public class DataServiceImplTest extends AbstractTest {
+public class DataServiceImplTest {
 
     @Rule
     public MockitoRule mockito = MockitoJUnit.rule();

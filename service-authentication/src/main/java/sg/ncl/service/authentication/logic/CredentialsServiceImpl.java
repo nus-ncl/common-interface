@@ -19,13 +19,7 @@ import sg.ncl.service.authentication.data.jpa.PasswordResetRequestRepository;
 import sg.ncl.service.authentication.domain.Credentials;
 import sg.ncl.service.authentication.domain.CredentialsService;
 import sg.ncl.service.authentication.domain.CredentialsStatus;
-import sg.ncl.service.authentication.exceptions.CredentialsNotFoundException;
-import sg.ncl.service.authentication.exceptions.PasswordNullOrEmptyException;
-import sg.ncl.service.authentication.exceptions.PasswordResetRequestNotFoundException;
-import sg.ncl.service.authentication.exceptions.PasswordResetRequestTimeoutException;
-import sg.ncl.service.authentication.exceptions.UserIdAlreadyExistsException;
-import sg.ncl.service.authentication.exceptions.UsernameAlreadyExistsException;
-import sg.ncl.service.authentication.exceptions.UsernameNullOrEmptyException;
+import sg.ncl.service.authentication.exceptions.*;
 import sg.ncl.service.mail.domain.MailService;
 
 import javax.inject.Inject;
@@ -36,17 +30,10 @@ import java.io.IOException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.time.ZonedDateTime;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
-import static sg.ncl.service.authentication.validation.Validator.addCheck;
-import static sg.ncl.service.authentication.validation.Validator.updateCheck;
-import static sg.ncl.service.authentication.validation.Validator.checkUsername;
-import static sg.ncl.service.authentication.validation.Validator.checkPassword;
-import static sg.ncl.service.authentication.validation.Validator.checkStatus;
-import static sg.ncl.service.authentication.validation.Validator.checkRoles;
+import static sg.ncl.service.authentication.validation.Validator.*;
 
 /**
  * @author Christopher Zhong
@@ -129,6 +116,16 @@ public class CredentialsServiceImpl implements CredentialsService {
         final CredentialsEntity saved = credentialsRepository.save(entity);
         log.info("Credentials updated: {}", saved);
         return saved;
+    }
+
+    @Transactional
+    @Override
+    public void removeCredentials(@NotNull final String id) {
+        CredentialsEntity entity = findCredentials(id);
+        Set<Role> roles = new HashSet<>(entity.getRoles());
+        roles.forEach(entity::removeRole);
+        credentialsRepository.save(entity);
+        credentialsRepository.delete(entity);
     }
 
     @Transactional

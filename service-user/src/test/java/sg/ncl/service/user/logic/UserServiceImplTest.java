@@ -9,19 +9,20 @@ import org.junit.rules.ExpectedException;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
-import sg.ncl.service.user.util.TestUtil;
+import sg.ncl.service.authentication.domain.CredentialsService;
 import sg.ncl.service.user.data.jpa.UserDetailsEntity;
 import sg.ncl.service.user.data.jpa.UserEntity;
 import sg.ncl.service.user.data.jpa.UserRepository;
 import sg.ncl.service.user.domain.User;
 import sg.ncl.service.user.domain.UserStatus;
 import sg.ncl.service.user.exceptions.*;
-
+import sg.ncl.service.user.util.TestUtil;
 
 import java.util.List;
 
-import static org.mockito.Matchers.*;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.*;
 
 /**
@@ -38,6 +39,9 @@ public class UserServiceImplTest {
     public ExpectedException exception = ExpectedException.none();
 
     @Mock
+    private CredentialsService credentialsService;
+
+    @Mock
     private UserRepository userRepository;
 
     private UserServiceImpl userServiceImpl;
@@ -45,7 +49,7 @@ public class UserServiceImplTest {
     @Before
     public void setup() {
         assertThat(mockingDetails(userRepository).isMock()).isTrue();
-        userServiceImpl = new UserServiceImpl(userRepository);
+        userServiceImpl = new UserServiceImpl(userRepository, credentialsService);
     }
 
     //throw UsernameAlreadyExistsException
@@ -55,7 +59,7 @@ public class UserServiceImplTest {
 
         exception.expect(UsernameAlreadyExistsException.class);
         when(userRepository.findByUserDetailsEmail(anyString())).thenReturn(userEntity);
-        User actual = userServiceImpl.createUser(userEntity);
+        userServiceImpl.createUser(userEntity);
 
         verify(userRepository, times(1)).findByUserDetailsEmail(anyString());
     }
@@ -343,6 +347,7 @@ public class UserServiceImplTest {
     }
 
     //throw UserIdNullOrEmptyException
+    @Test
     public void testAddTeamIdIsEmpty() {
         String randomTeamIdForTest = RandomStringUtils.randomAlphanumeric(20);
 
@@ -378,6 +383,7 @@ public class UserServiceImplTest {
     }
 
     //throw UserIdNullOrEmptyException
+    @Test
     public void testRemoveTeamIdIsEmpty() {
         String randomTeamIdForTest = RandomStringUtils.randomAlphanumeric(20);
 
@@ -592,7 +598,41 @@ public class UserServiceImplTest {
         verify(userRepository, times(1)).findOne(anyString());
         verify(userRepository, times(1)).save(any(UserEntity.class));
     }
+
+    @Test
+    public void testRemoveUserWhereUserIsNotFound() {
+        String randomIdForTest = RandomStringUtils.randomAlphanumeric(20);
+
+        when(userRepository.findOne(anyString())).thenReturn(null);
+
+        exception.expect(UserNotFoundException.class);
+        userServiceImpl.removeUser(randomIdForTest);
+    }
+
+    @Test
+    public void testRemoveUserWhereUserHasTeam() throws Exception {
+        String randomUserIdForTest = RandomStringUtils.randomAlphanumeric(20);
+        String randomTeamIdForTest = RandomStringUtils.randomAlphanumeric(20);
+        UserEntity userEntity = TestUtil.getUserEntity();
+
+        when(userRepository.findOne(anyString())).thenReturn(userEntity);
+        userServiceImpl.addTeam(randomUserIdForTest, randomTeamIdForTest);
+
+        exception.expect(UserIsNotDeletableException.class);
+        userServiceImpl.removeUser(randomUserIdForTest);
+    }
+
+    @Test
+    public void testRemoveUserWhereUserStatusNotCreatedOrPending() throws Exception {
+        String randomIdForTest = RandomStringUtils.randomAlphanumeric(20);
+        UserEntity userEntity = TestUtil.getUserEntity();
+        userEntity.setStatus(UserStatus.PENDING);
+
+        when(userRepository.findOne(anyString())).thenReturn(userEntity);
+        when(userRepository.save(any(UserEntity.class))).thenReturn(userEntity);
+        userServiceImpl.updateUserStatus(randomIdForTest, UserStatus.APPROVED);
+
+        exception.expect(UserIsNotDeletableException.class);
+        userServiceImpl.removeUser(randomIdForTest);
+    }
 }
-
-
-

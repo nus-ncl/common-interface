@@ -7,7 +7,6 @@ import sg.ncl.service.team.domain.MemberStatus;
 import sg.ncl.service.team.domain.MemberType;
 import sg.ncl.service.team.domain.TeamMember;
 
-import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
@@ -34,7 +33,7 @@ public class TeamMemberEntity extends AbstractEntity implements TeamMember {
     @Column(name = "id", nullable = false, unique = true, updatable = false)
     private Long id;
 
-    @ManyToOne(cascade = CascadeType.ALL, optional = false)
+    @ManyToOne(optional = false)
     @JoinColumn(name = "team_id", nullable = false, updatable = false)
     private TeamEntity team;
 
