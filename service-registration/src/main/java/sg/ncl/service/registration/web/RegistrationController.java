@@ -92,10 +92,10 @@ public class RegistrationController {
     @PostMapping(path = "/teams/{teamId}/owner/{ownerId}", params = {"status"})
     // FIXME: the path is wrong, there should not be multiple paths for different registrations
     @ResponseStatus(HttpStatus.OK)
-    public String approveOrRejectNewTeam(@PathVariable String teamId, @PathVariable String ownerId, @RequestParam("status") final TeamStatus teamStatus) {
+    public String approveOrRejectNewTeam(@PathVariable String teamId, @PathVariable String ownerId, @RequestParam("status") final TeamStatus teamStatus, @RequestBody(required=false) String reason) {
         // need to specify to deterlab who is the owner so that they can set it as project_root
         // else trust level is always none
-        return registrationService.approveOrRejectNewTeam(teamId, ownerId, teamStatus);
+        return registrationService.approveOrRejectNewTeam(teamId, ownerId, teamStatus, reason);
     }
 
     @GetMapping(path = "/user/{id}")

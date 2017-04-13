@@ -482,7 +482,7 @@ public class RegistrationServiceImplTest {
         userEntity.setId(RandomStringUtils.randomAlphanumeric(20));
 
         exception.expect(TeamIdNullOrEmptyException.class);
-        registrationService.approveOrRejectNewTeam("", userEntity.getId(), null);
+        registrationService.approveOrRejectNewTeam("", userEntity.getId(), null, null);
     }
 
     @Test
@@ -491,7 +491,7 @@ public class RegistrationServiceImplTest {
         UserEntity userEntity = Util.getUserEntity();
 
         exception.expect(UserIdNullOrEmptyException.class);
-        registrationService.approveOrRejectNewTeam(teamEntity.getId(), userEntity.getId(), null);
+        registrationService.approveOrRejectNewTeam(teamEntity.getId(), userEntity.getId(), null, null);
     }
 
     @Test
@@ -501,7 +501,7 @@ public class RegistrationServiceImplTest {
         userEntity.setId(RandomStringUtils.randomAlphanumeric(20));
 
         exception.expect(InvalidTeamStatusException.class);
-        registrationService.approveOrRejectNewTeam(teamEntity.getId(), userEntity.getId(), null);
+        registrationService.approveOrRejectNewTeam(teamEntity.getId(), userEntity.getId(), null, null);
     }
 
     @Test
@@ -518,7 +518,7 @@ public class RegistrationServiceImplTest {
         when(userService.getUser(anyString())).thenReturn(userEntity);
 
         exception.expect(EmailNotVerifiedException.class);
-        registrationService.approveOrRejectNewTeam(teamEntity.getId(), userEntity.getId(), TeamStatus.APPROVED);
+        registrationService.approveOrRejectNewTeam(teamEntity.getId(), userEntity.getId(), TeamStatus.APPROVED, null);
     }
 
     @Test
@@ -534,7 +534,7 @@ public class RegistrationServiceImplTest {
         when(teamService.updateTeamStatus(anyString(), any(TeamStatus.class))).thenReturn(teamEntity);
         when(userService.getUser(anyString())).thenReturn(userEntity);
 
-        registrationService.approveOrRejectNewTeam(teamEntity.getId(), userEntity.getId(), TeamStatus.APPROVED);
+        registrationService.approveOrRejectNewTeam(teamEntity.getId(), userEntity.getId(), TeamStatus.APPROVED, null);
 
         verify(userService, times(1)).updateUserStatus(anyString(), any(UserStatus.class));
         verify(teamService, times(1)).updateMemberStatus(anyString(), anyString(), any(MemberStatus.class));
@@ -557,7 +557,7 @@ public class RegistrationServiceImplTest {
         when(userService.getUser(anyString())).thenReturn(userEntity);
         when(teamService.getTeamById(anyString())).thenReturn(teamEntity);
 
-        registrationService.approveOrRejectNewTeam(teamEntity.getId(), userEntity.getId(), TeamStatus.REJECTED);
+        registrationService.approveOrRejectNewTeam(teamEntity.getId(), userEntity.getId(), TeamStatus.REJECTED, null);
 
         verify(teamService, times(1)).getTeamById(anyString());
         verify(userService, times(1)).removeTeam(anyString(), anyString());
