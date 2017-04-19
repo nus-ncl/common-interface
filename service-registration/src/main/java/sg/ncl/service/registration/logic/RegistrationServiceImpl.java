@@ -497,26 +497,31 @@ public class RegistrationServiceImpl implements RegistrationService {
     public UserStatus verifyEmail(@NotNull String uid, @NotNull String email, @NotNull String key) {
         UserStatus userStatus = userService.verifyEmail(uid, email, key);
         if (userStatus == UserStatus.PENDING) {
-            User user = userService.getUser(uid);
-            List<String> teamIds = user.getTeams();
-            for (String teamId : teamIds) {
-                Team team = teamService.getTeamById(teamId);
-                List<? extends TeamMember> teamMembersList = team.getMembers();
-                for (TeamMember teamMember : teamMembersList) {
-                    if (teamMember.getUserId().equals(uid)) {
-                        if (teamMember.getMemberType().equals(MemberType.OWNER)) {
-                            // send email to support
-                            sendApplyTeamEmail(user, team);
-                        } else {
-                            // send email to team owner
-                            String ownerId = teamService.findTeamOwner(teamId);
-                            sendApplyJoinTeamEmail(user, userService.getUser(ownerId), team);
-                        }
+            sendApplyOrJoinEmail(uid);
+        }
+        return userStatus;
+    }
+
+    private void sendApplyOrJoinEmail(@NotNull String uid) {
+        User user = userService.getUser(uid);
+        List<String> teamIds = user.getTeams();
+        for (String teamId : teamIds) {
+            Team team = teamService.getTeamById(teamId);
+            List<? extends TeamMember> teamMembersList = team.getMembers();
+            for (TeamMember teamMember : teamMembersList) {
+                if (teamMember.getUserId().equals(uid)) {
+                    if (teamMember.getMemberType().equals(MemberType.OWNER)) {
+                        // send email to support
+                        sendApplyTeamEmail(user, team);
+                    } else {
+                        // send email to team owner
+                        String ownerId = teamService.findTeamOwner(teamId);
+                        sendApplyJoinTeamEmail(user, userService.getUser(ownerId), team);
                     }
+                    break;
                 }
             }
         }
-        return userStatus;
     }
 
     private String getUserCreationStatus(String resultJSON) {

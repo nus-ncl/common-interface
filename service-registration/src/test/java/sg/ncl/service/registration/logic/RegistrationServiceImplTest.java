@@ -736,4 +736,21 @@ public class RegistrationServiceImplTest {
         registrationService.register(credentialsEntity, userEntity, team, true);
     }
 
+    @Test
+    public void testVerifyEmail() {
+        String randomUidString = RandomStringUtils.randomAlphanumeric(20);
+        String randomEmailString = RandomStringUtils.randomAlphanumeric(20);
+        String randomKeyString = RandomStringUtils.randomAlphanumeric(20);
+
+        TeamEntity teamEntity = Util.getTeamEntity();
+        UserEntity userEntity = Util.getUserEntity();
+        userEntity.addTeam(teamEntity.getId());
+
+        when(userService.getUser(anyString())).thenReturn(userEntity);
+        when(teamService.getTeamById(anyString())).thenReturn(teamEntity);
+        when(userService.verifyEmail(anyString(), anyString(), anyString())).thenReturn(UserStatus.PENDING);
+
+        assertThat(registrationService.verifyEmail(randomUidString, randomEmailString, randomKeyString)).isEqualTo(UserStatus.PENDING);
+    }
+
 }
