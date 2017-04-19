@@ -1,20 +1,15 @@
 package sg.ncl.service.registration.web;
 
 import lombok.extern.slf4j.Slf4j;
+import org.apache.tomcat.util.codec.binary.Base64;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseStatus;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import sg.ncl.service.registration.domain.Registration;
 import sg.ncl.service.registration.domain.RegistrationService;
 import sg.ncl.service.team.domain.TeamStatus;
+import sg.ncl.service.user.domain.UserStatus;
+import sg.ncl.service.user.web.VerificationKeyInfo;
 
 import javax.inject.Inject;
 import javax.validation.constraints.NotNull;
@@ -102,5 +97,11 @@ public class RegistrationController {
     @ResponseStatus(HttpStatus.OK)
     public String getDeterUid(@PathVariable String id) {
         return registrationService.getDeterUid(id);
+    }
+
+    @PutMapping(path = "/user/{id}/emails/{emailBase64}", consumes = MediaType.APPLICATION_JSON_VALUE)
+    public UserStatus verifyEmail(@PathVariable String id, @PathVariable String emailBase64, @RequestBody VerificationKeyInfo keyInfo) {
+        final String email = new String(Base64.decodeBase64(emailBase64));
+        return registrationService.verifyEmail(id, email, keyInfo.getKey());
     }
 }
