@@ -55,6 +55,10 @@ allprojects {
         dependsOn(processResources)
     }
 
+    test {
+        maxParallelForks = Runtime.runtime.availableProcessors() / 2
+    }
+
     jacocoTestReport {
         reports {
             xml {
