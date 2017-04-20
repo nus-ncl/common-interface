@@ -123,7 +123,7 @@ public class RegistrationControllerTest extends AbstractTest {
         Team team = teamService.createTeam(teamEntity);
         TeamMemberInfo owner = Util.getTeamMemberInfo(user.getId(), MemberType.OWNER);
 
-        userService.verifyEmail(user.getId(), user.getUserDetails().getEmail(), user.getVerificationKey());
+        userService.verifyUserEmail(user.getId(), user.getUserDetails().getEmail(), user.getVerificationKey());
         teamService.addMember(team.getId(), owner);
 
         JSONObject predefinedResultJson = new JSONObject();

@@ -4,6 +4,7 @@ import sg.ncl.service.authentication.domain.Credentials;
 import sg.ncl.service.team.domain.Team;
 import sg.ncl.service.team.domain.TeamStatus;
 import sg.ncl.service.user.domain.User;
+import sg.ncl.service.user.domain.UserStatus;
 
 /**
  * @author Christopher Zhong
@@ -23,4 +24,6 @@ public interface RegistrationService {
     String approveOrRejectNewTeam(String teamId, String ownerId, TeamStatus teamStatus, String reason);
 
     String getDeterUid(String id);
+
+    boolean verifyEmail(final String uid, final String email, final String key);
 }

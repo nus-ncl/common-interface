@@ -286,18 +286,6 @@ public class UsersControllerTest {
     }
 
     @Test
-    public void verifyEmail() throws Exception {
-        final VerificationKeyInfo verificationKeyInfo = new VerificationKeyInfo("key");
-
-        final byte[] content = mapper.writeValueAsBytes(verificationKeyInfo);
-
-        when(userService.verifyEmail(anyString(), anyString(), anyString())).thenReturn(UserStatus.PENDING);
-
-        mockMvc.perform(put(UsersController.PATH + "/id/emails/emailBase64").contentType(MediaType.APPLICATION_JSON).content(content))
-                .andExpect(status().isOk());
-    }
-
-    @Test
     public void updateUserStatusGood() throws Exception {
         final UserEntity entity = TestUtil.getUserEntity();
         entity.setStatus(UserStatus.CLOSED);

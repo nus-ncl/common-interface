@@ -87,9 +87,4 @@ public class UsersController {
         return String.valueOf(userService.removeUser(id));
     }
 
-    @PutMapping(path = "/{id}/emails/{emailBase64}", consumes = MediaType.APPLICATION_JSON_VALUE)
-    public UserStatus verifyEmail(@PathVariable String id, @PathVariable String emailBase64, @RequestBody VerificationKeyInfo keyInfo) {
-        final String email = new String(Base64.decodeBase64(emailBase64));
-        return userService.verifyEmail(id, email, keyInfo.getKey());
-    }
 }

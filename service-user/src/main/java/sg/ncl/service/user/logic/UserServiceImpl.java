@@ -63,31 +63,36 @@ public class UserServiceImpl implements UserService {
 
     @Transactional
     @Override
-    public UserStatus verifyEmail(@NotNull String uid, @NotNull String email, @NotNull String key) {
+    public User verifyUserEmail(@NotNull String uid, @NotNull String email, @NotNull String key) {
+
+        log.info("Verifying email {} for user {}", email, uid);
 
         final UserEntity user = findUser(uid);
         if (user == null) {
             log.warn("User not found when verify email: {}", uid);
             throw new UserNotFoundException(uid);
         }
+
         if (!email.equals(user.getUserDetails().getEmail())) {
             log.warn("Email not match. Expected: {}, received: {}", user.getUserDetails().getEmail(), email);
             throw new VerificationEmailNotMatchException("expected: " + user.getUserDetails().getEmail() +
                     ", received: " + email);
         }
-        if (null != user.getVerificationKey() && key.equals(user.getVerificationKey())) {
-            user.setEmailVerified(true);
-            if (user.getStatus() == UserStatus.CREATED) {
-                user.setStatus(UserStatus.PENDING);
-            }
-            userRepository.save(user);
-            log.info("User {} with email {} has been verified.", uid, user.getUserDetails().getEmail());
-            return user.getStatus();
-        } else {
+
+        if (key == null || user.getVerificationKey() == null || !key.equals(user.getVerificationKey())) {
             log.warn("Verification key mismatch. Expected: {}, received: {}", user.getVerificationKey(), key);
             throw new VerificationKeyNotMatchException("expected: " + user.getVerificationKey() +
                     ", received: " + key);
         }
+
+        user.setEmailVerified(true);
+        if (user.getStatus() == UserStatus.CREATED) {
+            user.setStatus(UserStatus.PENDING);
+        }
+        final User verifiedUser = userRepository.save(user);
+        log.info("User email {} has been verified.", verifiedUser.getUserDetails().getEmail());
+
+        return verifiedUser;
 
     }
 
