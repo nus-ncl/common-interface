@@ -25,5 +25,5 @@ public interface RegistrationService {
 
     String getDeterUid(String id);
 
-    UserStatus verifyEmail(final String uid, final String email, final String key);
+    boolean verifyEmail(final String uid, final String email, final String key);
 }

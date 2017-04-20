@@ -744,13 +744,20 @@ public class RegistrationServiceImplTest {
 
         TeamEntity teamEntity = Util.getTeamEntity();
         UserEntity userEntity = Util.getUserEntity();
+        userEntity.setEmailVerified(false);
         userEntity.addTeam(teamEntity.getId());
+        UserEntity verifiedUser = new UserEntity();
+        verifiedUser.setApplicationDate(userEntity.getApplicationDate());
+        verifiedUser.setVerificationKey(userEntity.getVerificationKey());
+        verifiedUser.setEmailVerified(true);
+        verifiedUser.setStatus(UserStatus.PENDING);
+        verifiedUser.setUserDetails(userEntity.getUserDetails());
 
         when(userService.getUser(anyString())).thenReturn(userEntity);
         when(teamService.getTeamById(anyString())).thenReturn(teamEntity);
-        when(userService.verifyEmail(anyString(), anyString(), anyString())).thenReturn(UserStatus.PENDING);
+        when(userService.verifyUserEmail(anyString(), anyString(), anyString())).thenReturn(verifiedUser);
 
-        assertThat(registrationService.verifyEmail(randomUidString, randomEmailString, randomKeyString)).isEqualTo(UserStatus.PENDING);
+        assertThat(registrationService.verifyEmail(randomUidString, randomEmailString, randomKeyString)).isEqualTo(true);
     }
 
 }

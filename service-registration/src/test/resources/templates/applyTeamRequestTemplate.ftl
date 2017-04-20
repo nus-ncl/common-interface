@@ -1,7 +1,7 @@
 Dear ${firstname},
 
-You have a request to apply for a new team.
-The details of the request are as follows:
+There is an application for creating a new team on the testbed.
+The details of the application are as follows:
 
 Team Name: ${teamname}
 Requester:
@@ -12,7 +12,7 @@ Requester:
     ${institution}
     ${country}
 
-Please login to the NCL website to approve the request.
+Please login to the NCL web portal to approve or reject the application.
 
 Regards,
-NCL Testbed Operations
+NCL Operations

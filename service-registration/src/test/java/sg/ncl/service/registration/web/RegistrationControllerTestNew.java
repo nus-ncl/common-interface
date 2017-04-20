@@ -190,9 +190,9 @@ public class RegistrationControllerTestNew extends AbstractTest {
 
         final byte[] content = mapper.writeValueAsBytes(verificationKeyInfo);
 
-        when(registrationService.verifyEmail(anyString(), anyString(), anyString())).thenReturn(UserStatus.PENDING);
+        when(registrationService.verifyEmail(anyString(), anyString(), anyString())).thenReturn(true);
 
-        mockMvc.perform(put("/registrations/user/id/emails/emailBase64").contentType(MediaType.APPLICATION_JSON).content(content))
+        mockMvc.perform(put("/registrations/users/id/emails/emailBase64").contentType(MediaType.APPLICATION_JSON).content(content))
                 .andExpect(status().isOk());
     }
 }

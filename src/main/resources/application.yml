@@ -40,7 +40,7 @@ ncl:
       '/images/global': GET # for retrieving list of global images
       '/registrations': POST # for apply/join new teams
       '/users/(\w|-)+': GET # for retrieving public teams' owner info
-      '/users/(\w|-)+/emails/\w+=*': PUT # for email verifications
+      '/registrations/users/(\w|-)+/emails/\w+=*': PUT # for email verifications
       '/teams\?visibility=PUBLIC': GET # for retrieving public teams
       '/teams\?name=(\w|-)+': GET # for retrieving teams by name
       '/credentials/password/resets': POST

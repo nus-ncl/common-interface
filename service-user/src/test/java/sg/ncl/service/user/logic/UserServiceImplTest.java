@@ -131,7 +131,7 @@ public class UserServiceImplTest {
         exception.expect(UserNotFoundException.class);
         when(userRepository.findOne(anyString())).thenReturn(null);
 
-        UserStatus actual = userServiceImpl.verifyEmail(randomIdStringForTest, randomEmailStringForTest, randomKeyStringForTest);
+        userServiceImpl.verifyUserEmail(randomIdStringForTest, randomEmailStringForTest, randomKeyStringForTest);
 
         verify(userRepository, times(1)).findOne(anyString());
     }
@@ -143,7 +143,7 @@ public class UserServiceImplTest {
         String randomKeyStringForTest = RandomStringUtils.randomAlphanumeric(20);
 
         exception.expect(UserIdNullOrEmptyException.class);
-        UserStatus actual = userServiceImpl.verifyEmail(null, randomEmailStringForTest, randomKeyStringForTest);
+        userServiceImpl.verifyUserEmail(null, randomEmailStringForTest, randomKeyStringForTest);
 
         verify(userRepository, times(1)).findOne(anyString());
     }
@@ -155,7 +155,7 @@ public class UserServiceImplTest {
         String randomKeyStringForTest = RandomStringUtils.randomAlphanumeric(20);
 
         exception.expect(UserIdNullOrEmptyException.class);
-        UserStatus actual = userServiceImpl.verifyEmail("", randomEmailStringForTest, randomKeyStringForTest);
+        userServiceImpl.verifyUserEmail("", randomEmailStringForTest, randomKeyStringForTest);
 
         verify(userRepository, times(1)).findOne(anyString());
     }
@@ -173,7 +173,7 @@ public class UserServiceImplTest {
         exception.expect(VerificationEmailNotMatchException.class);
         when(userRepository.findOne(anyString())).thenReturn(userEntity);
 
-        UserStatus actual = userServiceImpl.verifyEmail(randomUidStringForTest, randomEmailStringForTest, randomKeyStringForTest);
+        userServiceImpl.verifyUserEmail(randomUidStringForTest, randomEmailStringForTest, randomKeyStringForTest);
     }
 
 
@@ -191,13 +191,18 @@ public class UserServiceImplTest {
         userEntity.setVerificationKey(randomKeyForTest);                //verificationKey is not null
         userEntity.setStatus(UserStatus.CREATED);                     //user.getStatus() == UserStatus.CREATED
 
-        when(userRepository.findOne(anyString())).thenReturn(userEntity);
+        UserEntity userEntity1 = userEntity;
+        userEntity1.setEmailVerified(true);
+        userEntity1.setStatus(UserStatus.PENDING);
 
-        UserStatus actual = userServiceImpl.verifyEmail(randomUidForTest, randomEmailForTest, randomKeyForTest);
+        when(userRepository.findOne(anyString())).thenReturn(userEntity);
+        when(userRepository.save(any(UserEntity.class))).thenReturn(userEntity1);
+
+        User actual = userServiceImpl.verifyUserEmail(randomUidForTest, randomEmailForTest, randomKeyForTest);
 
         verify(userRepository, times(1)).findOne(anyString());
         verify(userRepository, times(1)).save(any(UserEntity.class));
-        assertThat(actual).isEqualTo(UserStatus.PENDING);
+        assertThat(actual.getStatus()).isEqualTo(UserStatus.PENDING);
     }
 
     //no exception thrown and user.getStatus() != UserStatus.CREATED
@@ -214,13 +219,18 @@ public class UserServiceImplTest {
         userEntity.setVerificationKey(randomKeyForTest);                //verificationKey is not null
         userEntity.setStatus(UserStatus.PENDING);                     //user.getStatus() == UserStatus.CREATED
 
-        when(userRepository.findOne(anyString())).thenReturn(userEntity);
+        UserEntity userEntity1 = userEntity;
+        userEntity1.setEmailVerified(true);
+        userEntity1.setStatus(UserStatus.PENDING);
 
-        UserStatus actual = userServiceImpl.verifyEmail(randomUidForTest, randomEmailForTest, randomKeyForTest);
+        when(userRepository.findOne(anyString())).thenReturn(userEntity);
+        when(userRepository.save(any(UserEntity.class))).thenReturn(userEntity1);
+
+        User actual = userServiceImpl.verifyUserEmail(randomUidForTest, randomEmailForTest, randomKeyForTest);
 
         verify(userRepository, times(1)).findOne(anyString());
         verify(userRepository, times(1)).save(any(UserEntity.class));
-        assertThat(actual).isEqualTo(UserStatus.PENDING);
+        assertThat(actual.getStatus()).isEqualTo(UserStatus.PENDING);
     }
 
     //throw VerificationKeyNotMatchException when user.getVerificationKey()==null
@@ -239,7 +249,7 @@ public class UserServiceImplTest {
         exception.expect(VerificationKeyNotMatchException.class);
         when(userRepository.findOne(anyString())).thenReturn(userEntity);
 
-        UserStatus actual = userServiceImpl.verifyEmail(randomUidForTest, randomEmailForTest, randomKeyForTest);
+        userServiceImpl.verifyUserEmail(randomUidForTest, randomEmailForTest, randomKeyForTest);
 
         verify(userRepository, times(1)).findOne(anyString());
     }
@@ -261,7 +271,7 @@ public class UserServiceImplTest {
         exception.expect(VerificationKeyNotMatchException.class);
         when(userRepository.findOne(anyString())).thenReturn(userEntity);
 
-        UserStatus actual = userServiceImpl.verifyEmail(randomUidForTest, randomEmailForTest, randomKeyForTest);
+        userServiceImpl.verifyUserEmail(randomUidForTest, randomEmailForTest, randomKeyForTest);
 
         verify(userRepository, times(1)).findOne(anyString());
     }

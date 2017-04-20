@@ -139,7 +139,7 @@ public class RegistrationServiceImpl implements RegistrationService {
         teamService.addMember(createdTeam.getId(), teamMemberInfo);
         adapterDeterLab.applyProject(mainObject.toString());
 
-        sendApplyTeamEmail(userService.getUser(nclUserId), createdTeam);
+        sendApplyCreateTeamEmail(userService.getUser(nclUserId), createdTeam);
         return null;
     }
 
@@ -494,15 +494,22 @@ public class RegistrationServiceImpl implements RegistrationService {
     }
 
     @Override
-    public UserStatus verifyEmail(@NotNull String uid, @NotNull String email, @NotNull String key) {
-        UserStatus userStatus = userService.verifyEmail(uid, email, key);
-        if (userStatus == UserStatus.PENDING) {
-            sendApplyOrJoinEmail(uid);
+    public boolean verifyEmail(@NotNull String uid, @NotNull String email, @NotNull String key) {
+        User user = userService.getUser(uid);
+        if (user.isEmailVerified()) {
+            log.warn("User email {} has already been verified.", user.getUserDetails().getEmail());
+            return false;
         }
-        return userStatus;
+
+        User verifiedUser = userService.verifyUserEmail(uid, email, key);
+        if (verifiedUser.isEmailVerified()) {
+            sendApplyCreateOrJoinTeamEmail(uid);
+            return true;
+        }
+        return false;
     }
 
-    private void sendApplyOrJoinEmail(@NotNull String uid) {
+    private void sendApplyCreateOrJoinTeamEmail(@NotNull String uid) {
         User user = userService.getUser(uid);
         List<String> teamIds = user.getTeams();
         for (String teamId : teamIds) {
@@ -512,7 +519,7 @@ public class RegistrationServiceImpl implements RegistrationService {
                 if (teamMember.getUserId().equals(uid)) {
                     if (teamMember.getMemberType().equals(MemberType.OWNER)) {
                         // send email to support
-                        sendApplyTeamEmail(user, team);
+                        sendApplyCreateTeamEmail(user, team);
                     } else {
                         // send email to team owner
                         String ownerId = teamService.findTeamOwner(teamId);
@@ -621,7 +628,7 @@ public class RegistrationServiceImpl implements RegistrationService {
             cc[0] = SUPPORT_EMAIL;
             String msgText = FreeMarkerTemplateUtils.processTemplateIntoString(applyJoinTeamRequestTemplate, map);
             mailService.send(TESTBED_EMAIL, to,
-                    "Please Approve/Reject Join Team Request",
+                    "Please Approve/Reject New Request To Join Your Team",
                     msgText, false, cc, null);
         } catch (IOException | TemplateException e) {
             log.warn("{}", e);
@@ -643,14 +650,14 @@ public class RegistrationServiceImpl implements RegistrationService {
             cc[0] = SUPPORT_EMAIL;
             String msgText = FreeMarkerTemplateUtils.processTemplateIntoString(replyTeamRequestTemplate, map);
             mailService.send(TESTBED_EMAIL, to,
-                    "Apply For New Team " + (status == TeamStatus.APPROVED ? "Approved" : "Rejected"),
+                    "Apply For Creating New Team " + (status == TeamStatus.APPROVED ? "Approved" : "Rejected"),
                     msgText, false, cc, null);
         } catch (IOException | TemplateException e) {
             log.warn("{}", e);
         }
     }
 
-    private void sendApplyTeamEmail(User user, Team team) {
+    private void sendApplyCreateTeamEmail(User user, Team team) {
         final Map<String, String> map = new HashMap<>();
         map.put(FIRST_NAME, "NCL Support");
         map.put(TEAM_NAME, team.getName());
@@ -664,7 +671,7 @@ public class RegistrationServiceImpl implements RegistrationService {
         try {
             String msgText = FreeMarkerTemplateUtils.processTemplateIntoString(applyTeamRequestTemplate, map);
             mailService.send(TESTBED_EMAIL, SUPPORT_EMAIL,
-                    "Please Approve New Team Request", msgText, false, null, null);
+                    "Please Approve/Reject New Request For Team Creation", msgText, false, null, null);
         } catch (IOException | TemplateException e) {
             log.warn("{}", e);
         }

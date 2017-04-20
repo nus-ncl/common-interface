@@ -99,8 +99,8 @@ public class RegistrationController {
         return registrationService.getDeterUid(id);
     }
 
-    @PutMapping(path = "/user/{id}/emails/{emailBase64}", consumes = MediaType.APPLICATION_JSON_VALUE)
-    public UserStatus verifyEmail(@PathVariable String id, @PathVariable String emailBase64, @RequestBody VerificationKeyInfo keyInfo) {
+    @PutMapping(path = "/users/{id}/emails/{emailBase64}", consumes = MediaType.APPLICATION_JSON_VALUE)
+    public boolean verifyEmail(@PathVariable String id, @PathVariable String emailBase64, @RequestBody VerificationKeyInfo keyInfo) {
         final String email = new String(Base64.decodeBase64(emailBase64));
         return registrationService.verifyEmail(id, email, keyInfo.getKey());
     }
