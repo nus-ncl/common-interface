@@ -10,7 +10,7 @@ import org.mockito.junit.MockitoRule;
 import org.springframework.mail.javamail.JavaMailSender;
 import sg.ncl.service.mail.data.jpa.EmailEntity;
 import sg.ncl.service.mail.data.jpa.EmailRepository;
-import sg.ncl.service.mail.domain.AsyncMailService;
+import sg.ncl.service.mail.domain.AsyncMailSender;
 
 import javax.mail.Message;
 import javax.mail.Session;
@@ -23,7 +23,7 @@ import static org.mockito.Mockito.doReturn;
 /**
  * Created by dcsjnh on 24/4/2017.
  */
-public class AsyncMailServiceImplTest {
+public class AsyncMailSenderImplTest {
 
     @Rule
     public MockitoRule mockito = MockitoJUnit.rule();
@@ -35,11 +35,11 @@ public class AsyncMailServiceImplTest {
     @Mock
     private EmailRepository emailRepository;
 
-    private AsyncMailService service;
+    private AsyncMailSender service;
 
     @Before
     public void before() {
-        service = new AsyncMailServiceImpl(javaMailSender, emailRepository);
+        service = new AsyncMailSenderImpl(javaMailSender, emailRepository);
     }
 
     @Test

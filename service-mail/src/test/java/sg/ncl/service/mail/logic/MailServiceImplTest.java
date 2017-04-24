@@ -8,7 +8,7 @@ import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
 import sg.ncl.service.mail.data.jpa.EmailEntity;
 import sg.ncl.service.mail.data.jpa.EmailRepository;
-import sg.ncl.service.mail.domain.AsyncMailService;
+import sg.ncl.service.mail.domain.AsyncMailSender;
 import sg.ncl.service.mail.domain.MailService;
 
 import java.util.ArrayList;
@@ -28,13 +28,13 @@ public class MailServiceImplTest {
     @Mock
     private EmailRepository emailRepository;
     @Mock
-    private AsyncMailService asyncMailService;
+    private AsyncMailSender asyncMailSender;
 
     private MailService service;
 
     @Before
     public void before() {
-        service = new MailServiceImpl(emailRepository, asyncMailService);
+        service = new MailServiceImpl(emailRepository, asyncMailSender);
     }
 
     @Test
@@ -46,7 +46,7 @@ public class MailServiceImplTest {
 
         service.send(from, to, subject, content, false, null, null);
 
-        verify(asyncMailService, times(1)).send(any(EmailEntity.class));
+        verify(asyncMailSender, times(1)).send(any(EmailEntity.class));
     }
 
     @Test
@@ -60,7 +60,7 @@ public class MailServiceImplTest {
 
         service.send(from, to, subject, content, false, cc, bcc);
 
-        verify(asyncMailService, times(1)).send(any(EmailEntity.class));
+        verify(asyncMailSender, times(1)).send(any(EmailEntity.class));
     }
 
     @Test
@@ -87,6 +87,6 @@ public class MailServiceImplTest {
 
         service.retry();
 
-        verify(asyncMailService, times(2)).send(any(EmailEntity.class));
+        verify(asyncMailSender, times(2)).send(any(EmailEntity.class));
     }
 }

@@ -7,7 +7,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import sg.ncl.service.mail.data.jpa.EmailEntity;
 import sg.ncl.service.mail.data.jpa.EmailRepository;
-import sg.ncl.service.mail.domain.AsyncMailService;
+import sg.ncl.service.mail.domain.AsyncMailSender;
 import sg.ncl.service.mail.domain.Email;
 import sg.ncl.service.mail.domain.MailService;
 
@@ -27,16 +27,16 @@ import java.util.List;
 class MailServiceImpl implements MailService {
 
     private final EmailRepository emailRepository;
-    private final AsyncMailService asyncMailService;
+    private final AsyncMailSender asyncMailSender;
     // FIXME should not use this format, instead should use auto configuration
     @Value("${ncl.mail.retry:3}")
     private int retryTimes;
 
     @Inject
     MailServiceImpl(@NotNull final EmailRepository emailRepository,
-                    @NotNull final AsyncMailService asyncMailService) {
+                    @NotNull final AsyncMailSender asyncMailService) {
         this.emailRepository = emailRepository;
-        this.asyncMailService = asyncMailService;
+        this.asyncMailSender = asyncMailService;
     }
 
     @Transactional
@@ -73,7 +73,7 @@ class MailServiceImpl implements MailService {
         entity.setCc(cc);
         entity.setBcc(bcc);
 
-        asyncMailService.send(entity);
+        asyncMailSender.send(entity);
     }
 
     @Transactional

@@ -8,7 +8,7 @@ import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import sg.ncl.service.mail.data.jpa.EmailEntity;
 import sg.ncl.service.mail.data.jpa.EmailRepository;
-import sg.ncl.service.mail.domain.AsyncMailService;
+import sg.ncl.service.mail.domain.AsyncMailSender;
 import sg.ncl.service.mail.domain.Email;
 
 import javax.inject.Inject;
@@ -25,14 +25,14 @@ import java.time.ZonedDateTime;
  */
 @Service
 @Slf4j
-public class AsyncMailServiceImpl implements AsyncMailService {
+public class AsyncMailSenderImpl implements AsyncMailSender {
 
     private final JavaMailSender javaMailSender;
     private final EmailRepository emailRepository;
 
     @Inject
-    AsyncMailServiceImpl(@NotNull final JavaMailSender javaMailSender,
-                         @NotNull final EmailRepository emailRepository) {
+    AsyncMailSenderImpl(@NotNull final JavaMailSender javaMailSender,
+                        @NotNull final EmailRepository emailRepository) {
         this.javaMailSender = javaMailSender;
         this.emailRepository = emailRepository;
     }
