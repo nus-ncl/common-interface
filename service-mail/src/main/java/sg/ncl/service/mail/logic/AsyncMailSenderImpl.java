@@ -44,9 +44,9 @@ public class AsyncMailSenderImpl implements AsyncMailSender {
         entity.setRetryTimes(entity.getRetryTimes() + 1);
         try {
             javaMailSender.send(message);
-            log.info("Email sent: {}", message);
             entity.setSent(true);
             entity.setErrorMessage(null);
+            log.info("Email sent: from {}, to {}, subject {}", entity.getSender(), entity.getRecipients(), entity.getSubject());
         } catch (MailException e) {
             log.warn("{}", e);
             entity.setErrorMessage(e.getMessage());
