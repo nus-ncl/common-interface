@@ -20,4 +20,4 @@ https://${domain}/data/${did}/requests/${rid}
 Ignore this email if you do not agree to the request.
 
 Regards,
-NCL Testbed Operations
+NCL Operations

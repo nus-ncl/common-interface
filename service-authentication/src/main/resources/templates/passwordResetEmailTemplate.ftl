@@ -1,10 +1,12 @@
 Dear ${username},
 
-Let us work together to reset your password now.
+Let's work together to reset your password now.
 
-Please click the below link to start:
+Please click on the below link to start:
 
 https://${domain}/passwordReset?key=${key}
 
+If you are not able to reset your password, please contact NCL Support (support@ncl.sg).
+
 Regards,
-NCL Testbed Operations
+NCL Operations

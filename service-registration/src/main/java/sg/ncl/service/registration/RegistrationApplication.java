@@ -33,8 +33,8 @@ import java.io.IOException;
 public class RegistrationApplication {
 
     private static final String VERIFICATION_EMAIL_TEMPLATE_NAME = "verificationEmailTemplate.ftl";
-    private static final String APPLY_TEAM_REQUEST_TEMPLATE_NAME = "applyTeamRequestTemplate.ftl";
-    private static final String REPLY_TEAM_REQUEST_TEMPLATE_NAME = "replyTeamRequestTemplate.ftl";
+    private static final String APPLY_CREATE_TEAM_REQUEST_TEMPLATE_NAME = "applyCreateTeamRequestTemplate.ftl";
+    private static final String REPLY_CREATE_TEAM_REQUEST_TEMPLATE_NAME = "replyCreateTeamRequestTemplate.ftl";
     private static final String APPLY_JOIN_TEAM_REQUEST_TEMPLATE_NAME = "applyJoinTeamRequestTemplate.ftl";
     private static final String REPLY_JOIN_TEAM_REQUEST_TEMPLATE_NAME = "replyJoinTeamRequestTemplate.ftl";
 
@@ -50,13 +50,13 @@ public class RegistrationApplication {
     }
 
     @Bean
-    Template applyTeamRequestTemplate(final Configuration configuration) throws IOException {
-        return configuration.getTemplate(APPLY_TEAM_REQUEST_TEMPLATE_NAME);
+    Template applyCreateTeamRequestTemplate(final Configuration configuration) throws IOException {
+        return configuration.getTemplate(APPLY_CREATE_TEAM_REQUEST_TEMPLATE_NAME);
     }
 
     @Bean
-    Template replyTeamRequestTemplate(final Configuration configuration) throws IOException {
-        return configuration.getTemplate(REPLY_TEAM_REQUEST_TEMPLATE_NAME);
+    Template replyCreateTeamRequestTemplate(final Configuration configuration) throws IOException {
+        return configuration.getTemplate(REPLY_CREATE_TEAM_REQUEST_TEMPLATE_NAME);
     }
 
     @Bean
