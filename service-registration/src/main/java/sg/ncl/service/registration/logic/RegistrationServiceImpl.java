@@ -642,10 +642,12 @@ public class RegistrationServiceImpl implements RegistrationService {
         try {
             String[] to = new String[1];
             to[0] = user.getUserDetails().getEmail();
+            String[] cc = new String[1];
+            cc[0] = ADMIN_EMAIL;
             String msgText = FreeMarkerTemplateUtils.processTemplateIntoString(replyCreateTeamRequestTemplate, map);
             mailService.send(TESTBED_EMAIL, to,
                     "Apply To Create New Team " + (status == TeamStatus.APPROVED ? "Approved" : "Rejected"),
-                    msgText, false, null, null);
+                    msgText, false, cc, null);
         } catch (IOException | TemplateException e) {
             log.warn("{}", e);
         }
