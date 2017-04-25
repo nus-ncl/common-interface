@@ -284,8 +284,8 @@ public class CredentialsServiceImpl implements CredentialsService {
         try {
             String msgText = FreeMarkerTemplateUtils.processTemplateIntoString(
                     passwordResetEmailTemplate, map);
-            mailService.send("NCL Testbed <testbed-ops@ncl.sg>", username,
-                    "NCL Testbed: Your Reset Password Request", msgText, false, null, null);
+            mailService.send("NCL Testbed Ops <testbed-ops@ncl.sg>", username,
+                    "Your Request To Reset Password", msgText, false, null, null);
             log.info("Password reset email sent: {}", msgText);
         } catch (IOException | TemplateException e) {
             log.warn("{}", e);
