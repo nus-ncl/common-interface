@@ -11,15 +11,19 @@ import org.mockito.junit.MockitoRule;
 import sg.ncl.adapter.deterlab.AdapterDeterLab;
 import sg.ncl.common.AccountingProperties;
 import sg.ncl.service.analytics.domain.AnalyticsService;
-import sg.ncl.service.team.data.jpa.TeamQuotaRepository;
 import sg.ncl.service.team.data.jpa.TeamEntity;
+import sg.ncl.service.team.data.jpa.TeamQuotaEntity;
+import sg.ncl.service.team.data.jpa.TeamQuotaRepository;
 import sg.ncl.service.team.data.jpa.TeamRepository;
 import sg.ncl.service.team.domain.*;
 import sg.ncl.service.team.exceptions.*;
+import sg.ncl.service.team.util.TestUtil;
 import sg.ncl.service.team.web.TeamInfo;
 import sg.ncl.service.team.web.TeamMemberInfo;
 import sg.ncl.service.user.domain.UserService;
 
+import java.math.BigDecimal;
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -120,13 +124,20 @@ public class TeamServiceImplTest {
     }
 
     @Test
+    public void testCreateTeamAlreadyExist() {
+        final TeamInfo teamInfo = new TeamInfo("id", "ncl-team", "description", "website", "organisationType", null, null, null, null, null, members);
+        when(teamRepository.findByName(anyString())).thenReturn(teamEntity);
+        exception.expect(TeamNameAlreadyExistsException.class);
+        teamService.createTeam(teamInfo);
+    }
+
+    @Test
     public void testCreateTeamGoodName() {
         final TeamInfo teamInfo = new TeamInfo("id", "ncl-team", "description", "website", "organisationType", null, null, null, null, null, members);
         when(teamRepository.save(any(TeamEntity.class))).thenAnswer(i -> i.getArgumentAt(0, TeamEntity.class));
         final Team team = teamService.createTeam(teamInfo);
 
         verify(teamRepository, times(1)).save(any(TeamEntity.class));
-//        assertThat(team.getId()).isEqualTo(teamInfo.getId());
         assertThat(team.getName()).isEqualTo(teamInfo.getName());
         assertThat(team.getDescription()).isEqualTo(teamInfo.getDescription());
         assertThat(team.getWebsite()).isEqualTo(teamInfo.getWebsite());
@@ -140,7 +151,6 @@ public class TeamServiceImplTest {
         final Team team = teamService.createTeam(teamInfo);
 
         verify(teamRepository, times(1)).save(any(TeamEntity.class));
-//        assertThat(team.getId()).isEqualTo(teamInfo.getId());
         assertThat(team.getName()).isEqualTo(teamInfo.getName());
         assertThat(team.getDescription()).isEqualTo(teamInfo.getDescription());
         assertThat(team.getWebsite()).isEqualTo(teamInfo.getWebsite());
@@ -228,6 +238,14 @@ public class TeamServiceImplTest {
     public void testAddMemberUnknownId() {
         when(teamRepository.findOne(anyString())).thenReturn(null);
         exception.expect(TeamNotFoundException.class);
+        teamService.addMember(teamEntity.getId(), teamMemberInfo);
+    }
+
+    @Test
+    public void testAddMemberAlreadyIsMember() {
+        teamEntity.addMember(teamMemberInfo);
+        when(teamRepository.findOne(anyString())).thenReturn(teamEntity);
+        exception.expect(TeamMemberAlreadyExistsException.class);
         teamService.addMember(teamEntity.getId(), teamMemberInfo);
     }
 
@@ -485,4 +503,86 @@ public class TeamServiceImplTest {
         assertThat(result.getMembers().get(0).getUserId()).isEqualTo(teamMember1.getUserId());
     }
 
+    @Test
+    public void testGetTeamQuotaByTeamIdEmptyId() {
+        assertThat(teamService.getTeamQuotaByTeamId("")).isNull();
+    }
+
+    @Test
+    public void testGetTeamQuotaByTeamIdTeamNotFound() {
+        when(teamRepository.findOne(anyString())).thenReturn(null);
+        exception.expect(TeamNotFoundException.class);
+        teamService.getTeamQuotaByTeamId(teamEntity.getId());
+    }
+
+    @Test
+    public void testGetTeamQuotaByTeamIdWithQuota() {
+        final TeamQuotaEntity teamQuotaEntity = TestUtil.getTeamQuotaEntity();
+        when(teamRepository.findOne(anyString())).thenReturn(teamEntity);
+        when(teamQuotaRepository.findByTeamId(anyString())).thenReturn(teamQuotaEntity);
+        TeamQuota teamQuota = teamService.getTeamQuotaByTeamId(teamEntity.getId());
+        assertThat(teamQuota.getId()).isEqualTo(teamQuotaEntity.getId());
+        assertThat(teamQuota.getTeamId()).isEqualTo(teamQuotaEntity.getTeamId());
+        assertThat(teamQuota.getQuota()).isEqualTo(teamQuotaEntity.getQuota());
+    }
+
+    @Test
+    public void testGetTeamQuotaByTeamIdWithoutQuota() {
+        when(teamRepository.findOne(anyString())).thenReturn(teamEntity);
+        when(teamQuotaRepository.findByTeamId(anyString())).thenReturn(null);
+        TeamQuota teamQuota = teamService.getTeamQuotaByTeamId(teamEntity.getId());
+        assertThat(teamQuota.getId()).isNull();
+        assertThat(teamQuota.getTeamId()).isEqualTo(teamEntity.getId());
+        assertThat(teamQuota.getQuota()).isNull();
+    }
+
+    @Test
+    public void testUpdateTeamQuotaEmptyTeamId() {
+        final TeamQuotaEntity teamQuotaEntity = TestUtil.getTeamQuotaEntity();
+        assertThat(teamService.updateTeamQuota("", teamQuotaEntity)).isNull();
+    }
+
+    @Test
+    public void testUpdateTeamQuotaTeamNotFound() {
+        final TeamQuotaEntity teamQuotaEntity = TestUtil.getTeamQuotaEntity();
+        when(teamRepository.findOne(anyString())).thenReturn(null);
+        exception.expect(TeamNotFoundException.class);
+        teamService.updateTeamQuota(teamEntity.getId(), teamQuotaEntity);
+    }
+
+    @Test
+    public void testUpdateTeamQuotaTeamOutOfRange() {
+        final TeamQuotaEntity teamQuotaEntity = TestUtil.getTeamQuotaEntity();
+        teamQuotaEntity.setQuota(new BigDecimal(RandomStringUtils.randomNumeric(9)));
+        when(teamRepository.findOne(anyString())).thenReturn(teamEntity);
+        exception.expect(TeamQuotaOutOfRangeException.class);
+        teamService.updateTeamQuota(teamEntity.getId(), teamQuotaEntity);
+    }
+
+    @Test
+    public void testUpdateTeamQuotaTeamNoPreviousQuota() {
+        final TeamQuotaEntity teamQuotaEntity = TestUtil.getTeamQuotaEntity();
+        when(teamRepository.findOne(anyString())).thenReturn(teamEntity);
+        when(teamQuotaRepository.findByTeamId(anyString())).thenReturn(null);
+        when(teamQuotaRepository.save(any(TeamQuotaEntity.class))).thenReturn(teamQuotaEntity);
+        TeamQuota teamQuota = teamService.updateTeamQuota(teamEntity.getId(), teamQuotaEntity);
+        verify(teamQuotaRepository, times(1)).save(any(TeamQuotaEntity.class));
+        assertThat(teamQuota.getId()).isEqualTo(teamQuotaEntity.getId());
+        assertThat(teamQuota.getTeamId()).isEqualTo(teamQuotaEntity.getTeamId());
+        assertThat(teamQuota.getQuota()).isEqualTo(teamQuotaEntity.getQuota());
+    }
+
+    @Test
+    public void testCheckTeamQuota() {
+        final TeamQuotaEntity teamQuotaEntity = TestUtil.getTeamQuotaEntity();
+        teamQuotaEntity.setQuota(new BigDecimal(10));
+        when(teamRepository.findByName(anyString())).thenReturn(TestUtil.getTeamEntityWithId());
+        when(teamRepository.findOne(anyString())).thenReturn(teamEntity);
+        when(teamQuotaRepository.findByTeamId(anyString())).thenReturn(teamQuotaEntity);
+        when(accountingProperties.getCharges()).thenReturn("0.12");
+        when(analyticsService.getUsageStatistics(anyString(), any(ZonedDateTime.class), any(ZonedDateTime.class)))
+                .thenReturn(RandomStringUtils.randomNumeric(1));
+        int quota = teamService.checkTeamQuota(teamEntity.getName());
+        assertThat(quota).isEqualTo(1);
+    }
 }
