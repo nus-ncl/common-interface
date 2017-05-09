@@ -1,17 +1,19 @@
 package sg.ncl.service.data.data.jpa;
 
 import lombok.Getter;
+import lombok.Setter;
 import org.hibernate.annotations.Type;
 import sg.ncl.service.data.domain.DataCategory;
 
-import javax.persistence.Column;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
+import javax.persistence.*;
 
 /**
  * Created by dcsjnh on 9/5/2017.
  */
+@Entity
+@Table(name = "data_categories", indexes = @Index(columnList = "name"))
 @Getter
+@Setter
 public class DataCategoryEntity implements DataCategory {
 
     @Id

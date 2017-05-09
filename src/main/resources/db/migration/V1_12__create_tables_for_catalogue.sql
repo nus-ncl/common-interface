@@ -6,7 +6,8 @@ CREATE TABLE IF NOT EXISTS `prod`.`data_keywords` (
   `data_id`    BIGINT(20)    NOT NULL,
   `keyword`    VARCHAR(255)  NOT NULL,
   PRIMARY KEY (`data_id`, `keyword`),
-  INDEX `IDXcc8154a8589506af091ad380ffa8ae31` (`data_id` ASC),
+  INDEX `IDXa565e755709166653ad81ac92b39cc15` (`data_id` ASC),
+  INDEX `IDXd7df5b64df1181ef1d62d646a13aa860` (`keyword` ASC),
   CONSTRAINT `FKa565e755709166653ad81ac92b39cc15`
   FOREIGN KEY (`data_id`)
   REFERENCES `prod`.`data` (`id`)
