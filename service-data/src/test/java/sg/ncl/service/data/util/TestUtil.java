@@ -3,6 +3,7 @@ package sg.ncl.service.data.util;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.lang3.RandomStringUtils;
 import sg.ncl.service.data.data.jpa.DataAccessRequestEntity;
+import sg.ncl.service.data.data.jpa.DataCategoryEntity;
 import sg.ncl.service.data.data.jpa.DataEntity;
 import sg.ncl.service.data.data.jpa.DataResourceEntity;
 import sg.ncl.service.data.domain.DataAccessibility;
@@ -91,6 +92,14 @@ public class TestUtil {
         entity.setReason(RandomStringUtils.randomAlphanumeric(20));
         entity.setRequestDate(ZonedDateTime.now());
         entity.setApprovedDate(ZonedDateTime.now());
+        return entity;
+    }
+
+    public static DataCategoryEntity getDataCategoryEntity() {
+        DataCategoryEntity entity = new DataCategoryEntity();
+        entity.setId(Long.parseLong(RandomStringUtils.randomNumeric(10)));
+        entity.setName(RandomStringUtils.randomAlphanumeric(10));
+        entity.setDescription(RandomStringUtils.randomAlphanumeric(20));
         return entity;
     }
 

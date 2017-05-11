@@ -3,6 +3,7 @@ package sg.ncl.service.data.data.jpa;
 import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.annotations.Type;
+import sg.ncl.common.jpa.AbstractEntity;
 import sg.ncl.service.data.domain.DataCategory;
 
 import javax.persistence.*;
@@ -14,7 +15,7 @@ import javax.persistence.*;
 @Table(name = "data_categories", indexes = @Index(columnList = "name"))
 @Getter
 @Setter
-public class DataCategoryEntity implements DataCategory {
+public class DataCategoryEntity extends AbstractEntity implements DataCategory {
 
     @Id
     @GeneratedValue
