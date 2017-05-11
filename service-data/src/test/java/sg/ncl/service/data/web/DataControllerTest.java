@@ -45,6 +45,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 import static org.springframework.test.web.servlet.setup.MockMvcBuilders.webAppContextSetup;
 import static sg.ncl.service.data.util.TestUtil.asJsonString;
+import static sg.ncl.service.data.util.TestUtil.getDataCategoryEntity;
 
 /**
  * Created by jng on 18/10/16.
@@ -110,6 +111,8 @@ public class DataControllerTest {
         final List<Data> dataSets = new ArrayList<>();
         DataEntity publicDataSet1 = TestUtil.getDataEntity();
         DataEntity publicDataSet2 = TestUtil.getDataEntity();
+        publicDataSet1.setCategory(getDataCategoryEntity());
+        publicDataSet2.setCategory(getDataCategoryEntity());
         dataSets.add(publicDataSet1);
         dataSets.add(publicDataSet2);
 
@@ -137,6 +140,7 @@ public class DataControllerTest {
     public void testGetAllDatasetsGoodAuthenticationPrincipal() throws Exception {
         final List<Data> dataSets = new ArrayList<>();
         DataEntity dataEntity = TestUtil.getDataEntity();
+        dataEntity.setCategory(getDataCategoryEntity());
         dataSets.add(dataEntity);
 
         when(securityContext.getAuthentication()).thenReturn(authentication);
@@ -183,6 +187,7 @@ public class DataControllerTest {
     @Test
     public void testGetDatasetByIdGoodAuthentication() throws Exception {
         final DataEntity dataEntity = TestUtil.getDataEntity();
+        dataEntity.setCategory(getDataCategoryEntity());
 
         when(securityContext.getAuthentication()).thenReturn(authentication);
         SecurityContextHolder.setContext(securityContext);
@@ -203,6 +208,7 @@ public class DataControllerTest {
     @Test
     public void testAddDatasetGoodAuthentication() throws Exception {
         final DataEntity dataEntity = TestUtil.getDataEntity();
+        dataEntity.setCategory(getDataCategoryEntity());
 
         mapper.registerModule(new JavaTimeModule());
         final byte[] content = mapper.writeValueAsBytes(new DataInfo(dataEntity));
@@ -229,6 +235,7 @@ public class DataControllerTest {
     @Test
     public void testUpdateDatasetGoodAuthentication() throws Exception {
         final DataEntity dataEntity = TestUtil.getDataEntity();
+        dataEntity.setCategory(getDataCategoryEntity());
 
         mapper.registerModule(new JavaTimeModule());
         final byte[] content = mapper.writeValueAsBytes(new DataInfo(dataEntity));
@@ -285,6 +292,7 @@ public class DataControllerTest {
     @Test
     public void testAddResourceGoodAuthentication() throws Exception {
         final DataEntity dataEntity = TestUtil.getDataEntityWithResources();
+        dataEntity.setCategory(getDataCategoryEntity());
 
         when(securityContext.getAuthentication()).thenReturn(authentication);
         SecurityContextHolder.setContext(securityContext);
@@ -310,6 +318,7 @@ public class DataControllerTest {
     @Test
     public void testDeleteDataResourceGoodAuthentication() throws Exception {
         final DataEntity dataEntity = TestUtil.getDataEntity();
+        dataEntity.setCategory(getDataCategoryEntity());
 
         when(securityContext.getAuthentication()).thenReturn(authentication);
         SecurityContextHolder.setContext(securityContext);

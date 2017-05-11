@@ -25,7 +25,7 @@ public class DataInfo implements Data {
     private List<String> keywords;
     private List<String> approvedUsers;
     private ZonedDateTime releasedDate;
-    private DataCategory category;
+    private DataCategoryInfo category;
 
     @JsonCreator
     public DataInfo(
@@ -39,7 +39,7 @@ public class DataInfo implements Data {
             @JsonProperty("keywords") final List<String> keywords,
             @JsonProperty("approvedUsers") final List<String> approvedUsers,
             @JsonProperty("releasedDate") final ZonedDateTime releasedDate,
-            @JsonProperty("category") final DataCategory category
+            @JsonProperty("category") final DataCategoryInfo category
     ) {
         this.id = id;
         this.name = name;
@@ -48,6 +48,7 @@ public class DataInfo implements Data {
         this.visibility = visibility;
         this.accessibility = accessibility;
         this.resources = resources.stream().map(DataResourceInfo::new).collect(Collectors.toList());
+        this.keywords = keywords;
         this.approvedUsers = approvedUsers;
         this.releasedDate = releasedDate;
         this.category = category;
