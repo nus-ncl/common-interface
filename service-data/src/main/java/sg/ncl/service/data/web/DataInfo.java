@@ -22,8 +22,10 @@ public class DataInfo implements Data {
     private DataVisibility visibility;
     private DataAccessibility accessibility;
     private List<DataResource> resources;
+    private List<String> keywords;
     private List<String> approvedUsers;
     private ZonedDateTime releasedDate;
+    private DataCategory category;
 
     @JsonCreator
     public DataInfo(
@@ -34,8 +36,10 @@ public class DataInfo implements Data {
             @JsonProperty("visibility") final DataVisibility visibility,
             @JsonProperty("accessibility") final DataAccessibility accessibility,
             @JsonProperty("resources") final List<? extends DataResource> resources,
+            @JsonProperty("keywords") final List<String> keywords,
             @JsonProperty("approvedUsers") final List<String> approvedUsers,
-            @JsonProperty("releasedDate") final ZonedDateTime releasedDate
+            @JsonProperty("releasedDate") final ZonedDateTime releasedDate,
+            @JsonProperty("category") final DataCategory category
     ) {
         this.id = id;
         this.name = name;
@@ -46,6 +50,7 @@ public class DataInfo implements Data {
         this.resources = resources.stream().map(DataResourceInfo::new).collect(Collectors.toList());
         this.approvedUsers = approvedUsers;
         this.releasedDate = releasedDate;
+        this.category = category;
     }
 
     public DataInfo(final Data data) {
@@ -57,8 +62,10 @@ public class DataInfo implements Data {
                 data.getVisibility(),
                 data.getAccessibility(),
                 data.getResources(),
+                data.getKeywords(),
                 data.getApprovedUsers(),
-                data.getReleasedDate()
+                data.getReleasedDate(),
+                new DataCategoryInfo(data.getCategory())
         );
     }
 }
