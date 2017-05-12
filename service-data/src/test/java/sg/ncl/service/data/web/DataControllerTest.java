@@ -22,12 +22,10 @@ import org.springframework.web.context.WebApplicationContext;
 import sg.ncl.common.exception.ExceptionAutoConfiguration;
 import sg.ncl.common.exception.GlobalExceptionHandler;
 import sg.ncl.service.data.data.jpa.DataAccessRequestEntity;
+import sg.ncl.service.data.data.jpa.DataCategoryEntity;
 import sg.ncl.service.data.data.jpa.DataEntity;
 import sg.ncl.service.data.data.jpa.DataResourceEntity;
-import sg.ncl.service.data.domain.Data;
-import sg.ncl.service.data.domain.DataAccessRequestService;
-import sg.ncl.service.data.domain.DataService;
-import sg.ncl.service.data.domain.DataVisibility;
+import sg.ncl.service.data.domain.*;
 import sg.ncl.service.data.util.TestUtil;
 import sg.ncl.service.transmission.web.ResumableInfo;
 
@@ -429,6 +427,49 @@ public class DataControllerTest {
         when(dataAccessRequestService.approveRequest(anyLong(), anyLong(), any(Claims.class))).thenReturn(entity);
 
         mockMvc.perform(put(DataController.PATH + "/1/requests/1"))
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    public void testGetRequest() throws Exception {
+        DataAccessRequestEntity entity = TestUtil.getDataAccessRequestEntity();
+
+        when(securityContext.getAuthentication()).thenReturn(authentication);
+        SecurityContextHolder.setContext(securityContext);
+        when(authentication.getPrincipal()).thenReturn(claims);
+        when(dataAccessRequestService.getRequest(anyLong(), anyLong(), any(Claims.class))).thenReturn(entity);
+
+        mockMvc.perform(get(DataController.PATH + "/1/requests/1"))
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    public void testGetCategories() throws Exception {
+        List<DataCategory> dataCategoryEntities = new ArrayList<>();
+        DataCategoryEntity dataCategoryEntity1 = TestUtil.getDataCategoryEntity();
+        DataCategoryEntity dataCategoryEntity2 = TestUtil.getDataCategoryEntity();
+        dataCategoryEntities.add(dataCategoryEntity1);
+        dataCategoryEntities.add(dataCategoryEntity2);
+
+        when(securityContext.getAuthentication()).thenReturn(authentication);
+        SecurityContextHolder.setContext(securityContext);
+        when(authentication.getPrincipal()).thenReturn(claims);
+        when(dataService.getCategories()).thenReturn(dataCategoryEntities);
+
+        mockMvc.perform(get(DataController.PATH + "/categories"))
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    public void testGetCategory() throws Exception {
+        DataCategoryEntity dataCategoryEntity = TestUtil.getDataCategoryEntity();
+
+        when(securityContext.getAuthentication()).thenReturn(authentication);
+        SecurityContextHolder.setContext(securityContext);
+        when(authentication.getPrincipal()).thenReturn(claims);
+        when(dataService.getCategory(anyLong())).thenReturn(dataCategoryEntity);
+
+        mockMvc.perform(get(DataController.PATH + "/categories/1"))
                 .andExpect(status().isOk());
     }
 
