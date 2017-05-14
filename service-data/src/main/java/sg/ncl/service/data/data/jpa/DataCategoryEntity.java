@@ -12,7 +12,7 @@ import javax.persistence.*;
  * Created by dcsjnh on 9/5/2017.
  */
 @Entity
-@Table(name = "data_categories", indexes = @Index(columnList = "name"))
+@Table(name = "data_categories")
 @Getter
 @Setter
 public class DataCategoryEntity extends AbstractEntity implements DataCategory {
@@ -22,7 +22,7 @@ public class DataCategoryEntity extends AbstractEntity implements DataCategory {
     @Column(name = "id", nullable = false, unique = true, updatable = false)
     private Long id;
 
-    @Column(name = "name", nullable = false, unique = true, updatable = false)
+    @Column(name = "name", nullable = false, unique = true)
     private String name;
 
     @Type(type = "text")

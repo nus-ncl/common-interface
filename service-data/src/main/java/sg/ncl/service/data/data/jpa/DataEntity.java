@@ -60,7 +60,7 @@ public class DataEntity extends AbstractEntity implements Data {
 
     @ElementCollection
     @CollectionTable(name = "data_keywords", joinColumns = @JoinColumn(name = "data_id", nullable = false, updatable = false), indexes = {@Index(columnList = "data_id"), @Index(columnList = "keyword")}, uniqueConstraints = @UniqueConstraint(columnNames = {"data_id", "keyword"}))
-    @Column(name = "keyword", nullable = false, updatable = false)
+    @Column(name = "keyword", nullable = false)
     private final List<String> keywords = new ArrayList<>();
 
     @ElementCollection

@@ -6,8 +6,6 @@ CREATE TABLE IF NOT EXISTS `prod`.`data_keywords` (
   `data_id`    BIGINT(20)    NOT NULL,
   `keyword`    VARCHAR(255)  NOT NULL,
   PRIMARY KEY (`data_id`, `keyword`),
-  INDEX `IDXa565e755709166653ad81ac92b39cc15` (`data_id` ASC),
-  INDEX `IDXd7df5b64df1181ef1d62d646a13aa860` (`keyword` ASC),
   CONSTRAINT `FKa565e755709166653ad81ac92b39cc15`
   FOREIGN KEY (`data_id`)
   REFERENCES `prod`.`data` (`id`)
@@ -25,7 +23,7 @@ CREATE TABLE IF NOT EXISTS `prod`.`data_categories` (
   `last_modified_date` DATETIME     NOT NULL,
   `version`            BIGINT(20)   NOT NULL,
   `name`               VARCHAR(255)	NOT NULL,
-  `description`        LONGTEXT	    NOT NULL,
+  `description`        LONGTEXT	    NULL,
   PRIMARY KEY (`id`)
 )
   ENGINE = InnoDB
