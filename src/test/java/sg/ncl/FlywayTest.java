@@ -407,7 +407,7 @@ public class FlywayTest {
 
         assertThat((String) dataCategoriesTable.get(5).get("FIELD")).isEqualTo("description");
         assertThat((String) dataCategoriesTable.get(5).get("TYPE")).contains("clob");
-        assertThat((String) dataCategoriesTable.get(5).get("NULL")).isEqualTo("NO");
+        assertThat((String) dataCategoriesTable.get(5).get("NULL")).isEqualTo("YES");
         assertThat((String) dataCategoriesTable.get(5).get("KEY")).isEmpty();
 
         List<Map<String, Object>> dataCategoriesConstraints = this.template.queryForList("SELECT * FROM INFORMATION_SCHEMA.CONSTRAINTS WHERE TABLE_NAME = 'data_categories'");
