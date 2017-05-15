@@ -7,10 +7,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.util.UriUtils;
 import sg.ncl.common.exception.base.NotFoundException;
 import sg.ncl.service.analytics.domain.AnalyticsService;
-import sg.ncl.service.data.data.jpa.DataCategoryRepository;
-import sg.ncl.service.data.data.jpa.DataEntity;
-import sg.ncl.service.data.data.jpa.DataRepository;
-import sg.ncl.service.data.data.jpa.DataResourceEntity;
+import sg.ncl.service.data.data.jpa.*;
 import sg.ncl.service.data.domain.*;
 import sg.ncl.service.data.exceptions.*;
 import sg.ncl.service.data.web.DataResourceInfo;
@@ -75,6 +72,7 @@ public class DataServiceImpl implements DataService {
         dataEntity.setContributorId(data.getContributorId());
         dataEntity.setAccessibility(data.getAccessibility());
         dataEntity.setVisibility(data.getVisibility());
+        dataEntity.setCategoryId(data.getCategoryId());
 
         return dataEntity;
     }

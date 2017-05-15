@@ -28,6 +28,6 @@ public interface Data {
 
     ZonedDateTime getReleasedDate();
 
-    DataCategory getCategory();
+    Long getCategoryId();
 
 }

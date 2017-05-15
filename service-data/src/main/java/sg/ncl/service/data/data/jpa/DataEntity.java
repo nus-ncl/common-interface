@@ -51,9 +51,8 @@ public class DataEntity extends AbstractEntity implements Data {
     @Column(name = "released_date", nullable = false)
     private ZonedDateTime releasedDate;
 
-    @OneToOne
-    @JoinColumn(name = "category_id")
-    private DataCategoryEntity category;
+    @Column(name = "category_id")
+    private Long categoryId;
 
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "dataEntity", orphanRemoval = true)
     private List<DataResourceEntity> resources = new ArrayList<>();
