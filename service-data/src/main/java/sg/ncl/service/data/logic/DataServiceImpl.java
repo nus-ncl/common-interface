@@ -73,6 +73,7 @@ public class DataServiceImpl implements DataService {
         dataEntity.setAccessibility(data.getAccessibility());
         dataEntity.setVisibility(data.getVisibility());
         dataEntity.setCategoryId(data.getCategoryId());
+        dataEntity.resetKeywords(data.getKeywords());
 
         return dataEntity;
     }

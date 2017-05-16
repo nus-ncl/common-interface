@@ -85,6 +85,11 @@ public class DataEntity extends AbstractEntity implements Data {
         log.info("User {} removed from the approved list for data {}", userId, name);
     }
 
+    public void resetKeywords(final List<String> keywords) {
+        this.keywords.clear();
+        this.keywords.addAll(keywords);
+    }
+
     public void addResource(DataResourceEntity dataResourceEntity) {
         if (!resources.contains(dataResourceEntity)) {
             resources.add(dataResourceEntity);
