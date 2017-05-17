@@ -6,6 +6,7 @@ import sg.ncl.service.transmission.web.ResumableInfo;
 import javax.servlet.http.HttpServletResponse;
 import java.io.UnsupportedEncodingException;
 import java.util.List;
+import java.util.Set;
 
 /**
  * Created by jng on 17/10/16.
@@ -21,6 +22,8 @@ public interface DataService {
     Data getDataset(Long id);
 
     List<Data> getDatasets();
+
+    Set<Data> searchDatasets(String[] keywords);
 
     List<Data> findByVisibility(DataVisibility visibility);
 

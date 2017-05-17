@@ -39,6 +39,17 @@ public class DataController {
         this.dataAccessRequestService = dataAccessRequestService;
     }
 
+    @GetMapping(path = "/search")
+    @ResponseStatus(HttpStatus.OK)
+    public List<Data> seatchDatasets(@AuthenticationPrincipal Object claims,
+                                     @RequestParam(value="keyword", required=false) String[] keywords) {
+        if (claims == null || !(claims instanceof Claims)) {
+            log.warn("Access denied for: /datasets/search GET");
+            throw new UnauthorizedException();
+        }
+        return dataService.searchDatasets(keywords).stream().map(DataInfo::new).collect(Collectors.toList());
+    }
+
     // Get a list of all available data sets
     @GetMapping()
     @ResponseStatus(HttpStatus.OK)

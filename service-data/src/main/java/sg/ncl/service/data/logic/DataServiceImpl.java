@@ -7,7 +7,10 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.util.UriUtils;
 import sg.ncl.common.exception.base.NotFoundException;
 import sg.ncl.service.analytics.domain.AnalyticsService;
-import sg.ncl.service.data.data.jpa.*;
+import sg.ncl.service.data.data.jpa.DataCategoryRepository;
+import sg.ncl.service.data.data.jpa.DataEntity;
+import sg.ncl.service.data.data.jpa.DataRepository;
+import sg.ncl.service.data.data.jpa.DataResourceEntity;
 import sg.ncl.service.data.domain.*;
 import sg.ncl.service.data.exceptions.*;
 import sg.ncl.service.data.web.DataResourceInfo;
@@ -22,7 +25,9 @@ import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import static sg.ncl.service.data.validations.Validator.checkAccessibility;
 import static sg.ncl.service.data.validations.Validator.checkPermissions;
@@ -175,6 +180,19 @@ public class DataServiceImpl implements DataService {
     @Override
     public List<Data> getDatasets() {
         return new ArrayList<>(dataRepository.findAll());
+    }
+
+    @Override
+    public Set<Data> searchDatasets(String[] keywords) {
+        Set<Data> datasets = new HashSet<>();
+        if (keywords != null && keywords.length > 0) {
+            for (String keyword : keywords) {
+                datasets.addAll(dataRepository.findDataByName(keyword));
+                datasets.addAll(dataRepository.findDataByDescription(keyword));
+                datasets.addAll(dataRepository.findDataByKeyword(keyword));
+            }
+        }
+        return datasets;
     }
 
     /**
