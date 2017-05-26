@@ -95,26 +95,6 @@ public class DataServiceImpl implements DataService {
 
         dataResourceEntity.setUri(dataResource.getUri());
 
-        try {
-            log.info("Initiating ClamAV... {}", client.version());
-            Path path = Paths.get("/mnt/resources/data/123abc/test.txt");
-
-            log.info("Path scanning... {}", path.getFileName());
-
-            ScanResult result = client.scan(path, false);
-
-            if (result.getStatus().equals(ScanResult.Status.OK)) {
-                log.info("File: " + path + " is ok");
-            } else if (result.getStatus().equals(ScanResult.Status.VIRUS_FOUND)) {
-                log.info("File: " + path + " is a virus");
-            } else {
-                log.info("Error: running clamav");
-            }
-
-        } catch (ClamavException e) {
-            e.printStackTrace();
-        }
-
         return dataResourceEntity;
     }
 
@@ -321,6 +301,7 @@ public class DataServiceImpl implements DataService {
             case FINISHED:
                 DataResourceInfo dataResourceInfo = new DataResourceInfo(null, resumableInfo.getResumableFilename());
                 createResource(id, dataResourceInfo, claims);
+                scanUploadedFile();
                 log.info("Resource upload finished and saved: {}", dataResourceInfo);
                 return "All finished.";
             case UPLOAD:
@@ -342,6 +323,28 @@ public class DataServiceImpl implements DataService {
         } catch (IOException e) {
             log.error("Unable to download resource: {}", e);
             throw new NotFoundException();
+        }
+    }
+
+    private void scanUploadedFile() {
+        try {
+            log.info("Initiating ClamAV... {}", client.version());
+            Path path = Paths.get("/mnt/resources/data/123abc/test.txt");
+
+            log.info("Path scanning... {}", path.toString());
+
+            ScanResult result = client.scan(path, false);
+
+            if (result.getStatus().equals(ScanResult.Status.OK)) {
+                log.info("File: " + path + " is ok");
+            } else if (result.getStatus().equals(ScanResult.Status.VIRUS_FOUND)) {
+                log.info("File: " + path + " is a virus");
+            } else {
+                log.info("Error: running clamav");
+            }
+
+        } catch (ClamavException e) {
+            e.printStackTrace();
         }
     }
 
