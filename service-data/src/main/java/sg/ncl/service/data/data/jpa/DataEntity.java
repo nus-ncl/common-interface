@@ -147,6 +147,8 @@ public class DataEntity extends AbstractEntity implements Data {
                 ", releasedDate=" + releasedDate +
                 ", resources=" + resources +
                 ", approvedUsers=" + approvedUsers +
+                ", categoryId=" + categoryId +
+                ", keywords=" + keywords +
                 "} " + super.toString();
     }
 }
