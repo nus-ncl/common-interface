@@ -29,6 +29,7 @@ import javax.servlet.http.HttpServletResponse;
 import javax.validation.constraints.NotNull;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.ZonedDateTime;
@@ -301,7 +302,7 @@ public class DataServiceImpl implements DataService {
             case FINISHED:
                 DataResourceInfo dataResourceInfo = new DataResourceInfo(null, resumableInfo.getResumableFilename());
                 createResource(id, dataResourceInfo, claims);
-                scanUploadedFile();
+                scanUploadedFile(dataEntity, dataResourceInfo.getUri());
                 log.info("Resource upload finished and saved: {}", dataResourceInfo);
                 return "All finished.";
             case UPLOAD:
@@ -326,12 +327,17 @@ public class DataServiceImpl implements DataService {
         }
     }
 
-    private void scanUploadedFile() {
+    private void scanUploadedFile(DataEntity dataEntity, String fileName) {
         try {
+            log.info(dataEntity.getName());
             log.info("Initiating ClamAV... {}", client.version());
-            Path path = Paths.get("/mnt/resources/data/123abc/test.txt");
+            Path path = Paths.get("/mnt/resources/data/" + dataEntity.getName() + "/" + fileName);
 
-            log.info("Path scanning... {}", path.toString());
+            if (Files.exists(path)) {
+                log.info("File path EXIST now scanning...{}", path);
+            } else {
+                log.info("Error: File path does not exist: {}", path);
+            }
 
             ScanResult result = client.scan(path, false);
 
