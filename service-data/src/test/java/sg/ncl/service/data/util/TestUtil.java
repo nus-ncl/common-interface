@@ -64,7 +64,7 @@ public class TestUtil {
 
     public static DataResourceEntity getDataResourceEntity() {
         DataResourceEntity entity = new DataResourceEntity();
-        entity.setUri("http://" + RandomStringUtils.randomAlphanumeric(20));
+        entity.setUri(RandomStringUtils.randomAlphanumeric(20));
 
         return entity;
     }
