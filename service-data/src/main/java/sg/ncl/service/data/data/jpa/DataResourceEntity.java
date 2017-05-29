@@ -26,6 +26,10 @@ public class DataResourceEntity extends AbstractEntity implements DataResource {
     @Column(name = "uri", nullable = false)
     private String uri;
 
+    @Column(name = "is_malicious", nullable = false)
+    @Type(type = "yes_no")
+    private boolean malicious = false;
+
     @ManyToOne
     @JoinColumn(name = "data_id")
     private DataEntity dataEntity;
@@ -35,6 +39,7 @@ public class DataResourceEntity extends AbstractEntity implements DataResource {
         return "DataResourceEntity{" +
                 "id='" + id + '\'' +
                 ", uri=" + uri +
+                ", malicious=" + malicious +
                 "} " + super.toString();
     }
 
