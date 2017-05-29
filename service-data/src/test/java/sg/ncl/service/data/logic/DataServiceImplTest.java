@@ -17,6 +17,13 @@ import sg.ncl.service.analytics.domain.AnalyticsService;
 import sg.ncl.service.data.data.jpa.*;
 import sg.ncl.service.data.domain.*;
 import sg.ncl.service.data.exceptions.*;
+import sg.ncl.service.data.data.jpa.DataEntity;
+import sg.ncl.service.data.data.jpa.DataRepository;
+import sg.ncl.service.data.data.jpa.DataResourceEntity;
+import sg.ncl.service.data.domain.*;
+import sg.ncl.service.data.exceptions.DataNameAlreadyExistsException;
+import sg.ncl.service.data.exceptions.DataNotFoundException;
+import sg.ncl.service.data.exceptions.DataResourceNotFoundException;
 import sg.ncl.service.data.util.TestUtil;
 import sg.ncl.service.transmission.domain.DownloadService;
 import sg.ncl.service.transmission.domain.UploadService;
@@ -57,6 +64,8 @@ public class DataServiceImplTest {
     @Mock
     private AnalyticsService analyticsService;
     @Mock
+    private AvScannerService avScannerService;
+    @Mock
     private Claims claims;
     @Mock
     private HttpServletResponse response;
@@ -71,9 +80,8 @@ public class DataServiceImplTest {
         assertThat(mockingDetails(uploadService).isMock()).isTrue();
         assertThat(mockingDetails(downloadService).isMock()).isTrue();
         assertThat(mockingDetails(analyticsService).isMock()).isTrue();
-        dataService = new DataServiceImpl(
-                dataRepository, dataCategoryRepository, dataLicenseRepository,
-                uploadService, downloadService, analyticsService);
+        assertThat(mockingDetails(avScannerService).isMock()).isTrue();
+        dataService = new DataServiceImpl(dataRepository, dataCategoryRepository, dataLicenseRepository, uploadService, downloadService, analyticsService, avScannerService);
     }
 
     @Test
