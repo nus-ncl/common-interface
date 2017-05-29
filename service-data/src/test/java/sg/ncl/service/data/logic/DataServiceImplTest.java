@@ -14,16 +14,9 @@ import sg.ncl.common.exception.base.ForbiddenException;
 import sg.ncl.common.exception.base.NotFoundException;
 import sg.ncl.common.jwt.JwtToken;
 import sg.ncl.service.analytics.domain.AnalyticsService;
-import sg.ncl.service.data.data.jpa.DataEntity;
-import sg.ncl.service.data.data.jpa.DataRepository;
-import sg.ncl.service.data.data.jpa.DataResourceEntity;
-import sg.ncl.service.data.domain.DataAccessibility;
-import sg.ncl.service.data.domain.DataResource;
-import sg.ncl.service.data.domain.DataService;
-import sg.ncl.service.data.domain.DataVisibility;
-import sg.ncl.service.data.exceptions.DataNameAlreadyExistsException;
-import sg.ncl.service.data.exceptions.DataNotFoundException;
-import sg.ncl.service.data.exceptions.DataResourceNotFoundException;
+import sg.ncl.service.data.data.jpa.*;
+import sg.ncl.service.data.domain.*;
+import sg.ncl.service.data.exceptions.*;
 import sg.ncl.service.data.util.TestUtil;
 import sg.ncl.service.transmission.domain.DownloadService;
 import sg.ncl.service.transmission.domain.UploadService;
@@ -54,6 +47,8 @@ public class DataServiceImplTest {
     @Mock
     private DataRepository dataRepository;
     @Mock
+    private DataCategoryRepository dataCategoryRepository;
+    @Mock
     private UploadService uploadService;
     @Mock
     private DownloadService downloadService;
@@ -69,10 +64,11 @@ public class DataServiceImplTest {
     @Before
     public void before() {
         assertThat(mockingDetails(dataRepository).isMock()).isTrue();
+        assertThat((mockingDetails(dataCategoryRepository).isMock())).isTrue();
         assertThat(mockingDetails(uploadService).isMock()).isTrue();
         assertThat(mockingDetails(downloadService).isMock()).isTrue();
         assertThat(mockingDetails(analyticsService).isMock()).isTrue();
-        dataService = new DataServiceImpl(dataRepository, uploadService, downloadService, analyticsService);
+        dataService = new DataServiceImpl(dataRepository, dataCategoryRepository, uploadService, downloadService, analyticsService);
     }
 
     @Test
@@ -95,7 +91,7 @@ public class DataServiceImplTest {
     }
 
     @Test
-    public void testGetDatasetknownId() {
+    public void testGetDatasetKnownId() {
         when(dataRepository.getOne(anyLong())).thenReturn(TestUtil.getDataEntity());
         dataService.getDataset(1L);
         verify(dataRepository, times(1)).getOne(anyLong());
@@ -227,6 +223,21 @@ public class DataServiceImplTest {
     }
 
     @Test
+    public void testSaveResourceAlreadyExist() {
+        DataEntity dataEntity = TestUtil.getDataEntity();
+        DataResourceEntity dataResourceEntity = TestUtil.getDataResourceEntity();
+        dataEntity.addResource(dataResourceEntity);
+        final List<String> roles = Collections.singletonList(Role.USER.getAuthority());
+
+        when(dataRepository.getOne(anyLong())).thenReturn(dataEntity);
+        when(claims.get(JwtToken.KEY)).thenReturn(roles);
+        when(claims.getSubject()).thenReturn(dataEntity.getContributorId());
+
+        exception.expect(DataResourceAlreadyExistsException.class);
+        dataService.createResource(dataEntity.getId(), dataResourceEntity, claims);
+    }
+
+    @Test
     public void testSaveResource() {
         DataEntity dataEntity = TestUtil.getDataEntity();
         DataResourceEntity dataResourceEntity = TestUtil.getDataResourceEntity();
@@ -238,6 +249,26 @@ public class DataServiceImplTest {
 
         dataService.createResource(dataEntity.getId(), dataResourceEntity, claims);
         verify(dataRepository, times(1)).save(any(DataEntity.class));
+    }
+
+    @Test
+    public void testDeleteResourceException() throws IOException {
+        DataEntity dataEntity = TestUtil.getDataEntity();
+        dataEntity.setId(1L);
+        List<DataResourceEntity> dataResourceList = new ArrayList<>();
+        DataResourceEntity dataResourceEntity = TestUtil.getDataResourceEntity();
+        dataResourceEntity.setId(1L);
+        dataResourceList.add(dataResourceEntity);
+        dataEntity.setResources(dataResourceList);
+        final List<String> roles = Collections.singletonList(Role.USER.getAuthority());
+
+        when(dataRepository.getOne(anyLong())).thenReturn(dataEntity);
+        when(claims.get(JwtToken.KEY)).thenReturn(roles);
+        when(claims.getSubject()).thenReturn(dataEntity.getContributorId());
+        when(uploadService.deleteUpload(anyString(), anyString(), anyString())).thenThrow(new IOException());
+
+        exception.expect(DataResourceDeleteException.class);
+        dataService.deleteResource(dataEntity.getId(), dataEntity.getResources().get(0).getId(), claims);
     }
 
     @Test
@@ -340,6 +371,22 @@ public class DataServiceImplTest {
 
         exception.expect(NotFoundException.class);
         dataService.downloadResource(response, 1L, 1L, claims);
+    }
+
+    @Test
+    public void testGetCategoryByIdNotFound() {
+        when(dataCategoryRepository.getOne(anyLong())).thenReturn(null);
+        exception.expect(DataCategoryNotFoundException.class);
+        dataService.getCategory(1L);
+    }
+
+    @Test
+    public void testGetCategoryByIdFound() {
+        DataCategoryEntity entity = TestUtil.getDataCategoryEntity();
+        when(dataCategoryRepository.getOne(anyLong())).thenReturn(entity);
+        DataCategory dataCategory = dataService.getCategory(entity.getId());
+        verify(dataCategoryRepository, times(1)).getOne(anyLong());
+        assertThat(dataCategory.getName()).isEqualTo(entity.getName());
     }
 
 }

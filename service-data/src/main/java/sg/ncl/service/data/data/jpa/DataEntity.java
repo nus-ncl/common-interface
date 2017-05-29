@@ -10,20 +10,7 @@ import sg.ncl.service.data.domain.DataAccessibility;
 import sg.ncl.service.data.domain.DataResource;
 import sg.ncl.service.data.domain.DataVisibility;
 
-import javax.persistence.CascadeType;
-import javax.persistence.CollectionTable;
-import javax.persistence.Column;
-import javax.persistence.ElementCollection;
-import javax.persistence.Entity;
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.persistence.Index;
-import javax.persistence.JoinColumn;
-import javax.persistence.OneToMany;
-import javax.persistence.Table;
-import javax.persistence.UniqueConstraint;
+import javax.persistence.*;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -64,10 +51,16 @@ public class DataEntity extends AbstractEntity implements Data {
     @Column(name = "released_date", nullable = false)
     private ZonedDateTime releasedDate;
 
+    @Column(name = "category_id")
+    private Long categoryId;
+
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "dataEntity", orphanRemoval = true)
     private List<DataResourceEntity> resources = new ArrayList<>();
 
-
+    @ElementCollection
+    @CollectionTable(name = "data_keywords", joinColumns = @JoinColumn(name = "data_id", nullable = false, updatable = false), indexes = {@Index(columnList = "data_id"), @Index(columnList = "keyword")}, uniqueConstraints = @UniqueConstraint(columnNames = {"data_id", "keyword"}))
+    @Column(name = "keyword", nullable = false)
+    private final List<String> keywords = new ArrayList<>();
 
     @ElementCollection
     @CollectionTable(name = "data_users", joinColumns = @JoinColumn(name = "data_id", nullable = false, updatable = false), indexes = {@Index(columnList = "data_id"), @Index(columnList = "user_id")}, uniqueConstraints = @UniqueConstraint(columnNames = {"data_id", "user_id"}))
@@ -90,6 +83,11 @@ public class DataEntity extends AbstractEntity implements Data {
         }
         approvedUsers.remove(userId);
         log.info("User {} removed from the approved list for data {}", userId, name);
+    }
+
+    public void resetKeywords(final List<String> keywords) {
+        this.keywords.clear();
+        this.keywords.addAll(keywords);
     }
 
     public void addResource(DataResourceEntity dataResourceEntity) {
@@ -149,6 +147,8 @@ public class DataEntity extends AbstractEntity implements Data {
                 ", releasedDate=" + releasedDate +
                 ", resources=" + resources +
                 ", approvedUsers=" + approvedUsers +
+                ", categoryId=" + categoryId +
+                ", keywords=" + keywords +
                 "} " + super.toString();
     }
 }

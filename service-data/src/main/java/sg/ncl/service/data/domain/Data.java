@@ -22,8 +22,12 @@ public interface Data {
 
     List<DataResource> getResources();
 
+    List<String> getKeywords();
+
     List<String> getApprovedUsers();
 
     ZonedDateTime getReleasedDate();
+
+    Long getCategoryId();
 
 }

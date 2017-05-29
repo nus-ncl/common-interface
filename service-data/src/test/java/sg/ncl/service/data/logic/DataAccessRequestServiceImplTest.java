@@ -21,6 +21,7 @@ import sg.ncl.service.data.domain.DataAccessRequest;
 import sg.ncl.service.data.domain.DataAccessRequestService;
 import sg.ncl.service.data.exceptions.DataAccessRequestNotFoundException;
 import sg.ncl.service.data.exceptions.DataNotFoundException;
+import sg.ncl.service.data.exceptions.DataNotMatchException;
 import sg.ncl.service.data.util.TestUtil;
 import sg.ncl.service.mail.domain.MailService;
 import sg.ncl.service.user.data.jpa.UserEntity;
@@ -113,6 +114,14 @@ public class DataAccessRequestServiceImplTest {
         when(dataRepository.getOne(anyLong())).thenReturn(null);
         exception.expect(DataNotFoundException.class);
         dataAccessRequestService.approveRequest(entity.getDataId(), 1L, claims);
+    }
+
+    @Test
+    public void testApproveRequestDataNotMatch() {
+        DataAccessRequestEntity entity = TestUtil.getDataAccessRequestEntity();
+        when(dataAccessRequestRepository.getOne(anyLong())).thenReturn(entity);
+        exception.expect(DataNotMatchException.class);
+        dataAccessRequestService.approveRequest(1L, 1L, claims);
     }
 
     @Test

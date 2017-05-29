@@ -39,6 +39,17 @@ public class DataController {
         this.dataAccessRequestService = dataAccessRequestService;
     }
 
+    @GetMapping(path = "/search")
+    @ResponseStatus(HttpStatus.OK)
+    public List<Data> seatchDatasets(@AuthenticationPrincipal Object claims,
+                                     @RequestParam(value="keyword", required=false) String[] keywords) {
+        if (claims == null || !(claims instanceof Claims)) {
+            log.warn("Access denied for: /datasets/search GET");
+            throw new UnauthorizedException();
+        }
+        return dataService.searchDatasets(keywords).stream().map(DataInfo::new).collect(Collectors.toList());
+    }
+
     // Get a list of all available data sets
     @GetMapping()
     @ResponseStatus(HttpStatus.OK)
@@ -192,6 +203,26 @@ public class DataController {
             throw new UnauthorizedException();
         }
         dataService.downloadResource(response, did, rid, (Claims) claims);
+    }
+
+    @GetMapping(value = "/categories")
+    @ResponseStatus(HttpStatus.OK)
+    public List<DataCategory> getCategories(@AuthenticationPrincipal Object claims) {
+        if (claims == null || !(claims instanceof Claims)) {
+            log.warn("Access denied for: /categories GET");
+            throw new UnauthorizedException();
+        }
+        return dataService.getCategories().stream().map(DataCategoryInfo::new).collect(Collectors.toList());
+    }
+
+    @GetMapping(value = "/categories/{id}")
+    @ResponseStatus(HttpStatus.OK)
+    public DataCategory getCategoryById(@AuthenticationPrincipal Object claims, @PathVariable Long id) {
+        if (claims == null || !(claims instanceof Claims)) {
+            log.warn("Access denied for: /categories/{id} GET");
+            throw new UnauthorizedException();
+        }
+        return new DataCategoryInfo(dataService.getCategory(id));
     }
 
 }

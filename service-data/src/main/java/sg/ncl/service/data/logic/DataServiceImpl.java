@@ -7,13 +7,11 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.util.UriUtils;
 import sg.ncl.common.exception.base.NotFoundException;
 import sg.ncl.service.analytics.domain.AnalyticsService;
+import sg.ncl.service.data.data.jpa.DataCategoryRepository;
 import sg.ncl.service.data.data.jpa.DataEntity;
 import sg.ncl.service.data.data.jpa.DataRepository;
 import sg.ncl.service.data.data.jpa.DataResourceEntity;
-import sg.ncl.service.data.domain.Data;
-import sg.ncl.service.data.domain.DataResource;
-import sg.ncl.service.data.domain.DataService;
-import sg.ncl.service.data.domain.DataVisibility;
+import sg.ncl.service.data.domain.*;
 import sg.ncl.service.data.exceptions.*;
 import sg.ncl.service.data.web.DataResourceInfo;
 import sg.ncl.service.transmission.domain.DownloadService;
@@ -26,8 +24,10 @@ import javax.validation.constraints.NotNull;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.time.ZonedDateTime;
+import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
-import java.util.stream.Collectors;
+import java.util.Set;
 
 import static sg.ncl.service.data.validations.Validator.checkAccessibility;
 import static sg.ncl.service.data.validations.Validator.checkPermissions;
@@ -44,16 +44,19 @@ public class DataServiceImpl implements DataService {
     private static final String UTF_ENCODING = "UTF-8";
 
     private final DataRepository dataRepository;
+    private final DataCategoryRepository dataCategoryRepository;
     private final UploadService uploadService;
     private final DownloadService downloadService;
     private final AnalyticsService analyticsService;
 
     @Inject
     DataServiceImpl(@NotNull final DataRepository dataRepository,
+                    @NotNull final DataCategoryRepository dataCategoryRepository,
                     @NotNull final UploadService uploadService,
                     @NotNull final DownloadService downloadService,
                     @NotNull final AnalyticsService analyticsService) {
         this.dataRepository = dataRepository;
+        this.dataCategoryRepository = dataCategoryRepository;
         this.uploadService = uploadService;
         this.downloadService = downloadService;
         this.analyticsService = analyticsService;
@@ -74,6 +77,8 @@ public class DataServiceImpl implements DataService {
         dataEntity.setContributorId(data.getContributorId());
         dataEntity.setAccessibility(data.getAccessibility());
         dataEntity.setVisibility(data.getVisibility());
+        dataEntity.setCategoryId(data.getCategoryId());
+        dataEntity.resetKeywords(data.getKeywords());
 
         return dataEntity;
     }
@@ -174,7 +179,20 @@ public class DataServiceImpl implements DataService {
      */
     @Override
     public List<Data> getDatasets() {
-        return dataRepository.findAll().stream().collect(Collectors.toList());
+        return new ArrayList<>(dataRepository.findAll());
+    }
+
+    @Override
+    public Set<Data> searchDatasets(String[] keywords) {
+        Set<Data> datasets = new HashSet<>();
+        if (keywords != null && keywords.length > 0) {
+            for (String keyword : keywords) {
+                datasets.addAll(dataRepository.findDataByName(keyword));
+                datasets.addAll(dataRepository.findDataByDescription(keyword));
+                datasets.addAll(dataRepository.findDataByKeyword(keyword));
+            }
+        }
+        return datasets;
     }
 
     /**
@@ -185,7 +203,7 @@ public class DataServiceImpl implements DataService {
      */
     @Override
     public List<Data> findByVisibility(DataVisibility visibility) {
-        return dataRepository.findByVisibility(visibility).stream().collect(Collectors.toList());
+        return new ArrayList<>(dataRepository.findByVisibility(visibility));
     }
 
     /**
@@ -311,6 +329,20 @@ public class DataServiceImpl implements DataService {
             log.error("Unable to download resource: {}", e);
             throw new NotFoundException();
         }
+    }
+
+    @Override
+    public List<DataCategory> getCategories() {
+        return new ArrayList<>(dataCategoryRepository.findAll());
+    }
+
+    @Override
+    public DataCategory getCategory(Long id) {
+        DataCategory dataCategory = dataCategoryRepository.getOne(id);
+        if (dataCategory == null) {
+            throw new DataCategoryNotFoundException("Category not found.");
+        }
+        return dataCategory;
     }
 
 }
