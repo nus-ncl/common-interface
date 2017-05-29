@@ -364,8 +364,18 @@ public class DataServiceImpl implements DataService {
         return dataLicense;
     }
 
-    private void scanResource(DataEntity dataEntity, String fileName) throws UnsupportedEncodingException {
-        boolean result = avScannerService.scan(DATA_DIR_KEY, UriUtils.encode(dataEntity.getName(), UTF_ENCODING), fileName);
+    private Data scanResource(DataEntity dataEntity, String fileName) throws UnsupportedEncodingException {
+        boolean isMalicious = avScannerService.scan(DATA_DIR_KEY, UriUtils.encode(dataEntity.getName(), UTF_ENCODING), fileName);
+
+        for (DataResource resource : dataEntity.getResources()) {
+            if (resource.getUri().equals(fileName) && isMalicious) {
+                log.info("Data resource {}: is malicious", resource.getUri());
+            } else if (resource.getUri().equals(fileName) && !isMalicious) {
+                log.info("Data resource {}: is clean", resource.getUri());
+            }
+        }
+
+        return dataRepository.save(dataEntity);
     }
 
 }
