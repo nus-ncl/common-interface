@@ -10,28 +10,18 @@ import sg.ncl.service.analytics.domain.AnalyticsService;
 import sg.ncl.service.data.data.jpa.DataEntity;
 import sg.ncl.service.data.data.jpa.DataRepository;
 import sg.ncl.service.data.data.jpa.DataResourceEntity;
-import sg.ncl.service.data.domain.Data;
-import sg.ncl.service.data.domain.DataResource;
-import sg.ncl.service.data.domain.DataService;
-import sg.ncl.service.data.domain.DataVisibility;
+import sg.ncl.service.data.domain.*;
 import sg.ncl.service.data.exceptions.*;
 import sg.ncl.service.data.web.DataResourceInfo;
 import sg.ncl.service.transmission.domain.DownloadService;
 import sg.ncl.service.transmission.domain.UploadService;
 import sg.ncl.service.transmission.web.ResumableInfo;
-import xyz.capybara.clamav.ClamavClient;
-import xyz.capybara.clamav.commands.scan.result.ScanResult;
-import xyz.capybara.clamav.configuration.Platform;
-import xyz.capybara.clamav.exceptions.ClamavException;
 
 import javax.inject.Inject;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.constraints.NotNull;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -54,22 +44,19 @@ public class DataServiceImpl implements DataService {
     private final UploadService uploadService;
     private final DownloadService downloadService;
     private final AnalyticsService analyticsService;
-
-    private final String clamavHost = "192.168.56.102";
-    private final Integer clamavPort = 19121;
-    private final ClamavClient client;
+    private final AvScannerService avScannerService;
 
     @Inject
     DataServiceImpl(@NotNull final DataRepository dataRepository,
                     @NotNull final UploadService uploadService,
                     @NotNull final DownloadService downloadService,
-                    @NotNull final AnalyticsService analyticsService) {
+                    @NotNull final AnalyticsService analyticsService,
+                    @NotNull final AvScannerService avScannerService) {
         this.dataRepository = dataRepository;
         this.uploadService = uploadService;
         this.downloadService = downloadService;
         this.analyticsService = analyticsService;
-
-        client = new ClamavClient(clamavHost, clamavPort, Platform.UNIX);
+        this.avScannerService = avScannerService;
     }
 
     private DataEntity setUpDataEntity(Data data, DataEntity... dataEntities) {
@@ -302,7 +289,7 @@ public class DataServiceImpl implements DataService {
             case FINISHED:
                 DataResourceInfo dataResourceInfo = new DataResourceInfo(null, resumableInfo.getResumableFilename());
                 createResource(id, dataResourceInfo, claims);
-                scanUploadedFile(dataEntity, dataResourceInfo.getUri());
+                scanResource(dataEntity, dataResourceInfo.getUri());
                 log.info("Resource upload finished and saved: {}", dataResourceInfo);
                 return "All finished.";
             case UPLOAD:
@@ -327,31 +314,8 @@ public class DataServiceImpl implements DataService {
         }
     }
 
-    private void scanUploadedFile(DataEntity dataEntity, String fileName) {
-        try {
-            log.info(dataEntity.getName());
-            log.info("Initiating ClamAV... {}", client.version());
-            Path path = Paths.get("/mnt/resources/data/" + dataEntity.getName() + "/" + fileName);
-
-            if (Files.exists(path)) {
-                log.info("File path EXIST now scanning...{}", path);
-            } else {
-                log.info("Error: File path does not exist: {}", path);
-            }
-
-            ScanResult result = client.scan(path, false);
-
-            if (result.getStatus().equals(ScanResult.Status.OK)) {
-                log.info("File: " + path + " is ok");
-            } else if (result.getStatus().equals(ScanResult.Status.VIRUS_FOUND)) {
-                log.info("File: " + path + " is a virus");
-            } else {
-                log.info("Error: running clamav");
-            }
-
-        } catch (ClamavException e) {
-            e.printStackTrace();
-        }
+    private void scanResource(DataEntity dataEntity, String fileName) throws UnsupportedEncodingException {
+        boolean result = avScannerService.scan(DATA_DIR_KEY, UriUtils.encode(dataEntity.getName(), UTF_ENCODING), fileName);
     }
 
 }
