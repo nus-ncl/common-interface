@@ -112,6 +112,17 @@ public class DataEntity extends AbstractEntity implements Data {
         }
     }
 
+    public DataResource editResourceMalicious(DataResource dataResource, boolean isMalicious) {
+        for (DataResourceEntity dataResourceEntity : resources) {
+            if (dataResourceEntity.getUri().equals(dataResource.getUri())) {
+                dataResourceEntity.setMalicious(isMalicious);
+                log.info("Data resource {}: is {}", dataResource.getUri(), isMalicious);
+                return dataResourceEntity;
+            }
+        }
+        return null;
+    }
+
     @Override
     public List<DataResource> getResources() {
         List<DataResource> dataResources = new ArrayList<>();
