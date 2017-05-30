@@ -31,7 +31,7 @@ public class V1_15__update_is_malicious_entry_for_existing_data_resources implem
             // not needed but just in case
             log.info("Content: {}", content);
             if(content == null || content.equals("")) {
-                boolean isMalicious = false;
+                String isMalicious = "N";
                 final String s2 = String.format("UPDATE prod.%s SET %s = ? WHERE id = ?", table, column);
                 jdbcTemplate.update(s2, isMalicious, id);
                 log.info("Updated {} entry: id={}, {}={}", table, id, column, isMalicious);
