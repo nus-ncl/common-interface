@@ -287,9 +287,9 @@ public class DataServiceImpl implements DataService {
         DataEntity dataEntity = (DataEntity) getDataset(id);
         switch (uploadService.addChunk(resumableInfo, Integer.parseInt(resumableChunkNumber), DATA_DIR_KEY, UriUtils.encode(dataEntity.getName(), UTF_ENCODING))) {
             case FINISHED:
-                DataResourceInfo dataResourceInfo = new DataResourceInfo(null, resumableInfo.getResumableFilename());
+                DataResourceInfo dataResourceInfo = new DataResourceInfo(null, resumableInfo.getResumableFilename(), false);
                 createResource(id, dataResourceInfo, claims);
-                scanResource(dataEntity, dataResourceInfo.getUri());
+                scanResource(dataEntity, dataResourceInfo);
                 log.info("Resource upload finished and saved: {}", dataResourceInfo);
                 return "All finished.";
             case UPLOAD:
@@ -314,16 +314,10 @@ public class DataServiceImpl implements DataService {
         }
     }
 
-    private Data scanResource(DataEntity dataEntity, String fileName) throws UnsupportedEncodingException {
-        boolean isMalicious = avScannerService.scan(DATA_DIR_KEY, UriUtils.encode(dataEntity.getName(), UTF_ENCODING), fileName);
+    private Data scanResource(DataEntity dataEntity, DataResource dataResource) throws UnsupportedEncodingException {
+        boolean isMalicious = avScannerService.scan(DATA_DIR_KEY, UriUtils.encode(dataEntity.getName(), UTF_ENCODING), dataResource.getUri());
 
-        for (DataResource resource : dataEntity.getResources()) {
-            if (resource.getUri().equals(fileName) && isMalicious) {
-                log.info("Data resource {}: is malicious", resource.getUri());
-            } else if (resource.getUri().equals(fileName) && !isMalicious) {
-                log.info("Data resource {}: is clean", resource.getUri());
-            }
-        }
+        dataEntity.editResourceMalicious(dataResource, isMalicious);
 
         return dataRepository.save(dataEntity);
     }
