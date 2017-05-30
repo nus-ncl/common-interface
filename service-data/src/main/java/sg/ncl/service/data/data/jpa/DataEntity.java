@@ -54,6 +54,9 @@ public class DataEntity extends AbstractEntity implements Data {
     @Column(name = "category_id")
     private Long categoryId;
 
+    @Column(name = "license_id")
+    private Long licenseId;
+
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "dataEntity", orphanRemoval = true)
     private List<DataResourceEntity> resources = new ArrayList<>();
 
@@ -148,6 +151,7 @@ public class DataEntity extends AbstractEntity implements Data {
                 ", resources=" + resources +
                 ", approvedUsers=" + approvedUsers +
                 ", categoryId=" + categoryId +
+                ", licenseId=" + licenseId +
                 ", keywords=" + keywords +
                 "} " + super.toString();
     }

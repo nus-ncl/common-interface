@@ -30,4 +30,6 @@ public interface Data {
 
     Long getCategoryId();
 
+    Long getLicenseId();
+
 }
