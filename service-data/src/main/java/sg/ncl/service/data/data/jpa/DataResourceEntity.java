@@ -52,7 +52,14 @@ public class DataResourceEntity extends AbstractEntity implements DataResource {
 
         DataResourceEntity that = (DataResourceEntity) o;
 
-        return uri.equals(that.uri);
+        if (!uri.equals(that.uri)) {
+            return false;
+        }
+        if (malicious != that.malicious) {
+            return false;
+        }
+
+        return true;
     }
 
     @Override
