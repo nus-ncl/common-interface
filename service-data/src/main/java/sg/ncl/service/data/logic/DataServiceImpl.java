@@ -364,6 +364,14 @@ public class DataServiceImpl implements DataService {
         return dataLicense;
     }
 
+    /**
+     * Scans a resource to check if it is malicious after uploading and updates the resource status
+     * @param dataEntity the data entity that contains the data resource
+     * @param dataResource the data resource to be scanned
+     * @return the data entity containing the edited data resource entity
+     * @throws UnsupportedEncodingException
+     * @see String addChunk()
+     */
     private Data scanResource(DataEntity dataEntity, DataResource dataResource) throws UnsupportedEncodingException {
         boolean isMalicious = avScannerService.scan(DATA_DIR_KEY, UriUtils.encode(dataEntity.getName(), UTF_ENCODING), dataResource.getUri());
 
