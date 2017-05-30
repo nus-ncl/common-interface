@@ -3,7 +3,6 @@ package sg.ncl.service.data.logic;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.stereotype.Service;
-import org.springframework.web.util.UriUtils;
 import sg.ncl.common.AvScannerProperties;
 import sg.ncl.service.data.domain.AvScannerService;
 import sg.ncl.service.transmission.DirectoryProperties;
@@ -15,7 +14,6 @@ import xyz.capybara.clamav.exceptions.ClamavException;
 
 import javax.inject.Inject;
 import javax.validation.constraints.NotNull;
-import java.io.UnsupportedEncodingException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -40,8 +38,6 @@ public class AvScannerImpl implements AvScannerService {
     private final ClamavClient client;
     private final DirectoryProperties directoryProperties;
 
-    private static final String UTF_ENCODING = "UTF-8";
-
     @Inject
     AvScannerImpl(@NotNull final AvScannerProperties avScannerProperties, @NotNull final DirectoryProperties directoryProperties) {
         this.avScannerProperties = avScannerProperties;
@@ -52,6 +48,15 @@ public class AvScannerImpl implements AvScannerService {
     //
     // return true if file is malicious
     // TODO: add authentication
+
+    /**
+     * Scans a file using ClamAv to check whether the file is malicious
+     * The file path is made by HttpUtils module from the given parameters e.g. /mnt/resources/[subDirKey]/[preDir]/[fileName]
+     * @param subDirKey the key from application.yml that indicates the name for the upload directory
+     * @param preDir usually the data entity name
+     * @param fileName the filename or data resource uri
+     * @return true if ClamAv detects a virus, false otherwise
+     */
     public boolean scan(String subDirKey, String preDir, String fileName) {
         try {
             log.info("Initiating ClamAV... {}", client.version());
@@ -78,7 +83,7 @@ public class AvScannerImpl implements AvScannerService {
             }
 
         } catch (ClamavException e) {
-            e.printStackTrace();
+            log.info("Error: running clamav - {}", e);
         }
         return  false;
     }
