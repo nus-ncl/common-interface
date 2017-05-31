@@ -14,7 +14,7 @@ import java.time.ZonedDateTime;
  * Created by dcsjnh on 30/5/2017.
  */
 @Slf4j
-public class V1_17__insert_data_licenses implements SpringJdbcMigration {
+public class V1_15__insert_data_licenses implements SpringJdbcMigration {
 
     private static final String SQL_INSERT_LICENSE =
                     "INSERT INTO prod.data_licenses " +
@@ -66,7 +66,7 @@ public class V1_17__insert_data_licenses implements SpringJdbcMigration {
                 "This license lets others distribute, remix, tweak, and build upon your work/data, even commercially, as long as they credit you for the original creation.",
                 "https://creativecommons.org/licenses/by/4.0/");
         createLicense(jdbcTemplate,
-                "Creative Commons Attribution Share Alike",
+                "Creative Commons Attribution ShareAlike",
                 "CC BY-SA",
                 "This license lets others remix, tweak, and build upon your work/data even for commercial purposes, as long as they credit you and license their new creations under the identical terms.",
                 "https://creativecommons.org/licenses/by-sa/4.0/");
@@ -81,7 +81,7 @@ public class V1_17__insert_data_licenses implements SpringJdbcMigration {
                 "This license lets others remix, tweak, and build upon your work/data non-commercially, and  their new works must acknowledge you.",
                 "https://creativecommons.org/licenses/by-nc/4.0/");
         createLicense(jdbcTemplate,
-                "Creative Commons Attribution Non-Commercial Share Alike",
+                "Creative Commons Attribution Non-Commercial ShareAlike",
                 "CC BY-NC-SA",
                 "This license lets others remix, tweak, and build upon your work/data non-commercially, as long as they credit you and license their new creations under the identical terms.",
                 "https://creativecommons.org/licenses/by-nc-sa/4.0");
