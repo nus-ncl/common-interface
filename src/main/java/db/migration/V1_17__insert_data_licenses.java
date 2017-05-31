@@ -46,9 +46,15 @@ public class V1_17__insert_data_licenses implements SpringJdbcMigration {
         return id;
     }
 
+    private void updateData(final JdbcTemplate jdbcTemplate, final int license_id) {
+        final String sql = "UPDATE prod.data SET license_id=?";
+        final int i = jdbcTemplate.update(sql, license_id);
+        log.info("Number of rows affected: {}", i);
+    }
+
     @Override
     public void migrate(final JdbcTemplate jdbcTemplate) throws Exception {
-        log.info("Creating licenses.");
+        log.info("Creating licenses and getting id for license 'CC BY-NC-ND'.");
         createLicense(jdbcTemplate,
                 "Public Domain",
                 "CC0",
@@ -79,11 +85,14 @@ public class V1_17__insert_data_licenses implements SpringJdbcMigration {
                 "CC BY-NC-SA",
                 "This license lets others remix, tweak, and build upon your work/data non-commercially, as long as they credit you and license their new creations under the identical terms.",
                 "https://creativecommons.org/licenses/by-nc-sa/4.0");
-        createLicense(jdbcTemplate,
+        int license_id = createLicense(jdbcTemplate,
                 "Creative Commons Attribution Non-Commercial No Derivatives",
                 "CC BY-NC-ND",
                 "This license lets others to download your works/data and share them with others as long as they credit you, but they can’t change them in any way or use them commercially.",
                 "https://creativecommons.org/licenses/by-nc-nd/4.0");
+
+        log.info("Setting id for license 'CC BY-NC-ND' into existing datasets.");
+        updateData(jdbcTemplate, license_id);
     }
 
 }
