@@ -25,7 +25,7 @@ public class DataLicenseEntity extends AbstractEntity implements DataLicense {
     @Column(name = "name", nullable = false, unique = true)
     private String name;
 
-    @Column(name = "acronym", nullable = false, updatable = true)
+    @Column(name = "acronym", nullable = false, unique = true)
     private String acronym;
 
     @Type(type = "text")

@@ -217,11 +217,7 @@ public class DataController {
 
     @GetMapping(value = "/categories/{id}")
     @ResponseStatus(HttpStatus.OK)
-    public DataCategory getCategoryById(@AuthenticationPrincipal Object claims, @PathVariable Long id) {
-        if (claims == null || !(claims instanceof Claims)) {
-            log.warn("Access denied for: /categories/{id} GET");
-            throw new UnauthorizedException();
-        }
+    public DataCategory getCategoryById(@PathVariable Long id) {
         return new DataCategoryInfo(dataService.getCategory(id));
     }
 
@@ -237,11 +233,7 @@ public class DataController {
 
     @GetMapping(value = "/licenses/{id}")
     @ResponseStatus(HttpStatus.OK)
-    private DataLicense getLicense(@AuthenticationPrincipal Object claims, @PathVariable Long id) {
-        if (claims == null || !(claims instanceof Claims)) {
-            log.warn("Access denied for: /licenses/{id} GET");
-            throw new UnauthorizedException();
-        }
+    private DataLicense getLicenseById(@PathVariable Long id) {
         return new DataLicenseInfo(dataService.getLicense(id));
     }
 
