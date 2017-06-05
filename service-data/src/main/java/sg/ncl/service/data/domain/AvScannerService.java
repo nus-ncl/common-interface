@@ -1,7 +1,5 @@
 package sg.ncl.service.data.domain;
 
-import java.io.UnsupportedEncodingException;
-
 /**
  * Created by dcsyeoty on 29-May-17.
  */
