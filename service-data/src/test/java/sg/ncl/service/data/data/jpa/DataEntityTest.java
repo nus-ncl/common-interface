@@ -1,20 +1,39 @@
 package sg.ncl.service.data.data.jpa;
 
 import org.apache.commons.lang3.RandomStringUtils;
+import org.junit.Before;
 import org.junit.Test;
+import org.mockito.Mock;
 import sg.ncl.service.data.domain.DataAccessibility;
 import sg.ncl.service.data.domain.DataResource;
 import sg.ncl.service.data.domain.DataVisibility;
+import sg.ncl.service.data.util.TestUtil;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+import static sg.ncl.service.data.util.TestUtil.getDataResourceEntity;
 
 /**
+ *
+ * Mocking enhanced for loop
+ * https://stackoverflow.com/questions/6379308/testing-java-enhanced-for-behavior-with-mockito
+ *
  * Created by dcszwang on 10/6/2016.
  */
 public class DataEntityTest {
+
+    @Mock
+    private Iterator<DataResourceEntity> dataResourceEntityIterator;
+
+    @Before
+    public void setUp() {
+        dataResourceEntityIterator = mock(Iterator.class);
+    }
 
     @Test
     public void testGetId() {
@@ -122,6 +141,40 @@ public class DataEntityTest {
         List<? extends DataResource> retResources = dataEntity.getResources();
         assertThat(retResources.size()).isEqualTo(1);
         assertThat(retResources.get(0)).isEqualTo(resourceEntity);
+    }
+
+    @Test
+    public void testEditResourceMalicious() {
+        DataEntity dataEntity = new DataEntity();
+        DataResourceEntity dataResourceEntity = getDataResourceEntity();
+
+        dataEntity.addResource(dataResourceEntity);
+        DataResource editedDataResource = dataEntity.editResourceMalicious(dataResourceEntity, true);
+
+        assertThat(editedDataResource.isMalicious()).isTrue();
+    }
+
+    // supply a data resource not found in the data entity
+    @Test
+    public void testEditResourceMaliciousNotFound() {
+        DataEntity dataEntity = new DataEntity();
+        DataResourceEntity dataResourceEntity = getDataResourceEntity();
+        DataResourceEntity dataResourceEntity2 = getDataResourceEntity();
+
+        dataEntity.addResource(dataResourceEntity);
+        DataResource editedDataResource = dataEntity.editResourceMalicious(dataResourceEntity2, true);
+
+        assertThat(editedDataResource).isNull();
+    }
+
+    @Test
+    public void testEditResourceMaliciousNull() {
+        DataEntity dataEntity = new DataEntity();
+        DataResourceEntity dataResourceEntity = getDataResourceEntity();
+
+        DataResource editedDataResource = dataEntity.editResourceMalicious(dataResourceEntity, true);
+
+        assertThat(editedDataResource).isNull();
     }
 
     @Test
