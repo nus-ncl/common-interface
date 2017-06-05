@@ -69,6 +69,19 @@ public class DataResourceEntityTest {
         assertThat(entity.equals(null)).isFalse();
     }
 
+    @Test
+    public void testEqualsDifferentUri() {
+        String link = RandomStringUtils.randomAlphanumeric(20);
+        String link2 = RandomStringUtils.randomAlphanumeric(20);
+        DataResourceEntity entity1 = new DataResourceEntity();
+        DataResourceEntity entity2 = new DataResourceEntity();
+
+        entity1.setUri(link);
+        entity2.setUri(link2);
+
+        assertThat(entity1.equals(entity2)).isFalse();
+    }
+
     // test two data resource objects
     // identical uri
     // different malicious
