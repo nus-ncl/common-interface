@@ -64,7 +64,7 @@ public class DataServiceImplTest {
     @Mock
     private AnalyticsService analyticsService;
     @Mock
-    private AvScannerService avScannerService;
+    private AsyncAvScannerService asyncAvScannerService;
     @Mock
     private Claims claims;
     @Mock
@@ -80,8 +80,8 @@ public class DataServiceImplTest {
         assertThat(mockingDetails(uploadService).isMock()).isTrue();
         assertThat(mockingDetails(downloadService).isMock()).isTrue();
         assertThat(mockingDetails(analyticsService).isMock()).isTrue();
-        assertThat(mockingDetails(avScannerService).isMock()).isTrue();
-        dataService = new DataServiceImpl(dataRepository, dataCategoryRepository, dataLicenseRepository, uploadService, downloadService, analyticsService, avScannerService);
+        assertThat(mockingDetails(asyncAvScannerService).isMock()).isTrue();
+        dataService = new DataServiceImpl(dataRepository, dataCategoryRepository, dataLicenseRepository, uploadService, downloadService, analyticsService, asyncAvScannerService);
     }
 
     @Test
