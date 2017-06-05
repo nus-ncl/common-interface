@@ -2,6 +2,7 @@ package sg.ncl.service.data.logic;
 
 import io.jsonwebtoken.Claims;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.util.UriUtils;
@@ -46,7 +47,7 @@ public class DataServiceImpl implements DataService {
     private final UploadService uploadService;
     private final DownloadService downloadService;
     private final AnalyticsService analyticsService;
-    private final AvScannerService avScannerService;
+    private final AsyncAvScannerService asyncAvScannerService;
 
     @Inject
     DataServiceImpl(@NotNull final DataRepository dataRepository,
@@ -55,14 +56,14 @@ public class DataServiceImpl implements DataService {
                     @NotNull final UploadService uploadService,
                     @NotNull final DownloadService downloadService,
                     @NotNull final AnalyticsService analyticsService,
-                    @NotNull final AvScannerService avScannerService) {
+                    @NotNull final AsyncAvScannerService asyncAvScannerService) {
         this.dataRepository = dataRepository;
         this.dataCategoryRepository = dataCategoryRepository;
         this.dataLicenseRepository = dataLicenseRepository;
         this.uploadService = uploadService;
         this.downloadService = downloadService;
         this.analyticsService = analyticsService;
-        this.avScannerService = avScannerService;
+        this.asyncAvScannerService = asyncAvScannerService;
     }
 
     private DataEntity setUpDataEntity(Data data, DataEntity... dataEntities) {
@@ -311,7 +312,7 @@ public class DataServiceImpl implements DataService {
             case FINISHED:
                 DataResourceInfo dataResourceInfo = new DataResourceInfo(null, resumableInfo.getResumableFilename(), false);
                 createResource(id, dataResourceInfo, claims);
-                scanResource(dataEntity, dataResourceInfo);
+                asyncAvScannerService.scanResource(dataEntity, dataResourceInfo, DATA_DIR_KEY, UTF_ENCODING);
                 log.info("Resource upload finished and saved: {}", dataResourceInfo);
                 return "All finished.";
             case UPLOAD:
@@ -362,22 +363,6 @@ public class DataServiceImpl implements DataService {
             throw new DataLicenseNotFoundException("License not found.");
         }
         return dataLicense;
-    }
-
-    /**
-     * Scans a resource to check if it is malicious after uploading and updates the resource status
-     * @param dataEntity the data entity that contains the data resource
-     * @param dataResource the data resource to be scanned
-     * @return the data entity containing the edited data resource entity
-     * @throws UnsupportedEncodingException
-     * @see String addChunk()
-     */
-    private Data scanResource(DataEntity dataEntity, DataResource dataResource) throws UnsupportedEncodingException {
-        boolean isMalicious = avScannerService.scan(DATA_DIR_KEY, UriUtils.encode(dataEntity.getName(), UTF_ENCODING), dataResource.getUri());
-
-        dataEntity.editResourceMalicious(dataResource, isMalicious);
-
-        return dataRepository.save(dataEntity);
     }
 
 }
