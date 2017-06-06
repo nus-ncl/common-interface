@@ -27,14 +27,6 @@ import static sg.ncl.service.data.util.TestUtil.getDataResourceEntity;
  */
 public class DataEntityTest {
 
-    @Mock
-    private Iterator<DataResourceEntity> dataResourceEntityIterator;
-
-    @Before
-    public void setUp() {
-        dataResourceEntityIterator = mock(Iterator.class);
-    }
-
     @Test
     public void testGetId() {
         DataEntity entity = new DataEntity();
