@@ -101,7 +101,7 @@ public class AvScannerImpl implements AvScannerService {
                 log.info("Error: running clamav");
             }
 
-        } catch (ClamavException e) {
+        } catch (ClamavException | NullPointerException e) {
             log.info("Error: running clamav - {}", e);
         }
         return  false;
