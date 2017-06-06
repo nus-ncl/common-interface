@@ -1,5 +1,6 @@
 package sg.ncl.service.data.logic;
 
+import org.apache.commons.lang3.RandomStringUtils;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -12,10 +13,14 @@ import sg.ncl.common.AvScannerProperties;
 import sg.ncl.service.data.domain.AvScannerService;
 import sg.ncl.service.transmission.DirectoryProperties;
 import xyz.capybara.clamav.ClamavClient;
+import xyz.capybara.clamav.commands.scan.result.ScanResult;
+import xyz.capybara.clamav.exceptions.ClamavException;
+
+import java.nio.file.Path;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Matchers.anyInt;
-import static org.mockito.Matchers.anyString;
+import static org.mockito.Matchers.*;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mockingDetails;
 import static org.mockito.Mockito.when;
 
@@ -38,6 +43,8 @@ public class AvScannerImplTest {
     private AvScannerImpl.ClamavFactory clamavFactory;
     @Mock
     private ClamavClient clamavClient;
+    @Mock
+    private ScanResult scanResult;
 
     private AvScannerService avScannerService;
 
@@ -47,6 +54,7 @@ public class AvScannerImplTest {
         assertThat(mockingDetails(clamavClient).isMock()).isTrue();
         assertThat(mockingDetails(clamavFactory).isMock()).isTrue();
         assertThat(mockingDetails(directoryProperties).isMock()).isTrue();
+        assertThat(mockingDetails(scanResult).isMock()).isTrue();
 
         when(clamavFactory.createClamavClient(anyString(), anyInt())).thenReturn(clamavClient);
 
@@ -55,7 +63,32 @@ public class AvScannerImplTest {
     }
 
     @Test
-    public void testScan() {
+    public void testScanCleanFile() throws ClamavException {
+        when(clamavClient.scan(any(Path.class), eq(false))).thenReturn(scanResult);
+        when(scanResult.getStatus()).thenReturn(ScanResult.Status.OK);
+        assertThat(avScannerService.scan("data", "dataset", "fileName")).isFalse();
+    }
+
+    @Test
+    public void testScanMaliciousFile() throws ClamavException {
+        when(clamavClient.scan(any(Path.class), eq(false))).thenReturn(scanResult);
+        when(scanResult.getStatus()).thenReturn(ScanResult.Status.VIRUS_FOUND);
+        assertThat(avScannerService.scan("data", "dataset", "fileName")).isTrue();
+    }
+
+    @Test
+    public void testScanFileNullResult() throws ClamavException {
+        when(clamavClient.scan(any(Path.class), eq(false))).thenReturn(scanResult);
+        when(scanResult.getStatus()).thenReturn(null);
+        assertThat(avScannerService.scan("data", "dataset", "fileName")).isFalse();
+    }
+
+    @Test
+    public void testScanFileClamAvException() throws ClamavException {
+        when(clamavClient.version()).thenReturn(RandomStringUtils.randomAlphanumeric(20));
+        doThrow(new ClamavException(new Throwable("error_message"))).when(clamavClient).scan(any(Path.class), eq(false));
+        when(scanResult.getStatus()).thenReturn(ScanResult.Status.VIRUS_FOUND);
+
         assertThat(avScannerService.scan("data", "dataset", "fileName")).isFalse();
     }
 }
