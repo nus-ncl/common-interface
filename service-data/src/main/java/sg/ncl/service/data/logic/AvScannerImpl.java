@@ -35,14 +35,33 @@ import java.nio.file.Paths;
 public class AvScannerImpl implements AvScannerService {
 
     private final AvScannerProperties avScannerProperties;
+    private final ClamavFactory clamavFactory;
     private final ClamavClient client;
     private final DirectoryProperties directoryProperties;
 
+    /**
+     * This class uses the factory design pattern to create the clamavclient
+     * in order to not instantiate a clamavclient by new()
+     * This design pattern helps in unit testing
+     *
+     * https://groups.google.com/forum/#!topic/mockito/7wYX4_2m6NU
+     */
+    protected static class ClamavFactory {
+        ClamavClient createClamavClient(String host, Integer port) {
+            return new ClamavClient(host, port);
+        }
+    }
+
     @Inject
     AvScannerImpl(@NotNull final AvScannerProperties avScannerProperties, @NotNull final DirectoryProperties directoryProperties) {
-        this.avScannerProperties = avScannerProperties;
-        this.directoryProperties = directoryProperties;
-        client = new ClamavClient(avScannerProperties.getHost(), avScannerProperties.getPort(), Platform.UNIX);
+        this(avScannerProperties, directoryProperties, new ClamavFactory());
+    }
+
+    protected AvScannerImpl(AvScannerProperties avScannerPropertiesParam, DirectoryProperties directoryPropertiesParam, ClamavFactory clamavFactoryParam) {
+        this.avScannerProperties = avScannerPropertiesParam;
+        this.directoryProperties = directoryPropertiesParam;
+        this.clamavFactory = clamavFactoryParam;
+        this.client = clamavFactory.createClamavClient(avScannerProperties.getHost(), avScannerProperties.getPort());
     }
 
     //
