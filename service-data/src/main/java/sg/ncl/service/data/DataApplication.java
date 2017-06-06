@@ -41,6 +41,7 @@ public class DataApplication extends AsyncConfigurerSupport {
         return configuration.getTemplate(APPROVED_ACCESS_TEMPLATE);
     }
 
+    // Async task scheduler to invoke the clam av scanning library
     @Override
     public Executor getAsyncExecutor() {
         ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
