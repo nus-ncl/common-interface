@@ -159,6 +159,18 @@ public class DataEntityTest {
         assertThat(editedDataResource).isNull();
     }
 
+    // no update to data resource if is_malicious tag is identical to result of the scan
+    @Test
+    public void testEditResourceMaliciousNoChange() {
+        DataEntity dataEntity = new DataEntity();
+        DataResourceEntity dataResourceEntity = getDataResourceEntity();
+
+        dataEntity.addResource(dataResourceEntity);
+        DataResource editedDataResource = dataEntity.editResourceMalicious(dataResourceEntity, false);
+
+        assertThat(editedDataResource).isNull();
+    }
+
     @Test
     public void testEditResourceMaliciousNull() {
         DataEntity dataEntity = new DataEntity();

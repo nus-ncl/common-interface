@@ -113,7 +113,7 @@ public class DataEntity extends AbstractEntity implements Data {
 
     public DataResource editResourceMalicious(DataResource dataResource, boolean isMalicious) {
         for (DataResourceEntity dataResourceEntity : resources) {
-            if (dataResourceEntity.getUri().equals(dataResource.getUri())) {
+            if (dataResourceEntity.getUri().equals(dataResource.getUri()) && dataResourceEntity.isMalicious() != isMalicious) {
                 dataResourceEntity.setMalicious(isMalicious);
                 log.info("Data resource {}: is {}", dataResource.getUri(), isMalicious);
                 return dataResourceEntity;
