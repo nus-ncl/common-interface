@@ -126,4 +126,12 @@ public class AvScannerImplTest {
 
         assertThat(avScannerService.scan("data", "dataset", "fileName")).isFalse();
     }
+
+    @Test
+    public void testGetScheduleCronExpression() throws Exception {
+        String one = RandomStringUtils.randomAlphanumeric(20);
+        when(avScannerProperties.getCron()).thenReturn(one);
+
+        assertThat(avScannerService.getScheduleCronExpression()).isEqualTo(one);
+    }
 }
