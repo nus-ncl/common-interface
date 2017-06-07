@@ -14,7 +14,7 @@ import sg.ncl.service.data.domain.AvScannerService;
 import sg.ncl.service.transmission.DirectoryProperties;
 import xyz.capybara.clamav.ClamavClient;
 import xyz.capybara.clamav.commands.scan.result.ScanResult;
-import xyz.capybara.clamav.exceptions.ClamavException;
+import xyz.capybara.clamav.exceptions.*;
 
 import java.nio.file.Path;
 
@@ -88,6 +88,41 @@ public class AvScannerImplTest {
         when(clamavClient.version()).thenReturn(RandomStringUtils.randomAlphanumeric(20));
         doThrow(new ClamavException(new Throwable("error_message"))).when(clamavClient).scan(any(Path.class), eq(false));
         when(scanResult.getStatus()).thenReturn(ScanResult.Status.VIRUS_FOUND);
+
+        assertThat(avScannerService.scan("data", "dataset", "fileName")).isFalse();
+    }
+
+    @Test
+    public void testScanCommunicationException() throws Exception {
+        doThrow(new CommunicationException(new Throwable("error_message"))).when(clamavClient).scan(any(Path.class), eq(false));
+
+        assertThat(avScannerService.scan("data", "dataset", "fileName")).isFalse();
+    }
+
+    @Test
+    public void testScanInvalidResponseException() throws Exception {
+        doThrow(new InvalidResponseException("error_message")).when(clamavClient).scan(any(Path.class), eq(false));
+
+        assertThat(avScannerService.scan("data", "dataset", "fileName")).isFalse();
+    }
+
+    @Test
+    public void testScanScanFailureException() throws Exception {
+        doThrow(new ScanFailureException("error_message")).when(clamavClient).scan(any(Path.class), eq(false));
+
+        assertThat(avScannerService.scan("data", "dataset", "fileName")).isFalse();
+    }
+
+    @Test
+    public void testScanUnknownCommandException() throws Exception {
+        doThrow(new UnknownCommandException("error_message")).when(clamavClient).scan(any(Path.class), eq(false));
+
+        assertThat(avScannerService.scan("data", "dataset", "fileName")).isFalse();
+    }
+
+    @Test
+    public void testScanUnsupportedCommandException() throws Exception {
+        doThrow(new UnsupportedCommandException("error_message")).when(clamavClient).scan(any(Path.class), eq(false));
 
         assertThat(avScannerService.scan("data", "dataset", "fileName")).isFalse();
     }
