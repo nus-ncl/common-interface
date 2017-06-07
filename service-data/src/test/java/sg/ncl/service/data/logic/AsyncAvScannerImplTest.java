@@ -1,5 +1,6 @@
 package sg.ncl.service.data.logic;
 
+import org.apache.commons.lang3.RandomStringUtils;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -58,5 +59,13 @@ public class AsyncAvScannerImplTest {
 
         verify(dataRepository, times(1)).save(dataEntity);
         assertThat(result.getResources().stream().anyMatch(DataResource::isMalicious));
+    }
+
+    @Test
+    public void testGetScheduleCronExpression() throws Exception {
+        String one = RandomStringUtils.randomAlphanumeric(20);
+        when(avScannerService.getScheduleCronExpression()).thenReturn(one);
+
+        assertThat(avScannerService.getScheduleCronExpression()).isEqualTo(one);
     }
 }
