@@ -20,6 +20,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = TestConfig.class, webEnvironment = WebEnvironment.NONE)
 @TestPropertySource(properties = {
+        "ncl.av-scanner.cron=* 0 2 * * SUN",
         "ncl.av-scanner.host=123.123.123.123",
         "ncl.av-scanner.port=1234"
 })
@@ -41,6 +42,11 @@ public class AvScannerPropertiesTest {
     @Test
     public void testGetPort() throws Exception {
         assertThat(properties.getPort()).isEqualTo(1234);
+    }
+
+    @Test
+    public void testGetCron() throws Exception {
+        assertThat(properties.getCron()).isEqualTo("* 0 2 * * SUN");
     }
 
 }
