@@ -66,6 +66,6 @@ public class AsyncAvScannerImplTest {
         String one = RandomStringUtils.randomAlphanumeric(20);
         when(avScannerService.getScheduleCronExpression()).thenReturn(one);
 
-        assertThat(avScannerService.getScheduleCronExpression()).isEqualTo(one);
+        assertThat(asyncAvScannerService.getScheduleCronExpression()).isEqualTo(one);
     }
 }

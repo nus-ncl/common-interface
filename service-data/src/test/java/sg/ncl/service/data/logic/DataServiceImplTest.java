@@ -33,6 +33,7 @@ import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.*;
@@ -340,6 +341,53 @@ public class DataServiceImplTest {
 
         exception.expect(NotFoundException.class);
         dataService.downloadResource(response, 1L, 1L, claims);
+    }
+
+    @Test
+    public void testScheduleDataResourceScan() throws UnsupportedEncodingException {
+        DataEntity dataEntity = TestUtil.getDataEntity();
+        List<DataEntity> dataList = new ArrayList<>();
+        List<DataResourceEntity> dataResourceList = new ArrayList<>();
+
+        DataResourceEntity dataResourceEntity = TestUtil.getDataResourceEntity();
+        dataResourceEntity.setId(1L);
+        dataResourceEntity.setMalicious(false);
+        dataResourceList.add(dataResourceEntity);
+        dataEntity.setResources(dataResourceList);
+
+        dataList.add(dataEntity);
+
+        when(dataRepository.findAll().stream().collect(Collectors.toList())).thenReturn(dataList);
+        when(dataRepository.findOne(anyLong())).thenReturn(dataEntity);
+        when(asyncAvScannerService.scanResource(any(DataEntity.class), any(DataResource.class), anyString(), anyString())).thenReturn(dataEntity);
+
+        dataService.scheduledDataResourceScan();
+
+        verify(asyncAvScannerService, times(1)).scanResource(any(DataEntity.class), any(DataResource.class), anyString(), anyString());
+    }
+
+    // async scanner service in schedule scan throws unsupported encoding exception
+    @Test
+    public void testScheduleDataResourceScanException() throws UnsupportedEncodingException {
+        DataEntity dataEntity = TestUtil.getDataEntity();
+        List<DataEntity> dataList = new ArrayList<>();
+        List<DataResourceEntity> dataResourceList = new ArrayList<>();
+
+        DataResourceEntity dataResourceEntity = TestUtil.getDataResourceEntity();
+        dataResourceEntity.setId(1L);
+        dataResourceEntity.setMalicious(false);
+        dataResourceList.add(dataResourceEntity);
+        dataEntity.setResources(dataResourceList);
+
+        dataList.add(dataEntity);
+
+        when(dataRepository.findAll().stream().collect(Collectors.toList())).thenReturn(dataList);
+        when(dataRepository.findOne(anyLong())).thenReturn(dataEntity);
+        when(asyncAvScannerService.scanResource(any(DataEntity.class), any(DataResource.class), anyString(), anyString())).thenThrow(new UnsupportedEncodingException());
+
+        dataService.scheduledDataResourceScan();
+
+        verify(asyncAvScannerService, times(1)).scanResource(any(DataEntity.class), any(DataResource.class), anyString(), anyString());
     }
 
 }
