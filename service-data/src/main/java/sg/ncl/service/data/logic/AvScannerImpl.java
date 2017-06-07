@@ -9,8 +9,7 @@ import sg.ncl.service.transmission.DirectoryProperties;
 import sg.ncl.service.transmission.util.HttpUtils;
 import xyz.capybara.clamav.ClamavClient;
 import xyz.capybara.clamav.commands.scan.result.ScanResult;
-import xyz.capybara.clamav.configuration.Platform;
-import xyz.capybara.clamav.exceptions.ClamavException;
+import xyz.capybara.clamav.exceptions.*;
 
 import javax.inject.Inject;
 import javax.validation.constraints.NotNull;
@@ -101,7 +100,7 @@ public class AvScannerImpl implements AvScannerService {
                 log.info("Error: running clamav");
             }
 
-        } catch (ClamavException | NullPointerException e) {
+        } catch (ClamavException | CommunicationException | InvalidResponseException | ScanFailureException | UnknownCommandException | UnsupportedCommandException | NullPointerException e) {
             log.info("Error: running clamav - {}", e);
         }
         return  false;
