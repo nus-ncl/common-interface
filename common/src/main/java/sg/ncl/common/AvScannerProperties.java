@@ -12,6 +12,7 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 @Setter
 @ConfigurationProperties(prefix = "ncl.av-scanner")
 public class AvScannerProperties {
+    private String cron;
     private String host;
     private Integer port;
 }
