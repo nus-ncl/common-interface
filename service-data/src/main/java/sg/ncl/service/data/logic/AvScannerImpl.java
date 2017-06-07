@@ -105,4 +105,11 @@ public class AvScannerImpl implements AvScannerService {
         }
         return  false;
     }
+
+    /**
+     * @return cron expression for the scheduled av scan
+     */
+    public String getScheduleCronExpression() {
+        return avScannerProperties.getCron();
+    }
 }

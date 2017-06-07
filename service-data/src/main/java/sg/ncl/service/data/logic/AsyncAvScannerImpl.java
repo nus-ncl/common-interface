@@ -52,4 +52,12 @@ public class AsyncAvScannerImpl implements AsyncAvScannerService {
 
        return dataRepository.save(dataEntity);
    }
+
+    /**
+     * cron expression retrieved from av scanner service to be use in DataService as a @Schedule(cron = '') parameter
+     * @return the cron expression
+     */
+   public String getScheduleCronExpression() {
+       return avScannerService.getScheduleCronExpression();
+   }
 }
