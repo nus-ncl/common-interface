@@ -8,6 +8,7 @@ import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.scheduling.annotation.AsyncConfigurerSupport;
 import org.springframework.scheduling.annotation.EnableAsync;
+import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import sg.ncl.common.jpa.UseJpa;
 
@@ -18,6 +19,7 @@ import java.util.concurrent.Executor;
  * Created by dcszwang on 10/5/2016.
  */
 @SpringBootApplication
+@EnableScheduling
 @EnableAsync
 @UseJpa
 public class DataApplication extends AsyncConfigurerSupport {

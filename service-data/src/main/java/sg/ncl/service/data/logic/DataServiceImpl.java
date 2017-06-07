@@ -2,7 +2,7 @@ package sg.ncl.service.data.logic;
 
 import io.jsonwebtoken.Claims;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.scheduling.annotation.Async;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.util.UriUtils;
@@ -24,6 +24,7 @@ import java.io.UnsupportedEncodingException;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.Date;
 import java.util.List;
 import java.util.Set;
 
@@ -363,6 +364,34 @@ public class DataServiceImpl implements DataService {
             throw new DataLicenseNotFoundException("License not found.");
         }
         return dataLicense;
+    }
+
+    /**
+     * Scheduled av scan method to periodically check for non-malicious data resources and rescan them
+     * cron expression is retrieve from AsyncAvScanner -> AvScanner -> AvScannerProperties -> application.yml
+     * cron expression: second, minute, hour, day-of-month, month, day-of-week
+     *
+     * Transactional annotation is required to maintain session for the object as DataEntity::getResource() is a lazy loading method, we need
+     * the transaction session to last for entire section
+     *
+     * https://stackoverflow.com/questions/3519059/hibernate-failed-to-lazily-initialize-a-collection-of-role-no-session-or-sessi
+     */
+    @Scheduled(cron = "#{asyncAvScannerImpl.scheduleCronExpression}", zone = "Asia/Singapore")
+    @Transactional
+    public void scheduledDataResourceScan() {
+        List<Data> dataList = getDatasets();
+        dataList.forEach(o -> o.getResources().forEach(dataResource -> {
+            DataEntity currentDataEntity = dataRepository.findOne(o.getId());
+            if (!dataResource.isMalicious()) {
+                try {
+                    log.info("Data resource scanning is in progress :: " + new Date());
+                    asyncAvScannerService.scanResource(currentDataEntity, dataResource, DATA_DIR_KEY, UTF_ENCODING);
+                } catch (UnsupportedEncodingException e) {
+                    log.error("Unable to scan data resource: {} for data: {}", e, currentDataEntity);
+                }
+            }
+        }));
+        log.info("Dataset scanning is completed.");
     }
 
 }
