@@ -6,4 +6,6 @@ package sg.ncl.service.data.domain;
 public interface AvScannerService {
 
     boolean scan(String subDirKey, String preDir, String fileName);
+
+    String getScheduleCronExpression();
 }

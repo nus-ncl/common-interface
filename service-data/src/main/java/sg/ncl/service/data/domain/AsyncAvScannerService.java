@@ -10,4 +10,6 @@ import java.io.UnsupportedEncodingException;
 public interface AsyncAvScannerService {
 
     Data scanResource(DataEntity dataEntity, DataResource dataResource, String dataDir, String encodingScheme) throws UnsupportedEncodingException;
+
+    String getScheduleCronExpression();
 }
