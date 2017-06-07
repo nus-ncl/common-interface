@@ -384,7 +384,7 @@ public class DataServiceImpl implements DataService {
             DataEntity currentDataEntity = dataRepository.findOne(o.getId());
             if (!dataResource.isMalicious()) {
                 try {
-                    log.info("Data resource scanning is in progress :: " + new Date());
+                    log.info("Data resource scanning is in progress: {} for data: {}", dataResource, currentDataEntity);
                     asyncAvScannerService.scanResource(currentDataEntity, dataResource, DATA_DIR_KEY, UTF_ENCODING);
                 } catch (UnsupportedEncodingException e) {
                     log.error("Unable to scan data resource: {} for data: {}", e, currentDataEntity);
