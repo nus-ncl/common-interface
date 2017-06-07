@@ -68,6 +68,7 @@ ncl:
   analytics:
     energyDir: home/sio/energylog
   av-scanner:
+    cron: '* 0 2 * * SUN' # cron expression: second, minute, hour, day-of-month, month, day-of-week, schedule scan on every Sun 2am
     host: 192.168.56.102
     port: 19121
 deterurl:
