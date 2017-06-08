@@ -24,7 +24,7 @@ public class V1_17__update_is_malicious_entry_for_existing_data_resources implem
         final String s1 = String.format("SELECT id, %s FROM prod.%s", column, table);
         final List<Map<String, Object>> list = jdbcTemplate.queryForList(s1);
         list.forEach(map -> {
-            final Object content = map.get(String.format("is_malicious", column));
+            final Object content = map.get(column);
             final Object id = map.get("id");
 
             // only update columns that are null

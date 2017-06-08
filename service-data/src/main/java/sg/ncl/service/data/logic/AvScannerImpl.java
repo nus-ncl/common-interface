@@ -63,10 +63,6 @@ public class AvScannerImpl implements AvScannerService {
         this.client = clamavFactory.createClamavClient(avScannerProperties.getHost(), avScannerProperties.getPort());
     }
 
-    //
-    // return true if file is malicious
-    // TODO: add authentication
-
     /**
      * Scans a file using ClamAv to check whether the file is malicious
      * The file path is made by HttpUtils module from the given parameters e.g. /mnt/resources/[subDirKey]/[preDir]/[fileName]
@@ -82,7 +78,7 @@ public class AvScannerImpl implements AvScannerService {
             Path directoryPath = HttpUtils.getPath(directoryProperties, subDirKey, preDir);
             Path fullPath = Paths.get(directoryPath.toString() + "/" + fileName);
 
-            if (Files.exists(fullPath)) {
+            if (fullPath.toFile().exists()) {
                 log.info("File path EXIST now scanning...{}", fullPath);
             } else {
                 log.info("Error: File path does not exist: {}", fullPath);
