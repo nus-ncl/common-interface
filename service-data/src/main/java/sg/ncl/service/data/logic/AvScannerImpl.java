@@ -13,7 +13,6 @@ import xyz.capybara.clamav.exceptions.*;
 
 import javax.inject.Inject;
 import javax.validation.constraints.NotNull;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
