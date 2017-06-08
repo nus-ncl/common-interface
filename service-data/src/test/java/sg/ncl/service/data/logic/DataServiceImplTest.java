@@ -49,6 +49,8 @@ public class DataServiceImplTest {
     @Mock
     private DataCategoryRepository dataCategoryRepository;
     @Mock
+    private DataLicenseRepository dataLicenseRepository;
+    @Mock
     private UploadService uploadService;
     @Mock
     private DownloadService downloadService;
@@ -65,10 +67,13 @@ public class DataServiceImplTest {
     public void before() {
         assertThat(mockingDetails(dataRepository).isMock()).isTrue();
         assertThat((mockingDetails(dataCategoryRepository).isMock())).isTrue();
+        assertThat((mockingDetails(dataLicenseRepository).isMock())).isTrue();
         assertThat(mockingDetails(uploadService).isMock()).isTrue();
         assertThat(mockingDetails(downloadService).isMock()).isTrue();
         assertThat(mockingDetails(analyticsService).isMock()).isTrue();
-        dataService = new DataServiceImpl(dataRepository, dataCategoryRepository, uploadService, downloadService, analyticsService);
+        dataService = new DataServiceImpl(
+                dataRepository, dataCategoryRepository, dataLicenseRepository,
+                uploadService, downloadService, analyticsService);
     }
 
     @Test
@@ -387,6 +392,22 @@ public class DataServiceImplTest {
         DataCategory dataCategory = dataService.getCategory(entity.getId());
         verify(dataCategoryRepository, times(1)).getOne(anyLong());
         assertThat(dataCategory.getName()).isEqualTo(entity.getName());
+    }
+
+    @Test
+    public void testGetLicenseByIdNotFound() {
+        when(dataLicenseRepository.getOne(anyLong())).thenReturn(null);
+        exception.expect(DataLicenseNotFoundException.class);
+        dataService.getLicense(1L);
+    }
+
+    @Test
+    public void testGetLicenseByIdFound() {
+        DataLicenseEntity entity = TestUtil.getDataLicenseEntity();
+        when(dataLicenseRepository.getOne(anyLong())).thenReturn(entity);
+        DataLicense dataLicense = dataService.getLicense(entity.getId());
+        verify(dataLicenseRepository, times(1)).getOne(anyLong());
+        assertThat(dataLicense.getName()).isEqualTo(entity.getName());
     }
 
 }

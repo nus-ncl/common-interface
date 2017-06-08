@@ -7,10 +7,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.util.UriUtils;
 import sg.ncl.common.exception.base.NotFoundException;
 import sg.ncl.service.analytics.domain.AnalyticsService;
-import sg.ncl.service.data.data.jpa.DataCategoryRepository;
-import sg.ncl.service.data.data.jpa.DataEntity;
-import sg.ncl.service.data.data.jpa.DataRepository;
-import sg.ncl.service.data.data.jpa.DataResourceEntity;
+import sg.ncl.service.data.data.jpa.*;
 import sg.ncl.service.data.domain.*;
 import sg.ncl.service.data.exceptions.*;
 import sg.ncl.service.data.web.DataResourceInfo;
@@ -45,6 +42,7 @@ public class DataServiceImpl implements DataService {
 
     private final DataRepository dataRepository;
     private final DataCategoryRepository dataCategoryRepository;
+    private final DataLicenseRepository dataLicenseRepository;
     private final UploadService uploadService;
     private final DownloadService downloadService;
     private final AnalyticsService analyticsService;
@@ -52,11 +50,13 @@ public class DataServiceImpl implements DataService {
     @Inject
     DataServiceImpl(@NotNull final DataRepository dataRepository,
                     @NotNull final DataCategoryRepository dataCategoryRepository,
+                    @NotNull final DataLicenseRepository dataLicenseRepository,
                     @NotNull final UploadService uploadService,
                     @NotNull final DownloadService downloadService,
                     @NotNull final AnalyticsService analyticsService) {
         this.dataRepository = dataRepository;
         this.dataCategoryRepository = dataCategoryRepository;
+        this.dataLicenseRepository = dataLicenseRepository;
         this.uploadService = uploadService;
         this.downloadService = downloadService;
         this.analyticsService = analyticsService;
@@ -78,6 +78,7 @@ public class DataServiceImpl implements DataService {
         dataEntity.setAccessibility(data.getAccessibility());
         dataEntity.setVisibility(data.getVisibility());
         dataEntity.setCategoryId(data.getCategoryId());
+        dataEntity.setLicenseId(data.getLicenseId());
         dataEntity.resetKeywords(data.getKeywords());
 
         return dataEntity;
@@ -343,6 +344,20 @@ public class DataServiceImpl implements DataService {
             throw new DataCategoryNotFoundException("Category not found.");
         }
         return dataCategory;
+    }
+
+    @Override
+    public List<DataLicense> getLicenses() {
+        return new ArrayList<>(dataLicenseRepository.findAll());
+    }
+
+    @Override
+    public DataLicense getLicense(Long id) {
+        DataLicense dataLicense = dataLicenseRepository.getOne(id);
+        if (dataLicense == null) {
+            throw new DataLicenseNotFoundException("License not found.");
+        }
+        return dataLicense;
     }
 
 }

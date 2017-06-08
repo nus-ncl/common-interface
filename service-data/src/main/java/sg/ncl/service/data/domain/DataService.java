@@ -43,4 +43,8 @@ public interface DataService {
 
     DataCategory getCategory(Long id);
 
+    List<DataLicense> getLicenses();
+
+    DataLicense getLicense(Long id);
+
 }

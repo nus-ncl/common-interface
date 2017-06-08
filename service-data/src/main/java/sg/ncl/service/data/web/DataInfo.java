@@ -26,6 +26,7 @@ public class DataInfo implements Data {
     private List<String> approvedUsers;
     private ZonedDateTime releasedDate;
     private Long categoryId;
+    private Long licenseId;
 
     @JsonCreator
     public DataInfo(
@@ -39,7 +40,8 @@ public class DataInfo implements Data {
             @JsonProperty("keywords") final List<String> keywords,
             @JsonProperty("approvedUsers") final List<String> approvedUsers,
             @JsonProperty("releasedDate") final ZonedDateTime releasedDate,
-            @JsonProperty("categoryId") final Long categoryId
+            @JsonProperty("categoryId") final Long categoryId,
+            @JsonProperty("licenseId") final Long licenseId
     ) {
         this.id = id;
         this.name = name;
@@ -52,6 +54,7 @@ public class DataInfo implements Data {
         this.approvedUsers = approvedUsers;
         this.releasedDate = releasedDate;
         this.categoryId = categoryId;
+        this.licenseId = licenseId;
     }
 
     public DataInfo(final Data data) {
@@ -66,7 +69,8 @@ public class DataInfo implements Data {
                 data.getKeywords(),
                 data.getApprovedUsers(),
                 data.getReleasedDate(),
-                data.getCategoryId()
+                data.getCategoryId(),
+                data.getLicenseId()
         );
     }
 }

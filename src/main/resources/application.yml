@@ -37,6 +37,8 @@ ncl:
     uri:
       '/authentications': POST # for login
       '/datasets\?visibility=PUBLIC': GET # for retrieving public datasets
+      '/datasets/categories/(\w|-)+': GET # for retrieving category for public datasets
+      '/datasets/licenses/(\w|-)+': GET # for retrieving license for public datasets
       '/images/global': GET # for retrieving list of global images
       '/registrations': POST # for apply/join new teams
       '/users/(\w|-)+': GET # for retrieving public teams' owner info

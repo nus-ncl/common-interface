@@ -29,6 +29,7 @@ public class FlywayTest {
     private static final String DATA_CATEGORIES = "data_categories";
     private static final String DATA_DOWNLOADS = "data_downloads";
     private static final String DATA_KEYWORDS = "data_keywords";
+    private static final String DATA_LICENSES = "data_licenses";
     private static final String DATA_RESOURCES = "data_resources";
     private static final String DATA_USERS = "data_users";
     private static final String DETERLAB_PROJECT = "deterlab_project";
@@ -70,6 +71,7 @@ public class FlywayTest {
         this.tables.add(DATA_CATEGORIES);
         this.tables.add(DATA_DOWNLOADS);
         this.tables.add(DATA_KEYWORDS);
+        this.tables.add(DATA_LICENSES);
         this.tables.add(DATA_RESOURCES);
         this.tables.add(DATA_USERS);
         this.tables.add(DETERLAB_PROJECT);
@@ -249,7 +251,7 @@ public class FlywayTest {
     public void testDataTable() throws Exception {
         // make sure 'data' table has expected number of columns
         List<Map<String, Object>> dataTable = this.template.queryForList("SHOW COLUMNS FROM " + SCHEMA + "." + DATA);
-        assertThat(dataTable.size()).isEqualTo(11);
+        assertThat(dataTable.size()).isEqualTo(12);
 
         // make sure 'data' table has expected column name and type
         assertThat((String) dataTable.get(0).get("FIELD")).isEqualTo("id");
@@ -302,10 +304,15 @@ public class FlywayTest {
         assertThat((String) dataTable.get(9).get("NULL")).isEqualTo("NO");
         assertThat((String) dataTable.get(9).get("KEY")).isEmpty();
 
-        assertThat((String) dataTable.get(10).get("FIELD")).isEqualTo("released_date");
-        assertThat((String) dataTable.get(10).get("TYPE")).contains("timestamp");
+        assertThat((String) dataTable.get(10).get("FIELD")).isEqualTo("license_id");
+        assertThat((String) dataTable.get(10).get("TYPE")).contains("bigint");
         assertThat((String) dataTable.get(10).get("NULL")).isEqualTo("NO");
         assertThat((String) dataTable.get(10).get("KEY")).isEmpty();
+
+        assertThat((String) dataTable.get(11).get("FIELD")).isEqualTo("released_date");
+        assertThat((String) dataTable.get(11).get("TYPE")).contains("timestamp");
+        assertThat((String) dataTable.get(11).get("NULL")).isEqualTo("NO");
+        assertThat((String) dataTable.get(11).get("KEY")).isEmpty();
 
         List<Map<String, Object>> dataConstraints = this.template.queryForList("SELECT * FROM INFORMATION_SCHEMA.CONSTRAINTS WHERE TABLE_NAME = 'data'");
 

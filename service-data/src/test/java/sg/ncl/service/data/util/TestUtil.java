@@ -2,10 +2,7 @@ package sg.ncl.service.data.util;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.lang3.RandomStringUtils;
-import sg.ncl.service.data.data.jpa.DataAccessRequestEntity;
-import sg.ncl.service.data.data.jpa.DataCategoryEntity;
-import sg.ncl.service.data.data.jpa.DataEntity;
-import sg.ncl.service.data.data.jpa.DataResourceEntity;
+import sg.ncl.service.data.data.jpa.*;
 import sg.ncl.service.data.domain.DataAccessibility;
 import sg.ncl.service.data.domain.DataVisibility;
 import sg.ncl.service.transmission.web.ResumableInfo;
@@ -100,6 +97,16 @@ public class TestUtil {
         entity.setId(Long.parseLong(RandomStringUtils.randomNumeric(10)));
         entity.setName(RandomStringUtils.randomAlphanumeric(10));
         entity.setDescription(RandomStringUtils.randomAlphanumeric(20));
+        return entity;
+    }
+
+    public static DataLicenseEntity getDataLicenseEntity() {
+        DataLicenseEntity entity = new DataLicenseEntity();
+        entity.setId(Long.parseLong(RandomStringUtils.randomNumeric(10)));
+        entity.setName(RandomStringUtils.randomAlphanumeric(10));
+        entity.setAcronym(RandomStringUtils.randomAlphabetic(5));
+        entity.setDescription(RandomStringUtils.randomAlphanumeric(20));
+        entity.setLink(RandomStringUtils.randomAlphanumeric(10));
         return entity;
     }
 

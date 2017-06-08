@@ -41,7 +41,7 @@ public class DataController {
 
     @GetMapping(path = "/search")
     @ResponseStatus(HttpStatus.OK)
-    public List<Data> seatchDatasets(@AuthenticationPrincipal Object claims,
+    public List<Data> searchDatasets(@AuthenticationPrincipal Object claims,
                                      @RequestParam(value="keyword", required=false) String[] keywords) {
         if (claims == null || !(claims instanceof Claims)) {
             log.warn("Access denied for: /datasets/search GET");
@@ -217,12 +217,24 @@ public class DataController {
 
     @GetMapping(value = "/categories/{id}")
     @ResponseStatus(HttpStatus.OK)
-    public DataCategory getCategoryById(@AuthenticationPrincipal Object claims, @PathVariable Long id) {
+    public DataCategory getCategoryById(@PathVariable Long id) {
+        return new DataCategoryInfo(dataService.getCategory(id));
+    }
+
+    @GetMapping(value = "/licenses")
+    @ResponseStatus(HttpStatus.OK)
+    public List<DataLicense> getLicenses(@AuthenticationPrincipal Object claims) {
         if (claims == null || !(claims instanceof Claims)) {
-            log.warn("Access denied for: /categories/{id} GET");
+            log.warn("Access denied for: /licenses GET");
             throw new UnauthorizedException();
         }
-        return new DataCategoryInfo(dataService.getCategory(id));
+        return dataService.getLicenses().stream().map(DataLicenseInfo::new).collect(Collectors.toList());
+    }
+
+    @GetMapping(value = "/licenses/{id}")
+    @ResponseStatus(HttpStatus.OK)
+    private DataLicense getLicenseById(@PathVariable Long id) {
+        return new DataLicenseInfo(dataService.getLicense(id));
     }
 
 }
