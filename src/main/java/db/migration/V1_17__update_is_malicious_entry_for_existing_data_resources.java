@@ -13,7 +13,7 @@ import java.util.Map;
  * Created by teye
  */
 @Slf4j
-public class V1_16__update_is_malicious_entry_for_existing_data_resources implements SpringJdbcMigration {
+public class V1_17__update_is_malicious_entry_for_existing_data_resources implements SpringJdbcMigration {
 
     @Override
     public void migrate(final JdbcTemplate jdbcTemplate) throws Exception {

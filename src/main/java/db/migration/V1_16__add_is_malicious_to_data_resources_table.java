@@ -8,7 +8,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
  * Created by teye
  */
 @Slf4j
-public class V1_15__add_is_malicious_to_data_resources_table implements SpringJdbcMigration {
+public class V1_16__add_is_malicious_to_data_resources_table implements SpringJdbcMigration {
 
     @Override
     public void migrate(final JdbcTemplate jdbcTemplate) throws Exception {
