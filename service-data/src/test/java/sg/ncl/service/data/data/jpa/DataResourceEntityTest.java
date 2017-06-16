@@ -98,6 +98,25 @@ public class DataResourceEntityTest {
         assertThat(entity1.equals(entity2)).isFalse();
     }
 
+    // test two data resource objects
+    // identical uri
+    // identical malicious
+    // different scanned
+    // expected is false
+    @Test
+    public void testEqualsNotDifferentScanned() {
+        String link = RandomStringUtils.randomAlphanumeric(20);
+        DataResourceEntity entity1 = new DataResourceEntity();
+        DataResourceEntity entity2 = new DataResourceEntity();
+        entity1.setUri(link);
+        entity2.setUri(link);
+        entity1.setMalicious(false);
+        entity2.setMalicious(false);
+        entity1.setScanned(false);
+        entity2.setScanned(true);
+        assertThat(entity1.equals(entity2)).isFalse();
+    }
+
     @Test
     public void testEqualsDataResource() {
         String link = RandomStringUtils.randomAlphanumeric(20);

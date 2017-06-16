@@ -64,6 +64,7 @@ public class TestUtil {
         DataResourceEntity entity = new DataResourceEntity();
         entity.setUri(RandomStringUtils.randomAlphanumeric(20));
         entity.setMalicious(false);
+        entity.setScanned(false);
 
         return entity;
     }

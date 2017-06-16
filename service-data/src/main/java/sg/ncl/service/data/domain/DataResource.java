@@ -11,4 +11,6 @@ public interface DataResource {
 
     boolean isMalicious();
 
+    boolean isScanned();
+
 }

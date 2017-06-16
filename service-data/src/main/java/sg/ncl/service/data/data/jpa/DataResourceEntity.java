@@ -30,6 +30,10 @@ public class DataResourceEntity extends AbstractEntity implements DataResource {
     @Type(type = "yes_no")
     private boolean malicious = false;
 
+    @Column(name = "is_scanned", nullable = false)
+    @Type(type = "yes_no")
+    private boolean scanned = false;
+
     @ManyToOne
     @JoinColumn(name = "data_id")
     private DataEntity dataEntity;
@@ -40,6 +44,7 @@ public class DataResourceEntity extends AbstractEntity implements DataResource {
                 "id='" + id + '\'' +
                 ", uri=" + uri +
                 ", malicious=" + malicious +
+                ", scanned=" + scanned +
                 "} " + super.toString();
     }
 
@@ -55,7 +60,12 @@ public class DataResourceEntity extends AbstractEntity implements DataResource {
         if (!uri.equals(that.uri)) {
             return false;
         }
+
         if (malicious != that.malicious) {
+            return false;
+        }
+
+        if (scanned != that.scanned) {
             return false;
         }
 

@@ -310,7 +310,7 @@ public class DataServiceImpl implements DataService {
         DataEntity dataEntity = (DataEntity) getDataset(id);
         switch (uploadService.addChunk(resumableInfo, Integer.parseInt(resumableChunkNumber), DATA_DIR_KEY, UriUtils.encode(dataEntity.getName(), UTF_ENCODING))) {
             case FINISHED:
-                DataResourceInfo dataResourceInfo = new DataResourceInfo(null, resumableInfo.getResumableFilename(), false);
+                DataResourceInfo dataResourceInfo = new DataResourceInfo(null, resumableInfo.getResumableFilename(), false, false);
                 createResource(id, dataResourceInfo, claims);
                 asyncAvScannerService.scanResource(dataEntity, dataResourceInfo, DATA_DIR_KEY, UTF_ENCODING);
                 log.info("Resource upload finished and saved: {}", dataResourceInfo);
