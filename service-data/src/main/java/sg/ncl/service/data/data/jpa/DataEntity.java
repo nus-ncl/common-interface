@@ -117,6 +117,7 @@ public class DataEntity extends AbstractEntity implements Data {
         for (DataResourceEntity dataResourceEntity : resources) {
             if (dataResourceEntity.getUri().equals(dataResource.getUri()) && !dataResourceEntity.isScanned()) {
                 dataResourceEntity.setMalicious(isMalicious);
+                dataResourceEntity.setScanned(true);
                 log.info("Data resource {}: is {}", dataResource.getUri(), isMalicious);
                 return dataResourceEntity;
             }

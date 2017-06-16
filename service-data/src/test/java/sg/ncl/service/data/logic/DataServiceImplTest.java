@@ -20,7 +20,6 @@ import sg.ncl.service.data.exceptions.*;
 import sg.ncl.service.data.data.jpa.DataEntity;
 import sg.ncl.service.data.data.jpa.DataRepository;
 import sg.ncl.service.data.data.jpa.DataResourceEntity;
-import sg.ncl.service.data.domain.*;
 import sg.ncl.service.data.exceptions.DataNameAlreadyExistsException;
 import sg.ncl.service.data.exceptions.DataNotFoundException;
 import sg.ncl.service.data.exceptions.DataResourceNotFoundException;
@@ -65,7 +64,7 @@ public class DataServiceImplTest {
     @Mock
     private AnalyticsService analyticsService;
     @Mock
-    private AsyncAvScannerService asyncAvScannerService;
+    private AvScannerService avScannerService;
     @Mock
     private Claims claims;
     @Mock
@@ -81,8 +80,8 @@ public class DataServiceImplTest {
         assertThat(mockingDetails(uploadService).isMock()).isTrue();
         assertThat(mockingDetails(downloadService).isMock()).isTrue();
         assertThat(mockingDetails(analyticsService).isMock()).isTrue();
-        assertThat(mockingDetails(asyncAvScannerService).isMock()).isTrue();
-        dataService = new DataServiceImpl(dataRepository, dataCategoryRepository, dataLicenseRepository, uploadService, downloadService, analyticsService, asyncAvScannerService);
+        assertThat(mockingDetails(avScannerService).isMock()).isTrue();
+        dataService = new DataServiceImpl(dataRepository, dataCategoryRepository, dataLicenseRepository, uploadService, downloadService, analyticsService, avScannerService);
     }
 
     @Test
@@ -435,11 +434,11 @@ public class DataServiceImplTest {
 
         when(dataRepository.findAll().stream().collect(Collectors.toList())).thenReturn(dataList);
         when(dataRepository.findOne(anyLong())).thenReturn(dataEntity);
-        when(asyncAvScannerService.scanResource(any(DataEntity.class), any(DataResource.class), anyString(), anyString())).thenReturn(dataEntity);
+        when(avScannerService.scan(anyString(), anyString(), anyString())).thenReturn(true);
 
         dataService.scheduledDataResourceScan();
 
-        verify(asyncAvScannerService, times(1)).scanResource(any(DataEntity.class), any(DataResource.class), anyString(), anyString());
+        verify(avScannerService, times(1)).scan(anyString(), anyString(), anyString());
     }
 
     // test scanning is not executed if data resource has already been scanned
@@ -460,35 +459,11 @@ public class DataServiceImplTest {
 
         when(dataRepository.findAll().stream().collect(Collectors.toList())).thenReturn(dataList);
         when(dataRepository.findOne(anyLong())).thenReturn(dataEntity);
-        when(asyncAvScannerService.scanResource(any(DataEntity.class), any(DataResource.class), anyString(), anyString())).thenReturn(dataEntity);
+        when(avScannerService.scan(anyString(), anyString(), anyString())).thenReturn(true);
 
         dataService.scheduledDataResourceScan();
 
-        verify(asyncAvScannerService, times(0)).scanResource(any(DataEntity.class), any(DataResource.class), anyString(), anyString());
-    }
-
-    // async scanner service in schedule scan throws unsupported encoding exception
-    @Test
-    public void testScheduleDataResourceScanException() throws UnsupportedEncodingException {
-        DataEntity dataEntity = TestUtil.getDataEntity();
-        List<DataEntity> dataList = new ArrayList<>();
-        List<DataResourceEntity> dataResourceList = new ArrayList<>();
-
-        DataResourceEntity dataResourceEntity = TestUtil.getDataResourceEntity();
-        dataResourceEntity.setId(1L);
-        dataResourceEntity.setMalicious(false);
-        dataResourceList.add(dataResourceEntity);
-        dataEntity.setResources(dataResourceList);
-
-        dataList.add(dataEntity);
-
-        when(dataRepository.findAll().stream().collect(Collectors.toList())).thenReturn(dataList);
-        when(dataRepository.findOne(anyLong())).thenReturn(dataEntity);
-        when(asyncAvScannerService.scanResource(any(DataEntity.class), any(DataResource.class), anyString(), anyString())).thenThrow(new UnsupportedEncodingException());
-
-        dataService.scheduledDataResourceScan();
-
-        verify(asyncAvScannerService, times(1)).scanResource(any(DataEntity.class), any(DataResource.class), anyString(), anyString());
+        verify(avScannerService, times(0)).scan(anyString(), anyString(), anyString());
     }
 
 }
