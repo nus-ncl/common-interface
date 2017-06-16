@@ -312,7 +312,6 @@ public class DataServiceImpl implements DataService {
             case FINISHED:
                 DataResourceInfo dataResourceInfo = new DataResourceInfo(null, resumableInfo.getResumableFilename(), false, false);
                 createResource(id, dataResourceInfo, claims);
-                asyncAvScannerService.scanResource(dataEntity, dataResourceInfo, DATA_DIR_KEY, UTF_ENCODING);
                 log.info("Resource upload finished and saved: {}", dataResourceInfo);
                 return "All finished.";
             case UPLOAD:
@@ -381,7 +380,7 @@ public class DataServiceImpl implements DataService {
         List<Data> dataList = getDatasets();
         dataList.forEach(o -> o.getResources().forEach(dataResource -> {
             DataEntity currentDataEntity = dataRepository.findOne(o.getId());
-            if (!dataResource.isMalicious()) {
+            if (!dataResource.isScanned()) {
                 try {
                     log.info("Data resource scanning is in progress: {} for data: {}", dataResource, currentDataEntity);
                     asyncAvScannerService.scanResource(currentDataEntity, dataResource, DATA_DIR_KEY, UTF_ENCODING);

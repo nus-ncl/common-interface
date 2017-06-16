@@ -442,6 +442,31 @@ public class DataServiceImplTest {
         verify(asyncAvScannerService, times(1)).scanResource(any(DataEntity.class), any(DataResource.class), anyString(), anyString());
     }
 
+    // test scanning is not executed if data resource has already been scanned
+    @Test
+    public void testScheduleDataResourceScanNotExecuted() throws UnsupportedEncodingException {
+        DataEntity dataEntity = TestUtil.getDataEntity();
+        List<DataEntity> dataList = new ArrayList<>();
+        List<DataResourceEntity> dataResourceList = new ArrayList<>();
+
+        DataResourceEntity dataResourceEntity = TestUtil.getDataResourceEntity();
+        dataResourceEntity.setId(1L);
+        dataResourceEntity.setMalicious(false);
+        dataResourceEntity.setScanned(true);
+        dataResourceList.add(dataResourceEntity);
+        dataEntity.setResources(dataResourceList);
+
+        dataList.add(dataEntity);
+
+        when(dataRepository.findAll().stream().collect(Collectors.toList())).thenReturn(dataList);
+        when(dataRepository.findOne(anyLong())).thenReturn(dataEntity);
+        when(asyncAvScannerService.scanResource(any(DataEntity.class), any(DataResource.class), anyString(), anyString())).thenReturn(dataEntity);
+
+        dataService.scheduledDataResourceScan();
+
+        verify(asyncAvScannerService, times(0)).scanResource(any(DataEntity.class), any(DataResource.class), anyString(), anyString());
+    }
+
     // async scanner service in schedule scan throws unsupported encoding exception
     @Test
     public void testScheduleDataResourceScanException() throws UnsupportedEncodingException {

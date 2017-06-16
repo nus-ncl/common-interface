@@ -159,11 +159,12 @@ public class DataEntityTest {
         assertThat(editedDataResource).isNull();
     }
 
-    // no update to data resource if is_malicious tag is identical to result of the scan
+    // no update to data resource if data resource has been scanned before
     @Test
     public void testEditResourceMaliciousNoChange() {
         DataEntity dataEntity = new DataEntity();
         DataResourceEntity dataResourceEntity = getDataResourceEntity();
+        dataResourceEntity.setScanned(true);
 
         dataEntity.addResource(dataResourceEntity);
         DataResource editedDataResource = dataEntity.editResourceMalicious(dataResourceEntity, false);
