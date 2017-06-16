@@ -452,7 +452,7 @@ public class FlywayTest {
     public void testDataResourcesTable() throws Exception {
         // make sure 'data_resources' table has expected number of columns
         List<Map<String, Object>> dataResourcesTable = this.template.queryForList("SHOW COLUMNS FROM " + SCHEMA + "." + DATA_RESOURCES);
-        assertThat(dataResourcesTable.size()).isEqualTo(7);
+        assertThat(dataResourcesTable.size()).isEqualTo(8);
 
         // make sure 'data_resources' table has expected column name and type
         assertThat((String) dataResourcesTable.get(0).get("FIELD")).isEqualTo("id");
@@ -489,6 +489,11 @@ public class FlywayTest {
         assertThat((String) dataResourcesTable.get(6).get("TYPE")).contains("char");
         assertThat((String) dataResourcesTable.get(6).get("NULL")).isEqualTo("NO");
         assertThat((String) dataResourcesTable.get(6).get("KEY")).isEmpty();
+
+        assertThat((String) dataResourcesTable.get(7).get("FIELD")).isEqualTo("is_scanned");
+        assertThat((String) dataResourcesTable.get(7).get("TYPE")).contains("char");
+        assertThat((String) dataResourcesTable.get(7).get("NULL")).isEqualTo("NO");
+        assertThat((String) dataResourcesTable.get(7).get("KEY")).isEmpty();
 
         List<Map<String, Object>> dataResourcesConstraints = this.template.queryForList("SELECT * FROM INFORMATION_SCHEMA.CONSTRAINTS WHERE TABLE_NAME = 'data_resources'");
 

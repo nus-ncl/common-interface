@@ -8,16 +8,16 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * populates is_malicious column for existing data resources by setting to 'N'
- * is_malicious column is NULL at this stage after v1_16
+ * populates is_scanned column for existing data resources by setting to 'N'
+ * is_scanned column is NULL at this stage after v1_18
  * Created by teye
  */
 @Slf4j
-public class V1_17__update_is_malicious_entry_for_existing_data_resources implements SpringJdbcMigration {
+public class V1_19__update_is_scanned_entry_for_existing_data_resources implements SpringJdbcMigration {
 
     @Override
     public void migrate(final JdbcTemplate jdbcTemplate) throws Exception {
-        migrate(jdbcTemplate, "data_resources", "is_malicious");
+        migrate(jdbcTemplate, "data_resources", "is_scanned");
     }
 
     private void migrate(final JdbcTemplate jdbcTemplate, final String table, final String column) {
@@ -31,10 +31,10 @@ public class V1_17__update_is_malicious_entry_for_existing_data_resources implem
             // not needed but just in case
             log.info("Content: {}", content);
             if(content == null || content.equals("")) {
-                String isMalicious = "N";
+                String isScanned = "N";
                 final String s2 = String.format("UPDATE prod.%s SET %s = ? WHERE id = ?", table, column);
-                jdbcTemplate.update(s2, isMalicious, id);
-                log.info("Updated {} entry: id={}, {}={}", table, id, column, isMalicious);
+                jdbcTemplate.update(s2, isScanned, id);
+                log.info("Updated {} entry: id={}, {}={}", table, id, column, isScanned);
             }
         });
     }
