@@ -15,7 +15,6 @@ import java.io.IOException;
  * Created by dcszwang on 10/5/2016.
  */
 @SpringBootApplication
-@EnableScheduling
 @UseJpa
 public class DataApplication {
 
