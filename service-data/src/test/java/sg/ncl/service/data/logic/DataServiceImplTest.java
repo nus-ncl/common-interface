@@ -35,7 +35,6 @@ import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.*;
@@ -64,8 +63,6 @@ public class DataServiceImplTest {
     @Mock
     private AnalyticsService analyticsService;
     @Mock
-    private AvScannerService avScannerService;
-    @Mock
     private Claims claims;
     @Mock
     private HttpServletResponse response;
@@ -80,8 +77,7 @@ public class DataServiceImplTest {
         assertThat(mockingDetails(uploadService).isMock()).isTrue();
         assertThat(mockingDetails(downloadService).isMock()).isTrue();
         assertThat(mockingDetails(analyticsService).isMock()).isTrue();
-        assertThat(mockingDetails(avScannerService).isMock()).isTrue();
-        dataService = new DataServiceImpl(dataRepository, dataCategoryRepository, dataLicenseRepository, uploadService, downloadService, analyticsService, avScannerService);
+        dataService = new DataServiceImpl(dataRepository, dataCategoryRepository, dataLicenseRepository, uploadService, downloadService, analyticsService);
     }
 
     @Test
@@ -416,54 +412,6 @@ public class DataServiceImplTest {
         DataLicense dataLicense = dataService.getLicense(entity.getId());
         verify(dataLicenseRepository, times(1)).getOne(anyLong());
         assertThat(dataLicense.getName()).isEqualTo(entity.getName());
-    }
-
-    @Test
-    public void testScheduleDataResourceScan() throws UnsupportedEncodingException {
-        DataEntity dataEntity = TestUtil.getDataEntity();
-        List<DataEntity> dataList = new ArrayList<>();
-        List<DataResourceEntity> dataResourceList = new ArrayList<>();
-
-        DataResourceEntity dataResourceEntity = TestUtil.getDataResourceEntity();
-        dataResourceEntity.setId(1L);
-        dataResourceEntity.setMalicious(false);
-        dataResourceList.add(dataResourceEntity);
-        dataEntity.setResources(dataResourceList);
-
-        dataList.add(dataEntity);
-
-        when(dataRepository.findAll().stream().collect(Collectors.toList())).thenReturn(dataList);
-        when(dataRepository.findOne(anyLong())).thenReturn(dataEntity);
-        when(avScannerService.scan(anyString(), anyString(), anyString())).thenReturn(true);
-
-        dataService.scheduledDataResourceScan();
-
-        verify(avScannerService, times(1)).scan(anyString(), anyString(), anyString());
-    }
-
-    // test scanning is not executed if data resource has already been scanned
-    @Test
-    public void testScheduleDataResourceScanNotExecuted() throws UnsupportedEncodingException {
-        DataEntity dataEntity = TestUtil.getDataEntity();
-        List<DataEntity> dataList = new ArrayList<>();
-        List<DataResourceEntity> dataResourceList = new ArrayList<>();
-
-        DataResourceEntity dataResourceEntity = TestUtil.getDataResourceEntity();
-        dataResourceEntity.setId(1L);
-        dataResourceEntity.setMalicious(false);
-        dataResourceEntity.setScanned(true);
-        dataResourceList.add(dataResourceEntity);
-        dataEntity.setResources(dataResourceList);
-
-        dataList.add(dataEntity);
-
-        when(dataRepository.findAll().stream().collect(Collectors.toList())).thenReturn(dataList);
-        when(dataRepository.findOne(anyLong())).thenReturn(dataEntity);
-        when(avScannerService.scan(anyString(), anyString(), anyString())).thenReturn(true);
-
-        dataService.scheduledDataResourceScan();
-
-        verify(avScannerService, times(0)).scan(anyString(), anyString(), anyString());
     }
 
 }

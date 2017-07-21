@@ -9,7 +9,6 @@ dependencies {
 
     compile 'org.springframework.boot:spring-boot-starter-freemarker'
     compileOnly 'org.springframework.boot:spring-boot-configuration-processor'
-    compile 'xyz.capybara:clamav-client:1.0.4'
 
     testCompile project(':common-test')
     testCompile 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310'
