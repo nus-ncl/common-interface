@@ -39,8 +39,6 @@ public interface DataService {
 
     void downloadResource(HttpServletResponse response, Long did, Long rid, Claims claims);
 
-    void scheduledDataResourceScan();
-
     List<DataCategory> getCategories();
 
     DataCategory getCategory(Long id);

@@ -2,7 +2,6 @@ package sg.ncl.service.data.logic;
 
 import io.jsonwebtoken.Claims;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.util.UriUtils;
@@ -44,7 +43,6 @@ public class DataServiceImpl implements DataService {
     private final UploadService uploadService;
     private final DownloadService downloadService;
     private final AnalyticsService analyticsService;
-    private final AvScannerService avScannerService;
 
     @Inject
     DataServiceImpl(@NotNull final DataRepository dataRepository,
@@ -52,15 +50,13 @@ public class DataServiceImpl implements DataService {
                     @NotNull final DataLicenseRepository dataLicenseRepository,
                     @NotNull final UploadService uploadService,
                     @NotNull final DownloadService downloadService,
-                    @NotNull final AnalyticsService analyticsService,
-                    @NotNull final AvScannerService avScannerService) {
+                    @NotNull final AnalyticsService analyticsService) {
         this.dataRepository = dataRepository;
         this.dataCategoryRepository = dataCategoryRepository;
         this.dataLicenseRepository = dataLicenseRepository;
         this.uploadService = uploadService;
         this.downloadService = downloadService;
         this.analyticsService = analyticsService;
-        this.avScannerService = avScannerService;
     }
 
     private DataEntity setUpDataEntity(Data data, DataEntity... dataEntities) {
@@ -359,43 +355,6 @@ public class DataServiceImpl implements DataService {
             throw new DataLicenseNotFoundException("License not found.");
         }
         return dataLicense;
-    }
-
-    /**
-     * Scheduled av scan method to periodically check for non-malicious data resources and rescan them
-     * cron expression is retrieve from AvScanner -> AvScannerProperties -> application.yml
-     * cron expression: second, minute, hour, day-of-month, month, day-of-week
-     *
-     * Transactional annotation is required to maintain session for the object as DataEntity::getResource() is a lazy loading method, we need
-     * the transaction session to last for entire section
-     *
-     * https://stackoverflow.com/questions/3519059/hibernate-failed-to-lazily-initialize-a-collection-of-role-no-session-or-sessi
-     */
-    @Scheduled(cron = "#{avScannerImpl.scheduleCronExpression}", zone = "Asia/Singapore")
-    @Transactional
-    public void scheduledDataResourceScan() {
-        List<Data> dataList = getDatasets();
-        dataList.forEach(o -> o.getResources().forEach(dataResource -> {
-            DataEntity currentDataEntity = dataRepository.findOne(o.getId());
-            if (!dataResource.isScanned()) {
-                try {
-                    log.info("Data resource scanning is in progress: {} for data: {}", dataResource, currentDataEntity);
-                    scanResource(currentDataEntity, dataResource, DATA_DIR_KEY, UTF_ENCODING);
-                } catch (UnsupportedEncodingException e) {
-                    log.error("Unable to scan data resource: {} for data: {}", e, currentDataEntity);
-                }
-            }
-            log.info("Scanning data-resource:: {} - {}", currentDataEntity.getName(), dataResource.getUri());
-        }));
-        log.info("Dataset scanning is completed.");
-    }
-
-    private DataEntity scanResource(DataEntity dataEntity, DataResource dataResource, String dataDir, String encodingScheme) throws UnsupportedEncodingException {
-        boolean isMalicious = avScannerService.scan(dataDir, UriUtils.encode(dataEntity.getName(), encodingScheme), dataResource.getUri());
-
-        dataEntity.editResourceMalicious(dataResource, isMalicious);
-
-        return dataRepository.save(dataEntity);
     }
 
 }
