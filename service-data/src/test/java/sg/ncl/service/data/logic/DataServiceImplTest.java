@@ -301,6 +301,53 @@ public class DataServiceImplTest {
     }
 
     @Test
+    public void testUpdateResource() {
+        DataEntity dataEntity = TestUtil.getDataEntity();
+
+        List<DataResourceEntity> dataResourceList = new ArrayList<>();
+        DataResourceEntity dataResourceEntity = TestUtil.getDataResourceEntity();
+        DataResourceEntity updatedDataResourceEntity = TestUtil.getDataResourceEntity();
+
+        dataResourceEntity.setId(1L);
+        updatedDataResourceEntity.setId(1L);
+        dataResourceList.add(dataResourceEntity);
+        dataEntity.setResources(dataResourceList);
+
+        // set the variables to be updated only after setting the list
+        updatedDataResourceEntity.setMalicious(true);
+        updatedDataResourceEntity.setScanned(true);
+
+        when(dataRepository.getOne(anyLong())).thenReturn(dataEntity);
+        when(dataRepository.save(any(DataEntity.class))).thenReturn(dataEntity);
+
+        Data result = dataService.updateResource(dataEntity.getId(), updatedDataResourceEntity, claims);
+
+        verify(dataRepository, times(1)).save(any(DataEntity.class));
+        assertThat(result.getResources()).isNotEmpty();
+        assertThat(result.getResources().get(0).isMalicious()).isTrue();
+        assertThat(result.getResources().get(0).isScanned()).isTrue();
+    }
+
+    @Test
+    public void testUpdateResourceNotFound() {
+        DataEntity dataEntity = TestUtil.getDataEntity();
+
+        List<DataResourceEntity> dataResourceList = new ArrayList<>();
+        DataResourceEntity dataResourceEntity = TestUtil.getDataResourceEntity();
+        DataResourceEntity updatedDataResourceEntity = TestUtil.getDataResourceEntity();
+
+        dataResourceEntity.setId(1L);
+        updatedDataResourceEntity.setId(2L);
+        dataResourceList.add(dataResourceEntity);
+        dataEntity.setResources(dataResourceList);
+
+        when(dataRepository.getOne(anyLong())).thenReturn(dataEntity);
+
+        exception.expect(DataResourceNotFoundException.class);
+        dataService.updateResource(dataEntity.getId(), updatedDataResourceEntity, claims);
+    }
+
+    @Test
     public void testCheckChunkUploaded() {
         String resumableIdentifier = "identifier";
         String resumableChunkNumber = "1";
