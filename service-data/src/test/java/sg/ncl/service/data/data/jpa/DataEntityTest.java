@@ -135,52 +135,33 @@ public class DataEntityTest {
         assertThat(retResources.get(0)).isEqualTo(resourceEntity);
     }
 
-//    @Test
-//    public void testEditResourceMalicious() {
-//        DataEntity dataEntity = new DataEntity();
-//        DataResourceEntity dataResourceEntity = getDataResourceEntity();
-//
-//        dataEntity.addResource(dataResourceEntity);
-//        DataResource editedDataResource = dataEntity.editResourceMalicious(dataResourceEntity, true);
-//
-//        assertThat(editedDataResource.isMalicious()).isTrue();
-//    }
-//
-//    // supply a data resource not found in the data entity
-//    @Test
-//    public void testEditResourceMaliciousNotFound() {
-//        DataEntity dataEntity = new DataEntity();
-//        DataResourceEntity dataResourceEntity = getDataResourceEntity();
-//        DataResourceEntity dataResourceEntity2 = getDataResourceEntity();
-//
-//        dataEntity.addResource(dataResourceEntity);
-//        DataResource editedDataResource = dataEntity.editResourceMalicious(dataResourceEntity2, true);
-//
-//        assertThat(editedDataResource).isNull();
-//    }
-//
-//    // no update to data resource if data resource has been scanned before
-//    @Test
-//    public void testEditResourceMaliciousNoChange() {
-//        DataEntity dataEntity = new DataEntity();
-//        DataResourceEntity dataResourceEntity = getDataResourceEntity();
-//        dataResourceEntity.setScanned(true);
-//
-//        dataEntity.addResource(dataResourceEntity);
-//        DataResource editedDataResource = dataEntity.editResourceMalicious(dataResourceEntity, false);
-//
-//        assertThat(editedDataResource).isNull();
-//    }
-//
-//    @Test
-//    public void testEditResourceMaliciousNull() {
-//        DataEntity dataEntity = new DataEntity();
-//        DataResourceEntity dataResourceEntity = getDataResourceEntity();
-//
-//        DataResource editedDataResource = dataEntity.editResourceMalicious(dataResourceEntity, true);
-//
-//        assertThat(editedDataResource).isNull();
-//    }
+    @Test
+    public void testUpdateResource() {
+        DataEntity dataEntity = new DataEntity();
+        DataResourceEntity dataResourceEntity = getDataResourceEntity();
+        dataResourceEntity.setId(Long.parseLong("1234"));
+        dataEntity.addResource(dataResourceEntity);
+
+        dataResourceEntity.setMalicious(true);
+        dataResourceEntity.setScanned(true);
+
+        DataResource savedResourceEntity = dataEntity.updateResource(dataResourceEntity);
+        assertThat(savedResourceEntity.isMalicious()).isTrue();
+        assertThat(savedResourceEntity.isScanned()).isTrue();
+    }
+
+    @Test
+    public void testUpdateResourceNotFound() {
+        DataEntity dataEntity = new DataEntity();
+        DataResourceEntity dataResourceEntity = getDataResourceEntity();
+        DataResourceEntity updatedResourceEntity = getDataResourceEntity();
+        dataResourceEntity.setId(Long.parseLong("1234"));
+        updatedResourceEntity.setId(Long.parseLong("1235"));
+        dataEntity.addResource(dataResourceEntity);
+
+        DataResource savedResourceEntity = dataEntity.updateResource(updatedResourceEntity);
+        assertThat(savedResourceEntity).isNull();
+    }
 
     @Test
     public void testGetApprovedUsers() {
