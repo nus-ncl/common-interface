@@ -287,6 +287,24 @@ public class DataServiceImpl implements DataService {
     }
 
     @Override
+    public Data updateResource(Long did, DataResource dataResource, Claims claims) {
+        DataEntity dataEntity = (DataEntity) getDataset(did);
+
+        DataResource updatedDataResource = dataEntity.updateResource(dataResource);
+
+        if (updatedDataResource != null) {
+            log.info("Data resource updated by {}: {}", claims.getSubject(), updatedDataResource);
+        } else {
+            log.warn("Data resource not found.");
+            throw new DataResourceNotFoundException("Data resource not found.");
+        }
+
+        DataEntity savedDataEntity = dataRepository.save(dataEntity);
+        log.info(INFO_TEXT, savedDataEntity);
+        return savedDataEntity;
+    }
+
+    @Override
     public String checkChunk(String resumableIdentifier, String resumableChunkNumber) {
         switch (uploadService.checkChunk(resumableIdentifier, Integer.parseInt(resumableChunkNumber))) {
             case UPLOADED:

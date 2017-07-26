@@ -33,6 +33,8 @@ public interface DataService {
 
     Data deleteResource(Long did, Long rid, Claims claims);
 
+    Data updateResource(Long did, DataResource dataResource, Claims claims);
+
     String checkChunk(String resumableIdentifier, String resumableChunkNumber);
 
     String addChunk(ResumableInfo resumableInfo, String resumableChunkNumber, Long id, Claims claims) throws UnsupportedEncodingException;
