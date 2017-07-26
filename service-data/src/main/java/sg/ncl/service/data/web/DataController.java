@@ -8,7 +8,6 @@ import org.springframework.http.MediaType;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import sg.ncl.common.exception.base.UnauthorizedException;
-import sg.ncl.common.validation.Validator;
 import sg.ncl.service.data.domain.*;
 import sg.ncl.service.transmission.web.ResumableInfo;
 

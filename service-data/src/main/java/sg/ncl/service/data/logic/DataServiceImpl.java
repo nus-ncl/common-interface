@@ -295,8 +295,8 @@ public class DataServiceImpl implements DataService {
         if (updatedDataResource != null) {
             log.info("Data resource updated by {}: {}", claims.getSubject(), updatedDataResource);
         } else {
-            log.warn("Data resource not found.");
-            throw new DataResourceNotFoundException("Data resource not found.");
+            log.warn("Data resource cannot tbe found.");
+            throw new DataResourceNotFoundException("Data resource cannot tbe found.");
         }
 
         DataEntity savedDataEntity = dataRepository.save(dataEntity);
