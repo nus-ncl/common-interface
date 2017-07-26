@@ -52,6 +52,19 @@ public class DataResourceEntityTest {
     }
 
     @Test
+    public void testIsScanned() {
+        DataResourceEntity entity = new DataResourceEntity();
+        assertThat(entity.isScanned()).isFalse();
+    }
+
+    @Test
+    public void testSetIsScanned() {
+        DataResourceEntity entity = new DataResourceEntity();
+        entity.setScanned(true);
+        assertThat(entity.isScanned()).isTrue();
+    }
+
+    @Test
     public void testToString() {
         DataResourceEntity entity = new DataResourceEntity();
         entity.setId(Long.parseLong(RandomStringUtils.randomNumeric(10)));
