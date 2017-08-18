@@ -9,4 +9,8 @@ public interface DataResource {
 
     String getUri();
 
+    boolean isMalicious();
+
+    boolean isScanned();
+
 }

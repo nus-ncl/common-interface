@@ -112,6 +112,21 @@ public class DataEntity extends AbstractEntity implements Data {
         }
     }
 
+    // update a data resource
+    // Note: there is only updating of is_malicious status at the moment
+    public DataResource updateResource(DataResource inputDataResource) {
+        for (DataResourceEntity dataResourceEntity : resources) {
+            if (dataResourceEntity.getId().equals(inputDataResource.getId())) {
+                dataResourceEntity.setMalicious(inputDataResource.isMalicious());
+                dataResourceEntity.setScanned(inputDataResource.isScanned());
+                log.info("Resource {} is updated for data {}", dataResourceEntity, name);
+                return dataResourceEntity;
+            }
+        }
+        log.info("Resource {} not in the list for data {}", inputDataResource, name);
+        return null;
+    }
+
     @Override
     public List<DataResource> getResources() {
         List<DataResource> dataResources = new ArrayList<>();

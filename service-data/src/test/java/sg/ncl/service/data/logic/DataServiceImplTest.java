@@ -17,6 +17,12 @@ import sg.ncl.service.analytics.domain.AnalyticsService;
 import sg.ncl.service.data.data.jpa.*;
 import sg.ncl.service.data.domain.*;
 import sg.ncl.service.data.exceptions.*;
+import sg.ncl.service.data.data.jpa.DataEntity;
+import sg.ncl.service.data.data.jpa.DataRepository;
+import sg.ncl.service.data.data.jpa.DataResourceEntity;
+import sg.ncl.service.data.exceptions.DataNameAlreadyExistsException;
+import sg.ncl.service.data.exceptions.DataNotFoundException;
+import sg.ncl.service.data.exceptions.DataResourceNotFoundException;
 import sg.ncl.service.data.util.TestUtil;
 import sg.ncl.service.transmission.domain.DownloadService;
 import sg.ncl.service.transmission.domain.UploadService;
@@ -71,9 +77,7 @@ public class DataServiceImplTest {
         assertThat(mockingDetails(uploadService).isMock()).isTrue();
         assertThat(mockingDetails(downloadService).isMock()).isTrue();
         assertThat(mockingDetails(analyticsService).isMock()).isTrue();
-        dataService = new DataServiceImpl(
-                dataRepository, dataCategoryRepository, dataLicenseRepository,
-                uploadService, downloadService, analyticsService);
+        dataService = new DataServiceImpl(dataRepository, dataCategoryRepository, dataLicenseRepository, uploadService, downloadService, analyticsService);
     }
 
     @Test
@@ -294,6 +298,53 @@ public class DataServiceImplTest {
 
         dataService.deleteResource(dataEntity.getId(), dataEntity.getResources().get(0).getId(), claims);
         verify(dataRepository, times(1)).save(any(DataEntity.class));
+    }
+
+    @Test
+    public void testUpdateResource() {
+        DataEntity dataEntity = TestUtil.getDataEntity();
+
+        List<DataResourceEntity> dataResourceList = new ArrayList<>();
+        DataResourceEntity dataResourceEntity = TestUtil.getDataResourceEntity();
+        DataResourceEntity updatedDataResourceEntity = TestUtil.getDataResourceEntity();
+
+        dataResourceEntity.setId(1L);
+        updatedDataResourceEntity.setId(1L);
+        dataResourceList.add(dataResourceEntity);
+        dataEntity.setResources(dataResourceList);
+
+        // set the variables to be updated only after setting the list
+        updatedDataResourceEntity.setMalicious(true);
+        updatedDataResourceEntity.setScanned(true);
+
+        when(dataRepository.getOne(anyLong())).thenReturn(dataEntity);
+        when(dataRepository.save(any(DataEntity.class))).thenReturn(dataEntity);
+
+        Data result = dataService.updateResource(dataEntity.getId(), updatedDataResourceEntity, claims);
+
+        verify(dataRepository, times(1)).save(any(DataEntity.class));
+        assertThat(result.getResources()).isNotEmpty();
+        assertThat(result.getResources().get(0).isMalicious()).isTrue();
+        assertThat(result.getResources().get(0).isScanned()).isTrue();
+    }
+
+    @Test
+    public void testUpdateResourceNotFound() {
+        DataEntity dataEntity = TestUtil.getDataEntity();
+
+        List<DataResourceEntity> dataResourceList = new ArrayList<>();
+        DataResourceEntity dataResourceEntity = TestUtil.getDataResourceEntity();
+        DataResourceEntity updatedDataResourceEntity = TestUtil.getDataResourceEntity();
+
+        dataResourceEntity.setId(1L);
+        updatedDataResourceEntity.setId(2L);
+        dataResourceList.add(dataResourceEntity);
+        dataEntity.setResources(dataResourceList);
+
+        when(dataRepository.getOne(anyLong())).thenReturn(dataEntity);
+
+        exception.expect(DataResourceNotFoundException.class);
+        dataService.updateResource(dataEntity.getId(), updatedDataResourceEntity, claims);
     }
 
     @Test

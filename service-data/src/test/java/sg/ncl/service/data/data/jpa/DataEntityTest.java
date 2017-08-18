@@ -1,17 +1,28 @@
 package sg.ncl.service.data.data.jpa;
 
 import org.apache.commons.lang3.RandomStringUtils;
+import org.junit.Before;
 import org.junit.Test;
+import org.mockito.Mock;
 import sg.ncl.service.data.domain.DataAccessibility;
 import sg.ncl.service.data.domain.DataResource;
 import sg.ncl.service.data.domain.DataVisibility;
+import sg.ncl.service.data.util.TestUtil;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+import static sg.ncl.service.data.util.TestUtil.getDataResourceEntity;
 
 /**
+ *
+ * Mocking enhanced for loop
+ * https://stackoverflow.com/questions/6379308/testing-java-enhanced-for-behavior-with-mockito
+ *
  * Created by dcszwang on 10/6/2016.
  */
 public class DataEntityTest {
@@ -122,6 +133,34 @@ public class DataEntityTest {
         List<? extends DataResource> retResources = dataEntity.getResources();
         assertThat(retResources.size()).isEqualTo(1);
         assertThat(retResources.get(0)).isEqualTo(resourceEntity);
+    }
+
+    @Test
+    public void testUpdateResource() {
+        DataEntity dataEntity = new DataEntity();
+        DataResourceEntity dataResourceEntity = getDataResourceEntity();
+        dataResourceEntity.setId(Long.parseLong("1234"));
+        dataEntity.addResource(dataResourceEntity);
+
+        dataResourceEntity.setMalicious(true);
+        dataResourceEntity.setScanned(true);
+
+        DataResource savedResourceEntity = dataEntity.updateResource(dataResourceEntity);
+        assertThat(savedResourceEntity.isMalicious()).isTrue();
+        assertThat(savedResourceEntity.isScanned()).isTrue();
+    }
+
+    @Test
+    public void testUpdateResourceNotFound() {
+        DataEntity dataEntity = new DataEntity();
+        DataResourceEntity dataResourceEntity = getDataResourceEntity();
+        DataResourceEntity updatedResourceEntity = getDataResourceEntity();
+        dataResourceEntity.setId(Long.parseLong("1234"));
+        updatedResourceEntity.setId(Long.parseLong("1235"));
+        dataEntity.addResource(dataResourceEntity);
+
+        DataResource savedResourceEntity = dataEntity.updateResource(updatedResourceEntity);
+        assertThat(savedResourceEntity).isNull();
     }
 
     @Test

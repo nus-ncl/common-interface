@@ -19,8 +19,10 @@ import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.web.context.WebApplicationContext;
+import sg.ncl.common.authentication.Role;
 import sg.ncl.common.exception.ExceptionAutoConfiguration;
 import sg.ncl.common.exception.GlobalExceptionHandler;
+import sg.ncl.common.jwt.JwtToken;
 import sg.ncl.service.data.data.jpa.DataAccessRequestEntity;
 import sg.ncl.service.data.data.jpa.DataCategoryEntity;
 import sg.ncl.service.data.data.jpa.DataEntity;
@@ -334,6 +336,76 @@ public class DataControllerTest {
                 .andExpect(jsonPath("visibility", is(equalTo(dataEntity.getVisibility().toString()))))
 
                 .andExpect(jsonPath("resources", hasSize(0)));
+    }
+
+    @Test
+    public void testUpdateResourceBadAuthentication() throws Exception {
+        final DataResourceEntity dataResourceEntity = TestUtil.getDataResourceEntity();
+        final byte[] content = mapper.writeValueAsBytes(dataResourceEntity);
+
+        when(securityContext.getAuthentication()).thenReturn(authentication);
+        SecurityContextHolder.setContext(securityContext);
+
+        when(authentication.getPrincipal()).thenReturn("");
+        when(dataService.updateResource(anyLong(), any(DataResource.class), any())).thenReturn(null);
+
+        mockMvc.perform(put(DataController.PATH + "/1/resources/1").contentType(MediaType.APPLICATION_JSON).content(content))
+                .andExpect(status().isUnauthorized())
+                .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON));
+    }
+
+    @Test
+    public void testUpdateResourceForbidden() throws Exception {
+        final DataResourceEntity dataResourceEntity = TestUtil.getDataResourceEntity();
+        final byte[] content = mapper.writeValueAsBytes(dataResourceEntity);
+        final List<String> roles = new ArrayList<>();
+
+        roles.add(Role.USER.getAuthority());
+
+        when(securityContext.getAuthentication()).thenReturn(authentication);
+        SecurityContextHolder.setContext(securityContext);
+        when(authentication.getPrincipal()).thenReturn(claims);
+
+        when(claims.get(JwtToken.KEY)).thenReturn(roles);
+        when(dataService.updateResource(anyLong(), any(DataResource.class), any())).thenReturn(null);
+
+        mockMvc.perform(put(DataController.PATH + "/1/resources/1").contentType(MediaType.APPLICATION_JSON).content(content))
+                .andExpect(status().isForbidden())
+                .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON));
+    }
+
+    @Test
+    public void testUpdateResourceGoodAuthentication() throws Exception {
+        final DataEntity dataEntity = TestUtil.getDataEntity();
+        final DataResourceEntity dataResourceEntity = TestUtil.getDataResourceEntity();
+        List<DataResourceEntity> dataResourceEntityList = new ArrayList<>();
+
+        dataResourceEntity.setId(1L);
+        dataResourceEntity.setMalicious(false);
+        dataResourceEntity.setScanned(true);
+
+        dataResourceEntityList.add(dataResourceEntity);
+        dataEntity.setResources(dataResourceEntityList);
+
+        final byte[] content = mapper.writeValueAsBytes(dataResourceEntity);
+        final List<String> roles = new ArrayList<>();
+
+        roles.add(Role.ADMIN.getAuthority());
+
+        when(securityContext.getAuthentication()).thenReturn(authentication);
+        SecurityContextHolder.setContext(securityContext);
+        when(authentication.getPrincipal()).thenReturn(claims);
+
+        when(claims.get(JwtToken.KEY)).thenReturn(roles);
+        when(dataService.updateResource(anyLong(), any(DataResource.class), any())).thenReturn(dataEntity);
+
+        mockMvc.perform(put(DataController.PATH + "/1/resources/1").contentType(MediaType.APPLICATION_JSON).content(content))
+                .andExpect(status().isOk())
+                .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
+
+                .andExpect(jsonPath("$.resources", hasSize(1)))
+                .andExpect(jsonPath("$.resources[0].malicious", is(equalTo(false))))
+                .andExpect(jsonPath("$.resources[0].scanned", is(equalTo(true))));
     }
 
     @Test

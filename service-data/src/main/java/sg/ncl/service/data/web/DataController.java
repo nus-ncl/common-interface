@@ -19,6 +19,8 @@ import java.io.UnsupportedEncodingException;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import static sg.ncl.common.validation.Validator.isAdmin;
+
 /**
  * Created by jng on 17/10/16.
  */
@@ -142,6 +144,18 @@ public class DataController {
             throw new UnauthorizedException();
         }
         return new DataInfo(dataService.deleteResource(did, rid, (Claims) claims));
+    }
+
+    // Update a resource in a data set
+    // Currently for editing is_malicious status only
+    @PutMapping(path = "/{did}/resources/{rid}")
+    @ResponseStatus(HttpStatus.OK)
+    public Data updateResource(@AuthenticationPrincipal Object claims, @PathVariable Long did, @PathVariable Long rid, @RequestBody @Valid DataResourceInfo dataResourceInfo) {
+        if (claims == null || !(claims instanceof Claims)) {
+            throw new UnauthorizedException();
+        }
+        isAdmin((Claims) claims);
+        return new DataInfo(dataService.updateResource(did, dataResourceInfo, (Claims) claims));
     }
 
     // Request access to a dataset

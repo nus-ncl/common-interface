@@ -21,10 +21,7 @@ import javax.validation.constraints.NotNull;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.time.ZonedDateTime;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 import static sg.ncl.service.data.validations.Validator.checkAccessibility;
 import static sg.ncl.service.data.validations.Validator.checkPermissions;
@@ -290,6 +287,24 @@ public class DataServiceImpl implements DataService {
     }
 
     @Override
+    public Data updateResource(Long did, DataResource dataResource, Claims claims) {
+        DataEntity dataEntity = (DataEntity) getDataset(did);
+
+        DataResource updatedDataResource = dataEntity.updateResource(dataResource);
+
+        if (updatedDataResource != null) {
+            log.info("Data resource updated by {}: {}", claims.getSubject(), updatedDataResource);
+        } else {
+            log.warn("Data resource cannot tbe found.");
+            throw new DataResourceNotFoundException("Data resource cannot tbe found.");
+        }
+
+        DataEntity savedDataEntity = dataRepository.save(dataEntity);
+        log.info(INFO_TEXT, savedDataEntity);
+        return savedDataEntity;
+    }
+
+    @Override
     public String checkChunk(String resumableIdentifier, String resumableChunkNumber) {
         switch (uploadService.checkChunk(resumableIdentifier, Integer.parseInt(resumableChunkNumber))) {
             case UPLOADED:
@@ -306,7 +321,7 @@ public class DataServiceImpl implements DataService {
         DataEntity dataEntity = (DataEntity) getDataset(id);
         switch (uploadService.addChunk(resumableInfo, Integer.parseInt(resumableChunkNumber), DATA_DIR_KEY, UriUtils.encode(dataEntity.getName(), UTF_ENCODING))) {
             case FINISHED:
-                DataResourceInfo dataResourceInfo = new DataResourceInfo(null, resumableInfo.getResumableFilename());
+                DataResourceInfo dataResourceInfo = new DataResourceInfo(null, resumableInfo.getResumableFilename(), false, false);
                 createResource(id, dataResourceInfo, claims);
                 log.info("Resource upload finished and saved: {}", dataResourceInfo);
                 return "All finished.";
