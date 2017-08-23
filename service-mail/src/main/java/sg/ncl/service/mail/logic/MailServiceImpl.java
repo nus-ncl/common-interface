@@ -39,12 +39,9 @@ class MailServiceImpl implements MailService {
         this.asyncMailSender = asyncMailService;
     }
 
-    // use by other modules such as credentials service to send email notifications
-    // the emailRetryId is set to NULL if it is the first time this email is being sent
-    @Transactional
+    // use by other services such as registration service to send email notifications
     @Override
     public void send(
-            final Long emailRetryId,
             @NotNull final String from,
             @NotNull final String to,
             @NotNull final String subject,
@@ -53,13 +50,11 @@ class MailServiceImpl implements MailService {
             final String cc,
             final String bcc
     ) {
-        send(emailRetryId, from, new String[]{to}, subject, content, html, cc == null ? null : new String[]{cc}, bcc == null ? null : new String[]{bcc});
+        send(from, new String[]{to}, subject, content, html, cc == null ? null : new String[]{cc}, bcc == null ? null : new String[]{bcc});
     }
 
-    @Transactional
     @Override
     public void send(
-            final Long emailRetryId,
             @NotNull final String from,
             @NotNull final String[] to,
             @NotNull final String subject,
@@ -68,41 +63,37 @@ class MailServiceImpl implements MailService {
             final String[] cc,
             final String[] bcc
     ) {
-
-        final EmailEntity entity;
-
-        if (emailRetryId == null) {
-            // new message
-            entity = new EmailEntity();
-            entity.setSender(from);
-            entity.setRecipients(to);
-            entity.setSubject(subject);
-            entity.setContent(content);
-            entity.setHtml(html);
-            entity.setCc(cc);
-            entity.setBcc(bcc);
-        } else {
-            // retry sending an email
-            entity = emailRepository.findOne(emailRetryId);
-        }
+        final EmailEntity entity = new EmailEntity();
+        entity.setSender(from);
+        entity.setRecipients(to);
+        entity.setSubject(subject);
+        entity.setContent(content);
+        entity.setHtml(html);
+        entity.setCc(cc);
+        entity.setBcc(bcc);
 
         asyncMailSender.send(entity);
     }
 
-    @Transactional
     @Override
-    public void send(final Long emailRetryId, @NotNull final Email email) {
-        send(emailRetryId, email.getSender(), email.getRecipients(), email.getSubject(), email.getContent(), email.isHtml(), email.getCc(), email.getBcc());
+    public void send(@NotNull final Email email) {
+        if (null == email.getId()) {
+            send(email.getSender(), email.getRecipients(), email.getSubject(),
+                    email.getContent(), email.isHtml(), email.getCc(), email.getBcc());
+
+        } else {
+            asyncMailSender.send(emailRepository.findOne(email.getId()));
+        }
     }
 
     // FIXME should not use this format, instead should use auto configuration
-    @Scheduled(initialDelayString = "${ncl.mail.delay:300000}", fixedRateString = "${ncl.mail.interval:600000}")
+    @Scheduled(initialDelayString = "${ncl.mail.delay:3000}", fixedRateString = "${ncl.mail.interval:6000}")
     @Transactional
     @Override
     public void retry() {
         final List<EmailEntity> emails = emailRepository.findBySentFalseAndRetryTimesLessThanOrderByRetryTimes(3);
         log.info("Retrying {} emails", emails.size());
-        emails.forEach(item -> send(item.getId(), item));
+        emails.forEach(item -> send(item));
     }
 
 }
