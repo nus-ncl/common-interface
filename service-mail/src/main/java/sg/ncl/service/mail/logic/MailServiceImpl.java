@@ -87,7 +87,7 @@ class MailServiceImpl implements MailService {
     }
 
     // FIXME should not use this format, instead should use auto configuration
-    @Scheduled(initialDelayString = "${ncl.mail.delay:3000}", fixedRateString = "${ncl.mail.interval:6000}")
+    @Scheduled(initialDelayString = "${ncl.mail.delay:300000}", fixedRateString = "${ncl.mail.interval:600000}")
     @Transactional
     @Override
     public void retry() {
