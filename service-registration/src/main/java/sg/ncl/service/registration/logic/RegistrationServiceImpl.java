@@ -600,7 +600,7 @@ public class RegistrationServiceImpl implements RegistrationService {
             String[] to = new String[1];
             to[0] = user.getUserDetails().getEmail();
             String msgText = FreeMarkerTemplateUtils.processTemplateIntoString(replyJoinTeamRequestTemplate, map);
-            mailService.send(TESTBED_EMAIL, to,
+            mailService.send(null, TESTBED_EMAIL, to,
                     "Apply To Join Team " + (status == TeamStatus.APPROVED ? "Approved" : "Rejected"),
                     msgText, false, null, null);
         } catch (IOException | TemplateException e) {
@@ -623,7 +623,7 @@ public class RegistrationServiceImpl implements RegistrationService {
             String[] to = new String[1];
             to[0] = owner.getUserDetails().getEmail();
             String msgText = FreeMarkerTemplateUtils.processTemplateIntoString(applyJoinTeamRequestTemplate, map);
-            mailService.send(TESTBED_EMAIL, to,
+            mailService.send(null, TESTBED_EMAIL, to,
                     "Please Process New Request To Join Your Team",
                     msgText, false, null, null);
         } catch (IOException | TemplateException e) {
@@ -645,7 +645,7 @@ public class RegistrationServiceImpl implements RegistrationService {
             String[] cc = new String[1];
             cc[0] = ADMIN_EMAIL;
             String msgText = FreeMarkerTemplateUtils.processTemplateIntoString(replyCreateTeamRequestTemplate, map);
-            mailService.send(TESTBED_EMAIL, to,
+            mailService.send(null, TESTBED_EMAIL, to,
                     "Apply To Create New Team " + (status == TeamStatus.APPROVED ? "Approved" : "Rejected"),
                     msgText, false, cc, null);
         } catch (IOException | TemplateException e) {
@@ -666,7 +666,7 @@ public class RegistrationServiceImpl implements RegistrationService {
 
         try {
             String msgText = FreeMarkerTemplateUtils.processTemplateIntoString(applyCreateTeamRequestTemplate, map);
-            mailService.send(TESTBED_EMAIL, ADMIN_EMAIL,
+            mailService.send(null, TESTBED_EMAIL, ADMIN_EMAIL,
                     "Please Process New Request To Create Team", msgText, false, null, null);
         } catch (IOException | TemplateException e) {
             log.warn("{}", e);
@@ -691,7 +691,7 @@ public class RegistrationServiceImpl implements RegistrationService {
         try {
             String msgText = FreeMarkerTemplateUtils.processTemplateIntoString(
                     emailValidationTemplate, map);
-            mailService.send(TESTBED_EMAIL, user.getUserDetails().getEmail(),
+            mailService.send(null, TESTBED_EMAIL, user.getUserDetails().getEmail(),
                     "Please Verify Your Email Address", msgText, false, null, null);
             log.debug("Email sent: {}", msgText);
         } catch (IOException | TemplateException e) {
