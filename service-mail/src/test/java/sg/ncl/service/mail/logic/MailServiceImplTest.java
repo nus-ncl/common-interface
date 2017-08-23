@@ -44,7 +44,7 @@ public class MailServiceImplTest {
         final String subject = "subject";
         final String content = "content";
 
-        service.send(from, to, subject, content, false, null, null);
+        service.send(null, from, to, subject, content, false, null, null);
 
         verify(asyncMailSender, times(1)).send(any(EmailEntity.class));
     }
@@ -58,7 +58,7 @@ public class MailServiceImplTest {
         final String subject = "subject";
         final String content = "content";
 
-        service.send(from, to, subject, content, false, cc, bcc);
+        service.send(null, from, to, subject, content, false, cc, bcc);
 
         verify(asyncMailSender, times(1)).send(any(EmailEntity.class));
     }
