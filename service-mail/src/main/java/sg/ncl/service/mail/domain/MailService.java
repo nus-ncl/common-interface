@@ -5,11 +5,11 @@ package sg.ncl.service.mail.domain;
  */
 public interface MailService {
 
-    void send(String from, String recipients, String subject, String content, boolean html, String cc, String bcc);
+    void send(Long emailRetryId, String from, String recipients, String subject, String content, boolean html, String cc, String bcc);
 
-    void send(String from, String[] recipients, String subject, String content, boolean html, String[] cc, String[] bcc);
+    void send(Long emailRetryId, String from, String[] recipients, String subject, String content, boolean html, String[] cc, String[] bcc);
 
-    void send(Email email);
+    void send(Long emailRetryId, Email email);
 
     void retry();
 
