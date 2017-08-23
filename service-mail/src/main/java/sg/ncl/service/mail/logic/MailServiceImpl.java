@@ -102,9 +102,7 @@ class MailServiceImpl implements MailService {
     public void retry() {
         final List<EmailEntity> emails = emailRepository.findBySentFalseAndRetryTimesLessThanOrderByRetryTimes(3);
         log.info("Retrying {} emails", emails.size());
-        emails.forEach(item -> {
-            send(item.getId(), item);
-        });
+        emails.forEach(item -> send(item.getId(), item));
     }
 
 }
