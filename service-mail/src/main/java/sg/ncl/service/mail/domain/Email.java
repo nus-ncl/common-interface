@@ -7,6 +7,8 @@ import java.time.ZonedDateTime;
  */
 public interface Email {
 
+    Long getId();
+
     String getSender();
 
     String[] getRecipients();

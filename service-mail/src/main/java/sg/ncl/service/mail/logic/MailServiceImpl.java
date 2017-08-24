@@ -39,7 +39,6 @@ class MailServiceImpl implements MailService {
         this.asyncMailSender = asyncMailService;
     }
 
-    @Transactional
     @Override
     public void send(
             @NotNull final String from,
@@ -53,7 +52,6 @@ class MailServiceImpl implements MailService {
         send(from, new String[]{to}, subject, content, html, cc == null ? null : new String[]{cc}, bcc == null ? null : new String[]{bcc});
     }
 
-    @Transactional
     @Override
     public void send(
             @NotNull final String from,
@@ -76,10 +74,15 @@ class MailServiceImpl implements MailService {
         asyncMailSender.send(entity);
     }
 
-    @Transactional
     @Override
     public void send(@NotNull final Email email) {
-        send(email.getSender(), email.getRecipients(), email.getSubject(), email.getContent(), email.isHtml(), email.getCc(), email.getBcc());
+        if (null == email.getId()) {
+            send(email.getSender(), email.getRecipients(), email.getSubject(),
+                    email.getContent(), email.isHtml(), email.getCc(), email.getBcc());
+
+        } else {
+            asyncMailSender.send(emailRepository.findOne(email.getId()));
+        }
     }
 
     // FIXME should not use this format, instead should use auto configuration
