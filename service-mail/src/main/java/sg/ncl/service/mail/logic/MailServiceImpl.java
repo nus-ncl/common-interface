@@ -39,7 +39,6 @@ class MailServiceImpl implements MailService {
         this.asyncMailSender = asyncMailService;
     }
 
-    // use by other services such as registration service to send email notifications
     @Override
     public void send(
             @NotNull final String from,
@@ -93,7 +92,7 @@ class MailServiceImpl implements MailService {
     public void retry() {
         final List<EmailEntity> emails = emailRepository.findBySentFalseAndRetryTimesLessThanOrderByRetryTimes(3);
         log.info("Retrying {} emails", emails.size());
-        emails.forEach(item -> send(item));
+        emails.forEach(this::send);
     }
 
 }
