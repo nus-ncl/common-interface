@@ -553,7 +553,7 @@ public class TeamServiceImplTest {
     @Test
     public void testUpdateTeamQuotaTeamOutOfRange() {
         final TeamQuotaEntity teamQuotaEntity = TestUtil.getTeamQuotaEntity();
-        teamQuotaEntity.setQuota(new BigDecimal(RandomStringUtils.randomNumeric(9)));
+        teamQuotaEntity.setQuota(new BigDecimal(RandomStringUtils.randomNumeric(9)+"100000000"));
         when(teamRepository.findOne(anyString())).thenReturn(teamEntity);
         exception.expect(TeamQuotaOutOfRangeException.class);
         teamService.updateTeamQuota(teamEntity.getId(), teamQuotaEntity);
