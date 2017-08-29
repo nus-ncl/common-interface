@@ -37,6 +37,7 @@ ncl:
     uri:
       '/authentications': POST # for login
       '/datasets\?visibility=PUBLIC': GET # for retrieving public datasets
+      '/datasets/(\w|-)+\?visibility=PUBLIC': GET # for retrieving a public dataset
       '/datasets/categories/(\w|-)+': GET # for retrieving category for public datasets
       '/datasets/licenses/(\w|-)+': GET # for retrieving license for public datasets
       '/images/global': GET # for retrieving list of global images

@@ -68,7 +68,7 @@ public class DataController {
     @ResponseStatus(HttpStatus.OK)
     public List<Data> getDatasetsByVisibility(@AuthenticationPrincipal Object claims, @RequestParam("visibility") DataVisibility visibility) {
         if (claims == null && visibility != DataVisibility.PUBLIC) {
-            log.warn("Access denied for: /datasets/?visibility=" + visibility);
+            log.warn("Access denied for: /datasets?visibility=" + visibility);
             throw new UnauthorizedException();
         }
         return dataService.findByVisibility(DataVisibility.PUBLIC).stream().map(DataInfo::new).collect(Collectors.toList());
@@ -82,6 +82,21 @@ public class DataController {
             throw new UnauthorizedException();
         }
         return new DataInfo(dataService.getDataset(id));
+    }
+
+    // Get details about a public data set
+    @GetMapping(path = "/{id}", params = {"visibility"})
+    public Data getDatasetByIdAndVisibility(@AuthenticationPrincipal Object claims, @PathVariable Long id, @RequestParam("visibility") DataVisibility visibility) {
+        if (claims == null && visibility != DataVisibility.PUBLIC) {
+            log.warn("Access denied for: /datasets/" + id + "?visibility=" + visibility);
+            throw new UnauthorizedException();
+        }
+        Data data = dataService.getDataset(id);
+        if (claims == null && data.getVisibility() != DataVisibility.PUBLIC) {
+            log.warn("Retrieved dataset " + id + " is not public");
+            throw new UnauthorizedException();
+        }
+        return new DataInfo(data);
     }
 
     // Create a data set
