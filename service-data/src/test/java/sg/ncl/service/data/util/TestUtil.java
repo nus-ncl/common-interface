@@ -112,6 +112,17 @@ public class TestUtil {
         return entity;
     }
 
+    public static DataPublicUserEntity getDataPublicUserEntity() {
+        DataPublicUserEntity entity = new DataPublicUserEntity();
+        entity.setId(Long.parseLong(RandomStringUtils.randomNumeric(10)));
+        entity.setFullName(RandomStringUtils.randomAlphanumeric(10));
+        entity.setEmail(RandomStringUtils.randomAlphabetic(10));
+        entity.setJobTitle(RandomStringUtils.randomAlphanumeric(10));
+        entity.setInstitution(RandomStringUtils.randomAlphanumeric(10));
+        entity.setCountry(RandomStringUtils.randomAlphabetic(10));
+        return entity;
+    }
+
     public static UserEntity getUserEntity() throws Exception {
         final UserEntity userEntity = new UserEntity();
         userEntity.setApplicationDate(ZonedDateTime.now());

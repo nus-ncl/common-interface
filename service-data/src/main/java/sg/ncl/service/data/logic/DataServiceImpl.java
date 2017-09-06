@@ -40,6 +40,7 @@ public class DataServiceImpl implements DataService {
     private final DataRepository dataRepository;
     private final DataCategoryRepository dataCategoryRepository;
     private final DataLicenseRepository dataLicenseRepository;
+    private final DataPublicUserRepository dataPublicUserRepository;
     private final UploadService uploadService;
     private final DownloadService downloadService;
     private final AnalyticsService analyticsService;
@@ -48,12 +49,14 @@ public class DataServiceImpl implements DataService {
     DataServiceImpl(@NotNull final DataRepository dataRepository,
                     @NotNull final DataCategoryRepository dataCategoryRepository,
                     @NotNull final DataLicenseRepository dataLicenseRepository,
+                    @NotNull final DataPublicUserRepository dataPublicUserRepository,
                     @NotNull final UploadService uploadService,
                     @NotNull final DownloadService downloadService,
                     @NotNull final AnalyticsService analyticsService) {
         this.dataRepository = dataRepository;
         this.dataCategoryRepository = dataCategoryRepository;
         this.dataLicenseRepository = dataLicenseRepository;
+        this.dataPublicUserRepository = dataPublicUserRepository;
         this.uploadService = uploadService;
         this.downloadService = downloadService;
         this.analyticsService = analyticsService;
@@ -373,6 +376,26 @@ public class DataServiceImpl implements DataService {
             throw new DataLicenseNotFoundException("License not found.");
         }
         return dataLicense;
+    }
+
+    /**
+     * Save the details of a public user
+     *
+     * @param   dataPublicUser  the data object passed from the web service
+     * @return  a public user
+     */
+    @Override
+    public DataPublicUser createPublicUser(DataPublicUser dataPublicUser) {
+        log.info("Save public user");
+        DataPublicUserEntity newPublicUserEntity = new DataPublicUserEntity();
+        newPublicUserEntity.setFullName(dataPublicUser.getFullName());
+        newPublicUserEntity.setEmail(dataPublicUser.getEmail());
+        newPublicUserEntity.setJobTitle(dataPublicUser.getJobTitle());
+        newPublicUserEntity.setInstitution(dataPublicUser.getInstitution());
+        newPublicUserEntity.setCountry(dataPublicUser.getCountry());
+        DataPublicUserEntity savedPublicUserEntity = dataPublicUserRepository.save(newPublicUserEntity);
+        log.info("Public user saved: {}", savedPublicUserEntity);
+        return savedPublicUserEntity;
     }
 
 }

@@ -266,4 +266,10 @@ public class DataController {
         return new DataLicenseInfo(dataService.getLicense(id));
     }
 
+    @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE, path = "/public/users")
+    @ResponseStatus(HttpStatus.CREATED)
+    public DataPublicUser savePublicUser(@RequestBody @Valid DataPublicUserInfo dataPublicUserInfo) {
+        return new DataPublicUserInfo(dataService.createPublicUser(dataPublicUserInfo));
+    }
+
 }

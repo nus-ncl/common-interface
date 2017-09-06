@@ -691,4 +691,27 @@ public class DataControllerTest {
                 .andExpect(status().isOk());
     }
 
+    @Test
+    public void testSaveNewPublicUser() throws Exception {
+        final DataPublicUserEntity dataPublicUserEntity = TestUtil.getDataPublicUserEntity();
+
+        mapper.registerModule(new JavaTimeModule());
+        final byte[] content = mapper.writeValueAsBytes(new DataPublicUserInfo(dataPublicUserEntity));
+
+        when(dataService.createPublicUser(any(DataPublicUserInfo.class))).thenReturn(dataPublicUserEntity);
+
+        mockMvc.perform(post(DataController.PATH + "/public/users")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(content))
+
+                .andExpect(status().isCreated())
+                .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
+
+                .andExpect(jsonPath("fullName", is(equalTo(dataPublicUserEntity.getFullName()))))
+                .andExpect(jsonPath("email", is(equalTo(dataPublicUserEntity.getEmail()))))
+                .andExpect(jsonPath("jobTitle", is(equalTo(dataPublicUserEntity.getJobTitle()))))
+                .andExpect(jsonPath("institution", is(equalTo(dataPublicUserEntity.getInstitution()))))
+                .andExpect(jsonPath("country", is(equalTo(dataPublicUserEntity.getCountry()))));
+    }
+
 }

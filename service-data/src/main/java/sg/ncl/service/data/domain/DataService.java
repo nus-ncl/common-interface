@@ -49,4 +49,6 @@ public interface DataService {
 
     DataLicense getLicense(Long id);
 
+    DataPublicUser createPublicUser(DataPublicUser dataPublicUser);
+
 }
