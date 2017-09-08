@@ -45,8 +45,23 @@ public class AnalyticsController {
         this.analyticsService = analyticsService;
     }
 
-    // Get number of download times for datasets
-    // @GetMapping(value = "/datasets/downloads", params = {"id", "startDate", "endDate"})
+    // Get number of download times for datasets by public users
+    @GetMapping("/datasets/downloads/public")
+    @ResponseStatus(HttpStatus.OK)
+    public List<DataDownloadStatistics> getDataPublicDownloadCount(@AuthenticationPrincipal Object claims,
+                                                                   @RequestParam(value = "id", required = false) Long id,
+                                                                   @RequestParam(value = "startDate", required = false) String startDate,
+                                                                   @RequestParam(value = "endDate", required = false) String endDate) {
+        if (claims == null || !(claims instanceof Claims)) {
+            log.warn("Access denied for: /analytics/datasets/downloads/public GET");
+            throw new UnauthorizedException();
+        }
+        ZonedDateTime start = getZonedDateTime(startDate);
+        ZonedDateTime end = getZonedDateTime(endDate);
+        return analyticsService.getDataPublicDownloadCount(id, start, end);
+    }
+
+    // Get number of download times for datasets by logged-in users
     @GetMapping("/datasets/downloads")
     @ResponseStatus(HttpStatus.OK)
     public List<DataDownloadStatistics> getDataDownloadCount(@AuthenticationPrincipal Object claims,
