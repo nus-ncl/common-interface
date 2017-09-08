@@ -30,6 +30,8 @@ public class FlywayTest {
     private static final String DATA_DOWNLOADS = "data_downloads";
     private static final String DATA_KEYWORDS = "data_keywords";
     private static final String DATA_LICENSES = "data_licenses";
+    private static final String DATA_PUBLIC_DOWNLOADS = "data_public_downloads";
+    private static final String DATA_PUBLIC_USERS = "data_public_users";
     private static final String DATA_RESOURCES = "data_resources";
     private static final String DATA_USERS = "data_users";
     private static final String DETERLAB_PROJECT = "deterlab_project";
@@ -72,6 +74,8 @@ public class FlywayTest {
         this.tables.add(DATA_DOWNLOADS);
         this.tables.add(DATA_KEYWORDS);
         this.tables.add(DATA_LICENSES);
+        this.tables.add(DATA_PUBLIC_DOWNLOADS);
+        this.tables.add(DATA_PUBLIC_USERS);
         this.tables.add(DATA_RESOURCES);
         this.tables.add(DATA_USERS);
         this.tables.add(DETERLAB_PROJECT);
