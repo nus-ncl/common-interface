@@ -368,6 +368,7 @@ public class DataServiceImpl implements DataService {
             }
             try {
                 downloadService.getChunks(response, DATA_DIR_KEY, UriUtils.encode(dataEntity.getName(), UTF_ENCODING), dataResource.getUri());
+                analyticsService.addDataPublicDownloadRecord(did, rid, ZonedDateTime.now(), puid);
             } catch (IOException e) {
                 log.error("Unable to download resource: {}", e);
                 throw new NotFoundException();

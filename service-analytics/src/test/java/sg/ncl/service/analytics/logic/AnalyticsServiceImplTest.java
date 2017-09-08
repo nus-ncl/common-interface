@@ -18,12 +18,15 @@ import sg.ncl.service.analytics.AnalyticsProperties;
 import sg.ncl.service.analytics.data.jpa.DataDownloadEntity;
 import sg.ncl.service.analytics.data.jpa.DataDownloadRepository;
 import sg.ncl.service.analytics.data.jpa.DataDownloadStatistics;
+import sg.ncl.service.analytics.data.jpa.DataPublicDownloadRepository;
 import sg.ncl.service.analytics.domain.AnalyticsService;
 import sg.ncl.service.analytics.exceptions.StartDateAfterEndDateException;
 
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Random;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
@@ -45,6 +48,8 @@ public class AnalyticsServiceImplTest {
     public final ExpectedException exception = ExpectedException.none();
 
     @Mock
+    private DataPublicDownloadRepository dataPublicDownloadRepository;
+    @Mock
     private DataDownloadRepository dataDownloadRepository;
     @Mock
     private AdapterDeterLab adapterDeterLab;
@@ -56,10 +61,11 @@ public class AnalyticsServiceImplTest {
 
     @Before
     public void before() {
+        assertThat(mockingDetails(dataPublicDownloadRepository).isMock()).isTrue();
         assertThat(mockingDetails(dataDownloadRepository).isMock()).isTrue();
         assertThat(mockingDetails(adapterDeterLab).isMock()).isTrue();
         assertThat(mockingDetails(analyticsProperties).isMock()).isTrue();
-        analyticsService = new AnalyticsServiceImpl(dataDownloadRepository, adapterDeterLab, analyticsProperties);
+        analyticsService = new AnalyticsServiceImpl(dataPublicDownloadRepository, dataDownloadRepository, adapterDeterLab, analyticsProperties);
     }
 
     @Test
