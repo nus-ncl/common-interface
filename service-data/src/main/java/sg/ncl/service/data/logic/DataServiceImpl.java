@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.util.UriUtils;
+import sg.ncl.common.exception.base.ForbiddenException;
 import sg.ncl.common.exception.base.NotFoundException;
 import sg.ncl.service.analytics.domain.AnalyticsService;
 import sg.ncl.service.data.data.jpa.*;
@@ -347,6 +348,32 @@ public class DataServiceImpl implements DataService {
         } catch (IOException e) {
             log.error("Unable to download resource: {}", e);
             throw new NotFoundException();
+        }
+    }
+
+    @Override
+    public void downloadPublicOpenResource(HttpServletResponse response, Long did, Long rid, Long puid) {
+        DataPublicUserEntity userEntity = dataPublicUserRepository.getOne(puid);
+        if (userEntity == null) {
+            throw new DataPublicUserNotFoundException("Public user not found.");
+        }
+
+        DataEntity dataEntity = (DataEntity) getDataset(did);
+        if (dataEntity.getVisibility() == DataVisibility.PUBLIC && dataEntity.getAccessibility() == DataAccessibility.OPEN) {
+            List<DataResource> dataResourceEntities = dataEntity.getResources();
+            DataResource dataResource = dataResourceEntities.stream().filter(o -> o.getId().equals(rid)).findFirst().orElse(null);
+            if (dataResource == null) {
+                log.warn("Data resource not found.");
+                throw new DataResourceNotFoundException("Data resource not found.");
+            }
+            try {
+                downloadService.getChunks(response, DATA_DIR_KEY, UriUtils.encode(dataEntity.getName(), UTF_ENCODING), dataResource.getUri());
+            } catch (IOException e) {
+                log.error("Unable to download resource: {}", e);
+                throw new NotFoundException();
+            }
+        } else {
+            throw new ForbiddenException();
         }
     }
 

@@ -41,6 +41,8 @@ public interface DataService {
 
     void downloadResource(HttpServletResponse response, Long did, Long rid, Claims claims);
 
+    void downloadPublicOpenResource(HttpServletResponse response, Long did, Long rid, Long puid);
+
     List<DataCategory> getCategories();
 
     DataCategory getCategory(Long id);

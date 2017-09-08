@@ -7,15 +7,18 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
+import sg.ncl.common.exception.base.BadRequestException;
 import sg.ncl.common.exception.base.UnauthorizedException;
 import sg.ncl.service.data.domain.*;
 import sg.ncl.service.transmission.web.ResumableInfo;
 
 import javax.inject.Inject;
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import java.io.UnsupportedEncodingException;
+import java.util.Enumeration;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -86,6 +89,7 @@ public class DataController {
 
     // Get details about a public data set
     @GetMapping(path = "/{id}", params = {"visibility"})
+    @ResponseStatus(HttpStatus.OK)
     public Data getDatasetByIdAndVisibility(@AuthenticationPrincipal Object claims, @PathVariable Long id, @RequestParam("visibility") DataVisibility visibility) {
         if (claims == null && visibility != DataVisibility.PUBLIC) {
             log.warn("Access denied for: /datasets/" + id + "?visibility=" + visibility);
@@ -232,6 +236,26 @@ public class DataController {
             throw new UnauthorizedException();
         }
         dataService.downloadResource(response, did, rid, (Claims) claims);
+    }
+
+    @GetMapping(path = "/{did}/resources/{rid}/download", params = {"visibility"})
+    public void downloadPublicResource(@AuthenticationPrincipal Object claims,
+                                       @PathVariable Long did, @PathVariable Long rid,
+                                       @RequestParam("visibility") DataVisibility visibility,
+                                       HttpServletResponse response, HttpServletRequest request) {
+        if (claims == null && visibility != DataVisibility.PUBLIC) {
+            log.warn("Access denied for: /datasets/" + did + "/resources/" + rid + "/download?visibility=" + visibility);
+            throw new UnauthorizedException();
+        }
+        Enumeration values = request.getHeaders("PublicUserId");
+        if (values.hasMoreElements()) {
+            String puid = (String) values.nextElement();
+            log.info("Public user id: {}", puid);
+            dataService.downloadPublicOpenResource(response, did, rid, Long.parseLong(puid));
+        } else {
+            log.warn("No public user id provided");
+            throw new BadRequestException();
+        }
     }
 
     @GetMapping(value = "/categories")

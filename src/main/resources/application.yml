@@ -38,6 +38,7 @@ ncl:
       '/authentications': POST # for login
       '/datasets\?visibility=PUBLIC': GET # for retrieving public datasets
       '/datasets/(\w|-)+\?visibility=PUBLIC': GET # for retrieving a public dataset
+      '/datasets/(\w|-)+/resources/(\w|-)+/download\?visibility=PUBLIC': GET # for downloading a public open resource
       '/datasets/categories/(\w|-)+': GET # for retrieving category for public datasets
       '/datasets/licenses/(\w|-)+': GET # for retrieving license for public datasets
       '/datasets/public/users': POST # for saving public download user info
