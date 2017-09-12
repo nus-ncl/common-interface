@@ -34,6 +34,7 @@ import static sg.ncl.service.data.validations.Validator.checkPermissions;
 @Slf4j
 public class DataServiceImpl implements DataService {
 
+    private static final String WARN_TEXT = "Data resource not found.";
     private static final String INFO_TEXT = "Data saved: {}";
     private static final String DATA_DIR_KEY = "dataDir";
     private static final String UTF_ENCODING = "UTF-8";
@@ -223,8 +224,8 @@ public class DataServiceImpl implements DataService {
         List<DataResource> dataResourceEntities = dataEntity.getResources();
         DataResource dataResource = dataResourceEntities.stream().filter(o -> o.getId().equals(rid)).findFirst().orElse(null);
         if (dataResource == null) {
-            log.warn("Data resource not found.");
-            throw new DataResourceNotFoundException("Data resource not found.");
+            log.warn(WARN_TEXT);
+            throw new DataResourceNotFoundException(WARN_TEXT);
         }
         return dataResource;
     }
@@ -363,8 +364,8 @@ public class DataServiceImpl implements DataService {
             List<DataResource> dataResourceEntities = dataEntity.getResources();
             DataResource dataResource = dataResourceEntities.stream().filter(o -> o.getId().equals(rid)).findFirst().orElse(null);
             if (dataResource == null) {
-                log.warn("Data resource not found.");
-                throw new DataResourceNotFoundException("Data resource not found.");
+                log.warn(WARN_TEXT);
+                throw new DataResourceNotFoundException(WARN_TEXT);
             }
             try {
                 downloadService.getChunks(response, DATA_DIR_KEY, UriUtils.encode(dataEntity.getName(), UTF_ENCODING), dataResource.getUri());

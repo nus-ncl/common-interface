@@ -96,64 +96,62 @@ public class AnalyticsServiceImpl implements AnalyticsService {
 
     @Override
     public List<DataDownloadStatistics> getDataPublicDownloadCount(Long dataId, ZonedDateTime startDate, ZonedDateTime endDate) {
-        return getDataDownloadCount(dataId, startDate, endDate, false);
+        List<DataDownloadStatistics> statisticsList;
+        switch (getFlags(dataId, startDate, endDate)) {
+            case 111:
+                statisticsList = dataPublicDownloadRepository.findDownloadCountByDataIdAndDownloadDateBetween(dataId, startDate, endDate);
+                break;
+            case 110:
+                statisticsList = dataPublicDownloadRepository.findDownloadCountByDataIdAndDownloadDateAfter(dataId, startDate);
+                break;
+            case 101:
+                statisticsList = dataPublicDownloadRepository.findDownloadCountByDataIdAndDownloadDateBefore(dataId, endDate);
+                break;
+            case 100:
+                statisticsList = dataPublicDownloadRepository.findDownloadCountByDataId(dataId);
+                break;
+            case 11:
+                statisticsList = dataPublicDownloadRepository.findDownloadCountByDownloadDateBetween(startDate, endDate);
+                break;
+            case 10:
+                statisticsList = dataPublicDownloadRepository.findDownloadCountByDownloadDateAfter(startDate);
+                break;
+            case 1:
+                statisticsList = dataPublicDownloadRepository.findDownloadCountByDownloadDateBefore(endDate);
+                break;
+            default:
+                statisticsList = dataPublicDownloadRepository.findDownloadCount();
+        }
+        return statisticsList;
     }
 
     @Override
     public List<DataDownloadStatistics> getDataDownloadCount(Long dataId, ZonedDateTime startDate, ZonedDateTime endDate) {
-        return getDataDownloadCount(dataId, startDate, endDate, true);
-    }
-
-    private List<DataDownloadStatistics> getDataDownloadCount(Long dataId, ZonedDateTime startDate, ZonedDateTime endDate, boolean nonPublic) {
         List<DataDownloadStatistics> statisticsList;
         switch (getFlags(dataId, startDate, endDate)) {
             case 111:
-                if (nonPublic)
-                    statisticsList = dataDownloadRepository.findDownloadCountByDataIdAndDownloadDateBetween(dataId, startDate, endDate);
-                else
-                    statisticsList = dataPublicDownloadRepository.findDownloadCountByDataIdAndDownloadDateBetween(dataId, startDate, endDate);
+                statisticsList = dataDownloadRepository.findDownloadCountByDataIdAndDownloadDateBetween(dataId, startDate, endDate);
                 break;
             case 110:
-                if (nonPublic)
-                    statisticsList = dataDownloadRepository.findDownloadCountByDataIdAndDownloadDateAfter(dataId, startDate);
-                else
-                    statisticsList = dataPublicDownloadRepository.findDownloadCountByDataIdAndDownloadDateAfter(dataId, startDate);
+                statisticsList = dataDownloadRepository.findDownloadCountByDataIdAndDownloadDateAfter(dataId, startDate);
                 break;
             case 101:
-                if (nonPublic)
-                    statisticsList = dataDownloadRepository.findDownloadCountByDataIdAndDownloadDateBefore(dataId, endDate);
-                else
-                    statisticsList = dataPublicDownloadRepository.findDownloadCountByDataIdAndDownloadDateBefore(dataId, endDate);
+                statisticsList = dataDownloadRepository.findDownloadCountByDataIdAndDownloadDateBefore(dataId, endDate);
                 break;
             case 100:
-                if (nonPublic)
-                    statisticsList = dataDownloadRepository.findDownloadCountByDataId(dataId);
-                else
-                    statisticsList = dataPublicDownloadRepository.findDownloadCountByDataId(dataId);
+                statisticsList = dataDownloadRepository.findDownloadCountByDataId(dataId);
                 break;
             case 11:
-                if (nonPublic)
-                    statisticsList = dataDownloadRepository.findDownloadCountByDownloadDateBetween(startDate, endDate);
-                else
-                    statisticsList = dataPublicDownloadRepository.findDownloadCountByDownloadDateBetween(startDate, endDate);
+                statisticsList = dataDownloadRepository.findDownloadCountByDownloadDateBetween(startDate, endDate);
                 break;
             case 10:
-                if (nonPublic)
-                    statisticsList = dataDownloadRepository.findDownloadCountByDownloadDateAfter(startDate);
-                else
-                    statisticsList = dataPublicDownloadRepository.findDownloadCountByDownloadDateAfter(startDate);
+                statisticsList = dataDownloadRepository.findDownloadCountByDownloadDateAfter(startDate);
                 break;
             case 1:
-                if (nonPublic)
-                    statisticsList = dataDownloadRepository.findDownloadCountByDownloadDateBefore(endDate);
-                else
-                    statisticsList = dataPublicDownloadRepository.findDownloadCountByDownloadDateBefore(endDate);
+                statisticsList = dataDownloadRepository.findDownloadCountByDownloadDateBefore(endDate);
                 break;
             default:
-                if (nonPublic)
-                    statisticsList = dataDownloadRepository.findDownloadCount();
-                else
-                    statisticsList = dataPublicDownloadRepository.findDownloadCount();
+                statisticsList = dataDownloadRepository.findDownloadCount();
         }
         return statisticsList;
     }
