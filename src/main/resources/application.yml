@@ -62,7 +62,7 @@ ncl:
   jwt:
     api-key: ${jwt.key:}
     signing-algorithm: HS512
-    expiry-duration: PT1H
+    expiry-duration: PT8H
   mail:
     delay: 10_000
   accounting:
