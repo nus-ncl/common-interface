@@ -40,7 +40,7 @@ public class Validator {
     }
 
     public static void checkAccessibility(final Data data, final Claims claims) {
-        if (data.getAccessibility().equals(DataAccessibility.RESTRICTED)) {
+        if (!data.getAccessibility().equals(DataAccessibility.OPEN)) {
             if (claims == null) {
                 log.warn("Restricted resources for public data set");
                 throw new ForbiddenException();
@@ -55,8 +55,13 @@ public class Validator {
             log.info("Role of requester from web: {}", claims.get(JwtToken.KEY));
             String contextUserId = claims.getSubject();
 
-            if (!isContributor(data, contextUserId) && !isApprovedUser(data, contextUserId)) {
-                throw new ForbiddenException();
+            if (data.getAccessibility().equals(DataAccessibility.RESTRICTED)) {
+                if (!isContributor(data, contextUserId) && !isApprovedUser(data, contextUserId)) {
+                    throw new ForbiddenException();
+                }
+            } else if (data.getAccessibility().equals(DataAccessibility.QUARANTINED)) {
+                if (!isContributor(data, contextUserId))
+                    throw new ForbiddenException();
             }
         }
     }
