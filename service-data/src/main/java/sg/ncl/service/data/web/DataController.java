@@ -8,6 +8,7 @@ import org.springframework.http.MediaType;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import sg.ncl.common.exception.base.BadRequestException;
+import sg.ncl.common.exception.base.ForbiddenException;
 import sg.ncl.common.exception.base.UnauthorizedException;
 import sg.ncl.service.data.domain.*;
 import sg.ncl.service.transmission.web.ResumableInfo;
@@ -63,7 +64,15 @@ public class DataController {
             log.warn("Access denied for: /datasets GET");
             throw new UnauthorizedException();
         }
-        return dataService.getDatasets().stream().map(DataInfo::new).collect(Collectors.toList());
+        try {
+            isAdmin((Claims) claims);
+            return dataService.getDatasets().stream().map(DataInfo::new).collect(Collectors.toList());
+        } catch (ForbiddenException e) {
+            String contextUserId = ((Claims) claims).getSubject();
+            return dataService.getDatasets().stream()
+                    .filter(d -> !(d.getVisibility() == DataVisibility.PRIVATE && !d.getContributorId().equals(contextUserId)))
+                    .map(DataInfo::new).collect(Collectors.toList());
+        }
     }
 
     // Get a list of public data sets
