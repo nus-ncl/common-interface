@@ -93,7 +93,18 @@ public class DataController {
         if (claims == null || !(claims instanceof Claims)) {
             throw new UnauthorizedException();
         }
-        return new DataInfo(dataService.getDataset(id));
+        try {
+            isAdmin((Claims) claims);
+            return new DataInfo(dataService.getDataset(id));
+        } catch (ForbiddenException e) {
+            String contextUserId = ((Claims) claims).getSubject();
+            Data data = dataService.getDataset(id);
+            if (!(data.getVisibility() == DataVisibility.PRIVATE && !data.getContributorId().equals(contextUserId))) {
+                return new DataInfo(data);
+            } else {
+                throw new ForbiddenException();
+            }
+        }
     }
 
     // Get details about a public data set
