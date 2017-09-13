@@ -342,13 +342,17 @@ public class DataServiceImpl implements DataService {
         DataEntity dataEntity = (DataEntity) getDataset(did);
         checkAccessibility(dataEntity, claims);
 
-        DataResource dataResource = findResourceById(did, rid, claims);
-        try {
-            downloadService.getChunks(response, DATA_DIR_KEY, UriUtils.encode(dataEntity.getName(), UTF_ENCODING), dataResource.getUri());
-            analyticsService.addDataDownloadRecord(did, rid, ZonedDateTime.now(), claims.getSubject());
-        } catch (IOException e) {
-            log.error("Unable to download resource: {}", e);
-            throw new NotFoundException();
+        if (dataEntity.getVisibility() != DataVisibility.PRIVATE || dataEntity.getContributorId().equals(claims.getSubject())) {
+            DataResource dataResource = findResourceById(did, rid, claims);
+            try {
+                downloadService.getChunks(response, DATA_DIR_KEY, UriUtils.encode(dataEntity.getName(), UTF_ENCODING), dataResource.getUri());
+                analyticsService.addDataDownloadRecord(did, rid, ZonedDateTime.now(), claims.getSubject());
+            } catch (IOException e) {
+                log.error("Unable to download resource: {}", e);
+                throw new NotFoundException();
+            }
+        } else {
+            throw new ForbiddenException();
         }
     }
 
