@@ -260,7 +260,7 @@ public class DataController {
         if (values.hasMoreElements()) {
             String puid = (String) values.nextElement();
             log.info("Public user id: {}", puid);
-            dataService.downloadPublicOpenResource(response, did, rid, Long.parseLong(puid));
+            dataService.downloadPublicOpenResource(response, did, rid, Long.valueOf(puid));
         } else {
             log.warn("No public user id provided");
             throw new BadRequestException();
