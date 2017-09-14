@@ -23,4 +23,6 @@ public interface ExperimentService {
 
     String getTopology(String teamId, Long expId);
 
+    String requestInternet(String teamId, Long expId, String reason);
+
 }

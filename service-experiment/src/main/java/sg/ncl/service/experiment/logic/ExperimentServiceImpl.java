@@ -1,10 +1,13 @@
 package sg.ncl.service.experiment.logic;
 
+import freemarker.template.Template;
+import freemarker.template.TemplateException;
 import io.jsonwebtoken.Claims;
 import lombok.extern.slf4j.Slf4j;
 import org.json.JSONObject;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.ui.freemarker.FreeMarkerTemplateUtils;
 import sg.ncl.adapter.deterlab.AdapterDeterLab;
 import sg.ncl.adapter.deterlab.ConnectionProperties;
 import sg.ncl.common.exception.base.ForbiddenException;
@@ -15,11 +18,13 @@ import sg.ncl.service.experiment.domain.ExperimentService;
 import sg.ncl.service.experiment.exceptions.ExperimentNameAlreadyExistsException;
 import sg.ncl.service.experiment.exceptions.TeamIdNullOrEmptyException;
 import sg.ncl.service.experiment.exceptions.UserIdNullOrEmptyException;
+import sg.ncl.service.mail.domain.MailService;
 import sg.ncl.service.realization.data.jpa.RealizationEntity;
 import sg.ncl.service.realization.domain.RealizationService;
 import sg.ncl.service.team.domain.TeamService;
 
 import javax.inject.Inject;
+import javax.inject.Named;
 import javax.validation.constraints.NotNull;
 import java.io.File;
 import java.io.FileOutputStream;
@@ -31,7 +36,7 @@ import java.util.stream.Collectors;
 import static sg.ncl.service.experiment.validation.Validator.checkPermissions;
 
 /**
- * Created by Desmond.
+ * @Author: Desmond, Vu
  */
 @Service
 @Slf4j
@@ -42,15 +47,26 @@ public class ExperimentServiceImpl implements ExperimentService {
     private final RealizationService realizationService;
     private final ConnectionProperties adapterConnectionProperties;
     private final TeamService teamService;
+    private final MailService mailService;
+    private final Template internetRequestTemplate;
+
 
     @Inject
-    ExperimentServiceImpl(@NotNull final ExperimentRepository experimentRepository, @NotNull final AdapterDeterLab adapterDeterLab, @NotNull final RealizationService realizationService, @NotNull final ConnectionProperties connectionProperties, @NotNull final TeamService teamService) {
+    ExperimentServiceImpl(@NotNull final ExperimentRepository experimentRepository,
+                          @NotNull final AdapterDeterLab adapterDeterLab,
+                          @NotNull final RealizationService realizationService,
+                          @NotNull final ConnectionProperties connectionProperties,
+                          @NotNull final TeamService teamService,
+                          @NotNull final MailService mailService,
+                          @NotNull @Named("internetRequestTemplate") final Template internetRequestTemplate) {
         this.experimentRepository = experimentRepository;
         this.adapterDeterLab = adapterDeterLab;
         this.realizationService = realizationService;
         this.adapterConnectionProperties = connectionProperties;
         // FIXME Do not expose the internal workings of the DeterLab adapter to the experiment service; i.e., should not need to inject ConnectionProperties
         this.teamService = teamService;
+        this.mailService = mailService;
+        this.internetRequestTemplate =  internetRequestTemplate;
     }
 
     /**
@@ -279,5 +295,35 @@ public class ExperimentServiceImpl implements ExperimentService {
         jsonObject.put("eid", experimentName);
 
         return adapterDeterLab.getTopologyThumbnail(jsonObject.toString());
+    }
+
+    @Override
+    public String requestInternet(String teamId, Long expId, String reason) {
+        log.info("Requesting internet for Experiment: {} from Team: {}", expId, teamId);
+
+        Experiment experimentEntity = experimentRepository.getOne(expId);
+        String teamName = experimentEntity.getTeamName();
+        String experimentName = experimentEntity.getName();
+
+        final Map<String, String> map = new HashMap<>();
+       // map.put()
+
+        try {
+            String[] to = new String[1];
+            to[0] = "support@ncl.sg";
+
+            String[] cc = new String[1];
+            cc[0] = "support@ncl.sg";
+
+            String msgText = FreeMarkerTemplateUtils.processTemplateIntoString(internetRequestTemplate, map);
+
+            mailService.send("NCL Testbed Ops <testbed-ops@ncl.sg>", to , "Internet access request", msgText, false, cc, null);
+
+            log.debug("Email sent: {}", msgText);
+        } catch (IOException | TemplateException e) {
+            log.warn("{}", e);
+        }
+
+        return reason;
     }
 }

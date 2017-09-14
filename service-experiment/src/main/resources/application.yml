@@ -1,0 +1,14 @@
+spring:
+  logging:
+    level:
+      sg.ncl.service.data: DEBUG
+  mail:
+      host: smtp-relay.gmail.com
+      port: 465
+      username: ${gmail.username}
+      password: ${gmail.password}
+      protocol: smtps
+      properties:
+        starttls:
+          enable: true
+        auth: true
