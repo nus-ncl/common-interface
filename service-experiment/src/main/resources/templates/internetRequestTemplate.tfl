@@ -3,9 +3,9 @@ Dear Testbed Admin,
 You have an internet request.
 The details of the request are as follows:
 
-Requester:
-Experiment name:
-Request Reason:
+Requester: ${teamName}
+Experiment name: ${expName}
+Request Reason: ${reason}
 
 Ignore this email if you do not agree to the request.
 

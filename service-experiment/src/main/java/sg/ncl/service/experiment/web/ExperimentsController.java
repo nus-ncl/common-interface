@@ -91,9 +91,7 @@ public class ExperimentsController {
 
     @PostMapping(path= "/teams/{teamId}/experiments/{expId}/internet")
     @ResponseStatus(HttpStatus.CREATED) //ask james
-    public String requestInternet(@AuthenticationPrincipal Objects claim, @PathVariable String teamId, @PathVariable Long expId, @RequestBody String reason) {
-        checkClaimsType(claim);
-        log.info("teamname is: " + teamId);
+    public String requestInternet(@PathVariable String teamId, @PathVariable Long expId, @RequestBody String reason) {
         final JSONObject jsonObject = new JSONObject(reason);
         return experimentService.requestInternet(teamId, expId, jsonObject.getString("reason"));
     }

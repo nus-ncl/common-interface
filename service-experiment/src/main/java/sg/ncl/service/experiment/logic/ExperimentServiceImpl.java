@@ -306,24 +306,29 @@ public class ExperimentServiceImpl implements ExperimentService {
         String experimentName = experimentEntity.getName();
 
         final Map<String, String> map = new HashMap<>();
-       // map.put()
+        map.put("teamName", teamName);
+        map.put("expName", experimentName);
+        map.put("reason", reason);
 
         try {
+            String from = "NCL Testbed Ops <testbed-ops@ncl.sg>";
+
             String[] to = new String[1];
             to[0] = "support@ncl.sg";
+
+            String subject = "Internet access request";
 
             String[] cc = new String[1];
             cc[0] = "support@ncl.sg";
 
             String msgText = FreeMarkerTemplateUtils.processTemplateIntoString(internetRequestTemplate, map);
 
-            mailService.send("NCL Testbed Ops <testbed-ops@ncl.sg>", to , "Internet access request", msgText, false, cc, null);
+            mailService.send(from , to , subject, msgText, false, cc, null);
 
             log.debug("Email sent: {}", msgText);
         } catch (IOException | TemplateException e) {
             log.warn("{}", e);
         }
-
         return reason;
     }
 }
