@@ -1,13 +1,14 @@
 Dear Testbed Admin,
 
 You have an internet request.
+
 The details of the request are as follows:
 
 Requester: ${teamName}
 Experiment name: ${expName}
 Request Reason: ${reason}
 
-Ignore this email if you do not agree to the request.
+Ignore this email if you do not approve to the request.
 
 Regards,
 NCL Operations

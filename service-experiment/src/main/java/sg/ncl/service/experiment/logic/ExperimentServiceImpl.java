@@ -318,14 +318,11 @@ public class ExperimentServiceImpl implements ExperimentService {
 
             String subject = "Internet access request";
 
-            String[] cc = new String[1];
-            cc[0] = "support@ncl.sg";
-
             String msgText = FreeMarkerTemplateUtils.processTemplateIntoString(internetRequestTemplate, map);
 
-            mailService.send(from , to , subject, msgText, false, cc, null);
+            mailService.send(from , to , subject, msgText, false, null, null);
 
-            log.debug("Email sent: {}", msgText);
+            log.info("Email sent: {}", msgText);
         } catch (IOException | TemplateException e) {
             log.warn("{}", e);
         }
