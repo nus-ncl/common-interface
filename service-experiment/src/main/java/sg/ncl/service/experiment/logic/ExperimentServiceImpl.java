@@ -36,7 +36,7 @@ import java.util.stream.Collectors;
 import static sg.ncl.service.experiment.validation.Validator.checkPermissions;
 
 /**
- * @Author: Desmond, Vu
+ * @Authors: Desmond, Tran Ly Vu
  */
 @Service
 @Slf4j
@@ -297,6 +297,14 @@ public class ExperimentServiceImpl implements ExperimentService {
         return adapterDeterLab.getTopologyThumbnail(jsonObject.toString());
     }
 
+    /**
+     * Send email to ncl support to notify internet access request
+     *
+     * @param expId  the experiment id (DB UUID), i.e. not the experiment name
+     * @param teamId the team id
+     *
+     * @return
+     */
     @Override
     public String requestInternet(String teamId, Long expId, String reason) {
         log.info("Requesting internet for Experiment: {} from Team: {}", expId, teamId);

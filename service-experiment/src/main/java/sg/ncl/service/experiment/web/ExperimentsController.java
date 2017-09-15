@@ -21,13 +21,12 @@ import javax.inject.Inject;
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import java.util.List;
-import java.util.Objects;
 import java.util.stream.Collectors;
 
 import static sg.ncl.common.validation.Validator.checkClaimsType;
 
 /**
- * Created by Desmond Lim
+ * @Authors: Desmond Lim, Tran Ly Vu
  */
 @RestController
 @RequestMapping(path = ExperimentsController.PATH, produces = MediaType.APPLICATION_JSON_VALUE)
@@ -90,7 +89,7 @@ public class ExperimentsController {
     }
 
     @PostMapping(path= "/teams/{teamId}/experiments/{expId}/internet")
-    @ResponseStatus(HttpStatus.CREATED) //ask james
+    @ResponseStatus(HttpStatus.CREATED)
     public String requestInternet(@PathVariable String teamId, @PathVariable Long expId, @RequestBody String reason) {
         final JSONObject jsonObject = new JSONObject(reason);
         return experimentService.requestInternet(teamId, expId, jsonObject.getString("reason"));
