@@ -1,5 +1,7 @@
 package sg.ncl.service.experiment.domain;
 
+import java.time.ZonedDateTime;
+
 /**
  * The {@link Experiment} interface represents a realization.
  * <p>
@@ -31,5 +33,9 @@ public interface Experiment {
     Integer getIdleSwap();
 
     Integer getMaxDuration();
+
+    ZonedDateTime getCreatedDate();
+
+    ZonedDateTime getLastModifiedDate();
 }
 
