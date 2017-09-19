@@ -53,6 +53,14 @@ public class ExperimentServiceImpl implements ExperimentService {
         this.teamService = teamService;
     }
 
+    @Override
+    public Experiment get(Long id) {
+        if (id == null) {
+            return null;
+        }
+        return experimentRepository.findOne(id);
+    }
+
     /**
      * Creates an experiment and realization object on DB.
      * Also creates the experiment on Deterlab DB.

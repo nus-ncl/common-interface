@@ -48,6 +48,12 @@ public class ExperimentsController {
         return experimentService.getAll().stream().map(ExperimentInfo::new).collect(Collectors.toList());
     }
 
+    @GetMapping(path = "/{id}")
+    @ResponseStatus(HttpStatus.OK)
+    public  Experiment getExperiment(@PathVariable Long id) {
+        return new ExperimentInfo(experimentService.get(id));
+    }
+
     // returns experiments that the user is part of
     @GetMapping(path = "/users/{id}")
     // FIXME: path is wrong "/experiments/users/{id}" should be "/users/{id}/experiments"

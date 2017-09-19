@@ -9,6 +9,8 @@ import java.util.List;
  */
 public interface ExperimentService {
 
+    Experiment get(Long id);
+
     Experiment save(Experiment experiment);
 
     List<Experiment> getAll();
