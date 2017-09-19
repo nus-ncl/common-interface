@@ -1,5 +1,6 @@
 package sg.ncl.service.experiment.logic;
 
+import freemarker.template.Template;
 import io.jsonwebtoken.Claims;
 import org.junit.Before;
 import org.junit.Rule;
@@ -20,6 +21,7 @@ import sg.ncl.service.experiment.domain.ExperimentService;
 import sg.ncl.service.experiment.exceptions.ExperimentNameAlreadyExistsException;
 import sg.ncl.service.experiment.exceptions.TeamIdNullOrEmptyException;
 import sg.ncl.service.experiment.exceptions.UserIdNullOrEmptyException;
+import sg.ncl.service.mail.domain.MailService;
 import sg.ncl.service.realization.data.jpa.RealizationEntity;
 import sg.ncl.service.realization.domain.RealizationService;
 import sg.ncl.service.team.domain.TeamService;
@@ -36,7 +38,7 @@ import static sg.ncl.service.experiment.util.TestUtil.getExperimentEntity;
 import static sg.ncl.service.experiment.util.TestUtil.getRealizationEntity;
 
 /**
- * @author Te Ye
+ * @authors: Te Ye, Tran Ly Vu
  */
 public class ExperimentServiceTest {
 
@@ -56,6 +58,10 @@ public class ExperimentServiceTest {
     @Mock
     private ConnectionProperties adapterConnectionProperties;
     @Mock
+    private MailService mailService;
+    @Mock
+    private Template internetRequestTemplate;
+    @Mock
     private Claims claims;
 
     private ExperimentService experimentService;
@@ -67,8 +73,10 @@ public class ExperimentServiceTest {
         assertThat(mockingDetails(realizationService).isMock()).isTrue();
         assertThat(mockingDetails(adapterConnectionProperties).isMock()).isTrue();
         assertThat(mockingDetails(teamService).isMock()).isTrue();
+        assertThat(mockingDetails(mailService).isMock()).isTrue();
+        assertThat(mockingDetails(internetRequestTemplate).isMock()).isTrue();
 
-        experimentService = new ExperimentServiceImpl(experimentRepository, adapterDeterLab, realizationService, adapterConnectionProperties, teamService);
+        experimentService = new ExperimentServiceImpl(experimentRepository, adapterDeterLab, realizationService, adapterConnectionProperties, teamService, mailService, internetRequestTemplate);
     }
 
     @Test
