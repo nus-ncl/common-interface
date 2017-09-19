@@ -302,12 +302,18 @@ public class ExperimentServiceImpl implements ExperimentService {
      *
      * @param expId  the experiment id (DB UUID), i.e. not the experiment name
      * @param teamId the team id
+     * @param reason the reason for internet access request
      *
-     * @return
+     * @return experiment with requested internet access
      */
     @Override
-    public String requestInternet(String teamId, Long expId, String reason) {
+    public Experiment requestInternet(String teamId, Long expId, String reason, final Claims claims) {
+
         log.info("Requesting internet for Experiment: {} from Team: {}", expId, teamId);
+        RealizationEntity realizationEntity = realizationService.getByExperimentId(expId);
+
+        // put the check inside here because we do not want to add the realization service and team service on the controller
+        checkPermissions(realizationEntity, teamService.isOwner(teamId, claims.getSubject()), claims);
 
         Experiment experimentEntity = experimentRepository.getOne(expId);
         String teamName = experimentEntity.getTeamName();
@@ -332,8 +338,10 @@ public class ExperimentServiceImpl implements ExperimentService {
 
             log.info("Email sent: {}", msgText);
         } catch (IOException | TemplateException e) {
-            log.warn("{}", e);
+            log.warn("Error sending email for internet access request: {}", e);
         }
-        return reason;
+
+        log.info("Successfully sending email for internet request for Experiment: {} from Team: {}", expId, teamId);
+        return experimentEntity;
     }
 }

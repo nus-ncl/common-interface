@@ -5,7 +5,7 @@ import io.jsonwebtoken.Claims;
 import java.util.List;
 
 /**
- * Created by Desmond.
+ * @Authors: Desmond, Tran Ly Vu
  */
 public interface ExperimentService {
 
@@ -23,6 +23,6 @@ public interface ExperimentService {
 
     String getTopology(String teamId, Long expId);
 
-    String requestInternet(String teamId, Long expId, String reason);
+    Experiment requestInternet(String teamId, Long expId, String reason, Claims claims);
 
 }
