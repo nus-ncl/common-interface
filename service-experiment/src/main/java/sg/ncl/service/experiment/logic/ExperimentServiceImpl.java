@@ -270,6 +270,26 @@ public class ExperimentServiceImpl implements ExperimentService {
     }
 
     /**
+     * Get the activity log from deterlab
+     *
+     * @param teamId    the team to get the exp for
+     * @param expId     the experiment to get the activity log
+     * @return  a json dump of the activity log from deterlab in the format: { "msg" : "get activity log success/fail", "activity_log" : "deterlab experiment activity log" }
+     * Otherwise, returns an empty "{}"
+     */
+    public String getActivityLog(String teamId, Long expId) {
+        Experiment experimentEntity = experimentRepository.getOne(expId);
+        String teamName = experimentEntity.getTeamName();
+        String experimentName = experimentEntity.getName();
+
+        JSONObject jsonObject = new JSONObject();
+        jsonObject.put("pid", teamName);
+        jsonObject.put("eid", experimentName);
+
+        return adapterDeterLab.getActivityLog(jsonObject.toString());
+    }
+
+    /**
      * Get the network topology map thumbnail from deterlab.
      *
      * @param teamId    the team to get the exp for

@@ -19,7 +19,9 @@ import sg.ncl.service.experiment.domain.ExperimentService;
 import javax.inject.Inject;
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 import static sg.ncl.common.validation.Validator.checkClaimsType;
@@ -85,6 +87,12 @@ public class ExperimentsController {
         log.info("Delete experiment User principal: " + claims);
         checkClaimsType(claims);
         return new ExperimentInfo(experimentService.deleteExperiment(expId, teamId, (Claims) claims));
+    }
+
+    @GetMapping(path = "/teams/{teamId}/experiments/{expId}/activityLog")
+    // FIXME: NEEDS REFACTORING
+    public String getActivityLog(@PathVariable String teamId, @PathVariable Long expId) {
+        return experimentService.getActivityLog(teamId, expId);
     }
 
     @GetMapping(path = "/teams/{teamId}/experiments/{expId}/topology")

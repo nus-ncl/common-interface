@@ -77,6 +77,10 @@ public class ConnectionProperties {
         return HTTP_MODE + ip + ":" + port + "/rejectProject";
     }
 
+    public String getActivityLog() {
+        return HTTP_MODE + ip + ":" + port + "/getActivityLog";
+    }
+
     public String getExpStatus() {
         return HTTP_MODE + ip + ":" + port + "/getExpStatus";
     }

@@ -662,6 +662,30 @@ public class AdapterDeterLab {
         }
     }
 
+    public String getActivityLog(String jsonString) {
+        log.info("Getting activity log...");
+
+        HttpHeaders headers = new HttpHeaders();
+        HttpEntity<String> request = new HttpEntity<>(jsonString, headers);
+        ResponseEntity response;
+
+        try {
+            response = restTemplate.exchange(properties.getActivityLog(), HttpMethod.POST, request, String.class);
+            String responseBody = response.getBody().toString();
+            String deterMessage = new JSONObject(responseBody).getString("msg");
+
+            if ("get activity log success".equals(deterMessage)) {
+                log.info("Get activity log OK");
+                return responseBody;
+            } else {
+                log.warn("Get activity log FAIL");
+            }
+        } catch (RestClientException e) {
+            log.warn("DeterLab connection error get activity log: {}", e);
+        }
+        return "{}";
+    }
+
     public String getFreeNodes() {
         log.info("Getting free nodes...");
 
