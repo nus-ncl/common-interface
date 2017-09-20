@@ -25,7 +25,10 @@ public interface ExperimentService {
 
     String getActivityLog(String teamId, Long expId);
 
+    String getExperimentDetails(String teamId, Long expId);
+
     String getTopology(String teamId, Long expId);
 
     String getNSFile(String teamId, Long expId);
+
 }

@@ -103,6 +103,13 @@ public class ExperimentsController {
         return experimentService.getNSFile(teamId, expId);
     }
 
+    @GetMapping(path = "/teams/{teamId}/experiments/{expId}/experimentDetails")
+    // FIXME: NEEDS REFACTORING
+    @ResponseStatus(HttpStatus.OK)
+    public String getExperimentDetails(@PathVariable String teamId, @PathVariable Long expId) {
+        return experimentService.getExperimentDetails(teamId, expId);
+    }
+
     @GetMapping(path = "/teams/{teamId}/experiments/{expId}/topology")
     @ResponseStatus(HttpStatus.OK)
     public String getTopology(@PathVariable String teamId, @PathVariable Long expId) {

@@ -686,6 +686,30 @@ public class AdapterDeterLab {
         return "{}";
     }
 
+    public String getExperimentDetails(String jsonString) {
+        log.info("Getting experiment details...");
+
+        HttpHeaders headers = new HttpHeaders();
+        HttpEntity<String> request = new HttpEntity<>(jsonString, headers);
+        ResponseEntity response;
+
+        try {
+            response = restTemplate.exchange(properties.getExpDetails(), HttpMethod.POST, request, String.class);
+            String responseBody = response.getBody().toString();
+            String deterMessage = new JSONObject(responseBody).getString("msg");
+
+            if ("get experiment details success".equals(deterMessage)) {
+                log.info("Get experiment details OK");
+                return responseBody;
+            } else {
+                log.warn("Get experiment details FAIL");
+            }
+        } catch (RestClientException e) {
+            log.warn("DeterLab connection error get experiment details: {}", e);
+        }
+        return "{}";
+    }
+
     public String getFreeNodes() {
         log.info("Getting free nodes...");
 

@@ -81,6 +81,10 @@ public class ConnectionProperties {
         return HTTP_MODE + ip + ":" + port + "/getActivityLog";
     }
 
+    public String getExpDetails() {
+        return HTTP_MODE + ip + ":" + port + "/getExpDetails";
+    }
+
     public String getExpStatus() {
         return HTTP_MODE + ip + ":" + port + "/getExpStatus";
     }
