@@ -290,6 +290,27 @@ public class ExperimentServiceImpl implements ExperimentService {
     }
 
     /**
+     * Get ns file from deterlab
+     *
+     * @param teamId    the team to get the exp for
+     * @param expId     the experiment to get the activity log
+     * @return  a json dump of the ns file from deterlab in the format: { "msg" : "get ns file success/fail", "ns_file" : "deterlab ns file" }
+     * Otherwise, returns an empty "{}"
+     */
+    @Override
+    public String getNSFile(String teamId, Long expId) {
+        Experiment experimentEntity = experimentRepository.getOne(expId);
+        String teamName = experimentEntity.getTeamName();
+        String experimentName = experimentEntity.getName();
+
+        JSONObject jsonObject = new JSONObject();
+        jsonObject.put("pid", teamName);
+        jsonObject.put("eid", experimentName);
+
+        return adapterDeterLab.getNSFile(jsonObject.toString());
+    }
+
+    /**
      * Get the network topology map thumbnail from deterlab.
      *
      * @param teamId    the team to get the exp for

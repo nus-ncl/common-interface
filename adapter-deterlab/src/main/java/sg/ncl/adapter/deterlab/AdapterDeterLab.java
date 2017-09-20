@@ -718,6 +718,30 @@ public class AdapterDeterLab {
         return response.getBody().toString();
     }
 
+    public String getNSFile(String jsonString) {
+        log.info("Getting ns file...");
+
+        HttpHeaders headers = new HttpHeaders();
+        HttpEntity<String> request = new HttpEntity<>(jsonString, headers);
+        ResponseEntity response;
+
+        try {
+            response = restTemplate.exchange(properties.getNSFile(), HttpMethod.POST, request, String.class);
+            String responseBody = response.getBody().toString();
+            String deterMessage = new JSONObject(responseBody).getString("msg");
+
+            if ("get ns file success".equals(deterMessage)) {
+                log.info("Get ns file OK");
+                return responseBody;
+            } else {
+                log.warn("Get ns file FAIL");
+            }
+        } catch (RestClientException e) {
+            log.warn("DeterLab connection error get ns file: {}", e);
+        }
+        return "{}";
+    }
+
     /**
      * @return number of logged in users at the current time
      */

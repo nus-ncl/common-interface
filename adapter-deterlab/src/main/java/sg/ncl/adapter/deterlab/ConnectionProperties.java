@@ -97,6 +97,10 @@ public class ConnectionProperties {
         return HTTP_MODE + ip + ":" + port + "/getNodesStatus";
     }
 
+    public String getNSFile() {
+        return HTTP_MODE + ip + ":" + port + "/getNSFile";
+    }
+
     public String getRunningExperimentsCount() {
         return HTTP_MODE + ip + ":" + port + "/getRunningExperimentsCount";
     }
