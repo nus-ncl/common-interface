@@ -2,8 +2,6 @@
 # For more information, please read http://docs.spring.io/spring-boot/docs/current/reference/html/index.html
 server:
   port: 8080
-  session:
-    timeout: 28800
 spring:
   datasource:
     url: ${jdbc.url:} # e.g., jdbc:mysql://localhost:3306/ncl?useSSL=false
@@ -64,7 +62,7 @@ ncl:
   jwt:
     api-key: ${jwt.key:}
     signing-algorithm: HS512
-    expiry-duration: PT8H
+    expiry-duration: PT6H
   mail:
     delay: 10_000
   accounting:
