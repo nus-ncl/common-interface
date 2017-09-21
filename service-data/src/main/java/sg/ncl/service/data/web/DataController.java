@@ -7,15 +7,19 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
+import sg.ncl.common.exception.base.BadRequestException;
+import sg.ncl.common.exception.base.ForbiddenException;
 import sg.ncl.common.exception.base.UnauthorizedException;
 import sg.ncl.service.data.domain.*;
 import sg.ncl.service.transmission.web.ResumableInfo;
 
 import javax.inject.Inject;
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import java.io.UnsupportedEncodingException;
+import java.util.Enumeration;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -60,15 +64,23 @@ public class DataController {
             log.warn("Access denied for: /datasets GET");
             throw new UnauthorizedException();
         }
-        return dataService.getDatasets().stream().map(DataInfo::new).collect(Collectors.toList());
+        try {
+            isAdmin((Claims) claims);
+            return dataService.getDatasets().stream().map(DataInfo::new).collect(Collectors.toList());
+        } catch (ForbiddenException e) {
+            String contextUserId = ((Claims) claims).getSubject();
+            return dataService.getDatasets().stream()
+                    .filter(d -> !(d.getVisibility() == DataVisibility.PRIVATE && !d.getContributorId().equals(contextUserId)))
+                    .map(DataInfo::new).collect(Collectors.toList());
+        }
     }
 
     // Get a list of public data sets
     @GetMapping(params = {"visibility"})
     @ResponseStatus(HttpStatus.OK)
-    public List<Data> getDatasetsByVisibility(@AuthenticationPrincipal Object claims, @RequestParam("visibility") DataVisibility visibility) {
-        if (claims == null && visibility != DataVisibility.PUBLIC) {
-            log.warn("Access denied for: /datasets/?visibility=" + visibility);
+    public List<Data> getDatasetsByVisibility(@RequestParam("visibility") DataVisibility visibility) {
+        if (visibility != DataVisibility.PUBLIC) {
+            log.warn("Access denied for: /datasets?visibility=" + visibility);
             throw new UnauthorizedException();
         }
         return dataService.findByVisibility(DataVisibility.PUBLIC).stream().map(DataInfo::new).collect(Collectors.toList());
@@ -81,7 +93,34 @@ public class DataController {
         if (claims == null || !(claims instanceof Claims)) {
             throw new UnauthorizedException();
         }
-        return new DataInfo(dataService.getDataset(id));
+        try {
+            isAdmin((Claims) claims);
+            return new DataInfo(dataService.getDataset(id));
+        } catch (ForbiddenException e) {
+            String contextUserId = ((Claims) claims).getSubject();
+            Data data = dataService.getDataset(id);
+            if (!(data.getVisibility() == DataVisibility.PRIVATE && !data.getContributorId().equals(contextUserId))) {
+                return new DataInfo(data);
+            } else {
+                throw new ForbiddenException();
+            }
+        }
+    }
+
+    // Get details about a public data set
+    @GetMapping(path = "/{id}", params = {"visibility"})
+    @ResponseStatus(HttpStatus.OK)
+    public Data getDatasetByIdAndVisibility(@PathVariable Long id, @RequestParam("visibility") DataVisibility visibility) {
+        if (visibility != DataVisibility.PUBLIC) {
+            log.warn("Access denied for: /datasets/" + id + "?visibility=" + visibility);
+            throw new UnauthorizedException();
+        }
+        Data data = dataService.getDataset(id);
+        if (data.getVisibility() != DataVisibility.PUBLIC) {
+            log.warn("Retrieved dataset " + id + " is not public");
+            throw new UnauthorizedException();
+        }
+        return new DataInfo(data);
     }
 
     // Create a data set
@@ -219,6 +258,26 @@ public class DataController {
         dataService.downloadResource(response, did, rid, (Claims) claims);
     }
 
+    @GetMapping(path = "/{did}/resources/{rid}/download", params = {"visibility"})
+    public void downloadPublicResource(@AuthenticationPrincipal Object claims,
+                                       @PathVariable Long did, @PathVariable Long rid,
+                                       @RequestParam("visibility") DataVisibility visibility,
+                                       HttpServletResponse response, HttpServletRequest request) {
+        if (claims == null && visibility != DataVisibility.PUBLIC) {
+            log.warn("Access denied for: /datasets/" + did + "/resources/" + rid + "/download?visibility=" + visibility);
+            throw new UnauthorizedException();
+        }
+        Enumeration values = request.getHeaders("PublicUserId");
+        if (values.hasMoreElements()) {
+            String puid = (String) values.nextElement();
+            log.info("Public user id: {}", puid);
+            dataService.downloadPublicOpenResource(response, did, rid, Long.valueOf(puid));
+        } else {
+            log.warn("No public user id provided");
+            throw new BadRequestException();
+        }
+    }
+
     @GetMapping(value = "/categories")
     @ResponseStatus(HttpStatus.OK)
     public List<DataCategory> getCategories(@AuthenticationPrincipal Object claims) {
@@ -249,6 +308,12 @@ public class DataController {
     @ResponseStatus(HttpStatus.OK)
     private DataLicense getLicenseById(@PathVariable Long id) {
         return new DataLicenseInfo(dataService.getLicense(id));
+    }
+
+    @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE, path = "/public/users")
+    @ResponseStatus(HttpStatus.CREATED)
+    public DataPublicUser savePublicUser(@RequestBody @Valid DataPublicUserInfo dataPublicUserInfo) {
+        return new DataPublicUserInfo(dataService.createPublicUser(dataPublicUserInfo));
     }
 
 }

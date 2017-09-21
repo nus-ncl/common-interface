@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.util.UriUtils;
+import sg.ncl.common.exception.base.ForbiddenException;
 import sg.ncl.common.exception.base.NotFoundException;
 import sg.ncl.service.analytics.domain.AnalyticsService;
 import sg.ncl.service.data.data.jpa.*;
@@ -33,6 +34,7 @@ import static sg.ncl.service.data.validations.Validator.checkPermissions;
 @Slf4j
 public class DataServiceImpl implements DataService {
 
+    private static final String WARN_TEXT = "Data resource not found.";
     private static final String INFO_TEXT = "Data saved: {}";
     private static final String DATA_DIR_KEY = "dataDir";
     private static final String UTF_ENCODING = "UTF-8";
@@ -40,6 +42,7 @@ public class DataServiceImpl implements DataService {
     private final DataRepository dataRepository;
     private final DataCategoryRepository dataCategoryRepository;
     private final DataLicenseRepository dataLicenseRepository;
+    private final DataPublicUserRepository dataPublicUserRepository;
     private final UploadService uploadService;
     private final DownloadService downloadService;
     private final AnalyticsService analyticsService;
@@ -48,12 +51,14 @@ public class DataServiceImpl implements DataService {
     DataServiceImpl(@NotNull final DataRepository dataRepository,
                     @NotNull final DataCategoryRepository dataCategoryRepository,
                     @NotNull final DataLicenseRepository dataLicenseRepository,
+                    @NotNull final DataPublicUserRepository dataPublicUserRepository,
                     @NotNull final UploadService uploadService,
                     @NotNull final DownloadService downloadService,
                     @NotNull final AnalyticsService analyticsService) {
         this.dataRepository = dataRepository;
         this.dataCategoryRepository = dataCategoryRepository;
         this.dataLicenseRepository = dataLicenseRepository;
+        this.dataPublicUserRepository = dataPublicUserRepository;
         this.uploadService = uploadService;
         this.downloadService = downloadService;
         this.analyticsService = analyticsService;
@@ -219,8 +224,8 @@ public class DataServiceImpl implements DataService {
         List<DataResource> dataResourceEntities = dataEntity.getResources();
         DataResource dataResource = dataResourceEntities.stream().filter(o -> o.getId().equals(rid)).findFirst().orElse(null);
         if (dataResource == null) {
-            log.warn("Data resource not found.");
-            throw new DataResourceNotFoundException("Data resource not found.");
+            log.warn(WARN_TEXT);
+            throw new DataResourceNotFoundException(WARN_TEXT);
         }
         return dataResource;
     }
@@ -337,13 +342,44 @@ public class DataServiceImpl implements DataService {
         DataEntity dataEntity = (DataEntity) getDataset(did);
         checkAccessibility(dataEntity, claims);
 
-        DataResource dataResource = findResourceById(did, rid, claims);
-        try {
-            downloadService.getChunks(response, DATA_DIR_KEY, UriUtils.encode(dataEntity.getName(), UTF_ENCODING), dataResource.getUri());
-            analyticsService.addDataDownloadRecord(did, rid, ZonedDateTime.now(), claims.getSubject());
-        } catch (IOException e) {
-            log.error("Unable to download resource: {}", e);
-            throw new NotFoundException();
+        if (dataEntity.getVisibility() != DataVisibility.PRIVATE || dataEntity.getContributorId().equals(claims.getSubject())) {
+            DataResource dataResource = findResourceById(did, rid, claims);
+            try {
+                downloadService.getChunks(response, DATA_DIR_KEY, UriUtils.encode(dataEntity.getName(), UTF_ENCODING), dataResource.getUri());
+                analyticsService.addDataDownloadRecord(did, rid, ZonedDateTime.now(), claims.getSubject());
+            } catch (IOException e) {
+                log.error("Unable to download resource: {}", e);
+                throw new NotFoundException();
+            }
+        } else {
+            throw new ForbiddenException();
+        }
+    }
+
+    @Override
+    public void downloadPublicOpenResource(HttpServletResponse response, Long did, Long rid, Long puid) {
+        DataPublicUserEntity userEntity = dataPublicUserRepository.getOne(puid);
+        if (userEntity == null) {
+            throw new DataPublicUserNotFoundException("Public user not found.");
+        }
+
+        DataEntity dataEntity = (DataEntity) getDataset(did);
+        if (dataEntity.getVisibility() == DataVisibility.PUBLIC && dataEntity.getAccessibility() == DataAccessibility.OPEN) {
+            List<DataResource> dataResourceEntities = dataEntity.getResources();
+            DataResource dataResource = dataResourceEntities.stream().filter(o -> o.getId().equals(rid)).findFirst().orElse(null);
+            if (dataResource == null) {
+                log.warn(WARN_TEXT);
+                throw new DataResourceNotFoundException(WARN_TEXT);
+            }
+            try {
+                downloadService.getChunks(response, DATA_DIR_KEY, UriUtils.encode(dataEntity.getName(), UTF_ENCODING), dataResource.getUri());
+                analyticsService.addDataPublicDownloadRecord(did, rid, ZonedDateTime.now(), puid);
+            } catch (IOException e) {
+                log.error("Unable to download resource: {}", e);
+                throw new NotFoundException();
+            }
+        } else {
+            throw new ForbiddenException();
         }
     }
 
@@ -373,6 +409,26 @@ public class DataServiceImpl implements DataService {
             throw new DataLicenseNotFoundException("License not found.");
         }
         return dataLicense;
+    }
+
+    /**
+     * Save the details of a public user
+     *
+     * @param   dataPublicUser  the data object passed from the web service
+     * @return  a public user
+     */
+    @Override
+    public DataPublicUser createPublicUser(DataPublicUser dataPublicUser) {
+        log.info("Save public user");
+        DataPublicUserEntity newPublicUserEntity = new DataPublicUserEntity();
+        newPublicUserEntity.setFullName(dataPublicUser.getFullName());
+        newPublicUserEntity.setEmail(dataPublicUser.getEmail());
+        newPublicUserEntity.setJobTitle(dataPublicUser.getJobTitle());
+        newPublicUserEntity.setInstitution(dataPublicUser.getInstitution());
+        newPublicUserEntity.setCountry(dataPublicUser.getCountry());
+        DataPublicUserEntity savedPublicUserEntity = dataPublicUserRepository.save(newPublicUserEntity);
+        log.info("Public user saved: {}", savedPublicUserEntity);
+        return savedPublicUserEntity;
     }
 
 }

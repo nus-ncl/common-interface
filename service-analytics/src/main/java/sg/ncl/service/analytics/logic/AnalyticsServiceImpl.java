@@ -7,11 +7,10 @@ import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.stereotype.Service;
 import sg.ncl.adapter.deterlab.AdapterDeterLab;
 import sg.ncl.service.analytics.AnalyticsProperties;
-import sg.ncl.service.analytics.data.jpa.DataDownloadEntity;
-import sg.ncl.service.analytics.data.jpa.DataDownloadRepository;
-import sg.ncl.service.analytics.data.jpa.DataDownloadStatistics;
+import sg.ncl.service.analytics.data.jpa.*;
 import sg.ncl.service.analytics.domain.AnalyticsService;
 import sg.ncl.service.analytics.domain.DataDownload;
+import sg.ncl.service.analytics.domain.DataPublicDownload;
 import sg.ncl.service.analytics.exceptions.StartDateAfterEndDateException;
 
 import javax.inject.Inject;
@@ -41,6 +40,8 @@ import java.util.regex.Pattern;
 @EnableConfigurationProperties(AnalyticsProperties.class)
 public class AnalyticsServiceImpl implements AnalyticsService {
 
+    private final DataPublicDownloadRepository dataPublicDownloadRepository;
+
     private final DataDownloadRepository dataDownloadRepository;
 
     private final AdapterDeterLab adapterDeterLab;
@@ -48,16 +49,35 @@ public class AnalyticsServiceImpl implements AnalyticsService {
     private final AnalyticsProperties analyticsProperties;
 
     public AnalyticsServiceImpl( ) {
+        dataPublicDownloadRepository = null;
         dataDownloadRepository = null;
         adapterDeterLab = null;
         analyticsProperties = null;
     }
 
     @Inject
-    AnalyticsServiceImpl(@NotNull DataDownloadRepository dataDownloadRepository, @NotNull final AdapterDeterLab adapterDeterLab, @NotNull final AnalyticsProperties analyticsProperties) {
+    AnalyticsServiceImpl(@NotNull DataPublicDownloadRepository dataPublicDownloadRepository,
+                         @NotNull DataDownloadRepository dataDownloadRepository,
+                         @NotNull final AdapterDeterLab adapterDeterLab,
+                         @NotNull final AnalyticsProperties analyticsProperties) {
+        this.dataPublicDownloadRepository = dataPublicDownloadRepository;
         this.dataDownloadRepository = dataDownloadRepository;
         this.adapterDeterLab = adapterDeterLab;
         this.analyticsProperties = analyticsProperties;
+    }
+
+    @Override
+    public DataPublicDownload addDataPublicDownloadRecord(Long dataId, Long resourceId, ZonedDateTime date, Long userId) {
+        DataPublicDownloadEntity entity = new DataPublicDownloadEntity();
+        entity.setDataId(dataId);
+        entity.setResourceId(resourceId);
+        entity.setDownloadDate(date);
+        entity.setPublicUserId(userId);
+
+        DataPublicDownloadEntity savedEntity = dataPublicDownloadRepository.save(entity);
+        log.info("New public open data download record saved: {}", savedEntity.toString());
+
+        return savedEntity;
     }
 
     @Override
@@ -72,6 +92,37 @@ public class AnalyticsServiceImpl implements AnalyticsService {
         log.info("New data download record saved: {}", savedEntity.toString());
 
         return savedEntity;
+    }
+
+    @Override
+    public List<DataDownloadStatistics> getDataPublicDownloadCount(Long dataId, ZonedDateTime startDate, ZonedDateTime endDate) {
+        List<DataDownloadStatistics> statisticsList;
+        switch (getFlags(dataId, startDate, endDate)) {
+            case 111:
+                statisticsList = dataPublicDownloadRepository.findDownloadCountByDataIdAndDownloadDateBetween(dataId, startDate, endDate);
+                break;
+            case 110:
+                statisticsList = dataPublicDownloadRepository.findDownloadCountByDataIdAndDownloadDateAfter(dataId, startDate);
+                break;
+            case 101:
+                statisticsList = dataPublicDownloadRepository.findDownloadCountByDataIdAndDownloadDateBefore(dataId, endDate);
+                break;
+            case 100:
+                statisticsList = dataPublicDownloadRepository.findDownloadCountByDataId(dataId);
+                break;
+            case 11:
+                statisticsList = dataPublicDownloadRepository.findDownloadCountByDownloadDateBetween(startDate, endDate);
+                break;
+            case 10:
+                statisticsList = dataPublicDownloadRepository.findDownloadCountByDownloadDateAfter(startDate);
+                break;
+            case 1:
+                statisticsList = dataPublicDownloadRepository.findDownloadCountByDownloadDateBefore(endDate);
+                break;
+            default:
+                statisticsList = dataPublicDownloadRepository.findDownloadCount();
+        }
+        return statisticsList;
     }
 
     @Override

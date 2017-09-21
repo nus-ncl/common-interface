@@ -12,6 +12,10 @@ import java.util.List;
 
 public interface AnalyticsService {
 
+    DataPublicDownload addDataPublicDownloadRecord(Long dataId, Long resourceId, ZonedDateTime downloadDate, Long userId);
+
+    List<DataDownloadStatistics> getDataPublicDownloadCount(Long dataId, ZonedDateTime startDate, ZonedDateTime endDate);
+
     DataDownload addDataDownloadRecord(Long dataId, Long resourceId, ZonedDateTime downloadDate, String userId);
 
     List<DataDownloadStatistics> getDataDownloadCount(Long dataId, ZonedDateTime startDate, ZonedDateTime endDate);

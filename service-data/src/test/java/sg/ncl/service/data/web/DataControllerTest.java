@@ -23,17 +23,16 @@ import sg.ncl.common.authentication.Role;
 import sg.ncl.common.exception.ExceptionAutoConfiguration;
 import sg.ncl.common.exception.GlobalExceptionHandler;
 import sg.ncl.common.jwt.JwtToken;
-import sg.ncl.service.data.data.jpa.DataAccessRequestEntity;
-import sg.ncl.service.data.data.jpa.DataCategoryEntity;
-import sg.ncl.service.data.data.jpa.DataEntity;
-import sg.ncl.service.data.data.jpa.DataResourceEntity;
+import sg.ncl.service.data.data.jpa.*;
 import sg.ncl.service.data.domain.*;
 import sg.ncl.service.data.util.TestUtil;
 import sg.ncl.service.transmission.web.ResumableInfo;
 
 import javax.inject.Inject;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.*;
@@ -82,6 +81,42 @@ public class DataControllerTest {
         assertThat(mockingDetails(dataService).isMock()).isTrue();
         assertThat(mockingDetails(dataAccessRequestService).isMock()).isTrue();
         mockMvc = webAppContextSetup(webApplicationContext).build();
+    }
+
+    @Test
+    public void testSearchDatasetsGoodAuthentication() throws Exception {
+        final Set<Data> dataSets = new HashSet<>();
+        DataEntity dataEntity = TestUtil.getDataEntity();
+        dataEntity.setCategoryId(getDataCategoryEntity().getId());
+        dataSets.add(dataEntity);
+
+        when(securityContext.getAuthentication()).thenReturn(authentication);
+        SecurityContextHolder.setContext(securityContext);
+        when(authentication.getPrincipal()).thenReturn(claims);
+        when(dataService.searchDatasets(any(String[].class))).thenReturn(dataSets);
+
+        mockMvc.perform(get(DataController.PATH + "/search?keyword=dataname"))
+                .andExpect(status().isOk())
+                .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$", hasSize(1)))
+
+                .andExpect(jsonPath("$[0].name", is(equalTo(dataEntity.getName()))))
+                .andExpect(jsonPath("$[0].description", is(equalTo(dataEntity.getDescription()))))
+                .andExpect(jsonPath("$[0].contributorId", is(equalTo(dataEntity.getContributorId()))))
+                .andExpect(jsonPath("$[0].accessibility", is(equalTo(dataEntity.getAccessibility().toString()))))
+                .andExpect(jsonPath("$[0].visibility", is(equalTo(dataEntity.getVisibility().toString()))));
+    }
+
+    @Test
+    public void testSearchDatasetsBadAuthentication() throws Exception {
+        when(securityContext.getAuthentication()).thenReturn(authentication);
+        SecurityContextHolder.setContext(securityContext);
+        when(authentication.getPrincipal()).thenReturn("");
+        when(dataService.searchDatasets(any(String[].class))).thenReturn(null);
+
+        mockMvc.perform(get(DataController.PATH + "/search?keyword=dataname"))
+                .andExpect(status().isUnauthorized())
+                .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON));
     }
 
     @Test
@@ -134,6 +169,55 @@ public class DataControllerTest {
                 .andExpect(jsonPath("$[1].contributorId", is(equalTo(publicDataSet2.getContributorId()))))
                 .andExpect(jsonPath("$[1].accessibility", is(equalTo(publicDataSet2.getAccessibility().toString()))))
                 .andExpect(jsonPath("$[1].visibility", is(equalTo(publicDataSet2.getVisibility().toString()))));
+    }
+
+    @Test
+    public void testGetPublicDatasetById() throws Exception {
+        final DataEntity dataEntity = TestUtil.getDataEntity();
+        dataEntity.setCategoryId(getDataCategoryEntity().getId());
+
+        when(securityContext.getAuthentication()).thenReturn(authentication);
+        SecurityContextHolder.setContext(securityContext);
+        when(authentication.getPrincipal()).thenReturn(claims);
+        when(dataService.getDataset(anyLong())).thenReturn(dataEntity);
+
+        mockMvc.perform(get(DataController.PATH + "/1?visibility=PUBLIC"))
+                .andExpect(status().isOk())
+                .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
+
+                .andExpect(jsonPath("name", is(equalTo(dataEntity.getName()))))
+                .andExpect(jsonPath("description", is(equalTo(dataEntity.getDescription()))))
+                .andExpect(jsonPath("contributorId", is(equalTo(dataEntity.getContributorId()))))
+                .andExpect(jsonPath("accessibility", is(equalTo(dataEntity.getAccessibility().toString()))))
+                .andExpect(jsonPath("visibility", is(equalTo(dataEntity.getVisibility().toString()))));
+    }
+
+    @Test
+    public void testGetPublicDatasetByIdParameterPrivate() throws Exception {
+        when(securityContext.getAuthentication()).thenReturn(authentication);
+        SecurityContextHolder.setContext(securityContext);
+        when(authentication.getPrincipal()).thenReturn(null);
+        when(dataService.getDataset(anyLong())).thenReturn(null);
+
+        mockMvc.perform(get(DataController.PATH + "/1?visibility=PRIVATE"))
+                .andExpect(status().isUnauthorized())
+                .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON));
+    }
+
+    @Test
+    public void testGetPublicDatasetByIdVisibilityPrivate() throws Exception {
+        final DataEntity dataEntity = TestUtil.getDataEntity();
+        dataEntity.setCategoryId(getDataCategoryEntity().getId());
+        dataEntity.setVisibility(DataVisibility.PRIVATE);
+
+        when(securityContext.getAuthentication()).thenReturn(authentication);
+        SecurityContextHolder.setContext(securityContext);
+        when(authentication.getPrincipal()).thenReturn(null);
+        when(dataService.getDataset(anyLong())).thenReturn(dataEntity);
+
+        mockMvc.perform(get(DataController.PATH + "/1?visibility=PUBLIC"))
+                .andExpect(status().isUnauthorized())
+                .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON));
     }
 
     @Test
@@ -203,6 +287,18 @@ public class DataControllerTest {
                 .andExpect(jsonPath("contributorId", is(equalTo(dataEntity.getContributorId()))))
                 .andExpect(jsonPath("accessibility", is(equalTo(dataEntity.getAccessibility().toString()))))
                 .andExpect(jsonPath("visibility", is(equalTo(dataEntity.getVisibility().toString()))));
+    }
+
+    @Test
+    public void testGetDatasetByIdBadAuthentication() throws Exception {
+        when(securityContext.getAuthentication()).thenReturn(authentication);
+        SecurityContextHolder.setContext(securityContext);
+        when(authentication.getPrincipal()).thenReturn("");
+        when(dataService.getDataset(anyLong())).thenReturn(null);
+
+        mockMvc.perform(get(DataController.PATH + "/1"))
+                .andExpect(status().isUnauthorized())
+                .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON));
     }
 
     @Test
@@ -516,7 +612,7 @@ public class DataControllerTest {
     }
 
     @Test
-    public void testGetCategories() throws Exception {
+    public void testGetCategoriesGoodAuthentication() throws Exception {
         List<DataCategory> dataCategoryEntities = new ArrayList<>();
         DataCategoryEntity dataCategoryEntity1 = TestUtil.getDataCategoryEntity();
         DataCategoryEntity dataCategoryEntity2 = TestUtil.getDataCategoryEntity();
@@ -533,6 +629,16 @@ public class DataControllerTest {
     }
 
     @Test
+    public void testGetCategoriesBadAuthentication() throws Exception {
+        when(securityContext.getAuthentication()).thenReturn(authentication);
+        SecurityContextHolder.setContext(securityContext);
+        when(authentication.getPrincipal()).thenReturn(null);
+
+        mockMvc.perform(get(DataController.PATH + "/categories"))
+                .andExpect(status().isUnauthorized());
+    }
+
+    @Test
     public void testGetCategory() throws Exception {
         DataCategoryEntity dataCategoryEntity = TestUtil.getDataCategoryEntity();
 
@@ -543,6 +649,69 @@ public class DataControllerTest {
 
         mockMvc.perform(get(DataController.PATH + "/categories/1"))
                 .andExpect(status().isOk());
+    }
+
+    @Test
+    public void testGetLicensesGoodAuthentication() throws Exception {
+        List<DataLicense> dataLicenseEntities = new ArrayList<>();
+        DataLicenseEntity dataLicenseEntity1 = TestUtil.getDataLicenseEntity();
+        DataLicenseEntity dataLicenseEntity2 = TestUtil.getDataLicenseEntity();
+        dataLicenseEntities.add(dataLicenseEntity1);
+        dataLicenseEntities.add(dataLicenseEntity2);
+
+        when(securityContext.getAuthentication()).thenReturn(authentication);
+        SecurityContextHolder.setContext(securityContext);
+        when(authentication.getPrincipal()).thenReturn(claims);
+        when(dataService.getLicenses()).thenReturn(dataLicenseEntities);
+
+        mockMvc.perform(get(DataController.PATH + "/licenses"))
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    public void testGetLicensesBadAuthentication() throws Exception {
+        when(securityContext.getAuthentication()).thenReturn(authentication);
+        SecurityContextHolder.setContext(securityContext);
+        when(authentication.getPrincipal()).thenReturn(null);
+
+        mockMvc.perform(get(DataController.PATH + "/licenses"))
+                .andExpect(status().isUnauthorized());
+    }
+
+    @Test
+    public void testGetLicence() throws Exception {
+        DataLicenseEntity dataLicenseEntity = TestUtil.getDataLicenseEntity();
+
+        when(securityContext.getAuthentication()).thenReturn(authentication);
+        SecurityContextHolder.setContext(securityContext);
+        when(authentication.getPrincipal()).thenReturn(claims);
+        when(dataService.getLicense(anyLong())).thenReturn(dataLicenseEntity);
+
+        mockMvc.perform(get(DataController.PATH + "/licenses/1"))
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    public void testSaveNewPublicUser() throws Exception {
+        final DataPublicUserEntity dataPublicUserEntity = TestUtil.getDataPublicUserEntity();
+
+        mapper.registerModule(new JavaTimeModule());
+        final byte[] content = mapper.writeValueAsBytes(new DataPublicUserInfo(dataPublicUserEntity));
+
+        when(dataService.createPublicUser(any(DataPublicUserInfo.class))).thenReturn(dataPublicUserEntity);
+
+        mockMvc.perform(post(DataController.PATH + "/public/users")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(content))
+
+                .andExpect(status().isCreated())
+                .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
+
+                .andExpect(jsonPath("fullName", is(equalTo(dataPublicUserEntity.getFullName()))))
+                .andExpect(jsonPath("email", is(equalTo(dataPublicUserEntity.getEmail()))))
+                .andExpect(jsonPath("jobTitle", is(equalTo(dataPublicUserEntity.getJobTitle()))))
+                .andExpect(jsonPath("institution", is(equalTo(dataPublicUserEntity.getInstitution()))))
+                .andExpect(jsonPath("country", is(equalTo(dataPublicUserEntity.getCountry()))));
     }
 
 }

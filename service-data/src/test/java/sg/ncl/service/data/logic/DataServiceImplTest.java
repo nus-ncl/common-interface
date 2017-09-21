@@ -57,6 +57,8 @@ public class DataServiceImplTest {
     @Mock
     private DataLicenseRepository dataLicenseRepository;
     @Mock
+    private DataPublicUserRepository dataPublicUserRepository;
+    @Mock
     private UploadService uploadService;
     @Mock
     private DownloadService downloadService;
@@ -74,10 +76,19 @@ public class DataServiceImplTest {
         assertThat(mockingDetails(dataRepository).isMock()).isTrue();
         assertThat((mockingDetails(dataCategoryRepository).isMock())).isTrue();
         assertThat((mockingDetails(dataLicenseRepository).isMock())).isTrue();
+        assertThat((mockingDetails(dataPublicUserRepository).isMock())).isTrue();
         assertThat(mockingDetails(uploadService).isMock()).isTrue();
         assertThat(mockingDetails(downloadService).isMock()).isTrue();
         assertThat(mockingDetails(analyticsService).isMock()).isTrue();
-        dataService = new DataServiceImpl(dataRepository, dataCategoryRepository, dataLicenseRepository, uploadService, downloadService, analyticsService);
+        dataService = new DataServiceImpl(
+                dataRepository,
+                dataCategoryRepository,
+                dataLicenseRepository,
+                dataPublicUserRepository,
+                uploadService,
+                downloadService,
+                analyticsService
+        );
     }
 
     @Test
@@ -459,6 +470,13 @@ public class DataServiceImplTest {
         DataLicense dataLicense = dataService.getLicense(entity.getId());
         verify(dataLicenseRepository, times(1)).getOne(anyLong());
         assertThat(dataLicense.getName()).isEqualTo(entity.getName());
+    }
+
+    @Test
+    public void testSaveNewPublicUser() {
+        DataPublicUserEntity entity = TestUtil.getDataPublicUserEntity();
+        dataService.createPublicUser(entity);
+        verify(dataPublicUserRepository, times(1)).save(any(DataPublicUserEntity.class));
     }
 
 }
