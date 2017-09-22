@@ -94,6 +94,6 @@ public class ExperimentsController {
         log.info("Authentication principal for internet access request: " + claims);
         checkClaimsType(claims);
         final JSONObject jsonObject = new JSONObject(reason);
-        return experimentService.requestInternet(teamId, expId, jsonObject.getString("reason"), (Claims) claims);
+        return new ExperimentInfo(experimentService.requestInternet(teamId, expId, jsonObject.getString("reason"), (Claims) claims));
     }
 }
