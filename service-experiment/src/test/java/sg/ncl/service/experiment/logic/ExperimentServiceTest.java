@@ -128,6 +128,24 @@ public class ExperimentServiceTest {
     }
 
     @Test
+    public void testGetExperimentByExpId() throws Exception {
+        ExperimentEntity entity = getExperimentEntity();
+
+        when(experimentRepository.findOne(anyLong())).thenReturn(entity);
+
+        Experiment one = experimentService.get(1L);
+
+        assertThat(one).isEqualTo(entity);
+    }
+
+    @Test
+    public void testGetExperimentByExpIdNullId() throws Exception {
+        Experiment one = experimentService.get(null);
+
+        assertThat(one).isNull();
+    }
+
+    @Test
     public void testGetExperimentsByUser() throws Exception {
         ExperimentEntity createdExperimentSave = getExperimentEntity();
         List<ExperimentEntity> expList = new ArrayList<>();
