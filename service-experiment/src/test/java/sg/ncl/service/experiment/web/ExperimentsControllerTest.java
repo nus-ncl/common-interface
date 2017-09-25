@@ -26,6 +26,7 @@ import sg.ncl.service.experiment.domain.ExperimentService;
 
 import javax.inject.Inject;
 
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -87,7 +88,7 @@ public class ExperimentsControllerTest {
 
     @Test
     public void testAddExperiment() throws Exception {
-        final ExperimentInfo experimentInfo = new ExperimentInfo(0L,"","","","","","","",0,0);
+        final ExperimentInfo experimentInfo = new ExperimentInfo(0L,"","","","","","","",0,0, ZonedDateTime.now(), ZonedDateTime.now());
         final byte[] content = mapper.writeValueAsBytes(experimentInfo);
 
         ExperimentEntity entity1 = getExperimentEntity();
