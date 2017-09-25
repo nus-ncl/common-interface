@@ -197,6 +197,18 @@ public class ExperimentsControllerTest {
     }
 
     @Test
+    public void testGetExperimentDetails() throws Exception {
+        String json = RandomStringUtils.randomAlphanumeric(20);
+
+        when(experimentService.getExperimentDetails(anyString(), anyLong())).thenReturn(json);
+
+        mockMvc.perform(get(ExperimentsController.PATH + "/teams/teamId/experiments/" + 1L + "/experimentDetails").contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$", is(equalTo(json))));
+    }
+
+    @Test
     public void testDeleteExperimentGoodAuthenticationPrincipal() throws Exception {
         final ExperimentEntity entity = getExperimentEntity();
         Long experimentId = Long.parseLong(RandomStringUtils.randomNumeric(5));
