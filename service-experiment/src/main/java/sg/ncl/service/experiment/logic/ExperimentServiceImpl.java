@@ -320,7 +320,7 @@ public class ExperimentServiceImpl implements ExperimentService {
         String experimentName = experimentEntity.getName();
 
         final Map<String, String> map = new HashMap<>();
-        map.put("teamName", teamName);
+        map.put("projectName", teamName);
         map.put("expName", experimentName);
         map.put("reason", reason);
 
