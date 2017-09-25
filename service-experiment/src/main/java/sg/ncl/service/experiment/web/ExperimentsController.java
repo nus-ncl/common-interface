@@ -90,7 +90,6 @@ public class ExperimentsController {
     }
 
     @GetMapping(path = "/teams/{teamId}/experiments/{expId}/experimentDetails")
-    // FIXME: NEEDS REFACTORING
     @ResponseStatus(HttpStatus.OK)
     public String getExperimentDetails(@PathVariable String teamId, @PathVariable Long expId) {
         return experimentService.getExperimentDetails(teamId, expId);

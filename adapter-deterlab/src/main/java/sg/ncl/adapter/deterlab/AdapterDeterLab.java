@@ -668,17 +668,17 @@ public class AdapterDeterLab {
     //        'ns_file' :
     //        {
     //            'msg' : 'success/fail',
-    //                'ns_file' : 'ns_file_contents'
+    //            'ns_file' : 'ns_file_contents'
     //        },
     //        'realization_details' :
     //        {
     //            'msg' : 'success/fail',
-    //                'realization_details' : 'realization_details_contents'
+    //            'realization_details' : 'realization_details_contents'
     //        },
     //        'activity_log'	:
     //        {
     //            'msg' : 'success/fail',
-    //                'activity_log' : 'activity_log_contents'
+    //            'activity_log' : 'activity_log_contents'
     //        }
     //    }
     // returns a '{}' otherwise if fail

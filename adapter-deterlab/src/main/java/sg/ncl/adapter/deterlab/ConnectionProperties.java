@@ -77,10 +77,6 @@ public class ConnectionProperties {
         return HTTP_MODE + ip + ":" + port + "/rejectProject";
     }
 
-    public String getActivityLog() {
-        return HTTP_MODE + ip + ":" + port + "/getActivityLog";
-    }
-
     public String getExpDetails() {
         return HTTP_MODE + ip + ":" + port + "/getExpDetails";
     }
@@ -99,10 +95,6 @@ public class ConnectionProperties {
 
     public String getNodesStatus() {
         return HTTP_MODE + ip + ":" + port + "/getNodesStatus";
-    }
-
-    public String getNSFile() {
-        return HTTP_MODE + ip + ":" + port + "/getNSFile";
     }
 
     public String getRunningExperimentsCount() {

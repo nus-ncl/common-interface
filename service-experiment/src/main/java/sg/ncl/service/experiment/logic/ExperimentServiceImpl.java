@@ -270,12 +270,29 @@ public class ExperimentServiceImpl implements ExperimentService {
     }
 
     /**
-     * Get experiment details from deterlab
+     * Get experiment details from deterlab for experiment profile
      *
      * @param teamId    the team to get the exp for
      * @param expId     the experiment to get the experiment details
      * @return  a json dump of the experiment details from deterlab in the format
-     * Otherwise, returns an empty "{}"
+     *   {
+     *       'ns_file' :
+     *       {
+     *           'msg' : 'success/fail',
+     *           'ns_file' : 'ns_file_contents'
+     *       },
+     *       'realization_details' :
+     *       {
+     *           'msg' : 'success/fail',
+     *           'realization_details' : 'realization_details_contents'
+     *       },
+     *       'activity_log'	:
+     *       {
+     *           'msg' : 'success/fail',
+     *           'activity_log' : 'activity_log_contents'
+     *       }
+     *   }
+     * Otherwise, returns "{}"
      */
     @Override
     public String getExperimentDetails(String teamId, Long expId) {
