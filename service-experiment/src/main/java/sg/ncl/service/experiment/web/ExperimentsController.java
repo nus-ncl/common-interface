@@ -89,20 +89,6 @@ public class ExperimentsController {
         return new ExperimentInfo(experimentService.deleteExperiment(expId, teamId, (Claims) claims));
     }
 
-    @GetMapping(path = "/teams/{teamId}/experiments/{expId}/activityLog")
-    // FIXME: NEEDS REFACTORING
-    @ResponseStatus(HttpStatus.OK)
-    public String getActivityLog(@PathVariable String teamId, @PathVariable Long expId) {
-        return experimentService.getActivityLog(teamId, expId);
-    }
-
-    @GetMapping(path = "/teams/{teamId}/experiments/{expId}/nsFile")
-    // FIXME: NEEDS REFACTORING
-    @ResponseStatus(HttpStatus.OK)
-    public String getNSFile(@PathVariable String teamId, @PathVariable Long expId) {
-        return experimentService.getNSFile(teamId, expId);
-    }
-
     @GetMapping(path = "/teams/{teamId}/experiments/{expId}/experimentDetails")
     // FIXME: NEEDS REFACTORING
     @ResponseStatus(HttpStatus.OK)

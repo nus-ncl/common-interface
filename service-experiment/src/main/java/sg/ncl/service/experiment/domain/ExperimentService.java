@@ -23,12 +23,8 @@ public interface ExperimentService {
 
     Experiment deleteExperiment(Long id, String teamId, Claims claims);
 
-    String getActivityLog(String teamId, Long expId);
-
     String getExperimentDetails(String teamId, Long expId);
 
     String getTopology(String teamId, Long expId);
-
-    String getNSFile(String teamId, Long expId);
 
 }

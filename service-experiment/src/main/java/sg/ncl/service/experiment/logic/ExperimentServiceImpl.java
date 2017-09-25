@@ -270,31 +270,11 @@ public class ExperimentServiceImpl implements ExperimentService {
     }
 
     /**
-     * Get the activity log from deterlab
-     *
-     * @param teamId    the team to get the exp for
-     * @param expId     the experiment to get the activity log
-     * @return  a json dump of the activity log from deterlab in the format: { "msg" : "get activity log success/fail", "activity_log" : "deterlab experiment activity log" }
-     * Otherwise, returns an empty "{}"
-     */
-    public String getActivityLog(String teamId, Long expId) {
-        Experiment experimentEntity = experimentRepository.getOne(expId);
-        String teamName = experimentEntity.getTeamName();
-        String experimentName = experimentEntity.getName();
-
-        JSONObject jsonObject = new JSONObject();
-        jsonObject.put("pid", teamName);
-        jsonObject.put("eid", experimentName);
-
-        return adapterDeterLab.getActivityLog(jsonObject.toString());
-    }
-
-    /**
      * Get experiment details from deterlab
      *
      * @param teamId    the team to get the exp for
      * @param expId     the experiment to get the experiment details
-     * @return  a json dump of the experiment details from deterlab in the format : { "msg" : "get experiment details success/fail", "experiment_details" : "deterlab experiment details" }
+     * @return  a json dump of the experiment details from deterlab in the format
      * Otherwise, returns an empty "{}"
      */
     @Override
@@ -308,27 +288,6 @@ public class ExperimentServiceImpl implements ExperimentService {
         jsonObject.put("eid", experimentName);
 
         return adapterDeterLab.getExperimentDetails(jsonObject.toString());
-    }
-
-    /**
-     * Get ns file from deterlab
-     *
-     * @param teamId    the team to get the exp for
-     * @param expId     the experiment to get the activity log
-     * @return  a json dump of the ns file from deterlab in the format: { "msg" : "get ns file success/fail", "ns_file" : "deterlab ns file" }
-     * Otherwise, returns an empty "{}"
-     */
-    @Override
-    public String getNSFile(String teamId, Long expId) {
-        Experiment experimentEntity = experimentRepository.getOne(expId);
-        String teamName = experimentEntity.getTeamName();
-        String experimentName = experimentEntity.getName();
-
-        JSONObject jsonObject = new JSONObject();
-        jsonObject.put("pid", teamName);
-        jsonObject.put("eid", experimentName);
-
-        return adapterDeterLab.getNSFile(jsonObject.toString());
     }
 
     /**

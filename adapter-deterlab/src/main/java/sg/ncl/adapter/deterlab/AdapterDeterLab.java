@@ -662,32 +662,28 @@ public class AdapterDeterLab {
         }
     }
 
-    public String getActivityLog(String jsonString) {
-        log.info("Getting activity log...");
-
-        HttpHeaders headers = new HttpHeaders();
-        HttpEntity<String> request = new HttpEntity<>(jsonString, headers);
-        ResponseEntity response;
-
-        try {
-            response = restTemplate.exchange(properties.getActivityLog(), HttpMethod.POST, request, String.class);
-            String responseBody = response.getBody().toString();
-            String deterMessage = new JSONObject(responseBody).getString("msg");
-
-            if ("get activity log success".equals(deterMessage)) {
-                log.info("Get activity log OK");
-                return responseBody;
-            } else {
-                log.warn("Get activity log FAIL");
-            }
-        } catch (RestClientException e) {
-            log.warn("DeterLab connection error get activity log: {}", e);
-        }
-        return "{}";
-    }
-
+    // information for displaying experiment profile
+    // returns a json string in the format:
+    //    {
+    //        'ns_file' :
+    //        {
+    //            'msg' : 'success/fail',
+    //                'ns_file' : 'ns_file_contents'
+    //        },
+    //        'realization_details' :
+    //        {
+    //            'msg' : 'success/fail',
+    //                'realization_details' : 'realization_details_contents'
+    //        },
+    //        'activity_log'	:
+    //        {
+    //            'msg' : 'success/fail',
+    //                'activity_log' : 'activity_log_contents'
+    //        }
+    //    }
+    // returns a '{}' otherwise if fail
     public String getExperimentDetails(String jsonString) {
-        log.info("Getting experiment details...");
+        log.info("Getting experiment details for experiment profile...");
 
         HttpHeaders headers = new HttpHeaders();
         HttpEntity<String> request = new HttpEntity<>(jsonString, headers);
@@ -696,16 +692,15 @@ public class AdapterDeterLab {
         try {
             response = restTemplate.exchange(properties.getExpDetails(), HttpMethod.POST, request, String.class);
             String responseBody = response.getBody().toString();
-            String deterMessage = new JSONObject(responseBody).getString("msg");
 
-            if ("get experiment details success".equals(deterMessage)) {
-                log.info("Get experiment details OK");
+            if (responseBody.contains("ns_file")) {
+                log.info("Get experiment details for experiment profile OK");
                 return responseBody;
             } else {
-                log.warn("Get experiment details FAIL");
+                log.warn("Get experiment details for experiment profile FAIL");
             }
         } catch (RestClientException e) {
-            log.warn("DeterLab connection error get experiment details: {}", e);
+            log.warn("DeterLab connection error get experiment details for experiment profile: {}", e);
         }
         return "{}";
     }
@@ -740,30 +735,6 @@ public class AdapterDeterLab {
             return "{}";
         }
         return response.getBody().toString();
-    }
-
-    public String getNSFile(String jsonString) {
-        log.info("Getting ns file...");
-
-        HttpHeaders headers = new HttpHeaders();
-        HttpEntity<String> request = new HttpEntity<>(jsonString, headers);
-        ResponseEntity response;
-
-        try {
-            response = restTemplate.exchange(properties.getNSFile(), HttpMethod.POST, request, String.class);
-            String responseBody = response.getBody().toString();
-            String deterMessage = new JSONObject(responseBody).getString("msg");
-
-            if ("get ns file success".equals(deterMessage)) {
-                log.info("Get ns file OK");
-                return responseBody;
-            } else {
-                log.warn("Get ns file FAIL");
-            }
-        } catch (RestClientException e) {
-            log.warn("DeterLab connection error get ns file: {}", e);
-        }
-        return "{}";
     }
 
     /**
