@@ -309,7 +309,7 @@ public class ExperimentServiceImpl implements ExperimentService {
     @Override
     public Experiment requestInternet(String teamId, Long expId, String reason, final Claims claims) {
 
-        log.info("Requesting internet for Experiment: {} from Team: {}", expId, teamId);
+        log.info("Requesting internet access for Experiment {} from Team {}", expId, teamId);
         RealizationEntity realizationEntity = realizationService.getByExperimentId(expId);
 
         // put the check inside here because we do not want to add the realization service and team service on the controller
@@ -336,12 +336,11 @@ public class ExperimentServiceImpl implements ExperimentService {
 
             mailService.send(from , to , subject, msgText, false, null, null);
 
-            log.info("Email sent: {}", msgText);
+            log.info("Email sent for internet request for Experiment {} from Team {}", expId, teamId);
         } catch (IOException | TemplateException e) {
             log.warn("Error sending email for internet access request: {}", e);
         }
 
-        log.info("Successfully sending email for internet request for Experiment: {} from Team: {}", expId, teamId);
         return experimentEntity;
     }
 }

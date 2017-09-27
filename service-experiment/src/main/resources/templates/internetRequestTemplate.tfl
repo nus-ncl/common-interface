@@ -1,10 +1,10 @@
 Dear Testbed Admin,
 
-You have an internet request.
+You have a new internet request.
 
 The details of the request are as follows:
 
-Requester: ${projectName}
+Team name: ${projectName}
 Experiment name: ${expName}
 Request Reason: ${reason}
 
