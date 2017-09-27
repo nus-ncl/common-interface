@@ -58,11 +58,11 @@ ncl:
   domain: dev.ncl.sg
   deterlab:
     adapter:
-      ip: test.ncl.sg
+      ip: 172.18.178.5
       port: 8080
       bossUrl: ${deterlab.boss:}
       userUrl: ${deterlab.user:}
-      enabled: false
+      enabled: true
   jwt:
     api-key: ${jwt.key:}
     signing-algorithm: HS512

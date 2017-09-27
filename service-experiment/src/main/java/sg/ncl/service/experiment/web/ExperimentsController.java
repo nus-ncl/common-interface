@@ -2,6 +2,7 @@ package sg.ncl.service.experiment.web;
 
 import io.jsonwebtoken.Claims;
 import lombok.extern.slf4j.Slf4j;
+import org.json.JSONObject;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -25,7 +26,7 @@ import java.util.stream.Collectors;
 import static sg.ncl.common.validation.Validator.checkClaimsType;
 
 /**
- * Created by Desmond Lim
+ * @Authors: Desmond Lim, Tran Ly Vu
  */
 @RestController
 @RequestMapping(path = ExperimentsController.PATH, produces = MediaType.APPLICATION_JSON_VALUE)
@@ -85,5 +86,14 @@ public class ExperimentsController {
     @ResponseStatus(HttpStatus.OK)
     public String getTopology(@PathVariable String teamId, @PathVariable Long expId) {
         return experimentService.getTopology(teamId, expId);
+    }
+
+    @PostMapping(path= "/teams/{teamId}/experiments/{expId}/internet")
+    @ResponseStatus(HttpStatus.CREATED)
+    public Experiment requestInternet(@PathVariable String teamId, @PathVariable Long expId, @RequestBody String reason, @AuthenticationPrincipal Object claims) {
+        log.debug("Authentication principal for internet access request: " + claims);
+        checkClaimsType(claims);
+        final JSONObject jsonObject = new JSONObject(reason);
+        return new ExperimentInfo(experimentService.requestInternet(teamId, expId, jsonObject.getString("reason"), (Claims) claims));
     }
 }

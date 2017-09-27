@@ -1,10 +1,13 @@
 package sg.ncl.service.experiment.logic;
 
+import freemarker.template.Template;
+import freemarker.template.TemplateException;
 import io.jsonwebtoken.Claims;
 import lombok.extern.slf4j.Slf4j;
 import org.json.JSONObject;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.ui.freemarker.FreeMarkerTemplateUtils;
 import sg.ncl.adapter.deterlab.AdapterDeterLab;
 import sg.ncl.adapter.deterlab.ConnectionProperties;
 import sg.ncl.common.exception.base.ForbiddenException;
@@ -15,11 +18,13 @@ import sg.ncl.service.experiment.domain.ExperimentService;
 import sg.ncl.service.experiment.exceptions.ExperimentNameAlreadyExistsException;
 import sg.ncl.service.experiment.exceptions.TeamIdNullOrEmptyException;
 import sg.ncl.service.experiment.exceptions.UserIdNullOrEmptyException;
+import sg.ncl.service.mail.domain.MailService;
 import sg.ncl.service.realization.data.jpa.RealizationEntity;
 import sg.ncl.service.realization.domain.RealizationService;
 import sg.ncl.service.team.domain.TeamService;
 
 import javax.inject.Inject;
+import javax.inject.Named;
 import javax.validation.constraints.NotNull;
 import java.io.File;
 import java.io.FileOutputStream;
@@ -31,7 +36,7 @@ import java.util.stream.Collectors;
 import static sg.ncl.service.experiment.validation.Validator.checkPermissions;
 
 /**
- * Created by Desmond.
+ * @Authors: Desmond, Tran Ly Vu
  */
 @Service
 @Slf4j
@@ -42,15 +47,26 @@ public class ExperimentServiceImpl implements ExperimentService {
     private final RealizationService realizationService;
     private final ConnectionProperties adapterConnectionProperties;
     private final TeamService teamService;
+    private final MailService mailService;
+    private final Template internetRequestTemplate;
+
 
     @Inject
-    ExperimentServiceImpl(@NotNull final ExperimentRepository experimentRepository, @NotNull final AdapterDeterLab adapterDeterLab, @NotNull final RealizationService realizationService, @NotNull final ConnectionProperties connectionProperties, @NotNull final TeamService teamService) {
+    ExperimentServiceImpl(@NotNull final ExperimentRepository experimentRepository,
+                          @NotNull final AdapterDeterLab adapterDeterLab,
+                          @NotNull final RealizationService realizationService,
+                          @NotNull final ConnectionProperties connectionProperties,
+                          @NotNull final TeamService teamService,
+                          @NotNull final MailService mailService,
+                          @NotNull @Named("internetRequestTemplate") final Template internetRequestTemplate) {
         this.experimentRepository = experimentRepository;
         this.adapterDeterLab = adapterDeterLab;
         this.realizationService = realizationService;
         this.adapterConnectionProperties = connectionProperties;
         // FIXME Do not expose the internal workings of the DeterLab adapter to the experiment service; i.e., should not need to inject ConnectionProperties
         this.teamService = teamService;
+        this.mailService = mailService;
+        this.internetRequestTemplate =  internetRequestTemplate;
     }
 
     /**
@@ -279,5 +295,52 @@ public class ExperimentServiceImpl implements ExperimentService {
         jsonObject.put("eid", experimentName);
 
         return adapterDeterLab.getTopologyThumbnail(jsonObject.toString());
+    }
+
+    /**
+     * Send email to ncl support to notify internet access request
+     *
+     * @param expId  the experiment id (DB UUID), i.e. not the experiment name
+     * @param teamId the team id
+     * @param reason the reason for internet access request
+     *
+     * @return experiment with requested internet access
+     */
+    @Override
+    public Experiment requestInternet(String teamId, Long expId, String reason, final Claims claims) {
+
+        log.info("Requesting internet access for Experiment {} from Team {}", expId, teamId);
+        RealizationEntity realizationEntity = realizationService.getByExperimentId(expId);
+
+        // put the check inside here because we do not want to add the realization service and team service on the controller
+        checkPermissions(realizationEntity, teamService.isOwner(teamId, claims.getSubject()), claims);
+
+        Experiment experimentEntity = experimentRepository.getOne(expId);
+        String teamName = experimentEntity.getTeamName();
+        String experimentName = experimentEntity.getName();
+
+        final Map<String, String> map = new HashMap<>();
+        map.put("projectName", teamName);
+        map.put("expName", experimentName);
+        map.put("reason", reason);
+
+        try {
+            String from = "NCL Testbed Ops <testbed-ops@ncl.sg>";
+
+            String[] to = new String[1];
+            to[0] = "support@ncl.sg";
+
+            String subject = "Internet access request";
+
+            String msgText = FreeMarkerTemplateUtils.processTemplateIntoString(internetRequestTemplate, map);
+
+            mailService.send(from , to , subject, msgText, false, null, null);
+
+            log.info("Email sent for internet request for Experiment {} from Team {}", expId, teamId);
+        } catch (IOException | TemplateException e) {
+            log.warn("Error sending email for internet access request: {}", e);
+        }
+
+        return experimentEntity;
     }
 }
