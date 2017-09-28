@@ -662,6 +662,53 @@ public class AdapterDeterLab {
         }
     }
 
+
+    /**
+     * information for displaying experiment profile
+     * @param jsonString the team name and experiment name
+     * @return  a json string in the format:
+     *   {
+     *       'ns_file' :
+     *       {
+     *           'msg' : 'success/fail',
+     *           'ns_file' : 'ns_file_contents'
+     *       },
+     *       'realization_details' :
+     *       {
+     *           'msg' : 'success/fail',
+     *           'realization_details' : 'realization_details_contents'
+     *       },
+     *       'activity_log'	:
+     *       {
+     *           'msg' : 'success/fail',
+     *           'activity_log' : 'activity_log_contents'
+     *       }
+     *   }
+     *   otherwise, returns a '{}'
+     */
+    public String getExperimentDetails(String jsonString) {
+        log.info("Getting experiment details for experiment profile...");
+
+        HttpHeaders headers = new HttpHeaders();
+        HttpEntity<String> request = new HttpEntity<>(jsonString, headers);
+        ResponseEntity response;
+
+        try {
+            response = restTemplate.exchange(properties.getExpDetails(), HttpMethod.POST, request, String.class);
+            String responseBody = response.getBody().toString();
+
+            if (responseBody.contains("ns_file")) {
+                log.info("Get experiment details for experiment profile OK");
+                return responseBody;
+            } else {
+                log.warn("Get experiment details for experiment profile FAIL");
+            }
+        } catch (RestClientException e) {
+            log.warn("DeterLab connection error get experiment details for experiment profile: {}", e);
+        }
+        return "{}";
+    }
+
     public String getFreeNodes() {
         log.info("Getting free nodes...");
 

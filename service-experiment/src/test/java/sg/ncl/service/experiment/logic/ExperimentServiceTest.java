@@ -2,6 +2,7 @@ package sg.ncl.service.experiment.logic;
 
 import freemarker.template.Template;
 import io.jsonwebtoken.Claims;
+import org.apache.commons.lang3.RandomStringUtils;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -136,6 +137,24 @@ public class ExperimentServiceTest {
     }
 
     @Test
+    public void testGetExperimentByExpId() throws Exception {
+        ExperimentEntity entity = getExperimentEntity();
+
+        when(experimentRepository.findOne(anyLong())).thenReturn(entity);
+
+        Experiment one = experimentService.get(1L);
+
+        assertThat(one).isEqualTo(entity);
+    }
+
+    @Test
+    public void testGetExperimentByExpIdNullId() throws Exception {
+        Experiment one = experimentService.get(null);
+
+        assertThat(one).isNull();
+    }
+
+    @Test
     public void testGetExperimentsByUser() throws Exception {
         ExperimentEntity createdExperimentSave = getExperimentEntity();
         List<ExperimentEntity> expList = new ArrayList<>();
@@ -171,6 +190,18 @@ public class ExperimentServiceTest {
     public void testGetExperimentsByTeamNullId() throws Exception {
         exception.expect(TeamIdNullOrEmptyException.class);
         experimentService.findByTeam("");
+    }
+
+    @Test
+    public void testGetExperimentDetails() throws Exception {
+        String json = RandomStringUtils.randomAlphanumeric(20);
+        ExperimentEntity entity = getExperimentEntity();
+
+        when(experimentRepository.getOne(anyLong())).thenReturn(entity);
+        when(adapterDeterLab.getExperimentDetails(anyString())).thenReturn(json);
+
+        String result = experimentService.getExperimentDetails("teamId", 1L);
+        assertThat(result).isEqualTo(json);
     }
 
     @Test

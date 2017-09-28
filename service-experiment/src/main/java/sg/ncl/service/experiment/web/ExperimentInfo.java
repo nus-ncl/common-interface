@@ -5,6 +5,8 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Getter;
 import sg.ncl.service.experiment.domain.Experiment;
 
+import java.time.ZonedDateTime;
+
 /**
  * Created by Desmond.
  */
@@ -21,6 +23,8 @@ public class ExperimentInfo implements Experiment {
     private String nsFileContent;
     private Integer idleSwap;
     private Integer maxDuration;
+    private ZonedDateTime createdDate;
+    private ZonedDateTime lastModifiedDate;
 
     @JsonCreator
     public ExperimentInfo(
@@ -33,7 +37,9 @@ public class ExperimentInfo implements Experiment {
             @JsonProperty("nsFile") final String nsFile,
             @JsonProperty("nsFileContent") final String nsFileContent,
             @JsonProperty("idleSwap") final Integer idleSwap,
-            @JsonProperty("maxDuration") final Integer maxDuration
+            @JsonProperty("maxDuration") final Integer maxDuration,
+            @JsonProperty("createdDate") final ZonedDateTime createdDate,
+            @JsonProperty("lastModifiedDate") final ZonedDateTime lastModifiedDate
     ) {
         this.id = id;
         this.userId = userId;
@@ -45,6 +51,8 @@ public class ExperimentInfo implements Experiment {
         this.nsFileContent = nsFileContent;
         this.idleSwap = idleSwap;
         this.maxDuration = maxDuration;
+        this.createdDate = createdDate;
+        this.lastModifiedDate = lastModifiedDate;
     }
 
     public ExperimentInfo(final Experiment experiment) {
@@ -58,7 +66,9 @@ public class ExperimentInfo implements Experiment {
                 experiment.getNsFile(),
                 experiment.getNsFileContent(),
                 experiment.getIdleSwap(),
-                experiment.getMaxDuration()
+                experiment.getMaxDuration(),
+                experiment.getCreatedDate(),
+                experiment.getLastModifiedDate()
         );
     }
 

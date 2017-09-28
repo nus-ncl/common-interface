@@ -73,6 +73,12 @@ public class ConnectionPropertiesTest {
     }
 
     @Test
+    public void testGetExperimentDetails() throws Exception {
+        assertThat(connectionProperties.getExpDetails()).isNotNull();
+        assertThat(connectionProperties.getExpDetails()).isEqualTo("http://127.0.0.1:22/getExpDetails");
+    }
+
+    @Test
     public void testStartExperiment() throws Exception {
         assertThat(connectionProperties.startExperiment()).isNotNull();
         assertThat(connectionProperties.startExperiment()).isEqualTo("http://127.0.0.1:22/startExperiment");

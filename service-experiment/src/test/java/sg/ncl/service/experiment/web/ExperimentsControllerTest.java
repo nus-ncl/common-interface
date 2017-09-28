@@ -26,6 +26,7 @@ import sg.ncl.service.experiment.domain.ExperimentService;
 
 import javax.inject.Inject;
 
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -87,7 +88,7 @@ public class ExperimentsControllerTest {
 
     @Test
     public void testAddExperiment() throws Exception {
-        final ExperimentInfo experimentInfo = new ExperimentInfo(0L,"","","","","","","",0,0);
+        final ExperimentInfo experimentInfo = new ExperimentInfo(0L,"","","","","","","",0,0, ZonedDateTime.now(), ZonedDateTime.now());
         final byte[] content = mapper.writeValueAsBytes(experimentInfo);
 
         ExperimentEntity entity1 = getExperimentEntity();
@@ -193,6 +194,18 @@ public class ExperimentsControllerTest {
                 .andExpect(jsonPath("$[0].nsFileContent", is(equalTo(entity1.getNsFileContent()))))
                 .andExpect(jsonPath("$[0].idleSwap", is(equalTo(entity1.getIdleSwap()))))
                 .andExpect(jsonPath("$[0].maxDuration", is(equalTo(entity1.getMaxDuration()))));
+    }
+
+    @Test
+    public void testGetExperimentDetails() throws Exception {
+        String json = RandomStringUtils.randomAlphanumeric(20);
+
+        when(experimentService.getExperimentDetails(anyString(), anyLong())).thenReturn(json);
+
+        mockMvc.perform(get(ExperimentsController.PATH + "/teams/teamId/experiments/" + 1L + "/experimentDetails").contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$", is(equalTo(json))));
     }
 
     @Test

@@ -1620,6 +1620,53 @@ public class AdapterDeterLabTest {
     }
 
     @Test
+    public void getExperimentDetailsGood() {
+        String randomString = RandomStringUtils.randomAlphanumeric(10);
+
+        JSONObject myobject = new JSONObject();
+        myobject.put("ns_file", "{ 'msg' : 'get ns file success', 'ns_file' : 'ns_file_contents' }");
+
+        when(restTemplate.exchange(anyString(),eq(HttpMethod.POST),anyObject(),eq(String.class))).thenReturn(response);
+        when(response.getBody()).thenReturn(myobject);
+
+        String result = adapterDeterLab.getExperimentDetails(randomString);
+
+        verify(restTemplate,times(1)).exchange(anyString(),eq(HttpMethod.POST),anyObject(),eq(String.class));
+        verify(properties,times(1)).getExpDetails();
+        assertThat(result).isEqualTo(myobject.toString());
+    }
+
+    @Test
+    public void getExperimentDetailsBadResult() {
+        String randomString = RandomStringUtils.randomAlphanumeric(10);
+
+        JSONObject myobject = new JSONObject();
+        myobject.put("bad_result", "{ bad_result }");
+
+        when(restTemplate.exchange(anyString(),eq(HttpMethod.POST),anyObject(),eq(String.class))).thenReturn(response);
+        when(response.getBody()).thenReturn(myobject);
+
+        String result = adapterDeterLab.getExperimentDetails(randomString);
+
+        verify(restTemplate,times(1)).exchange(anyString(),eq(HttpMethod.POST),anyObject(),eq(String.class));
+        verify(properties,times(1)).getExpDetails();
+        assertThat(result).isEqualTo("{}");
+    }
+
+    @Test
+    public void getExperimentDetailsDeterLabConnectionFailed() {
+        String randomString = RandomStringUtils.randomAlphanumeric(10);
+
+        when(restTemplate.exchange(anyString(),eq(HttpMethod.POST),anyObject(),eq(String.class))).thenThrow(new RestClientException("error get number of logged in users"));
+
+        String result = adapterDeterLab.getExperimentDetails(randomString);
+
+        verify(restTemplate,times(1)).exchange(anyString(),eq(HttpMethod.POST),anyObject(),eq(String.class));
+        verify(properties,times(1)).getExpDetails();
+        assertThat(result).isEqualTo("{}");
+    }
+
+    @Test
     public void getLoggedInUsersCountGood() {
 
         String nodes = RandomStringUtils.randomNumeric(3);

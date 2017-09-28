@@ -69,6 +69,14 @@ public class ExperimentServiceImpl implements ExperimentService {
         this.internetRequestTemplate =  internetRequestTemplate;
     }
 
+    @Override
+    public Experiment get(Long id) {
+        if (id == null) {
+            return null;
+        }
+        return experimentRepository.findOne(id);
+    }
+
     /**
      * Creates an experiment and realization object on DB.
      * Also creates the experiment on Deterlab DB.
@@ -275,6 +283,44 @@ public class ExperimentServiceImpl implements ExperimentService {
 
         log.info("End deleteExperiment");
         return experimentEntity;
+    }
+
+    /**
+     * Get experiment details from deterlab for experiment profile
+     *
+     * @param teamId    the team to get the exp for
+     * @param expId     the experiment to get the experiment details
+     * @return  a json dump of the experiment details from deterlab in the format
+     *   {
+     *       'ns_file' :
+     *       {
+     *           'msg' : 'success/fail',
+     *           'ns_file' : 'ns_file_contents'
+     *       },
+     *       'realization_details' :
+     *       {
+     *           'msg' : 'success/fail',
+     *           'realization_details' : 'realization_details_contents'
+     *       },
+     *       'activity_log'	:
+     *       {
+     *           'msg' : 'success/fail',
+     *           'activity_log' : 'activity_log_contents'
+     *       }
+     *   }
+     * Otherwise, returns "{}"
+     */
+    @Override
+    public String getExperimentDetails(String teamId, Long expId) {
+        Experiment experimentEntity = experimentRepository.getOne(expId);
+        String teamName = experimentEntity.getTeamName();
+        String experimentName = experimentEntity.getName();
+
+        JSONObject jsonObject = new JSONObject();
+        jsonObject.put("pid", teamName);
+        jsonObject.put("eid", experimentName);
+
+        return adapterDeterLab.getExperimentDetails(jsonObject.toString());
     }
 
     /**

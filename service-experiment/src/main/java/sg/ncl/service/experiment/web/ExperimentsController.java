@@ -49,6 +49,12 @@ public class ExperimentsController {
         return experimentService.getAll().stream().map(ExperimentInfo::new).collect(Collectors.toList());
     }
 
+    @GetMapping(path = "/{id}")
+    @ResponseStatus(HttpStatus.OK)
+    public  Experiment getExperiment(@PathVariable Long id) {
+        return new ExperimentInfo(experimentService.get(id));
+    }
+
     // returns experiments that the user is part of
     @GetMapping(path = "/users/{id}")
     // FIXME: path is wrong "/experiments/users/{id}" should be "/users/{id}/experiments"
@@ -80,6 +86,12 @@ public class ExperimentsController {
         log.info("Delete experiment User principal: " + claims);
         checkClaimsType(claims);
         return new ExperimentInfo(experimentService.deleteExperiment(expId, teamId, (Claims) claims));
+    }
+
+    @GetMapping(path = "/teams/{teamId}/experiments/{expId}/experimentDetails")
+    @ResponseStatus(HttpStatus.OK)
+    public String getExperimentDetails(@PathVariable String teamId, @PathVariable Long expId) {
+        return experimentService.getExperimentDetails(teamId, expId);
     }
 
     @GetMapping(path = "/teams/{teamId}/experiments/{expId}/topology")

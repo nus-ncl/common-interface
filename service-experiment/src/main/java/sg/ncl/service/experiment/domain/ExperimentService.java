@@ -9,6 +9,8 @@ import java.util.List;
  */
 public interface ExperimentService {
 
+    Experiment get(Long id);
+
     Experiment save(Experiment experiment);
 
     List<Experiment> getAll();
@@ -20,6 +22,8 @@ public interface ExperimentService {
 //  String createNsFile(String filename, String contents);
 
     Experiment deleteExperiment(Long id, String teamId, Claims claims);
+
+    String getExperimentDetails(String teamId, Long expId);
 
     String getTopology(String teamId, Long expId);
 
