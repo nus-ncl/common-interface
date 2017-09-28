@@ -394,7 +394,9 @@ public class ExperimentServiceImpl implements ExperimentService {
     public Experiment updateExperiment(Long expId, String teamId) {
         log.info("Updating experiment {},  team {}", expId, teamId);
         ExperimentEntity experimentEntity = experimentRepository.getOne(expId);
-        
+
+        adapterDeterLab.modifyExperiment();
+
         return null;
     }
 }
