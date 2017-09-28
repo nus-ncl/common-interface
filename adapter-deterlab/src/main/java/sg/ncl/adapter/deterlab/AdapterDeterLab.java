@@ -514,6 +514,29 @@ public class AdapterDeterLab {
         return expStatus;
     }
 
+    public String modifyExperiment() {
+        log.info("Modify experiment...");
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        HttpEntity<String> request = new HttpEntity<>(headers);
+
+        ResponseEntity response;
+
+        try {
+            response = restTemplate.exchange(properties.modifyExperiment(), HttpMethod.GET, request, String.class);
+        } catch (Exception e) {
+            log.warn("Adapter error delete experiment: {}", e);
+            throw new AdapterConnectionException(e.getMessage());
+        }
+
+        String msg = response.getBody().toString();
+
+        log.info("Modify experiment... {}", msg);
+
+        return msg;
+    }
+
     /**
      * Retrieves the experiment status from Deterlab
      *

@@ -389,4 +389,12 @@ public class ExperimentServiceImpl implements ExperimentService {
 
         return experimentEntity;
     }
+
+    @Override
+    public Experiment updateExperiment(Long expId, String teamId) {
+        log.info("Updating experiment {},  team {}", expId, teamId);
+        ExperimentEntity experimentEntity = experimentRepository.getOne(expId);
+        
+        return null;
+    }
 }

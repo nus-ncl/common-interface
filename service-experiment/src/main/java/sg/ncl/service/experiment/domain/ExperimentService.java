@@ -29,4 +29,5 @@ public interface ExperimentService {
 
     Experiment requestInternet(String teamId, Long expId, String reason, Claims claims);
 
+    Experiment updateExperiment(Long expId, String teamId);
 }
