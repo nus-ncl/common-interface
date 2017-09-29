@@ -79,6 +79,12 @@ public class ConnectionPropertiesTest {
     }
 
     @Test
+    public void testModifyExperiment() throws Exception {
+        assertThat(connectionProperties.modifyExperiment()).isNotNull();
+        assertThat(connectionProperties.modifyExperiment()).isEqualTo("http://127.0.0.1:22/modifyExperiment");
+    }
+
+    @Test
     public void testStartExperiment() throws Exception {
         assertThat(connectionProperties.startExperiment()).isNotNull();
         assertThat(connectionProperties.startExperiment()).isEqualTo("http://127.0.0.1:22/startExperiment");

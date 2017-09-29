@@ -601,6 +601,80 @@ public class AdapterDeterLabTest {
 
     }
 
+    @Test
+    public void modifyExperimentGood() {
+        String random = RandomStringUtils.randomAlphanumeric(20);
+
+        JSONObject myobject = new JSONObject();
+        myobject.put("msg", "modify experiment success");
+
+        when(restTemplate.exchange(anyString(),eq(HttpMethod.POST),anyObject(),eq(String.class))).thenReturn(response);
+        when(response.getBody()).thenReturn(myobject.toString());
+        when(response.getBody().toString()).thenReturn(myobject.toString());
+
+        String result = adapterDeterLab.modifyExperiment(random);
+
+        verify(restTemplate,times(1)).exchange(anyString(),eq(HttpMethod.POST),anyObject(),eq(String.class));
+        verify(properties,times(1)).modifyExperiment();
+
+        assertThat(result).isEqualTo(myobject.getString("msg"));
+    }
+
+    // throw AdapterConnectionException
+    @Test
+    public void modifyExperimentAdapterConnectionException() {
+        String random = RandomStringUtils.randomAlphanumeric(20);
+
+        JSONObject myobject = new JSONObject();
+        myobject.put("msg", "modify experiment fail");
+
+        exception.expect(AdapterConnectionException.class);
+        when(restTemplate.exchange(anyString(),eq(HttpMethod.POST),anyObject(),eq(String.class))).thenThrow(new RuntimeException());
+
+        adapterDeterLab.modifyExperiment(random);
+
+        verify(restTemplate,times(1)).exchange(anyString(),eq(HttpMethod.POST),anyObject(),eq(String.class));
+        verify(properties,times(1)).modifyExperiment();
+    }
+
+    // throw NSFileParseException
+    @Test
+    public void modifyExperimentNSFileParseException() {
+        String random = RandomStringUtils.randomAlphanumeric(20);
+
+        JSONObject myobject = new JSONObject();
+        myobject.put("msg", "modify experiment fail ns file parse error");
+
+        exception.expect(NSFileParseException.class);
+        when(restTemplate.exchange(anyString(),eq(HttpMethod.POST),anyObject(),eq(String.class))).thenReturn(response);
+        when(response.getBody()).thenReturn(myobject.toString());
+        when(response.getBody().toString()).thenReturn(myobject.toString());
+
+        adapterDeterLab.modifyExperiment(random);
+
+        verify(restTemplate,times(1)).exchange(anyString(),eq(HttpMethod.POST),anyObject(),eq(String.class));
+        verify(properties,times(1)).modifyExperiment();
+    }
+
+    // throw ExperimentModifyException
+    @Test
+    public void modifyExperimentExperimentModifyException() {
+        String random = RandomStringUtils.randomAlphanumeric(20);
+
+        JSONObject myobject = new JSONObject();
+        myobject.put("msg", "modify experiment fail");
+
+        exception.expect(ExperimentModifyException.class);
+        when(restTemplate.exchange(anyString(),eq(HttpMethod.POST),anyObject(),eq(String.class))).thenReturn(response);
+        when(response.getBody()).thenReturn(myobject.toString());
+        when(response.getBody().toString()).thenReturn(myobject.toString());
+
+        adapterDeterLab.modifyExperiment(random);
+
+        verify(restTemplate,times(1)).exchange(anyString(),eq(HttpMethod.POST),anyObject(),eq(String.class));
+        verify(properties,times(1)).modifyExperiment();
+    }
+
     //no exception thrown
     @Test
     public void startExperimentTest1() {
