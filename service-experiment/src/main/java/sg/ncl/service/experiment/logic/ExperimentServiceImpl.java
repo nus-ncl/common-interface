@@ -392,9 +392,14 @@ public class ExperimentServiceImpl implements ExperimentService {
 
     @Override
     @Transactional
-    public Experiment updateExperiment(Long expId, String teamId, Experiment experiment) {
-        log.info("Updating experiment {},  team {}", expId, teamId);
+    public Experiment updateExperiment(Long expId, String teamId, Experiment experiment, Claims claims) {
+        log.info("Updating Experiment: {} for Team {}", expId, teamId);
         ExperimentEntity experimentEntity = experimentRepository.getOne(expId);
+
+        RealizationEntity realizationEntity = realizationService.getByExperimentId(expId);
+
+        // put the check inside here because we do not want to add the realization service and team service on the controller
+        checkPermissions(realizationEntity, teamService.isOwner(teamId, claims.getSubject()), claims);
 
         JSONObject jsonObject = new JSONObject();
         jsonObject.put("pid", experiment.getTeamName());

@@ -83,8 +83,10 @@ public class ExperimentsController {
 
     @PutMapping(path = "/teams/{teamId}/experiments/{expId}")
     @ResponseStatus(HttpStatus.OK)
-    public Experiment updateExperiment(@PathVariable Long expId, @PathVariable String teamId, @RequestBody @Valid ExperimentInfo experiment) {
-        return new ExperimentInfo(experimentService.updateExperiment(expId, teamId, experiment));
+    public Experiment updateExperiment(@PathVariable Long expId, @PathVariable String teamId, @RequestBody @Valid ExperimentInfo experiment, @AuthenticationPrincipal Object claims) {
+        log.info("Update experiment User principal: " + claims);
+        checkClaimsType(claims);
+        return new ExperimentInfo(experimentService.updateExperiment(expId, teamId, experiment, (Claims) claims));
     }
 
     @GetMapping(path = "/teams/{teamId}/experiments/{expId}/experimentDetails")
