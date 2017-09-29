@@ -391,12 +391,19 @@ public class ExperimentServiceImpl implements ExperimentService {
     }
 
     @Override
-    public Experiment updateExperiment(Long expId, String teamId) {
+    @Transactional
+    public Experiment updateExperiment(Long expId, String teamId, Experiment experiment) {
         log.info("Updating experiment {},  team {}", expId, teamId);
         ExperimentEntity experimentEntity = experimentRepository.getOne(expId);
 
-        adapterDeterLab.modifyExperiment();
+        JSONObject jsonObject = new JSONObject();
+        jsonObject.put("pid", experiment.getTeamName());
+        jsonObject.put("eid", experiment.getName());
+        jsonObject.put("nsfile", experiment.getNsFileContent());
 
-        return null;
+        adapterDeterLab.modifyExperiment(jsonObject.toString());
+
+        experimentEntity.setNsFileContent(experiment.getNsFileContent());
+        return experimentRepository.save(experimentEntity);
     }
 }

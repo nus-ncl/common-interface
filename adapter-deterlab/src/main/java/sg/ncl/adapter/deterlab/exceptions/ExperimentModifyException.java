@@ -7,14 +7,10 @@ import sg.ncl.common.exception.base.BadRequestException;
 /**
  * @author Te Ye
  */
-@ResponseStatus(value = HttpStatus.BAD_REQUEST, reason = "Error parsing ns file")
-public class NSFileParseException extends BadRequestException {
+@ResponseStatus(value = HttpStatus.BAD_REQUEST, reason = "Error in modify experiment")
+public class ExperimentModifyException extends BadRequestException {
 
-    public NSFileParseException(final String message) {
-        super(message);
-    }
-
-    public NSFileParseException() {
+    public ExperimentModifyException() {
         super("Error in modify experiment");
     }
 
