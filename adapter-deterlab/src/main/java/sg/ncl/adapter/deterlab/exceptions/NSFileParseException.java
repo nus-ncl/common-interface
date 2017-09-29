@@ -15,7 +15,7 @@ public class NSFileParseException extends BadRequestException {
     }
 
     public NSFileParseException() {
-        super("Error in modify experiment");
+        super("Error in parsing ns file");
     }
 
 }

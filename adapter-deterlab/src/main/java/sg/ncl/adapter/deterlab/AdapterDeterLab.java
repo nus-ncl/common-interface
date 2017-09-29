@@ -526,7 +526,7 @@ public class AdapterDeterLab {
         try {
             response = restTemplate.exchange(properties.modifyExperiment(), HttpMethod.POST, request, String.class);
         } catch (Exception e) {
-            log.warn("Adapter error delete experiment: {}", e);
+            log.warn("Adapter error modify experiment: {}", e);
             throw new AdapterConnectionException(e.getMessage());
         }
 
