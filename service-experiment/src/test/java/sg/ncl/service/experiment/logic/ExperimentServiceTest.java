@@ -326,4 +326,98 @@ public class ExperimentServiceTest {
 
         verify(experimentRepository, times(0)).delete(anyLong());
     }
+
+    @Test
+    public void testUpdateExperimentGood() throws Exception {
+        ExperimentEntity original = getExperimentEntity();
+        ExperimentEntity edited = getExperimentEntity();
+
+        RealizationEntity realizationEntity = getRealizationEntity();
+        final List<String> roles = Collections.singletonList(Role.USER.getAuthority());
+
+        when(experimentRepository.getOne(anyLong())).thenReturn(original);
+        when(experimentRepository.save(any(ExperimentEntity.class))).thenReturn(edited);
+        when(realizationService.getByExperimentId(anyLong())).thenReturn(realizationEntity);
+        when(claims.getSubject()).thenReturn(realizationEntity.getUserId()); // claims user id should be identical to realizationEntity user id
+        when(claims.get(JwtToken.KEY)).thenReturn(roles);
+
+        Experiment result = experimentService.updateExperiment(1L, "teamName", edited, claims);
+
+        assertThat(result).isEqualTo(edited);
+    }
+
+    @Test
+    public void testUpdateExperimentTeamOwner() throws Exception {
+        ExperimentEntity original = getExperimentEntity();
+        ExperimentEntity edited = getExperimentEntity();
+
+        RealizationEntity realizationEntity = getRealizationEntity();
+        final List<String> roles = Collections.singletonList(Role.USER.getAuthority());
+
+        when(experimentRepository.getOne(anyLong())).thenReturn(original);
+        when(experimentRepository.save(any(ExperimentEntity.class))).thenReturn(edited);
+        when(realizationService.getByExperimentId(anyLong())).thenReturn(realizationEntity);
+        when(teamService.isOwner(anyString(), anyString())).thenReturn(true);
+        when(claims.getSubject()).thenReturn("ownerId"); // claims user id should be identical to realizationEntity user id
+        when(claims.get(JwtToken.KEY)).thenReturn(roles);
+
+        Experiment result = experimentService.updateExperiment(1L, "teamName", edited, claims);
+
+        assertThat(result).isEqualTo(edited);
+    }
+
+    @Test
+    public void testUpdateExperimentAdmin() throws Exception {
+        ExperimentEntity original = getExperimentEntity();
+        ExperimentEntity edited = getExperimentEntity();
+
+        RealizationEntity realizationEntity = getRealizationEntity();
+        final List<String> roles = Collections.singletonList(Role.ADMIN.getAuthority());
+
+        when(experimentRepository.getOne(anyLong())).thenReturn(original);
+        when(experimentRepository.save(any(ExperimentEntity.class))).thenReturn(edited);
+        when(realizationService.getByExperimentId(anyLong())).thenReturn(realizationEntity);
+        when(claims.getSubject()).thenReturn("userId"); // userid not matched on purpose with realizationEntity because we want to test the role effect
+        when(claims.get(JwtToken.KEY)).thenReturn(roles);
+
+        Experiment result = experimentService.updateExperiment(1L, "teamName", edited, claims);
+
+        assertThat(result).isEqualTo(edited);
+    }
+
+    @Test
+    public void testUpdateExperimentNotExpCreator() throws Exception {
+        ExperimentEntity original = getExperimentEntity();
+        ExperimentEntity edited = getExperimentEntity();
+
+        RealizationEntity realizationEntity = getRealizationEntity();
+        final List<String> roles = Collections.singletonList(Role.USER.getAuthority());
+
+        when(experimentRepository.getOne(anyLong())).thenReturn(original);
+        when(realizationService.getByExperimentId(anyLong())).thenReturn(realizationEntity);
+        when(claims.getSubject()).thenReturn("userId"); // claims user id should be identical to realizationEntity user id
+        when(claims.get(JwtToken.KEY)).thenReturn(roles);
+
+        exception.expect(ForbiddenException.class);
+        exception.expectMessage("Permission denied");
+        experimentService.updateExperiment(1L, "teamName", edited, claims);
+    }
+
+    @Test
+    public void testUpdateExperimentBadAuthoritiesDataType() throws Exception {
+        ExperimentEntity original = getExperimentEntity();
+        ExperimentEntity edited = getExperimentEntity();
+
+        RealizationEntity realizationEntity = getRealizationEntity();
+        final List<String> roles = Collections.singletonList(Role.USER.getAuthority());
+
+        when(experimentRepository.getOne(anyLong())).thenReturn(original);
+        when(realizationService.getByExperimentId(anyLong())).thenReturn(realizationEntity);
+        when(claims.getSubject()).thenReturn("userId"); // claims user id should be identical to realizationEntity user id
+        when(claims.get(JwtToken.KEY)).thenReturn("ADMIN"); // not supposed to be a String
+
+        exception.expect(ForbiddenException.class);
+        exception.expectMessage("Permission denied");
+        experimentService.updateExperiment(1L, "teamName", edited, claims);
+    }
 }

@@ -37,9 +37,7 @@ import static org.hamcrest.Matchers.is;
 import static org.mockito.Matchers.*;
 import static org.mockito.Mockito.mockingDetails;
 import static org.mockito.Mockito.when;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -257,6 +255,71 @@ public class ExperimentsControllerTest {
         when(experimentService.deleteExperiment(anyLong(), anyString(), any(Claims.class))).thenReturn(null);
 
         mockMvc.perform(delete(ExperimentsController.PATH + "/teams/" + "teamId" + "/experiments/" + 1L))
+                .andExpect(status().isForbidden())
+                .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON));
+    }
+
+    @Test
+    public void testModifyExperimentGoodAuthenticationPrincipal() throws Exception {
+        final ExperimentEntity entity = getExperimentEntity();
+        Long experimentId = Long.parseLong(RandomStringUtils.randomNumeric(5));
+        String teamId = RandomStringUtils.randomAlphabetic(8);
+
+        final byte[] content = mapper.writeValueAsBytes(new ExperimentInfo(entity));
+
+        when(securityContext.getAuthentication()).thenReturn(authentication);
+        SecurityContextHolder.setContext(securityContext);
+        when(authentication.getPrincipal()).thenReturn(claims);
+
+        when(experimentService.updateExperiment(anyLong(), anyString(), any(Experiment.class), any(Claims.class))).thenReturn(entity);
+
+        mockMvc.perform(put(ExperimentsController.PATH + "/teams/" + teamId + "/experiments/" + experimentId).contentType(MediaType.APPLICATION_JSON).content(content))
+                .andExpect(status().isOk())
+                .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
+
+                .andExpect(jsonPath("$.userId", is(equalTo(entity.getUserId()))))
+                .andExpect(jsonPath("$.teamId", is(equalTo(entity.getTeamId()))))
+                .andExpect(jsonPath("$.teamName", is(equalTo(entity.getTeamName()))))
+                .andExpect(jsonPath("$.name", is(equalTo(entity.getName()))))
+                .andExpect(jsonPath("$.description", is(equalTo(entity.getDescription()))))
+                .andExpect(jsonPath("$.nsFile", is(equalTo(entity.getNsFile()))))
+                .andExpect(jsonPath("$.nsFileContent", is(equalTo(entity.getNsFileContent()))))
+                .andExpect(jsonPath("$.idleSwap", is(equalTo(entity.getIdleSwap()))))
+                .andExpect(jsonPath("$.maxDuration", is(equalTo(entity.getMaxDuration()))))
+                .andExpect(jsonPath("$.createdDate", is(equalTo(entity.getCreatedDate()))))
+                .andExpect(jsonPath("$.lastModifiedDate", is(equalTo(entity.getLastModifiedDate()))));
+    }
+
+    @Test
+    public void testModifyExperimentBadAuthenticationPrincipal() throws Exception {
+        final ExperimentEntity entity = getExperimentEntity();
+
+        final byte[] content = mapper.writeValueAsBytes(new ExperimentInfo(entity));
+
+        when(securityContext.getAuthentication()).thenReturn(authentication);
+        SecurityContextHolder.setContext(securityContext);
+        when(authentication.getPrincipal()).thenReturn("");
+
+        when(experimentService.updateExperiment(anyLong(), anyString(), any(Experiment.class), any(Claims.class))).thenReturn(null);
+
+        mockMvc.perform(put(ExperimentsController.PATH + "/teams/" + "teamId" + "/experiments/" + 1L).contentType(MediaType.APPLICATION_JSON).content(content))
+                .andExpect(status().isForbidden())
+                .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON));
+    }
+
+    @Test
+    public void testModifyExperimentNullAuthentication() throws Exception {
+        final ExperimentEntity entity = getExperimentEntity();
+
+        final byte[] content = mapper.writeValueAsBytes(new ExperimentInfo(entity));
+
+        when(securityContext.getAuthentication()).thenReturn(authentication);
+        SecurityContextHolder.setContext(securityContext);
+        when(authentication.getPrincipal()).thenReturn(null);
+
+        when(experimentService.updateExperiment(anyLong(), anyString(), any(Experiment.class), any(Claims.class))).thenReturn(null);
+
+        mockMvc.perform(put(ExperimentsController.PATH + "/teams/" + "teamId" + "/experiments/" + 1L).contentType(MediaType.APPLICATION_JSON).content(content))
                 .andExpect(status().isForbidden())
                 .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON));
     }
