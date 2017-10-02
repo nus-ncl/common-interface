@@ -14,6 +14,7 @@ public class DataPublicUserInfo implements DataPublicUser {
     private String jobTitle;
     private String institution;
     private String country;
+    private boolean licenseAgreed;
 
     @JsonCreator
     public DataPublicUserInfo(
@@ -22,7 +23,8 @@ public class DataPublicUserInfo implements DataPublicUser {
             @JsonProperty("email") final String email,
             @JsonProperty("jobTitle") final String jobTitle,
             @JsonProperty("institution") final String institution,
-            @JsonProperty("country") final String country
+            @JsonProperty("country") final String country,
+            @JsonProperty("licenseAgreed") final boolean licenseAgreed
     ) {
         this.id = id;
         this.fullName = fullName;
@@ -30,6 +32,7 @@ public class DataPublicUserInfo implements DataPublicUser {
         this.jobTitle = jobTitle;
         this.institution = institution;
         this.country = country;
+        this.licenseAgreed = licenseAgreed;
     }
 
     public DataPublicUserInfo(DataPublicUser dataPublicUser) {
@@ -39,7 +42,8 @@ public class DataPublicUserInfo implements DataPublicUser {
                 dataPublicUser.getEmail(),
                 dataPublicUser.getJobTitle(),
                 dataPublicUser.getInstitution(),
-                dataPublicUser.getCountry()
+                dataPublicUser.getCountry(),
+                true
         );
     }
 

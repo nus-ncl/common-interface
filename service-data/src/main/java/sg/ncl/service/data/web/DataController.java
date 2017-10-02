@@ -11,6 +11,7 @@ import sg.ncl.common.exception.base.BadRequestException;
 import sg.ncl.common.exception.base.ForbiddenException;
 import sg.ncl.common.exception.base.UnauthorizedException;
 import sg.ncl.service.data.domain.*;
+import sg.ncl.service.data.exceptions.DataLicenseNotAgreedException;
 import sg.ncl.service.transmission.web.ResumableInfo;
 
 import javax.inject.Inject;
@@ -313,6 +314,9 @@ public class DataController {
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE, path = "/public/users")
     @ResponseStatus(HttpStatus.CREATED)
     public DataPublicUser savePublicUser(@RequestBody @Valid DataPublicUserInfo dataPublicUserInfo) {
+        if (!dataPublicUserInfo.isLicenseAgreed()) {
+            throw new DataLicenseNotAgreedException("User has not agree to the data license");
+        }
         return new DataPublicUserInfo(dataService.createPublicUser(dataPublicUserInfo));
     }
 

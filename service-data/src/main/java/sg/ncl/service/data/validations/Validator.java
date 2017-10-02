@@ -60,7 +60,7 @@ public class Validator {
                     throw new ForbiddenException();
                 }
             } else if (data.getAccessibility().equals(DataAccessibility.QUARANTINED)) {
-                if (!isContributor(data, contextUserId))
+                // if (!isContributor(data, contextUserId))
                     throw new ForbiddenException();
             }
         }
