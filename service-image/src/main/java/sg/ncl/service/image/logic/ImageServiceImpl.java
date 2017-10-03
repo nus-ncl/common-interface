@@ -94,4 +94,11 @@ public class ImageServiceImpl implements ImageService {
         log.info("Image created: {}", saved);
         return saved;
     }
+
+    @Override
+    public Image deleteImage(Image image, Claims claims) {
+        final ImageEntity entity = new ImageEntity();
+
+        return entity;
+    }
 }
