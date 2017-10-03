@@ -84,10 +84,10 @@ public class ImageController {
 
     @DeleteMapping(path = "/{imageName}/delete")
     @ResponseStatus(HttpStatus.OK)
-    public String deleteImage(@PathVariable String imageName, @RequestParam(value = "teamId", required = true) String teamId,
+    public String deleteImage(@PathVariable String imageName,
+                              @RequestParam(value = "teamId", required = true) String teamId,
                               @AuthenticationPrincipal Object claims) {
         checkClaimsType(claims);
-
-        return "";
+        return imageService.deleteImage(teamId, imageName, (Claims) claims);
     }
 }

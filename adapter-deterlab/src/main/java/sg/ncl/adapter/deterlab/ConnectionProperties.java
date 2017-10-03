@@ -129,6 +129,10 @@ public class ConnectionProperties {
         return HTTP_MODE + ip + ":" + port + "/saveImage";
     }
 
+    public String deleteImage() {
+        return HTTP_MODE + ip + ":" + port + "/deleteImage";
+    }
+
     public String removeUserFromTeam() {
         return HTTP_MODE + ip + ":" + port + "/removeUserFromTeam";
     }

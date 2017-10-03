@@ -16,7 +16,7 @@ public interface ImageService {
 
     Image addImage(Image image, Claims claims);
 
-    Image deleteImage(Image image, Claims claims);
+    String deleteImage(String teamId, String imageName, Claims claims);
 
     Map<String, String> getSavedImages(String teamId);
 

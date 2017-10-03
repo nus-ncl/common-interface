@@ -874,6 +874,8 @@ public class AdapterDeterLab {
         return response.getBody().toString();
     }
 
+
+
     public String saveImage(String nclTeamId, String nclUserId, String nodeId, String imageName, String currentOS) {
         final String pid = getDeterProjectIdByNclTeamId(nclTeamId);
         final String uid = getDeterUserIdByNclUserId(nclUserId);
@@ -906,6 +908,35 @@ public class AdapterDeterLab {
             }
 
         } catch (ResourceAccessException rae) {
+            log.warn("Save image error: {}", rae);
+            throw new AdapterConnectionException(rae.getMessage());
+        } catch (HttpServerErrorException hsee) {
+            log.warn("Save image error: Adapter DeterLab internal server error {}", hsee);
+            throw new AdapterInternalErrorException();
+        }
+    }
+
+    public String deleteImage(String teamId, String userId, String imageName) {
+        final String pid = getDeterProjectIdByNclTeamId(teamId);
+        final String uid = getDeterUserIdByNclUserId(userId);
+
+        log.info("Deleting image: pid {}, uid {}, image name {}", pid, uid, imageName);
+        JSONObject jsonObject = new JSONObject();
+        jsonObject.put("pid", pid);
+        jsonObject.put("uid", uid);
+        jsonObject.put("imageName", imageName);
+
+        HttpHeaders httpHeaders= new HttpHeaders();
+        httpHeaders.setContentType(MediaType.APPLICATION_JSON);
+        HttpEntity<String> request = new HttpEntity<>(jsonObject.toString(), httpHeaders);
+
+        try {
+            ResponseEntity responseEntity = restTemplate.exchange(properties.deleteImage(), HttpMethod.DELETE, request, String.class);
+            String responseBody = responseEntity.getBody().toString();
+            //String deterMessage = new JSONObject(responseBody).getString("msg");
+            return responseBody;
+
+        }catch (ResourceAccessException rae) {
             log.warn("Save image error: {}", rae);
             throw new AdapterConnectionException(rae.getMessage());
         } catch (HttpServerErrorException hsee) {

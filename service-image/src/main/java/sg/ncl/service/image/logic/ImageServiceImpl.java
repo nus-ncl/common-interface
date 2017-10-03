@@ -96,9 +96,7 @@ public class ImageServiceImpl implements ImageService {
     }
 
     @Override
-    public Image deleteImage(Image image, Claims claims) {
-        final ImageEntity entity = new ImageEntity();
-
-        return entity;
+    public String deleteImage(String teamId, String imageName, Claims claims) {
+        return adapterDeterLab.deleteImage(teamId, claims.getSubject(), imageName);
     }
 }
