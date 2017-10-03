@@ -88,6 +88,6 @@ public class ImageController {
                               @RequestParam(value = "teamId", required = true) String teamId,
                               @AuthenticationPrincipal Object claims) {
         checkClaimsType(claims);
-        return imageService.deleteImage(teamId, imageName, (Claims) claims);
+        return imageService.removeImage(teamId, imageName, (Claims) claims);
     }
 }
