@@ -917,12 +917,15 @@ public class AdapterDeterLab {
     }
 
     public String deleteImage(String teamId, String userId, String imageName) {
-        final String pid = getDeterProjectIdByNclTeamId(teamId);
         final String uid = getDeterUserIdByNclUserId(userId);
 
-        log.info("Deleting image: pid {}, uid {}, image name {}", pid, uid, imageName);
+        log.info("pid in adapterDeterlab: {}", teamId);
+        log.info("uid in adapterDeterlab: {}", uid);
+        log.info("imageName in adapterDeterlab: {}", imageName);
+
+        log.info("Deleting image: pid {}, uid {}, image name {}", teamId, uid, imageName);
         JSONObject jsonObject = new JSONObject();
-        jsonObject.put("pid", pid);
+        jsonObject.put("pid", teamId);
         jsonObject.put("uid", uid);
         jsonObject.put("imageName", imageName);
 
@@ -936,11 +939,11 @@ public class AdapterDeterLab {
             //String deterMessage = new JSONObject(responseBody).getString("msg");
             return responseBody;
 
-        }catch (ResourceAccessException rae) {
-            log.warn("Save image error: {}", rae);
-            throw new AdapterConnectionException(rae.getMessage());
-        } catch (HttpServerErrorException hsee) {
-            log.warn("Save image error: Adapter DeterLab internal server error {}", hsee);
+        }catch (ResourceAccessException resourceAccessException) {
+            log.warn("Deleting image error: {}", resourceAccessException);
+            throw new AdapterConnectionException(resourceAccessException.getMessage());
+        } catch (HttpServerErrorException httpServerErrorException) {
+            log.warn("Deleting image error: Adapter DeterLab internal server error {}", httpServerErrorException);
             throw new AdapterInternalErrorException();
         }
     }
