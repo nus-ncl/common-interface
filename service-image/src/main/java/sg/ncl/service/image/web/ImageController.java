@@ -18,6 +18,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 import static sg.ncl.common.validation.Validator.checkClaimsType;
+import static sg.ncl.common.validation.Validator.isAdmin;
 import static sg.ncl.service.image.web.ImageController.PATH;
 
 /**

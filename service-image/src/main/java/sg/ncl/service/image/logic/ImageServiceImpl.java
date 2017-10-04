@@ -97,6 +97,6 @@ public class ImageServiceImpl implements ImageService {
 
     @Override
     public String removeImage(String teamId, String imageName, Claims claims) {
-        return adapterDeterLab.deleteImage(teamId, claims.getSubject(), imageName);
+        return adapterDeterLab.deleteImage(teamId, imageName, claims);
     }
 }

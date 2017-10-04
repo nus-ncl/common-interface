@@ -1,6 +1,7 @@
 package sg.ncl.adapter.deterlab;
 
 
+import io.jsonwebtoken.Claims;
 import lombok.extern.slf4j.Slf4j;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -24,6 +25,9 @@ import sg.ncl.adapter.deterlab.exceptions.*;
 import javax.inject.Inject;
 import java.util.HashSet;
 import java.util.Set;
+
+import static sg.ncl.common.validation.Validator.checkAdmin;
+import static sg.ncl.common.validation.Validator.isAdmin;
 
 /**
  * This is to invoke python scripts on the BOSS
@@ -918,15 +922,20 @@ public class AdapterDeterLab {
         }
     }
 
-    public String deleteImage(String teamId, String userId, String imageName) {
-        final String uid = getDeterUserIdByNclUserId(userId);
+    public String deleteImage(String teamId, String imageName, Claims claims) {
+        final String uid = getDeterUserIdByNclUserId(claims.getSubject());
 
-        log.info("Deleting image {} from uid {} of pid {}", uid, teamId, imageName);
+        log.info("Deleting image '{}' from uid '{}' of pid '{}'", uid, teamId, imageName);
         JSONObject jsonObject = new JSONObject();
         jsonObject.put("pid", teamId);
         jsonObject.put("uid", uid);
         jsonObject.put("imageName", imageName);
 
+        if (checkAdmin(claims)) {
+            jsonObject.put("isAdmin", "yes");
+        } else {
+            jsonObject.put("isAdmin", "no");
+        }
 
         HttpHeaders httpHeaders= new HttpHeaders();
         httpHeaders.setContentType(MediaType.APPLICATION_JSON);
@@ -937,18 +946,20 @@ public class AdapterDeterLab {
             String responseBody = responseEntity.getBody().toString();
             String deterMessage = new JSONObject(responseBody).getString("msg");
 
-            Set<String> successfulMessages = new HashSet<>();
-            successfulMessages.add("delete image OK from both web and project directory");
-            successfulMessages.add("delete image OK from web but physical image can not be found in proj directory");
-            successfulMessages.add("delete image OK from web but error in using rm command to delete physical image");
-            successfulMessages.add("image still in use");
-            successfulMessages.add("no permission to delete the imageid");
+            Set<String> returnMessages = new HashSet<>();
+            returnMessages.add("delete image OK from both web and project directory");
+            returnMessages.add("delete image OK from web but error in using rm command to delete physical image");
+            returnMessages.add("delete image OK from web but physical image can not be found in proj directory");
+            returnMessages.add("delete image OK from web but there is unknown error when deleting physical image");
+            returnMessages.add("image still in use");
+            returnMessages.add("not creator");
+            returnMessages.add("no permission to delete the imageid");
 
-            if (successfulMessages .contains(deterMessage)) {
-                log.info("Deleting image {} from uid {} of pid {} successful: {} ", uid, teamId, imageName, deterMessage);
+            if (returnMessages.contains(deterMessage)) {
+                log.info("Deleting image '{}' from uid '{}' of pid '{}' : {} ", uid, teamId, imageName, deterMessage);
                 return responseBody;
             } else {
-                log.warn("Deleting image {} from uid {} of pid {} error : {} ", uid, teamId, imageName, deterMessage);
+                log.warn("Error in deleting image '{}' from uid '{}' of pid '{}' : {} ", uid, teamId, imageName, deterMessage);
                 throw new DeterLabOperationFailedException(deterMessage);
             }
 
