@@ -22,6 +22,8 @@ import sg.ncl.adapter.deterlab.dtos.entities.DeterLabUserEntity;
 import sg.ncl.adapter.deterlab.exceptions.*;
 
 import javax.inject.Inject;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * This is to invoke python scripts on the BOSS
@@ -919,15 +921,12 @@ public class AdapterDeterLab {
     public String deleteImage(String teamId, String userId, String imageName) {
         final String uid = getDeterUserIdByNclUserId(userId);
 
-        log.info("pid in adapterDeterlab: {}", teamId);
-        log.info("uid in adapterDeterlab: {}", uid);
-        log.info("imageName in adapterDeterlab: {}", imageName);
-
-        log.info("Deleting image: pid {}, uid {}, image name {}", teamId, uid, imageName);
+        log.info("Deleting image {} from uid {} of pid {}", uid, teamId, imageName);
         JSONObject jsonObject = new JSONObject();
         jsonObject.put("pid", teamId);
         jsonObject.put("uid", uid);
         jsonObject.put("imageName", imageName);
+
 
         HttpHeaders httpHeaders= new HttpHeaders();
         httpHeaders.setContentType(MediaType.APPLICATION_JSON);
@@ -936,14 +935,28 @@ public class AdapterDeterLab {
         try {
             ResponseEntity responseEntity = restTemplate.exchange(properties.deleteImage(), HttpMethod.DELETE, request, String.class);
             String responseBody = responseEntity.getBody().toString();
-            //String deterMessage = new JSONObject(responseBody).getString("msg");
-            return responseBody;
+            String deterMessage = new JSONObject(responseBody).getString("msg");
+
+            Set<String> successfulMessages = new HashSet<>();
+            successfulMessages.add("delete image OK from both web and project directory");
+            successfulMessages.add("delete image OK from web but physical image can not be found in proj directory");
+            successfulMessages.add("delete image OK from web but error in using rm command to delete physical image");
+            successfulMessages.add("image still in use");
+            successfulMessages.add("no permission to delete the imageid");
+
+            if (successfulMessages .contains(deterMessage)) {
+                log.info("Deleting image {} from uid {} of pid {} successful: {} ", uid, teamId, imageName, deterMessage);
+                return responseBody;
+            } else {
+                log.warn("Deleting image {} from uid {} of pid {} error : {} ", uid, teamId, imageName, deterMessage);
+                throw new DeterLabOperationFailedException(deterMessage);
+            }
 
         }catch (ResourceAccessException resourceAccessException) {
-            log.warn("Deleting image error: {}", resourceAccessException);
+            log.warn("Deleting image {} from uid {} of pid {} error: {}", uid, teamId, imageName, resourceAccessException);
             throw new AdapterConnectionException(resourceAccessException.getMessage());
         } catch (HttpServerErrorException httpServerErrorException) {
-            log.warn("Deleting image error: Adapter DeterLab internal server error {}", httpServerErrorException);
+            log.warn("Deleting image {} from uid {} of pid {} error: Adapter DeterLab internal server error {}", uid, teamId, imageName, httpServerErrorException);
             throw new AdapterInternalErrorException();
         }
     }
