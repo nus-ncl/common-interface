@@ -6,7 +6,6 @@ import org.json.JSONObject;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import sg.ncl.adapter.deterlab.AdapterDeterLab;
-import sg.ncl.adapter.deterlab.exceptions.ImageNotFoundException;
 import sg.ncl.service.image.data.jpa.ImageEntity;
 import sg.ncl.service.image.data.jpa.ImageRepository;
 import sg.ncl.service.image.domain.Image;
@@ -14,7 +13,6 @@ import sg.ncl.service.image.domain.ImageService;
 import sg.ncl.service.image.domain.ImageVisibility;
 import sg.ncl.service.team.data.jpa.TeamEntity;
 import sg.ncl.service.team.data.jpa.TeamRepository;
-import sg.ncl.service.team.domain.Team;
 import sg.ncl.service.team.domain.TeamService;
 import sg.ncl.service.team.exceptions.TeamNotFoundException;
 
