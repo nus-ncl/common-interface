@@ -11,6 +11,7 @@ import sg.ncl.service.image.data.jpa.ImageRepository;
 import sg.ncl.service.image.domain.Image;
 import sg.ncl.service.image.domain.ImageService;
 import sg.ncl.service.image.domain.ImageVisibility;
+import sg.ncl.service.team.data.jpa.TeamEntity;
 import sg.ncl.service.team.data.jpa.TeamRepository;
 import sg.ncl.service.team.domain.Team;
 import sg.ncl.service.team.domain.TeamService;
@@ -108,23 +109,23 @@ public class ImageServiceImpl implements ImageService {
 
     @Override
     public String removeImage(String teamId, String imageName, Claims claims) {
-        //check if team exists
-        Team team = teamRepository.findByName(teamId);
+
+        //check if team exists in sio database
+        TeamEntity team = teamRepository.findOne(teamId);
         if (team == null) {
             log.warn("Error in deleting image '{}' from team '{}': team is not found", imageName, teamId);
             String message = "Team " + teamId + " is not found!";
             throw new TeamNotFoundException(message);
         }
 
-        // check if image with teamId exists
-        Image image = imageRepository.findByTeamIdAndImageName(teamId,imageName);
-        if (image == null) {
-            log.warn("Error in deleting image '{}' from team '{}': image is not found in team", imageName, teamId);
-            String message = "Image " + imageName + " is not found in team " + teamId;
-            throw new ImageNotFoundException(message);
+        // check if image with teamId exists in sio database
+        ImageEntity image = imageRepository.findByTeamIdAndImageName(teamId,imageName);
+        if (image != null) {
+            log.info("Error in deleting image '{}' from team '{}': delete image from sio database", imageName, teamId);
+            imageRepository.delete(image);
         }
 
-        Boolean specialRole = false;
+        boolean specialRole = false;
         if (teamService.isOwner(teamId, claims.getSubject()) || checkAdmin(claims)) {
             specialRole = true;
         }
