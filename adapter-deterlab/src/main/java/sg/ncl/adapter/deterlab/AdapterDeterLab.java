@@ -26,8 +26,6 @@ import javax.inject.Inject;
 import java.util.HashSet;
 import java.util.Set;
 
-import static sg.ncl.common.validation.Validator.checkAdmin;
-
 /**
  * This is to invoke python scripts on the BOSS
  * Created by Te Ye on 15-Jun-16.
@@ -945,46 +943,48 @@ public class AdapterDeterLab {
             String responseBody = responseEntity.getBody().toString();
             String deterMessage = new JSONObject(responseBody).getString("msg");
 
-            Set<String> curl_success = new HashSet<>();
-            curl_success.add("delete image OK from both web and project directory");
-            curl_success.add("delete image OK from web but error when executing rm command to delete physical image");
-            curl_success.add("delete image OK from web but there is unknown error when deleting physical image");
-            curl_success.add("image still in use");
+            Set<String> curlSuccess = new HashSet<>();
+            curlSuccess.add("delete image OK from both web and project directory");
+            curlSuccess.add("delete image OK from web but error when executing rm command to delete physical image");
+            curlSuccess.add("delete image OK from web but there is unknown error when deleting physical image");
+            curlSuccess.add("image still in use");
 
-            String message = "Deleting image '" + imageName + "' of team '" +  pid + "' : " + deterMessage;
+            String exceptionMessage = "Deleting image '" + imageName + "' of team '" +  pid + "' : " + deterMessage;
+            String errorMessage = "Error in deleting image '{}' from uid '{}' of pid '{}' : {} ";
 
-            if (curl_success.contains(deterMessage)) {
+            if (curlSuccess.contains(deterMessage)) {
                 log.info("Deleting image '{}' from uid '{}' of pid '{}' : {} ", uid, pid, imageName, deterMessage);
                 return responseBody;
 
             } else if ("not the creator".equals(deterMessage)) {
-                log.warn("Error in deleting image '{}' from uid '{}' of pid '{}' : {} ", uid, pid, imageName, deterMessage);
-                throw new InsufficientPermissionException(message);
+                log.warn(errorMessage , uid, pid, imageName, deterMessage);
+                throw new InsufficientPermissionException(exceptionMessage);
 
             } else if ("no permission to delete the imageid when executing Curl command".equals(deterMessage)) {
-                log.warn("Error in deleting image '{}' from uid '{}' of pid '{}' : {} ", uid, pid, imageName, deterMessage);
-                throw new InsufficientPermissionException(message);
+                log.warn(errorMessage , uid, pid, imageName, deterMessage);
+                throw new InsufficientPermissionException(exceptionMessage);
 
             } else if ("required image id is not found when querying database".equals(deterMessage)) {
-                log.warn("Error in deleting image '{}' from uid '{}' of pid '{}' : {} ", uid, pid, imageName, deterMessage);
-                throw new ImageNotFoundException(message);
+                log.warn(errorMessage , uid, pid, imageName, deterMessage);
+                throw new ImageNotFoundException(exceptionMessage);
 
             } else if ("no creator found when querying database".equals(deterMessage)) {
-                log.warn("Error in deleting image '{}' from uid '{}' of pid '{}' : {} ", uid, pid, imageName, deterMessage);
-                throw new ImageNotFoundException(message);
+                log.warn(errorMessage , uid, pid, imageName, deterMessage);
+                throw new ImageNotFoundException(exceptionMessage);
 
             } else if ("imageid could not be found when executing Curl command".equals(deterMessage)) {
-                log.warn("Error in deleting image '{}' from uid '{}' of pid '{}' : {} ", uid, pid, imageName, deterMessage);
-                throw new ImageNotFoundException(message);
+                log.warn(errorMessage , uid, pid, imageName, deterMessage);
+                throw new ImageNotFoundException(exceptionMessage);
 
             } else {
                 log.warn("Error in deleting image '{}' from uid '{}' of pid '{}' : {} ", uid, pid, imageName, deterMessage);
-                throw new DeterLabOperationFailedException(message);
+                throw new DeterLabOperationFailedException(exceptionMessage);
             }
 
         }catch (ResourceAccessException resourceAccessException) {
             log.warn("Deleting image {} from uid {} of pid {} error: {}", uid, teamId, imageName, resourceAccessException);
             throw new AdapterConnectionException(resourceAccessException.getMessage());
+
         } catch (HttpServerErrorException httpServerErrorException) {
             log.warn("Deleting image {} from uid {} of pid {} error: Adapter DeterLab internal server error {}", uid, pid, imageName, httpServerErrorException);
             throw new AdapterInternalErrorException();

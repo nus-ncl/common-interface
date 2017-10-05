@@ -60,9 +60,6 @@ public class Validator {
 
         log.info("Context user id: {}, Context roles: {}", contextUserId, roles);
 
-        if (!roles.contains(Role.ADMIN.toString())) {
-            return false;
-        }
-        return true;
+        return roles.contains(Role.ADMIN.toString());
     }
 }
