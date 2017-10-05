@@ -128,6 +128,7 @@ public class ImageServiceImpl implements ImageService {
         if (teamService.isOwner(teamId, claims.getSubject()) || checkAdmin(claims)) {
             specialRole = true;
         }
+
         String userId = claims.getSubject();
         return adapterDeterLab.deleteImage(teamId, userId, imageName, specialRole);
     }

@@ -951,13 +951,23 @@ public class AdapterDeterLab {
             returnMessages.add("delete image OK from web but physical image can not be found in proj directory");
             returnMessages.add("delete image OK from web but there is unknown error when deleting physical image");
             returnMessages.add("image still in use");
-            returnMessages.add("not creator");
-            returnMessages.add("no permission to delete the imageid when executing Curl command");
 
             if (returnMessages.contains(deterMessage)) {
                 log.info("Deleting image '{}' from uid '{}' of pid '{}' : {} ", uid, teamId, imageName, deterMessage);
                 return responseBody;
-            } else {
+
+            } else if ("not the creator".equals(deterMessage)) {
+                log.warn("Error in deleting image '{}' from uid '{}' of pid '{}' : {} ", uid, teamId, imageName, deterMessage);
+                String message = "Deleting image " + imageName + " of team " +  teamId + " : not the creator";
+                throw new InsufficientPermissionException(message);
+
+            } else if ("no permission to delete the imageid when executing Curl command".equals(deterMessage)) {
+                log.warn("Error in deleting image '{}' from uid '{}' of pid '{}' : {} ", uid, teamId, imageName, deterMessage);
+                String message = "Deleting image " + imageName + " of team " +  teamId + " : no permission to delete the imageid when executing Curl command";
+                throw new InsufficientPermissionException(message);
+            }
+
+            else {
                 log.warn("Error in deleting image '{}' from uid '{}' of pid '{}' : {} ", uid, teamId, imageName, deterMessage);
                 throw new DeterLabOperationFailedException(deterMessage);
             }
