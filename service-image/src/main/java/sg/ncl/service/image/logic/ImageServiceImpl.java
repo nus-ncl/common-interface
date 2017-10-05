@@ -5,12 +5,12 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import sg.ncl.adapter.deterlab.AdapterDeterLab;
+import sg.ncl.adapter.deterlab.exceptions.ImageNotFoundException;
 import sg.ncl.service.image.data.jpa.ImageEntity;
 import sg.ncl.service.image.data.jpa.ImageRepository;
 import sg.ncl.service.image.domain.Image;
 import sg.ncl.service.image.domain.ImageService;
 import sg.ncl.service.image.domain.ImageVisibility;
-import sg.ncl.service.image.exceptions.ImageNotFoundInTeamException;
 import sg.ncl.service.team.data.jpa.TeamRepository;
 import sg.ncl.service.team.domain.Team;
 import sg.ncl.service.team.domain.TeamService;
@@ -109,7 +109,7 @@ public class ImageServiceImpl implements ImageService {
     @Override
     public String removeImage(String teamId, String imageName, Claims claims) {
         //check if team exists
-        Team team = teamRepository.findOne(teamId);
+        Team team = teamRepository.findByName(teamId);
         if (team == null) {
             log.warn("Error in deleting image '{}' from team '{}': team is not found", imageName, teamId);
             String message = "Team " + teamId + " is not found!";
@@ -121,7 +121,7 @@ public class ImageServiceImpl implements ImageService {
         if (image == null) {
             log.warn("Error in deleting image '{}' from team '{}': image is not found in team", imageName, teamId);
             String message = "Image " + imageName + " is not found in team " + teamId;
-            throw new ImageNotFoundInTeamException(message);
+            throw new ImageNotFoundException(message);
         }
 
         Boolean specialRole = false;

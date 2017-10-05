@@ -879,8 +879,6 @@ public class AdapterDeterLab {
         return response.getBody().toString();
     }
 
-
-
     public String saveImage(String nclTeamId, String nclUserId, String nodeId, String imageName, String currentOS) {
         final String pid = getDeterProjectIdByNclTeamId(nclTeamId);
         final String uid = getDeterUserIdByNclUserId(nclUserId);
@@ -965,6 +963,11 @@ public class AdapterDeterLab {
                 log.warn("Error in deleting image '{}' from uid '{}' of pid '{}' : {} ", uid, teamId, imageName, deterMessage);
                 String message = "Deleting image " + imageName + " of team " +  teamId + " : no permission to delete the imageid when executing Curl command";
                 throw new InsufficientPermissionException(message);
+
+            } else if ("required image is not found when querying database".equals(deterMessage)) {
+                log.warn("Error in deleting image '{}' from uid '{}' of pid '{}' : {} ", uid, teamId, imageName, deterMessage);
+                String message = "Deleting image " + imageName + " of team " +  teamId + " : required image is not found when querying database";
+                throw new ImageNotFoundException(message);
             }
 
             else {
