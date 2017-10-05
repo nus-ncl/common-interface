@@ -947,8 +947,7 @@ public class AdapterDeterLab {
 
             Set<String> curl_success = new HashSet<>();
             curl_success.add("delete image OK from both web and project directory");
-            curl_success.add("delete image OK from web but error in using rm command to delete physical image");
-            curl_success.add("delete image OK from web but physical image can not be found in proj directory");
+            curl_success.add("delete image OK from web but error when executing rm command to delete physical image");
             curl_success.add("delete image OK from web but there is unknown error when deleting physical image");
             curl_success.add("image still in use");
 
@@ -966,11 +965,15 @@ public class AdapterDeterLab {
                 log.warn("Error in deleting image '{}' from uid '{}' of pid '{}' : {} ", uid, pid, imageName, deterMessage);
                 throw new InsufficientPermissionException(message);
 
-            } else if ("required image is not found when querying database".equals(deterMessage)) {
+            } else if ("required image id is not found when querying database".equals(deterMessage)) {
                 log.warn("Error in deleting image '{}' from uid '{}' of pid '{}' : {} ", uid, pid, imageName, deterMessage);
                 throw new ImageNotFoundException(message);
 
             } else if ("no creator found when querying database".equals(deterMessage)) {
+                log.warn("Error in deleting image '{}' from uid '{}' of pid '{}' : {} ", uid, pid, imageName, deterMessage);
+                throw new ImageNotFoundException(message);
+
+            } else if ("imageid could not be found when executing Curl command".equals(deterMessage)) {
                 log.warn("Error in deleting image '{}' from uid '{}' of pid '{}' : {} ", uid, pid, imageName, deterMessage);
                 throw new ImageNotFoundException(message);
 

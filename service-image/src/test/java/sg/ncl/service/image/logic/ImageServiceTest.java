@@ -15,6 +15,8 @@ import sg.ncl.service.image.domain.Image;
 import sg.ncl.service.image.domain.ImageService;
 import sg.ncl.service.image.domain.ImageVisibility;
 import sg.ncl.service.image.web.ImageInfo;
+import sg.ncl.service.team.data.jpa.TeamRepository;
+import sg.ncl.service.team.domain.TeamService;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -27,7 +29,7 @@ import static org.mockito.Mockito.*;
 import static sg.ncl.service.image.util.TestUtil.getImageEntity;
 
 /**
- * Created by dcsyeoty on 29-Oct-16.
+ * @Authors: Teye, Tran Ly Vu
  */
 public class ImageServiceTest {
 
@@ -42,6 +44,10 @@ public class ImageServiceTest {
     private ImageRepository imageRepository;
     @Mock
     private Claims claims;
+    @Mock
+    private TeamService teamService;
+    @Mock
+    private TeamRepository teamRepository;
 
     private ImageService imageService;
 
@@ -49,9 +55,11 @@ public class ImageServiceTest {
     public void before() {
         assertThat(mockingDetails(adapterDeterLab).isMock()).isTrue();
         assertThat(mockingDetails(imageRepository).isMock()).isTrue();
+        assertThat(mockingDetails(teamService).isMock()).isTrue();
+        assertThat(mockingDetails(teamRepository).isMock()).isTrue();
         assertThat(mockingDetails(claims).isMock()).isTrue();
 
-        imageService = new ImageServiceImpl(adapterDeterLab, imageRepository);
+        imageService = new ImageServiceImpl(adapterDeterLab, imageRepository,teamService, teamRepository);
     }
 
     @Test

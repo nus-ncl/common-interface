@@ -2,6 +2,7 @@ package sg.ncl.service.image.logic;
 
 import io.jsonwebtoken.Claims;
 import lombok.extern.slf4j.Slf4j;
+import org.json.JSONObject;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import sg.ncl.adapter.deterlab.AdapterDeterLab;
@@ -19,9 +20,7 @@ import sg.ncl.service.team.exceptions.TeamNotFoundException;
 
 import javax.inject.Inject;
 import javax.validation.constraints.NotNull;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static sg.ncl.common.validation.Validator.checkAdmin;
@@ -118,19 +117,30 @@ public class ImageServiceImpl implements ImageService {
             throw new TeamNotFoundException(message);
         }
 
-        // check if image with teamId exists in sio database
-        ImageEntity image = imageRepository.findByTeamIdAndImageName(teamId,imageName);
-        if (image != null) {
-            log.info("Error in deleting image '{}' from team '{}': delete image from sio database", imageName, teamId);
-            imageRepository.delete(image);
-        }
-
         boolean specialRole = false;
         if (teamService.isOwner(teamId, claims.getSubject()) || checkAdmin(claims)) {
             specialRole = true;
         }
 
         String userId = claims.getSubject();
-        return adapterDeterLab.deleteImage(teamId, userId, imageName, specialRole);
+        String output = adapterDeterLab.deleteImage(teamId, userId, imageName, specialRole);
+
+        log.info("Deleting image '{}' from team '{}': Deleting image entity from sio database", imageName, teamId);
+        String deterMessage = new JSONObject(output).getString("msg");
+
+        Set<String> success = new HashSet<>();
+        success.add("delete image OK from both web and project directory");
+        success.add("delete image OK from web but error when executing rm command to delete physical image");
+        success.add("delete image OK from web but there is unknown error when deleting physical image");
+
+        if (deterMessage != null && success.contains(deterMessage)) {
+            ImageEntity image = imageRepository.findByTeamIdAndImageName(teamId, imageName);
+            if (image != null) {
+                log.info("Error in deleting image '{}' from team '{}': delete image from sio database", imageName, teamId);
+                imageRepository.delete(image);
+            }
+        }
+
+        return output;
     }
 }
