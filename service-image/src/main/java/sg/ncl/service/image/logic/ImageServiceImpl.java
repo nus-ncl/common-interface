@@ -10,6 +10,11 @@ import sg.ncl.service.image.data.jpa.ImageRepository;
 import sg.ncl.service.image.domain.Image;
 import sg.ncl.service.image.domain.ImageService;
 import sg.ncl.service.image.domain.ImageVisibility;
+import sg.ncl.service.image.exceptions.ImageNotFoundInTeamException;
+import sg.ncl.service.team.data.jpa.TeamRepository;
+import sg.ncl.service.team.domain.Team;
+import sg.ncl.service.team.domain.TeamService;
+import sg.ncl.service.team.exceptions.TeamNotFoundException;
 
 import javax.inject.Inject;
 import javax.validation.constraints.NotNull;
@@ -18,8 +23,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import static sg.ncl.common.validation.Validator.checkAdmin;
+
 /**
- * Created by dcsyeoty on 28-Oct-16.
+ * @authors:  Teye, Tran Ly Vu.
  */
 @Service
 @Slf4j
@@ -27,11 +34,15 @@ public class ImageServiceImpl implements ImageService {
 
     private final AdapterDeterLab adapterDeterLab;
     private final ImageRepository imageRepository;
-
+    private final TeamService teamService;
+    private final TeamRepository teamRepository;
     @Inject
-    ImageServiceImpl(@NotNull final AdapterDeterLab adapterDeterLab, @NotNull ImageRepository imageRepository) {
+    ImageServiceImpl(@NotNull final AdapterDeterLab adapterDeterLab, @NotNull ImageRepository imageRepository,
+                     @NotNull TeamService teamService, @NotNull TeamRepository teamRepository) {
         this.adapterDeterLab = adapterDeterLab;
         this.imageRepository = imageRepository;
+        this.teamService = teamService;
+        this.teamRepository = teamRepository;
     }
 
     /**
@@ -97,6 +108,27 @@ public class ImageServiceImpl implements ImageService {
 
     @Override
     public String removeImage(String teamId, String imageName, Claims claims) {
-        return adapterDeterLab.deleteImage(teamId, imageName, claims);
+        //check if team exists
+        Team team = teamRepository.findOne(teamId);
+        if (team == null) {
+            log.warn("Error in deleting image '{}' from team '{}': team is not found", imageName, teamId);
+            String message = "Team " + teamId + " is not found!";
+            throw new TeamNotFoundException(message);
+        }
+
+        // check if image with teamId exists
+        Image image = imageRepository.findByTeamIdAndImageName(teamId,imageName);
+        if (image == null) {
+            log.warn("Error in deleting image '{}' from team '{}': image is not found in team", imageName, teamId);
+            String message = "Image " + imageName + " is not found in team " + teamId;
+            throw new ImageNotFoundInTeamException(message);
+        }
+
+        Boolean specialRole = false;
+        if (teamService.isOwner(teamId, claims.getSubject()) || checkAdmin(claims)) {
+            specialRole = true;
+        }
+        String userId = claims.getSubject();
+        return adapterDeterLab.deleteImage(teamId, userId, imageName, specialRole);
     }
 }

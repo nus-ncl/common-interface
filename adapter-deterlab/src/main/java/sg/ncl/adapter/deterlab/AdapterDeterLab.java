@@ -27,7 +27,6 @@ import java.util.HashSet;
 import java.util.Set;
 
 import static sg.ncl.common.validation.Validator.checkAdmin;
-import static sg.ncl.common.validation.Validator.isAdmin;
 
 /**
  * This is to invoke python scripts on the BOSS
@@ -922,8 +921,8 @@ public class AdapterDeterLab {
         }
     }
 
-    public String deleteImage(String teamId, String imageName, Claims claims) {
-        final String uid = getDeterUserIdByNclUserId(claims.getSubject());
+    public String deleteImage(String teamId, String userId, String imageName, boolean specialRole) {
+        final String uid = getDeterUserIdByNclUserId(userId);
 
         log.info("Deleting image '{}' from uid '{}' of pid '{}'", uid, teamId, imageName);
         JSONObject jsonObject = new JSONObject();
@@ -931,10 +930,10 @@ public class AdapterDeterLab {
         jsonObject.put("uid", uid);
         jsonObject.put("imageName", imageName);
 
-        if (checkAdmin(claims)) {
-            jsonObject.put("isAdmin", "yes");
+        if (specialRole) {
+            jsonObject.put("isSpecialRole", "yes");
         } else {
-            jsonObject.put("isAdmin", "no");
+            jsonObject.put("isSpecialRole", "no");
         }
 
         HttpHeaders httpHeaders= new HttpHeaders();
@@ -953,7 +952,7 @@ public class AdapterDeterLab {
             returnMessages.add("delete image OK from web but there is unknown error when deleting physical image");
             returnMessages.add("image still in use");
             returnMessages.add("not creator");
-            returnMessages.add("no permission to delete the imageid");
+            returnMessages.add("no permission to delete the imageid when executing Curl command");
 
             if (returnMessages.contains(deterMessage)) {
                 log.info("Deleting image '{}' from uid '{}' of pid '{}' : {} ", uid, teamId, imageName, deterMessage);

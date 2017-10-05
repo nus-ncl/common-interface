@@ -6,7 +6,7 @@ import sg.ncl.service.image.domain.ImageVisibility;
 import java.util.List;
 
 /**
- * @author Christopher Zhong
+ * @authors: Teye, Tran Ly Vu
  */
 public interface ImageRepository extends JpaRepository<ImageEntity, Long> {
 
@@ -14,4 +14,5 @@ public interface ImageRepository extends JpaRepository<ImageEntity, Long> {
 
     List<ImageEntity> findByTeamIdOrVisibility(String teamId, ImageVisibility visibility);
 
+    ImageEntity findByTeamIdAndImageName(String teamId, String imageName);
 }
