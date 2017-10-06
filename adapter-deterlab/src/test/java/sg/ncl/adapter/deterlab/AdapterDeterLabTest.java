@@ -607,6 +607,7 @@ public class AdapterDeterLabTest {
 
         JSONObject myobject = new JSONObject();
         myobject.put("msg", "modify experiment success");
+        myobject.put("modify_experiment", "modify experiment output");
 
         when(restTemplate.exchange(anyString(),eq(HttpMethod.POST),anyObject(),eq(String.class))).thenReturn(response);
         when(response.getBody()).thenReturn(myobject.toString());
@@ -627,6 +628,7 @@ public class AdapterDeterLabTest {
 
         JSONObject myobject = new JSONObject();
         myobject.put("msg", "modify experiment fail");
+        myobject.put("modify_experiment", "modify experiment output");
 
         exception.expect(AdapterConnectionException.class);
         when(restTemplate.exchange(anyString(),eq(HttpMethod.POST),anyObject(),eq(String.class))).thenThrow(new RuntimeException());
@@ -644,6 +646,7 @@ public class AdapterDeterLabTest {
 
         JSONObject myobject = new JSONObject();
         myobject.put("msg", "modify experiment fail ns file parse error");
+        myobject.put("modify_experiment", "modify experiment output");
 
         exception.expect(NSFileParseException.class);
         when(restTemplate.exchange(anyString(),eq(HttpMethod.POST),anyObject(),eq(String.class))).thenReturn(response);
@@ -663,6 +666,7 @@ public class AdapterDeterLabTest {
 
         JSONObject myobject = new JSONObject();
         myobject.put("msg", "modify experiment fail");
+        myobject.put("modify_experiment", "modify experiment output");
 
         exception.expect(ExperimentModifyException.class);
         when(restTemplate.exchange(anyString(),eq(HttpMethod.POST),anyObject(),eq(String.class))).thenReturn(response);
