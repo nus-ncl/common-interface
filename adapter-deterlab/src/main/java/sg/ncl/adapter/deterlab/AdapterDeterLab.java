@@ -532,11 +532,12 @@ public class AdapterDeterLab {
 
         log.info("Modify experiment request submitted to deterlab");
         String status = new JSONObject(response.getBody().toString()).getString("msg");
+        String modify_output = new JSONObject(response.getBody().toString()).getString("modify_experiment");
 
         if ("modify experiment fail ns file parse error".equals(status)) {
-            throw new NSFileParseException();
+            throw new NSFileParseException(modify_output);
         } else if (!"modify experiment success".equals(status)) {
-            throw new ExperimentModifyException();
+            throw new ExperimentModifyException(modify_output);
         }
 
         log.info("Modify experiment request success at deterlab {}", response.getBody().toString());

@@ -14,4 +14,8 @@ public class ExperimentModifyException extends BadRequestException {
         super("Error in modify experiment");
     }
 
+    public ExperimentModifyException(final String message) {
+        super(message);
+    }
+
 }

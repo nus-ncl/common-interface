@@ -401,9 +401,12 @@ public class ExperimentServiceImpl implements ExperimentService {
         // put the check inside here because we do not want to add the realization service and team service on the controller
         checkPermissions(realizationEntity, teamService.isOwner(teamId, claims.getSubject()), claims);
 
+        final String uid = adapterDeterLab.getDeterUserIdByNclUserId(claims.getSubject());
+
         JSONObject jsonObject = new JSONObject();
         jsonObject.put("pid", experiment.getTeamName());
         jsonObject.put("eid", experiment.getName());
+        jsonObject.put("uid", uid);
         jsonObject.put("nsfile", experiment.getNsFileContent());
 
         adapterDeterLab.modifyExperiment(jsonObject.toString());
