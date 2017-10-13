@@ -389,4 +389,29 @@ public class ExperimentServiceImpl implements ExperimentService {
 
         return experimentEntity;
     }
+
+    @Override
+    @Transactional
+    public Experiment updateExperiment(Long expId, String teamId, Experiment experiment, Claims claims) {
+        log.info("Updating Experiment: {} for Team {}", expId, teamId);
+        ExperimentEntity experimentEntity = experimentRepository.getOne(expId);
+
+        RealizationEntity realizationEntity = realizationService.getByExperimentId(expId);
+
+        // put the check inside here because we do not want to add the realization service and team service on the controller
+        checkPermissions(realizationEntity, teamService.isOwner(teamId, claims.getSubject()), claims);
+
+        final String uid = adapterDeterLab.getDeterUserIdByNclUserId(claims.getSubject());
+
+        JSONObject jsonObject = new JSONObject();
+        jsonObject.put("pid", experiment.getTeamName());
+        jsonObject.put("eid", experiment.getName());
+        jsonObject.put("uid", uid);
+        jsonObject.put("nsfile", experiment.getNsFileContent());
+
+        adapterDeterLab.modifyExperiment(jsonObject.toString());
+
+        experimentEntity.setNsFileContent(experiment.getNsFileContent());
+        return experimentRepository.save(experimentEntity);
+    }
 }

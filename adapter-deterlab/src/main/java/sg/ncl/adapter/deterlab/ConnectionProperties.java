@@ -53,6 +53,10 @@ public class ConnectionProperties {
 
     public String deleteExperiment() { return HTTP_MODE + ip + ":" + port + "/deleteExperiment"; }
 
+    public String modifyExperiment() {
+        return HTTP_MODE + ip + ":" + port + "/modifyExperiment";
+    }
+
     public String getUpdateCredentials() {
         return HTTP_MODE + ip + ":" + port + "/changePassword";
     }
