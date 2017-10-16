@@ -11,10 +11,8 @@ import sg.ncl.service.image.data.jpa.ImageRepository;
 import sg.ncl.service.image.domain.Image;
 import sg.ncl.service.image.domain.ImageService;
 import sg.ncl.service.image.domain.ImageVisibility;
-import sg.ncl.service.team.data.jpa.TeamEntity;
 import sg.ncl.service.team.data.jpa.TeamRepository;
 import sg.ncl.service.team.domain.TeamService;
-import sg.ncl.service.team.exceptions.TeamNotFoundException;
 
 import javax.inject.Inject;
 import javax.validation.constraints.NotNull;
@@ -33,14 +31,12 @@ public class ImageServiceImpl implements ImageService {
     private final AdapterDeterLab adapterDeterLab;
     private final ImageRepository imageRepository;
     private final TeamService teamService;
-    private final TeamRepository teamRepository;
     @Inject
     ImageServiceImpl(@NotNull final AdapterDeterLab adapterDeterLab, @NotNull ImageRepository imageRepository,
                      @NotNull TeamService teamService, @NotNull TeamRepository teamRepository) {
         this.adapterDeterLab = adapterDeterLab;
         this.imageRepository = imageRepository;
         this.teamService = teamService;
-        this.teamRepository = teamRepository;
     }
 
     /**
