@@ -915,7 +915,7 @@ public class AdapterDeterLab {
         }
     }
 
-    public String deleteImage(String teamId, String userId, String imageName, boolean specialRole) {
+    public String deleteImage(String teamId, String userId, String imageName, boolean imageCreator) {
         // uid, pid in deter is the same as sio project and user name
         final String uid = getDeterUserIdByNclUserId(userId);
         final String pid = getDeterProjectIdByNclTeamId(teamId);
@@ -926,10 +926,10 @@ public class AdapterDeterLab {
         jsonObject.put("uid", uid);
         jsonObject.put("imageName", imageName);
 
-        if (specialRole) {
-            jsonObject.put("isSpecialRole", "yes");
+        if (imageCreator) {
+            jsonObject.put("isImageCreator", "yes");
         } else {
-            jsonObject.put("isSpecialRole", "no");
+            jsonObject.put("isImageCreator", "no");
         }
 
         HttpHeaders httpHeaders= new HttpHeaders();
@@ -943,7 +943,6 @@ public class AdapterDeterLab {
 
             Set<String> curlSuccess = new HashSet<>();
             curlSuccess.add("delete image OK from both web and project directory");
-            curlSuccess.add("delete image OK from web but error when executing rm command to delete physical image");
             curlSuccess.add("delete image OK from web but there is unknown error when deleting physical image");
             curlSuccess.add("image still in use");
 

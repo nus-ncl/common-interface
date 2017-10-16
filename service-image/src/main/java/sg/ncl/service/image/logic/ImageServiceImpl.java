@@ -107,28 +107,19 @@ public class ImageServiceImpl implements ImageService {
     @Override
     public String removeImage(String teamId, String imageName, Claims claims) {
 
-        //check if team exists in sio database
-        TeamEntity team = teamRepository.findOne(teamId);
-        if (team == null) {
-            log.warn("Error in deleting image '{}' from team '{}': team is not found", imageName, teamId);
-            String message = "Team " + teamId + " is not found!";
-            throw new TeamNotFoundException(message);
-        }
-
-        boolean specialRole = false;
+        boolean imageCreator = true;
         if (teamService.isOwner(teamId, claims.getSubject()) || checkAdmin(claims)) {
-            specialRole = true;
+            imageCreator = false;
         }
 
         String userId = claims.getSubject();
-        String output = adapterDeterLab.deleteImage(teamId, userId, imageName, specialRole);
+        String output = adapterDeterLab.deleteImage(teamId, userId, imageName, imageCreator);
 
         log.info("Deleting image '{}' from team '{}': Deleting image entity from sio database", imageName, teamId);
         String deterMessage = new JSONObject(output).getString("msg");
 
         Set<String> success = new HashSet<>();
         success.add("delete image OK from both web and project directory");
-        success.add("delete image OK from web but error when executing rm command to delete physical image");
         success.add("delete image OK from web but there is unknown error when deleting physical image");
 
         if (deterMessage != null && success.contains(deterMessage)) {
