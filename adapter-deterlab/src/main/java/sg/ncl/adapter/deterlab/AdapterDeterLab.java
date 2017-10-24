@@ -920,7 +920,7 @@ public class AdapterDeterLab {
         final String uid = getDeterUserIdByNclUserId(userId);
         final String pid = getDeterProjectIdByNclTeamId(teamId);
 
-        log.info("Deleting image '{}' from uid '{}' of pid '{}'", uid, pid, imageName);
+        log.info("Deleting image '{}' from uid '{}' of pid '{}'", imageName, uid, pid);
         JSONObject jsonObject = new JSONObject();
         jsonObject.put("pid", pid);
         jsonObject.put("uid", uid);
@@ -950,7 +950,7 @@ public class AdapterDeterLab {
             String errorMessage = "Error in deleting image '{}' from uid '{}' of pid '{}' : {} ";
 
             if (curlSuccess.contains(deterMessage)) {
-                log.info("Deleting image '{}' from uid '{}' of pid '{}' : {} ", uid, pid, imageName, deterMessage);
+                log.info("Deleting image '{}' from uid '{}' of pid '{}' : {} ", imageName, uid, pid, deterMessage);
                 return responseBody;
 
             } else if ("not the creator".equals(deterMessage)) {
@@ -974,16 +974,16 @@ public class AdapterDeterLab {
                 throw new ImageNotFoundException(exceptionMessage);
 
             } else {
-                log.warn("Error in deleting image '{}' from uid '{}' of pid '{}' : {} ", uid, pid, imageName, deterMessage);
+                log.warn("Error in deleting image '{}' from uid '{}' of pid '{}' : {} ", imageName, uid, pid, deterMessage);
                 throw new DeterLabOperationFailedException(exceptionMessage);
             }
 
         }catch (ResourceAccessException resourceAccessException) {
-            log.warn("Deleting image {} from uid {} of pid {} error: {}", uid, teamId, imageName, resourceAccessException);
+            log.warn("Deleting image {} from uid {} of pid {} error: {}", imageName, uid, pid, resourceAccessException);
             throw new AdapterConnectionException(resourceAccessException.getMessage());
 
         } catch (HttpServerErrorException httpServerErrorException) {
-            log.warn("Deleting image {} from uid {} of pid {} error: Adapter DeterLab internal server error {}", uid, pid, imageName, httpServerErrorException);
+            log.warn("Deleting image {} from uid {} of pid {} error: Adapter DeterLab internal server error {}", imageName, uid, pid, httpServerErrorException);
             throw new AdapterInternalErrorException();
         }
     }
