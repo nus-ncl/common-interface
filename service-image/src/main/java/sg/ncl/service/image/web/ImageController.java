@@ -18,7 +18,6 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 import static sg.ncl.common.validation.Validator.checkClaimsType;
-import static sg.ncl.common.validation.Validator.isAdmin;
 import static sg.ncl.service.image.web.ImageController.PATH;
 
 /**
@@ -83,7 +82,7 @@ public class ImageController {
         return new ImageInfo(imageService.addImage(image, (Claims) claims)).getId();
     }
 
-    @DeleteMapping(path = "/{imageName}/delete")
+    @DeleteMapping(path = "/{imageName}")
     @ResponseStatus(HttpStatus.OK)
     public String deleteImage(@PathVariable String imageName,
                               @RequestParam(value = "teamId", required = true) String teamId,

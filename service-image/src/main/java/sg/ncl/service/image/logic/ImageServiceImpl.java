@@ -33,7 +33,7 @@ public class ImageServiceImpl implements ImageService {
     private final TeamService teamService;
     @Inject
     ImageServiceImpl(@NotNull final AdapterDeterLab adapterDeterLab, @NotNull ImageRepository imageRepository,
-                     @NotNull TeamService teamService, @NotNull TeamRepository teamRepository) {
+                     @NotNull TeamService teamService) {
         this.adapterDeterLab = adapterDeterLab;
         this.imageRepository = imageRepository;
         this.teamService = teamService;
@@ -121,7 +121,7 @@ public class ImageServiceImpl implements ImageService {
         if (deterMessage != null && success.contains(deterMessage)) {
             ImageEntity image = imageRepository.findByTeamIdAndImageName(teamId, imageName);
             if (image != null) {
-                log.info("Error in deleting image '{}' from team '{}': delete image from sio database", imageName, teamId);
+                log.info("Deleting image '{}' from team '{}': delete image from sio database", imageName, teamId);
                 imageRepository.delete(image);
             }
         }
