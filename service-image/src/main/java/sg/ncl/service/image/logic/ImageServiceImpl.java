@@ -11,7 +11,6 @@ import sg.ncl.service.image.data.jpa.ImageRepository;
 import sg.ncl.service.image.domain.Image;
 import sg.ncl.service.image.domain.ImageService;
 import sg.ncl.service.image.domain.ImageVisibility;
-import sg.ncl.service.team.data.jpa.TeamRepository;
 import sg.ncl.service.team.domain.TeamService;
 
 import javax.inject.Inject;
