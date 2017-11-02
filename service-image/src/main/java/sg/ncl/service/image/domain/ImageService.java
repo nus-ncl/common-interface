@@ -6,7 +6,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Created by dcsyeoty on 28-Oct-16.
+ * @Authors: dcsyeoty, Tran Ly Vu
  */
 public interface ImageService {
 
@@ -15,6 +15,8 @@ public interface ImageService {
     Image getImage(Long id);
 
     Image addImage(Image image, Claims claims);
+
+    String removeImage(String teamId, String imageName, Claims claims);
 
     Map<String, String> getSavedImages(String teamId);
 

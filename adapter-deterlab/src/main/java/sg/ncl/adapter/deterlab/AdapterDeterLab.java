@@ -1,6 +1,5 @@
 package sg.ncl.adapter.deterlab;
 
-
 import lombok.extern.slf4j.Slf4j;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -22,6 +21,8 @@ import sg.ncl.adapter.deterlab.dtos.entities.DeterLabUserEntity;
 import sg.ncl.adapter.deterlab.exceptions.*;
 
 import javax.inject.Inject;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * This is to invoke python scripts on the BOSS
@@ -940,6 +941,79 @@ public class AdapterDeterLab {
             throw new AdapterConnectionException(rae.getMessage());
         } catch (HttpServerErrorException hsee) {
             log.warn("Save image error: Adapter DeterLab internal server error {}", hsee);
+            throw new AdapterInternalErrorException();
+        }
+    }
+
+    public String deleteImage(String teamId, String userId, String imageName, boolean imageCreator) {
+        // uid, pid in deter is the same as sio project and user name
+        final String uid = getDeterUserIdByNclUserId(userId);
+        final String pid = getDeterProjectIdByNclTeamId(teamId);
+
+        log.info("Deleting image '{}' from uid '{}' of pid '{}'", imageName, uid, pid);
+        JSONObject jsonObject = new JSONObject();
+        jsonObject.put("pid", pid);
+        jsonObject.put("uid", uid);
+        jsonObject.put("imageName", imageName);
+
+        if (imageCreator) {
+            jsonObject.put("isImageCreator", "yes");
+        } else {
+            jsonObject.put("isImageCreator", "no");
+        }
+
+        HttpHeaders httpHeaders= new HttpHeaders();
+        httpHeaders.setContentType(MediaType.APPLICATION_JSON);
+        HttpEntity<String> request = new HttpEntity<>(jsonObject.toString(), httpHeaders);
+
+        try {
+            ResponseEntity responseEntity = restTemplate.exchange(properties.deleteImage(), HttpMethod.DELETE, request, String.class);
+            String responseBody = responseEntity.getBody().toString();
+            String deterMessage = new JSONObject(responseBody).getString("msg");
+
+            Set<String> curlSuccess = new HashSet<>();
+            curlSuccess.add("delete image OK from both web and project directory");
+            curlSuccess.add("delete image OK from web but there is unknown error when deleting physical image");
+            curlSuccess.add("image still in use");
+
+            String exceptionMessage = "Deleting image '" + imageName + "' of team '" +  pid + "' : " + deterMessage;
+            String errorMessage = "Error in deleting image '{}' from uid '{}' of pid '{}' : {} ";
+
+            if (curlSuccess.contains(deterMessage)) {
+                log.info("Deleting image '{}' from uid '{}' of pid '{}' : {} ", imageName, uid, pid, deterMessage);
+                return responseBody;
+
+            } else if ("not the creator".equals(deterMessage)) {
+                log.warn(errorMessage , uid, pid, imageName, deterMessage);
+                throw new InsufficientPermissionException(exceptionMessage);
+
+            } else if ("no permission to delete the imageid when executing Curl command".equals(deterMessage)) {
+                log.warn(errorMessage , uid, pid, imageName, deterMessage);
+                throw new InsufficientPermissionException(exceptionMessage);
+
+            } else if ("required image id is not found when querying database".equals(deterMessage)) {
+                log.warn(errorMessage , uid, pid, imageName, deterMessage);
+                throw new ImageNotFoundException(exceptionMessage);
+
+            } else if ("no creator found when querying database".equals(deterMessage)) {
+                log.warn(errorMessage , uid, pid, imageName, deterMessage);
+                throw new ImageNotFoundException(exceptionMessage);
+
+            } else if ("imageid could not be found when executing Curl command".equals(deterMessage)) {
+                log.warn(errorMessage , uid, pid, imageName, deterMessage);
+                throw new ImageNotFoundException(exceptionMessage);
+
+            } else {
+                log.warn("Error in deleting image '{}' from uid '{}' of pid '{}' : {} ", imageName, uid, pid, deterMessage);
+                throw new DeterLabOperationFailedException(exceptionMessage);
+            }
+
+        }catch (ResourceAccessException resourceAccessException) {
+            log.warn("Deleting image {} from uid {} of pid {} error: {}", imageName, uid, pid, resourceAccessException);
+            throw new AdapterConnectionException(resourceAccessException.getMessage());
+
+        } catch (HttpServerErrorException httpServerErrorException) {
+            log.warn("Deleting image {} from uid {} of pid {} error: Adapter DeterLab internal server error {}", imageName, uid, pid, httpServerErrorException);
             throw new AdapterInternalErrorException();
         }
     }

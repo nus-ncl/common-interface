@@ -47,4 +47,19 @@ public class Validator {
             throw new ForbiddenException();
         }
     }
+
+    public static boolean checkAdmin(final Claims claims) {
+        if (!(claims.get(JwtToken.KEY) instanceof List<?>)) {
+            log.warn("Bad claims type found: {}", claims);
+            throw new ForbiddenException();
+        }
+
+        String contextUserId = claims.getSubject();
+        List<String> roles;
+        roles = (ArrayList<String>) claims.get(JwtToken.KEY);
+
+        log.info("Context user id: {}, Context roles: {}", contextUserId, roles);
+
+        return roles.contains(Role.ADMIN.toString());
+    }
 }

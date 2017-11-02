@@ -81,4 +81,13 @@ public class ImageController {
         checkClaimsType(claims);
         return new ImageInfo(imageService.addImage(image, (Claims) claims)).getId();
     }
+
+    @DeleteMapping(path = "/{imageName}")
+    @ResponseStatus(HttpStatus.OK)
+    public String deleteImage(@PathVariable String imageName,
+                              @RequestParam(value = "teamId", required = true) String teamId,
+                              @AuthenticationPrincipal Object claims) {
+        checkClaimsType(claims);
+        return imageService.removeImage(teamId, imageName, (Claims) claims);
+    }
 }
