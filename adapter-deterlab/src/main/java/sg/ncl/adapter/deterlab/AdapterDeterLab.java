@@ -905,7 +905,7 @@ public class AdapterDeterLab {
         return response.getBody().toString();
     }
 
-    public String saveImage(String nclTeamId, String nclUserId, String nodeId, String imageName, String currentOS) {
+    public String saveImage(String expId, String nclTeamId, String nclUserId, String nodeId, String imageName, String currentOS) {
         final String pid = getDeterProjectIdByNclTeamId(nclTeamId);
         final String uid = getDeterUserIdByNclUserId(nclUserId);
         log.info("Saving image: pid {}, uid {}, node ID {}, image name {}", pid, uid, nodeId, imageName);
@@ -916,6 +916,9 @@ public class AdapterDeterLab {
         json.put("nodeId", nodeId);
         json.put("imageName", imageName);
         json.put("currentOS", currentOS);
+        json.put("expId", expId);
+
+        log.debug("expId is {}", expId);
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
@@ -931,7 +934,10 @@ public class AdapterDeterLab {
             if ("save image OK".equals(deterMessage)) {
                 log.info("Save image OK");
                 return responseBody;
-            } else {
+            } else if ("not the swapper".equals(deterMessage)) {
+                log.warn("Not the swapper");
+                throw new InsufficientPermissionException(deterMessage);
+            }else {
                 log.warn("Save image FAIL");
                 throw new DeterLabOperationFailedException(deterMessage);
             }

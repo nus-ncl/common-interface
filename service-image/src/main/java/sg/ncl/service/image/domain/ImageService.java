@@ -14,7 +14,7 @@ public interface ImageService {
 
     Image getImage(Long id);
 
-    Image addImage(Image image, Claims claims);
+    Image addImage(String expId, Image image, Claims claims);
 
     String removeImage(String teamId, String imageName, Claims claims);
 
