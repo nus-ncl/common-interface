@@ -317,6 +317,7 @@ public class RegistrationServiceImpl implements RegistrationService {
         one.put("uid", adapterDeterLab.getDeterUserIdByNclUserId(userId));
         one.put("pid", pid);
         one.put("gid", pid);
+        one.put("privilege", privilege);
         one.put("action", "approve");
         if ((UserStatus.PENDING).equals(user.getStatus())) {
             userService.updateUserStatus(userId, UserStatus.APPROVED);
@@ -330,6 +331,7 @@ public class RegistrationServiceImpl implements RegistrationService {
 
     @Override
     @Transactional
+    // the user privilege is define as local_root but doesn't matter here as adapter will define it as local_root by default
     public String rejectJoinRequest(String teamId, String userId, User approver) {
         if (!teamService.isOwner(teamId, approver.getId())) {
             log.warn("User {} is not a team owner of Team {}", approver.getId(), teamId);
@@ -358,6 +360,7 @@ public class RegistrationServiceImpl implements RegistrationService {
                 object.put("uid", adapterDeterLab.getDeterUserIdByNclUserId(userId));
                 object.put("pid", pid);
                 object.put("gid", pid);
+                object.put("privilege", MemberPrivilege.LOCAL_ROOT);
                 object.put("action", "deny");
                 String adapterResult = adapterDeterLab.processJoinRequest(object.toString());
                 sendReplyJoinTeamEmail(userService.getUser(userId), one, TeamStatus.REJECTED);
