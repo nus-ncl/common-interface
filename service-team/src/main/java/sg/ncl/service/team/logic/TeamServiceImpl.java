@@ -254,7 +254,7 @@ public class TeamServiceImpl implements TeamService {
             throw new TeamMemberNotFoundException("User " + userId + " is not a member of team " + teamId);
         }
 
-        log.info("Update member privilege: user {}, new permission {}", userId, privilege);
+        log.info("Update member privilege: user {}, new privilege {}", userId, privilege);
         return entity.changeMemberPrivilege(member, privilege);
     }
 

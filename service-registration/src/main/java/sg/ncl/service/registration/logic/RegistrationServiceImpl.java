@@ -322,7 +322,7 @@ public class RegistrationServiceImpl implements RegistrationService {
             userService.updateUserStatus(userId, UserStatus.APPROVED);
         }
         teamService.updateMemberStatus(teamId, userId, MemberStatus.APPROVED);
-        teamService.updateMemberPrivilege(teamId, userId, MemberPrivilege.LOCAL_ROOT);
+        teamService.updateMemberPrivilege(teamId, userId, privilege);
         String adapterResult = adapterDeterLab.processJoinRequest(one.toString());
         sendReplyJoinTeamEmail(user, team, TeamStatus.APPROVED);
         return adapterResult;
