@@ -2,6 +2,7 @@ package sg.ncl.service.image.web;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.jsonwebtoken.Claims;
+import org.apache.commons.lang3.RandomStringUtils;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -87,6 +88,7 @@ public class ImageControllerTest {
     public void testAddImage() throws Exception {
 
         final ImageInfo imageInfo =  new ImageInfo(1L, "teamId", "imageName", "nodeId", "description", "currentOS", ImageVisibility.PUBLIC);
+
         final byte[] content = mapper.writeValueAsBytes(imageInfo);
 
         final ImageEntity entity = new ImageEntity();
@@ -100,9 +102,9 @@ public class ImageControllerTest {
         when(securityContext.getAuthentication()).thenReturn(authentication);
         SecurityContextHolder.setContext(securityContext);
         when(authentication.getPrincipal()).thenReturn(claims);
-        when(imageService.addImage(any(Image.class), any(Claims.class))).thenReturn(entity);
+        when(imageService.addImage(anyString(), any(Image.class), any(Claims.class))).thenReturn(entity);
 
-        mockMvc.perform(post(ImageController.PATH).contentType(MediaType.APPLICATION_JSON).content(content))
+        mockMvc.perform(post(ImageController.PATH + "?expName=experiment").contentType(MediaType.APPLICATION_JSON).content(content))
                 .andExpect(status().isAccepted())
                 .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$", is(equalTo(1))));
@@ -124,9 +126,9 @@ public class ImageControllerTest {
         when(securityContext.getAuthentication()).thenReturn(authentication);
         SecurityContextHolder.setContext(securityContext);
         when(authentication.getPrincipal()).thenReturn(null);
-        when(imageService.addImage(any(Image.class), any(Claims.class))).thenReturn(entity);
+        when(imageService.addImage(anyString(), any(Image.class), any(Claims.class))).thenReturn(entity);
 
-        mockMvc.perform(post(ImageController.PATH).contentType(MediaType.APPLICATION_JSON).content(content))
+        mockMvc.perform(post(ImageController.PATH + "?expName=experiment").contentType(MediaType.APPLICATION_JSON).content(content))
                 .andExpect(status().isForbidden());
     }
 
