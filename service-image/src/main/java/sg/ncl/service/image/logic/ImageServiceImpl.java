@@ -31,7 +31,8 @@ public class ImageServiceImpl implements ImageService {
     private final ImageRepository imageRepository;
     private final TeamService teamService;
     @Inject
-    ImageServiceImpl(@NotNull final AdapterDeterLab adapterDeterLab, @NotNull ImageRepository imageRepository,
+    ImageServiceImpl(@NotNull final AdapterDeterLab adapterDeterLab,
+                     @NotNull ImageRepository imageRepository,
                      @NotNull TeamService teamService) {
         this.adapterDeterLab = adapterDeterLab;
         this.imageRepository = imageRepository;
@@ -85,7 +86,7 @@ public class ImageServiceImpl implements ImageService {
 
     @Transactional
     @Override
-    public Image addImage(String expId, Image image, Claims claims) {
+    public Image addImage(String expName, Image image, Claims claims) {
         final ImageEntity entity = new ImageEntity();
         entity.setImageName(image.getImageName());
         entity.setDescription(image.getDescription());
@@ -94,7 +95,10 @@ public class ImageServiceImpl implements ImageService {
         entity.setVisibility(image.getVisibility());
         entity.setCurrentOS(image.getCurrentOS());
         final ImageEntity saved = imageRepository.save(entity);
-        adapterDeterLab.saveImage(expId, image.getTeamId(), claims.getSubject(), image.getNodeId(), image.getImageName(), image.getCurrentOS());
+
+        log.info("expName is {}", expName);
+
+        adapterDeterLab.saveImage(expName, image.getTeamId(), claims.getSubject(), image.getNodeId(), image.getImageName(), image.getCurrentOS());
         log.info("Image created: {}", saved);
         return saved;
     }

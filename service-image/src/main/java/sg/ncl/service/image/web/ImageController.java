@@ -77,9 +77,9 @@ public class ImageController {
      */
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.ACCEPTED)
-    public Long addImage(@RequestParam (value = "expId", required = true) String expId, @RequestBody final ImageInfo image, @AuthenticationPrincipal Object claims) {
+    public Long addImage(@RequestParam (value = "expName", required = true) String expName, @RequestBody final ImageInfo image, @AuthenticationPrincipal Object claims) {
         checkClaimsType(claims);
-        return new ImageInfo(imageService.addImage(expId, image, (Claims) claims)).getId();
+        return new ImageInfo(imageService.addImage(expName, image, (Claims) claims)).getId();
     }
 
     @DeleteMapping(path = "/{imageName}")
