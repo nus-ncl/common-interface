@@ -7,8 +7,8 @@ import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 import sg.ncl.service.registration.domain.Registration;
 import sg.ncl.service.registration.domain.RegistrationService;
+import sg.ncl.service.team.domain.MemberPrivilege;
 import sg.ncl.service.team.domain.TeamStatus;
-import sg.ncl.service.user.domain.UserStatus;
 import sg.ncl.service.user.web.VerificationKeyInfo;
 
 import javax.inject.Inject;
@@ -68,12 +68,11 @@ public class RegistrationController {
         return map;
     }
 
-    @PostMapping(path = "/teams/{teamId}/members/{userId}")
+    @PostMapping(path = "/teams/{teamId}/members/{userId}", params = {"privilege"})
     // FIXME: the path is wrong, there should not be multiple paths for different registrations; status should be ACCEPTED
     @ResponseStatus(HttpStatus.ACCEPTED)
-    public String approveJoinRequest(@PathVariable String teamId, @PathVariable String userId, @RequestBody RegistrationInfo registrationInfo) {
-        return
-                registrationService.approveJoinRequest(teamId, userId, registrationInfo.getUser());
+    public String approveJoinRequest(@PathVariable String teamId, @PathVariable String userId, @RequestParam("privilege") MemberPrivilege privilege, @RequestBody RegistrationInfo registrationInfo) {
+        return registrationService.approveJoinRequest(teamId, userId, privilege, registrationInfo.getUser());
     }
 
     @DeleteMapping(path = "/teams/{teamId}/members/{userId}")

@@ -295,7 +295,7 @@ public class RegistrationServiceImpl implements RegistrationService {
 
     @Override
     @Transactional
-    public String approveJoinRequest(String teamId, String userId, User approver) {
+    public String approveJoinRequest(String teamId, String userId, MemberPrivilege privilege, User approver) {
         User user = userService.getUser(userId);
         if (!user.isEmailVerified()) {
             log.warn("Email not verified for {}", user.getId());
@@ -322,6 +322,7 @@ public class RegistrationServiceImpl implements RegistrationService {
             userService.updateUserStatus(userId, UserStatus.APPROVED);
         }
         teamService.updateMemberStatus(teamId, userId, MemberStatus.APPROVED);
+        teamService.updateMemberPrivilege(teamId, userId, MemberPrivilege.LOCAL_ROOT);
         String adapterResult = adapterDeterLab.processJoinRequest(one.toString());
         sendReplyJoinTeamEmail(user, team, TeamStatus.APPROVED);
         return adapterResult;
