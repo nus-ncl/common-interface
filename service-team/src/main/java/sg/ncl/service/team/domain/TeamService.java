@@ -37,6 +37,8 @@ public interface TeamService {
 
     TeamMember updateMemberStatus(String teamId, String userId, MemberStatus status);
 
+    TeamMember updateMemberPrivilege(String teamId, String userId, MemberPrivilege localRoot);
+
     TeamQuota getTeamQuotaByTeamId(String teamId);
 
     int checkTeamQuota(String teamName);

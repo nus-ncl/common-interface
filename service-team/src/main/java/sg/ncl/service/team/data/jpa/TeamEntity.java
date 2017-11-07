@@ -125,6 +125,17 @@ public class TeamEntity extends AbstractEntity implements Team {
         return null;
     }
 
+    public TeamMember changeMemberPrivilege(TeamMember member, MemberPrivilege permission) {
+        final String userId = member.getUserId();
+        if (members.containsKey(userId)) {
+            TeamMemberEntity entity = members.get(userId);
+            entity.setMemberPrivilege(permission);
+            members.put(userId, entity);
+            return members.get(userId);
+        }
+        return null;
+    }
+
     @Override
     public boolean equals(final Object o) {
         if (this == o) {
@@ -160,4 +171,5 @@ public class TeamEntity extends AbstractEntity implements Team {
                 ", members=" + members +
                 "} " + super.toString();
     }
+
 }

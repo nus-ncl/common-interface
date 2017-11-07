@@ -241,6 +241,25 @@ public class TeamServiceImpl implements TeamService {
 
     @Override
     @Transactional
+    public TeamMember updateMemberPrivilege(@NotNull final String teamId, @NotNull final String userId, @NotNull final MemberPrivilege privilege) {
+        TeamEntity entity = findTeam(teamId);
+        if (entity == null) {
+            log.warn("Update member privilege error: team {} not found", teamId);
+            throw new TeamNotFoundException(teamId);
+        }
+
+        TeamMember member = entity.getMember(userId);
+        if (member == null) {
+            log.warn("Update member privilege error: user {} is not a member of team {}", userId, teamId);
+            throw new TeamMemberNotFoundException("User " + userId + " is not a member of team " + teamId);
+        }
+
+        log.info("Update member privilege: user {}, new permission {}", userId, privilege);
+        return entity.changeMemberPrivilege(member, privilege);
+    }
+
+    @Override
+    @Transactional
     public Team updateTeamStatus(@NotNull final String id, @NotNull final TeamStatus status) {
         TeamEntity entity = findTeam(id);
         if (entity == null) {
