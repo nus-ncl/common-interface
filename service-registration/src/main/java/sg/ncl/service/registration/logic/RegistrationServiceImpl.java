@@ -416,7 +416,8 @@ public class RegistrationServiceImpl implements RegistrationService {
             if ((UserStatus.PENDING).equals(user.getStatus())) {
                 userService.updateUserStatus(ownerId, UserStatus.APPROVED);
             }
-            // change team owner member status
+            // change team owner member status and privilege
+            // team owner privilege is automatically assigned on deter side, here is to update NCL database
             teamService.updateMemberStatus(teamId, ownerId, MemberStatus.APPROVED);
             teamService.updateMemberPrivilege(teamId, ownerId, MemberPrivilege.PROJECT_ROOT);
             adapterResult = adapterDeterLab.approveProject(one.toString());
