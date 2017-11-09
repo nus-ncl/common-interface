@@ -235,6 +235,31 @@ public class TeamEntityTest {
     }
 
     @Test
+    public void testChangeMemberPrivilege() throws Exception {
+        TeamEntity teamEntity = TestUtil.getTeamEntity();
+        TeamMember teamMember = TestUtil.getTeamMemberInfo(MemberType.MEMBER, MemberPrivilege.USER);
+        teamEntity.addMember(teamMember);
+
+        TeamMember result = teamEntity.changeMemberPrivilege(teamMember, MemberPrivilege.PROJECT_ROOT);
+
+        assertThat(result.getUserId(), is(teamMember.getUserId()));
+        assertThat(result.getMemberType(), is(teamMember.getMemberType()));
+        assertThat(result.getMemberPrivilege(), is(MemberPrivilege.PROJECT_ROOT));
+    }
+
+    @Test
+    public void testChangeMemberPrivilegeUnknownId() {
+        TeamEntity teamEntity = TestUtil.getTeamEntity();
+        TeamMember teamMember1 = TestUtil.getTeamMemberInfo(MemberType.MEMBER, MemberPrivilege.USER);
+        TeamMember teamMember2 = TestUtil.getTeamMemberInfo(MemberType.MEMBER, MemberPrivilege.USER);
+        teamEntity.addMember(teamMember1);
+
+        TeamMember result = teamEntity.changeMemberPrivilege(teamMember2, MemberPrivilege.PROJECT_ROOT);
+
+        assertThat(result, is(nullValue()));
+    }
+
+    @Test
     public void testAddMember() throws Exception {
         final TeamEntity entity = new TeamEntity();
         final TeamMemberInfo teamMemberInfo = TestUtil.getTeamMemberInfo(MemberType.MEMBER);
