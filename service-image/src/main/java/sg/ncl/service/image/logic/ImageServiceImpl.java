@@ -31,7 +31,8 @@ public class ImageServiceImpl implements ImageService {
     private final ImageRepository imageRepository;
     private final TeamService teamService;
     @Inject
-    ImageServiceImpl(@NotNull final AdapterDeterLab adapterDeterLab, @NotNull ImageRepository imageRepository,
+    ImageServiceImpl(@NotNull final AdapterDeterLab adapterDeterLab,
+                     @NotNull ImageRepository imageRepository,
                      @NotNull TeamService teamService) {
         this.adapterDeterLab = adapterDeterLab;
         this.imageRepository = imageRepository;
@@ -94,7 +95,9 @@ public class ImageServiceImpl implements ImageService {
         entity.setVisibility(image.getVisibility());
         entity.setCurrentOS(image.getCurrentOS());
         final ImageEntity saved = imageRepository.save(entity);
-        adapterDeterLab.saveImage(image.getTeamId(), claims.getSubject(), image.getNodeId(), image.getImageName(), image.getCurrentOS());
+
+        adapterDeterLab.saveImage(image.getTeamId(), claims.getSubject(), image.getNodeId(), image.getImageName());
+
         log.info("Image created: {}", saved);
         return saved;
     }

@@ -1,6 +1,7 @@
 package sg.ncl.service.image.logic;
 
 import io.jsonwebtoken.Claims;
+import org.apache.commons.lang3.RandomStringUtils;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -61,7 +62,6 @@ public class ImageServiceTest {
     @Test
     public void testAddImageGood() {
         final Image imageInfo = new ImageInfo(1L, "teamId", "imageName", "nodeId", "description", "currentOS", ImageVisibility.PRIVATE);
-
         when(imageRepository.save(any(ImageEntity.class))).thenAnswer(i -> i.getArgumentAt(0, ImageEntity.class));
 
         final Image image = imageService.addImage(imageInfo, claims);

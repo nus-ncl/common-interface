@@ -77,7 +77,7 @@ public class ImageController {
      */
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.ACCEPTED)
-    public Long addImage(@RequestBody final ImageInfo image,  @AuthenticationPrincipal Object claims) {
+    public Long addImage(@RequestBody final ImageInfo image, @AuthenticationPrincipal Object claims) {
         checkClaimsType(claims);
         return new ImageInfo(imageService.addImage(image, (Claims) claims)).getId();
     }

@@ -905,7 +905,7 @@ public class AdapterDeterLab {
         return response.getBody().toString();
     }
 
-    public String saveImage(String nclTeamId, String nclUserId, String nodeId, String imageName, String currentOS) {
+    public String saveImage(String nclTeamId, String nclUserId, String nodeId, String imageName) {
         final String pid = getDeterProjectIdByNclTeamId(nclTeamId);
         final String uid = getDeterUserIdByNclUserId(nclUserId);
         log.info("Saving image: pid {}, uid {}, node ID {}, image name {}", pid, uid, nodeId, imageName);
@@ -915,7 +915,6 @@ public class AdapterDeterLab {
         json.put("uid", uid);
         json.put("nodeId", nodeId);
         json.put("imageName", imageName);
-        json.put("currentOS", currentOS);
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
@@ -932,7 +931,7 @@ public class AdapterDeterLab {
                 log.info("Save image OK");
                 return responseBody;
             } else {
-                log.warn("Save image FAIL");
+                log.warn("Save image FAIL: {}", deterMessage);
                 throw new DeterLabOperationFailedException(deterMessage);
             }
 
