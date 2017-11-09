@@ -410,6 +410,33 @@ public class RegistrationServiceImplTest {
     }
 
     @Test
+    public void testApproveJoinRequestEmailNotVerified()  {
+        UserEntity userEntity = Util.getUserEntity();
+        userEntity.setEmailVerified(false);
+
+        when(userService.getUser(anyString())).thenReturn(userEntity);
+
+        exception.expect(EmailNotVerifiedException.class);
+
+        registrationService.approveJoinRequest("teamId", userEntity.getId(), MemberPrivilege.USER, userEntity);
+    }
+
+    @Test
+    public void testApproveJoinRequestNullPrivilege() {
+
+    }
+
+    @Test
+    public void testApproveJoinRequestUnknownPrivilege() {
+
+    }
+
+    @Test
+    public void testApproveJoinRequestUpdateMemberPrivilege() {
+
+    }
+
+    @Test
     public void testRejectJoinRequestNotTeamOwner() {
         Team createdTeam = Util.getTeamEntity();
         User createdUser = Util.getUserEntity();
