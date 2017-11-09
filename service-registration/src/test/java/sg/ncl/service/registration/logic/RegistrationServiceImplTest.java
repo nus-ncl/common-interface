@@ -378,7 +378,7 @@ public class RegistrationServiceImplTest {
         when(teamService.isOwner(anyString(), anyString())).thenReturn(false);
 
         exception.expect(UserIsNotTeamOwnerException.class);
-        registrationService.approveJoinRequest(createdTeam.getId(), createdUser.getId(), createdUser);
+        registrationService.approveJoinRequest(createdTeam.getId(), createdUser.getId(), MemberPrivilege.USER, createdUser);
     }
 
     @Test
@@ -391,7 +391,7 @@ public class RegistrationServiceImplTest {
         when(teamService.getTeamById(anyString())).thenReturn(null);
 
         exception.expect(TeamNotFoundException.class);
-        registrationService.approveJoinRequest(createdTeam.getId(), createdUser.getId(), createdUser);
+        registrationService.approveJoinRequest(createdTeam.getId(), createdUser.getId(), MemberPrivilege.USER, createdUser);
     }
 
     @Test
@@ -404,7 +404,7 @@ public class RegistrationServiceImplTest {
         when(adapterDeterLab.getDeterUserIdByNclUserId(anyString())).thenReturn(RandomStringUtils.randomAlphanumeric(20));
         when(userService.getUser(anyString())).thenReturn(createdUser);
 
-        registrationService.approveJoinRequest(createdTeam.getId(), createdUser.getId(), createdUser);
+        registrationService.approveJoinRequest(createdTeam.getId(), createdUser.getId(), MemberPrivilege.USER, createdUser);
 
         verify(userService, times(1)).updateUserStatus(anyString(), any(UserStatus.class));
     }
