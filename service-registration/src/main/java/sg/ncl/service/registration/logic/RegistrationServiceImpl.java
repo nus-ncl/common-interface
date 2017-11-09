@@ -23,6 +23,7 @@ import sg.ncl.service.registration.domain.RegistrationService;
 import sg.ncl.service.registration.exceptions.*;
 import sg.ncl.service.team.data.jpa.TeamMemberEntity;
 import sg.ncl.service.team.domain.*;
+import sg.ncl.service.registration.exceptions.InvalidTeamMemberPrivilegeException;
 import sg.ncl.service.team.exceptions.TeamNotFoundException;
 import sg.ncl.service.team.web.TeamMemberInfo;
 import sg.ncl.service.user.domain.User;
@@ -310,6 +311,12 @@ public class RegistrationServiceImpl implements RegistrationService {
             log.warn("Team NOT found, TeamId {}", teamId);
             throw new TeamNotFoundException(teamId);
         }
+
+        if (privilege == null || !(privilege.equals(MemberPrivilege.LOCAL_ROOT) || privilege.equals(MemberPrivilege.USER)) ) {
+            log.warn("User {} is assigned an invalid privilege {}", userId, privilege);
+            throw new InvalidTeamMemberPrivilegeException();
+        }
+
         String pid = team.getName();
         // already add to user side when request to join
         JSONObject one = new JSONObject();
@@ -317,7 +324,7 @@ public class RegistrationServiceImpl implements RegistrationService {
         one.put("uid", adapterDeterLab.getDeterUserIdByNclUserId(userId));
         one.put("pid", pid);
         one.put("gid", pid);
-        one.put("privilege", privilege);
+        one.put("privilege", privilege.name().toLowerCase());
         one.put("action", "approve");
         if ((UserStatus.PENDING).equals(user.getStatus())) {
             userService.updateUserStatus(userId, UserStatus.APPROVED);
