@@ -1543,7 +1543,7 @@ public class AdapterDeterLabTest {
         when(deterLabProjectRepository.findByNclTeamId(anyString())).thenReturn(new DeterLabProjectEntity());
         when(deterLabUserRepository.findByNclUserId(anyString())).thenReturn(new DeterLabUserEntity());
 
-        String result = adapterDeterLab.saveImage("expName","nclTeamId", "nclUserId", "nodeId", "imageName", "currentOS");
+        String result = adapterDeterLab.saveImage("nclTeamId", "nclUserId", "nodeId", "imageName");
 
         verify(restTemplate,times(1)).exchange(anyString(),eq(HttpMethod.POST),anyObject(),eq(String.class));
         verify(properties,times(1)).saveImage();
@@ -1561,7 +1561,7 @@ public class AdapterDeterLabTest {
         when(deterLabProjectRepository.findByNclTeamId(anyString())).thenReturn(new DeterLabProjectEntity());
         when(deterLabUserRepository.findByNclUserId(anyString())).thenReturn(new DeterLabUserEntity());
 
-        adapterDeterLab.saveImage("expName", "nclTeamId", "nclUserId", "nodeId", "imageName", "currentOS");
+        adapterDeterLab.saveImage("nclTeamId", "nclUserId", "nodeId", "imageName");
 
         verify(restTemplate,times(1)).exchange(anyString(),eq(HttpMethod.POST),anyObject(),eq(String.class));
         verify(properties,times(1)).saveImage();
@@ -1577,7 +1577,7 @@ public class AdapterDeterLabTest {
         when(deterLabProjectRepository.findByNclTeamId(anyString())).thenReturn(new DeterLabProjectEntity());
         when(deterLabUserRepository.findByNclUserId(anyString())).thenReturn(new DeterLabUserEntity());
 
-        adapterDeterLab.saveImage("expName","nclTeamId", "nclUserId", "nodeId", "imageName", "currentOS");
+        adapterDeterLab.saveImage("nclTeamId", "nclUserId", "nodeId", "imageName");
 
         verify(restTemplate,times(1)).exchange(anyString(),eq(HttpMethod.POST),anyObject(),eq(String.class));
         verify(properties,times(1)).saveImage();
@@ -1599,7 +1599,7 @@ public class AdapterDeterLabTest {
         when(deterLabProjectRepository.findByNclTeamId(anyString())).thenReturn(new DeterLabProjectEntity());
         when(deterLabUserRepository.findByNclUserId(anyString())).thenReturn(new DeterLabUserEntity());
 
-        adapterDeterLab.saveImage("expName","nclTeamId", "nclUserId", "nodeId", "imageName", "currentOS");
+        adapterDeterLab.saveImage("nclTeamId", "nclUserId", "nodeId", "imageName");
 
         verify(restTemplate,times(1)).exchange(anyString(),eq(HttpMethod.POST),anyObject(),eq(String.class));
         verify(properties,times(1)).saveImage();

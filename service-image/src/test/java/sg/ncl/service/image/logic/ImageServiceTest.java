@@ -62,10 +62,9 @@ public class ImageServiceTest {
     @Test
     public void testAddImageGood() {
         final Image imageInfo = new ImageInfo(1L, "teamId", "imageName", "nodeId", "description", "currentOS", ImageVisibility.PRIVATE);
-        final String randomExpName = RandomStringUtils.randomAlphanumeric(20);
         when(imageRepository.save(any(ImageEntity.class))).thenAnswer(i -> i.getArgumentAt(0, ImageEntity.class));
 
-        final Image image = imageService.addImage(randomExpName, imageInfo, claims);
+        final Image image = imageService.addImage(imageInfo, claims);
 
         verify(imageRepository, times(1)).save(any(ImageEntity.class));
         assertThat(image.getTeamId()).isEqualTo(imageInfo.getTeamId());

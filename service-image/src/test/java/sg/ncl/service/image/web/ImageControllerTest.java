@@ -102,7 +102,7 @@ public class ImageControllerTest {
         when(securityContext.getAuthentication()).thenReturn(authentication);
         SecurityContextHolder.setContext(securityContext);
         when(authentication.getPrincipal()).thenReturn(claims);
-        when(imageService.addImage(anyString(), any(Image.class), any(Claims.class))).thenReturn(entity);
+        when(imageService.addImage(any(Image.class), any(Claims.class))).thenReturn(entity);
 
         mockMvc.perform(post(ImageController.PATH + "?expName=experiment").contentType(MediaType.APPLICATION_JSON).content(content))
                 .andExpect(status().isAccepted())
@@ -126,7 +126,7 @@ public class ImageControllerTest {
         when(securityContext.getAuthentication()).thenReturn(authentication);
         SecurityContextHolder.setContext(securityContext);
         when(authentication.getPrincipal()).thenReturn(null);
-        when(imageService.addImage(anyString(), any(Image.class), any(Claims.class))).thenReturn(entity);
+        when(imageService.addImage(any(Image.class), any(Claims.class))).thenReturn(entity);
 
         mockMvc.perform(post(ImageController.PATH + "?expName=experiment").contentType(MediaType.APPLICATION_JSON).content(content))
                 .andExpect(status().isForbidden());

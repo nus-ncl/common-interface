@@ -86,7 +86,7 @@ public class ImageServiceImpl implements ImageService {
 
     @Transactional
     @Override
-    public Image addImage(String expName, Image image, Claims claims) {
+    public Image addImage(Image image, Claims claims) {
         final ImageEntity entity = new ImageEntity();
         entity.setImageName(image.getImageName());
         entity.setDescription(image.getDescription());
@@ -96,9 +96,8 @@ public class ImageServiceImpl implements ImageService {
         entity.setCurrentOS(image.getCurrentOS());
         final ImageEntity saved = imageRepository.save(entity);
 
-        log.info("expName is {}", expName);
+        adapterDeterLab.saveImage(image.getTeamId(), claims.getSubject(), image.getNodeId(), image.getImageName());
 
-        adapterDeterLab.saveImage(expName, image.getTeamId(), claims.getSubject(), image.getNodeId(), image.getImageName(), image.getCurrentOS());
         log.info("Image created: {}", saved);
         return saved;
     }
