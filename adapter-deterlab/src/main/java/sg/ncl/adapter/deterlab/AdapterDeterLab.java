@@ -581,7 +581,7 @@ public class AdapterDeterLab {
 
     public String processJoinRequest(String jsonString) {
         JSONObject request = new JSONObject(jsonString);
-        if (request.length() < 5) {
+        if (request.length() < 6) {
             log.warn("NOT enough inputs: {}", jsonString);
             throw new IllegalArgumentException();
         }
@@ -590,8 +590,9 @@ public class AdapterDeterLab {
         String uid = request.getString("uid");
         String gid = request.getString("gid");
         String action = request.getString("action");
-        log.info("Processing join request: team {}, requester {}, approver {}, group {}, action {}",
-                pid, uid, approverUid, gid, action);
+        String privilege = request.getString("privilege");
+        log.info("Processing join request: team {}, requester {}, approver {}, group {}, action {}, privilege {}",
+                pid, uid, approverUid, gid, action, privilege);
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
