@@ -125,11 +125,11 @@ public class TeamEntity extends AbstractEntity implements Team {
         return null;
     }
 
-    public TeamMember changeMemberPrivilege(TeamMember member, MemberPrivilege permission) {
+    public TeamMember changeMemberPrivilege(TeamMember member, MemberPrivilege privilege) {
         final String userId = member.getUserId();
         if (members.containsKey(userId)) {
             TeamMemberEntity entity = members.get(userId);
-            entity.setMemberPrivilege(permission);
+            entity.setMemberPrivilege(privilege);
             members.put(userId, entity);
             return members.get(userId);
         }

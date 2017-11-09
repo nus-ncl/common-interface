@@ -418,6 +418,7 @@ public class RegistrationServiceImpl implements RegistrationService {
             }
             // change team owner member status
             teamService.updateMemberStatus(teamId, ownerId, MemberStatus.APPROVED);
+            teamService.updateMemberPrivilege(teamId, ownerId, MemberPrivilege.PROJECT_ROOT);
             adapterResult = adapterDeterLab.approveProject(one.toString());
             sendReplyCreateTeamEmail(user, team, status, reason);
         } else {
