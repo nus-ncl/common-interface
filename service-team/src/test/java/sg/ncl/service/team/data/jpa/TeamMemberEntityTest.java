@@ -2,6 +2,7 @@ package sg.ncl.service.team.data.jpa;
 
 import org.apache.commons.lang3.RandomStringUtils;
 import org.junit.Test;
+import sg.ncl.service.team.domain.MemberPrivilege;
 import sg.ncl.service.team.domain.MemberStatus;
 import sg.ncl.service.team.domain.MemberType;
 
@@ -116,5 +117,18 @@ public class TeamMemberEntityTest {
     public void testGetMemberStatus() throws Exception {
         final TeamMemberEntity entity = new TeamMemberEntity();
         assertThat(entity.getMemberStatus(), is(notNullValue()));
+    }
+
+    @Test
+    public void testSetMemberPrivilege() throws Exception {
+        final TeamMemberEntity entity = new TeamMemberEntity();
+        entity.setMemberPrivilege(MemberPrivilege.USER);
+        assertThat(entity.getMemberPrivilege(), is(MemberPrivilege.USER));
+    }
+
+    @Test
+    public void testGetMemberPrivilege() throws Exception {
+        final TeamMemberEntity entity = new TeamMemberEntity();
+        assertThat(entity.getMemberPrivilege(), is(notNullValue()));
     }
 }
