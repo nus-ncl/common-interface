@@ -464,7 +464,23 @@ public class RegistrationServiceImplTest {
 
         registrationService.approveJoinRequest(createdTeam.getId(), createdUser.getId(), MemberPrivilege.LOCAL_ROOT, createdUser);
 
-        verify(teamService, times(1)).updateMemberPrivilege(anyString(), anyString(), any(MemberPrivilege.class));
+        verify(teamService, times(1)).updateMemberPrivilege(anyString(), anyString(), eq(MemberPrivilege.LOCAL_ROOT));
+    }
+
+    @Test
+    public void testApproveJoinRequestUpdateMemberPrivilege2() {
+        Team createdTeam = Util.getTeamEntity();
+        User createdUser = Util.getUserEntity();
+
+        when(teamService.isOwner(anyString(), anyString())).thenReturn(true);
+        when(teamService.getTeamById(anyString())).thenReturn(createdTeam);
+        when(adapterDeterLab.getDeterUserIdByNclUserId(anyString())).thenReturn(RandomStringUtils.randomAlphanumeric(20));
+        when(userService.getUser(anyString())).thenReturn(createdUser);
+
+
+        registrationService.approveJoinRequest(createdTeam.getId(), createdUser.getId(), MemberPrivilege.USER, createdUser);
+
+        verify(teamService, times(1)).updateMemberPrivilege(anyString(), anyString(), eq(MemberPrivilege.USER));
     }
 
     @Test
