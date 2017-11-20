@@ -9,6 +9,7 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import sg.ncl.service.experiment.domain.Experiment;
 import sg.ncl.service.experiment.domain.ExperimentService;
+import sg.ncl.service.experiment.logic.RealizedExperiment;
 
 import javax.inject.Inject;
 import javax.validation.Valid;
@@ -22,7 +23,7 @@ import static sg.ncl.common.validation.Validator.checkClaimsType;
  * @Authors: Desmond Lim, Tran Ly Vu
  */
 @RestController
-@RequestMapping(path = ExperimentsController.PATH, produces = MediaType.APPLICATION_JSON_VALUE)
+@RequestMapping(produces = MediaType.APPLICATION_JSON_VALUE)
 @Slf4j
 public class ExperimentsController {
 
@@ -36,20 +37,20 @@ public class ExperimentsController {
     }
 
     // return all experiments (for use by administration)
-    @GetMapping
+    @GetMapping(path = "/experiments")
     @ResponseStatus(HttpStatus.OK)
     public List<Experiment> get() {
         return experimentService.getAll().stream().map(ExperimentInfo::new).collect(Collectors.toList());
     }
 
-    @GetMapping(path = "/{id}")
+    @GetMapping(path = "/experiments/{id}")
     @ResponseStatus(HttpStatus.OK)
     public  Experiment getExperiment(@PathVariable Long id) {
         return new ExperimentInfo(experimentService.get(id));
     }
 
     // returns experiments that the user is part of
-    @GetMapping(path = "/users/{id}")
+    @GetMapping(path = "/experiments/users/{id}")
     // FIXME: path is wrong "/experiments/users/{id}" should be "/users/{id}/experiments"
     @ResponseStatus(HttpStatus.OK)
     public List<Experiment> getByUser(@PathVariable String id) {
@@ -57,7 +58,7 @@ public class ExperimentsController {
     }
 
     // returns experiments that are part of the team
-    @GetMapping(path = "/teams/{id}")
+    @GetMapping(path = "/experiments/teams/{id}")
     // FIXME: path is wrong "/experiments/teams/{id}" should be "/teams/{id}/experiments"
     @ResponseStatus(HttpStatus.OK)
     public List<Experiment> getByTeamId(@PathVariable String id) {
@@ -65,14 +66,14 @@ public class ExperimentsController {
     }
 
     // create new experiment
-    @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
+    @PostMapping(path = "/experiments", consumes = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.CREATED)
     public Experiment addExperiment(@RequestBody @Valid ExperimentInfo experiment) {
         return new ExperimentInfo(experimentService.save(experiment));
     }
 
     // delete experiment
-    @DeleteMapping(path = "/teams/{teamId}/experiments/{expId}")
+    @DeleteMapping(path = "/experiments/teams/{teamId}/experiments/{expId}")
     // FIXME: should be DELETE instead of POST and path should be "/experiments/{id}"
     @ResponseStatus(HttpStatus.OK)
     public Experiment deleteExperiment(@PathVariable Long expId, @PathVariable String teamId, @AuthenticationPrincipal Object claims) {
@@ -81,7 +82,7 @@ public class ExperimentsController {
         return new ExperimentInfo(experimentService.deleteExperiment(expId, teamId, (Claims) claims));
     }
 
-    @PutMapping(path = "/teams/{teamId}/experiments/{expId}")
+    @PutMapping(path = "/experiments/teams/{teamId}/experiments/{expId}")
     @ResponseStatus(HttpStatus.OK)
     public Experiment updateExperiment(@PathVariable Long expId, @PathVariable String teamId, @RequestBody @Valid ExperimentInfo experiment, @AuthenticationPrincipal Object claims) {
         log.info("Update experiment User principal: " + claims);
@@ -89,24 +90,31 @@ public class ExperimentsController {
         return new ExperimentInfo(experimentService.updateExperiment(expId, teamId, experiment, (Claims) claims));
     }
 
-    @GetMapping(path = "/teams/{teamId}/experiments/{expId}/experimentDetails")
+    @GetMapping(path = "/experiments/teams/{teamId}/experiments/{expId}/experimentDetails")
     @ResponseStatus(HttpStatus.OK)
     public String getExperimentDetails(@PathVariable String teamId, @PathVariable Long expId) {
         return experimentService.getExperimentDetails(teamId, expId);
     }
 
-    @GetMapping(path = "/teams/{teamId}/experiments/{expId}/topology")
+    @GetMapping(path = "/experiments/teams/{teamId}/experiments/{expId}/topology")
     @ResponseStatus(HttpStatus.OK)
     public String getTopology(@PathVariable String teamId, @PathVariable Long expId) {
         return experimentService.getTopology(teamId, expId);
     }
 
-    @PostMapping(path= "/teams/{teamId}/experiments/{expId}/internet")
+    @PostMapping(path= "/experiments/teams/{teamId}/experiments/{expId}/internet")
     @ResponseStatus(HttpStatus.CREATED)
     public Experiment requestInternet(@PathVariable String teamId, @PathVariable Long expId, @RequestBody String reason, @AuthenticationPrincipal Object claims) {
         log.debug("Authentication principal for internet access request: " + claims);
         checkClaimsType(claims);
         final JSONObject jsonObject = new JSONObject(reason);
         return new ExperimentInfo(experimentService.requestInternet(teamId, expId, jsonObject.getString("reason"), (Claims) claims));
+    }
+
+    @GetMapping(path = "/teams/{id}/experiments")
+    @ResponseStatus(HttpStatus.OK)
+    public List<RealizedExperiment> getTeamRealizedExperiments(@PathVariable String id, @AuthenticationPrincipal Object claims) {
+        checkClaimsType(claims);
+        return experimentService.getTeamRealizedExperiments(id, ((Claims) claims).getSubject());
     }
 }

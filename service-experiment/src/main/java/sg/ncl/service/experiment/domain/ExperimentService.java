@@ -1,6 +1,7 @@
 package sg.ncl.service.experiment.domain;
 
 import io.jsonwebtoken.Claims;
+import sg.ncl.service.experiment.logic.RealizedExperiment;
 
 import java.util.List;
 
@@ -30,4 +31,6 @@ public interface ExperimentService {
     Experiment requestInternet(String teamId, Long expId, String reason, Claims claims);
 
     Experiment updateExperiment(Long expId, String teamId, Experiment experiment, Claims claims);
+
+    List<RealizedExperiment> getTeamRealizedExperiments(String teamId, String userId);
 }

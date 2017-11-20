@@ -414,4 +414,80 @@ public class ExperimentServiceImpl implements ExperimentService {
         experimentEntity.setNsFileContent(experiment.getNsFileContent());
         return experimentRepository.save(experimentEntity);
     }
+
+    @Override
+    public List<RealizedExperiment> getTeamRealizedExperiments(String teamId, String userId) {
+
+        if (!teamService.isMember(teamId, userId)) {
+            log.warn("User {} is not a member of team {}", userId, teamId);
+            return new ArrayList<>();
+        }
+
+        final String result = adapterDeterLab.getRealizedExperiments(teamId);
+        log.debug("Realized experiments for team {}: {}", teamId, result);
+
+        if (result.isEmpty() || "{}".equals(result)) {
+            return new ArrayList<>();
+        }
+
+        List<RealizedExperiment> realExpList = new ArrayList<>();
+
+        JSONObject object = new JSONObject(result);
+
+        for (Object key : object.keySet()) {
+            final String expName = (String) key;
+            ExperimentEntity expEntity = experimentRepository.findOneByTeamIdAndName(teamId, expName);
+            if (expEntity != null) {
+                JSONObject expDetails = object.getJSONObject(expName);
+                RealizedExperiment realExp = new RealizedExperiment();
+                realExp.setTeamId(expEntity.getTeamId());
+                realExp.setTeamName(expEntity.getTeamName());
+                realExp.setExpId(expEntity.getId());
+                realExp.setExpName(expEntity.getName());
+                realExp.setUserId(expEntity.getUserId());
+                realExp.setDescription(expEntity.getDescription());
+                realExp.setCreatedDate(expEntity.getCreatedDate());
+                realExp.setLastModifiedDate(expEntity.getLastModifiedDate());
+                realExp.setState(myExperimentState(expDetails.getString("state")));
+                realExp.setNodes(expDetails.getInt("nodes"));
+                realExp.setMinNodes(expDetails.getInt("min_nodes"));
+                realExp.setIdleHours(expDetails.getLong("idle_hours"));
+                realExp.setDetails(expDetails.getString("details"));
+
+                realExpList.add(realExp);
+            }
+        }
+
+        return realExpList;
+    }
+
+    private String myExperimentState(String deterState) {
+
+/*
+        # Experiment states on Deter
+        $TB_EXPTSTATE_NEW		    = "new";
+        $TB_EXPTSTATE_PRERUN		= "prerunning";
+        $TB_EXPTSTATE_SWAPPING		= "swapping";
+        $TB_EXPTSTATE_SWAPPED		= "swapped";
+        $TB_EXPTSTATE_ACTIVATING	= "activating";
+        $TB_EXPTSTATE_ACTIVE		= "active";
+        $TB_EXPTSTATE_PANICED		= "paniced";
+        $TB_EXPTSTATE_QUEUED		= "queued";
+        $TB_EXPTSTATE_MODIFY_RESWAP	= "modify_reswap";
+*/
+
+        if ("activating".equals(deterState)){
+            return "STARTING";
+        } else if ("active".equals(deterState)){
+            return "RUNNING";
+        } else if ("swapping".equals(deterState)){
+            return "STOPPING";
+        } else if ("swapped".equals(deterState)){
+            return "STOPPED";
+        } else if ("error".equals(deterState)){
+            return "ERROR";
+        } else {
+            return "STOPPED"; // this includes "new", "prerunning", "paniced", "queued" and "modify_reswap"
+        }
+    }
 }

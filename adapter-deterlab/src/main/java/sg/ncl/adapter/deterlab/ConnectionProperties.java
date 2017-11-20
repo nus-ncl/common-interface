@@ -89,6 +89,10 @@ public class ConnectionProperties {
         return HTTP_MODE + ip + ":" + port + "/getExpStatus";
     }
 
+    public String getRealizedExperiments() {
+        return HTTP_MODE + ip + ":" + port + "/getRealizedExperiments";
+    }
+
     public String getFreeNodes() {
         return HTTP_MODE + ip + ":" + port + "/getFreeNodes";
     }

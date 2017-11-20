@@ -16,4 +16,6 @@ public interface ExperimentRepository extends JpaRepository<ExperimentEntity, Lo
     Long countByName(String name);
 
     List<ExperimentEntity> findByTeamName(String teamName);
+
+    ExperimentEntity findOneByTeamIdAndName(String teamId, String expName);
 }

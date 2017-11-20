@@ -221,6 +221,22 @@ public class TeamServiceImpl implements TeamService {
     }
 
     @Override
+    public Boolean isMember(@NotNull final String teamId, @NotNull final String userId) {
+        TeamEntity entity = findTeam(teamId);
+        if (entity == null) {
+            log.warn("Team {} not found", teamId);
+            throw new TeamNotFoundException(teamId);
+        }
+        List<TeamMemberEntity> teamMembersList = entity.getMembers();
+        for (TeamMember teamMember : teamMembersList) {
+            if (teamMember.getUserId().equals(userId)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    @Override
     @Transactional
     public TeamMember updateMemberStatus(@NotNull final String teamId, @NotNull final String userId, @NotNull final MemberStatus status) {
         TeamEntity entity = findTeam(teamId);

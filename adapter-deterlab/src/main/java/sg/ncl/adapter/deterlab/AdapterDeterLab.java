@@ -740,6 +740,41 @@ public class AdapterDeterLab {
         return "{}";
     }
 
+    /**
+     * get list of experiments from a project
+     * @param teamId the NCL team ID to get experiments list
+     * @return  a json string in the format:
+     *  {
+     *      "eid1": {"state": "active", "min_nodes": "2", "nodes": "2", "idle_hours": "0", "details": "..."},
+     *      "eid2": {"state": "swapped", "min_nodes": "1", "nodes": "0", "idle_hours": "0", "details": ""},
+     *      "eid3": {"state": "active", "min_nodes": "2", "nodes": "2", "idle_hours": "0", "details": "..."}
+     *   }
+     *   otherwise, returns {}
+     */
+    public String getRealizedExperiments(String teamId) {
+        final String pid = getDeterProjectIdByNclTeamId(teamId);
+        log.info("Getting list of experiments for project: {}", pid);
+
+        JSONObject json = new JSONObject();
+        json.put("pid", pid);
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        HttpEntity<String> request = new HttpEntity<>(json.toString(), headers);
+
+        ResponseEntity response;
+
+        try {
+            response = restTemplate.exchange(properties.getRealizedExperiments(), HttpMethod.POST, request, String.class);
+        } catch (RestClientException e) {
+            log.warn("Adapter connection error: {}", e);
+            return "{}";
+        }
+
+        log.info("List of experiments for project {}:\n{}", pid, response.getBody().toString());
+        return response.getBody().toString();
+    }
+
     public String getFreeNodes() {
         log.info("Getting free nodes...");
 
