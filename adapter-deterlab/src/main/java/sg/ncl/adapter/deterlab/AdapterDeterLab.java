@@ -541,7 +541,8 @@ public class AdapterDeterLab {
             throw new ExperimentModifyException(modifyOutput);
         }
 
-        log.info("Modify experiment request success at deterlab {}", response.getBody().toString());
+        log.info("Modify experiment request success at deterlab");
+        log.debug("Deter response: {}", response.getBody().toString());
         return status;
     }
 
@@ -751,7 +752,7 @@ public class AdapterDeterLab {
      *   }
      *   otherwise, returns {}
      */
-    public String getRealizedExperiments(String teamId) {
+    public String getExperimentsByTeam(String teamId) {
         final String pid = getDeterProjectIdByNclTeamId(teamId);
         log.info("Getting list of experiments for project: {}", pid);
 
@@ -765,15 +766,51 @@ public class AdapterDeterLab {
         ResponseEntity response;
 
         try {
-            response = restTemplate.exchange(properties.getRealizedExperiments(), HttpMethod.POST, request, String.class);
+            response = restTemplate.exchange(properties.getExperimentsByTeam(), HttpMethod.POST, request, String.class);
         } catch (RestClientException e) {
             log.warn("Adapter connection error: {}", e);
             return "{}";
         }
 
-        log.info("List of experiments for project {}:\n{}", pid, response.getBody().toString());
+        log.debug("List of experiments for project {}:\n{}", pid, response.getBody().toString());
         return response.getBody().toString();
     }
+
+    /**
+     * get status of an experiment from a project
+     * @param teamId the NCL team ID to get experiments list
+     * @param expName the experiment name eid
+     * @return  a json string in the format:
+     *  {
+     *      "eid1": {"state": "active", "min_nodes": "2", "nodes": "2", "idle_hours": "0", "details": "..."}
+     *   }
+     *   otherwise, returns {}
+     */
+    public String getExperiment(String teamId, String expName) {
+        final String pid = getDeterProjectIdByNclTeamId(teamId);
+        log.info("Getting experiment status for {}/{}", pid, expName);
+
+        JSONObject json = new JSONObject();
+        json.put("pid", pid);
+        json.put("eid", expName);
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        HttpEntity<String> request = new HttpEntity<>(json.toString(), headers);
+
+        ResponseEntity response;
+
+        try {
+            response = restTemplate.exchange(properties.getExperiment(), HttpMethod.POST, request, String.class);
+        } catch (RestClientException e) {
+            log.warn("Adapter connection error: {}", e);
+            return "{}";
+        }
+
+        log.debug("Status for {}/{}:\n{}", pid, expName, response.getBody().toString());
+        return response.getBody().toString();
+    }
+
 
     public String getFreeNodes() {
         log.info("Getting free nodes...");

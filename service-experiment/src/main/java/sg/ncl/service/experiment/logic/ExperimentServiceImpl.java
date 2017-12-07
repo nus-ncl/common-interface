@@ -16,8 +16,10 @@ import sg.ncl.service.experiment.data.jpa.ExperimentRepository;
 import sg.ncl.service.experiment.domain.Experiment;
 import sg.ncl.service.experiment.domain.ExperimentService;
 import sg.ncl.service.experiment.exceptions.ExperimentNameAlreadyExistsException;
+import sg.ncl.service.experiment.exceptions.ExperimentNotFoundException;
 import sg.ncl.service.experiment.exceptions.TeamIdNullOrEmptyException;
 import sg.ncl.service.experiment.exceptions.UserIdNullOrEmptyException;
+import sg.ncl.service.experiment.web.StatefulExperiment;
 import sg.ncl.service.mail.domain.MailService;
 import sg.ncl.service.realization.data.jpa.RealizationEntity;
 import sg.ncl.service.realization.domain.RealizationService;
@@ -416,49 +418,98 @@ public class ExperimentServiceImpl implements ExperimentService {
     }
 
     @Override
-    public List<RealizedExperiment> getTeamRealizedExperiments(String teamId, String userId) {
+    public List<StatefulExperiment> getStatefulExperimentsByTeam(String teamId, String userId) {
 
         if (!teamService.isMember(teamId, userId)) {
             log.warn("User {} is not a member of team {}", userId, teamId);
             return new ArrayList<>();
         }
 
-        final String result = adapterDeterLab.getRealizedExperiments(teamId);
-        log.debug("Realized experiments for team {}: {}", teamId, result);
+        final String result = adapterDeterLab.getExperimentsByTeam(teamId);
+        log.debug("List of experiments in team {}: {}", teamId, result);
 
         if (result.isEmpty() || "{}".equals(result)) {
             return new ArrayList<>();
         }
 
-        List<RealizedExperiment> realExpList = new ArrayList<>();
+        List<StatefulExperiment> stateExpList = new ArrayList<>();
 
         JSONObject object = new JSONObject(result);
-
         for (Object key : object.keySet()) {
             final String expName = (String) key;
             ExperimentEntity expEntity = experimentRepository.findOneByTeamIdAndName(teamId, expName);
+            /**
+             * the SIO database may have more or less experiments than Deter database;
+             * we only return the experiments that exist in both SIO and Deter databases
+             */
             if (expEntity != null) {
                 JSONObject expDetails = object.getJSONObject(expName);
-                RealizedExperiment realExp = new RealizedExperiment();
-                realExp.setTeamId(expEntity.getTeamId());
-                realExp.setTeamName(expEntity.getTeamName());
-                realExp.setExpId(expEntity.getId());
-                realExp.setExpName(expEntity.getName());
-                realExp.setUserId(expEntity.getUserId());
-                realExp.setDescription(expEntity.getDescription());
-                realExp.setCreatedDate(expEntity.getCreatedDate());
-                realExp.setLastModifiedDate(expEntity.getLastModifiedDate());
-                realExp.setState(myExperimentState(expDetails.getString("state")));
-                realExp.setNodes(expDetails.getInt("nodes"));
-                realExp.setMinNodes(expDetails.getInt("min_nodes"));
-                realExp.setIdleHours(expDetails.getLong("idle_hours"));
-                realExp.setDetails(expDetails.getString("details"));
+                StatefulExperiment stateExp = new StatefulExperiment();
+                stateExp.setTeamId(expEntity.getTeamId());
+                stateExp.setTeamName(expEntity.getTeamName());
+                stateExp.setId(expEntity.getId());
+                stateExp.setName(expEntity.getName());
+                stateExp.setUserId(expEntity.getUserId());
+                stateExp.setDescription(expEntity.getDescription());
+                stateExp.setCreatedDate(expEntity.getCreatedDate());
+                stateExp.setLastModifiedDate(expEntity.getLastModifiedDate());
+                stateExp.setState(myExperimentState(expDetails.getString("state")));
+                stateExp.setNodes(expDetails.getInt("nodes"));
+                stateExp.setMinNodes(expDetails.getInt("min_nodes"));
+                stateExp.setIdleHours(expDetails.getLong("idle_hours"));
+                stateExp.setDetails(expDetails.getString("details"));
 
-                realExpList.add(realExp);
+                stateExpList.add(stateExp);
             }
         }
 
-        return realExpList;
+        return stateExpList;
+    }
+
+    @Override
+    public StatefulExperiment getStatefulExperiment(Long expId, String userId) {
+
+        final ExperimentEntity expEntity = experimentRepository.findOne(expId);
+        if (expEntity == null) {
+            log.warn("Experiment {} not found in database!", expId);
+            throw new ExperimentNotFoundException("Experiment " + expId + " not found.");
+        }
+
+        final String teamId = expEntity.getTeamId();
+
+        if (!teamService.isMember(teamId, userId)) {
+            log.warn("User {} is not a member of team {}", userId, teamId);
+            throw new ForbiddenException();
+        }
+
+        final String expName = expEntity.getName();
+        final String result = adapterDeterLab.getExperiment(teamId, expName);
+        log.debug("Status for experiment {}: {}", expId, result);
+
+        if (result.isEmpty() || "{}".equals(result)) {
+            log.warn("Experiment {} not found in Deter!", expId);
+            throw new ExperimentNotFoundException("Experiment " + expId + " not found.");
+        }
+
+        JSONObject object = new JSONObject(result);
+        JSONObject expDetails = object.getJSONObject(expName);
+        StatefulExperiment stateExp = new StatefulExperiment();
+
+        stateExp.setTeamId(expEntity.getTeamId());
+        stateExp.setTeamName(expEntity.getTeamName());
+        stateExp.setId(expEntity.getId());
+        stateExp.setName(expEntity.getName());
+        stateExp.setUserId(expEntity.getUserId());
+        stateExp.setDescription(expEntity.getDescription());
+        stateExp.setCreatedDate(expEntity.getCreatedDate());
+        stateExp.setLastModifiedDate(expEntity.getLastModifiedDate());
+        stateExp.setState(myExperimentState(expDetails.getString("state")));
+        stateExp.setNodes(expDetails.getInt("nodes"));
+        stateExp.setMinNodes(expDetails.getInt("min_nodes"));
+        stateExp.setIdleHours(expDetails.getLong("idle_hours"));
+        stateExp.setDetails(expDetails.getString("details"));
+
+        return stateExp;
     }
 
     private String myExperimentState(String deterState) {

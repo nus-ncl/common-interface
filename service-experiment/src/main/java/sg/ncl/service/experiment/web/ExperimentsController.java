@@ -9,7 +9,6 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import sg.ncl.service.experiment.domain.Experiment;
 import sg.ncl.service.experiment.domain.ExperimentService;
-import sg.ncl.service.experiment.logic.RealizedExperiment;
 
 import javax.inject.Inject;
 import javax.validation.Valid;
@@ -113,8 +112,15 @@ public class ExperimentsController {
 
     @GetMapping(path = "/teams/{id}/experiments")
     @ResponseStatus(HttpStatus.OK)
-    public List<RealizedExperiment> getTeamRealizedExperiments(@PathVariable String id, @AuthenticationPrincipal Object claims) {
+    public List<StatefulExperiment> getStatefulExperimentsByTeam(@PathVariable String id, @AuthenticationPrincipal Object claims) {
         checkClaimsType(claims);
-        return experimentService.getTeamRealizedExperiments(id, ((Claims) claims).getSubject());
+        return experimentService.getStatefulExperimentsByTeam(id, ((Claims) claims).getSubject());
+    }
+
+    @GetMapping(path = "/experiments/{id}/status")
+    @ResponseStatus(HttpStatus.OK)
+    public StatefulExperiment getStatefulExperiment(@PathVariable Long id, @AuthenticationPrincipal Object claims) {
+        checkClaimsType(claims);
+        return experimentService.getStatefulExperiment(id, ((Claims) claims).getSubject());
     }
 }

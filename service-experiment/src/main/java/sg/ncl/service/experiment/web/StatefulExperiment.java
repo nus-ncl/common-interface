@@ -1,4 +1,4 @@
-package sg.ncl.service.experiment.logic;
+package sg.ncl.service.experiment.web;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -8,18 +8,19 @@ import java.time.ZonedDateTime;
 /**
  * Created by dcszwang on 11/15/2017.
  *
- * Represent a realized experiment with status and node details information
+ * Represent an experiment with status;
+ * if the experiment is active, also include the realization details
  *
  * This class is going to replace the Realization class in Realization service
  */
 @Getter
 @Setter
-public class RealizedExperiment {
+public class StatefulExperiment {
 
     private String teamId;
     private String teamName;
-    private Long expId;
-    private String expName;
+    private Long id;
+    private String name;
     private String userId;
     private String description;
     private ZonedDateTime createdDate;
@@ -32,11 +33,11 @@ public class RealizedExperiment {
 
     @Override
     public String toString() {
-        return "RealizedExperiment{" +
+        return "StatefulExperiment{" +
                 "teamId='" + teamId + "'" +
                 ", teamName='" + teamName + "'" +
-                ", expId='" + expId + "'" +
-                ", expName='" + expName + "'" +
+                ", id='" + id + "'" +
+                ", name='" + name + "'" +
                 ", userId='" + userId + "'" +
                 ", description='" + description + "'" +
                 ", createdDate='" + createdDate + "'" +

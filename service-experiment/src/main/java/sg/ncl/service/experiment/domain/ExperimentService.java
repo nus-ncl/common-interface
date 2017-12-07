@@ -1,7 +1,7 @@
 package sg.ncl.service.experiment.domain;
 
 import io.jsonwebtoken.Claims;
-import sg.ncl.service.experiment.logic.RealizedExperiment;
+import sg.ncl.service.experiment.web.StatefulExperiment;
 
 import java.util.List;
 
@@ -32,5 +32,7 @@ public interface ExperimentService {
 
     Experiment updateExperiment(Long expId, String teamId, Experiment experiment, Claims claims);
 
-    List<RealizedExperiment> getTeamRealizedExperiments(String teamId, String userId);
+    List<StatefulExperiment> getStatefulExperimentsByTeam(String teamId, String userId);
+
+    StatefulExperiment getStatefulExperiment(Long expId, String userId);
 }
