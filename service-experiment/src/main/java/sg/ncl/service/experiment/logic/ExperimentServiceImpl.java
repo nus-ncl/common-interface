@@ -179,44 +179,6 @@ public class ExperimentServiceImpl implements ExperimentService {
         return experimentRepository.findByTeamId(teamId).stream().collect(Collectors.toList());
     }
 
-    public String createNsFile(String filename, String contents) {
-        log.info("Create NS file");
-
-        File file;
-        FileOutputStream fileOutputStream = null;
-
-        try {
-            file = new File(filename);
-            fileOutputStream = new FileOutputStream(file);
-
-            // if file doesn't exist, create it
-            if (!file.exists()) {
-                file.createNewFile();
-            }
-
-            // getAll contents in bytes
-            byte[] contentInBytes = contents.getBytes();
-
-            fileOutputStream.write(contentInBytes);
-            fileOutputStream.flush();
-            fileOutputStream.close();
-        } catch (IOException e) {
-            log.error("File cannot be created.\n" + e.getMessage());
-            filename = "error";
-        } finally {
-            try {
-                if (fileOutputStream != null) {
-                    fileOutputStream.close();
-                }
-            } catch (IOException e) {
-                log.error("File cannot be created.\n" + e.getMessage());
-                filename = "error";
-            }
-        }
-
-        return filename;
-    }
-
     /**
      * Invokes the adapter to create an experiment on Deterlab DB
      *

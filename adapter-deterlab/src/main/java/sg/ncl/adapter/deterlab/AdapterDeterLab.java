@@ -77,7 +77,6 @@ public class AdapterDeterLab {
         // msg: user not found, uid: xxx
         String responseBody = response.getBody().toString();
         try {
-            //checkAdapterResultNewUsers(responseBody, "Join new project as new user failed: {}.");
             String deterMessage = new JSONObject(responseBody).getString("msg");
             if("user is created".equalsIgnoreCase(deterMessage)) {
                 log.info("Join project as new user to DeterLab OK");
@@ -118,7 +117,7 @@ public class AdapterDeterLab {
         // msg: user not found, uid: xxx
         String responseBody = response.getBody().toString();
         try {
-            // checkAdapterResultNewUsers(responseBody, "Apply new project as new user failed: {}. ");
+
             String deterMessage = new JSONObject(responseBody).getString("msg");
             if("user is created".equalsIgnoreCase(deterMessage)) {
                 log.info("Apply project as new user to DeterLab OK");
@@ -295,8 +294,6 @@ public class AdapterDeterLab {
         JSONObject adapterObject = new JSONObject();
         adapterObject.put("uid", getDeterUserIdByNclUserId(nclUserId));
         adapterObject.put("password", password);
-
-        //log.info("Now attempting to invoke adapter to login and create cookie file");
 
         log.info("Logging into DeterLab");
         HttpHeaders headers = new HttpHeaders();
@@ -1129,79 +1126,6 @@ public class AdapterDeterLab {
         }
     }
 
-    /**
-     * Checks the response from adapter deterlab when applying or joining a new project as a new user and determines the exception to be thrown
-     * Use only if @applyProjectNewUsers and @joinProjectNewUsers are performing identical checks
-     * @param responseBody the JSON response from adapter deterlab python script
-     * @param logPrefix the prefix for the log messages to display either "Apply new project as new user..." or "Join new project as new user..."
-     */
-/*
-    private void checkAdapterResultNewUsers(String responseBody, String logPrefix) {
-
-        String jsonResult = new JSONObject(responseBody).getString("msg");
-
-        checkUserNotFoundError (responseBody, jsonResult, logPrefix);
-
-        checkEmailAddressError (responseBody, jsonResult, logPrefix);
-
-        checkInvalidPasswordError (responseBody, jsonResult, logPrefix);
-
-        checkTeamNameAlreadyExistsError (responseBody, jsonResult, logPrefix);
-
-        checkVerificationKeyError (responseBody, jsonResult, logPrefix);
-
-        if (!"user is created".equals(jsonResult)) {
-            log.warn(logPrefix, responseBody);
-            throw new DeterLabOperationFailedException("User creation failed");
-        }
-    }
-
-    private void checkVerificationKeyError (String responseBody, String  jsonResult, String logPrefix) {
-
-        if ("verification key not found".equals(jsonResult)) {
-            log.warn(logPrefix + "Verification key is not found", responseBody);
-            throw new DeterLabOperationFailedException("Verification key is not found");
-        } else if ("incorrect verification key".equals(jsonResult)) {
-            log.warn(logPrefix + "Incorrect verification key", responseBody);
-            throw new DeterLabOperationFailedException("Incorrect verification key");
-        } else if ("user verification failed".equals(jsonResult)) {
-            log.warn(logPrefix + "user verification failed", responseBody);
-            throw new DeterLabOperationFailedException("User verification failed");
-        }
-    }
-
-    private void checkEmailAddressError (String responseBody, String jsonResult, String logPrefix) {
-
-        if ("email address in use".equals(jsonResult)) {
-            log.warn(logPrefix + "Email address already exists.", responseBody);
-            throw new EmailAlreadyExistsException("Email address already exists.");
-        }
-    }
-
-    private void checkInvalidPasswordError (String responseBody, String jsonResult, String logPrefix) {
-
-        if ("invalid password".equals(jsonResult)) {
-            log.warn(logPrefix + "Password is invalid.", responseBody);
-            throw new InvalidPasswordException();
-        }
-    }
-
-    private void checkTeamNameAlreadyExistsError (String responseBody, String  jsonResult, String logPrefix) {
-
-        if ("team name is already in use".equals(jsonResult)) {
-            log.warn(logPrefix + "Team Name is already in use.", responseBody);
-            throw new TeamNameAlreadyExistsException("Team Name is already in use.");
-        }
-    }
-
-    private void checkUserNotFoundError (String responseBody, String jsonResult, String logPrefix) {
-
-        if ("user not created in deter database".equals(jsonResult)) {
-            log.warn(logPrefix + "User is not found in database.", responseBody);
-            throw new UserNotFoundException("User is not found in database.");
-        }
-    }
-*/
     /**
      * Crafts the JSON string for start/stop experiment
      * @param operation in or out, implies start or stop experiment respectively

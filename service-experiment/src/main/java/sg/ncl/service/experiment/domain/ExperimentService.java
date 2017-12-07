@@ -20,8 +20,6 @@ public interface ExperimentService {
 
     List<Experiment> findByTeam(String teamId);
 
-//  String createNsFile(String filename, String contents);
-
     Experiment deleteExperiment(Long id, String teamId, Claims claims);
 
     String getExperimentDetails(String teamId, Long expId);
