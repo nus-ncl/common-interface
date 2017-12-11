@@ -89,6 +89,14 @@ public class ConnectionProperties {
         return HTTP_MODE + ip + ":" + port + "/getExpStatus";
     }
 
+    public String getExperiment() {
+        return HTTP_MODE + ip + ":" + port + "/getExperiment";
+    }
+
+    public String getExperimentsByTeam() {
+        return HTTP_MODE + ip + ":" + port + "/getExperimentsByTeam";
+    }
+
     public String getFreeNodes() {
         return HTTP_MODE + ip + ":" + port + "/getFreeNodes";
     }

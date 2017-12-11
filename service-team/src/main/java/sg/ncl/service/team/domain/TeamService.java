@@ -40,4 +40,6 @@ public interface TeamService {
     TeamQuota getTeamQuotaByTeamId(String teamId);
 
     int checkTeamQuota(String teamName);
+
+    Boolean isMember(String teamId, String userId);
 }

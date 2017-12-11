@@ -77,7 +77,6 @@ public class AdapterDeterLab {
         // msg: user not found, uid: xxx
         String responseBody = response.getBody().toString();
         try {
-            //checkAdapterResultNewUsers(responseBody, "Join new project as new user failed: {}.");
             String deterMessage = new JSONObject(responseBody).getString("msg");
             if("user is created".equalsIgnoreCase(deterMessage)) {
                 log.info("Join project as new user to DeterLab OK");
@@ -118,7 +117,7 @@ public class AdapterDeterLab {
         // msg: user not found, uid: xxx
         String responseBody = response.getBody().toString();
         try {
-            // checkAdapterResultNewUsers(responseBody, "Apply new project as new user failed: {}. ");
+
             String deterMessage = new JSONObject(responseBody).getString("msg");
             if("user is created".equalsIgnoreCase(deterMessage)) {
                 log.info("Apply project as new user to DeterLab OK");
@@ -295,8 +294,6 @@ public class AdapterDeterLab {
         JSONObject adapterObject = new JSONObject();
         adapterObject.put("uid", getDeterUserIdByNclUserId(nclUserId));
         adapterObject.put("password", password);
-
-        //log.info("Now attempting to invoke adapter to login and create cookie file");
 
         log.info("Logging into DeterLab");
         HttpHeaders headers = new HttpHeaders();
@@ -541,7 +538,8 @@ public class AdapterDeterLab {
             throw new ExperimentModifyException(modifyOutput);
         }
 
-        log.info("Modify experiment request success at deterlab {}", response.getBody().toString());
+        log.info("Modify experiment request success at deterlab");
+        log.debug("Deter response: {}", response.getBody().toString());
         return status;
     }
 
@@ -739,6 +737,77 @@ public class AdapterDeterLab {
         }
         return "{}";
     }
+
+    /**
+     * get list of experiments from a project
+     * @param teamId the NCL team ID to get experiments list
+     * @return  a json string in the format:
+     *  {
+     *      "eid1": {"state": "active", "min_nodes": "2", "nodes": "2", "idle_hours": "0", "details": "..."},
+     *      "eid2": {"state": "swapped", "min_nodes": "1", "nodes": "0", "idle_hours": "0", "details": ""},
+     *      "eid3": {"state": "active", "min_nodes": "2", "nodes": "2", "idle_hours": "0", "details": "..."}
+     *   }
+     *   otherwise, returns {}
+     */
+    public String getExperimentsByTeam(String teamId) {
+        final String pid = getDeterProjectIdByNclTeamId(teamId);
+        log.info("Getting list of experiments for project: {}", pid);
+
+        JSONObject json = new JSONObject();
+        json.put("pid", pid);
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        HttpEntity<String> request = new HttpEntity<>(json.toString(), headers);
+
+        ResponseEntity response;
+
+        try {
+            response = restTemplate.exchange(properties.getExperimentsByTeam(), HttpMethod.POST, request, String.class);
+        } catch (RestClientException e) {
+            log.warn("Adapter connection error: {}", e);
+            return "{}";
+        }
+
+        log.debug("List of experiments for project {}:\n{}", pid, response.getBody().toString());
+        return response.getBody().toString();
+    }
+
+    /**
+     * get status of an experiment from a project
+     * @param teamId the NCL team ID to get experiments list
+     * @param expName the experiment name eid
+     * @return  a json string in the format:
+     *  {
+     *      "eid1": {"state": "active", "min_nodes": "2", "nodes": "2", "idle_hours": "0", "details": "..."}
+     *   }
+     *   otherwise, returns {}
+     */
+    public String getExperiment(String teamId, String expName) {
+        final String pid = getDeterProjectIdByNclTeamId(teamId);
+        log.info("Getting experiment status for {}/{}", pid, expName);
+
+        JSONObject json = new JSONObject();
+        json.put("pid", pid);
+        json.put("eid", expName);
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        HttpEntity<String> request = new HttpEntity<>(json.toString(), headers);
+
+        ResponseEntity response;
+
+        try {
+            response = restTemplate.exchange(properties.getExperiment(), HttpMethod.POST, request, String.class);
+        } catch (RestClientException e) {
+            log.warn("Adapter connection error: {}", e);
+            return "{}";
+        }
+
+        log.debug("Status for {}/{}:\n{}", pid, expName, response.getBody().toString());
+        return response.getBody().toString();
+    }
+
 
     public String getFreeNodes() {
         log.info("Getting free nodes...");
@@ -1057,79 +1126,6 @@ public class AdapterDeterLab {
         }
     }
 
-    /**
-     * Checks the response from adapter deterlab when applying or joining a new project as a new user and determines the exception to be thrown
-     * Use only if @applyProjectNewUsers and @joinProjectNewUsers are performing identical checks
-     * @param responseBody the JSON response from adapter deterlab python script
-     * @param logPrefix the prefix for the log messages to display either "Apply new project as new user..." or "Join new project as new user..."
-     */
-/*
-    private void checkAdapterResultNewUsers(String responseBody, String logPrefix) {
-
-        String jsonResult = new JSONObject(responseBody).getString("msg");
-
-        checkUserNotFoundError (responseBody, jsonResult, logPrefix);
-
-        checkEmailAddressError (responseBody, jsonResult, logPrefix);
-
-        checkInvalidPasswordError (responseBody, jsonResult, logPrefix);
-
-        checkTeamNameAlreadyExistsError (responseBody, jsonResult, logPrefix);
-
-        checkVerificationKeyError (responseBody, jsonResult, logPrefix);
-
-        if (!"user is created".equals(jsonResult)) {
-            log.warn(logPrefix, responseBody);
-            throw new DeterLabOperationFailedException("User creation failed");
-        }
-    }
-
-    private void checkVerificationKeyError (String responseBody, String  jsonResult, String logPrefix) {
-
-        if ("verification key not found".equals(jsonResult)) {
-            log.warn(logPrefix + "Verification key is not found", responseBody);
-            throw new DeterLabOperationFailedException("Verification key is not found");
-        } else if ("incorrect verification key".equals(jsonResult)) {
-            log.warn(logPrefix + "Incorrect verification key", responseBody);
-            throw new DeterLabOperationFailedException("Incorrect verification key");
-        } else if ("user verification failed".equals(jsonResult)) {
-            log.warn(logPrefix + "user verification failed", responseBody);
-            throw new DeterLabOperationFailedException("User verification failed");
-        }
-    }
-
-    private void checkEmailAddressError (String responseBody, String jsonResult, String logPrefix) {
-
-        if ("email address in use".equals(jsonResult)) {
-            log.warn(logPrefix + "Email address already exists.", responseBody);
-            throw new EmailAlreadyExistsException("Email address already exists.");
-        }
-    }
-
-    private void checkInvalidPasswordError (String responseBody, String jsonResult, String logPrefix) {
-
-        if ("invalid password".equals(jsonResult)) {
-            log.warn(logPrefix + "Password is invalid.", responseBody);
-            throw new InvalidPasswordException();
-        }
-    }
-
-    private void checkTeamNameAlreadyExistsError (String responseBody, String  jsonResult, String logPrefix) {
-
-        if ("team name is already in use".equals(jsonResult)) {
-            log.warn(logPrefix + "Team Name is already in use.", responseBody);
-            throw new TeamNameAlreadyExistsException("Team Name is already in use.");
-        }
-    }
-
-    private void checkUserNotFoundError (String responseBody, String jsonResult, String logPrefix) {
-
-        if ("user not created in deter database".equals(jsonResult)) {
-            log.warn(logPrefix + "User is not found in database.", responseBody);
-            throw new UserNotFoundException("User is not found in database.");
-        }
-    }
-*/
     /**
      * Crafts the JSON string for start/stop experiment
      * @param operation in or out, implies start or stop experiment respectively

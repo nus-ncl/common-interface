@@ -16,8 +16,10 @@ import sg.ncl.service.experiment.data.jpa.ExperimentRepository;
 import sg.ncl.service.experiment.domain.Experiment;
 import sg.ncl.service.experiment.domain.ExperimentService;
 import sg.ncl.service.experiment.exceptions.ExperimentNameAlreadyExistsException;
+import sg.ncl.service.experiment.exceptions.ExperimentNotFoundException;
 import sg.ncl.service.experiment.exceptions.TeamIdNullOrEmptyException;
 import sg.ncl.service.experiment.exceptions.UserIdNullOrEmptyException;
+import sg.ncl.service.experiment.web.StatefulExperiment;
 import sg.ncl.service.mail.domain.MailService;
 import sg.ncl.service.realization.data.jpa.RealizationEntity;
 import sg.ncl.service.realization.domain.RealizationService;
@@ -175,44 +177,6 @@ public class ExperimentServiceImpl implements ExperimentService {
         }
 
         return experimentRepository.findByTeamId(teamId).stream().collect(Collectors.toList());
-    }
-
-    public String createNsFile(String filename, String contents) {
-        log.info("Create NS file");
-
-        File file;
-        FileOutputStream fileOutputStream = null;
-
-        try {
-            file = new File(filename);
-            fileOutputStream = new FileOutputStream(file);
-
-            // if file doesn't exist, create it
-            if (!file.exists()) {
-                file.createNewFile();
-            }
-
-            // getAll contents in bytes
-            byte[] contentInBytes = contents.getBytes();
-
-            fileOutputStream.write(contentInBytes);
-            fileOutputStream.flush();
-            fileOutputStream.close();
-        } catch (IOException e) {
-            log.error("File cannot be created.\n" + e.getMessage());
-            filename = "error";
-        } finally {
-            try {
-                if (fileOutputStream != null) {
-                    fileOutputStream.close();
-                }
-            } catch (IOException e) {
-                log.error("File cannot be created.\n" + e.getMessage());
-                filename = "error";
-            }
-        }
-
-        return filename;
     }
 
     /**
@@ -413,5 +377,130 @@ public class ExperimentServiceImpl implements ExperimentService {
 
         experimentEntity.setNsFileContent(experiment.getNsFileContent());
         return experimentRepository.save(experimentEntity);
+    }
+
+    @Override
+    public List<StatefulExperiment> getStatefulExperimentsByTeam(String teamId, String userId) {
+
+        if (!teamService.isMember(teamId, userId)) {
+            log.warn("User {} is not a member of team {}", userId, teamId);
+            return new ArrayList<>();
+        }
+
+        final String result = adapterDeterLab.getExperimentsByTeam(teamId);
+        log.debug("List of experiments in team {}: {}", teamId, result);
+
+        if (result.isEmpty() || "{}".equals(result)) {
+            return new ArrayList<>();
+        }
+
+        List<StatefulExperiment> stateExpList = new ArrayList<>();
+
+        JSONObject object = new JSONObject(result);
+        for (Object key : object.keySet()) {
+            final String expName = (String) key;
+            ExperimentEntity expEntity = experimentRepository.findOneByTeamIdAndName(teamId, expName);
+            /**
+             * the SIO database may have more or less experiments than Deter database;
+             * we only return the experiments that exist in both SIO and Deter databases
+             */
+            if (expEntity != null) {
+                JSONObject expDetails = object.getJSONObject(expName);
+                StatefulExperiment stateExp = new StatefulExperiment();
+                stateExp.setTeamId(expEntity.getTeamId());
+                stateExp.setTeamName(expEntity.getTeamName());
+                stateExp.setId(expEntity.getId());
+                stateExp.setName(expEntity.getName());
+                stateExp.setUserId(expEntity.getUserId());
+                stateExp.setDescription(expEntity.getDescription());
+                stateExp.setCreatedDate(expEntity.getCreatedDate());
+                stateExp.setLastModifiedDate(expEntity.getLastModifiedDate());
+                stateExp.setState(myExperimentState(expDetails.getString("state")));
+                stateExp.setNodes(expDetails.getInt("nodes"));
+                stateExp.setMinNodes(expDetails.getInt("min_nodes"));
+                stateExp.setIdleHours(expDetails.getLong("idle_hours"));
+                stateExp.setDetails(expDetails.getString("details"));
+
+                stateExpList.add(stateExp);
+            }
+        }
+
+        return stateExpList;
+    }
+
+    @Override
+    public StatefulExperiment getStatefulExperiment(Long expId, String userId) {
+
+        final ExperimentEntity expEntity = experimentRepository.findOne(expId);
+        if (expEntity == null) {
+            log.warn("Experiment {} not found in database!", expId);
+            throw new ExperimentNotFoundException("Experiment " + expId + " not found.");
+        }
+
+        final String teamId = expEntity.getTeamId();
+
+        if (!teamService.isMember(teamId, userId)) {
+            log.warn("User {} is not a member of team {}", userId, teamId);
+            throw new ForbiddenException();
+        }
+
+        final String expName = expEntity.getName();
+        final String result = adapterDeterLab.getExperiment(teamId, expName);
+        log.debug("Status for experiment {}: {}", expId, result);
+
+        if (result.isEmpty() || "{}".equals(result)) {
+            log.warn("Experiment {} not found in Deter!", expId);
+            throw new ExperimentNotFoundException("Experiment " + expId + " not found.");
+        }
+
+        JSONObject object = new JSONObject(result);
+        JSONObject expDetails = object.getJSONObject(expName);
+        StatefulExperiment stateExp = new StatefulExperiment();
+
+        stateExp.setTeamId(expEntity.getTeamId());
+        stateExp.setTeamName(expEntity.getTeamName());
+        stateExp.setId(expEntity.getId());
+        stateExp.setName(expEntity.getName());
+        stateExp.setUserId(expEntity.getUserId());
+        stateExp.setDescription(expEntity.getDescription());
+        stateExp.setCreatedDate(expEntity.getCreatedDate());
+        stateExp.setLastModifiedDate(expEntity.getLastModifiedDate());
+        stateExp.setState(myExperimentState(expDetails.getString("state")));
+        stateExp.setNodes(expDetails.getInt("nodes"));
+        stateExp.setMinNodes(expDetails.getInt("min_nodes"));
+        stateExp.setIdleHours(expDetails.getLong("idle_hours"));
+        stateExp.setDetails(expDetails.getString("details"));
+
+        return stateExp;
+    }
+
+    private String myExperimentState(String deterState) {
+
+/*
+        # Experiment states on Deter
+        $TB_EXPTSTATE_NEW		    = "new";
+        $TB_EXPTSTATE_PRERUN		= "prerunning";
+        $TB_EXPTSTATE_SWAPPING		= "swapping";
+        $TB_EXPTSTATE_SWAPPED		= "swapped";
+        $TB_EXPTSTATE_ACTIVATING	= "activating";
+        $TB_EXPTSTATE_ACTIVE		= "active";
+        $TB_EXPTSTATE_PANICED		= "paniced";
+        $TB_EXPTSTATE_QUEUED		= "queued";
+        $TB_EXPTSTATE_MODIFY_RESWAP	= "modify_reswap";
+*/
+
+        if ("activating".equals(deterState)){
+            return "STARTING";
+        } else if ("active".equals(deterState)){
+            return "RUNNING";
+        } else if ("swapping".equals(deterState)){
+            return "STOPPING";
+        } else if ("swapped".equals(deterState)){
+            return "STOPPED";
+        } else if ("error".equals(deterState)){
+            return "ERROR";
+        } else {
+            return "STOPPED"; // this includes "new", "prerunning", "paniced", "queued" and "modify_reswap"
+        }
     }
 }
