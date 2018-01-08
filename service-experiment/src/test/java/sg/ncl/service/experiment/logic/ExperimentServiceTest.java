@@ -26,6 +26,7 @@ import sg.ncl.service.mail.domain.MailService;
 import sg.ncl.service.realization.data.jpa.RealizationEntity;
 import sg.ncl.service.realization.domain.RealizationService;
 import sg.ncl.service.team.domain.TeamService;
+import sg.ncl.service.user.domain.UserService;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -57,6 +58,8 @@ public class ExperimentServiceTest {
     @Mock
     private TeamService teamService;
     @Mock
+    private UserService userService;
+    @Mock
     private ConnectionProperties adapterConnectionProperties;
     @Mock
     private MailService mailService;
@@ -77,7 +80,7 @@ public class ExperimentServiceTest {
         assertThat(mockingDetails(mailService).isMock()).isTrue();
         assertThat(mockingDetails(internetRequestTemplate).isMock()).isTrue();
 
-        experimentService = new ExperimentServiceImpl(experimentRepository, adapterDeterLab, realizationService, adapterConnectionProperties, teamService, mailService, internetRequestTemplate);
+        experimentService = new ExperimentServiceImpl(experimentRepository, adapterDeterLab, realizationService, adapterConnectionProperties, teamService, userService, mailService, internetRequestTemplate);
     }
 
     @Test

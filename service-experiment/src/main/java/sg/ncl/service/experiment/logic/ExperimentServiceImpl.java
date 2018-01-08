@@ -24,6 +24,8 @@ import sg.ncl.service.mail.domain.MailService;
 import sg.ncl.service.realization.data.jpa.RealizationEntity;
 import sg.ncl.service.realization.domain.RealizationService;
 import sg.ncl.service.team.domain.TeamService;
+import sg.ncl.service.user.domain.User;
+import sg.ncl.service.user.domain.UserService;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -49,9 +51,9 @@ public class ExperimentServiceImpl implements ExperimentService {
     private final RealizationService realizationService;
     private final ConnectionProperties adapterConnectionProperties;
     private final TeamService teamService;
+    private final UserService userService;
     private final MailService mailService;
     private final Template internetRequestTemplate;
-
 
     @Inject
     ExperimentServiceImpl(@NotNull final ExperimentRepository experimentRepository,
@@ -59,6 +61,7 @@ public class ExperimentServiceImpl implements ExperimentService {
                           @NotNull final RealizationService realizationService,
                           @NotNull final ConnectionProperties connectionProperties,
                           @NotNull final TeamService teamService,
+                          @NotNull final UserService userService,
                           @NotNull final MailService mailService,
                           @NotNull @Named("internetRequestTemplate") final Template internetRequestTemplate) {
         this.experimentRepository = experimentRepository;
@@ -67,6 +70,7 @@ public class ExperimentServiceImpl implements ExperimentService {
         this.adapterConnectionProperties = connectionProperties;
         // FIXME Do not expose the internal workings of the DeterLab adapter to the experiment service; i.e., should not need to inject ConnectionProperties
         this.teamService = teamService;
+        this.userService = userService;
         this.mailService = mailService;
         this.internetRequestTemplate =  internetRequestTemplate;
     }
@@ -328,8 +332,14 @@ public class ExperimentServiceImpl implements ExperimentService {
         Experiment experimentEntity = experimentRepository.getOne(expId);
         String teamName = experimentEntity.getTeamName();
         String experimentName = experimentEntity.getName();
+        String userID = experimentEntity.getUserId();
+
+        User requester = userService.getUser(userID);
+
+        String requesterName = requester.getUserDetails().getFirstName() + " " + requester.getUserDetails().getLastName();
 
         final Map<String, String> map = new HashMap<>();
+        map.put("requester", requesterName);
         map.put("projectName", teamName);
         map.put("expName", experimentName);
         map.put("reason", reason);
@@ -344,7 +354,10 @@ public class ExperimentServiceImpl implements ExperimentService {
 
             String msgText = FreeMarkerTemplateUtils.processTemplateIntoString(internetRequestTemplate, map);
 
-            mailService.send(from , to , subject, msgText, false, null, null);
+            String[] cc = new String[1];
+            cc[0] = requester.getUserDetails().getEmail();
+
+            mailService.send(from , to , subject, msgText, false, cc , null);
 
             log.info("Email sent for internet request for Experiment {} from Team {}", expId, teamId);
         } catch (IOException | TemplateException e) {
