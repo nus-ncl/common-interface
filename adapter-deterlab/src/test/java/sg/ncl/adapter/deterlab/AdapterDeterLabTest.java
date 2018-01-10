@@ -601,8 +601,9 @@ public class AdapterDeterLabTest {
 
     }
 
+
     @Test
-    public void modifyExperimentGood() {
+    public void modifyNSFileGood() {
         String random = RandomStringUtils.randomAlphanumeric(20);
 
         JSONObject myobject = new JSONObject();
@@ -623,7 +624,7 @@ public class AdapterDeterLabTest {
 
     // throw AdapterConnectionException
     @Test
-    public void modifyExperimentAdapterConnectionException() {
+    public void modifyNSFileAdapterConnectionException() {
         String random = RandomStringUtils.randomAlphanumeric(20);
 
         JSONObject myobject = new JSONObject();
@@ -641,7 +642,7 @@ public class AdapterDeterLabTest {
 
     // throw NSFileParseException
     @Test
-    public void modifyExperimentNSFileParseException() {
+    public void modifyNSFileParseException() {
         String random = RandomStringUtils.randomAlphanumeric(20);
 
         JSONObject myobject = new JSONObject();
@@ -661,7 +662,7 @@ public class AdapterDeterLabTest {
 
     // throw ExperimentModifyException
     @Test
-    public void modifyExperimentExperimentModifyException() {
+    public void modifyNSFileExperimentModifyException() {
         String random = RandomStringUtils.randomAlphanumeric(20);
 
         JSONObject myobject = new JSONObject();
