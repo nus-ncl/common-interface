@@ -424,6 +424,7 @@ public class ExperimentServiceImpl implements ExperimentService {
                 stateExp.setLastModifiedDate(expEntity.getLastModifiedDate());
                 stateExp.setState(myExperimentState(expDetails.getString("state")));
                 stateExp.setNodes(expDetails.getInt("nodes"));
+                stateExp.setMaxDuration(expEntity.getMaxDuration());
                 stateExp.setMinNodes(expDetails.getInt("min_nodes"));
                 stateExp.setIdleHours(expDetails.getLong("idle_hours"));
                 stateExp.setDetails(expDetails.getString("details"));
@@ -474,6 +475,7 @@ public class ExperimentServiceImpl implements ExperimentService {
         stateExp.setLastModifiedDate(expEntity.getLastModifiedDate());
         stateExp.setState(myExperimentState(expDetails.getString("state")));
         stateExp.setNodes(expDetails.getInt("nodes"));
+        stateExp.setMaxDuration(expEntity.getMaxDuration());
         stateExp.setMinNodes(expDetails.getInt("min_nodes"));
         stateExp.setIdleHours(expDetails.getLong("idle_hours"));
         stateExp.setDetails(expDetails.getString("details"));
