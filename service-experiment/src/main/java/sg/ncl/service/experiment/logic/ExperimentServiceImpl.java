@@ -28,8 +28,6 @@ import sg.ncl.service.team.domain.TeamService;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.validation.constraints.NotNull;
-import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -372,10 +370,19 @@ public class ExperimentServiceImpl implements ExperimentService {
         jsonObject.put("eid", experiment.getName());
         jsonObject.put("uid", uid);
         jsonObject.put("nsfile", experiment.getNsFileContent());
+        jsonObject.put("maxDuration", experiment.getMaxDuration());
 
-        adapterDeterLab.modifyExperiment(jsonObject.toString());
+        // prevent un-necessary call if no changes are to be made
+        if (!experimentEntity.getNsFileContent().equalsIgnoreCase(experiment.getNsFileContent())) {
+            adapterDeterLab.modifyNSFile(jsonObject.toString());
+            experimentEntity.setNsFileContent(experiment.getNsFileContent());
+        }
 
-        experimentEntity.setNsFileContent(experiment.getNsFileContent());
+        if (!experimentEntity.getMaxDuration().equals(experiment.getMaxDuration())) {
+            adapterDeterLab.modifyExperimentSettings(jsonObject.toString());
+            experimentEntity.setMaxDuration(experiment.getMaxDuration());
+        }
+
         return experimentRepository.save(experimentEntity);
     }
 
