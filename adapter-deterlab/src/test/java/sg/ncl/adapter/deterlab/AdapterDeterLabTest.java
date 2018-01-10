@@ -601,6 +601,60 @@ public class AdapterDeterLabTest {
 
     }
 
+    @Test
+    public void modifyExperimentSettingsGood() {
+        String random = RandomStringUtils.randomAlphanumeric(20);
+
+        JSONObject myobject = new JSONObject();
+        myobject.put("msg", "modify experiment settings: max_duration success");
+
+        when(restTemplate.exchange(anyString(),eq(HttpMethod.POST),anyObject(),eq(String.class))).thenReturn(response);
+        when(response.getBody()).thenReturn(myobject.toString());
+        when(response.getBody().toString()).thenReturn(myobject.toString());
+
+        String result = adapterDeterLab.modifyExperimentSettings(random);
+
+        verify(restTemplate,times(1)).exchange(anyString(),eq(HttpMethod.POST),anyObject(),eq(String.class));
+        verify(properties,times(1)).modifyExperimentSettings();
+
+        assertThat(result).isEqualTo(myobject.getString("msg"));
+    }
+
+    // throw AdapterConnectionException
+    @Test
+    public void modifyExperimentSettingsAdapterConnectionException() {
+        String random = RandomStringUtils.randomAlphanumeric(20);
+
+        JSONObject myobject = new JSONObject();
+        myobject.put("msg", "modify experiment settings: max_duration fail");
+
+        exception.expect(AdapterConnectionException.class);
+        when(restTemplate.exchange(anyString(),eq(HttpMethod.POST),anyObject(),eq(String.class))).thenThrow(new RuntimeException());
+
+        adapterDeterLab.modifyExperimentSettings(random);
+
+        verify(restTemplate,times(1)).exchange(anyString(),eq(HttpMethod.POST),anyObject(),eq(String.class));
+        verify(properties,times(1)).modifyExperimentSettings();
+    }
+
+    // throw ExperimentModifyException
+    @Test
+    public void modifyExperimentSettingsExperimentModifyException() {
+        String random = RandomStringUtils.randomAlphanumeric(20);
+
+        JSONObject myobject = new JSONObject();
+        myobject.put("msg", "modify experiment settings: max_duration fail");
+
+        exception.expect(ExperimentModifyException.class);
+        when(restTemplate.exchange(anyString(),eq(HttpMethod.POST),anyObject(),eq(String.class))).thenReturn(response);
+        when(response.getBody()).thenReturn(myobject.toString());
+        when(response.getBody().toString()).thenReturn(myobject.toString());
+
+        adapterDeterLab.modifyExperimentSettings(random);
+
+        verify(restTemplate,times(1)).exchange(anyString(),eq(HttpMethod.POST),anyObject(),eq(String.class));
+        verify(properties,times(1)).modifyExperimentSettings();
+    }
 
     @Test
     public void modifyNSFileGood() {
