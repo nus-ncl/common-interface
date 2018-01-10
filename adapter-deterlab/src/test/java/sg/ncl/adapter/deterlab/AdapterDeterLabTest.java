@@ -613,10 +613,10 @@ public class AdapterDeterLabTest {
         when(response.getBody()).thenReturn(myobject.toString());
         when(response.getBody().toString()).thenReturn(myobject.toString());
 
-        String result = adapterDeterLab.modifyExperiment(random);
+        String result = adapterDeterLab.modifyNSFile(random);
 
         verify(restTemplate,times(1)).exchange(anyString(),eq(HttpMethod.POST),anyObject(),eq(String.class));
-        verify(properties,times(1)).modifyExperiment();
+        verify(properties,times(1)).modifyNSFile();
 
         assertThat(result).isEqualTo(myobject.getString("msg"));
     }
@@ -633,10 +633,10 @@ public class AdapterDeterLabTest {
         exception.expect(AdapterConnectionException.class);
         when(restTemplate.exchange(anyString(),eq(HttpMethod.POST),anyObject(),eq(String.class))).thenThrow(new RuntimeException());
 
-        adapterDeterLab.modifyExperiment(random);
+        adapterDeterLab.modifyNSFile(random);
 
         verify(restTemplate,times(1)).exchange(anyString(),eq(HttpMethod.POST),anyObject(),eq(String.class));
-        verify(properties,times(1)).modifyExperiment();
+        verify(properties,times(1)).modifyNSFile();
     }
 
     // throw NSFileParseException
@@ -653,10 +653,10 @@ public class AdapterDeterLabTest {
         when(response.getBody()).thenReturn(myobject.toString());
         when(response.getBody().toString()).thenReturn(myobject.toString());
 
-        adapterDeterLab.modifyExperiment(random);
+        adapterDeterLab.modifyNSFile(random);
 
         verify(restTemplate,times(1)).exchange(anyString(),eq(HttpMethod.POST),anyObject(),eq(String.class));
-        verify(properties,times(1)).modifyExperiment();
+        verify(properties,times(1)).modifyNSFile();
     }
 
     // throw ExperimentModifyException
@@ -673,10 +673,10 @@ public class AdapterDeterLabTest {
         when(response.getBody()).thenReturn(myobject.toString());
         when(response.getBody().toString()).thenReturn(myobject.toString());
 
-        adapterDeterLab.modifyExperiment(random);
+        adapterDeterLab.modifyNSFile(random);
 
         verify(restTemplate,times(1)).exchange(anyString(),eq(HttpMethod.POST),anyObject(),eq(String.class));
-        verify(properties,times(1)).modifyExperiment();
+        verify(properties,times(1)).modifyNSFile();
     }
 
     //no exception thrown

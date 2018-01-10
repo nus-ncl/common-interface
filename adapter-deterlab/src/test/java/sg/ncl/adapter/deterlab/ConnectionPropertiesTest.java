@@ -80,8 +80,8 @@ public class ConnectionPropertiesTest {
 
     @Test
     public void testModifyExperiment() throws Exception {
-        assertThat(connectionProperties.modifyExperiment()).isNotNull();
-        assertThat(connectionProperties.modifyExperiment()).isEqualTo("http://127.0.0.1:22/modifyExperiment");
+        assertThat(connectionProperties.modifyNSFile()).isNotNull();
+        assertThat(connectionProperties.modifyNSFile()).isEqualTo("http://127.0.0.1:22/modifyNSFile");
     }
 
     @Test

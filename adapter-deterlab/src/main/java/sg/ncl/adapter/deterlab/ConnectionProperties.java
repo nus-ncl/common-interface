@@ -53,8 +53,12 @@ public class ConnectionProperties {
 
     public String deleteExperiment() { return HTTP_MODE + ip + ":" + port + "/deleteExperiment"; }
 
-    public String modifyExperiment() {
-        return HTTP_MODE + ip + ":" + port + "/modifyExperiment";
+    public String modifyExperimentSettings() {
+        return HTTP_MODE + ip + ":" + port + "/modifyExperimentSettings";
+    }
+
+    public String modifyNSFile() {
+        return HTTP_MODE + ip + ":" + port + "/modifyNSFile";
     }
 
     public String getUpdateCredentials() {
