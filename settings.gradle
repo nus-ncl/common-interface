@@ -18,4 +18,5 @@ include 'service-image'
 include 'service-transmission'
 include 'service-telemetry'
 include 'service-analytics'
+include 'adapter-openstack'
 
