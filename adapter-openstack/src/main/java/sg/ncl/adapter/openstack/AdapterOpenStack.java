@@ -101,6 +101,6 @@ public class AdapterOpenStack {
         return new JSONObject(response.getBody().toString());
     }
 
-
+    
 
 }
