@@ -86,13 +86,21 @@ public class AdapterOpenStack {
         httpHeaders.setContentType(MediaType.APPLICATION_JSON);
         httpHeaders.set("X-Auth-Token", token.toString());
         HttpEntity<String> request = new HttpEntity<>(jsonObject.toString(), httpHeaders);
-        ResponseEntity responseEntity;
+        ResponseEntity response;
 
-        
+        try {
+            response = restTemplate.exchange(properties.createUserUrl(), HttpMethod.POST, request, String.class);
+        } catch (ResourceAccessException e) {
+            log.warn("Error requesting token in OpenStack: {}", e);
+            throw new OpenStackConnectionException(e.getMessage());
+        } catch (JSONException e) {
+            log.warn("Error requesting token in OpenStack: error parsing response body");
+            throw e;
+        }
 
-        return new JSONObject();
-
+        return new JSONObject(response.getBody().toString());
     }
+
 
 
 }
