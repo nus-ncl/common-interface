@@ -66,5 +66,15 @@ public class AdapterOpenStack {
         JSONObject token = new JSONObject(response.getBody().toString());
     }
 
+    public JSONObject createUser(String name, String password) {
+        JSONObject userObject = new JSONObject();
+        userObject.put("enabled", true);
+        userObject.put("name", name);
+        userObject.put("password", password);
+
+        return new JSONObject();
+
+    }
+
 
 }
