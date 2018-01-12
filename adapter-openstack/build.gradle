@@ -1,5 +1,5 @@
 dependencies {
     compile project(':common')
-
+    compile 'org.json:json'
     testCompile project(':common-test')
 }

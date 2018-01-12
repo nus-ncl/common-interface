@@ -63,6 +63,10 @@ ncl:
       bossUrl: ${deterlab.boss:}
       userUrl: ${deterlab.user:}
       enabled: true
+  openstack:
+    adapter:
+      ip: 172.18.178.26
+      port: 80
   jwt:
     api-key: ${jwt.key:}
     signing-algorithm: HS512
