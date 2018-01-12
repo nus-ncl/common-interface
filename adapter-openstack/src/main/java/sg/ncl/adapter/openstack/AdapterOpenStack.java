@@ -1,8 +1,10 @@
 package sg.ncl.adapter.openstack;
 import lombok.extern.slf4j.Slf4j;
+import org.json.JSONException;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.*;
+import org.springframework.web.client.ResourceAccessException;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 import sg.ncl.adapter.openstack.exceptions.OpenStackConnectionException;
@@ -52,12 +54,13 @@ public class AdapterOpenStack {
         ResponseEntity response;
 
         try {
-            response = restTemplate.exchange(
-                                properties.requestTokenUrl(),
-                                HttpMethod.POST, request, String.class);
-        } catch (RestClientException e) {
+            response = restTemplate.exchange(properties.requestTokenUrl(), HttpMethod.POST, request, String.class);
+        } catch (ResourceAccessException e) {
             log.warn("Error requesting token in OpenStack: {}", e);
             throw new OpenStackConnectionException(e.getMessage());
+        } catch (JSONException e) {
+            log.warn("Error requesting token in OpenStack: error parsing response body");
+            throw e;
         }
 
         JSONObject token = new JSONObject(response.getBody().toString());
