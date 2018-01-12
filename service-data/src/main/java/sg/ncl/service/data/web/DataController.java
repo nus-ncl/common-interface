@@ -24,7 +24,7 @@ import java.util.Enumeration;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static sg.ncl.common.validation.Validator.isAdmin;
+import static sg.ncl.common.validation.Validator.checkAdmin;
 
 /**
  * Created by jng on 17/10/16.
@@ -66,7 +66,7 @@ public class DataController {
             throw new UnauthorizedException();
         }
         try {
-            isAdmin((Claims) claims);
+            checkAdmin((Claims) claims);
             return dataService.getDatasets().stream().map(DataInfo::new).collect(Collectors.toList());
         } catch (ForbiddenException e) {
             String contextUserId = ((Claims) claims).getSubject();
@@ -95,7 +95,7 @@ public class DataController {
             throw new UnauthorizedException();
         }
         try {
-            isAdmin((Claims) claims);
+            checkAdmin((Claims) claims);
             return new DataInfo(dataService.getDataset(id));
         } catch (ForbiddenException e) {
             String contextUserId = ((Claims) claims).getSubject();
@@ -194,7 +194,7 @@ public class DataController {
         if (claims == null || !(claims instanceof Claims)) {
             throw new UnauthorizedException();
         }
-        isAdmin((Claims) claims);
+        checkAdmin((Claims) claims);
         return new DataInfo(dataService.updateResource(did, dataResourceInfo, (Claims) claims));
     }
 

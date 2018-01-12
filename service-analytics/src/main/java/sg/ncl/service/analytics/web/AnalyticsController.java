@@ -19,7 +19,7 @@ import java.util.List;
 
 import static java.time.temporal.TemporalAdjusters.firstDayOfMonth;
 import static java.time.temporal.TemporalAdjusters.lastDayOfMonth;
-import static sg.ncl.common.validation.Validator.isAdmin;
+import static sg.ncl.common.validation.Validator.checkAdmin;
 
 /**
  * @author: Tran Ly Vu, James Ng
@@ -127,7 +127,7 @@ public class AnalyticsController {
                                         @RequestParam(value = "endDate", required = false) String endDate) {
 
         //check admin using validator class from common
-        isAdmin((Claims) claims);
+        checkAdmin((Claims) claims);
 
         ZonedDateTime start = getZonedDateTime(startDate);
         ZonedDateTime end = getZonedDateTime(endDate);

@@ -30,14 +30,13 @@ import sg.ncl.service.user.domain.UserService;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.validation.constraints.NotNull;
-import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.stream.Collectors;
 
 import static sg.ncl.service.experiment.validation.Validator.checkPermissions;
+import static sg.ncl.common.validation.Validator.isAdmin;
 
 /**
  * @Authors: Desmond, Tran Ly Vu
@@ -324,10 +323,11 @@ public class ExperimentServiceImpl implements ExperimentService {
     public Experiment requestInternet(String teamId, Long expId, String reason, final Claims claims) {
 
         log.info("Requesting internet access for Experiment {} from Team {}", expId, teamId);
-        RealizationEntity realizationEntity = realizationService.getByExperimentId(expId);
 
-        // put the check inside here because we do not want to add the realization service and team service on the controller
-        checkPermissions(realizationEntity, teamService.isOwner(teamId, claims.getSubject()), claims);
+        if(!isAdmin(claims) && !teamService.isMember(teamId, claims.getSubject())) {
+            log.warn("Permission denied for internet access request!");
+            throw new ForbiddenException();
+        }
 
         Experiment experimentEntity = experimentRepository.getOne(expId);
         String teamName = experimentEntity.getTeamName();
