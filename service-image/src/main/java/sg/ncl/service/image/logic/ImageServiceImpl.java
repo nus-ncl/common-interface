@@ -18,7 +18,7 @@ import javax.validation.constraints.NotNull;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static sg.ncl.common.validation.Validator.checkAdmin;
+import static sg.ncl.common.validation.Validator.isAdmin;
 
 /**
  * @authors:  Teye, Tran Ly Vu.
@@ -106,7 +106,7 @@ public class ImageServiceImpl implements ImageService {
     public String removeImage(String teamId, String imageName, Claims claims) {
 
         boolean imageCreator = true;
-        if (teamService.isOwner(teamId, claims.getSubject()) || checkAdmin(claims)) {
+        if (teamService.isOwner(teamId, claims.getSubject()) || isAdmin(claims)) {
             imageCreator = false;
         }
 

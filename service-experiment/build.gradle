@@ -6,6 +6,7 @@ dependencies {
     compile project(':service-realization')
     compile project(':service-team')
     compile project(':service-mail')
+    compile project(':service-user')
 
     runtime 'mysql:mysql-connector-java'
 

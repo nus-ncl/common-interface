@@ -4,6 +4,7 @@ You have a new internet request.
 
 The details of the request are as follows:
 
+Requester: ${requester}
 Team name: ${projectName}
 Experiment name: ${expName}
 Request Reason: ${reason}

@@ -30,7 +30,7 @@ public class Validator {
     }
 
 
-    public static void isAdmin(final Claims claims) {
+    public static void checkAdmin(final Claims claims) {
         if (!(claims.get(JwtToken.KEY) instanceof List<?>)) {
             log.warn("Bad claims type found: {}", claims);
             throw new ForbiddenException();
@@ -40,7 +40,7 @@ public class Validator {
         List<String> roles;
         roles = (ArrayList<String>) claims.get(JwtToken.KEY);
 
-        log.info("Context user id: {}, Context roles: {}", contextUserId, roles);
+        log.debug("Context user id: {}, Context roles: {}", contextUserId, roles);
 
         if (!roles.contains(Role.ADMIN.toString())) {
             log.warn("Must be an Admin");
@@ -48,7 +48,7 @@ public class Validator {
         }
     }
 
-    public static boolean checkAdmin(final Claims claims) {
+    public static boolean isAdmin(final Claims claims) {
         if (!(claims.get(JwtToken.KEY) instanceof List<?>)) {
             log.warn("Bad claims type found: {}", claims);
             throw new ForbiddenException();
@@ -58,7 +58,7 @@ public class Validator {
         List<String> roles;
         roles = (ArrayList<String>) claims.get(JwtToken.KEY);
 
-        log.info("Context user id: {}, Context roles: {}", contextUserId, roles);
+        log.debug("Context user id: {}, Context roles: {}", contextUserId, roles);
 
         return roles.contains(Role.ADMIN.toString());
     }
