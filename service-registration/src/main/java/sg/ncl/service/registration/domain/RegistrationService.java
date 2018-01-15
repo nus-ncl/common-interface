@@ -17,7 +17,7 @@ public interface RegistrationService {
 
     Registration register(Credentials credentials, User user, Team team, boolean isJoinTeam);
 
-    String registerOpenStack(Credentials credentials);
+    String registerOpenStack(Credentials credentials, Team team);
 
     String approveJoinRequest(String teamId, String userId, User user);
 

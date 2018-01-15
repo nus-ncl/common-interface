@@ -26,14 +26,14 @@ public class AdapterOpenStack {
         this.restTemplate = restTemplate;
     }
 
-    public JSONObject requestToken (String name, String password) {
+    public JSONObject requestToken () {
         JSONObject domainObject = new JSONObject();
         domainObject.put("name", "Default");
 
         JSONObject userObject = new JSONObject();
-        userObject.put("name", name);
+        userObject.put("name", "admin");
         userObject.put("domain", domainObject);
-        userObject.put("password", password);
+        userObject.put("password", "adminpass");
 
         JSONObject passwordObject = new JSONObject();
         userObject.put("user", userObject);
@@ -77,7 +77,7 @@ public class AdapterOpenStack {
         JSONObject jsonObject = new JSONObject();
         jsonObject.put("user", userObject);
 
-        JSONObject token = requestToken(name, password);
+        JSONObject token = requestToken();
 
         HttpHeaders httpHeaders = new HttpHeaders();
         httpHeaders.setContentType(MediaType.APPLICATION_JSON);
@@ -101,7 +101,7 @@ public class AdapterOpenStack {
         return new JSONObject(responseEntity.getBody().toString());
     }
 
-    public JSONObject createProject(String name, String password, String description) {
+    public JSONObject createProject(String name, String description) {
         JSONObject projectObject = new JSONObject();
         projectObject.put("description", description);
         projectObject.put("name", name);
@@ -109,7 +109,7 @@ public class AdapterOpenStack {
         JSONObject jsonObject = new JSONObject();
         jsonObject.put("project", projectObject);
 
-        JSONObject token = requestToken(name, password);
+        JSONObject token = requestToken();
 
         HttpHeaders httpHeaders = new HttpHeaders();
         httpHeaders.setContentType(MediaType.APPLICATION_JSON);
