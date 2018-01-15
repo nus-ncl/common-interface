@@ -2,21 +2,18 @@ package sg.ncl.adapter.openstack;
 import lombok.extern.slf4j.Slf4j;
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.*;
-import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.client.ResourceAccessException;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 import sg.ncl.adapter.openstack.exceptions.OpenStackConnectionException;
-
 import javax.inject.Inject;
-import javax.management.openmbean.OpenDataException;
 
 
 /**
  * Author: Tran Ly Vu
  */
+
 @Slf4j
 public class AdapterOpenStack {
 
@@ -54,19 +51,22 @@ public class AdapterOpenStack {
         HttpHeaders httpHeaders = new HttpHeaders();
         httpHeaders.setContentType(MediaType.APPLICATION_JSON);
         HttpEntity<String> request = new HttpEntity<>(jsonObject.toString(), httpHeaders);
-        ResponseEntity response;
+        ResponseEntity responseEntity;
 
         try {
-            response = restTemplate.exchange(properties.requestTokenUrl(), HttpMethod.POST, request, String.class);
+            responseEntity = restTemplate.exchange(properties.requestTokenUrl(), HttpMethod.POST, request, String.class);
         } catch (ResourceAccessException e) {
             log.warn("Error requesting token in OpenStack: {}", e);
             throw new OpenStackConnectionException(e.getMessage());
         } catch (JSONException e) {
             log.warn("Error requesting token in OpenStack: error parsing response body");
             throw e;
+        } catch (RestClientException e) {
+            log.warn("Error requesting token in Openstack: {}", e);
+            throw new OpenStackConnectionException(e.getMessage());
         }
 
-        JSONObject token = new JSONObject(response.getBody().toString());
+        JSONObject token = new JSONObject(responseEntity.getBody().toString());
 
         return token;
     }
@@ -86,19 +86,53 @@ public class AdapterOpenStack {
         httpHeaders.setContentType(MediaType.APPLICATION_JSON);
         httpHeaders.set("X-Auth-Token", token.toString());
         HttpEntity<String> request = new HttpEntity<>(jsonObject.toString(), httpHeaders);
-        ResponseEntity response;
+        ResponseEntity responseEntity;
 
         try {
-            response = restTemplate.exchange(properties.createUserUrl(), HttpMethod.POST, request, String.class);
+            responseEntity = restTemplate.exchange(properties.createUserUrl(), HttpMethod.POST, request, String.class);
         } catch (ResourceAccessException e) {
             log.warn("Error requesting token in OpenStack: {}", e);
             throw new OpenStackConnectionException(e.getMessage());
         } catch (JSONException e) {
-            log.warn("Error requesting token in OpenStack: error parsing response body");
+            log.warn("Error creating user in OpenStack: error parsing response body");
             throw e;
+        } catch (RestClientException e) {
+            log.warn("Error creating user in OpenStack: {}", e);
+            throw new OpenStackConnectionException(e.getMessage());
         }
 
-        return new JSONObject(response.getBody().toString());
+        return new JSONObject(responseEntity.getBody().toString());
+    }
+
+    public JSONObject createProject(String name, String password, String description) {
+        JSONObject projectObject = new JSONObject();
+        projectObject.put("description", description);
+        projectObject.put("name", name);
+
+        JSONObject jsonObject = new JSONObject();
+        jsonObject.put("project", projectObject);
+
+        JSONObject token = requestToken(name, password);
+
+        HttpHeaders httpHeaders = new HttpHeaders();
+        httpHeaders.setContentType(MediaType.APPLICATION_JSON);
+        httpHeaders.set("X-Auth-Token", token.toString());
+        HttpEntity<String> request = new HttpEntity<>(jsonObject.toString(), httpHeaders);
+
+        ResponseEntity responseEntity;
+
+        try {
+            responseEntity = restTemplate.exchange(properties.createProjectUrl(),
+                                                    HttpMethod.POST, request, String.class);
+        } catch (JSONException e) {
+            log.warn("Error creating project in OpenStack: error parsing response body");
+            throw e;
+        } catch (RestClientException e) {
+            log.warn("Error creating project in OpenStack: {}", e);
+            throw new OpenStackConnectionException(e.getMessage());
+        }
+
+        return new JSONObject(responseEntity.getBody().toString());
     }
 
 
