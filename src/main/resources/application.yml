@@ -67,6 +67,7 @@ ncl:
     adapter:
       ip: 172.18.178.26
       port: 80
+      role_id: 69a0564a4994458baf70b98aa638c530
   jwt:
     api-key: ${jwt.key:}
     signing-algorithm: HS512

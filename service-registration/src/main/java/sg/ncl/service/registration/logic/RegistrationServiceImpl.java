@@ -299,7 +299,7 @@ public class RegistrationServiceImpl implements RegistrationService {
 
     @Override
     public String registerOpenStack(Credentials credentials) {
-        JSONObject jsonObject = adapterOpenStack.createUser("name", "password");
+        JSONObject jsonObject = adapterOpenStack.createUser(credentials.getUsername(), credentials.getPassword());
 
         return "a";
     }
