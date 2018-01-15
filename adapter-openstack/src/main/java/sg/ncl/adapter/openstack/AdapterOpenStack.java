@@ -135,6 +135,8 @@ public class AdapterOpenStack {
         return new JSONObject(responseEntity.getBody().toString());
     }
 
-
+    public void addUserToProject(String project_id, String user_id) {
+        
+    }
 
 }
