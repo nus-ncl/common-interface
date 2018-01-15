@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.ui.freemarker.FreeMarkerTemplateUtils;
 import sg.ncl.adapter.deterlab.AdapterDeterLab;
+import sg.ncl.adapter.openstack.AdapterOpenStack;
 import sg.ncl.common.DomainProperties;
 import sg.ncl.common.authentication.Role;
 import sg.ncl.service.authentication.domain.Credentials;
@@ -65,6 +66,7 @@ public class RegistrationServiceImpl implements RegistrationService {
     private final RegistrationRepository registrationRepository;
     private final MailService mailService;
     private final AdapterDeterLab adapterDeterLab;
+    private final AdapterOpenStack adapterOpenStack;
     private final Template emailValidationTemplate;
     private final Template applyCreateTeamRequestTemplate;
     private final Template replyCreateTeamRequestTemplate;
@@ -79,6 +81,7 @@ public class RegistrationServiceImpl implements RegistrationService {
             @NotNull final UserService userService,
             @NotNull final RegistrationRepository registrationRepository,
             @NotNull final AdapterDeterLab adapterDeterLab,
+            @NotNull final AdapterOpenStack adapterOpenStack,
             @NotNull final MailService mailService,
             @NotNull final DomainProperties domainProperties,
             @NotNull @Named("emailValidationTemplate") final Template emailValidationTemplate,
@@ -92,6 +95,7 @@ public class RegistrationServiceImpl implements RegistrationService {
         this.userService = userService;
         this.registrationRepository = registrationRepository;
         this.adapterDeterLab = adapterDeterLab;
+        this.adapterOpenStack = adapterOpenStack;
         this.mailService = mailService;
         this.domainProperties = domainProperties;
         this.emailValidationTemplate = emailValidationTemplate;
