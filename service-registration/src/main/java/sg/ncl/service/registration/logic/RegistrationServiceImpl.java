@@ -298,6 +298,13 @@ public class RegistrationServiceImpl implements RegistrationService {
     }
 
     @Override
+    public String registerOpenStack(Credentials credentials) {
+        JSONObject jsonObject = adapterOpenStack.createUser("name", "password");
+
+        return "a";
+    }
+
+    @Override
     @Transactional
     public String approveJoinRequest(String teamId, String userId, User approver) {
         User user = userService.getUser(userId);
