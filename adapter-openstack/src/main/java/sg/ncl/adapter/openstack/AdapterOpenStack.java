@@ -55,14 +55,11 @@ public class AdapterOpenStack {
 
         try {
             responseEntity = restTemplate.exchange(properties.requestTokenUrl(), HttpMethod.POST, request, String.class);
-        } catch (ResourceAccessException e) {
-            log.warn("Error requesting token in OpenStack: {}", e);
-            throw new OpenStackConnectionException(e.getMessage());
         } catch (JSONException e) {
             log.warn("Error requesting token in OpenStack: error parsing response body");
             throw e;
         } catch (RestClientException e) {
-            log.warn("Error requesting token in Openstack: {}", e);
+            log.warn("Error requesting token in OpenStack: {}", e);
             throw new OpenStackConnectionException(e.getMessage());
         }
 
@@ -135,8 +132,22 @@ public class AdapterOpenStack {
         return new JSONObject(responseEntity.getBody().toString());
     }
 
-    public void addUserToProject(String project_id, String user_id) {
-        
+    public void addUserToProject(String projectId, String userId, JSONObject token) {
+        HttpHeaders httpHeaders = new HttpHeaders();
+        httpHeaders.setContentType(MediaType.APPLICATION_JSON);
+        httpHeaders.set("X-Auth-Token", token.toString());
+        HttpEntity<String> request = new HttpEntity<>(httpHeaders);
+        ResponseEntity responseEntity;
+        try {
+            responseEntity = restTemplate.exchange(properties.addUserToProjectUrl(projectId, userId),
+                                                    HttpMethod.PUT, request, String.class);
+        } catch (JSONException e) {
+            log.warn("Error adding User to Project in OpenStack: error parsing response body");
+            throw e;
+        } catch (RestClientException e) {
+            log.warn("Error adding User to Project in OpenStack: {}", e);
+            throw new OpenStackConnectionException(e.getMessage());
+        }
     }
 
 }
