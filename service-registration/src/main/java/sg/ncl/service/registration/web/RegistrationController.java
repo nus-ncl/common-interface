@@ -45,11 +45,8 @@ public class RegistrationController {
     //new user and team in openstack
     @PostMapping(path = "/openstack")
     @ResponseStatus(HttpStatus.OK)
-    public void registerOpenStack(@RequestBody final RegistrationInfo registrationInfo) {
-        Map<String, String> map = new HashMap<>();
-
-        String one = registrationService.registerOpenStack(registrationInfo.getCredentials(),registrationInfo.getTeam());
-
+    public String registerOpenStack(@RequestBody final RegistrationInfo registrationInfo) {
+        return registrationService.registerOpenStack(registrationInfo.getCredentials(),registrationInfo.getTeam());
     }
 
 

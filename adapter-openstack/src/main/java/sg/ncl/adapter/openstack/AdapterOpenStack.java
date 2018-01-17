@@ -3,6 +3,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.springframework.http.*;
+import org.springframework.stereotype.Component;
 import org.springframework.web.client.ResourceAccessException;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
@@ -13,7 +14,7 @@ import javax.inject.Inject;
 /**
  * Author: Tran Ly Vu
  */
-
+@Component
 @Slf4j
 public class AdapterOpenStack {
 
