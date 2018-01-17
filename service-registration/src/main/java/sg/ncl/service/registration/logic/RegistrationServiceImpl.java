@@ -300,10 +300,17 @@ public class RegistrationServiceImpl implements RegistrationService {
     @Override
     public String registerOpenStack(Credentials credentials, Team team) {
         Team teamEntity = teamService.getTeamById(team.getId());
-        JSONObject projectObject = adapterOpenStack.createProject(credentials.getUsername(), teamEntity.getDescription());
 
-        JSONObject userObject = adapterOpenStack.createUser(credentials.getUsername(), credentials.getPassword());
+        String projectId = adapterOpenStack.createProject(credentials.getUsername(), teamEntity.getDescription());
+        String userId =  null;
 
+        if (projectId != null) {
+            userId = adapterOpenStack.createUser(credentials.getUsername(), credentials.getPassword());
+        }
+
+        if (projectId != null && userId != null) {
+            String result = adapterOpenStack.addUserToProject(userId, projectId);
+        }
         return "a";
     }
 

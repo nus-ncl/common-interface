@@ -26,7 +26,7 @@ public class AdapterOpenStack {
         this.restTemplate = restTemplate;
     }
 
-    public JSONObject requestToken () {
+    private String requestToken () {
         JSONObject domainObject = new JSONObject();
         domainObject.put("name", "Default");
 
@@ -63,12 +63,49 @@ public class AdapterOpenStack {
             throw new OpenStackConnectionException(e.getMessage());
         }
 
-        JSONObject token = new JSONObject(responseEntity.getBody().toString());
 
-        return token;
+        return responseEntity.getHeaders().toString();
     }
 
-    public JSONObject createUser(String name, String password) {
+    public String createProject(String name, String description) {
+        JSONObject projectObject = new JSONObject();
+        projectObject.put("description", description);
+        projectObject.put("domain_id", "default");
+        projectObject.put("enabled", true);
+        projectObject.put("is_domain", false);
+        projectObject.put("name", name);
+
+        JSONObject jsonObject = new JSONObject();
+        jsonObject.put("project", projectObject);
+
+        String token = requestToken();
+
+        HttpHeaders httpHeaders = new HttpHeaders();
+        httpHeaders.setContentType(MediaType.APPLICATION_JSON);
+        httpHeaders.set("X-Auth-Token", token);
+        HttpEntity<String> request = new HttpEntity<>(jsonObject.toString(), httpHeaders);
+
+        ResponseEntity responseEntity;
+
+        try {
+            responseEntity = restTemplate.exchange(properties.createProjectUrl(),
+                    HttpMethod.POST, request, String.class);
+        } catch (JSONException e) {
+            log.warn("Error creating project in OpenStack: error parsing response body");
+            throw e;
+        } catch (RestClientException e) {
+            log.warn("Error creating project in OpenStack: {}", e);
+            throw new OpenStackConnectionException(e.getMessage());
+        }
+
+        log.info("Successfully registering new project {} for OpenStack", name);
+
+        JSONObject responseObject = new JSONObject(responseEntity.getBody().toString());
+        String projectId = responseObject.getJSONObject("project").getJSONObject("id").toString();
+        return projectId;
+    }
+
+    public String createUser(String name, String password) {
         JSONObject userObject = new JSONObject();
         userObject.put("enabled", true);
         userObject.put("name", name);
@@ -77,11 +114,11 @@ public class AdapterOpenStack {
         JSONObject jsonObject = new JSONObject();
         jsonObject.put("user", userObject);
 
-        JSONObject token = requestToken();
+        String token = requestToken();
 
         HttpHeaders httpHeaders = new HttpHeaders();
         httpHeaders.setContentType(MediaType.APPLICATION_JSON);
-        httpHeaders.set("X-Auth-Token", token.toString());
+        httpHeaders.set("X-Auth-Token", token);
         HttpEntity<String> request = new HttpEntity<>(jsonObject.toString(), httpHeaders);
         ResponseEntity responseEntity;
 
@@ -98,45 +135,24 @@ public class AdapterOpenStack {
             throw new OpenStackConnectionException(e.getMessage());
         }
 
-        return new JSONObject(responseEntity.getBody().toString());
+        log.info("Successfully registering new user {} for OpenStack", name);
+
+        JSONObject responseObject = new JSONObject(responseEntity.getBody().toString());
+        String userId = responseObject.getJSONObject("user").getJSONObject("id").toString();
+        return userId;
     }
 
-    public JSONObject createProject(String name, String description) {
-        JSONObject projectObject = new JSONObject();
-        projectObject.put("description", description);
-        projectObject.put("name", name);
 
-        JSONObject jsonObject = new JSONObject();
-        jsonObject.put("project", projectObject);
 
-        JSONObject token = requestToken();
-
+    public String addUserToProject(String userId, String projectId) {
         HttpHeaders httpHeaders = new HttpHeaders();
         httpHeaders.setContentType(MediaType.APPLICATION_JSON);
-        httpHeaders.set("X-Auth-Token", token.toString());
-        HttpEntity<String> request = new HttpEntity<>(jsonObject.toString(), httpHeaders);
 
-        ResponseEntity responseEntity;
+        String token = requestToken();
 
-        try {
-            responseEntity = restTemplate.exchange(properties.createProjectUrl(),
-                                                    HttpMethod.POST, request, String.class);
-        } catch (JSONException e) {
-            log.warn("Error creating project in OpenStack: error parsing response body");
-            throw e;
-        } catch (RestClientException e) {
-            log.warn("Error creating project in OpenStack: {}", e);
-            throw new OpenStackConnectionException(e.getMessage());
-        }
-
-        return new JSONObject(responseEntity.getBody().toString());
-    }
-
-    public void addUserToProject(String projectId, String userId, JSONObject token) {
-        HttpHeaders httpHeaders = new HttpHeaders();
-        httpHeaders.setContentType(MediaType.APPLICATION_JSON);
-        httpHeaders.set("X-Auth-Token", token.toString());
+        httpHeaders.set("X-Auth-Token", token);
         HttpEntity<String> request = new HttpEntity<>(httpHeaders);
+
         ResponseEntity responseEntity;
         try {
             responseEntity = restTemplate.exchange(properties.addUserToProjectUrl(projectId, userId),
@@ -148,6 +164,9 @@ public class AdapterOpenStack {
             log.warn("Error adding User to Project in OpenStack: {}", e);
             throw new OpenStackConnectionException(e.getMessage());
         }
+
+        log.info("Successfully adding user {} to project {} for OpenStack", userId, projectId);
+        return "Success";
     }
 
 }

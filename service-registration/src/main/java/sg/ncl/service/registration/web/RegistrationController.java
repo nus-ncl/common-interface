@@ -49,7 +49,7 @@ public class RegistrationController {
     public void registerOpenStack(@RequestBody final RegistrationInfo registrationInfo) {
         Map<String, String> map = new HashMap<>();
 
-        String one = registrationService.registerOpenStack(registrationInfo.getCredentials());
+        String one = registrationService.registerOpenStack(registrationInfo.getCredentials(),registrationInfo.getTeam());
 
     }
 

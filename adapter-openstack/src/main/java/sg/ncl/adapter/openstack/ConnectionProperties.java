@@ -1,8 +1,17 @@
 package sg.ncl.adapter.openstack;
 
+import lombok.Getter;
+import lombok.Setter;
+import org.springframework.boot.context.properties.ConfigurationProperties;
+
+import static sg.ncl.adapter.openstack.ConnectionProperties.PREFIX;
+
 /**
  * Author: Tran Ly Vu
  */
+@ConfigurationProperties(prefix = PREFIX)
+@Getter
+@Setter
 public class ConnectionProperties {
     private static final String HTTP_MODE = "http://";
     public static final String PREFIX = "ncl.openstack.adapter";
