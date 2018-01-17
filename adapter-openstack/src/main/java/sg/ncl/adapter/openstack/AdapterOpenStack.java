@@ -1,4 +1,5 @@
 package sg.ncl.adapter.openstack;
+
 import lombok.extern.slf4j.Slf4j;
 import org.json.JSONException;
 import org.json.JSONObject;

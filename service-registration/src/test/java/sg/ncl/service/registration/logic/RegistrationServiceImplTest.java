@@ -12,6 +12,7 @@ import org.mockito.Mockito;
 import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
 import sg.ncl.adapter.deterlab.AdapterDeterLab;
+import sg.ncl.adapter.openstack.AdapterOpenStack;
 import sg.ncl.adapter.deterlab.ConnectionProperties;
 import sg.ncl.adapter.deterlab.data.jpa.DeterLabUserRepository;
 import sg.ncl.common.DomainProperties;
@@ -65,6 +66,8 @@ public class RegistrationServiceImplTest {
     @Mock
     private AdapterDeterLab adapterDeterLab;
     @Mock
+    private AdapterOpenStack adapterOpenStack;
+    @Mock
     private MailService mailService;
     @Mock
     private DomainProperties domainProperties;
@@ -89,10 +92,11 @@ public class RegistrationServiceImplTest {
         assertThat(mockingDetails(userService).isMock()).isTrue();
         assertThat(mockingDetails(registrationRepository).isMock()).isTrue();
         assertThat(mockingDetails(adapterDeterLab).isMock()).isTrue();
+        assertThat(mockingDetails(adapterOpenStack).isMock()).isTrue();
         assertThat(mockingDetails(mailService).isMock()).isTrue();
 
         registrationService = new RegistrationServiceImpl(
-                credentialsService, teamService, userService, registrationRepository, adapterDeterLab, mailService, domainProperties,
+                credentialsService, teamService, userService, registrationRepository, adapterDeterLab, adapterOpenStack, mailService, domainProperties,
                 emailValidationTemplate, applyTeamRequestTemplate, replyTeamRequestTemplate, applyJoinTeamRequestTemplate, replyJoinTeamRequestTemplate);
     }
 
