@@ -67,7 +67,7 @@ ncl:
   openstack:
     adapter:
       ip: 172.18.178.26
-      port: 80
+      port: 5000
       role_id: ab96b98f07be4073a3ee9794d6a1bd2c
   jwt:
     api-key: ${jwt.key:}

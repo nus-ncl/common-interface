@@ -65,7 +65,6 @@ public class AdapterOpenStack {
             throw new OpenStackConnectionException(e.getMessage());
         }
 
-
         return responseEntity.getHeaders().toString();
     }
 
