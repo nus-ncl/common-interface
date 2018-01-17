@@ -8,6 +8,7 @@ import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Import;
 import sg.ncl.adapter.deterlab.DeterLabAutoConfiguration;
+import sg.ncl.adapter.openstack.OpenStackAutoConfiguration;
 import sg.ncl.common.DomainProperties;
 import sg.ncl.common.authentication.AuthenticationAutoConfiguration;
 import sg.ncl.common.exception.ExceptionAutoConfiguration;

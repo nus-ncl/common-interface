@@ -299,16 +299,26 @@ public class RegistrationServiceImpl implements RegistrationService {
 
     @Override
     public String registerOpenStack(Credentials credentials, Team team) {
+        log.info("Starting to register OpenStack, first register project");
         Team teamEntity = teamService.getTeamById(team.getId());
 
+        log.info("credentials.getUsername() is {}", credentials.getUsername());
+        log.info("teamEntity.getDescription( is {}", teamEntity.getDescription());
+
         String projectId = adapterOpenStack.createProject(credentials.getUsername(), teamEntity.getDescription());
+        log.info("projectId is {}",  projectId);
+
         String userId =  null;
 
         if (projectId != null) {
             userId = adapterOpenStack.createUser(credentials.getUsername(), credentials.getPassword());
+            log.info("userId  is {}",  userId );
+
         }
 
         if (projectId != null && userId != null) {
+            log.info("adding user to project {}", adapterOpenStack.addUserToProject(userId, projectId));
+
             return adapterOpenStack.addUserToProject(userId, projectId);
         }
 
