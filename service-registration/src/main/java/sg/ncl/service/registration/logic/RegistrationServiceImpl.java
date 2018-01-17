@@ -309,9 +309,10 @@ public class RegistrationServiceImpl implements RegistrationService {
         }
 
         if (projectId != null && userId != null) {
-            String result = adapterOpenStack.addUserToProject(userId, projectId);
+            return adapterOpenStack.addUserToProject(userId, projectId);
         }
-        return "a";
+
+        return null;
     }
 
     @Override

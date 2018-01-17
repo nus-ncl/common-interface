@@ -8,7 +8,6 @@ import org.springframework.web.bind.annotation.*;
 import sg.ncl.service.registration.domain.Registration;
 import sg.ncl.service.registration.domain.RegistrationService;
 import sg.ncl.service.team.domain.TeamStatus;
-import sg.ncl.service.user.domain.UserStatus;
 import sg.ncl.service.user.web.VerificationKeyInfo;
 
 import javax.inject.Inject;
@@ -17,7 +16,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * @author Te Ye & Desmond
+ * @author: Te Ye, Desmond, Tran Ly Vu
  */
 @Slf4j
 @RestController

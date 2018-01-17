@@ -99,10 +99,9 @@ public class AdapterOpenStack {
         }
 
         log.info("Successfully registering new project {} for OpenStack", name);
-
         JSONObject responseObject = new JSONObject(responseEntity.getBody().toString());
-        String projectId = responseObject.getJSONObject("project").getJSONObject("id").toString();
-        return projectId;
+
+        return responseObject.getJSONObject("project").getJSONObject("id").toString();
     }
 
     public String createUser(String name, String password) {
@@ -138,8 +137,7 @@ public class AdapterOpenStack {
         log.info("Successfully registering new user {} for OpenStack", name);
 
         JSONObject responseObject = new JSONObject(responseEntity.getBody().toString());
-        String userId = responseObject.getJSONObject("user").getJSONObject("id").toString();
-        return userId;
+        return responseObject.getJSONObject("user").getJSONObject("id").toString();
     }
 
 
@@ -166,7 +164,7 @@ public class AdapterOpenStack {
         }
 
         log.info("Successfully adding user {} to project {} for OpenStack", userId, projectId);
-        return "Success";
+        return responseEntity.getStatusCode().toString();
     }
 
 }
