@@ -66,7 +66,7 @@ public class AdapterOpenStack {
 
         try {
             responseEntity = restTemplate.exchange(properties.requestTokenUrl(), HttpMethod.POST, request, String.class);
-            log.info("Finishing requesting OpenStack token without any error");
+            log.info("Succesfully requesting OpenStack");
         } catch (ResourceAccessException e) {
             log.warn("Error in requesting OpenStack token : {}", e.getMessage());
             throw new OpenStackConnectionException(e.getMessage());
@@ -149,8 +149,9 @@ public class AdapterOpenStack {
         ResponseEntity responseEntity;
 
         try {
-            responseEntity = restTemplate.exchange(properties.createProjectUrl(),
-                    HttpMethod.POST, request, String.class);
+            responseEntity = restTemplate.exchange(properties.createProjectUrl(), HttpMethod.POST, request, String.class);
+            log.info("Successfully registering new project {} for OpenStack", name);
+
         } catch (ResourceAccessException e) {
             log.warn("Error in creating project: {}", e.getMessage());
             throw new OpenStackConnectionException(e.getMessage());
@@ -165,9 +166,8 @@ public class AdapterOpenStack {
             throw new OpenStackConnectionException(e.getMessage());
         }
 
-        log.info("Successfully registering new project {} for OpenStack", name);
         JSONObject responseObject = new JSONObject(responseEntity.getBody().toString());
-
+        log.info("Openstack new project is is is {}", responseObject.getJSONObject("project").getJSONObject("id").toString() );
         return responseObject.getJSONObject("project").getJSONObject("id").toString();
     }
 
@@ -183,8 +183,8 @@ public class AdapterOpenStack {
 
         ResponseEntity responseEntity;
         try {
-            responseEntity = restTemplate.exchange(properties.addUserToProjectUrl(projectId, userId),
-                                                    HttpMethod.PUT, request, String.class);
+            responseEntity = restTemplate.exchange(properties.addUserToProjectUrl(projectId, userId), HttpMethod.PUT, request, String.class);
+            log.info("Successfully adding user {} to project {} for OpenStack", userId, projectId);
         } catch (ResourceAccessException e) {
             log.warn("Error in adding user to project: {}", e.getMessage());
             throw new OpenStackConnectionException(e.getMessage());
@@ -198,8 +198,6 @@ public class AdapterOpenStack {
             log.warn("Error in adding user to project: {}", e.getMessage());
             throw new OpenStackConnectionException(e.getMessage());
         }
-
-        log.info("Successfully adding user {} to project {} for OpenStack", userId, projectId);
         return responseEntity.getStatusCode().toString();
     }
 

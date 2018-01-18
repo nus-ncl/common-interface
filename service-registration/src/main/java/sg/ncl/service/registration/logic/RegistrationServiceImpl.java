@@ -305,18 +305,16 @@ public class RegistrationServiceImpl implements RegistrationService {
             throw new IncompleteRegistrationFormException();
         }
 
-        if (isJoinTeam) {
-            if (team.getId() == null || team.getId().isEmpty()) {
+        if (isJoinTeam && (team.getId() == null || team.getId().isEmpty())) {
                 log.warn("Apply to join team: Team ID is null or empty!");
                 throw new IncompleteRegistrationFormException();
-            }
-        } else {
-            if (team.getName() == null || team.getName().isEmpty()) {
+        } else if (team.getName() == null || team.getName().isEmpty()) {
                 log.warn("Apply to create team: Team name is null or empty!");
                 throw new IncompleteRegistrationFormException();
-            }
-            checkTeamNameDuplicate(team.getName());
         }
+
+        // todo : check if projects exist , maybe next pull request
+
 
         log.info("Starting to create OpenStack user {}",credentials.getUsername());
         String userId = adapterOpenStack.createUser(credentials.getUsername(), credentials.getPassword());
