@@ -1,6 +1,7 @@
 package sg.ncl.adapter.openstack;
 
 import lombok.extern.slf4j.Slf4j;
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.springframework.http.*;
@@ -43,8 +44,11 @@ public class AdapterOpenStack {
         JSONObject passwordObject = new JSONObject();
         userObject.put("user", userObject);
 
+        JSONArray passwordArray = new JSONArray();
+        passwordArray.put("password");
+
         JSONObject identityObject = new JSONObject();
-        userObject.put("methods", "password");
+        userObject.put("methods", passwordArray);
         userObject.put("password", passwordObject);
 
         JSONObject authObject = new JSONObject();
@@ -53,10 +57,10 @@ public class AdapterOpenStack {
         JSONObject jsonObject = new JSONObject();
         jsonObject.put("auth", authObject);
 
+        log.info("Requesting OpenStack token");
+
         HttpHeaders httpHeaders = new HttpHeaders();
         httpHeaders.setContentType(MediaType.APPLICATION_JSON);
-
-        log.info("Requesting OpenStack token");
         HttpEntity<String> request = new HttpEntity<>(jsonObject.toString(), httpHeaders);
         ResponseEntity responseEntity;
 
