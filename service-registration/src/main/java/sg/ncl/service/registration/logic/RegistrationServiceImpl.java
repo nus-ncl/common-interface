@@ -317,9 +317,9 @@ public class RegistrationServiceImpl implements RegistrationService {
 
 
         log.info("Starting to create OpenStack user {}",credentials.getUsername());
-        String userId = adapterOpenStack.createUser(credentials.getUsername(), credentials.getPassword());
+        String userId = adapterOpenStack.createUserAndRetrieveUserId(credentials.getUsername(), credentials.getPassword());
         log.info("Starting to create OpenStack project {}", team.getName());
-        String projectId = adapterOpenStack.createProject(team.getName(), team.getDescription());
+        String projectId = adapterOpenStack.createProjectAndRetrieveProjectId(team.getName(), team.getDescription());
 
         if (projectId != null && userId != null) {
             log.info("Start adding user to project {}", adapterOpenStack.addUserToProject(userId, projectId));

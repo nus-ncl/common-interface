@@ -89,7 +89,7 @@ public class AdapterOpenStack {
     }
 
 
-    public String createUser(String name, String password) {
+    public String createUserAndRetrieveUserId(String name, String password) {
         JSONObject userObject = new JSONObject();
         userObject.put("enabled", true);
         userObject.put("name", name);
@@ -129,7 +129,7 @@ public class AdapterOpenStack {
         return responseObject.getJSONObject("user").getJSONObject("id").toString();
     }
 
-    public String createProject(String name, String description) {
+    public String createProjectAndRetrieveProjectId(String name, String description) {
         JSONObject projectObject = new JSONObject();
         projectObject.put("description", description);
         projectObject.put("domain_id", "default");
