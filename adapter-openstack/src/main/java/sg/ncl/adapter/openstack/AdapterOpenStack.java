@@ -153,7 +153,6 @@ public class AdapterOpenStack {
         try {
             responseEntity = restTemplate.exchange(properties.createProjectUrl(), HttpMethod.POST, request, String.class);
             log.info("Successfully registering new project {} for OpenStack", name);
-
         } catch (ResourceAccessException e) {
             log.warn("Error in creating project: {}", e.getMessage());
             throw new OpenStackConnectionException(e.getMessage());
@@ -169,7 +168,7 @@ public class AdapterOpenStack {
         }
 
         JSONObject responseObject = new JSONObject(responseEntity.getBody().toString());
-        log.info("Openstack new project is is is {}", responseObject.getJSONObject("project").getJSONObject("id").toString() );
+        log.info("OpenStack new project is {}", responseObject.getJSONObject("project").getJSONObject("id").toString() );
         return responseObject.getJSONObject("project").getJSONObject("id").toString();
     }
 
