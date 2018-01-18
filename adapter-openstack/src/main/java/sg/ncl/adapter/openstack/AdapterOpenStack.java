@@ -5,10 +5,13 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.springframework.http.*;
 import org.springframework.stereotype.Component;
+import org.springframework.web.client.HttpServerErrorException;
 import org.springframework.web.client.ResourceAccessException;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 import sg.ncl.adapter.openstack.exceptions.OpenStackConnectionException;
+import sg.ncl.adapter.openstack.exceptions.OpenStackInternalErrorException;
+
 import javax.inject.Inject;
 
 
@@ -52,11 +55,19 @@ public class AdapterOpenStack {
 
         HttpHeaders httpHeaders = new HttpHeaders();
         httpHeaders.setContentType(MediaType.APPLICATION_JSON);
+
+        log.info("Requesting OpenStack token");
         HttpEntity<String> request = new HttpEntity<>(jsonObject.toString(), httpHeaders);
         ResponseEntity responseEntity;
 
         try {
             responseEntity = restTemplate.exchange(properties.requestTokenUrl(), HttpMethod.POST, request, String.class);
+        } catch (ResourceAccessException rae) {
+            log.warn("Requesting OpenStack token error: {}", rae);
+            throw new OpenStackConnectionException(rae.getMessage());
+        } catch (HttpServerErrorException hsee) {
+            log.warn("Requesting OpenStack token error: {}", hsee);
+            throw new OpenStackInternalErrorException();
         } catch (JSONException e) {
             log.warn("Error requesting token in OpenStack: error parsing response body");
             throw e;
@@ -65,7 +76,46 @@ public class AdapterOpenStack {
             throw new OpenStackConnectionException(e.getMessage());
         }
 
+        log.info("responseEntity.getHeaders().toString() is {}", responseEntity.getHeaders().toString());
+
         return responseEntity.getHeaders().toString();
+    }
+
+
+    public String createUser(String name, String password) {
+        JSONObject userObject = new JSONObject();
+        userObject.put("enabled", true);
+        userObject.put("name", name);
+        userObject.put("password", password);
+
+        JSONObject jsonObject = new JSONObject();
+        jsonObject.put("user", userObject);
+
+        String token = requestToken();
+
+        HttpHeaders httpHeaders = new HttpHeaders();
+        httpHeaders.setContentType(MediaType.APPLICATION_JSON);
+        httpHeaders.set("X-Auth-Token", token);
+        HttpEntity<String> request = new HttpEntity<>(jsonObject.toString(), httpHeaders);
+        ResponseEntity responseEntity;
+
+        try {
+            responseEntity = restTemplate.exchange(properties.createUserUrl(), HttpMethod.POST, request, String.class);
+        } catch (ResourceAccessException e) {
+            log.warn("Error requesting token in OpenStack: {}", e);
+            throw new OpenStackConnectionException(e.getMessage());
+        } catch (JSONException e) {
+            log.warn("Error creating user in OpenStack: error parsing response body");
+            throw e;
+        } catch (RestClientException e) {
+            log.warn("Error creating user in OpenStack: {}", e);
+            throw new OpenStackConnectionException(e.getMessage());
+        }
+
+        log.info("Successfully registering new user {} for OpenStack", name);
+
+        JSONObject responseObject = new JSONObject(responseEntity.getBody().toString());
+        return responseObject.getJSONObject("user").getJSONObject("id").toString();
     }
 
     public String createProject(String name, String description) {
@@ -104,43 +154,6 @@ public class AdapterOpenStack {
 
         return responseObject.getJSONObject("project").getJSONObject("id").toString();
     }
-
-    public String createUser(String name, String password) {
-        JSONObject userObject = new JSONObject();
-        userObject.put("enabled", true);
-        userObject.put("name", name);
-        userObject.put("password", password);
-
-        JSONObject jsonObject = new JSONObject();
-        jsonObject.put("user", userObject);
-
-        String token = requestToken();
-
-        HttpHeaders httpHeaders = new HttpHeaders();
-        httpHeaders.setContentType(MediaType.APPLICATION_JSON);
-        httpHeaders.set("X-Auth-Token", token);
-        HttpEntity<String> request = new HttpEntity<>(jsonObject.toString(), httpHeaders);
-        ResponseEntity responseEntity;
-
-        try {
-            responseEntity = restTemplate.exchange(properties.createUserUrl(), HttpMethod.POST, request, String.class);
-        } catch (ResourceAccessException e) {
-            log.warn("Error requesting token in OpenStack: {}", e);
-            throw new OpenStackConnectionException(e.getMessage());
-        } catch (JSONException e) {
-            log.warn("Error creating user in OpenStack: error parsing response body");
-            throw e;
-        } catch (RestClientException e) {
-            log.warn("Error creating user in OpenStack: {}", e);
-            throw new OpenStackConnectionException(e.getMessage());
-        }
-
-        log.info("Successfully registering new user {} for OpenStack", name);
-
-        JSONObject responseObject = new JSONObject(responseEntity.getBody().toString());
-        return responseObject.getJSONObject("user").getJSONObject("id").toString();
-    }
-
 
 
     public String addUserToProject(String userId, String projectId) {

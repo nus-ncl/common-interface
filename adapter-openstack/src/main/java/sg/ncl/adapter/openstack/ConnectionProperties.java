@@ -20,7 +20,7 @@ public class ConnectionProperties {
     private String role_id;
 
     public String requestTokenUrl() {
-        return HTTP_MODE + ip + ":" + port + "/horizon/v3/auth/tokens";
+        return HTTP_MODE + ip + ":" + port + "/v3/auth/tokens";
     }
 
     public String createUserUrl() {
