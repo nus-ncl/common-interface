@@ -42,14 +42,14 @@ public class AdapterOpenStack {
         userObject.put("password", "adminpass");
 
         JSONObject passwordObject = new JSONObject();
-        userObject.put("user", userObject);
+        passwordObject.put("user", userObject);
 
         JSONArray passwordArray = new JSONArray();
         passwordArray.put("password");
 
         JSONObject identityObject = new JSONObject();
-        userObject.put("methods", passwordArray);
-        userObject.put("password", passwordObject);
+        identityObject.put("methods", passwordArray);
+        identityObject.put("password", passwordObject);
 
         JSONObject authObject = new JSONObject();
         authObject.put("identity", identityObject);
@@ -66,6 +66,7 @@ public class AdapterOpenStack {
 
         try {
             responseEntity = restTemplate.exchange(properties.requestTokenUrl(), HttpMethod.POST, request, String.class);
+            log.info("Finishing requesting OpenStack token without any error");
         } catch (ResourceAccessException e) {
             log.warn("Error in requesting OpenStack token : {}", e.getMessage());
             throw new OpenStackConnectionException(e.getMessage());
@@ -80,9 +81,11 @@ public class AdapterOpenStack {
             throw new OpenStackConnectionException(e.getMessage());
         }
 
-        log.info("responseEntity.getHeaders().toString() is {}", responseEntity.getHeaders().toString());
+        HttpHeaders headers = responseEntity.getHeaders();
+        String token= headers.get("X-Subject-Token").get(0);
+        log.info("OpenStack token is {}", token);
 
-        return responseEntity.getHeaders().toString();
+        return token;
     }
 
 
@@ -91,6 +94,7 @@ public class AdapterOpenStack {
         userObject.put("enabled", true);
         userObject.put("name", name);
         userObject.put("password", password);
+        userObject.put("email", name); // name is email
 
         JSONObject jsonObject = new JSONObject();
         jsonObject.put("user", userObject);
@@ -105,6 +109,7 @@ public class AdapterOpenStack {
 
         try {
             responseEntity = restTemplate.exchange(properties.createUserUrl(), HttpMethod.POST, request, String.class);
+            log.info("Successfully creating new user {} for OpenStack", name);
         } catch (ResourceAccessException e) {
             log.warn("Error in creating user: {}", e.getMessage());
             throw new OpenStackConnectionException(e.getMessage());
@@ -118,8 +123,6 @@ public class AdapterOpenStack {
             log.warn("Error in creating user: {}", e.getMessage());
             throw new OpenStackConnectionException(e.getMessage());
         }
-
-        log.info("Successfully creating new user {} for OpenStack", name);
 
         JSONObject responseObject = new JSONObject(responseEntity.getBody().toString());
         return responseObject.getJSONObject("user").getJSONObject("id").toString();

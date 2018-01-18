@@ -298,23 +298,33 @@ public class RegistrationServiceImpl implements RegistrationService {
     }
 
     @Override
-    public String registerOpenStack(Credentials credentials, Team team) {
-        log.info("Starting to register OpenStack, first register project");
+    public String registerOpenStack(Credentials credentials, Team team, boolean isJoinTeam) {
 
-        String projectId = adapterOpenStack.createProject(credentials.getUsername(), team.getDescription());
-        log.info("projectId is {}",  projectId);
-
-        String userId =  null;
-
-        if (projectId != null) {
-            userId = adapterOpenStack.createUser(credentials.getUsername(), credentials.getPassword());
-            log.info("userId  is {}",  userId );
-
+        if (credentials.getPassword() == null || credentials.getPassword().isEmpty()) {
+            log.warn("Credentials password is empty");
+            throw new IncompleteRegistrationFormException();
         }
 
-        if (projectId != null && userId != null) {
-            log.info("adding user to project {}", adapterOpenStack.addUserToProject(userId, projectId));
+        if (isJoinTeam) {
+            if (team.getId() == null || team.getId().isEmpty()) {
+                log.warn("Apply to join team: Team ID is null or empty!");
+                throw new IncompleteRegistrationFormException();
+            }
+        } else {
+            if (team.getName() == null || team.getName().isEmpty()) {
+                log.warn("Apply to create team: Team name is null or empty!");
+                throw new IncompleteRegistrationFormException();
+            }
+            checkTeamNameDuplicate(team.getName());
+        }
 
+        log.info("Starting to create OpenStack user {}",credentials.getUsername());
+        String userId = adapterOpenStack.createUser(credentials.getUsername(), credentials.getPassword());
+        log.info("Starting to create OpenStack project {}", team.getName());
+        String projectId = adapterOpenStack.createProject(team.getName(), team.getDescription());
+
+        if (projectId != null && userId != null) {
+            log.info("Start adding user to project {}", adapterOpenStack.addUserToProject(userId, projectId));
             return adapterOpenStack.addUserToProject(userId, projectId);
         }
 

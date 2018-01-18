@@ -47,7 +47,7 @@ public class RegistrationController {
     @ResponseStatus(HttpStatus.OK)
     public String registerOpenStack(@RequestBody final RegistrationInfo registrationInfo) {
         log.info("Calling registration implementation to register OpenStack account");
-        return registrationService.registerOpenStack(registrationInfo.getCredentials(),registrationInfo.getTeam());
+        return registrationService.registerOpenStack(registrationInfo.getCredentials(), registrationInfo.getTeam(), registrationInfo.getIsJoinTeam());
     }
 
 
