@@ -308,7 +308,7 @@ public class RegistrationServiceImpl implements RegistrationService {
         if (isJoinTeam && (team.getId() == null || team.getId().isEmpty())) {
                 log.warn("Apply to join team: Team ID is null or empty!");
                 throw new IncompleteRegistrationFormException();
-        } else if (team.getName() == null || team.getName().isEmpty()) {
+        } else if (!isJoinTeam && (team.getName() == null || team.getName().isEmpty())) {
                 log.warn("Apply to create team: Team name is null or empty!");
                 throw new IncompleteRegistrationFormException();
         }

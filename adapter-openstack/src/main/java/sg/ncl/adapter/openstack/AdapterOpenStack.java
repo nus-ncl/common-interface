@@ -57,7 +57,7 @@ public class AdapterOpenStack {
         JSONObject jsonObject = new JSONObject();
         jsonObject.put("auth", authObject);
 
-        log.info("Requesting OpenStack token");
+        log.info("Starting to OpenStack token");
 
         HttpHeaders httpHeaders = new HttpHeaders();
         httpHeaders.setContentType(MediaType.APPLICATION_JSON);
@@ -101,6 +101,7 @@ public class AdapterOpenStack {
 
         String token = requestToken();
 
+        log.info("Starting to create OpenStack user");
         HttpHeaders httpHeaders = new HttpHeaders();
         httpHeaders.setContentType(MediaType.APPLICATION_JSON);
         httpHeaders.set("X-Auth-Token", token);
@@ -141,6 +142,7 @@ public class AdapterOpenStack {
 
         String token = requestToken();
 
+        log.info("Starting to create OpenStack project");
         HttpHeaders httpHeaders = new HttpHeaders();
         httpHeaders.setContentType(MediaType.APPLICATION_JSON);
         httpHeaders.set("X-Auth-Token", token);
@@ -173,11 +175,12 @@ public class AdapterOpenStack {
 
 
     public String addUserToProject(String userId, String projectId) {
-        HttpHeaders httpHeaders = new HttpHeaders();
-        httpHeaders.setContentType(MediaType.APPLICATION_JSON);
 
         String token = requestToken();
 
+        log.info("Starting to add OpenStack user {} to project {}", userId, projectId);
+        HttpHeaders httpHeaders = new HttpHeaders();
+        httpHeaders.setContentType(MediaType.APPLICATION_JSON);
         httpHeaders.set("X-Auth-Token", token);
         HttpEntity<String> request = new HttpEntity<>(httpHeaders);
 
