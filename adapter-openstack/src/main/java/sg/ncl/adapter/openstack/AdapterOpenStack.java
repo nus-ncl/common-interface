@@ -130,7 +130,10 @@ public class AdapterOpenStack {
             throw new OpenStackConnectionException(e.getMessage());
         }
 
+        log.info("Retrieving new OpenStack user id");
         JSONObject responseObject = new JSONObject(responseEntity.getBody().toString());
+        log.info("user object is is {}",responseObject.getJSONObject("user").toString());
+        log.info("id is {}",responseObject.getJSONObject("user").getJSONObject("id").toString());
         return responseObject.getJSONObject("user").getJSONObject("id").toString();
     }
 
