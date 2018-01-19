@@ -306,13 +306,13 @@ public class RegistrationServiceImpl implements RegistrationService {
         log.info("Starting to create OpenStack user {}",credentials.getUsername());
         String creatUser = adapterOpenStack.createUserAndRetrieveUserId(credentials.getUsername(), credentials.getPassword());
 
-        if (! "Sucessfully created OpenStack user".equals(creatUser)) {
-            return "Failed to create OpenStack User";
+        if (!"Sucessfully created OpenStack user".equals(creatUser)) {
+            return creatUser;
         } else {
             log.info("Starting to create OpenStack project {}", team.getName());
             String createProject = adapterOpenStack.createProjectAndRetrieveProjectId(team.getName(), team.getDescription());
             if (! "Sucessfully created OpenStack project".equals(createProject)) {
-                return "Succefully created user but failed to create project";
+                return createProject;
             }
         }
 
