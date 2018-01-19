@@ -33,17 +33,15 @@ public class AdapterOpenStack {
     }
 
     private String requestToken () {
-        JSONObject domainObject = new JSONObject();
-        domainObject.put("name", "Default");
 
         JSONObject userObject = new JSONObject();
-        userObject.put("name", "admin");
-        userObject.put("domain", domainObject);
+        userObject.put("id", "69a0564a4994458baf70b98aa638c530");
         userObject.put("password", "adminpass");
 
         JSONObject passwordObject = new JSONObject();
         passwordObject.put("user", userObject);
 
+        // password array
         JSONArray passwordArray = new JSONArray();
         passwordArray.put("password");
 
@@ -51,13 +49,20 @@ public class AdapterOpenStack {
         identityObject.put("methods", passwordArray);
         identityObject.put("password", passwordObject);
 
+        JSONObject projectObject = new JSONObject();
+        projectObject.put("id", "f9915a7644a648af8db8ee3d8b821419");
+
+        JSONObject scopeObject = new JSONObject();
+        projectObject.put("project", projectObject);
+
         JSONObject authObject = new JSONObject();
         authObject.put("identity", identityObject);
+        authObject.put("scope", scopeObject);
 
         JSONObject jsonObject = new JSONObject();
         jsonObject.put("auth", authObject);
 
-        log.info("Starting to OpenStack token");
+        log.info("Starting to request OpenStack token");
 
         HttpHeaders httpHeaders = new HttpHeaders();
         httpHeaders.setContentType(MediaType.APPLICATION_JSON);
