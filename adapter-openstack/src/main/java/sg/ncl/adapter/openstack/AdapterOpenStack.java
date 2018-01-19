@@ -45,8 +45,11 @@ public class AdapterOpenStack {
         JSONArray passwordArray = new JSONArray();
         passwordArray.put("password");
 
+        JSONObject methodObject = new JSONObject();
+        methodObject.put("user", passwordArray );
+
         JSONObject identityObject = new JSONObject();
-        identityObject.put("methods", passwordArray);
+        identityObject.put("methods", methodObject);
         identityObject.put("password", passwordObject);
 
         JSONObject projectObject = new JSONObject();
