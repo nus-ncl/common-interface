@@ -187,6 +187,7 @@ public class AdapterOpenStack {
         String token = requestToken();
 
         log.info("Starting to add OpenStack user {} to project {}", userId, projectId);
+
         HttpHeaders httpHeaders = new HttpHeaders();
         httpHeaders.setContentType(MediaType.APPLICATION_JSON);
         httpHeaders.set("X-Auth-Token", token);
