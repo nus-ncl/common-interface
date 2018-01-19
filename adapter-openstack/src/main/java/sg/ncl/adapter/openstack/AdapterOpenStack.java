@@ -132,9 +132,9 @@ public class AdapterOpenStack {
 
         log.info("Retrieving new OpenStack user id");
         JSONObject responseObject = new JSONObject(responseEntity.getBody().toString());
-        log.info("user object is is {}",responseObject.getJSONObject("user").toString());
-        log.info("id is {}",responseObject.getJSONObject("user").getJSONObject("id").toString());
-        return responseObject.getJSONObject("user").getJSONObject("id").toString();
+        log.info("Openstack new user id is {}",responseObject.getJSONObject("user").getString("id"));
+
+        return responseObject.getJSONObject("user").getString("id");
     }
 
     public String createProjectAndRetrieveProjectId(String name, String description) {
@@ -175,9 +175,10 @@ public class AdapterOpenStack {
             throw new OpenStackConnectionException(e.getMessage());
         }
 
+        log.info("Retrieving new OpenStack project id");
         JSONObject responseObject = new JSONObject(responseEntity.getBody().toString());
-        log.info("OpenStack new project is {}", responseObject.getJSONObject("project").getJSONObject("id").toString() );
-        return responseObject.getJSONObject("project").getJSONObject("id").toString();
+        log.info("OpenStack new project id is {}", responseObject.getJSONObject("project").getString("id"));
+        return responseObject.getJSONObject("project").getString("id");
     }
 
 
