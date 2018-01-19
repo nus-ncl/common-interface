@@ -278,6 +278,8 @@ public class RegistrationServiceImpl implements RegistrationService {
             userObject.put("projOrg", teamEntity.getOrganisationType());
             userObject.put("projPublic", teamEntity.getVisibility());
             resultJSON = adapterDeterLab.applyProjectNewUsers(userObject.toString());
+
+
         }
 
         if ("user is created".equals(getUserCreationStatus(resultJSON))) {
@@ -299,34 +301,22 @@ public class RegistrationServiceImpl implements RegistrationService {
 
     @Override
     public String registerOpenStack(Credentials credentials, Team team, boolean isJoinTeam) {
-
-        if (credentials.getPassword() == null || credentials.getPassword().isEmpty()) {
-            log.warn("Credentials password is empty");
-            throw new IncompleteRegistrationFormException();
-        }
-
-        if (isJoinTeam && (team.getId() == null || team.getId().isEmpty())) {
-                log.warn("Apply to join team: Team ID is null or empty!");
-                throw new IncompleteRegistrationFormException();
-        } else if (!isJoinTeam && (team.getName() == null || team.getName().isEmpty())) {
-                log.warn("Apply to create team: Team name is null or empty!");
-                throw new IncompleteRegistrationFormException();
-        }
-
-        // todo : check if projects exist , maybe next pull request
-
+        // Todo: check team in openstack
 
         log.info("Starting to create OpenStack user {}",credentials.getUsername());
-        String userId = adapterOpenStack.createUserAndRetrieveUserId(credentials.getUsername(), credentials.getPassword());
-        log.info("Starting to create OpenStack project {}", team.getName());
-        String projectId = adapterOpenStack.createProjectAndRetrieveProjectId(team.getName(), team.getDescription());
+        String creatUser = adapterOpenStack.createUserAndRetrieveUserId(credentials.getUsername(), credentials.getPassword());
 
-        if (projectId != null && userId != null) {
-            log.info("Start adding user to project {}", adapterOpenStack.addUserToProject(userId, projectId));
-            return adapterOpenStack.addUserToProject(userId, projectId);
+        if (! "Sucessfully created OpenStack user".equals(creatUser)) {
+            return "Failed to create OpenStack User";
+        } else {
+            log.info("Starting to create OpenStack project {}", team.getName());
+            String createProject = adapterOpenStack.createProjectAndRetrieveProjectId(team.getName(), team.getDescription());
+            if (! "Sucessfully created OpenStack project".equals(createProject)) {
+                return "Succefully created user but failed to create project";
+            }
         }
 
-        return null;
+        return "Sucessfully created OpenStack user and project";
     }
 
     @Override

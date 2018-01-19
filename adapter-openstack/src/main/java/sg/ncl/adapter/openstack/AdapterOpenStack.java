@@ -115,7 +115,7 @@ public class AdapterOpenStack {
 
         try {
             responseEntity = restTemplate.exchange(properties.createUserUrl(), HttpMethod.POST, request, String.class);
-            log.info("Successfully creating new user {} for OpenStack", name);
+            log.info("Successfully created new user {} for OpenStack", name);
         } catch (ResourceAccessException e) {
             log.warn("Error in creating user: {}", e.getMessage());
             throw new OpenStackConnectionException(e.getMessage());
@@ -134,7 +134,7 @@ public class AdapterOpenStack {
         JSONObject responseObject = new JSONObject(responseEntity.getBody().toString());
         log.info("OpenStack new user id is {}",responseObject.getJSONObject("user").getString("id"));
 
-        return responseObject.getJSONObject("user").getString("id");
+        return "Sucessfully created OpenStack user";
     }
 
     public String createProjectAndRetrieveProjectId(String name, String description) {
@@ -160,7 +160,7 @@ public class AdapterOpenStack {
 
         try {
             responseEntity = restTemplate.exchange(properties.createProjectUrl(), HttpMethod.POST, request, String.class);
-            log.info("Successfully registering new project {} for OpenStack", name);
+            log.info("Successfully created new project {} for OpenStack", name);
         } catch (ResourceAccessException e) {
             log.warn("Error in creating project: {}", e.getMessage());
             throw new OpenStackConnectionException(e.getMessage());
@@ -178,7 +178,8 @@ public class AdapterOpenStack {
         log.info("Retrieving new OpenStack project id");
         JSONObject responseObject = new JSONObject(responseEntity.getBody().toString());
         log.info("OpenStack new project id is {}", responseObject.getJSONObject("project").getString("id"));
-        return responseObject.getJSONObject("project").getString("id");
+
+        return "Sucessfully created OpenStack project";
     }
 
 
