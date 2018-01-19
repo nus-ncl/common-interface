@@ -31,8 +31,8 @@ public class ConnectionProperties {
         return HTTP_MODE + ip + ":" + identity_port + "/v3/projects";
     }
 
-    public String addUserToProjectUrl(String project_id, String user_id) {
-        return HTTP_MODE + ip + ":" + identity_port + "/v3/projects" + project_id + "/users/"
-                + user_id + "/roles" + user_role_id;
+    public String addUserToProjectUrl(String userId, String projectId) {
+        return HTTP_MODE + ip + ":" + identity_port + "/v3/projects/" + projectId + "/users/"
+                + userId + "/roles/" + user_role_id;
     }
 }
