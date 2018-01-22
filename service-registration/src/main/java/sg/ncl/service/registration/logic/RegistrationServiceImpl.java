@@ -476,9 +476,9 @@ public class RegistrationServiceImpl implements RegistrationService {
     }
 
     //approve openstack project
-    private void approveNewOpenStackTeam(String openStackUsername, String openStackProjectname) {
+    private void approveNewOpenStackTeam(String openStackUsername, String openStackProjectName) {
         String openStackUserId = adapterOpenStack.retrieveOpenStackUserId(openStackUsername);
-        String openStackProjectId = adapterOpenStack.retrieveOpenStackProjectId(openStackProjectname);
+        String openStackProjectId = adapterOpenStack.retrieveOpenStackProjectId(openStackProjectName);
         adapterOpenStack.addUserToProject(openStackUserId, openStackProjectId);
     }
 
