@@ -470,7 +470,8 @@ public class RegistrationServiceImpl implements RegistrationService {
 
 
     // reject openstack team
-    private void rejectNewOpenStackTeam(String openStackProjectId) {
+    private void rejectNewOpenStackTeam(String openStackProjectName) {
+        String openStackProjectId = adapterOpenStack.retrieveOpenStackProjectId(openStackProjectName);
         adapterOpenStack.deleteOpenStackProject(openStackProjectId);
     }
 
