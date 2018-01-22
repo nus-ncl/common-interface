@@ -19,27 +19,31 @@ public class ConnectionProperties {
     private String identity_port;
     private String user_role_id;
 
-    public String requestTokenUrl() {
+    protected String requestTokenUrl() {
         return HTTP_MODE + ip + ":" + identity_port + "/v3/auth/tokens";
     }
 
-    public String createUserUrl() {
+    protected String createUserUrl() {
         return HTTP_MODE + ip + ":" + identity_port + "/v3/users";
     }
 
-    public String listUserUrl(boolean enabled, String userName) {
+    protected String listUserUrl(boolean enabled, String userName) {
         return HTTP_MODE + ip + ":" + identity_port + "/v3/users?enabled=" + enabled + "&name=" + userName;
     }
 
-    public String listProjectUrl(boolean enabled, String userProject) {
-        return HTTP_MODE + ip + ":" + identity_port + "/v3/projects?enabled=" + enabled + "&name=" + userProject;
-    }
-
-    public String createProjectUrl() {
+    protected String createProjectUrl() {
         return HTTP_MODE + ip + ":" + identity_port + "/v3/projects";
     }
 
-    public String addUserToProjectUrl(String userId, String projectId) {
+    protected String listProjectUrl(boolean enabled, String userProject) {
+        return HTTP_MODE + ip + ":" + identity_port + "/v3/projects?enabled=" + enabled + "&name=" + userProject;
+    }
+
+    protected String deleteProject(String projectId) {
+        return HTTP_MODE + ip + ":" + identity_port + "/v3/projects/" + projectId;
+    }
+
+    protected String addUserToProjectUrl(String userId, String projectId) {
         return HTTP_MODE + ip + ":" + identity_port + "/v3/projects/" + projectId + "/users/"
                 + userId + "/roles/" + user_role_id;
     }

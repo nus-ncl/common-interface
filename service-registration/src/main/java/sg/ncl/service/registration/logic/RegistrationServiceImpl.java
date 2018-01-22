@@ -302,7 +302,7 @@ public class RegistrationServiceImpl implements RegistrationService {
 
     @Override
     public String registerOpenStack(Credentials credentials, Team team, boolean isJoinTeam) {
-        // Todo: check team in openstack
+        // Todo: check user and rpject in openstack
 
         log.info("Starting to create OpenStack user {}",credentials.getUsername());
         String createUser = adapterOpenStack.createUserAndRetrieveUserId(credentials.getUsername(), credentials.getPassword());
@@ -453,8 +453,12 @@ public class RegistrationServiceImpl implements RegistrationService {
     }
 
     @Override
-    public String approveOrRejectNewOpenStackTeam() {
-        String statusCode = adapterOpenStack.addUserToProject(openstackUserId, openstackProjectID);
+    public String approveOrRejectNewOpenStackTeam(Credentials credentials, Team team) {
+
+        String openStackUserId = credentials.getUsername() ;
+        String openStackProjectId = team.getName();
+
+        String statusCode = adapterOpenStack.addUserToProject(openStackUserId, openStackProjectId);
 
         return "a";
     }
