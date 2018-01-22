@@ -80,16 +80,26 @@ public class RegistrationController {
     // FIXME: the path is wrong, there should not be multiple paths for different registrations; status should be ACCEPTED
     @ResponseStatus(HttpStatus.ACCEPTED)
     public String approveJoinRequest(@PathVariable String teamId, @PathVariable String userId, @RequestBody RegistrationInfo registrationInfo) {
-        return
-                registrationService.approveJoinRequest(teamId, userId, registrationInfo.getUser());
+        return registrationService.approveJoinRequest(teamId, userId, registrationInfo.getUser());
     }
 
     @DeleteMapping(path = "/teams/{teamId}/members/{userId}")
     // FIXME: the path is wrong, there should not be multiple paths for different registrations; status should be OK
     @ResponseStatus(HttpStatus.ACCEPTED)
     public String rejectJoinRequest(@PathVariable String teamId, @PathVariable String userId, @RequestBody RegistrationInfo registrationInfo) {
-        return
-                registrationService.rejectJoinRequest(teamId, userId, registrationInfo.getUser());
+        return registrationService.rejectJoinRequest(teamId, userId, registrationInfo.getUser());
+    }
+
+    @PostMapping(path = "/teams/{teamId}/members/{userId}/openstack")
+    @ResponseStatus(HttpStatus.ACCEPTED)
+    public String approveOpenStackJoinRequest(@PathVariable String teamId, @PathVariable String userId, @RequestBody RegistrationInfo registrationInfo) {
+        return registrationService.approveJoinRequest(teamId, userId, registrationInfo.getUser());
+    }
+
+    @DeleteMapping(path = "/teams/{teamId}/members/{userId}/openstack")
+    @ResponseStatus(HttpStatus.ACCEPTED)
+    public String rejectOpenStackJoinRequest(@PathVariable String teamId, @PathVariable String userId, @RequestBody RegistrationInfo registrationInfo) {
+        return registrationService.rejectJoinRequest(teamId, userId, registrationInfo.getUser());
     }
 
     @PostMapping(path = "/teams/{teamId}/owner/{ownerId}", params = {"status"})

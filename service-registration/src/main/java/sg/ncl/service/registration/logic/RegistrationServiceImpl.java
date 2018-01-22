@@ -304,10 +304,10 @@ public class RegistrationServiceImpl implements RegistrationService {
         // Todo: check team in openstack
 
         log.info("Starting to create OpenStack user {}",credentials.getUsername());
-        String creatUser = adapterOpenStack.createUserAndRetrieveUserId(credentials.getUsername(), credentials.getPassword());
+        String createUser = adapterOpenStack.createUserAndRetrieveUserId(credentials.getUsername(), credentials.getPassword());
 
-        if (!"Sucessfully created OpenStack user".equals(creatUser)) {
-            return creatUser;
+        if (!"Sucessfully created OpenStack user".equals(createUser)) {
+            return createUser;
         } else {
             log.info("Starting to create OpenStack project {}", team.getName());
             String createProject = adapterOpenStack.createProjectAndRetrieveProjectId(team.getName(), team.getDescription());

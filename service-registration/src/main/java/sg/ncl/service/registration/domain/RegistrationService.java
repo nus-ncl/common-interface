@@ -23,6 +23,10 @@ public interface RegistrationService {
 
     String rejectJoinRequest(String teamId, String userId, User user);
 
+    String approveOpenStackJoinRequest(String teamId, String userId, User user);
+
+    String rejectOpenStackJoinRequest(String teamId, String userId, User user);
+
     String approveOrRejectNewTeam(String teamId, String ownerId, TeamStatus teamStatus, String reason);
 
     String getDeterUid(String id);
