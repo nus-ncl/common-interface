@@ -112,18 +112,18 @@ public class AdapterOpenStack {
 
         try {
             responseEntity = restTemplate.exchange(properties.createUserUrl(), HttpMethod.POST, request, String.class);
-            log.info("Successfully creating new user {} for OpenStack", userName);
+            log.info("Successfully creating new OpenStack user {}", userName);
         } catch (ResourceAccessException e) {
-            log.warn("Error in creating user {}: {}", userName, e.getMessage());
+            log.warn("Error in creating new OpenStack user {}: {}", userName, e.getMessage());
             throw new OpenStackConnectionException(e.getMessage());
         } catch (HttpServerErrorException e) {
-            log.warn("Error in creating user {}: {}", userName, e.getMessage());
+            log.warn("Error in creating new OpenStack user {}: {}", userName, e.getMessage());
             throw new OpenStackInternalErrorException();
         } catch (JSONException e) {
-            log.warn("Error in creating user {}: error parsing response body", userName);
+            log.warn("Error in creating new OpenStack user {}: error parsing response body", userName);
             throw e;
         } catch (HttpClientErrorException e) {
-            log.warn("Error in creating user {}: {}", userName, e.getMessage());
+            log.warn("Error in creating new OpenStack user {}: {}", userName, e.getMessage());
             throw e;
         }
 
@@ -156,18 +156,18 @@ public class AdapterOpenStack {
 
         try {
             responseEntity = restTemplate.exchange(properties.createProjectUrl(), HttpMethod.POST, request, String.class);
-            log.info("Successfully creating new project {} for OpenStack", projectName);
+            log.info("Successfully creating new OpenStack project {}", projectName);
         } catch (ResourceAccessException e) {
-            log.warn("Error in creating project {}: {}", projectName, e.getMessage());
+            log.warn("Error in creating new OpenStack project {}: {}", projectName, e.getMessage());
             throw new OpenStackConnectionException(e.getMessage());
         } catch (HttpServerErrorException e) {
-            log.warn("Error in creating project {}: {}",projectName, e.getMessage());
+            log.warn("Error in creating new OpenStack project {}: {}",projectName, e.getMessage());
             throw new OpenStackInternalErrorException();
         } catch (JSONException e) {
-            log.warn("Error in creating project {}: error parsing response body", projectName);
+            log.warn("Error in creating new OpenStack project {}: error parsing response body", projectName);
             throw e;
         } catch (HttpClientErrorException e) {
-            log.warn("Error in creating project {}: {}", projectName, e.getMessage());
+            log.warn("Error in creating new OpenStack project {}: {}", projectName, e.getMessage());
             throw e;
         }
 
@@ -191,18 +191,18 @@ public class AdapterOpenStack {
 
         try {
             restTemplate.exchange(properties.addUserToProjectUrl(openStackUserId, openStackProjectId), HttpMethod.PUT, request, String.class);
-            log.info("Successfully adding user {} to project {} for OpenStack", openStackUserId, openStackProjectId);
+            log.info("Successfully adding OpenStack user {} to project {}", openStackUserId, openStackProjectId);
         } catch (ResourceAccessException e) {
-            log.warn("Error in adding user to project: {}", e.getMessage());
+            log.warn("Error in adding OpenStack user to project: {}", e.getMessage());
             throw new OpenStackConnectionException(e.getMessage());
         } catch (HttpServerErrorException e) {
-            log.warn("Error in adding user to project: {}", e.getMessage());
+            log.warn("Error in adding OpenStack user to project: {}", e.getMessage());
             throw new OpenStackInternalErrorException();
         } catch (JSONException e) {
-            log.warn("Error in adding user to project: error parsing response body");
+            log.warn("Error in adding OpenStack user to project: error parsing response body");
             throw e;
         } catch (HttpClientErrorException e) {
-            log.warn("Error in adding user to project: {}", e.getMessage());
+            log.warn("Error in adding OpenStack user to project: {}", e.getMessage());
             throw e;
         }
     }
@@ -214,7 +214,7 @@ public class AdapterOpenStack {
         parameters.put("enabled", "true");
         parameters.put("name", userName);
 
-        log.info("Starting to retrieve user id from user name {}", userName);
+        log.info("Starting to retrieve OpenStack user id from user name {}", userName);
         HttpHeaders httpHeaders =  new HttpHeaders();
         httpHeaders.setContentType(MediaType.APPLICATION_JSON);
         httpHeaders.set("X-Auth-Token", token);
@@ -223,18 +223,18 @@ public class AdapterOpenStack {
 
         try {
             responseEntity = restTemplate.exchange(properties.listUserUrl(true, userName), HttpMethod.GET, request, String.class);
-            log.info("Successfully retrieving user id from user name {}", userName);
+            log.info("Successfully retrieving OpenStack user id from user name {}", userName);
         } catch (ResourceAccessException e) {
-            log.warn("Error in retrieving user id from user name {}", userName, e.getMessage());
+            log.warn("Error in retrieving OpenStack user id from user name {}", userName, e.getMessage());
             throw new OpenStackConnectionException(e.getMessage());
         }  catch (JSONException e) {
-            log.warn("Error in retrieving user id from user name {}: error parsing response body", userName);
+            log.warn("Error in retrieving OpenStack user id from user name {}: error parsing response body", userName);
             throw e;
         } catch (HttpServerErrorException e) {
-            log.warn("Error in retrieving user id from user name {}", userName, e.getMessage());
+            log.warn("Error in retrieving OpenStack user id from user name {}", userName, e.getMessage());
             throw new OpenStackInternalErrorException();
         } catch (HttpClientErrorException e) {
-            log.warn("Error in retrieving user id from user name {}", userName, e.getMessage());
+            log.warn("Error in retrieving OpenStack user id from user name {}", userName, e.getMessage());
             throw e;
         }
 
@@ -252,7 +252,7 @@ public class AdapterOpenStack {
         parameters.put("enabled", "true");
         parameters.put("name", projectName);
 
-        log.info("Starting to retrieve project id from project name {}", projectName);
+        log.info("Starting to retrieve OpenStack project id from project name {}", projectName);
         HttpHeaders httpHeaders =  new HttpHeaders();
         httpHeaders.setContentType(MediaType.APPLICATION_JSON);
         httpHeaders.set("X-Auth-Token", token);
@@ -261,18 +261,18 @@ public class AdapterOpenStack {
 
         try {
             responseEntity = restTemplate.exchange(properties.listProjectUrl(true, projectName), HttpMethod.GET, request, String.class);
-            log.info("Successfully retrieving project id from project name {}", projectName);
+            log.info("Successfully retrieving OpenStack project id from project name {}", projectName);
         } catch (ResourceAccessException e) {
-            log.warn("Error in retrieving project id from project name {}", projectName, e.getMessage());
+            log.warn("Error in retrieving OpenStack project id from project name {}", projectName, e.getMessage());
             throw new OpenStackConnectionException(e.getMessage());
         } catch (HttpServerErrorException e) {
-            log.warn("Error retrieving project id from project name {}", projectName, e.getMessage());
+            log.warn("Error retrieving OpenStack project id from project name {}", projectName, e.getMessage());
             throw new OpenStackInternalErrorException();
         } catch (JSONException e) {
-            log.warn("Error in retrieving project id from project name {}: error parsing response body", projectName);
+            log.warn("Error in retrieving OpenStack project id from project name {}: error parsing response body", projectName);
             throw e;
         } catch (HttpClientErrorException e) {
-            log.warn("Error in retrieving project id from project name {}", projectName, e.getMessage());
+            log.warn("Error in retrieving OpenStack project id from project name {}", projectName, e.getMessage());
             throw e;
         }
 
@@ -286,7 +286,7 @@ public class AdapterOpenStack {
     public void deleteOpenStackProject(String projectId) {
         String token = requestToken();
 
-        log.info("Starting to delete project id {}", projectId);
+        log.info("Starting to delete OpenStack project id {}", projectId);
         HttpHeaders httpHeaders =  new HttpHeaders();
         httpHeaders.setContentType(MediaType.APPLICATION_JSON);
         httpHeaders.set("X-Auth-Token", token);
@@ -294,18 +294,18 @@ public class AdapterOpenStack {
 
         try {
             restTemplate.exchange(properties.deleteProject(projectId), HttpMethod.DELETE, request, String.class);
-            log.info("Successfully deleting project id {}", projectId);
+            log.info("Successfully deleting OpenStack project id {}", projectId);
         } catch (ResourceAccessException e) {
-            log.warn("Error in deleting project id {}: {}", projectId, e.getMessage());
+            log.warn("Error in deleting OpenStack project id {}: {}", projectId, e.getMessage());
             throw new OpenStackConnectionException(e.getMessage());
         } catch (JSONException e) {
-            log.warn("Error in deleting project id {}: error parsing response body", projectId);
+            log.warn("Error in deleting OpenStack project id {}: error parsing response body", projectId);
             throw e;
         }  catch (HttpServerErrorException e) {
-            log.warn("Error when deleting project id {}: {}", projectId, e.getMessage());
+            log.warn("Error when deleting OpenStack project id {}: {}", projectId, e.getMessage());
             throw new OpenStackInternalErrorException();
         } catch (HttpClientErrorException e) {
-            log.warn("Error when deleting project id {}: {}", projectId, e.getMessage());
+            log.warn("Error when deleting OpenStack project id {}: {}", projectId, e.getMessage());
             throw e;
         }
     }
