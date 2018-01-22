@@ -115,7 +115,7 @@ public class RegistrationController {
     // FIXME: the path is wrong, there should not be multiple paths for different registrations
     @ResponseStatus(HttpStatus.OK)
     public String approveOrRejectNewOpenStackTeam(@PathVariable String teamId, @PathVariable String ownerId, @RequestParam("status") final TeamStatus teamStatus, @RequestBody(required=false) String reason) {
-        return registrationService.approveOrRejectNewOpenStackTeam();
+        return registrationService.approveOrRejectNewOpenStackTeam(teamId, ownerId, teamStatus);
     }
 
     @GetMapping(path = "/user/{id}")

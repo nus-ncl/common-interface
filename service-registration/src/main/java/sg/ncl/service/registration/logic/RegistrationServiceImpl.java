@@ -453,7 +453,7 @@ public class RegistrationServiceImpl implements RegistrationService {
     }
 
     @Override
-    public String approveOrRejectNewOpenStackTeam(Credentials credentials, Team team) {
+    public String approveOrRejectNewOpenStackTeam(String teamId, String ownerId, TeamStatus teamStatus) {
 
         String openStackUserId = credentials.getUsername() ;
         String openStackProjectId = team.getName();

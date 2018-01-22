@@ -28,7 +28,7 @@ public interface RegistrationService {
 
     String approveOrRejectNewTeam(String teamId, String ownerId, TeamStatus teamStatus, String reason);
 
-    String approveOrRejectNewOpenStackTeam(Credentials credentials, Team team);
+    String approveOrRejectNewOpenStackTeam(String teamId, String ownerId, TeamStatus teamStatus);
 
     String getDeterUid(String id);
 
