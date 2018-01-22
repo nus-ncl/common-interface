@@ -6,7 +6,7 @@ import sg.ncl.service.team.domain.TeamStatus;
 import sg.ncl.service.user.domain.User;
 
 /**
- * @author Christopher Zhong. Tran Ly vu
+ * @author Christopher Zhong, Tran Ly vu
  */
 public interface RegistrationService {
 

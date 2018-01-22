@@ -1,18 +1,13 @@
 package sg.ncl.service.registration.logic;
 
-import com.sun.net.httpserver.HttpServer;
 import freemarker.template.Template;
 import freemarker.template.TemplateException;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.coyote.Adapter;
 import org.apache.tomcat.util.codec.binary.Base64;
 import org.json.JSONObject;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.ui.freemarker.FreeMarkerTemplateUtils;
-import org.springframework.web.client.HttpClientErrorException;
-import org.springframework.web.client.HttpServerErrorException;
 import sg.ncl.adapter.deterlab.AdapterDeterLab;
 import sg.ncl.adapter.openstack.AdapterOpenStack;
 import sg.ncl.common.DomainProperties;
@@ -36,7 +31,6 @@ import sg.ncl.service.user.domain.UserService;
 import sg.ncl.service.user.domain.UserStatus;
 import sg.ncl.service.registration.exceptions.EmailNotVerifiedException;
 import sg.ncl.service.user.exceptions.UserNotFoundException;
-import sun.net.www.http.HttpClient;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -46,7 +40,7 @@ import java.time.ZonedDateTime;
 import java.util.*;
 
 /**
- * @author Christopher Zhong
+ * @author Christopher Zhong, Tran Ly Vu
  */
 @Service
 @Slf4j
