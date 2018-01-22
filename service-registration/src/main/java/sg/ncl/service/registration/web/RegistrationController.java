@@ -42,15 +42,6 @@ public class RegistrationController {
         return map;
     }
 
-    //new user and team in openstack
-    @PostMapping(path = "/openstack")
-    @ResponseStatus(HttpStatus.OK)
-    public String registerOpenStack(@RequestBody final RegistrationInfo registrationInfo) {
-        log.info("Calling registration implementation to register OpenStack account");
-        return registrationService.registerOpenStack(registrationInfo.getCredentials(), registrationInfo.getTeam(), registrationInfo.getIsJoinTeam());
-    }
-
-
     @PostMapping(path = "/newTeam/{nclUserId}")
     // FIXME: the path is wrong, there should not be multiple paths for different registrations; status should be ACCEPTED
     @ResponseStatus(HttpStatus.CREATED)

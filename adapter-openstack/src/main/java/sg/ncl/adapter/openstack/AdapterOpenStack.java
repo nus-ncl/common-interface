@@ -91,7 +91,7 @@ public class AdapterOpenStack {
     }
 
 
-    public String createUserAndRetrieveUserId(String userName, String password) {
+    public void createOpenStackUser(String userName, String password) {
         JSONObject userObject = new JSONObject();
         userObject.put("enabled", true);
         userObject.put("name", userName);
@@ -126,14 +126,11 @@ public class AdapterOpenStack {
             log.warn("Error in creating new OpenStack user {}: {}", userName, e.getMessage());
             throw e;
         }
-
-        JSONObject responseObject = new JSONObject(responseEntity.getBody().toString());
-        log.info("OpenStack new user id is {}",responseObject.getJSONObject("user").getString("id"));
-
-        return "Sucessfully created OpenStack user";
     }
 
-    public String createProjectAndRetrieveProjectId(String projectName, String description) {
+
+
+    public void createOpenStackProject(String projectName, String description) {
         JSONObject projectObject = new JSONObject();
         projectObject.put("description", description);
         projectObject.put("domain_id", "default");
@@ -170,11 +167,6 @@ public class AdapterOpenStack {
             log.warn("Error in creating new OpenStack project {}: {}", projectName, e.getMessage());
             throw e;
         }
-
-        JSONObject responseObject = new JSONObject(responseEntity.getBody().toString());
-        log.info("OpenStack new project id is {}", responseObject.getJSONObject("project").getString("id"));
-
-        return "Sucessfully created OpenStack project";
     }
 
 

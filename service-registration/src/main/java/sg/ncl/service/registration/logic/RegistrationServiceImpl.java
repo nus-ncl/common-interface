@@ -292,7 +292,11 @@ public class RegistrationServiceImpl implements RegistrationService {
             // call deterlab adapter to store ncluid to deteruid mapping
             addNclUserIdMapping(resultJSON, userId);
             log.info("Register new Deterlab user OK: uid {}, pid {}", one.getUid(), one.getPid());
-            log.info("Starting to create new OpenStack User and Project")
+
+            // starting to create Openstack
+            log.info("Starting to create new OpenStack User and Project");
+            adapterOpenStack.createOpenStackUser(credentials.getUsername(), credentials.getPassword());
+            adapterOpenStack.createOpenStackProject(team.getName(), team.getDescription());
 
             // send verification email
             sendVerificationEmail(createdUser);
@@ -302,26 +306,6 @@ public class RegistrationServiceImpl implements RegistrationService {
             log.warn("Register new users: unreachable branch, result of registration is {}", resultJSON);
             return null;
         }
-    }
-
-    @Override
-    public String registerOpenStack(Credentials credentials, Team team, boolean isJoinTeam) {
-        // Todo: check user and rpject in openstack
-
-        log.info("Starting to create OpenStack user {}",credentials.getUsername());
-        String createUser = adapterOpenStack.createUserAndRetrieveUserId(credentials.getUsername(), credentials.getPassword());
-
-        if (!"Sucessfully created OpenStack user".equals(createUser)) {
-            return createUser;
-        } else {
-            log.info("Starting to create OpenStack project {}", team.getName());
-            String createProject = adapterOpenStack.createProjectAndRetrieveProjectId(team.getName(), team.getDescription());
-            if (! "Sucessfully created OpenStack project".equals(createProject)) {
-                return createProject;
-            }
-        }
-
-        return "Sucessfully created OpenStack user and project";
     }
 
     @Override
