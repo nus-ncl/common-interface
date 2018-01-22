@@ -189,16 +189,15 @@ public class AdapterOpenStack {
         httpHeaders.set("X-Auth-Token", token);
         HttpEntity<String> request = new HttpEntity<>(httpHeaders);
 
-        ResponseEntity responseEntity;
         try {
-            responseEntity = restTemplate.exchange(properties.addUserToProjectUrl(openStackUserId, openStackProjectId), HttpMethod.PUT, request, String.class);
+            restTemplate.exchange(properties.addUserToProjectUrl(openStackUserId, openStackProjectId), HttpMethod.PUT, request, String.class);
             log.info("Successfully adding user {} to project {} for OpenStack", openStackUserId, openStackProjectId);
         } catch (ResourceAccessException e) {
             log.warn("Error in adding user to project: {}", e.getMessage());
             throw new OpenStackConnectionException(e.getMessage());
         } catch (HttpServerErrorException e) {
             log.warn("Error in adding user to project: {}", e.getMessage());
-            throw new OpenStackConnectionException();
+            throw new OpenStackInternalErrorException();
         } catch (JSONException e) {
             log.warn("Error in adding user to project: error parsing response body");
             throw e;
