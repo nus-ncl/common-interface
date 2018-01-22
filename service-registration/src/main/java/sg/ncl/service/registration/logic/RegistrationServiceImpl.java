@@ -284,8 +284,6 @@ public class RegistrationServiceImpl implements RegistrationService {
             userObject.put("projOrg", teamEntity.getOrganisationType());
             userObject.put("projPublic", teamEntity.getVisibility());
             resultJSON = adapterDeterLab.applyProjectNewUsers(userObject.toString());
-
-
         }
 
         if ("user is created".equals(getUserCreationStatus(resultJSON))) {
@@ -293,7 +291,8 @@ public class RegistrationServiceImpl implements RegistrationService {
             Registration one = addUserToRegistrationRepository(resultJSON, user, teamEntity);
             // call deterlab adapter to store ncluid to deteruid mapping
             addNclUserIdMapping(resultJSON, userId);
-            log.info("Register new user OK: uid {}, pid {}", one.getUid(), one.getPid());
+            log.info("Register new Deterlab user OK: uid {}, pid {}", one.getUid(), one.getPid());
+            log.info("Starting to create new OpenStack User and Project")
 
             // send verification email
             sendVerificationEmail(createdUser);
