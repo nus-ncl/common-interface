@@ -3,6 +3,7 @@ package sg.ncl.service.registration.logic;
 import freemarker.template.Template;
 import freemarker.template.TemplateException;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.coyote.Adapter;
 import org.apache.tomcat.util.codec.binary.Base64;
 import org.json.JSONObject;
 import org.springframework.stereotype.Service;
@@ -449,6 +450,13 @@ public class RegistrationServiceImpl implements RegistrationService {
             sendReplyCreateTeamEmail(userService.getUser(ownerId), team, status, reason);
         }
         return adapterResult;
+    }
+
+    @Override
+    public String approveOrRejectNewOpenStackTeam() {
+        String statusCode = adapterOpenStack.addUserToProject(openstackUserId, openstackProjectID);
+
+        return "a";
     }
 
     private boolean userFormFieldsHasErrors(User user) {

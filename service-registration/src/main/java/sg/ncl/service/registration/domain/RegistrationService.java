@@ -4,10 +4,9 @@ import sg.ncl.service.authentication.domain.Credentials;
 import sg.ncl.service.team.domain.Team;
 import sg.ncl.service.team.domain.TeamStatus;
 import sg.ncl.service.user.domain.User;
-import sg.ncl.service.user.domain.UserStatus;
 
 /**
- * @author Christopher Zhong
+ * @author Christopher Zhong. Tran Ly vu
  */
 public interface RegistrationService {
 
@@ -28,6 +27,8 @@ public interface RegistrationService {
     String rejectOpenStackJoinRequest(String teamId, String userId, User user);
 
     String approveOrRejectNewTeam(String teamId, String ownerId, TeamStatus teamStatus, String reason);
+
+    String approveOrRejectNewOpenStackTeam();
 
     String getDeterUid(String id);
 

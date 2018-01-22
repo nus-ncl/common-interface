@@ -27,6 +27,14 @@ public class ConnectionProperties {
         return HTTP_MODE + ip + ":" + identity_port + "/v3/users";
     }
 
+    public String listUserUrl(boolean enabled, String userName) {
+        return HTTP_MODE + ip + ":" + identity_port + "/v3/users?enabled=" + enabled + "&name=" + userName;
+    }
+
+    public String listProjectUrl(boolean enabled, String userProject) {
+        return HTTP_MODE + ip + ":" + identity_port + "/v3/projects?enabled=" + enabled + "&name=" + userProject;
+    }
+
     public String createProjectUrl() {
         return HTTP_MODE + ip + ":" + identity_port + "/v3/projects";
     }
