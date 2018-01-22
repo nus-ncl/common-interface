@@ -9,7 +9,6 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.client.*;
 import sg.ncl.adapter.openstack.exceptions.OpenStackConnectionException;
 import sg.ncl.adapter.openstack.exceptions.OpenStackInternalErrorException;
-import sg.ncl.common.exception.base.UnauthorizedException;
 
 import javax.inject.Inject;
 
