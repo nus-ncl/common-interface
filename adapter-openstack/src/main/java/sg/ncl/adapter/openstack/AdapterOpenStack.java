@@ -181,11 +181,11 @@ public class AdapterOpenStack {
     }
 
 
-    public String addUserToProject(String openstackUserId, String openstackProjectId) {
+    public String addUserToProject(String openStackUserId, String openStackProjectId) {
 
         String token = requestToken();
 
-        log.info("Starting to add OpenStack user {} to project {}", openstackUserId, openstackProjectId);
+        log.info("Starting to add OpenStack user {} to project {}", openStackUserId, openStackProjectId);
 
         HttpHeaders httpHeaders = new HttpHeaders();
         httpHeaders.setContentType(MediaType.APPLICATION_JSON);
@@ -194,8 +194,8 @@ public class AdapterOpenStack {
 
         ResponseEntity responseEntity;
         try {
-            responseEntity = restTemplate.exchange(properties.addUserToProjectUrl(openstackUserId, openstackProjectId), HttpMethod.PUT, request, String.class);
-            log.info("Successfully adding user {} to project {} for OpenStack", openstackUserId, openstackProjectId);
+            responseEntity = restTemplate.exchange(properties.addUserToProjectUrl(openStackUserId, openStackProjectId), HttpMethod.PUT, request, String.class);
+            log.info("Successfully adding user {} to project {} for OpenStack", openStackUserId, openStackProjectId);
         } catch (ResourceAccessException e) {
             log.warn("Error in adding user to project: {}", e.getMessage());
             throw new OpenStackConnectionException(e.getMessage());

@@ -28,8 +28,6 @@ public interface RegistrationService {
 
     String approveOrRejectNewTeam(String teamId, String ownerId, TeamStatus teamStatus, String reason);
 
-    String approveOrRejectNewOpenStackTeam(String teamId, String ownerId, TeamStatus teamStatus);
-
     String getDeterUid(String id);
 
     boolean verifyEmail(final String uid, final String email, final String key);

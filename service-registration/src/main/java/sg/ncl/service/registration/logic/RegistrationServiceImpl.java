@@ -435,10 +435,20 @@ public class RegistrationServiceImpl implements RegistrationService {
             // change team owner member status
             teamService.updateMemberStatus(teamId, ownerId, MemberStatus.APPROVED);
             adapterResult = adapterDeterLab.approveProject(one.toString());
+
+            // Approve Openstack team => use email because email is openstack name
+            approveNewOpenStackTeam(user.getUserDetails().getEmail(), team.getName());
+
+            // now send mail
             sendReplyCreateTeamEmail(user, team, status, reason);
         } else {
             // FIXME may need to be more specific and check if TeamStatus is REJECTED
             Team existingTeam = teamService.getTeamById(teamId);
+
+            // delete openstack team here before the team is removed from SIO database
+            rejectNewOpenStackTeam(existingTeam.getName());
+
+            // now we can remove SIO database
             List<? extends TeamMember> existingMembersList = existingTeam.getMembers();
             for (TeamMember member : existingMembersList) {
                 // remove from user side
@@ -447,20 +457,21 @@ public class RegistrationServiceImpl implements RegistrationService {
             // remove from team side
             teamService.removeTeam(teamId);
             adapterResult = adapterDeterLab.rejectProject(one.toString());
+
             sendReplyCreateTeamEmail(userService.getUser(ownerId), team, status, reason);
         }
         return adapterResult;
     }
 
-    @Override
-    public String approveOrRejectNewOpenStackTeam(String teamId, String ownerId, TeamStatus teamStatus) {
 
-        String openStackUserId = credentials.getUsername() ;
-        String openStackProjectId = team.getName();
+    // reject openstack team
+    private void rejectNewOpenStackTeam(String openStackProjectId) {
+        String statusCode = adapterOpenStack.deleteOpenStackProject(openStackProjectId);
+    }
 
+    //approve openstack project
+    private void approveNewOpenStackTeam(String openStackUserId, String openStackProjectId) {
         String statusCode = adapterOpenStack.addUserToProject(openStackUserId, openStackProjectId);
-
-        return "a";
     }
 
     private boolean userFormFieldsHasErrors(User user) {
