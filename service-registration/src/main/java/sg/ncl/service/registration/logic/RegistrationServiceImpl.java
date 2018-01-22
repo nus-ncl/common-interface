@@ -1,14 +1,18 @@
 package sg.ncl.service.registration.logic;
 
+import com.sun.net.httpserver.HttpServer;
 import freemarker.template.Template;
 import freemarker.template.TemplateException;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.coyote.Adapter;
 import org.apache.tomcat.util.codec.binary.Base64;
 import org.json.JSONObject;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.ui.freemarker.FreeMarkerTemplateUtils;
+import org.springframework.web.client.HttpClientErrorException;
+import org.springframework.web.client.HttpServerErrorException;
 import sg.ncl.adapter.deterlab.AdapterDeterLab;
 import sg.ncl.adapter.openstack.AdapterOpenStack;
 import sg.ncl.common.DomainProperties;
@@ -32,6 +36,7 @@ import sg.ncl.service.user.domain.UserService;
 import sg.ncl.service.user.domain.UserStatus;
 import sg.ncl.service.registration.exceptions.EmailNotVerifiedException;
 import sg.ncl.service.user.exceptions.UserNotFoundException;
+import sun.net.www.http.HttpClient;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -445,7 +450,7 @@ public class RegistrationServiceImpl implements RegistrationService {
             // FIXME may need to be more specific and check if TeamStatus is REJECTED
             Team existingTeam = teamService.getTeamById(teamId);
 
-            // delete openstack team here before the team is removed from SIO database
+            // Delete openstack team here before the team is removed from SIO database
             rejectNewOpenStackTeam(existingTeam.getName());
 
             // now we can remove SIO database
@@ -466,12 +471,12 @@ public class RegistrationServiceImpl implements RegistrationService {
 
     // reject openstack team
     private void rejectNewOpenStackTeam(String openStackProjectId) {
-        String statusCode = adapterOpenStack.deleteOpenStackProject(openStackProjectId);
+        adapterOpenStack.deleteOpenStackProject(openStackProjectId);
     }
 
     //approve openstack project
     private void approveNewOpenStackTeam(String openStackUserId, String openStackProjectId) {
-        String statusCode = adapterOpenStack.addUserToProject(openStackUserId, openStackProjectId);
+       adapterOpenStack.addUserToProject(openStackUserId, openStackProjectId);
     }
 
     private boolean userFormFieldsHasErrors(User user) {

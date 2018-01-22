@@ -6,12 +6,10 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.springframework.http.*;
 import org.springframework.stereotype.Component;
-import org.springframework.web.client.HttpServerErrorException;
-import org.springframework.web.client.ResourceAccessException;
-import org.springframework.web.client.RestClientException;
-import org.springframework.web.client.RestTemplate;
+import org.springframework.web.client.*;
 import sg.ncl.adapter.openstack.exceptions.OpenStackConnectionException;
 import sg.ncl.adapter.openstack.exceptions.OpenStackInternalErrorException;
+import sg.ncl.common.exception.base.UnauthorizedException;
 
 import javax.inject.Inject;
 
@@ -81,9 +79,9 @@ public class AdapterOpenStack {
         } catch (JSONException e) {
             log.warn("Error in requesting OpenStack token: error parsing response body");
             throw e;
-        } catch (RestClientException e) {
+        } catch (HttpClientErrorException e) {
             log.warn("Error in requesting OpenStack token: {}", e.getMessage());
-            throw new OpenStackConnectionException(e.getMessage());
+            throw e;
         }
 
         HttpHeaders headers = responseEntity.getHeaders();
@@ -125,9 +123,9 @@ public class AdapterOpenStack {
         } catch (JSONException e) {
             log.warn("Error in creating user {}: error parsing response body", userName);
             throw e;
-        } catch (RestClientException e) {
+        } catch (HttpClientErrorException e) {
             log.warn("Error in creating user {}: {}", userName, e.getMessage());
-            throw new OpenStackConnectionException(e.getMessage());
+            throw e;
         }
 
         JSONObject responseObject = new JSONObject(responseEntity.getBody().toString());
@@ -169,9 +167,9 @@ public class AdapterOpenStack {
         } catch (JSONException e) {
             log.warn("Error in creating project {}: error parsing response body", projectName);
             throw e;
-        } catch (RestClientException e) {
+        } catch (HttpClientErrorException e) {
             log.warn("Error in creating project {}: {}", projectName, e.getMessage());
-            throw new OpenStackConnectionException(e.getMessage());
+            throw e;
         }
 
         JSONObject responseObject = new JSONObject(responseEntity.getBody().toString());
@@ -181,7 +179,7 @@ public class AdapterOpenStack {
     }
 
 
-    public String addUserToProject(String openStackUserId, String openStackProjectId) {
+    public void addUserToProject(String openStackUserId, String openStackProjectId) {
 
         String token = requestToken();
 
@@ -201,15 +199,14 @@ public class AdapterOpenStack {
             throw new OpenStackConnectionException(e.getMessage());
         } catch (HttpServerErrorException e) {
             log.warn("Error in adding user to project: {}", e.getMessage());
-            throw new OpenStackInternalErrorException();
+            throw new OpenStackConnectionException();
         } catch (JSONException e) {
             log.warn("Error in adding user to project: error parsing response body");
             throw e;
-        } catch (RestClientException e) {
+        } catch (HttpClientErrorException e) {
             log.warn("Error in adding user to project: {}", e.getMessage());
-            throw new OpenStackConnectionException(e.getMessage());
+            throw e;
         }
-        return responseEntity.getStatusCode().toString();
     }
 
     public String retrieveOpenStackUserId(String userName) {
@@ -232,15 +229,15 @@ public class AdapterOpenStack {
         } catch (ResourceAccessException e) {
             log.warn("Error in retrieving user id from user name {}", userName, e.getMessage());
             throw new OpenStackConnectionException(e.getMessage());
+        }  catch (JSONException e) {
+            log.warn("Error in retrieving user id from user name {}: error parsing response body", userName);
+            throw e;
         } catch (HttpServerErrorException e) {
             log.warn("Error in retrieving user id from user name {}", userName, e.getMessage());
             throw new OpenStackInternalErrorException();
-        } catch (JSONException e) {
-            log.warn("Error in retrieving user id from user name {}: error parsing response body", userName);
-            throw e;
-        } catch (RestClientException e) {
+        } catch (HttpClientErrorException e) {
             log.warn("Error in retrieving user id from user name {}", userName, e.getMessage());
-            throw new OpenStackConnectionException(e.getMessage());
+            throw e;
         }
 
         JSONObject responseObject = new JSONObject(responseEntity.getBody().toString());
@@ -276,9 +273,9 @@ public class AdapterOpenStack {
         } catch (JSONException e) {
             log.warn("Error in retrieving project id from project name {}: error parsing response body", projectName);
             throw e;
-        } catch (RestClientException e) {
+        } catch (HttpClientErrorException e) {
             log.warn("Error in retrieving project id from project name {}", projectName, e.getMessage());
-            throw new OpenStackConnectionException(e.getMessage());
+            throw e;
         }
 
         JSONObject responseObject = new JSONObject(responseEntity.getBody().toString());
@@ -288,7 +285,7 @@ public class AdapterOpenStack {
         return projectId;
     }
 
-    public String deleteOpenStackProject(String projectId) {
+    public void deleteOpenStackProject(String projectId) {
         String token = requestToken();
 
         log.info("Starting to delete project id {}", projectId);
@@ -296,26 +293,24 @@ public class AdapterOpenStack {
         httpHeaders.setContentType(MediaType.APPLICATION_JSON);
         httpHeaders.set("X-Auth-Token", token);
         HttpEntity<String> request = new HttpEntity<>(httpHeaders);
-        ResponseEntity responseEntity;
 
         try {
-            responseEntity = restTemplate.exchange(properties.deleteProject(projectId), HttpMethod.DELETE, request, String.class);
+            restTemplate.exchange(properties.deleteProject(projectId), HttpMethod.DELETE, request, String.class);
             log.info("Successfully deleting project id {}", projectId);
         } catch (ResourceAccessException e) {
             log.warn("Error in deleting project id {}: {}", projectId, e.getMessage());
             throw new OpenStackConnectionException(e.getMessage());
-        } catch (HttpServerErrorException e) {
-            log.warn("Error in deleting project id {}: {}", projectId, e.getMessage());
-            throw new OpenStackInternalErrorException();
         } catch (JSONException e) {
             log.warn("Error in deleting project id {}: error parsing response body", projectId);
             throw e;
-        } catch (RestClientException e) {
-            log.warn("Error in deleting project id {}: {}", projectId, e.getMessage());
-            throw new OpenStackConnectionException(e.getMessage());
+        }  catch (HttpServerErrorException e) {
+            log.warn("Error when deleting project id {}: {}", projectId, e.getMessage());
+            throw new OpenStackInternalErrorException();
+        } catch (HttpClientErrorException e) {
+            log.warn("Error when deleting project id {}: {}", projectId, e.getMessage());
+            throw e;
         }
-
-        return responseEntity.getStatusCode().toString();
     }
 
 }
+;
