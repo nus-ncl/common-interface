@@ -330,7 +330,12 @@ public class RegistrationServiceImpl implements RegistrationService {
         one.put("action", "approve");
         if ((UserStatus.PENDING).equals(user.getStatus())) {
             userService.updateUserStatus(userId, UserStatus.APPROVED);
+
+            // Enable OpenStack User , this is when team leader approve joining team
+            String openStackUserId = adapterOpenStack.retrieveOpenStackUserId(user.getUserDetails().getEmail());
+            adapterOpenStack.enableOpenStackUser(openStackUserId);
         }
+        
         teamService.updateMemberStatus(teamId, userId, MemberStatus.APPROVED);
         String adapterResult = adapterDeterLab.processJoinRequest(one.toString());
 
@@ -421,6 +426,11 @@ public class RegistrationServiceImpl implements RegistrationService {
             }
             if ((UserStatus.PENDING).equals(user.getStatus())) {
                 userService.updateUserStatus(ownerId, UserStatus.APPROVED);
+
+                // Enable OpenStack User , this is when admin approve new team
+                String openStackUserId = adapterOpenStack.retrieveOpenStackUserId(user.getUserDetails().getEmail());
+                adapterOpenStack.enableOpenStackUser(openStackUserId);
+
             }
             // change team owner member status
             teamService.updateMemberStatus(teamId, ownerId, MemberStatus.APPROVED);
@@ -543,11 +553,6 @@ public class RegistrationServiceImpl implements RegistrationService {
         if (user.isEmailVerified()) {
             String userEmail = user.getUserDetails().getEmail();
             log.info("User email {} has already been verified, start to enable OpenStack user", userEmail);
-
-            // Enable OpenStack User
-            String openStackUserId = adapterOpenStack.retrieveOpenStackUserId(userEmail);
-            adapterOpenStack.enableOpenStackUser(openStackUserId);
-
             return false;
         }
 

@@ -28,6 +28,9 @@ public class AdapterOpenStack {
     public AdapterOpenStack(ConnectionProperties properties, RestTemplate restTemplate) {
         this.properties = properties;
         this.restTemplate = restTemplate;
+        //somehow spring does not work with PATCH => the following solution is found on stackoverflow
+        HttpComponentsClientHttpRequestFactory requestFactory = new HttpComponentsClientHttpRequestFactory();
+        restTemplate.setRequestFactory(requestFactory);
     }
 
     private String requestToken () {
@@ -215,9 +218,6 @@ public class AdapterOpenStack {
         HttpEntity<String> request = new HttpEntity<>(parameters.toString(), httpHeaders);
 
         try {
-            //somehow spring does not work with PATCH => the following solution is found on stackoverflow
-            HttpComponentsClientHttpRequestFactory requestFactory = new HttpComponentsClientHttpRequestFactory();
-            restTemplate.setRequestFactory(requestFactory);
             restTemplate.exchange(properties.updateProjectUrl(projectId), HttpMethod.PATCH, request, String.class);
             log.info("Successfully enabling OpenStack project id {}", projectId);
         } catch (ResourceAccessException e) {
