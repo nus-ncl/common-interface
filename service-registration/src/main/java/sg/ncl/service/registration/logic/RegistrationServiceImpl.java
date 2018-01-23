@@ -335,7 +335,7 @@ public class RegistrationServiceImpl implements RegistrationService {
             String openStackUserId = adapterOpenStack.retrieveOpenStackUserId(user.getUserDetails().getEmail());
             adapterOpenStack.enableOpenStackUser(openStackUserId);
         }
-        
+
         teamService.updateMemberStatus(teamId, userId, MemberStatus.APPROVED);
         String adapterResult = adapterDeterLab.processJoinRequest(one.toString());
 
