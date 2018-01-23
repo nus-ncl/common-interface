@@ -288,7 +288,7 @@ public class RegistrationServiceImpl implements RegistrationService {
             addNclUserIdMapping(resultJSON, userId);
             log.info("Register new Deterlab user OK: uid {}, pid {}", one.getUid(), one.getPid());
 
-            // starting to create Openstack , throw exception for any error
+            // starting to create OpenStack user and project but its not enable until email is verified
             log.info("Starting to create new OpenStack User and Project after Deterlab registration was successful");
             adapterOpenStack.createOpenStackUser(credentials.getUsername(), credentials.getPassword());
             adapterOpenStack.createOpenStackProject(team.getName(), team.getDescription());
@@ -539,7 +539,13 @@ public class RegistrationServiceImpl implements RegistrationService {
     public boolean verifyEmail(@NotNull String uid, @NotNull String email, @NotNull String key) {
         User user = userService.getUser(uid);
         if (user.isEmailVerified()) {
-            log.warn("User email {} has already been verified.", user.getUserDetails().getEmail());
+            String userEmail = user.getUserDetails().getEmail();
+            log.warn("User email {} has already been verified.", userEmail);
+
+            // Enable OpenStack User
+            String openStackUserId = adapterOpenStack.retrieveOpenStackUserId(userEmail);
+            adapterOpenStack.enableOpenStackUser(openStackUserId);
+
             return false;
         }
 

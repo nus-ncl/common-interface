@@ -93,7 +93,7 @@ public class AdapterOpenStack {
 
     public void createOpenStackUser(String userName, String password) {
         JSONObject userObject = new JSONObject();
-        userObject.put("enabled", true);
+        userObject.put("enabled", false);
         userObject.put("name", userName);
         userObject.put("password", password);
         userObject.put("email", userName); // name is email
@@ -108,10 +108,9 @@ public class AdapterOpenStack {
         httpHeaders.setContentType(MediaType.APPLICATION_JSON);
         httpHeaders.set("X-Auth-Token", token);
         HttpEntity<String> request = new HttpEntity<>(parameters.toString(), httpHeaders);
-        ResponseEntity responseEntity;
 
         try {
-            responseEntity = restTemplate.exchange(properties.createUserUrl(), HttpMethod.POST, request, String.class);
+            restTemplate.exchange(properties.createUserUrl(), HttpMethod.POST, request, String.class);
             log.info("Successfully creating new OpenStack user {}", userName);
         } catch (ResourceAccessException e) {
             log.warn("Error in creating new OpenStack user {}: {}", userName, e.getMessage());
@@ -128,13 +127,45 @@ public class AdapterOpenStack {
         }
     }
 
+    public void enableOpenStackUser(String userId) {
+        JSONObject userObject = new JSONObject();
+        userObject.put("enabled", true);
+
+        JSONObject parameters = new JSONObject();
+        parameters.put("user", userObject);
+
+        String token = requestToken();
+
+        log.info("Starting to enable OpenStack user");
+        HttpHeaders httpHeaders = new HttpHeaders();
+        httpHeaders.setContentType(MediaType.APPLICATION_JSON);
+        httpHeaders.set("X-Auth-Token", token);
+        HttpEntity<String> request = new HttpEntity<>(parameters.toString(), httpHeaders);
+
+        try {
+            restTemplate.exchange(properties.updateUserUrl(userId), HttpMethod.PATCH, request, String.class);
+            log.info("Successfully enabling OpenStack user id {}", userId);
+        } catch (ResourceAccessException e) {
+            log.warn("Error in enabling OpenStack user id {}: {}", userId, e.getMessage());
+            throw new OpenStackConnectionException(e.getMessage());
+        } catch (HttpServerErrorException e) {
+            log.warn("Error in enabling OpenStack user id {}: {}",userId, e.getMessage());
+            throw new OpenStackInternalErrorException();
+        } catch (JSONException e) {
+            log.warn("Error in enabling OpenStack user id {}: error parsing response body", userId);
+            throw e;
+        } catch (HttpClientErrorException e) {
+            log.warn("Error in enabling OpenStack user id {}: {}", userId, e.getMessage());
+            throw e;
+        }
+    }
 
 
     public void createOpenStackProject(String projectName, String description) {
         JSONObject projectObject = new JSONObject();
         projectObject.put("description", description);
         projectObject.put("domain_id", "default");
-        projectObject.put("enabled", true);
+        projectObject.put("enabled", false);
         projectObject.put("is_domain", false);
         projectObject.put("name", projectName);
 
@@ -149,10 +180,8 @@ public class AdapterOpenStack {
         httpHeaders.set("X-Auth-Token", token);
         HttpEntity<String> request = new HttpEntity<>(parameters.toString(), httpHeaders);
 
-        ResponseEntity responseEntity;
-
         try {
-            responseEntity = restTemplate.exchange(properties.createProjectUrl(), HttpMethod.POST, request, String.class);
+            restTemplate.exchange(properties.createProjectUrl(), HttpMethod.POST, request, String.class);
             log.info("Successfully creating new OpenStack project {}", projectName);
         } catch (ResourceAccessException e) {
             log.warn("Error in creating new OpenStack project {}: {}", projectName, e.getMessage());
@@ -168,6 +197,40 @@ public class AdapterOpenStack {
             throw e;
         }
     }
+
+    public void enableOpenStackProject(String projectId) {
+        JSONObject userObject = new JSONObject();
+        userObject.put("enabled", true);
+
+        JSONObject parameters = new JSONObject();
+        parameters.put("project", userObject);
+
+        String token = requestToken();
+
+        log.info("Starting to enable OpenStack  project");
+        HttpHeaders httpHeaders = new HttpHeaders();
+        httpHeaders.setContentType(MediaType.APPLICATION_JSON);
+        httpHeaders.set("X-Auth-Token", token);
+        HttpEntity<String> request = new HttpEntity<>(parameters.toString(), httpHeaders);
+
+        try {
+            restTemplate.exchange(properties.updateProjectUrl(projectId), HttpMethod.PATCH, request, String.class);
+            log.info("Successfully enabling OpenStack project id {}", projectId);
+        } catch (ResourceAccessException e) {
+            log.warn("Error in enabling OpenStack project id {}: {}", projectId, e.getMessage());
+            throw new OpenStackConnectionException(e.getMessage());
+        } catch (HttpServerErrorException e) {
+            log.warn("Error in enabling OpenStack project id {}: {}", projectId, e.getMessage());
+            throw new OpenStackInternalErrorException();
+        } catch (JSONException e) {
+            log.warn("Error in enabling OpenStack project id {}: error parsing response body", projectId);
+            throw e;
+        } catch (HttpClientErrorException e) {
+            log.warn("Error in enabling OpenStack project id {}: {}", projectId, e.getMessage());
+            throw e;
+        }
+    }
+
 
 
     public void addUserToProject(String openStackUserId, String openStackProjectId) {
