@@ -31,8 +31,8 @@ public class ConnectionProperties {
         return HTTP_MODE + ip + ":" + identity_port + "/v3/users/" + userId;
     }
 
-    protected String listUserUrl(boolean enabled, String userName) {
-        return HTTP_MODE + ip + ":" + identity_port + "/v3/users?enabled=" + enabled + "&name=" + userName;
+    protected String listUserUrl(String userName) {
+        return HTTP_MODE + ip + ":" + identity_port + "/v3/users?name=" + userName;
     }
 
     protected String createProjectUrl() {
@@ -44,8 +44,8 @@ public class ConnectionProperties {
     }
 
 
-    protected String listProjectUrl(boolean enabled, String userProject) {
-        return HTTP_MODE + ip + ":" + identity_port + "/v3/projects?enabled=" + enabled + "&name=" + userProject;
+    protected String listProjectUrl(String userProject) {
+        return HTTP_MODE + ip + ":" + identity_port + "/v3/projects?name=" + userProject;
     }
 
     protected String deleteProject(String projectId) {

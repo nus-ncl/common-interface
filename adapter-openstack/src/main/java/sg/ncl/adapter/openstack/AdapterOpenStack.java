@@ -277,7 +277,7 @@ public class AdapterOpenStack {
         ResponseEntity responseEntity;
 
         try {
-            responseEntity = restTemplate.exchange(properties.listUserUrl(true, userName), HttpMethod.GET, request, String.class);
+            responseEntity = restTemplate.exchange(properties.listUserUrl(userName), HttpMethod.GET, request, String.class);
             log.info("Successfully retrieving OpenStack user id from user name {}", userName);
         } catch (ResourceAccessException e) {
             log.warn("Error in retrieving OpenStack user id from user name {}", userName, e.getMessage());
@@ -315,7 +315,7 @@ public class AdapterOpenStack {
         ResponseEntity responseEntity;
 
         try {
-            responseEntity = restTemplate.exchange(properties.listProjectUrl(true, projectName), HttpMethod.GET, request, String.class);
+            responseEntity = restTemplate.exchange(properties.listProjectUrl(projectName), HttpMethod.GET, request, String.class);
             log.info("Successfully retrieving OpenStack project id from project name {}", projectName);
         } catch (ResourceAccessException e) {
             log.warn("Error in retrieving OpenStack project id from project name {}", projectName, e.getMessage());
