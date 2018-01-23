@@ -63,8 +63,6 @@ public class AdapterOpenStack {
         JSONObject parameters = new JSONObject();
         parameters.put("auth", authObject);
 
-        log.info("Starting to request OpenStack token");
-
         HttpHeaders httpHeaders = new HttpHeaders();
         httpHeaders.setContentType(MediaType.APPLICATION_JSON);
         HttpEntity<String> request = new HttpEntity<>(parameters.toString(), httpHeaders);
@@ -72,7 +70,6 @@ public class AdapterOpenStack {
 
         try {
             responseEntity = restTemplate.exchange(properties.requestTokenUrl(), HttpMethod.POST, request, String.class);
-            log.info("Succesfully requesting OpenStack token");
         } catch (ResourceAccessException e) {
             log.warn("Error in requesting OpenStack token : {}", e.getMessage());
             throw new OpenStackConnectionException(e.getMessage());
@@ -88,10 +85,7 @@ public class AdapterOpenStack {
         }
 
         HttpHeaders headers = responseEntity.getHeaders();
-        String token= headers.get("X-Subject-Token").get(0);
-        log.info("OpenStack token is {}", token);
-
-        return token;
+        return headers.get("X-Subject-Token").get(0);
     }
 
 
@@ -105,9 +99,10 @@ public class AdapterOpenStack {
         JSONObject parameters = new JSONObject();
         parameters.put("user", userObject);
 
+        log.info("Request OpenStack token to create OpenStack user");
         String token = requestToken();
 
-        log.info("Starting to create OpenStack user");
+        log.info("Succesfully requesting OpenStack token and start to create OpenStack user");
         HttpHeaders httpHeaders = new HttpHeaders();
         httpHeaders.setContentType(MediaType.APPLICATION_JSON);
         httpHeaders.set("X-Auth-Token", token);
@@ -138,9 +133,10 @@ public class AdapterOpenStack {
         JSONObject parameters = new JSONObject();
         parameters.put("user", userObject);
 
+        log.info("Request OpenStack token to enable OpenStack user");
         String token = requestToken();
 
-        log.info("Starting to enable OpenStack user");
+        log.info("Succesfully requesting OpenStack token and start to enable OpenStack user");
         HttpHeaders httpHeaders = new HttpHeaders();
         httpHeaders.setContentType(MediaType.APPLICATION_JSON);
         httpHeaders.set("X-Auth-Token", token);
@@ -176,9 +172,11 @@ public class AdapterOpenStack {
         JSONObject parameters = new JSONObject();
         parameters.put("project", projectObject);
 
+        log.info("Request OpenStack token to create OpenStack project");
         String token = requestToken();
 
-        log.info("Starting to create OpenStack project");
+        log.info("Succesfully requesting OpenStack token and start to create OpenStack project");
+
         HttpHeaders httpHeaders = new HttpHeaders();
         httpHeaders.setContentType(MediaType.APPLICATION_JSON);
         httpHeaders.set("X-Auth-Token", token);
@@ -209,9 +207,10 @@ public class AdapterOpenStack {
         JSONObject parameters = new JSONObject();
         parameters.put("project", projectObject);
 
+        log.info("Request OpenStack token to enable OpenStack project");
         String token = requestToken();
 
-        log.info("Starting to enable OpenStack project");
+        log.info("Succesfully requesting OpenStack token and start to enable OpenStack project");
         HttpHeaders httpHeaders = new HttpHeaders();
         httpHeaders.setContentType(MediaType.APPLICATION_JSON);
         httpHeaders.set("X-Auth-Token", token);
@@ -239,10 +238,10 @@ public class AdapterOpenStack {
 
     public void addUserToProject(String openStackUserId, String openStackProjectId) {
 
+        log.info("Request OpenStack token to add OpenStack user to project");
         String token = requestToken();
 
-        log.info("Starting to add OpenStack user {} to project {}", openStackUserId, openStackProjectId);
-
+        log.info("Succesfully requesting OpenStack token and starting to add OpenStack user {} to project {}", openStackUserId, openStackProjectId);
         HttpHeaders httpHeaders = new HttpHeaders();
         httpHeaders.setContentType(MediaType.APPLICATION_JSON);
         httpHeaders.set("X-Auth-Token", token);
@@ -267,13 +266,14 @@ public class AdapterOpenStack {
     }
 
     public String retrieveOpenStackUserId(String userName) {
-        String token = requestToken();
-
         JSONObject parameters =  new JSONObject();
         parameters.put("enabled", "true");
         parameters.put("name", userName);
 
-        log.info("Starting to retrieve OpenStack user id from user name {}", userName);
+        log.info("Request OpenStack token to retrieve OpenStack user id");
+        String token = requestToken();
+
+        log.info("Succesfully requesting OpenStack token and start to retrieve OpenStack user id from user name {}", userName);
         HttpHeaders httpHeaders =  new HttpHeaders();
         httpHeaders.setContentType(MediaType.APPLICATION_JSON);
         httpHeaders.set("X-Auth-Token", token);
@@ -305,13 +305,14 @@ public class AdapterOpenStack {
     }
 
     public String retrieveOpenStackProjectId(String projectName) {
-        String token = requestToken();
-
         JSONObject parameters =  new JSONObject();
         parameters.put("enabled", "true");
         parameters.put("name", projectName);
 
-        log.info("Starting to retrieve OpenStack project id from project name {}", projectName);
+        log.info("Request OpenStack token to retrieve OpenStack user id");
+        String token = requestToken();
+
+        log.info("Succesfully requesting OpenStack token and to retrieve OpenStack project id from project name {}", projectName);
         HttpHeaders httpHeaders =  new HttpHeaders();
         httpHeaders.setContentType(MediaType.APPLICATION_JSON);
         httpHeaders.set("X-Auth-Token", token);
@@ -343,9 +344,10 @@ public class AdapterOpenStack {
     }
 
     public void deleteOpenStackProject(String projectId) {
+        log.info("Request OpenStack token to delete OpenStack project");
         String token = requestToken();
 
-        log.info("Starting to delete OpenStack project id {}", projectId);
+        log.info("Successful requesting Openstack token and start to delete OpenStack project id {}", projectId);
         HttpHeaders httpHeaders =  new HttpHeaders();
         httpHeaders.setContentType(MediaType.APPLICATION_JSON);
         httpHeaders.set("X-Auth-Token", token);
