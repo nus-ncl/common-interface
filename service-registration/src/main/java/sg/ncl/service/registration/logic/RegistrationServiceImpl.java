@@ -426,7 +426,9 @@ public class RegistrationServiceImpl implements RegistrationService {
             teamService.updateMemberStatus(teamId, ownerId, MemberStatus.APPROVED);
             adapterResult = adapterDeterLab.approveProject(one.toString());
 
-            // Approve Openstack team => use email because email is openstack name
+            // Approve Openstack team + enable project when project is first created
+            String openStackProjectId = adapterOpenStack.retrieveOpenStackProjectId(team.getName());
+            adapterOpenStack.enableOpenStackProject(openStackProjectId);
             addOpenStackUserToProject(user.getUserDetails().getEmail(), team.getName());
 
             // now send mail
@@ -435,7 +437,7 @@ public class RegistrationServiceImpl implements RegistrationService {
             // FIXME may need to be more specific and check if TeamStatus is REJECTED
             Team existingTeam = teamService.getTeamById(teamId);
 
-            // Delete openstack team here before the team is removed from SIO database
+            // Delete OpenStack team here before the team is removed from SIO database
             deleteOpenStackTeam(existingTeam.getName());
 
             // now we can remove SIO database
