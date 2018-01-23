@@ -5,6 +5,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.springframework.http.*;
+import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.*;
 import sg.ncl.adapter.openstack.exceptions.OpenStackConnectionException;
@@ -199,21 +200,24 @@ public class AdapterOpenStack {
     }
 
     public void enableOpenStackProject(String projectId) {
-        JSONObject userObject = new JSONObject();
-        userObject.put("enabled", true);
+        JSONObject projectObject = new JSONObject();
+        projectObject.put("enabled", true);
 
         JSONObject parameters = new JSONObject();
-        parameters.put("project", userObject);
+        parameters.put("project", projectObject);
 
         String token = requestToken();
 
-        log.info("Starting to enable OpenStack  project");
+        log.info("Starting to enable OpenStack project");
         HttpHeaders httpHeaders = new HttpHeaders();
         httpHeaders.setContentType(MediaType.APPLICATION_JSON);
         httpHeaders.set("X-Auth-Token", token);
         HttpEntity<String> request = new HttpEntity<>(parameters.toString(), httpHeaders);
 
         try {
+            //somehow spring does not work with PATCH => the following solution is found on stackoverflow
+            HttpComponentsClientHttpRequestFactory requestFactory = new HttpComponentsClientHttpRequestFactory();
+            restTemplate.setRequestFactory(requestFactory);
             restTemplate.exchange(properties.updateProjectUrl(projectId), HttpMethod.PATCH, request, String.class);
             log.info("Successfully enabling OpenStack project id {}", projectId);
         } catch (ResourceAccessException e) {

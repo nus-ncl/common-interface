@@ -40,7 +40,7 @@ public class ConnectionProperties {
     }
 
     protected String updateProjectUrl(String projectId) {
-        return HTTP_MODE + ip + ":" + identity_port + "/v3/users/" + projectId;
+        return HTTP_MODE + ip + ":" + identity_port + "/v3/projects/" + projectId;
     }
 
 
