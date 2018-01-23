@@ -269,6 +269,7 @@ public class RegistrationServiceImpl implements RegistrationService {
         if (isJoinTeam) {
             userObject.put("pid", teamEntity.getName());
             resultJSON = adapterDeterLab.joinProjectNewUsers(userObject.toString());
+
         } else {
             // call python script to apply for new project
             userObject.put("projName", teamEntity.getName());
@@ -287,8 +288,8 @@ public class RegistrationServiceImpl implements RegistrationService {
             addNclUserIdMapping(resultJSON, userId);
             log.info("Register new Deterlab user OK: uid {}, pid {}", one.getUid(), one.getPid());
 
-            // starting to create Openstack
-            log.info("Starting to create new OpenStack User and Project");
+            // starting to create Openstack , throw exception for any error
+            log.info("Starting to create new OpenStack User and Project after Deterlab registration was successful");
             adapterOpenStack.createOpenStackUser(credentials.getUsername(), credentials.getPassword());
             adapterOpenStack.createOpenStackProject(team.getName(), team.getDescription());
 
@@ -332,6 +333,10 @@ public class RegistrationServiceImpl implements RegistrationService {
         }
         teamService.updateMemberStatus(teamId, userId, MemberStatus.APPROVED);
         String adapterResult = adapterDeterLab.processJoinRequest(one.toString());
+
+        //Add OpenStack into project
+        addOpenStackUserToProject(user.getUserDetails().getEmail(), team.getName());
+
         sendReplyJoinTeamEmail(user, team, TeamStatus.APPROVED);
         return adapterResult;
     }
@@ -368,6 +373,9 @@ public class RegistrationServiceImpl implements RegistrationService {
                 object.put("gid", pid);
                 object.put("action", "deny");
                 String adapterResult = adapterDeterLab.processJoinRequest(object.toString());
+
+                // Tran Ly Vu note: OpenStack will not need to do anything if request join team is rejected
+
                 sendReplyJoinTeamEmail(userService.getUser(userId), one, TeamStatus.REJECTED);
                 return adapterResult;
             }
@@ -419,7 +427,7 @@ public class RegistrationServiceImpl implements RegistrationService {
             adapterResult = adapterDeterLab.approveProject(one.toString());
 
             // Approve Openstack team => use email because email is openstack name
-            approveNewOpenStackTeam(user.getUserDetails().getEmail(), team.getName());
+            addOpenStackUserToProject(user.getUserDetails().getEmail(), team.getName());
 
             // now send mail
             sendReplyCreateTeamEmail(user, team, status, reason);
@@ -428,7 +436,7 @@ public class RegistrationServiceImpl implements RegistrationService {
             Team existingTeam = teamService.getTeamById(teamId);
 
             // Delete openstack team here before the team is removed from SIO database
-            rejectNewOpenStackTeam(existingTeam.getName());
+            deleteOpenStackTeam(existingTeam.getName());
 
             // now we can remove SIO database
             List<? extends TeamMember> existingMembersList = existingTeam.getMembers();
@@ -447,13 +455,13 @@ public class RegistrationServiceImpl implements RegistrationService {
 
 
     // reject openstack team
-    private void rejectNewOpenStackTeam(String openStackProjectName) {
+    private void deleteOpenStackTeam(String openStackProjectName) {
         String openStackProjectId = adapterOpenStack.retrieveOpenStackProjectId(openStackProjectName);
         adapterOpenStack.deleteOpenStackProject(openStackProjectId);
     }
 
     //approve openstack project
-    private void approveNewOpenStackTeam(String openStackUsername, String openStackProjectName) {
+    private void addOpenStackUserToProject(String openStackUsername, String openStackProjectName) {
         String openStackUserId = adapterOpenStack.retrieveOpenStackUserId(openStackUsername);
         String openStackProjectId = adapterOpenStack.retrieveOpenStackProjectId(openStackProjectName);
         adapterOpenStack.addUserToProject(openStackUserId, openStackProjectId);
