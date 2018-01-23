@@ -298,10 +298,7 @@ public class AdapterOpenStack {
         }
 
         JSONObject responseObject = new JSONObject(responseEntity.getBody().toString());
-        String userId = responseObject.getJSONArray("users").getJSONObject(0).getString("id");
-        log.info("OpenStack user id of user name {} is {}", userName, userId);
-
-        return userId;
+        return responseObject.getJSONArray("users").getJSONObject(0).getString("id");
     }
 
     public String retrieveOpenStackProjectId(String projectName) {
@@ -337,10 +334,7 @@ public class AdapterOpenStack {
         }
 
         JSONObject responseObject = new JSONObject(responseEntity.getBody().toString());
-        String projectId = responseObject.getJSONArray("projects").getJSONObject(0).getString("id");
-        log.info("OpenStack project id of project name {} is {}", projectName, projectId);
-
-        return projectId;
+        return responseObject.getJSONArray("projects").getJSONObject(0).getString("id");
     }
 
     public void deleteOpenStackProject(String projectId) {
