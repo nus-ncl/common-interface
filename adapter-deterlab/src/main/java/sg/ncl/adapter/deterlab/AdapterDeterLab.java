@@ -512,8 +512,8 @@ public class AdapterDeterLab {
         return expStatus;
     }
 
-    public String modifyExperiment(String jsonString) {
-        log.info("Modify experiment - {} at {} : {}", properties.getIp(), properties.getPort(), jsonString);
+    public String modifyNSFile(String jsonString) {
+        log.info("Modify experiment ns file - {} at {} : {}", properties.getIp(), properties.getPort(), jsonString);
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
@@ -522,13 +522,13 @@ public class AdapterDeterLab {
         ResponseEntity response;
 
         try {
-            response = restTemplate.exchange(properties.modifyExperiment(), HttpMethod.POST, request, String.class);
+            response = restTemplate.exchange(properties.modifyNSFile(), HttpMethod.POST, request, String.class);
         } catch (Exception e) {
-            log.warn("Adapter error modify experiment: {}", e);
+            log.warn("Adapter error modify experiment ns file: {}", e);
             throw new AdapterConnectionException(e.getMessage());
         }
 
-        log.info("Modify experiment request submitted to deterlab");
+        log.info("Modify experiment ns file request submitted to deterlab");
         String status = new JSONObject(response.getBody().toString()).getString("msg");
         String modifyOutput = new JSONObject(response.getBody().toString()).getString("modify_experiment");
 
@@ -538,7 +538,36 @@ public class AdapterDeterLab {
             throw new ExperimentModifyException(modifyOutput);
         }
 
-        log.info("Modify experiment request success at deterlab");
+        log.info("Modify experiment ns file request success at deterlab");
+        log.debug("Deter response: {}", response.getBody().toString());
+        return status;
+    }
+
+    // modify the experiment settings, such as max duration, etc
+    public String modifyExperimentSettings(String jsonString) {
+        log.info("Modify experiment settings - {} at {} : {}", properties.getIp(), properties.getPort(), jsonString);
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        HttpEntity<String> request = new HttpEntity<>(jsonString, headers);
+
+        ResponseEntity response;
+
+        try {
+            response = restTemplate.exchange(properties.modifyExperimentSettings(), HttpMethod.POST, request, String.class);
+        } catch (Exception e) {
+            log.warn("Adapter error modify experiment settings: {}", e);
+            throw new AdapterConnectionException(e.getMessage());
+        }
+
+        log.info("Modify experiment settings request submitted to deterlab");
+        String status = new JSONObject(response.getBody().toString()).getString("msg");
+
+        if ("modify experiment settings: max_duration fail".equals(status)) {
+            throw new ExperimentModifyException("Please select an appropriate shutdown time.");
+        }
+
+        log.info("Modify experiment settings request success at deterlab");
         log.debug("Deter response: {}", response.getBody().toString());
         return status;
     }

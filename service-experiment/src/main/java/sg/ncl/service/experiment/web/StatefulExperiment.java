@@ -27,6 +27,7 @@ public class StatefulExperiment {
     private ZonedDateTime lastModifiedDate;
     private String state;
     private Integer nodes = 0;
+    private Integer maxDuration = 0;
     private Integer minNodes = 0;
     private Long idleHours = 0L;
     private String details;
@@ -44,6 +45,7 @@ public class StatefulExperiment {
                 ", lastModifiedDate='" + lastModifiedDate + "'" +
                 ", state='" + state + "'" +
                 ", nodes='" + nodes + "'" +
+                ", maxDuration='" + maxDuration + "'" +
                 ", minNodes='" + minNodes + "'" +
                 ", idleHours='" + idleHours + "'" +
                 ", details='" + details + "'}";

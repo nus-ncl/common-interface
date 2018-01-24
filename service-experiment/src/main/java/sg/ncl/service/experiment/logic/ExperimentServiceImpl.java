@@ -385,10 +385,19 @@ public class ExperimentServiceImpl implements ExperimentService {
         jsonObject.put("eid", experiment.getName());
         jsonObject.put("uid", uid);
         jsonObject.put("nsfile", experiment.getNsFileContent());
+        jsonObject.put("maxDuration", experiment.getMaxDuration());
 
-        adapterDeterLab.modifyExperiment(jsonObject.toString());
+        // prevent un-necessary call if no changes are to be made
+        if (!experimentEntity.getNsFileContent().equalsIgnoreCase(experiment.getNsFileContent())) {
+            adapterDeterLab.modifyNSFile(jsonObject.toString());
+            experimentEntity.setNsFileContent(experiment.getNsFileContent());
+        }
 
-        experimentEntity.setNsFileContent(experiment.getNsFileContent());
+        if (!experimentEntity.getMaxDuration().equals(experiment.getMaxDuration())) {
+            adapterDeterLab.modifyExperimentSettings(jsonObject.toString());
+            experimentEntity.setMaxDuration(experiment.getMaxDuration());
+        }
+
         return experimentRepository.save(experimentEntity);
     }
 
@@ -430,6 +439,7 @@ public class ExperimentServiceImpl implements ExperimentService {
                 stateExp.setLastModifiedDate(expEntity.getLastModifiedDate());
                 stateExp.setState(myExperimentState(expDetails.getString("state")));
                 stateExp.setNodes(expDetails.getInt("nodes"));
+                stateExp.setMaxDuration(expEntity.getMaxDuration());
                 stateExp.setMinNodes(expDetails.getInt("min_nodes"));
                 stateExp.setIdleHours(expDetails.getLong("idle_hours"));
                 stateExp.setDetails(expDetails.getString("details"));
@@ -480,6 +490,7 @@ public class ExperimentServiceImpl implements ExperimentService {
         stateExp.setLastModifiedDate(expEntity.getLastModifiedDate());
         stateExp.setState(myExperimentState(expDetails.getString("state")));
         stateExp.setNodes(expDetails.getInt("nodes"));
+        stateExp.setMaxDuration(expEntity.getMaxDuration());
         stateExp.setMinNodes(expDetails.getInt("min_nodes"));
         stateExp.setIdleHours(expDetails.getLong("idle_hours"));
         stateExp.setDetails(expDetails.getString("details"));
