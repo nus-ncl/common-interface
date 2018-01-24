@@ -143,6 +143,10 @@ public class RegistrationServiceImpl implements RegistrationService {
         teamService.addMember(createdTeam.getId(), teamMemberInfo);
         adapterDeterLab.applyProject(mainObject.toString());
 
+        // creating Openstack project/team when an existing user is applying for new team
+        log.info("Starting to create new OpenStack project");
+        adapterOpenStack.createOpenStackProject(team.getName(), team.getDescription());
+
         sendApplyCreateTeamEmail(userService.getUser(nclUserId), createdTeam);
         return null;
     }
