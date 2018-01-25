@@ -4,9 +4,9 @@ server:
   port: 8080
 spring:
   datasource:
-    url: ${jdbc.url:} # e.g., jdbc:mysql://localhost:3306/ncl?useSSL=false
-    username: ${jdbc.username:}
-    password: ${jdbc.password:}
+    url: jdbc:mysql://localhost:3306/prod?useSSL=false #${jdbc.url:} # e.g., jdbc:mysql://localhost:3306/ncl?useSSL=false
+    username: root #${jdbc.username:}
+    password: 13061990 #${jdbc.password:}
   jpa:
     hibernate:
       ddl-auto: validate
@@ -29,9 +29,9 @@ flyway:
   # baseline-version: 1.1
   # baseline-on-migrate: true # for cases when the schema is non-empty and there is no metadata table
   schemas: flyway, prod
-  url: ${db.url:} # e.g., jdbc:mysql://localhost:3306?useSSL=false
-  user: ${db.user:}
-  password: ${db.password:}
+  url: jdbc:mysql://localhost:3306?useSSL=false #${db.url:} # e.g., jdbc:mysql://localhost:3306?useSSL=false
+  user: root #${db.user:}
+  password: 13061990 #${db.password:}
 ncl:
   authentication:
     uri:

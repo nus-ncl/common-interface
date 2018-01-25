@@ -37,9 +37,9 @@ public class AdapterOpenStack {
     private static final String ERROR_ADD_USER_TO_PROJECT = "Error in adding OpenStack user to project: {}";
     private static final String ERROR_ENABLE_PROJECT = "Error in enabling OpenStack project id {}: {}";
     private static final String ERROR_RETRIEVE_USER = "Error in retrieving OpenStack user id from user name {}";
-    private static final String PASSWORD= "password";
-    private static final String ENABLED= "enabled";
-    private static final String PROJECT= "project";
+    private static final String PASSWORD_KEY  = "password";
+    private static final String ENABLED = "enabled";
+    private static final String PROJECT = "project";
     private static final String X_AUTH_TOKEN = "X-Auth-Token";
     private  static final String ERR_CREATE_PROJECT = "Error in creating new OpenStack project {}: {}";
 
@@ -59,18 +59,18 @@ public class AdapterOpenStack {
 
         JSONObject userObject = new JSONObject();
         userObject.put("id", "69a0564a4994458baf70b98aa638c530");
-        userObject.put(PASSWORD, adminPass);
+        userObject.put(PASSWORD_KEY, adminPass);
 
         JSONObject passwordObject = new JSONObject();
         passwordObject.put("user", userObject);
 
         // password array
         JSONArray passwordMethodArray = new JSONArray();
-        passwordMethodArray.put(PASSWORD);
+        passwordMethodArray.put(PASSWORD_KEY);
 
         JSONObject identityObject = new JSONObject();
         identityObject.put("methods", passwordMethodArray);
-        identityObject.put(PASSWORD, passwordObject);
+        identityObject.put(PASSWORD_KEY, passwordObject);
 
         JSONObject projectObject = new JSONObject();
         projectObject.put("id", "f9915a7644a648af8db8ee3d8b821419");
@@ -115,7 +115,7 @@ public class AdapterOpenStack {
         JSONObject userObject = new JSONObject();
         userObject.put(ENABLED, false);
         userObject.put("name", userName);
-        userObject.put(PASSWORD, password);
+        userObject.put(PASSWORD_KEY, password);
         userObject.put("email", userName); // name is email
 
         JSONObject parameters = new JSONObject();
@@ -289,7 +289,7 @@ public class AdapterOpenStack {
 
     public String retrieveOpenStackUserId(String userName) {
         JSONObject parameters =  new JSONObject();
-        parameters.put(ENABLED, "true");
+        parameters.put(ENABLED, true);
         parameters.put("name", userName);
 
         log.info("Request OpenStack token to retrieve OpenStack user id");
@@ -303,7 +303,7 @@ public class AdapterOpenStack {
         ResponseEntity responseEntity;
 
         try {
-            responseEntity = restTemplate.exchange(properties.listUserUrl(userName), HttpMethod.GET, request, String.class);
+            responseEntity = restTemplate.exchange(properties.listUserUrl(), HttpMethod.GET, request, String.class);
             log.info("Successfully retrieving OpenStack user id from user name {}", userName);
         } catch (ResourceAccessException e) {
             log.warn(ERROR_RETRIEVE_USER, userName, e.getMessage());
@@ -325,7 +325,7 @@ public class AdapterOpenStack {
 
     public String retrieveOpenStackProjectId(String projectName) {
         JSONObject parameters =  new JSONObject();
-        parameters.put(ENABLED, "true");
+        parameters.put(ENABLED, true);
         parameters.put("name", projectName);
 
         log.info("Request OpenStack token to retrieve OpenStack user id");
@@ -339,7 +339,7 @@ public class AdapterOpenStack {
         ResponseEntity responseEntity;
 
         try {
-            responseEntity = restTemplate.exchange(properties.listProjectUrl(projectName), HttpMethod.GET, request, String.class);
+            responseEntity = restTemplate.exchange(properties.listProjectUrl(), HttpMethod.GET, request, String.class);
             log.info("Successfully retrieving OpenStack project id from project name {}", projectName);
         } catch (ResourceAccessException e) {
             log.warn("Error in retrieving OpenStack project id from project name {}", projectName, e.getMessage());

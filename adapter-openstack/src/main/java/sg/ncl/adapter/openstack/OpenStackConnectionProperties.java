@@ -15,7 +15,7 @@ import static sg.ncl.adapter.openstack.OpenStackConnectionProperties.PREFIX;
 public class OpenStackConnectionProperties {
     private static final String HTTP_MODE = "http://";
     public static final String PREFIX = "ncl.openstack.adapter";
-    private static final String PROJECT_ENdPOINT = "/v3/projects/";
+    private static final String PROJECT_ENDPOINT = "/v3/projects/";
 
     private String ip;
     private String identityPort;
@@ -33,8 +33,8 @@ public class OpenStackConnectionProperties {
         return HTTP_MODE + ip + ":" + identityPort + "/v3/users/" + userId;
     }
 
-    public String listUserUrl(String userName) {
-        return HTTP_MODE + ip + ":" + identityPort + "/v3/users?name=" + userName;
+    public String listUserUrl() {
+        return HTTP_MODE + ip + ":" + identityPort + "/v3/users";
     }
 
     public String createProjectUrl() {
@@ -42,20 +42,20 @@ public class OpenStackConnectionProperties {
     }
 
     public String updateProjectUrl(String projectId) {
-        return HTTP_MODE + ip + ":" + identityPort + PROJECT_ENdPOINT + projectId;
+        return HTTP_MODE + ip + ":" + identityPort + PROJECT_ENDPOINT + projectId;
     }
 
 
-    public String listProjectUrl(String userProject) {
-        return HTTP_MODE + ip + ":" + identityPort + "/v3/projects?name=" + userProject;
+    public String listProjectUrl() {
+        return HTTP_MODE + ip + ":" + identityPort + "/v3/projects";
     }
 
     public String deleteProject(String projectId) {
-        return HTTP_MODE + ip + ":" + identityPort + PROJECT_ENdPOINT + projectId;
+        return HTTP_MODE + ip + ":" + identityPort + PROJECT_ENDPOINT + projectId;
     }
 
     public String addUserToProjectUrl(String userId, String projectId) {
-        return HTTP_MODE + ip + ":" + identityPort + PROJECT_ENdPOINT + projectId + "/users/"
+        return HTTP_MODE + ip + ":" + identityPort + PROJECT_ENDPOINT + projectId + "/users/"
                 + userId + "/roles/" + userRoleId;
     }
 }
