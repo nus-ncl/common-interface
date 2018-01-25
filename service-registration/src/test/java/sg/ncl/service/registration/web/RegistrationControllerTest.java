@@ -3,12 +3,14 @@ package sg.ncl.service.registration.web;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import org.apache.commons.lang3.RandomStringUtils;
+import org.json.JSONArray;
 import org.json.JSONObject;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.*;
+import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.web.client.MockRestServiceServer;
 import org.springframework.test.web.servlet.MockMvc;
@@ -19,12 +21,14 @@ import org.springframework.web.context.WebApplicationContext;
 import sg.ncl.adapter.deterlab.AdapterDeterLab;
 import sg.ncl.adapter.deterlab.ConnectionProperties;
 
+import sg.ncl.adapter.openstack.OpenStackConnectionProperties;
 import sg.ncl.service.registration.AbstractTest;
 import sg.ncl.service.registration.Util;
 import sg.ncl.service.registration.serializers.DateTimeDeserializer;
 import sg.ncl.service.registration.serializers.DateTimeSerializer;
 import sg.ncl.service.team.domain.*;
 import sg.ncl.service.team.web.TeamMemberInfo;
+import sg.ncl.service.user.data.jpa.UserEntity;
 import sg.ncl.service.user.domain.User;
 import sg.ncl.service.user.domain.UserService;
 
@@ -33,8 +37,10 @@ import java.time.ZonedDateTime;
 import java.util.List;
 
 import static org.hamcrest.core.Is.is;
+import static org.mockito.Matchers.anyString;
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.method;
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.requestTo;
+import static org.springframework.test.web.client.response.MockRestResponseCreators.withStatus;
 import static org.springframework.test.web.client.response.MockRestResponseCreators.withSuccess;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -53,6 +59,9 @@ public class RegistrationControllerTest extends AbstractTest {
 
     @Inject
     private ConnectionProperties properties;
+
+    @Inject
+    private OpenStackConnectionProperties openStackProperties;
 
     @Inject
     private TeamService teamService;
@@ -115,7 +124,7 @@ public class RegistrationControllerTest extends AbstractTest {
                 .andExpect(status().isAccepted());
     }
 
-    /*
+/*
     @Test
     public void approveTeam() throws Exception {
         Team teamEntity = Util.getTeamEntity();
@@ -136,18 +145,13 @@ public class RegistrationControllerTest extends AbstractTest {
         httpHeaders.setContentType(MediaType.APPLICATION_JSON);
         String randomToken = RandomStringUtils.randomAlphabetic(8);
         httpHeaders.set("X-Subject-Token", randomToken);
-        mockServer.expect(requestTo(openStackConnectionProperties.requestTokenUrl()))
+        mockServer.expect(requestTo(openStackProperties.requestTokenUrl()))
                 .andExpect(method(HttpMethod.POST))
                 .andRespond(withSuccess().headers(httpHeaders));
 
-        //mockServer.expect(requestTo(openStackConnectionProperties.listUserUrl(anyString())))
-        //        .andExpect(method(HttpMethod.GET))
-        //        .andRespond(withStatus(HttpStatus.OK));
-        when(adapterOpenStack.retrieveOpenStackUserId(anyString())).thenReturn("abc");
-
-        //mockOpenStackServer.expect(requestTo(openStackConnectionProperties.createUserUrl()))
-       //         .andExpect(method(HttpMethod.POST))
-       //         .andRespond(withStatus(HttpStatus.OK));
+        mockServer.expect(requestTo(openStackProperties.updateUserUrl(anyString())))
+                .andExpect(method(HttpMethod.PATCH))
+                .andRespond(withStatus(HttpStatus.OK));
 
         String randomUserId = RandomStringUtils.randomAlphabetic(8);
         JSONObject idObject = new JSONObject();
@@ -156,16 +160,12 @@ public class RegistrationControllerTest extends AbstractTest {
         userArray.put(idObject);
         JSONObject responseObject = new JSONObject();
         responseObject.put("users", userArray);
-        mockOpenStackServer.expect(requestTo(openStackConnectionProperties.listUserUrl(anyString())))
+        mockServer.expect(requestTo(openStackProperties.listUserUrl()))
                 .andExpect(method(HttpMethod.GET))
-                .andRespond(withSuccess(responseObject.toString(), MediaType.APPLICATION_JSON));
-
-        mockOpenStackServer.expect(requestTo(openStackConnectionProperties.createProjectUrl()))
-                .andExpect(method(HttpMethod.POST))
-                .andRespond(withStatus(HttpStatus.OK));
+                .andRespond(withSuccess().body(responseObject.toString()));
 
 
-        mockServer.expect(requestTo(properties.getApproveProject())
+        mockServer.expect(requestTo(properties.getApproveProject()))
                 .andExpect(method(HttpMethod.POST))
                 .andRespond(withStatus(HttpStatus.OK)
                         .contentType(MediaType.APPLICATION_JSON));

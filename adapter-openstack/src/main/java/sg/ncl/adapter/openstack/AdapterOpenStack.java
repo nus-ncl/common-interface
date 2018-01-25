@@ -289,7 +289,7 @@ public class AdapterOpenStack {
 
     public String retrieveOpenStackUserId(String userName) {
         JSONObject parameters =  new JSONObject();
-        parameters.put(ENABLED, true);
+        parameters.put(ENABLED, false);  // to filter
         parameters.put("name", userName);
 
         log.info("Request OpenStack token to retrieve OpenStack user id");
@@ -325,7 +325,7 @@ public class AdapterOpenStack {
 
     public String retrieveOpenStackProjectId(String projectName) {
         JSONObject parameters =  new JSONObject();
-        parameters.put(ENABLED, true);
+        parameters.put(ENABLED, false);
         parameters.put("name", projectName);
 
         log.info("Request OpenStack token to retrieve OpenStack user id");
