@@ -33,4 +33,9 @@ ncl:
     adapter:
       ip: localhost
       port: 8181
+  openstack:
+    adapter:
+      ip: localhost
+      identity_port: 5151
+      user_role_id: ab96b98f07be4073a3ee9794d6a1bd2c
   domain: dev.ncl.sg

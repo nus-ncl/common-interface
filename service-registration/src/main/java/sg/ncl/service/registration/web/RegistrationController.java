@@ -81,18 +81,6 @@ public class RegistrationController {
         return registrationService.rejectJoinRequest(teamId, userId, registrationInfo.getUser());
     }
 
-    @PostMapping(path = "/teams/{teamId}/members/{userId}/openstack")
-    @ResponseStatus(HttpStatus.ACCEPTED)
-    public String approveOpenStackJoinRequest(@PathVariable String teamId, @PathVariable String userId, @RequestBody RegistrationInfo registrationInfo) {
-        return registrationService.approveJoinRequest(teamId, userId, registrationInfo.getUser());
-    }
-
-    @DeleteMapping(path = "/teams/{teamId}/members/{userId}/openstack")
-    @ResponseStatus(HttpStatus.ACCEPTED)
-    public String rejectOpenStackJoinRequest(@PathVariable String teamId, @PathVariable String userId, @RequestBody RegistrationInfo registrationInfo) {
-        return registrationService.rejectJoinRequest(teamId, userId, registrationInfo.getUser());
-    }
-
     @PostMapping(path = "/teams/{teamId}/owner/{ownerId}", params = {"status"})
     // FIXME: the path is wrong, there should not be multiple paths for different registrations
     @ResponseStatus(HttpStatus.OK)
@@ -101,7 +89,6 @@ public class RegistrationController {
         // else trust level is always none
         return registrationService.approveOrRejectNewTeam(teamId, ownerId, teamStatus, reason);
     }
-
 
     @GetMapping(path = "/user/{id}")
     @ResponseStatus(HttpStatus.OK)

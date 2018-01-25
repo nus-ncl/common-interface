@@ -13,7 +13,7 @@ import sg.ncl.common.jpa.UseJpa;
 
 @Configuration
 @ComponentScan
-@EnableConfigurationProperties(ConnectionProperties.class)
+@EnableConfigurationProperties(OpenStackConnectionProperties.class)
 @UseJpa
 public class OpenStackAutoConfiguration {
     @Bean

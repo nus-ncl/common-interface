@@ -45,7 +45,6 @@ ncl:
       '/datasets/public/users/(\w|-)+': GET # for retrieving public download user info
       '/images/global': GET # for retrieving list of global images
       '/registrations': POST # for apply/join new teams
-      '/registrations/openstack': POST
       '/users/(\w|-)+': GET # for retrieving public teams' owner info
       '/registrations/users/(\w|-)+/emails/\w+=*': PUT # for email verifications
       '/teams\?visibility=PUBLIC': GET # for retrieving public teams

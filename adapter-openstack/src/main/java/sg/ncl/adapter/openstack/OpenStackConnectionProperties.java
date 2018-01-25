@@ -4,7 +4,7 @@ import lombok.Getter;
 import lombok.Setter;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
-import static sg.ncl.adapter.openstack.ConnectionProperties.PREFIX;
+import static sg.ncl.adapter.openstack.OpenStackConnectionProperties.PREFIX;
 
 /**
  * Author: Tran Ly Vu
@@ -12,47 +12,47 @@ import static sg.ncl.adapter.openstack.ConnectionProperties.PREFIX;
 @ConfigurationProperties(prefix = PREFIX)
 @Getter
 @Setter
-public class ConnectionProperties {
+public class OpenStackConnectionProperties {
     private static final String HTTP_MODE = "http://";
     public static final String PREFIX = "ncl.openstack.adapter";
     private String ip;
     private String identity_port;
     private String user_role_id;
 
-    protected String requestTokenUrl() {
+    public String requestTokenUrl() {
         return HTTP_MODE + ip + ":" + identity_port + "/v3/auth/tokens";
     }
 
-    protected String createUserUrl() {
+    public String createUserUrl() {
         return HTTP_MODE + ip + ":" + identity_port + "/v3/users";
     }
 
-    protected String updateUserUrl(String userId) {
+    public String updateUserUrl(String userId) {
         return HTTP_MODE + ip + ":" + identity_port + "/v3/users/" + userId;
     }
 
-    protected String listUserUrl(String userName) {
+    public String listUserUrl(String userName) {
         return HTTP_MODE + ip + ":" + identity_port + "/v3/users?name=" + userName;
     }
 
-    protected String createProjectUrl() {
+    public String createProjectUrl() {
         return HTTP_MODE + ip + ":" + identity_port + "/v3/projects";
     }
 
-    protected String updateProjectUrl(String projectId) {
+    public String updateProjectUrl(String projectId) {
         return HTTP_MODE + ip + ":" + identity_port + "/v3/projects/" + projectId;
     }
 
 
-    protected String listProjectUrl(String userProject) {
+    public String listProjectUrl(String userProject) {
         return HTTP_MODE + ip + ":" + identity_port + "/v3/projects?name=" + userProject;
     }
 
-    protected String deleteProject(String projectId) {
+    public String deleteProject(String projectId) {
         return HTTP_MODE + ip + ":" + identity_port + "/v3/projects/" + projectId;
     }
 
-    protected String addUserToProjectUrl(String userId, String projectId) {
+    public String addUserToProjectUrl(String userId, String projectId) {
         return HTTP_MODE + ip + ":" + identity_port + "/v3/projects/" + projectId + "/users/"
                 + userId + "/roles/" + user_role_id;
     }

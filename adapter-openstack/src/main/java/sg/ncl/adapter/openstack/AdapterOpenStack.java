@@ -22,10 +22,10 @@ import javax.inject.Inject;
 public class AdapterOpenStack {
 
     private RestTemplate restTemplate;
-    private ConnectionProperties properties;
+    private OpenStackConnectionProperties properties;
 
     @Inject
-    public AdapterOpenStack(ConnectionProperties properties, RestTemplate restTemplate) {
+    public AdapterOpenStack(OpenStackConnectionProperties properties, RestTemplate restTemplate) {
         this.properties = properties;
         this.restTemplate = restTemplate;
         //somehow spring does not work with PATCH => the following solution is found on stackoverflow
@@ -33,7 +33,7 @@ public class AdapterOpenStack {
         restTemplate.setRequestFactory(requestFactory);
     }
 
-    private String requestToken () {
+    public String requestToken () {
 
         JSONObject userObject = new JSONObject();
         userObject.put("id", "69a0564a4994458baf70b98aa638c530");

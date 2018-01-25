@@ -3,11 +3,13 @@ package sg.ncl.service.registration.web;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import org.apache.commons.lang3.RandomStringUtils;
+import org.hamcrest.Matchers;
 import org.json.JSONObject;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.TestPropertySource;
@@ -19,6 +21,9 @@ import org.springframework.web.client.RestTemplate;
 import org.springframework.web.context.WebApplicationContext;
 import sg.ncl.adapter.deterlab.AdapterDeterLab;
 import sg.ncl.adapter.deterlab.ConnectionProperties;
+
+import sg.ncl.adapter.openstack.AdapterOpenStack;
+import sg.ncl.adapter.openstack.OpenStackConnectionProperties;
 import sg.ncl.service.registration.AbstractTest;
 import sg.ncl.service.registration.Util;
 import sg.ncl.service.registration.serializers.DateTimeDeserializer;
@@ -34,6 +39,10 @@ import java.time.ZonedDateTime;
 import java.util.List;
 
 import static org.hamcrest.core.Is.is;
+import static org.junit.Assert.assertThat;
+import static org.mockito.Matchers.anyString;
+import static org.mockito.Mockito.mockingDetails;
+import static org.mockito.Mockito.when;
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.method;
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.requestTo;
 import static org.springframework.test.web.client.response.MockRestResponseCreators.withSuccess;
@@ -56,6 +65,9 @@ public class RegistrationControllerTest extends AbstractTest {
     private ConnectionProperties properties;
 
     @Inject
+    private OpenStackConnectionProperties openStackConnectionProperties;
+
+    @Inject
     private TeamService teamService;
 
     @Inject
@@ -64,6 +76,9 @@ public class RegistrationControllerTest extends AbstractTest {
     @Inject
     private AdapterDeterLab adapterDeterLab;
 
+    @Inject
+    private AdapterOpenStack adapterOpenStack;
+
     @Autowired
     private RestOperations restOperations;
 
@@ -71,8 +86,11 @@ public class RegistrationControllerTest extends AbstractTest {
 
     @Before
     public void setUp() throws Exception {
+
         mockMvc = webAppContextSetup(webApplicationContext).build();
         mockServer = MockRestServiceServer.createServer((RestTemplate) restOperations);
+        assertThat(mockingDetails(adapterOpenStack).isMock(), Matchers.is(true));
+
     }
 
     @Test
@@ -129,12 +147,15 @@ public class RegistrationControllerTest extends AbstractTest {
         JSONObject predefinedResultJson = new JSONObject();
         predefinedResultJson.put("msg", "approve project OK");
 
+
         mockServer.expect(requestTo(properties.getApproveProject()))
                 .andExpect(method(HttpMethod.POST))
                 .andRespond(withSuccess(predefinedResultJson.toString(), MediaType.APPLICATION_JSON));
 
         String deterUserIdOne = RandomStringUtils.randomAlphabetic(8);
         adapterDeterLab.saveDeterUserIdMapping(deterUserIdOne, owner.getUserId());
+
+        when(adapterOpenStack.requestToken()).thenReturn("abc");
 
         mockMvc.perform(post("/registrations/teams/" + team.getId() + "/owner/" + owner.getUserId() + "?status=" + TeamStatus.APPROVED))
                 .andExpect(status().isOk());

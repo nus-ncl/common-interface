@@ -556,7 +556,6 @@ public class RegistrationServiceImpl implements RegistrationService {
         User user = userService.getUser(uid);
         if (user.isEmailVerified()) {
             String userEmail = user.getUserDetails().getEmail();
-            log.info("User email {} has already been verified, start to enable OpenStack user", userEmail);
             return false;
         }
 
