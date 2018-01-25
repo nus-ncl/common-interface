@@ -37,7 +37,7 @@ public class AdapterOpenStack {
     private static final String ERROR_ADD_USER_TO_PROJECT = "Error in adding OpenStack user to project: {}";
     private static final String ERROR_ENABLE_PROJECT = "Error in enabling OpenStack project id {}: {}";
     private static final String ERROR_RETRIEVE_USER = "Error in retrieving OpenStack user id from user name {}";
-    private static final String PASSWORD_KEY  = "password";
+    private static final String PASS  = "password";
     private static final String ENABLED = "enabled";
     private static final String PROJECT = "project";
     private static final String X_AUTH_TOKEN = "X-Auth-Token";
@@ -61,18 +61,18 @@ public class AdapterOpenStack {
 
         JSONObject userObject = new JSONObject();
         userObject.put("id", adminId);
-        userObject.put(PASSWORD_KEY, adminPass);
+        userObject.put(PASS, adminPass);
 
         JSONObject passwordObject = new JSONObject();
         passwordObject.put("user", userObject);
 
         // password array
         JSONArray passwordMethodArray = new JSONArray();
-        passwordMethodArray.put(PASSWORD_KEY);
+        passwordMethodArray.put(PASS);
 
         JSONObject identityObject = new JSONObject();
         identityObject.put("methods", passwordMethodArray);
-        identityObject.put(PASSWORD_KEY, passwordObject);
+        identityObject.put(PASS, passwordObject);
 
         JSONObject projectObject = new JSONObject();
         projectObject.put("id", adminProject);
@@ -117,7 +117,7 @@ public class AdapterOpenStack {
         JSONObject userObject = new JSONObject();
         userObject.put(ENABLED, false);
         userObject.put("name", userName);
-        userObject.put(PASSWORD_KEY, password);
+        userObject.put(PASS, password);
         userObject.put("email", userName); // name is email
 
         JSONObject parameters = new JSONObject();
