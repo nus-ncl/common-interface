@@ -69,6 +69,7 @@ ncl:
       identityPort: 5000
       userRoleId: ab96b98f07be4073a3ee9794d6a1bd2c
       adminPass: adminpass
+      adminId: 69a0564a4994458baf70b98aa638c530
   jwt:
     api-key: ${jwt.key:}
     signing-algorithm: HS512

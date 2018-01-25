@@ -44,6 +44,7 @@ public class AdapterOpenStack {
     private  static final String ERR_CREATE_PROJECT = "Error in creating new OpenStack project {}: {}";
 
     private String adminPass;
+    private String adminId;
 
 
     @Inject
@@ -58,7 +59,7 @@ public class AdapterOpenStack {
     public String requestToken () {
 
         JSONObject userObject = new JSONObject();
-        userObject.put("id", "69a0564a4994458baf70b98aa638c530");
+        userObject.put("id", adminId);
         userObject.put(PASSWORD_KEY, adminPass);
 
         JSONObject passwordObject = new JSONObject();
