@@ -15,45 +15,47 @@ import static sg.ncl.adapter.openstack.OpenStackConnectionProperties.PREFIX;
 public class OpenStackConnectionProperties {
     private static final String HTTP_MODE = "http://";
     public static final String PREFIX = "ncl.openstack.adapter";
+    private static final String PROJECT_ENdPOINT = "/v3/projects/";
+
     private String ip;
-    private String identity_port;
-    private String user_role_id;
+    private String identityPort;
+    private String userRoleId;
 
     public String requestTokenUrl() {
-        return HTTP_MODE + ip + ":" + identity_port + "/v3/auth/tokens";
+        return HTTP_MODE + ip + ":" + identityPort + "/v3/auth/tokens";
     }
 
     public String createUserUrl() {
-        return HTTP_MODE + ip + ":" + identity_port + "/v3/users";
+        return HTTP_MODE + ip + ":" + identityPort + "/v3/users";
     }
 
     public String updateUserUrl(String userId) {
-        return HTTP_MODE + ip + ":" + identity_port + "/v3/users/" + userId;
+        return HTTP_MODE + ip + ":" + identityPort + "/v3/users/" + userId;
     }
 
     public String listUserUrl(String userName) {
-        return HTTP_MODE + ip + ":" + identity_port + "/v3/users?name=" + userName;
+        return HTTP_MODE + ip + ":" + identityPort + "/v3/users?name=" + userName;
     }
 
     public String createProjectUrl() {
-        return HTTP_MODE + ip + ":" + identity_port + "/v3/projects";
+        return HTTP_MODE + ip + ":" + identityPort + "/v3/projects";
     }
 
     public String updateProjectUrl(String projectId) {
-        return HTTP_MODE + ip + ":" + identity_port + "/v3/projects/" + projectId;
+        return HTTP_MODE + ip + ":" + identityPort + PROJECT_ENdPOINT + projectId;
     }
 
 
     public String listProjectUrl(String userProject) {
-        return HTTP_MODE + ip + ":" + identity_port + "/v3/projects?name=" + userProject;
+        return HTTP_MODE + ip + ":" + identityPort + "/v3/projects?name=" + userProject;
     }
 
     public String deleteProject(String projectId) {
-        return HTTP_MODE + ip + ":" + identity_port + "/v3/projects/" + projectId;
+        return HTTP_MODE + ip + ":" + identityPort + PROJECT_ENdPOINT + projectId;
     }
 
     public String addUserToProjectUrl(String userId, String projectId) {
-        return HTTP_MODE + ip + ":" + identity_port + "/v3/projects/" + projectId + "/users/"
-                + userId + "/roles/" + user_role_id;
+        return HTTP_MODE + ip + ":" + identityPort + PROJECT_ENdPOINT + projectId + "/users/"
+                + userId + "/roles/" + userRoleId;
     }
 }
