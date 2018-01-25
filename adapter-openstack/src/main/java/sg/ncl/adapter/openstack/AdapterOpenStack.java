@@ -45,6 +45,7 @@ public class AdapterOpenStack {
 
     private String adminPass;
     private String adminId;
+    private String adminProject;
 
 
     @Inject
@@ -74,7 +75,7 @@ public class AdapterOpenStack {
         identityObject.put(PASSWORD_KEY, passwordObject);
 
         JSONObject projectObject = new JSONObject();
-        projectObject.put("id", "f9915a7644a648af8db8ee3d8b821419");
+        projectObject.put("id", adminProject);
 
         JSONObject scopeObject = new JSONObject();
         scopeObject.put(PROJECT, projectObject);

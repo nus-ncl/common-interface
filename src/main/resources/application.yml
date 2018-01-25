@@ -70,6 +70,7 @@ ncl:
       userRoleId: ab96b98f07be4073a3ee9794d6a1bd2c
       adminPass: adminpass
       adminId: 69a0564a4994458baf70b98aa638c530
+      adminProject: f9915a7644a648af8db8ee3d8b821419
   jwt:
     api-key: ${jwt.key:}
     signing-algorithm: HS512
