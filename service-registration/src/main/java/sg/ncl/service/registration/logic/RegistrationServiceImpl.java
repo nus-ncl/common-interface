@@ -555,7 +555,7 @@ public class RegistrationServiceImpl implements RegistrationService {
     public boolean verifyEmail(@NotNull String uid, @NotNull String email, @NotNull String key) {
         User user = userService.getUser(uid);
         if (user.isEmailVerified()) {
-            String userEmail = user.getUserDetails().getEmail();
+            log.warn("User email {} has already been verified.", user.getUserDetails().getEmail());
             return false;
         }
 

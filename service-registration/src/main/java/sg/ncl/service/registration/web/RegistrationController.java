@@ -9,7 +9,6 @@ import sg.ncl.service.registration.domain.Registration;
 import sg.ncl.service.registration.domain.RegistrationService;
 import sg.ncl.service.team.domain.TeamStatus;
 import sg.ncl.service.user.web.VerificationKeyInfo;
-
 import javax.inject.Inject;
 import javax.validation.constraints.NotNull;
 import java.util.HashMap;

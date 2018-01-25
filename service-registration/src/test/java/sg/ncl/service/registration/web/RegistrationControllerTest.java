@@ -19,15 +19,12 @@ import org.springframework.web.context.WebApplicationContext;
 import sg.ncl.adapter.deterlab.AdapterDeterLab;
 import sg.ncl.adapter.deterlab.ConnectionProperties;
 
-import sg.ncl.adapter.openstack.AdapterOpenStack;
-import sg.ncl.adapter.openstack.OpenStackConnectionProperties;
 import sg.ncl.service.registration.AbstractTest;
 import sg.ncl.service.registration.Util;
 import sg.ncl.service.registration.serializers.DateTimeDeserializer;
 import sg.ncl.service.registration.serializers.DateTimeSerializer;
 import sg.ncl.service.team.domain.*;
 import sg.ncl.service.team.web.TeamMemberInfo;
-import sg.ncl.service.user.data.jpa.UserEntity;
 import sg.ncl.service.user.domain.User;
 import sg.ncl.service.user.domain.UserService;
 
@@ -36,11 +33,8 @@ import java.time.ZonedDateTime;
 import java.util.List;
 
 import static org.hamcrest.core.Is.is;
-import static org.mockito.Matchers.anyString;
-import static org.mockito.Mockito.when;
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.method;
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.requestTo;
-import static org.springframework.test.web.client.response.MockRestResponseCreators.withStatus;
 import static org.springframework.test.web.client.response.MockRestResponseCreators.withSuccess;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -61,9 +55,6 @@ public class RegistrationControllerTest extends AbstractTest {
     private ConnectionProperties properties;
 
     @Inject
-    private OpenStackConnectionProperties openStackConnectionProperties;
-
-    @Inject
     private TeamService teamService;
 
     @Inject
@@ -71,9 +62,6 @@ public class RegistrationControllerTest extends AbstractTest {
 
     @Inject
     private AdapterDeterLab adapterDeterLab;
-
-    @Inject
-    private AdapterOpenStack adapterOpenStack;
 
     @Autowired
     private RestOperations restOperations;
