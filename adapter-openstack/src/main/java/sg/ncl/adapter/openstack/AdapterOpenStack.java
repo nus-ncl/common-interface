@@ -287,9 +287,9 @@ public class AdapterOpenStack {
         }
     }
 
-    public String retrieveOpenStackUserId(String userName) {
+    public String retrieveOpenStackUserId(String userName, boolean isEnabled) {
         JSONObject parameters =  new JSONObject();
-        parameters.put(ENABLED, false);  // to filter
+        parameters.put(ENABLED, isEnabled); //for stronger filter
         parameters.put("name", userName);
 
         log.info("Request OpenStack token to retrieve OpenStack user id");
@@ -323,9 +323,9 @@ public class AdapterOpenStack {
         return responseObject.getJSONArray("users").getJSONObject(0).getString("id");
     }
 
-    public String retrieveOpenStackProjectId(String projectName) {
+    public String retrieveOpenStackProjectId(String projectName, boolean isEnabled) {
         JSONObject parameters =  new JSONObject();
-        parameters.put(ENABLED, false);
+        parameters.put(ENABLED, isEnabled);  // for stronger filter
         parameters.put("name", projectName);
 
         log.info("Request OpenStack token to retrieve OpenStack user id");
