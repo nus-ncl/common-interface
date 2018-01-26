@@ -316,15 +316,22 @@ public class AdapterOpenStack {
         }
 
         JSONObject responseObject = new JSONObject(responseEntity.getBody().toString());
-        if (responseObject.getJSONArray(USERS_KEY).length() < 1) {
-            log.warn(ERROR_RETRIEVE_USER_ID, userName);
-            throw new OpenStackUserNotFoundException("OpenStack user " + userName + " not found");
-        } else if (responseObject.getJSONArray(USERS_KEY).length() > 1) {
-            log.warn(ERROR_RETRIEVE_USER_ID, userName);
-            throw new OpenStackDuplicateUserException("More than 1 OpenStack user with same name " + userName + " found");
-        } else {
-            return responseObject.getJSONArray(USERS_KEY).getJSONObject(0).getString("id");
+        try {
+            JSONArray userArray = responseObject.getJSONArray(USERS_KEY);
+            if (userArray.length() < 1) {
+                log.warn(ERROR_RETRIEVE_USER_ID, userName);
+                throw new OpenStackUserNotFoundException("OpenStack user " + userName + " not found");
+            } else if (userArray.length() > 1) {
+                log.warn(ERROR_RETRIEVE_USER_ID, userName);
+                throw new OpenStackDuplicateUserException("More than 1 OpenStack user with same name " + userName + " found");
+            } else {
+                return responseObject.getJSONArray(USERS_KEY).getJSONObject(0).getString("id");
+            }
+        } catch (JSONException e) {
+            log.warn("Error in retrieving OpenStack user id from user name {}:cant retrieve user array from OpenStack", userName);
+            throw e;
         }
+
     }
 
     public String retrieveOpenStackProjectId(String projectName) {
@@ -359,15 +366,22 @@ public class AdapterOpenStack {
         }
 
         JSONObject responseObject = new JSONObject(responseEntity.getBody().toString());
-        if (responseObject.getJSONArray(PROJECTS_KEY).length() < 1) {
-            log.warn(ERROR_RETRIEVE_PROJECT_ID, projectName);
-            throw new OpenStackProjectNotFoundException("OpenStack project " + projectName + " not found");
-        }  else if (responseObject.getJSONArray(PROJECTS_KEY).length() > 1) {
-            log.warn(ERROR_RETRIEVE_PROJECT_ID, projectName);
-            throw new OpenStackDuplicateProjectException("More than 1 OpenStack project with same name " + projectName + " found");
-        } else {
-            return responseObject.getJSONArray(PROJECTS_KEY).getJSONObject(0).getString("id");
+        try {
+            JSONArray projectIdJsonArray = responseObject.getJSONArray(PROJECTS_KEY);
+            if (projectIdJsonArray.length() < 1) {
+                log.warn(ERROR_RETRIEVE_PROJECT_ID, projectName);
+                throw new OpenStackProjectNotFoundException("OpenStack project " + projectName + " not found");
+            }  else if (projectIdJsonArray.length() > 1) {
+                log.warn(ERROR_RETRIEVE_PROJECT_ID, projectName);
+                throw new OpenStackDuplicateProjectException("More than 1 OpenStack project with same name " + projectName + " found");
+            } else {
+                return responseObject.getJSONArray(PROJECTS_KEY).getJSONObject(0).getString("id");
+            }
+        } catch (JSONException e){
+            log.warn(ERROR_RETRIEVE_PROJECT_ID + ": project array cant be retrieve from OpenStack", projectName);
+            throw e;
         }
+
     }
 
     public void deleteOpenStackProject(String projectId) {
@@ -427,10 +441,17 @@ public class AdapterOpenStack {
         }
 
         JSONObject responseObject = new JSONObject(responseEntity.getBody().toString());
-         if (responseObject.getJSONArray(PROJECTS_KEY).length() > 0) {
-            log.warn(ERROR_CHECK_IF_PROJECT_EXIST, projectName);
-            throw new OpenStackDuplicateProjectException("OpenStack project with name " + projectName + " already exists");
+        try{
+            JSONArray projectJsonArray = responseObject.getJSONArray(PROJECTS_KEY);
+            if (projectJsonArray.length() > 0) {
+                log.warn(ERROR_CHECK_IF_PROJECT_EXIST, projectName);
+                throw new OpenStackDuplicateProjectException("OpenStack project with name " + projectName + " already exists");
+            }
+        } catch (JSONException e) {
+            log.warn("Error in checking if project name {} already exists: project array cant be retrieve from OpenStack", projectName);
+            throw e;
         }
+
     }
 
     public void isUserNameAlreadyExist(String userName) {
@@ -445,7 +466,7 @@ public class AdapterOpenStack {
         ResponseEntity responseEntity;
 
         try {
-            responseEntity = restTemplate.exchange(properties.listProjectUrl(userName), HttpMethod.GET, request, String.class);
+            responseEntity = restTemplate.exchange(properties.listUserUrl(userName), HttpMethod.GET, request, String.class);
             log.info("Successfully retrieving OpenStack user id from user name {} to check if project name already exists", userName);
         } catch (ResourceAccessException e) {
             log.warn(ERROR_CHECK_IF_USER_EXIST, userName, e.getMessage());
@@ -462,9 +483,15 @@ public class AdapterOpenStack {
         }
 
         JSONObject responseObject = new JSONObject(responseEntity.getBody().toString());
-        if (responseObject.getJSONArray(USERS_KEY).length() > 0) {
-            log.warn(ERROR_CHECK_IF_USER_EXIST, userName);
-            throw new OpenStackDuplicateUserException("OpenStack user with name " + userName+ " already exists");
+        try{
+            JSONArray usersJsonArray = responseObject.getJSONArray(USERS_KEY);
+            if (usersJsonArray.length() > 0) {
+                log.warn(ERROR_CHECK_IF_USER_EXIST, userName);
+                throw new OpenStackDuplicateUserException("OpenStack user with name " + userName+ " already exists");
+            }
+        } catch (JSONException e) {
+            log.warn("Error in checking if user name {} already exists: user array cant be retrieve from OpenStack", userName);
+            throw e;
         }
     }
 }
