@@ -31,22 +31,23 @@ public class AdapterOpenStack {
 
     private RestTemplate restTemplate;
     private OpenStackConnectionProperties properties;
+
     private static final String ERROR_CREATE_USER = "Error in creating new OpenStack user {}: {}";
+    private  static final String ERR_CREATE_PROJECT = "Error in creating new OpenStack project {}: {}";
     private static final String ERROR_ENABLE_USER = "Error in enabling OpenStack user id {}: {}";
-    private static final String ERROR_ADD_USER_TO_PROJECT = "Error in adding OpenStack user to project: {}";
     private static final String ERROR_ENABLE_PROJECT = "Error in enabling OpenStack project id {}: {}";
+    private static final String ERROR_ADD_USER_TO_PROJECT = "Error in adding OpenStack user to project: {}";
     private static final String ERROR_RETRIEVE_USER_ID = "Error in retrieving OpenStack user id from user name {}";
+    private static final String ERROR_RETRIEVE_PROJECT_ID = "Error in retrieving OpenStack project id from project name {}";
     private static final String ERROR_CHECK_IF_USER_EXIST = "Error in checking if user name {} already exists";
     private static final String ERROR_CHECK_IF_PROJECT_EXIST = "Error in checking if project name {} already exists";
     private static final String ERROR_DELETE_PROJECT_ID = "Error in deleting OpenStack project id {}: {}";
-    private static final String ERROR_RETRIEVE_PROJECT_ID = "Error in retrieving OpenStack project id from project name {}";
     private static final String PASS_KEY  = "password";
     private static final String ENABLED_KEY = "enabled";
     private static final String PROJECT_KEY = "project";
     private static final String PROJECTS_KEY = "projects";
     private static final String USERS_KEY = "users";
     private static final String X_AUTH_TOKEN_KEY = "X-Auth-Token";
-    private  static final String ERR_CREATE_PROJECT = "Error in creating new OpenStack project {}: {}";
 
     private String adminPass;
     private String adminId;
