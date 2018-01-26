@@ -412,7 +412,8 @@ public class AdapterOpenStack {
         }
     }
 
-    public void isProjectNameAlreadyExist(String projectName) {
+    // check if exactly 1 project name exists
+    public boolean isProjectNameAlreadyExist(String projectName) {
         log.info("Request OpenStack token to check if project name already exists");
         String token = requestToken();
 
@@ -446,6 +447,10 @@ public class AdapterOpenStack {
             if (projectJsonArray.length() > 0) {
                 log.warn(ERROR_CHECK_IF_PROJECT_EXIST, projectName);
                 throw new OpenStackDuplicateProjectException("OpenStack project with name " + projectName + " already exists");
+            } else if (projectJsonArray.length() > 1) {
+                
+            } else {
+
             }
         } catch (JSONException e) {
             log.warn("Error in checking if project name {} already exists: project array cant be retrieve from OpenStack", projectName);
@@ -454,7 +459,7 @@ public class AdapterOpenStack {
 
     }
 
-    public void isUserNameAlreadyExist(String userName) {
+    public boolean isUserNameAlreadyExist(String userName) {
         log.info("Request OpenStack token to check if project name already exists");
         String token = requestToken();
 
@@ -485,9 +490,13 @@ public class AdapterOpenStack {
         JSONObject responseObject = new JSONObject(responseEntity.getBody().toString());
         try{
             JSONArray usersJsonArray = responseObject.getJSONArray(USERS_KEY);
-            if (usersJsonArray.length() > 0) {
+            if (usersJsonArray.length() > 1) {
                 log.warn(ERROR_CHECK_IF_USER_EXIST, userName);
-                throw new OpenStackDuplicateUserException("OpenStack user with name " + userName+ " already exists");
+                throw new OpenStackDuplicateUserException("There are more than 1 OpenStack user with name " + userName+ " exists");
+            } else if (usersJsonArray.length() == 0) {
+                return false;
+            } else {
+                return true;
             }
         } catch (JSONException e) {
             log.warn("Error in checking if user name {} already exists: user array cant be retrieve from OpenStack", userName);

@@ -115,6 +115,9 @@ public class RegistrationServiceImpl implements RegistrationService {
         checkTeamName(team.getName()); //check if team name is null or empty
         checkTeamNameDuplicate(team.getName()); // check if team name already exists
 
+        //check if openstack project already exists
+        adapterOpenStack.isProjectNameAlreadyExist(team.getName());
+
         if (userService.getUser(nclUserId) == null) {
             log.warn("User not found: {}", nclUserId);
             throw new UserNotFoundException(USER + " " + nclUserId + " " + NOT_FOUND);
@@ -144,8 +147,6 @@ public class RegistrationServiceImpl implements RegistrationService {
         adapterDeterLab.applyProject(mainObject.toString());
 
         log.info("Starting to create new OpenStack Project {}", team.getName());
-        // check if OpenStack Project name already exist and create if not
-        adapterOpenStack.isProjectNameAlreadyExist(team.getName());
         adapterOpenStack.createOpenStackProject(team.getName(), team.getDescription());
         log.info("Succesfully create new OpenStack Project", team.getName());
 
@@ -161,6 +162,8 @@ public class RegistrationServiceImpl implements RegistrationService {
         checkUserId(nclUserId);
         checkTeamName(team.getName());
 
+
+
         if (userService.getUser(nclUserId) == null) {
             log.warn("User not found: {}", nclUserId);
             throw new UserNotFoundException(USER + " " + nclUserId + " " + NOT_FOUND);
@@ -171,6 +174,9 @@ public class RegistrationServiceImpl implements RegistrationService {
             log.warn("Team not found: {}", team.getName());
             throw new TeamNotFoundException(TEAM + " " + team.getName() + " " + NOT_FOUND);
         }
+
+        // check if team exists in openstack
+        //if (isUserNameAlreadyExist(userName))
 
         String teamId = teamEntity.getId();
 
@@ -215,6 +221,9 @@ public class RegistrationServiceImpl implements RegistrationService {
                 throw new IncompleteRegistrationFormException();
             }
             checkTeamNameDuplicate(team.getName());
+
+            //check team name for OpenStack already exists
+            adapterOpenStack.isProjectNameAlreadyExist(team.getName());
         }
 
         String teamId;
@@ -234,6 +243,9 @@ public class RegistrationServiceImpl implements RegistrationService {
             addNclTeamIdMapping(teamEntity.getName(), teamId);
             log.info("Register new user: apply new Team {}", teamEntity.getName());
         }
+
+        // Check if openstack user already exists before adding user to SIO database
+        adapterOpenStack.isUserNameAlreadyExist(user.getUserDetails().getEmail());
 
         // accept user data from form
         User createdUser = userService.createUser(user);
@@ -296,13 +308,7 @@ public class RegistrationServiceImpl implements RegistrationService {
 
             // starting to create OpenStack user and project but its not enable until email is verified
             log.info("Starting to create new OpenStack User and Project after Deterlab registration was successful");
-
-            // check if openstack user name already exists and create if not
-            adapterOpenStack.isUserNameAlreadyExist(user.getUserDetails().getEmail());
             adapterOpenStack.createOpenStackUser(user.getUserDetails().getEmail(), credentials.getPassword());
-
-            //check if openstack project name already exists and create if not
-            adapterOpenStack.isProjectNameAlreadyExist(team.getName());
             adapterOpenStack.createOpenStackProject(team.getName(), team.getDescription());
 
             log.info("Sucessfully create new OpenStack User {} and Project {}", user.getUserDetails().getEmail(), team.getName());
