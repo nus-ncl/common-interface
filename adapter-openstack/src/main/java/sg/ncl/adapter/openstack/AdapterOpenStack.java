@@ -11,8 +11,7 @@ import org.springframework.http.*;
 import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.*;
-import sg.ncl.adapter.openstack.exceptions.OpenStackConnectionException;
-import sg.ncl.adapter.openstack.exceptions.OpenStackInternalErrorException;
+import sg.ncl.adapter.openstack.exceptions.*;
 
 import javax.inject.Inject;
 
@@ -289,9 +288,8 @@ public class AdapterOpenStack {
         }
     }
 
-    public String retrieveOpenStackUserId(String userName, boolean isEnabled) {
+    public String retrieveOpenStackUserId(String userName) {
         JSONObject parameters =  new JSONObject();
-        parameters.put(ENABLED, isEnabled); //for stronger filter
         parameters.put("name", userName);
 
         log.info("Request OpenStack token to retrieve OpenStack user id");
@@ -322,12 +320,19 @@ public class AdapterOpenStack {
         }
 
         JSONObject responseObject = new JSONObject(responseEntity.getBody().toString());
+        if (responseObject.getJSONArray("users").length() < 1) {
+            log.warn(ERROR_RETRIEVE_USER, userName);
+            throw new OpenStackUserNotFoundException("OpenStack user " + userName + " not found");
+        } else if (responseObject.getJSONArray("users").length() > 1) {
+            log.warn(ERROR_RETRIEVE_USER, userName);
+            throw new OpenStackDuplicateUserException("More than 1 OpenStack user with same name " + userName + " found");
+        }
+
         return responseObject.getJSONArray("users").getJSONObject(0).getString("id");
     }
 
-    public String retrieveOpenStackProjectId(String projectName, boolean isEnabled) {
+    public String retrieveOpenStackProjectId(String projectName) {
         JSONObject parameters =  new JSONObject();
-        parameters.put(ENABLED, isEnabled);  // for stronger filter
         parameters.put("name", projectName);
 
         log.info("Request OpenStack token to retrieve OpenStack user id");
@@ -358,7 +363,15 @@ public class AdapterOpenStack {
         }
 
         JSONObject responseObject = new JSONObject(responseEntity.getBody().toString());
-        return responseObject.getJSONArray("projects").getJSONObject(0).getString("id");
+        if (responseObject.getJSONArray("projects").length() < 1) {
+            log.warn("Error in retrieving OpenStack project id from project name {}", projectName);
+            throw new OpenStackProjectNotFoundException("OpenStack project " + projectName + " not found");
+        }  else if (responseObject.getJSONArray("projects").length() > 1) {
+            log.warn("Error in retrieving OpenStack project id from project name {}", projectName);
+            throw new OpenStackDuplicateProjectException("More than 1 OpenStack project with same name " + projectName + " found");
+        } else {
+            return responseObject.getJSONArray("projects").getJSONObject(0).getString("id");
+        }
     }
 
     public void deleteOpenStackProject(String projectId) {

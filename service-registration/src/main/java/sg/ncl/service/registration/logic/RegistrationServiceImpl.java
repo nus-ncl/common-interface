@@ -337,7 +337,7 @@ public class RegistrationServiceImpl implements RegistrationService {
             userService.updateUserStatus(userId, UserStatus.APPROVED);
 
             // Enable OpenStack User , this is when team leader approve joining team
-            openStackUserId = adapterOpenStack.retrieveOpenStackUserId(user.getUserDetails().getEmail(), false);
+            openStackUserId = adapterOpenStack.retrieveOpenStackUserId(user.getUserDetails().getEmail());
             adapterOpenStack.enableOpenStackUser(openStackUserId);
         }
 
@@ -345,8 +345,8 @@ public class RegistrationServiceImpl implements RegistrationService {
         String adapterResult = adapterDeterLab.processJoinRequest(one.toString());
 
         //Add OpenStack into existing project => hence project already enabled
-        openStackUserId = adapterOpenStack.retrieveOpenStackUserId(user.getUserDetails().getEmail(), true);
-        String openStackProjectId = adapterOpenStack.retrieveOpenStackProjectId(team.getName(), true);
+        openStackUserId = adapterOpenStack.retrieveOpenStackUserId(user.getUserDetails().getEmail());
+        String openStackProjectId = adapterOpenStack.retrieveOpenStackProjectId(team.getName());
         adapterOpenStack.addUserToProject(openStackUserId, openStackProjectId);
 
         sendReplyJoinTeamEmail(user, team, TeamStatus.APPROVED);
@@ -439,7 +439,7 @@ public class RegistrationServiceImpl implements RegistrationService {
                 userService.updateUserStatus(ownerId, UserStatus.APPROVED);
 
                 // Enable OpenStack User , this is when admin approve new team
-                openStackUserId = adapterOpenStack.retrieveOpenStackUserId(user.getUserDetails().getEmail(), false);
+                openStackUserId = adapterOpenStack.retrieveOpenStackUserId(user.getUserDetails().getEmail());
                 adapterOpenStack.enableOpenStackUser(openStackUserId);
 
             }
@@ -448,8 +448,8 @@ public class RegistrationServiceImpl implements RegistrationService {
             adapterResult = adapterDeterLab.approveProject(one.toString());
 
             // Approve Openstack team : enable project when project is first created + add user
-            openStackUserId = adapterOpenStack.retrieveOpenStackUserId(user.getUserDetails().getEmail(), true);
-            String openStackProjectId = adapterOpenStack.retrieveOpenStackProjectId(team.getName(), false);
+            openStackUserId = adapterOpenStack.retrieveOpenStackUserId(user.getUserDetails().getEmail());
+            String openStackProjectId = adapterOpenStack.retrieveOpenStackProjectId(team.getName());
             adapterOpenStack.enableOpenStackProject(openStackProjectId);
             adapterOpenStack.addUserToProject(openStackUserId, openStackProjectId);
 
@@ -462,7 +462,7 @@ public class RegistrationServiceImpl implements RegistrationService {
 
             // Delete OpenStack team here before the team is removed from SIO database
             // project is not enabled yet
-            String openStackProjectId = adapterOpenStack.retrieveOpenStackProjectId(existingTeam.getName(), false);
+            String openStackProjectId = adapterOpenStack.retrieveOpenStackProjectId(existingTeam.getName());
             adapterOpenStack.deleteOpenStackProject(openStackProjectId);
 
             // now we can remove SIO database
