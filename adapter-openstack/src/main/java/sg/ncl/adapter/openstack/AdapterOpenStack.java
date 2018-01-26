@@ -481,7 +481,7 @@ public class AdapterOpenStack {
         }
 
         JSONObject responseObject = new JSONObject(responseEntity.getBody().toString());
-        if (responseObject.getJSONArray("users").length() > 0) {
+        if (responseObject.getJSONArray(USERS_KEY).length() > 0) {
             log.warn(ERROR_CHECK_IF_USER_EXIST, userName);
             throw new OpenStackDuplicateUserException("OpenStack user with name " + userName+ " already exists");
         }
