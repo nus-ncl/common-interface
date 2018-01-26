@@ -23,11 +23,7 @@ import static sg.ncl.adapter.openstack.OpenStackConnectionProperties.PREFIX;
  */
 @Component
 @Slf4j
-@ConfigurationProperties(prefix = PREFIX)
-@Getter
-@Setter
 public class AdapterOpenStack {
-    public static final String PREFIX = "ncl.openstack.adapter";
 
     private RestTemplate restTemplate;
     private OpenStackConnectionProperties properties;
@@ -50,10 +46,6 @@ public class AdapterOpenStack {
     private static final String USERS_KEY = "users";
     private static final String X_AUTH_TOKEN_KEY = "X-Auth-Token";
 
-    private String adminPass;
-    private String adminId;
-    private String adminProjectId;
-
 
     @Inject
     public AdapterOpenStack(OpenStackConnectionProperties properties, RestTemplate restTemplate) {
@@ -67,8 +59,8 @@ public class AdapterOpenStack {
     private String requestToken () {
 
         JSONObject userObject = new JSONObject();
-        userObject.put("id", adminId);
-        userObject.put(PASS_KEY, adminPass);
+        userObject.put("id", properties.getAdminId());
+        userObject.put(PASS_KEY, properties.getAdminPass());
 
         JSONObject passwordObject = new JSONObject();
         passwordObject.put("user", userObject);
@@ -82,7 +74,7 @@ public class AdapterOpenStack {
         identityObject.put(PASS_KEY, passwordObject);
 
         JSONObject projectObject = new JSONObject();
-        projectObject.put("id", adminProjectId);
+        projectObject.put("id", properties.getAdminProjectId());
 
         JSONObject scopeObject = new JSONObject();
         scopeObject.put(PROJECT_KEY, projectObject);

@@ -20,6 +20,9 @@ public class OpenStackConnectionProperties {
     private String ip;
     private String identityPort;
     private String userRoleId;
+    private String adminPass;
+    private String adminId;
+    private String adminProjectId;
 
     public String requestTokenUrl() {
         return HTTP_MODE + ip + ":" + identityPort + "/v3/auth/tokens";
@@ -29,25 +32,25 @@ public class OpenStackConnectionProperties {
         return HTTP_MODE + ip + ":" + identityPort + "/v3/users";
     }
 
-    public String updateUserUrl(String userId) {
-        return HTTP_MODE + ip + ":" + identityPort + "/v3/users/" + userId;
+    public String createProjectUrl() {
+        return HTTP_MODE + ip + ":" + identityPort + "/v3/projects";
     }
+
 
     public String listUserUrl() {
         return HTTP_MODE + ip + ":" + identityPort + "/v3/users";
     }
 
-    public String createProjectUrl() {
+    public String listProjectUrl() {
         return HTTP_MODE + ip + ":" + identityPort + "/v3/projects";
+    }
+
+    public String updateUserUrl(String userId) {
+        return HTTP_MODE + ip + ":" + identityPort + "/v3/users/" + userId;
     }
 
     public String updateProjectUrl(String projectId) {
         return HTTP_MODE + ip + ":" + identityPort + PROJECT_ENDPOINT + projectId;
-    }
-
-
-    public String listProjectUrl() {
-        return HTTP_MODE + ip + ":" + identityPort + "/v3/projects";
     }
 
     public String deleteProject(String projectId) {
