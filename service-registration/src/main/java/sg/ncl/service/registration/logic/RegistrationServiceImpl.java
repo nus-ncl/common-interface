@@ -364,7 +364,7 @@ public class RegistrationServiceImpl implements RegistrationService {
         adapterOpenStack.addUserToProject(openStackUserId, openStackProjectId);
 
         log.info("Successfully add OpenStack User {} to Project {}", user.getUserDetails().getEmail(), team.getName());
-        
+
         sendReplyJoinTeamEmail(user, team, TeamStatus.APPROVED);
         return adapterResult;
     }
@@ -464,13 +464,13 @@ public class RegistrationServiceImpl implements RegistrationService {
             teamService.updateMemberStatus(teamId, ownerId, MemberStatus.APPROVED);
             adapterResult = adapterDeterLab.approveProject(one.toString());
 
-            log.info("Start to add OpenStack user {} to project {}",user.getUserDetails().getEmail(), team.getName());
+            log.info("Start to add OpenStack User {} to Project {}",user.getUserDetails().getEmail(), team.getName());
             openStackUserId = adapterOpenStack.retrieveOpenStackUserId(user.getUserDetails().getEmail());
             // Approve OpenStack team : enable project when project is first created + add user
             String openStackProjectId = adapterOpenStack.retrieveOpenStackProjectId(team.getName());
             adapterOpenStack.enableOpenStackProject(openStackProjectId);
             adapterOpenStack.addUserToProject(openStackUserId, openStackProjectId);
-            log.info("Succesfully add OpenStack user {} to project {}",user.getUserDetails().getEmail(), team.getName());
+            log.info("Succesfully add OpenStack User {} to Project {}",user.getUserDetails().getEmail(), team.getName());
 
 
             // now send mail
