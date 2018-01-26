@@ -51,7 +51,7 @@ public class AdapterOpenStack {
 
     private String adminPass;
     private String adminId;
-    private String adminProject;
+    private String adminProjectId;
 
 
     @Inject
@@ -63,7 +63,7 @@ public class AdapterOpenStack {
         restTemplate.setRequestFactory(requestFactory);
     }
 
-    public String requestToken () {
+    private String requestToken () {
 
         JSONObject userObject = new JSONObject();
         userObject.put("id", adminId);
@@ -81,7 +81,7 @@ public class AdapterOpenStack {
         identityObject.put(PASS_KEY, passwordObject);
 
         JSONObject projectObject = new JSONObject();
-        projectObject.put("id", adminProject);
+        projectObject.put("id", adminProjectId);
 
         JSONObject scopeObject = new JSONObject();
         scopeObject.put(PROJECT_KEY, projectObject);
