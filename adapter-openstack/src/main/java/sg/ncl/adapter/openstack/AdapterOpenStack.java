@@ -374,7 +374,7 @@ public class AdapterOpenStack {
         log.info("Request OpenStack token to delete OpenStack project");
         String token = requestToken();
 
-        log.info("Successful requesting Openstack token and start to delete OpenStack project id {}", projectId);
+        log.info("Successful requesting OpenStack token and start to delete OpenStack project id {}", projectId);
         HttpHeaders httpHeaders =  new HttpHeaders();
         httpHeaders.setContentType(MediaType.APPLICATION_JSON);
         httpHeaders.set(X_AUTH_TOKEN_KEY, token);
