@@ -37,12 +37,12 @@ public class OpenStackConnectionProperties {
     }
 
 
-    public String listUserUrl() {
-        return HTTP_MODE + ip + ":" + identityPort + "/v3/users";
+    public String listUserUrl(String userName) {
+        return HTTP_MODE + ip + ":" + identityPort + "/v3/users?name=" + userName;
     }
 
-    public String listProjectUrl() {
-        return HTTP_MODE + ip + ":" + identityPort + "/v3/projects";
+    public String listProjectUrl(String projectName) {
+        return HTTP_MODE + ip + ":" + identityPort + "/v3/projects?name=" + projectName;
     }
 
     public String updateUserUrl(String userId) {

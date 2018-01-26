@@ -299,7 +299,7 @@ public class AdapterOpenStack {
         ResponseEntity responseEntity;
 
         try {
-            responseEntity = restTemplate.exchange(properties.listUserUrl(), HttpMethod.GET, request, String.class);
+            responseEntity = restTemplate.exchange(properties.listUserUrl(userName), HttpMethod.GET, request, String.class);
             log.info("Successfully retrieving OpenStack user id from user name {}", userName);
         } catch (ResourceAccessException e) {
             log.warn(ERROR_RETRIEVE_USER_ID, userName, e.getMessage());
@@ -342,7 +342,7 @@ public class AdapterOpenStack {
         ResponseEntity responseEntity;
 
         try {
-            responseEntity = restTemplate.exchange(properties.listProjectUrl(), HttpMethod.GET, request, String.class);
+            responseEntity = restTemplate.exchange(properties.listProjectUrl(projectName), HttpMethod.GET, request, String.class);
             log.info("Successfully retrieving OpenStack project id from project name {}", projectName);
         } catch (ResourceAccessException e) {
             log.warn(ERROR_RETRIEVE_PROJECT_ID, projectName, e.getMessage());
@@ -402,18 +402,15 @@ public class AdapterOpenStack {
         log.info("Request OpenStack token to check if project name already exists");
         String token = requestToken();
 
-        JSONObject parameters =  new JSONObject();
-        parameters.put("name", projectName);
-
         log.info("Succesfully requesting OpenStack token and start check if project name {} already exists", projectName);
         HttpHeaders httpHeaders =  new HttpHeaders();
         httpHeaders.setContentType(MediaType.APPLICATION_JSON);
         httpHeaders.set(X_AUTH_TOKEN_KEY, token);
-        HttpEntity<String> request = new HttpEntity<>(parameters.toString(), httpHeaders);
+        HttpEntity<String> request = new HttpEntity<>(httpHeaders);
         ResponseEntity responseEntity;
 
         try {
-            responseEntity = restTemplate.exchange(properties.listProjectUrl(), HttpMethod.GET, request, String.class);
+            responseEntity = restTemplate.exchange(properties.listProjectUrl(projectName), HttpMethod.GET, request, String.class);
             log.info("Successfully retrieving OpenStack project id from project name {} to check if project name already exists", projectName);
         } catch (ResourceAccessException e) {
             log.warn(ERROR_CHECK_IF_PROJECT_EXIST, projectName, e.getMessage());
@@ -440,18 +437,15 @@ public class AdapterOpenStack {
         log.info("Request OpenStack token to check if project name already exists");
         String token = requestToken();
 
-        JSONObject parameters =  new JSONObject();
-        parameters.put("name", userName);
-
         log.info("Succesfully requesting OpenStack token and start check if user name {} already exists", userName);
         HttpHeaders httpHeaders =  new HttpHeaders();
         httpHeaders.setContentType(MediaType.APPLICATION_JSON);
         httpHeaders.set(X_AUTH_TOKEN_KEY, token);
-        HttpEntity<String> request = new HttpEntity<>(parameters.toString(), httpHeaders);
+        HttpEntity<String> request = new HttpEntity<>(httpHeaders);
         ResponseEntity responseEntity;
 
         try {
-            responseEntity = restTemplate.exchange(properties.listProjectUrl(), HttpMethod.GET, request, String.class);
+            responseEntity = restTemplate.exchange(properties.listProjectUrl(userName), HttpMethod.GET, request, String.class);
             log.info("Successfully retrieving OpenStack user id from user name {} to check if project name already exists", userName);
         } catch (ResourceAccessException e) {
             log.warn(ERROR_CHECK_IF_USER_EXIST, userName, e.getMessage());

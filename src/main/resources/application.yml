@@ -66,11 +66,11 @@ ncl:
   openstack:
     adapter:
       ip: 172.18.178.26
-      identityPort: 5000
+      identityPort: 35357
       userRoleId: ab96b98f07be4073a3ee9794d6a1bd2c
       adminPass: adminpass
       adminId: 69a0564a4994458baf70b98aa638c530
-      adminProjectId: f9915a7644a648af8db8ee3d8b821419
+      adminProjectId: 58fb697dadca4929a594ada25d894d64
   jwt:
     api-key: ${jwt.key:}
     signing-algorithm: HS512
