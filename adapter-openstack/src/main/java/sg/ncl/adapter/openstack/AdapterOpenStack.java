@@ -6,7 +6,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.http.*;
 import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.stereotype.Component;
@@ -14,9 +13,6 @@ import org.springframework.web.client.*;
 import sg.ncl.adapter.openstack.exceptions.*;
 
 import javax.inject.Inject;
-
-import static sg.ncl.adapter.openstack.OpenStackConnectionProperties.PREFIX;
-
 
 /**
  * Author: Tran Ly Vu
