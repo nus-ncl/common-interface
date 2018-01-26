@@ -7,7 +7,7 @@ import sg.ncl.common.exception.base.ConflictException;
 /**
  * Author: Tran Ly Vu
  */
-@ResponseStatus(value = HttpStatus.CONFLICT, reason = "More than 1 project with same name found")
+@ResponseStatus(value = HttpStatus.CONFLICT)
 public class OpenStackDuplicateProjectException extends ConflictException {
     public OpenStackDuplicateProjectException(final String message) {
         super(message);

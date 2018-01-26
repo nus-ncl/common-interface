@@ -149,40 +149,6 @@ public class AdapterOpenStack {
         }
     }
 
-    public void enableOpenStackUser(String userId) {
-        JSONObject userObject = new JSONObject();
-        userObject.put(ENABLED, true);
-
-        JSONObject parameters = new JSONObject();
-        parameters.put("user", userObject);
-
-        log.info("Request OpenStack token to enable OpenStack user");
-        String token = requestToken();
-
-        log.info("Succesfully requesting OpenStack token and start to enable OpenStack user");
-        HttpHeaders httpHeaders = new HttpHeaders();
-        httpHeaders.setContentType(MediaType.APPLICATION_JSON);
-        httpHeaders.set(X_AUTH_TOKEN, token);
-        HttpEntity<String> request = new HttpEntity<>(parameters.toString(), httpHeaders);
-
-        try {
-            restTemplate.exchange(properties.updateUserUrl(userId), HttpMethod.PATCH, request, String.class);
-            log.info("Successfully enabling OpenStack user id {}", userId);
-        } catch (ResourceAccessException e) {
-            log.warn(ERROR_ENABLE_USER, userId, e.getMessage());
-            throw new OpenStackConnectionException(e.getMessage());
-        } catch (HttpServerErrorException e) {
-            log.warn(ERROR_ENABLE_USER,userId, e.getMessage());
-            throw new OpenStackInternalErrorException();
-        } catch (JSONException e) {
-            log.warn("Error in enabling OpenStack user id {}: error parsing response body", userId);
-            throw e;
-        } catch (HttpClientErrorException e) {
-            log.warn(ERROR_ENABLE_USER, userId, e.getMessage());
-            throw e;
-        }
-    }
-
 
     public void createOpenStackProject(String projectName, String description) {
         JSONObject projectObject = new JSONObject();
@@ -222,6 +188,42 @@ public class AdapterOpenStack {
             throw e;
         }
     }
+
+
+    public void enableOpenStackUser(String userId) {
+        JSONObject userObject = new JSONObject();
+        userObject.put(ENABLED, true);
+
+        JSONObject parameters = new JSONObject();
+        parameters.put("user", userObject);
+
+        log.info("Request OpenStack token to enable OpenStack user");
+        String token = requestToken();
+
+        log.info("Succesfully requesting OpenStack token and start to enable OpenStack user");
+        HttpHeaders httpHeaders = new HttpHeaders();
+        httpHeaders.setContentType(MediaType.APPLICATION_JSON);
+        httpHeaders.set(X_AUTH_TOKEN, token);
+        HttpEntity<String> request = new HttpEntity<>(parameters.toString(), httpHeaders);
+
+        try {
+            restTemplate.exchange(properties.updateUserUrl(userId), HttpMethod.PATCH, request, String.class);
+            log.info("Successfully enabling OpenStack user id {}", userId);
+        } catch (ResourceAccessException e) {
+            log.warn(ERROR_ENABLE_USER, userId, e.getMessage());
+            throw new OpenStackConnectionException(e.getMessage());
+        } catch (HttpServerErrorException e) {
+            log.warn(ERROR_ENABLE_USER,userId, e.getMessage());
+            throw new OpenStackInternalErrorException();
+        } catch (JSONException e) {
+            log.warn("Error in enabling OpenStack user id {}: error parsing response body", userId);
+            throw e;
+        } catch (HttpClientErrorException e) {
+            log.warn(ERROR_ENABLE_USER, userId, e.getMessage());
+            throw e;
+        }
+    }
+
 
     public void enableOpenStackProject(String projectId) {
         JSONObject projectObject = new JSONObject();
@@ -326,9 +328,9 @@ public class AdapterOpenStack {
         } else if (responseObject.getJSONArray("users").length() > 1) {
             log.warn(ERROR_RETRIEVE_USER, userName);
             throw new OpenStackDuplicateUserException("More than 1 OpenStack user with same name " + userName + " found");
+        } else {
+            return responseObject.getJSONArray("users").getJSONObject(0).getString("id");
         }
-
-        return responseObject.getJSONArray("users").getJSONObject(0).getString("id");
     }
 
     public String retrieveOpenStackProjectId(String projectName) {
@@ -338,7 +340,7 @@ public class AdapterOpenStack {
         log.info("Request OpenStack token to retrieve OpenStack user id");
         String token = requestToken();
 
-        log.info("Succesfully requesting OpenStack token and to retrieve OpenStack project id from project name {}", projectName);
+        log.info("Succesfully requesting OpenStack token and start to retrieve OpenStack project id from project name {}", projectName);
         HttpHeaders httpHeaders =  new HttpHeaders();
         httpHeaders.setContentType(MediaType.APPLICATION_JSON);
         httpHeaders.set(X_AUTH_TOKEN, token);
@@ -352,7 +354,7 @@ public class AdapterOpenStack {
             log.warn("Error in retrieving OpenStack project id from project name {}", projectName, e.getMessage());
             throw new OpenStackConnectionException(e.getMessage());
         } catch (HttpServerErrorException e) {
-            log.warn("Error retrieving OpenStack project id from project name {}", projectName, e.getMessage());
+            log.warn("Error in retrieving OpenStack project id from project name {}", projectName, e.getMessage());
             throw new OpenStackInternalErrorException();
         } catch (JSONException e) {
             log.warn("Error in retrieving OpenStack project id from project name {}: error parsing response body", projectName);
@@ -394,11 +396,87 @@ public class AdapterOpenStack {
             log.warn("Error in deleting OpenStack project id {}: error parsing response body", projectId);
             throw e;
         }  catch (HttpServerErrorException e) {
-            log.warn("Error when deleting OpenStack project id {}: {}", projectId, e.getMessage());
+            log.warn("Error in deleting OpenStack project id {}: {}", projectId, e.getMessage());
             throw new OpenStackInternalErrorException();
         } catch (HttpClientErrorException e) {
-            log.warn("Error when deleting OpenStack project id {}: {}", projectId, e.getMessage());
+            log.warn("Error in deleting OpenStack project id {}: {}", projectId, e.getMessage());
             throw e;
+        }
+    }
+
+    public void isProjectNameAlreadyExist(String projectName) {
+        log.info("Request OpenStack token to check if project name already exists");
+        String token = requestToken();
+
+        JSONObject parameters =  new JSONObject();
+        parameters.put("name", projectName);
+
+        log.info("Succesfully requesting OpenStack token and start check if project name {} already exists", projectName);
+        HttpHeaders httpHeaders =  new HttpHeaders();
+        httpHeaders.setContentType(MediaType.APPLICATION_JSON);
+        httpHeaders.set(X_AUTH_TOKEN, token);
+        HttpEntity<String> request = new HttpEntity<>(parameters.toString(), httpHeaders);
+        ResponseEntity responseEntity;
+
+        try {
+            responseEntity = restTemplate.exchange(properties.listProjectUrl(), HttpMethod.GET, request, String.class);
+            log.info("Successfully retrieving OpenStack project id from project name {} to check if project name already exists", projectName);
+        } catch (ResourceAccessException e) {
+            log.warn("Error in checking if project name {} already exists", projectName, e.getMessage());
+            throw new OpenStackConnectionException(e.getMessage());
+        } catch (HttpServerErrorException e) {
+            log.warn("Error in checking if project name {} already exists", projectName, e.getMessage());
+            throw new OpenStackInternalErrorException();
+        } catch (JSONException e) {
+            log.warn("Error in checking if project name {} already exists: error parsing response body", projectName);
+            throw e;
+        } catch (HttpClientErrorException e) {
+            log.warn("Error in checking if project name {} already exists", projectName, e.getMessage());
+            throw e;
+        }
+
+        JSONObject responseObject = new JSONObject(responseEntity.getBody().toString());
+         if (responseObject.getJSONArray("projects").length() > 0) {
+            log.warn("Error in checking if project name {} already exists", projectName);
+            throw new OpenStackDuplicateProjectException("OpenStack project with name " + projectName + " already exists");
+        }
+    }
+
+    public void isUserNameAlreadyExist(String userName) {
+        log.info("Request OpenStack token to check if project name already exists");
+        String token = requestToken();
+
+        JSONObject parameters =  new JSONObject();
+        parameters.put("name", userName);
+
+        log.info("Succesfully requesting OpenStack token and start check if user name {} already exists", userName);
+        HttpHeaders httpHeaders =  new HttpHeaders();
+        httpHeaders.setContentType(MediaType.APPLICATION_JSON);
+        httpHeaders.set(X_AUTH_TOKEN, token);
+        HttpEntity<String> request = new HttpEntity<>(parameters.toString(), httpHeaders);
+        ResponseEntity responseEntity;
+
+        try {
+            responseEntity = restTemplate.exchange(properties.listProjectUrl(), HttpMethod.GET, request, String.class);
+            log.info("Successfully retrieving OpenStack user id from user name {} to check if project name already exists", userName);
+        } catch (ResourceAccessException e) {
+            log.warn("Error in checking if user name {} already exists", userName, e.getMessage());
+            throw new OpenStackConnectionException(e.getMessage());
+        } catch (HttpServerErrorException e) {
+            log.warn("Error in checking if user name {} already exists", userName, e.getMessage());
+            throw new OpenStackInternalErrorException();
+        } catch (JSONException e) {
+            log.warn("Error in checking if user name {} already exists: error parsing response body", userName);
+            throw e;
+        } catch (HttpClientErrorException e) {
+            log.warn("Error in checking if user name {} already exists", userName, e.getMessage());
+            throw e;
+        }
+
+        JSONObject responseObject = new JSONObject(responseEntity.getBody().toString());
+        if (responseObject.getJSONArray("users").length() > 0) {
+            log.warn("Error in checking if user name {} already exists", userName);
+            throw new OpenStackDuplicateUserException("OpenStack user with name " + userName+ " already exists");
         }
     }
 }

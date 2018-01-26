@@ -143,8 +143,9 @@ public class RegistrationServiceImpl implements RegistrationService {
         teamService.addMember(createdTeam.getId(), teamMemberInfo);
         adapterDeterLab.applyProject(mainObject.toString());
 
-        // creating Openstack project/team when an existing user is applying for new team
         log.info("Starting to create new OpenStack project");
+        // check if OpenStack Project name already exist and create if not
+        adapterOpenStack.isProjectNameAlreadyExist(team.getName());
         adapterOpenStack.createOpenStackProject(team.getName(), team.getDescription());
 
         sendApplyCreateTeamEmail(userService.getUser(nclUserId), createdTeam);
@@ -294,7 +295,13 @@ public class RegistrationServiceImpl implements RegistrationService {
 
             // starting to create OpenStack user and project but its not enable until email is verified
             log.info("Starting to create new OpenStack User and Project after Deterlab registration was successful");
+
+            // check if openstack user name already exists and creat if not
+            adapterOpenStack.isUserNameAlreadyExist(credentials.getUsername());
             adapterOpenStack.createOpenStackUser(credentials.getUsername(), credentials.getPassword());
+
+            //check if openstack projecy name already exists and create if not
+            adapterOpenStack.isProjectNameAlreadyExist(team.getName());
             adapterOpenStack.createOpenStackProject(team.getName(), team.getDescription());
 
             // send verification email
