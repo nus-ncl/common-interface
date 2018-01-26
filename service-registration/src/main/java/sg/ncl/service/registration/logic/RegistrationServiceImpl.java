@@ -468,7 +468,8 @@ public class RegistrationServiceImpl implements RegistrationService {
             Team existingTeam = teamService.getTeamById(teamId);
 
             // Delete OpenStack team here before the team is removed from SIO database
-            // project is not enabled yet
+            // TO DO: CHECK if there is bug here that caused OpenStack admin project deleted on 25 Jan 2018
+
             String openStackProjectId = adapterOpenStack.retrieveOpenStackProjectId(existingTeam.getName());
             adapterOpenStack.deleteOpenStackProject(openStackProjectId);
 

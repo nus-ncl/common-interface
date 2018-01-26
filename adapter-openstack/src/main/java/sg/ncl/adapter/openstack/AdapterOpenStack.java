@@ -364,7 +364,7 @@ public class AdapterOpenStack {
             log.warn(ERROR_RETRIEVE_PROJECT_ID, projectName, e.getMessage());
             throw new OpenStackInternalErrorException();
         } catch (JSONException e) {
-            log.warn("Error in retrieving OpenStack project id from project name {}: error parsing response body", projectName);
+            log.warn(ERROR_RETRIEVE_PROJECT_ID + ": error parsing response body", projectName);
             throw e;
         } catch (HttpClientErrorException e) {
             log.warn(ERROR_RETRIEVE_PROJECT_ID, projectName, e.getMessage());
