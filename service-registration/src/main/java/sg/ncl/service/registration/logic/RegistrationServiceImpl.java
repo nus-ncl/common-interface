@@ -318,8 +318,8 @@ public class RegistrationServiceImpl implements RegistrationService {
 
             // create openstack project
             log.info("Starting to create new OpenStack Project");
-            adapterOpenStack.createOpenStackProject(team.getName(), team.getDescription());
-            log.info("Sucessfully create new OpenStack Project {} ", team.getName());
+            adapterOpenStack.createOpenStackProject(teamEntity.getName(), teamEntity.getDescription());
+            log.info("Sucessfully create new OpenStack Project {} ", teamEntity.getName());
         }
 
         if ("user is created".equals(getUserCreationStatus(resultJSON))) {
