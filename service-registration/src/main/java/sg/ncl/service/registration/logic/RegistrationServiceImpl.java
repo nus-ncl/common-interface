@@ -452,6 +452,7 @@ public class RegistrationServiceImpl implements RegistrationService {
         checkTeamId(teamId);
         checkUserId(ownerId);
 
+
         if (status == null ||
                 !(status.equals(TeamStatus.APPROVED) || status.equals(TeamStatus.REJECTED))) {
             log.warn("Invalid TeamStatus {}", status);
@@ -465,6 +466,12 @@ public class RegistrationServiceImpl implements RegistrationService {
         JSONObject one = new JSONObject();
         one.put("pid", team.getName());
         one.put("uid", adapterDeterLab.getDeterUserIdByNclUserId(ownerId));
+        
+        //check if openstack team already exists
+        if (!adapterOpenStack.isProjectNameAlreadyExist(team.getName())) {
+            log.warn("Apply to create team: OpenStack project name is already exists");
+            throw new OpenStackProjectNameAlreadyExistsException("OpenStack project " + team.getName() +" already exists");
+        };
 
         String adapterResult;
         if (status.equals(TeamStatus.APPROVED)) {
@@ -475,7 +482,6 @@ public class RegistrationServiceImpl implements RegistrationService {
                 throw new EmailNotVerifiedException(user.getId());
             }
 
-            // retrieve opestack and id here before they are enabled
             String openStackUserId;
 
             if ((UserStatus.PENDING).equals(user.getStatus())) {
