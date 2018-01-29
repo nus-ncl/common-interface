@@ -40,7 +40,7 @@ import java.time.ZonedDateTime;
 import java.util.*;
 
 /**
- * @author Christopher Zhong, Tran Ly Vu
+ * @authors Christopher Zhong, Tran Ly Vu
  */
 @Service
 @Slf4j
@@ -116,7 +116,10 @@ public class RegistrationServiceImpl implements RegistrationService {
         checkTeamNameDuplicate(team.getName()); // check if team name already exists
 
         //check if openstack project already exists
-        adapterOpenStack.isProjectNameAlreadyExist(team.getName());
+        if (adapterOpenStack.isProjectNameAlreadyExist(team.getName())){
+            log.warn("Error existing user request to apply team: OpenStack project name already exists");
+            throw new OpenStackProjectNameAlreadyExistsException("OpenStack project "+ team.getName() +" already exists");
+        };
 
         if (userService.getUser(nclUserId) == null) {
             log.warn("User not found: {}", nclUserId);
@@ -223,7 +226,7 @@ public class RegistrationServiceImpl implements RegistrationService {
             checkTeamNameDuplicate(team.getName());
 
             //check team name for OpenStack already exists
-            if (!adapterOpenStack.isProjectNameAlreadyExist(team.getName())) {
+            if (adapterOpenStack.isProjectNameAlreadyExist(team.getName())) {
                 log.warn("Apply to create team: OpenStack project name is already exists");
                 throw new OpenStackProjectNameAlreadyExistsException("OpenStack project " + team.getName() +" already exists");
             };
@@ -248,7 +251,7 @@ public class RegistrationServiceImpl implements RegistrationService {
         }
 
         // Check if openstack user already exists before adding user to SIO database
-        if (!adapterOpenStack.isUserNameAlreadyExist(user.getUserDetails().getEmail())) {
+        if (adapterOpenStack.isUserNameAlreadyExist(user.getUserDetails().getEmail())) {
             log.warn("Apply to create team: OpenStack user name is already exists");
             throw new OpenStackUserNameAlreadyExistsException("OpenStack user " + user.getUserDetails().getEmail() +" already exists");
         };
@@ -348,14 +351,14 @@ public class RegistrationServiceImpl implements RegistrationService {
         }
 
         //check if openstack team already exists
-        if (!adapterOpenStack.isProjectNameAlreadyExist(team.getName())) {
-            log.warn("Apply to create team: OpenStack project name is already exists");
+        if (adapterOpenStack.isProjectNameAlreadyExist(team.getName())) {
+            log.warn("Error approve join request: OpenStack project name is already exists");
             throw new OpenStackProjectNameAlreadyExistsException("OpenStack project " + team.getName() +" already exists");
         };
 
         // Check if openstack user already exists
-        if (!adapterOpenStack.isUserNameAlreadyExist(user.getUserDetails().getEmail())) {
-            log.warn("Apply to create team: OpenStack user name is already exists");
+        if (adapterOpenStack.isUserNameAlreadyExist(user.getUserDetails().getEmail())) {
+            log.warn("Error approve join request: OpenStack user name is already exists");
             throw new OpenStackUserNameAlreadyExistsException("OpenStack user " + user.getUserDetails().getEmail() +" already exists");
         };
 
@@ -467,7 +470,7 @@ public class RegistrationServiceImpl implements RegistrationService {
         one.put("uid", adapterDeterLab.getDeterUserIdByNclUserId(ownerId));
 
         //check if openstack team already exists
-        if (!adapterOpenStack.isProjectNameAlreadyExist(team.getName())) {
+        if (adapterOpenStack.isProjectNameAlreadyExist(team.getName())) {
             log.warn("Apply to create team: OpenStack project name is already exists");
             throw new OpenStackProjectNameAlreadyExistsException("OpenStack project " + team.getName() +" already exists");
         };

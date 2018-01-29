@@ -302,6 +302,7 @@ public class RegistrationServiceImplTest {
         Mockito.doReturn(userWithId).when(userService).createUser(any(User.class));
         Mockito.doReturn(predefinedResultJson.toString()).when(adapterDeterLab).joinProjectNewUsers(anyString());
         Mockito.doReturn(registrationEntity).when(registrationRepository).save(any(RegistrationEntity.class));
+        Mockito.doReturn(false).when(adapterOpenStack).isProjectNameAlreadyExist(anyString());
 
         Registration result = registrationService.register(credentialsEntity, user, team, isJoinTeam);
 
@@ -327,6 +328,7 @@ public class RegistrationServiceImplTest {
         Mockito.doReturn(userWithId).when(userService).createUser(any(User.class));
         Mockito.doReturn(predefinedResultJson.toString()).when(adapterDeterLab).joinProjectNewUsers(anyString());
         Mockito.doReturn(registrationEntity).when(registrationRepository).save(any(RegistrationEntity.class));
+        Mockito.doReturn(false).when(adapterOpenStack).isProjectNameAlreadyExist(anyString());
 
         Registration result = registrationService.register(credentialsEntity, user, team, isJoinTeam);
 
@@ -352,6 +354,7 @@ public class RegistrationServiceImplTest {
         Mockito.doReturn(userEntity).when(userService).createUser(any(User.class));
         Mockito.doReturn(predefinedResultJson.toString()).when(adapterDeterLab).applyProjectNewUsers(anyString());
         Mockito.doReturn(registrationEntity).when(registrationRepository).save(any(RegistrationEntity.class));
+        Mockito.doReturn(false).when(adapterOpenStack).isProjectNameAlreadyExist(anyString());
 
         Registration result = registrationService.register(credentialsEntity, userEntity, teamEntity, isJoinTeam);
         assertThat(result.getId()).isEqualTo(registrationEntity.getId());
@@ -367,6 +370,7 @@ public class RegistrationServiceImplTest {
         isJoinTeam = false;
 
         Mockito.doReturn(teamEntity).when(teamService).createTeam(any(Team.class));
+        Mockito.doReturn(false).when(adapterOpenStack).isProjectNameAlreadyExist(anyString());
 
         exception.expect(TeamIdNullOrEmptyException.class);
 
@@ -407,6 +411,7 @@ public class RegistrationServiceImplTest {
         when(teamService.getTeamById(anyString())).thenReturn(createdTeam);
         when(adapterDeterLab.getDeterUserIdByNclUserId(anyString())).thenReturn(RandomStringUtils.randomAlphanumeric(20));
         when(userService.getUser(anyString())).thenReturn(createdUser);
+        Mockito.doReturn(false).when(adapterOpenStack).isProjectNameAlreadyExist(anyString());
 
         registrationService.approveJoinRequest(createdTeam.getId(), createdUser.getId(), createdUser);
 
