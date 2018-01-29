@@ -252,7 +252,7 @@ public class AdapterOpenStack {
             throw e;
         }
     }
-    
+
     public void addUserToProject(String openStackUserId, String openStackProjectId) {
 
         log.info("Request OpenStack token to add OpenStack user to project");
@@ -440,7 +440,7 @@ public class AdapterOpenStack {
         }
 
         JSONObject responseObject = new JSONObject(responseEntity.getBody().toString());
-        try{
+        try {
             JSONArray projectJsonArray = responseObject.getJSONArray(PROJECTS_KEY);
             if (projectJsonArray.length() == 1) { // only exactly 1 already exists
                 return true;

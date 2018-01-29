@@ -8,7 +8,7 @@ import sg.ncl.common.exception.base.ConflictException;
  * Author: Tran Ly Vu
  */
 
-@ResponseStatus(value = HttpStatus.CONFLICT)
+@ResponseStatus(value = HttpStatus.CONFLICT, reason="More than 1 OpenStack user with same name already exists")
 
 public class OpenStackDuplicateUserException extends ConflictException {
     public OpenStackDuplicateUserException(final String message) {

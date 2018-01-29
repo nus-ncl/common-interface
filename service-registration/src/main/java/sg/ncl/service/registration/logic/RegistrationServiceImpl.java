@@ -223,7 +223,10 @@ public class RegistrationServiceImpl implements RegistrationService {
             checkTeamNameDuplicate(team.getName());
 
             //check team name for OpenStack already exists
-            adapterOpenStack.isProjectNameAlreadyExist(team.getName());
+            if (!adapterOpenStack.isProjectNameAlreadyExist(team.getName())) {
+                log.warn("Apply to create team: OpenStack project name is already exists");
+                throw new OpenStackProjectNameAlreadyExistsException("OpenStack project " + team.getName() +" already exists");
+            };
         }
 
         String teamId;
