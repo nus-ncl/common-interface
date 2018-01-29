@@ -10,7 +10,6 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.ui.freemarker.FreeMarkerTemplateUtils;
 import sg.ncl.adapter.deterlab.AdapterDeterLab;
 import sg.ncl.adapter.openstack.AdapterOpenStack;
-import sg.ncl.adapter.openstack.exceptions.OpenStackUserNotFoundException;
 import sg.ncl.common.DomainProperties;
 import sg.ncl.common.authentication.Role;
 import sg.ncl.service.authentication.domain.Credentials;
@@ -466,7 +465,7 @@ public class RegistrationServiceImpl implements RegistrationService {
         JSONObject one = new JSONObject();
         one.put("pid", team.getName());
         one.put("uid", adapterDeterLab.getDeterUserIdByNclUserId(ownerId));
-        
+
         //check if openstack team already exists
         if (!adapterOpenStack.isProjectNameAlreadyExist(team.getName())) {
             log.warn("Apply to create team: OpenStack project name is already exists");
