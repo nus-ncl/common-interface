@@ -248,7 +248,10 @@ public class RegistrationServiceImpl implements RegistrationService {
         }
 
         // Check if openstack user already exists before adding user to SIO database
-        adapterOpenStack.isUserNameAlreadyExist(user.getUserDetails().getEmail());
+        if (!adapterOpenStack.isUserNameAlreadyExist(user.getUserDetails().getEmail())) {
+            log.warn("Apply to create team: OpenStack user name is already exists");
+            throw new OpenStackProjectNameAlreadyExistsException("OpenStack user " + team.getName() +" already exists");
+        };
 
         // accept user data from form
         User createdUser = userService.createUser(user);
