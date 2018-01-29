@@ -302,7 +302,7 @@ public class RegistrationServiceImplTest {
         Mockito.doReturn(userWithId).when(userService).createUser(any(User.class));
         Mockito.doReturn(predefinedResultJson.toString()).when(adapterDeterLab).joinProjectNewUsers(anyString());
         Mockito.doReturn(registrationEntity).when(registrationRepository).save(any(RegistrationEntity.class));
-        Mockito.doReturn(false).when(adapterOpenStack).isProjectNameAlreadyExist(anyString());
+        Mockito.doReturn(true).when(adapterOpenStack).isProjectNameAlreadyExist(anyString());
 
         Registration result = registrationService.register(credentialsEntity, user, team, isJoinTeam);
 
@@ -328,7 +328,7 @@ public class RegistrationServiceImplTest {
         Mockito.doReturn(userWithId).when(userService).createUser(any(User.class));
         Mockito.doReturn(predefinedResultJson.toString()).when(adapterDeterLab).joinProjectNewUsers(anyString());
         Mockito.doReturn(registrationEntity).when(registrationRepository).save(any(RegistrationEntity.class));
-        Mockito.doReturn(false).when(adapterOpenStack).isProjectNameAlreadyExist(anyString());
+        Mockito.doReturn(true).when(adapterOpenStack).isProjectNameAlreadyExist(anyString());
 
         Registration result = registrationService.register(credentialsEntity, user, team, isJoinTeam);
 
