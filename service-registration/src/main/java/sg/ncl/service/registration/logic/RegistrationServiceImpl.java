@@ -10,6 +10,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.ui.freemarker.FreeMarkerTemplateUtils;
 import sg.ncl.adapter.deterlab.AdapterDeterLab;
 import sg.ncl.adapter.openstack.AdapterOpenStack;
+import sg.ncl.adapter.openstack.exceptions.OpenStackUserNotFoundException;
 import sg.ncl.common.DomainProperties;
 import sg.ncl.common.authentication.Role;
 import sg.ncl.service.authentication.domain.Credentials;
@@ -250,7 +251,7 @@ public class RegistrationServiceImpl implements RegistrationService {
         // Check if openstack user already exists before adding user to SIO database
         if (!adapterOpenStack.isUserNameAlreadyExist(user.getUserDetails().getEmail())) {
             log.warn("Apply to create team: OpenStack user name is already exists");
-            throw new OpenStackProjectNameAlreadyExistsException("OpenStack user " + team.getName() +" already exists");
+            throw new OpenStackUserNameAlreadyExistsException("OpenStack user " + user.getUserDetails().getEmail() +" already exists");
         };
 
         // accept user data from form
@@ -346,6 +347,20 @@ public class RegistrationServiceImpl implements RegistrationService {
             log.warn("Team NOT found, TeamId {}", teamId);
             throw new TeamNotFoundException(teamId);
         }
+
+        //check if openstack team already exists
+        if (!adapterOpenStack.isProjectNameAlreadyExist(team.getName())) {
+            log.warn("Apply to create team: OpenStack project name is already exists");
+            throw new OpenStackProjectNameAlreadyExistsException("OpenStack project " + team.getName() +" already exists");
+        };
+
+        // Check if openstack user already exists
+        if (!adapterOpenStack.isUserNameAlreadyExist(user.getUserDetails().getEmail())) {
+            log.warn("Apply to create team: OpenStack user name is already exists");
+            throw new OpenStackUserNameAlreadyExistsException("OpenStack user " + user.getUserDetails().getEmail() +" already exists");
+        };
+
+
         String pid = team.getName();
         // already add to user side when request to join
         JSONObject one = new JSONObject();
