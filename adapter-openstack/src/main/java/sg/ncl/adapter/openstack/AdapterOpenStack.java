@@ -436,11 +436,7 @@ public class AdapterOpenStack {
         JSONObject responseObject = new JSONObject(responseEntity.getBody().toString());
         try {
             JSONArray projectJsonArray = responseObject.getJSONArray(PROJECTS_KEY);
-            if (projectJsonArray.length() == 1) { // only exactly 1 already exists
-                return true;
-            }  else  {
-                return false;
-            }
+            return (projectJsonArray.length() == 1);
         } catch (JSONException e) {
             log.warn("Error in checking if project name {} already exists: project array cant be retrieve from OpenStack", projectName);
             throw e;
@@ -478,12 +474,7 @@ public class AdapterOpenStack {
         JSONObject responseObject = new JSONObject(responseEntity.getBody().toString());
         try{
             JSONArray usersJsonArray = responseObject.getJSONArray(USERS_KEY);
-
-            if (usersJsonArray.length() == 1) {
-                return true;
-            } else  {
-                return false;
-            }
+            return (usersJsonArray.length() == 1);
         } catch (JSONException e) {
             log.warn("Error in checking if user name {} already exists: user array cant be retrieve from OpenStack", userName);
             throw e;
