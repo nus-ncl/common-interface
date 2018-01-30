@@ -49,7 +49,7 @@ public class RegistrationServiceImpl implements RegistrationService {
 
     private static final String USER = "User";
     private static final String TEAM = "Team";
-    private static final String NOT_FOUND = "not found";
+    private static final String NOT_FOUND = " not found";
     private static final String FIRST_NAME = "firstname";
     private static final String TEAM_NAME = "teamname";
     private static final String FULL_NAME = "fullname";
@@ -60,6 +60,9 @@ public class RegistrationServiceImpl implements RegistrationService {
     private static final String COUNTRY = "country";
     private static final String ADMIN_EMAIL = "ncl-admin@ncl.sg";
     private static final String TESTBED_EMAIL = "NCL Testbed Ops <testbed-ops@ncl.sg>";
+    private static final String OPENSTACK_USER = "OpenStack User ";
+    private static final String OPENSTACK_PROJECT = "OpenStack Project";
+    private static final String ALREADY_EXIST = " Already exists";
 
     private final CredentialsService credentialsService;
     private final TeamService teamService;
@@ -118,13 +121,20 @@ public class RegistrationServiceImpl implements RegistrationService {
 
         //check if openstack project already exists
         if (adapterOpenStack.isProjectNameAlreadyExist(team.getName())){
-            log.warn("Error existing user request to apply team: OpenStack project name already exists");
-            throw new OpenStackProjectNameAlreadyExistsException("OpenStack project "+ team.getName() +" already exists");
-        };
+            log.warn("Error existing user request to apply team: OpenStack project name {} already exists", team.getName());
+            throw new OpenStackProjectNameAlreadyExistsException(OPENSTACK_PROJECT + team.getName() + ALREADY_EXIST);
+        }
 
         if (userService.getUser(nclUserId) == null) {
             log.warn("User not found: {}", nclUserId);
-            throw new UserNotFoundException(USER + " " + nclUserId + " " + NOT_FOUND);
+            throw new UserNotFoundException(USER + " " + nclUserId + NOT_FOUND);
+        }
+
+        // check if we can find OpenStack user
+        String userEmail = userService.getUser(nclUserId).getUserDetails().getEmail(); //we use email as Openstack name
+        if (!adapterOpenStack.isUserNameAlreadyExist(userEmail)) {
+            log.warn("Error register to apply new team: OpenStack user {} not found", userEmail);
+            throw new UserNotFoundException(OPENSTACK_USER + userEmail + NOT_FOUND);
         }
 
         // no problem with the team, create the team
@@ -179,8 +189,20 @@ public class RegistrationServiceImpl implements RegistrationService {
             throw new TeamNotFoundException(TEAM + " " + team.getName() + " " + NOT_FOUND);
         }
 
-        // check if team exists in openstack
-        //if (isUserNameAlreadyExist(userName))
+        //check if we can find OpenStack team
+        if (!adapterOpenStack.isProjectNameAlreadyExist(team.getName())){
+            log.warn("Error existing user request to join team: OpenStack project {} not found", teamEntity.getName());
+            throw new OpenStackProjectNotFoundException(OPENSTACK_PROJECT + team.getName() + NOT_FOUND);
+        }
+
+        // check if we can find OpenStack user
+        String userEmail = userService.getUser(nclUserId).getUserDetails().getEmail(); //we use email as OpenStack name
+        if (!adapterOpenStack.isUserNameAlreadyExist(userEmail)) {
+            log.warn("Error register to apply new team: OpenStack user {} not found", userEmail);
+            throw new UserNotFoundException(OPENSTACK_USER + userEmail + " " + NOT_FOUND);
+        }
+
+
 
         String teamId = teamEntity.getId();
 
@@ -246,8 +268,8 @@ public class RegistrationServiceImpl implements RegistrationService {
             log.info("Register new user: join Team {}", teamEntity.getName());
 
             if (!adapterOpenStack.isProjectNameAlreadyExist(teamEntity.getName())) {
-                log.warn("Apply to join team: OpenStack project name does not exist");
-                throw new OpenStackProjectNotFoundException("OpenStack project " + teamEntity.getName() +" does not exists");
+                log.warn("Apply to join team: OpenStack project {} not found", teamEntity.getName());
+                throw new OpenStackProjectNotFoundException(OPENSTACK_PROJECT + teamEntity.getName() + NOT_FOUND);
             }
 
         } else {
@@ -260,10 +282,11 @@ public class RegistrationServiceImpl implements RegistrationService {
         }
 
         // Check if openstack user already exists before adding user to SIO database
-        if (adapterOpenStack.isUserNameAlreadyExist(user.getUserDetails().getEmail())) {
-            log.warn("Apply to create team: OpenStack user name is already exists");
-            throw new OpenStackUserNameAlreadyExistsException("OpenStack user " + user.getUserDetails().getEmail() +" already exists");
-        };
+        String userEmail = user.getUserDetails().getEmail();
+        if (adapterOpenStack.isUserNameAlreadyExist(userEmail)) {
+            log.warn("Apply to create team: OpenStack user {} already exists", userEmail);
+            throw new OpenStackUserNameAlreadyExistsException(OPENSTACK_USER + userEmail + ALREADY_EXIST);
+        }
 
         // accept user data from form
         User createdUser = userService.createUser(user);
