@@ -61,8 +61,8 @@ public class RegistrationServiceImpl implements RegistrationService {
     private static final String ADMIN_EMAIL = "ncl-admin@ncl.sg";
     private static final String TESTBED_EMAIL = "NCL Testbed Ops <testbed-ops@ncl.sg>";
     private static final String OPENSTACK_USER = "OpenStack User ";
-    private static final String OPENSTACK_PROJECT = "OpenStack Project";
-    private static final String ALREADY_EXIST = " Already exists";
+    private static final String OPENSTACK_PROJECT = "OpenStack Project ";
+    private static final String ALREADY_EXIST = " already exists";
 
     private final CredentialsService credentialsService;
     private final TeamService teamService;
