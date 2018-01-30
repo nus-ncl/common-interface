@@ -50,7 +50,7 @@ public class AdapterOpenStack {
         restTemplate.setRequestFactory(requestFactory);
     }
 
-    private String requestToken () {
+    public String requestToken () {
 
         JSONObject userObject = new JSONObject();
         userObject.put("id", properties.getAdminId());
@@ -460,7 +460,7 @@ public class AdapterOpenStack {
 
         try {
             responseEntity = restTemplate.exchange(properties.listUserUrl(userName), HttpMethod.GET, request, String.class);
-            log.info("Successfully retrieving OpenStack user id from user name {} to check if project name already exists", userName);
+            log.info("Successfully retrieving OpenStack user id from user name {} to check if user name already exists", userName);
         } catch (ResourceAccessException e) {
             log.warn(ERROR_CHECK_IF_USER_EXIST, userName, e.getMessage());
             throw new OpenStackConnectionException(e.getMessage());

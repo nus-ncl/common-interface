@@ -154,7 +154,8 @@ public class RegistrationServiceImplTest {
         when(userService.getUser(anyString())).thenReturn(userEntity);
         when(teamService.getTeamByName(anyString())).thenReturn(null);
         when(teamService.createTeam(any(Team.class))).thenReturn(teamEntity);
-
+        when(adapterOpenStack.isProjectNameAlreadyExist(anyString())).thenReturn(false);
+        when(adapterOpenStack.isUserNameAlreadyExist(anyString())).thenReturn(true);
         registrationService.registerRequestToApplyTeam(userEntity.getId(), teamEntity);
 
         verify(teamService, times(1)).createTeam(any(Team.class));
@@ -173,7 +174,8 @@ public class RegistrationServiceImplTest {
 
         when(userService.getUser(anyString())).thenReturn(userEntity);
         when(teamService.createTeam(any(Team.class))).thenReturn(teamEntity);
-
+        when(adapterOpenStack.isProjectNameAlreadyExist(anyString())).thenReturn(false);
+        when(adapterOpenStack.isUserNameAlreadyExist(anyString())).thenReturn(true);
         exception.expect(TeamIdNullOrEmptyException.class);
 
         registrationService.registerRequestToApplyTeam(userEntity.getId(), teamEntity);
@@ -220,7 +222,10 @@ public class RegistrationServiceImplTest {
         when(teamService.getTeamByName(anyString())).thenReturn(teamEntity);
         UserEntity userEntity = Util.getUserEntity();
         when(userService.getUser(anyString())).thenReturn(userEntity);
+        when(adapterOpenStack.isUserNameAlreadyExist(anyString())).thenReturn(true);
+        when(adapterOpenStack.isProjectNameAlreadyExist(anyString())).thenReturn(true);
         registrationService.registerRequestToJoinTeam(uid, teamEntity);
+
 
         verify(adapterDeterLab, times(1)).getDeterUserIdByNclUserId(anyString());
         verify(userService, times(1)).addTeam(anyString(), anyString());
