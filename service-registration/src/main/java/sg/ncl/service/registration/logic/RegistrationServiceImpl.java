@@ -714,7 +714,7 @@ public class RegistrationServiceImpl implements RegistrationService {
         Team one = teamService.getTeamByName(teamName);
         if (one != null) {
             log.warn("Team name duplicate entry found: {}", teamName);
-            throw new TeamNameAlreadyExistsException(TEAM + " " + teamName + " already exists");
+            throw new TeamNameAlreadyExistsException(TEAM + " " + teamName + ALREADY_EXIST);
         }
     }
 
