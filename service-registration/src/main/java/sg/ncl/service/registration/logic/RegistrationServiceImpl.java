@@ -257,6 +257,7 @@ public class RegistrationServiceImpl implements RegistrationService {
 
             if (adapterOpenStack.isOpenStackEnable()) {
                 //check team name for OpenStack already exists
+                log.info("Apply to create team: Start checking if OpenStack project name is already exists");
                 if (adapterOpenStack.isProjectNameAlreadyExist(team.getName())) {
                     log.warn("Apply to create team: OpenStack project name is already exists");
                     throw new OpenStackProjectNameAlreadyExistsException(OPENSTACK_PROJECT + team.getName() + ALREADY_EXIST);
@@ -275,6 +276,7 @@ public class RegistrationServiceImpl implements RegistrationService {
             log.info("Register new user: join Team {}", teamEntity.getName());
 
             if (adapterOpenStack.isOpenStackEnable()) {
+                log.info("Apply to join team: Start checking if OpenStack project {} can be found", teamEntity.getName());
                 if (!adapterOpenStack.isProjectNameAlreadyExist(teamEntity.getName())) {
                     log.warn("Apply to join team: OpenStack project {} not found", teamEntity.getName());
                     throw new OpenStackProjectNotFoundException(OPENSTACK_PROJECT + teamEntity.getName() + NOT_FOUND);
