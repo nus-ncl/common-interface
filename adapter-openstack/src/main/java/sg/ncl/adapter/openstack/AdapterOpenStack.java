@@ -55,7 +55,7 @@ public class AdapterOpenStack {
     }
 
     public String requestToken () {
-        
+
         JSONObject userObject = new JSONObject();
         userObject.put("id", properties.getAdminId());
         userObject.put(PASS_KEY, properties.getAdminPass());
