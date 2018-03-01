@@ -522,16 +522,16 @@ public class RegistrationServiceImpl implements RegistrationService {
 
             String openStackUserId;
 
-            if (adapterOpenStack.isOpenStackEnable() && (UserStatus.PENDING).equals(user.getStatus())) {
-                log.info("Start to enable OpenStack user ", user.getUserDetails().getEmail());
-                // Enable OpenStack User , this is when admin approve new team
-                openStackUserId = adapterOpenStack.retrieveOpenStackUserId(user.getUserDetails().getEmail());
-                adapterOpenStack.enableOpenStackUser(openStackUserId);
-                log.info("Succesfully enable OpenStack user ", user.getUserDetails().getEmail());
-            }
-
             if ((UserStatus.PENDING).equals(user.getStatus())) {
                 userService.updateUserStatus(ownerId, UserStatus.APPROVED);
+
+                if (adapterOpenStack.isOpenStackEnable()) {
+                    log.info("Start to enable OpenStack user ", user.getUserDetails().getEmail());
+                    // Enable OpenStack User , this is when admin approve new team
+                    openStackUserId = adapterOpenStack.retrieveOpenStackUserId(user.getUserDetails().getEmail());
+                    adapterOpenStack.enableOpenStackUser(openStackUserId);
+                    log.info("Succesfully enable OpenStack user ", user.getUserDetails().getEmail());
+                }
             }
 
             // change team owner member status
