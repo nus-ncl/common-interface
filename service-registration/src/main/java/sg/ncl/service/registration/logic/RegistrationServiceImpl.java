@@ -522,17 +522,19 @@ public class RegistrationServiceImpl implements RegistrationService {
 
             String openStackUserId;
 
-            if ((UserStatus.PENDING).equals(user.getStatus())) {
+            if (adapterOpenStack.isOpenStackEnable() && (UserStatus.PENDING).equals(user.getStatus())) {
                 userService.updateUserStatus(ownerId, UserStatus.APPROVED);
+                log.info("Start to enable OpenStack user ", user.getUserDetails().getEmail());
+                // Enable OpenStack User , this is when admin approve new team
+                openStackUserId = adapterOpenStack.retrieveOpenStackUserId(user.getUserDetails().getEmail());
+                adapterOpenStack.enableOpenStackUser(openStackUserId);
+                log.info("Succesfully enable OpenStack user ", user.getUserDetails().getEmail());
 
-                if (adapterOpenStack.isOpenStackEnable()) {
-                    log.info("Start to enable OpenStack user ", user.getUserDetails().getEmail());
-                    // Enable OpenStack User , this is when admin approve new team
-                    openStackUserId = adapterOpenStack.retrieveOpenStackUserId(user.getUserDetails().getEmail());
-                    adapterOpenStack.enableOpenStackUser(openStackUserId);
-                    log.info("Succesfully enable OpenStack user ", user.getUserDetails().getEmail());
-                }
+            } else if ((UserStatus.PENDING).equals(user.getStatus())) {
+                userService.updateUserStatus(ownerId, UserStatus.APPROVED);
             }
+
+
             // change team owner member status
             teamService.updateMemberStatus(teamId, ownerId, MemberStatus.APPROVED);
             adapterResult = adapterDeterLab.approveProject(one.toString());
