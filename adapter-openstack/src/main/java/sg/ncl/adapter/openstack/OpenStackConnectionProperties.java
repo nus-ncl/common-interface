@@ -23,6 +23,7 @@ public class OpenStackConnectionProperties {
     private String adminPass;
     private String adminId;
     private String adminProjectId;
+    private boolean enabled = true;
 
     public String requestTokenUrl() {
         return HTTP_MODE + ip + ":" + identityPort + "/v3/auth/tokens";
