@@ -520,19 +520,7 @@ public class RegistrationServiceImpl implements RegistrationService {
                 throw new EmailNotVerifiedException(user.getId());
             }
 
-            String openStackUserId;
-
-            if ((UserStatus.PENDING).equals(user.getStatus())) {
-                userService.updateUserStatus(ownerId, UserStatus.APPROVED);
-
-                if (adapterOpenStack.isOpenStackEnable()) {
-                    log.info("Start to enable OpenStack user ", user.getUserDetails().getEmail());
-                    // Enable OpenStack User , this is when admin approve new team
-                    openStackUserId = adapterOpenStack.retrieveOpenStackUserId(user.getUserDetails().getEmail());
-                    adapterOpenStack.enableOpenStackUser(openStackUserId);
-                    log.info("Succesfully enable OpenStack user ", user.getUserDetails().getEmail());
-                }
-            }
+            updateUserStatusPendingToApproved(user, ownerId);
 
             // change team owner member status
             teamService.updateMemberStatus(teamId, ownerId, MemberStatus.APPROVED);
@@ -540,7 +528,7 @@ public class RegistrationServiceImpl implements RegistrationService {
 
             if (adapterOpenStack.isOpenStackEnable()) {
                 log.info("Start to add OpenStack User {} to Project {}", user.getUserDetails().getEmail(), team.getName());
-                openStackUserId = adapterOpenStack.retrieveOpenStackUserId(user.getUserDetails().getEmail());
+                String openStackUserId = adapterOpenStack.retrieveOpenStackUserId(user.getUserDetails().getEmail());
                 // Approve OpenStack team : enable project when project is first created + add user
                 String openStackProjectId = adapterOpenStack.retrieveOpenStackProjectId(team.getName());
                 adapterOpenStack.enableOpenStackProject(openStackProjectId);
@@ -576,6 +564,23 @@ public class RegistrationServiceImpl implements RegistrationService {
             sendReplyCreateTeamEmail(userService.getUser(ownerId), team, status, reason);
         }
         return adapterResult;
+    }
+
+
+    private void updateUserStatusPendingToApproved(User user, String ownerId) {
+
+        if ((UserStatus.PENDING).equals(user.getStatus())) {
+            userService.updateUserStatus(ownerId, UserStatus.APPROVED);
+
+            if (adapterOpenStack.isOpenStackEnable()) {
+                log.info("Start to enable OpenStack user ", user.getUserDetails().getEmail());
+                // Enable OpenStack User , this is when admin approve new team
+                String openStackUserId = adapterOpenStack.retrieveOpenStackUserId(user.getUserDetails().getEmail());
+                adapterOpenStack.enableOpenStackUser(openStackUserId);
+                log.info("Succesfully enable OpenStack user ", user.getUserDetails().getEmail());
+            }
+        }
+
     }
 
     private boolean userFormFieldsHasErrors(User user) {
