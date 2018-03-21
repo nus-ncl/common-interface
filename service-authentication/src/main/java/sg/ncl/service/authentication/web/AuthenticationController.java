@@ -48,7 +48,7 @@ public class AuthenticationController {
         if (authorization.startsWith("Basic ")) {
             final byte[] bytes = Base64Utils.decodeFromString(authorization.substring(6));
             final String decoded = new String(bytes);
-            final String[] split = decoded.split(":");
+            final String[] split = decoded.split(":", 2);
             if (split.length == 2) {
                 final String username = split[0];
                 final String password = split[1];
