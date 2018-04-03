@@ -162,4 +162,10 @@ public class TeamsController {
         checkClaimsType(claims);
         return new TeamInfo(teamService.removeMember(id, teamMember, ((Claims) claims).getSubject()));
     }
+
+    @GetMapping(path = "/{id}/reservations")
+    @ResponseStatus(HttpStatus.OK)
+    public String getReservationStatus(@PathVariable final String id) {
+        return teamService.getReservationStatus(id);
+    }
 }

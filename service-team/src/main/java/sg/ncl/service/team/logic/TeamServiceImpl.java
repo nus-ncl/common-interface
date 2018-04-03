@@ -426,4 +426,9 @@ public class TeamServiceImpl implements TeamService {
         return 1;
     }
 
+    @Override
+    public String getReservationStatus(@NotNull String teamId) {
+        return adapterDeterLab.getReservationStatus(teamId);
+    }
+
 }

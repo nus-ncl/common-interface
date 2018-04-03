@@ -1180,4 +1180,39 @@ public class AdapterDeterLab {
         return jsonObject.toString();
     }
 
+    public String getReservationStatus(String teamId) {
+        final String pid = getDeterProjectIdByNclTeamId(teamId);
+        log.info("Get reservation status: pid {}", pid);
+
+        JSONObject json = new JSONObject();
+        json.put("pid", pid);
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        HttpEntity<String> request = new HttpEntity<>(json.toString(), headers);
+
+        ResponseEntity response;
+
+        try {
+            response = restTemplate.exchange(properties.getReservationStatus(), HttpMethod.POST, request, String.class);
+            String responseBody = response.getBody().toString();
+            String deterMessage = new JSONObject(responseBody).getString("msg");
+
+            if ("get reservation OK".equals(deterMessage)) {
+                log.info("Get reservation OK");
+                return responseBody;
+            } else {
+                log.warn("Get reservation FAIL: {}", deterMessage);
+                throw new DeterLabOperationFailedException(deterMessage);
+            }
+
+        } catch (ResourceAccessException rae) {
+            log.warn("Get reservation: {}", rae);
+            throw new AdapterConnectionException(rae.getMessage());
+        } catch (HttpServerErrorException hsee) {
+            log.warn("Get reservation error: Adapter DeterLab internal server error {}", hsee);
+            throw new AdapterInternalErrorException();
+        }
+    }
+
 }

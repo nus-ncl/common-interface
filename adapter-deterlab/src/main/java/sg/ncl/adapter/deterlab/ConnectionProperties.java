@@ -153,4 +153,8 @@ public class ConnectionProperties {
         return HTTP_MODE + ip + ":" + port + "/removeUserFromTeam";
     }
 
+    public String getReservationStatus() {
+        return HTTP_MODE + ip + ":" + port + "/getReservation";
+    }
+
 }
