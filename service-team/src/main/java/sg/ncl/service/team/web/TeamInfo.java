@@ -26,7 +26,7 @@ public class TeamInfo implements Team {
     private final String organisationType;
     private final TeamVisibility visibility;
     private final TeamPrivacy privacy;
-    private final Boolean isClass;
+    private final boolean isClass;
     private final TeamStatus status;
     private final ZonedDateTime applicationDate;
     private final ZonedDateTime processedDate;
@@ -41,7 +41,7 @@ public class TeamInfo implements Team {
             @JsonProperty("website") final String website,
             @JsonProperty("organisationType") final String organisationType,
             @JsonProperty("visibility") final TeamVisibility visibility,
-            @JsonProperty("isClass") final Boolean isClass,
+            @JsonProperty("isClass") final boolean isClass,
             @JsonProperty("privacy") final TeamPrivacy privacy,
             @JsonProperty("status") final TeamStatus status,
             @JsonProperty("applicationDate") final ZonedDateTime applicationDate,
@@ -60,6 +60,9 @@ public class TeamInfo implements Team {
         this.processedDate = processedDate;
         this.members = members.stream().map(TeamMemberInfo::new).collect(Collectors.toList());
     }
+
+    @Override
+    public  boolean getIsClass() {return isClass;}
 
     public TeamInfo(final Team team) {
         this(
