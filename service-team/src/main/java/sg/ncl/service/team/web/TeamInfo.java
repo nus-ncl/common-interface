@@ -26,6 +26,7 @@ public class TeamInfo implements Team {
     private final String organisationType;
     private final TeamVisibility visibility;
     private final TeamPrivacy privacy;
+    private final Boolean isClass;
     private final TeamStatus status;
     private final ZonedDateTime applicationDate;
     private final ZonedDateTime processedDate;
@@ -40,6 +41,7 @@ public class TeamInfo implements Team {
             @JsonProperty("website") final String website,
             @JsonProperty("organisationType") final String organisationType,
             @JsonProperty("visibility") final TeamVisibility visibility,
+            @JsonProperty("isClass") final Boolean isClass,
             @JsonProperty("privacy") final TeamPrivacy privacy,
             @JsonProperty("status") final TeamStatus status,
             @JsonProperty("applicationDate") final ZonedDateTime applicationDate,
@@ -51,6 +53,7 @@ public class TeamInfo implements Team {
         this.website = website;
         this.organisationType = organisationType;
         this.visibility = visibility;
+        this.isClass = isClass;
         this.privacy = privacy;
         this.status = status;
         this.applicationDate = applicationDate;
@@ -66,6 +69,7 @@ public class TeamInfo implements Team {
                 team.getWebsite(),
                 team.getOrganisationType(),
                 team.getVisibility(),
+                team.getIsClass(),
                 team.getPrivacy(),
                 team.getStatus(),
                 team.getApplicationDate(),

@@ -74,6 +74,7 @@ public class TeamServiceImpl implements TeamService {
         entity.setOrganisationType(team.getOrganisationType());
         entity.setWebsite(team.getWebsite());
         entity.setVisibility(team.getVisibility());
+        entity.setIsClass(team.getIsClass());
         entity.setStatus(TeamStatus.PENDING);
 
         final Team savedTeam = teamRepository.save(entity);
