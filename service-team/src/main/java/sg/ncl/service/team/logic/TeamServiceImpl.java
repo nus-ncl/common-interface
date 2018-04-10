@@ -431,4 +431,9 @@ public class TeamServiceImpl implements TeamService {
         return adapterDeterLab.getReservationStatus(teamId);
     }
 
+    @Override
+    public String releaseNodes(String teamId, String numNodes) {
+        return adapterDeterLab.releaseNodes(teamId, numNodes);
+    }
+
 }

@@ -168,4 +168,10 @@ public class TeamsController {
     public String getReservationStatus(@PathVariable final String id) {
         return teamService.getReservationStatus(id);
     }
+
+    @DeleteMapping(path = "/{id}/reservations")
+    @ResponseStatus(HttpStatus.OK)
+    public String releaseNodes(@PathVariable final String id, @RequestParam(value = "numNodes", required = false) String numNodes) {
+        return teamService.releaseNodes(id, numNodes);
+    }
 }

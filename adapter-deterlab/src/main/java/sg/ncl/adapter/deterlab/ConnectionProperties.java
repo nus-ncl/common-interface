@@ -4,6 +4,8 @@ import lombok.Getter;
 import lombok.Setter;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
+import java.net.URI;
+
 import static sg.ncl.adapter.deterlab.ConnectionProperties.PREFIX;
 
 /**
@@ -157,4 +159,7 @@ public class ConnectionProperties {
         return HTTP_MODE + ip + ":" + port + "/getReservation";
     }
 
+    public String releaseNodes() {
+        return HTTP_MODE + ip + ":" + port + "/releaseReservation";
+    }
 }

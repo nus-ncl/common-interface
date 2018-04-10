@@ -1215,4 +1215,44 @@ public class AdapterDeterLab {
         }
     }
 
+    public String releaseNodes(String teamId, String numNodes) {
+        final String pid = getDeterProjectIdByNclTeamId(teamId);
+        log.info("Get reservation status: pid {}", pid);
+
+        JSONObject json = new JSONObject();
+        json.put("pid", pid);
+
+        if (numNodes != null) {
+            json.put("numNodes", numNodes);
+        } else {
+            json.put("numNodes", "");
+        }
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        HttpEntity<String> request = new HttpEntity<>(json.toString(), headers);
+
+        ResponseEntity response;
+
+        try {
+            response = restTemplate.exchange(properties.releaseNodes(), HttpMethod.POST, request, String.class);
+            String responseBody = response.getBody().toString();
+            String deterMessage = new JSONObject(responseBody).getString("msg");
+
+            if ("release reservation OK".equals(deterMessage)) {
+                log.info("release reservation OK");
+                return responseBody;
+            } else {
+                log.warn("release reservation FAIL: {}", deterMessage);
+                throw new DeterLabOperationFailedException(deterMessage);
+            }
+
+        } catch (ResourceAccessException rae) {
+            log.warn("release reservation: {}", rae);
+            throw new AdapterConnectionException(rae.getMessage());
+        } catch (HttpServerErrorException hsee) {
+            log.warn("release reservation error: Adapter DeterLab internal server error {}", hsee);
+            throw new AdapterInternalErrorException();
+        }
+    }
 }
