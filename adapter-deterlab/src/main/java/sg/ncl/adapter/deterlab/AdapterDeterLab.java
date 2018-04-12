@@ -1248,4 +1248,39 @@ public class AdapterDeterLab {
             throw new AdapterInternalErrorException();
         }
     }
+
+    public String reserveNodes(String teamId, Integer numNodes, String machineType) {
+        final String pid = getDeterProjectIdByNclTeamId(teamId);
+        log.info("Get reservation status: pid {}", pid);
+
+        JSONObject json = new JSONObject();
+        json.put("pid", pid);
+        json.put("numNodes", numNodes);
+
+        if (machineType != null) {
+            json.put("machineType", machineType);
+        } else {
+            json.put("machineType", "");
+        }
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        HttpEntity<String> request = new HttpEntity<>(json.toString(), headers);
+
+        ResponseEntity response;
+
+        try {
+            response = restTemplate.exchange(properties.reserveNodes(), HttpMethod.POST, request, String.class);
+
+            // return regardless of success / fail
+            return response.getBody().toString();
+
+        } catch (ResourceAccessException rae) {
+            log.warn("release reservation: {}", rae);
+            throw new AdapterConnectionException(rae.getMessage());
+        } catch (HttpServerErrorException hsee) {
+            log.warn("release reservation error: Adapter DeterLab internal server error {}", hsee);
+            throw new AdapterInternalErrorException();
+        }
+    }
 }

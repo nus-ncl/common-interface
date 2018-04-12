@@ -436,4 +436,9 @@ public class TeamServiceImpl implements TeamService {
         return adapterDeterLab.releaseNodes(teamId, numNodes);
     }
 
+    @Override
+    public String reserveNodes(String teamId, Integer numNodes, String machineType) {
+        return adapterDeterLab.reserveNodes(teamId, numNodes, machineType);
+    }
+
 }

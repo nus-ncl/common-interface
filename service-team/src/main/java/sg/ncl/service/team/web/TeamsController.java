@@ -174,4 +174,10 @@ public class TeamsController {
     public String releaseNodes(@PathVariable final String id, @RequestParam(value = "numNodes", required = false) String numNodes) {
         return teamService.releaseNodes(id, numNodes);
     }
+
+    @PostMapping(path = "/{id}/reservations")
+    @ResponseStatus(HttpStatus.OK)
+    public String reserveNodes(@PathVariable final String id, @RequestParam(value = "numNodes", required = true) Integer numNodes, @RequestParam(value = "machineType", required = false) String machineType) {
+        return teamService.reserveNodes(id, numNodes, machineType);
+    }
 }
