@@ -1196,14 +1196,14 @@ public class AdapterDeterLab {
         try {
             response = restTemplate.exchange(properties.getReservationStatus(), HttpMethod.POST, request, String.class);
             String responseBody = response.getBody().toString();
-            String deterMessage = new JSONObject(responseBody).getString("msg");
+            String status = new JSONObject(responseBody).getString("status");
 
-            if ("get reservation OK".equals(deterMessage)) {
+            if ("get reservation OK".equals(status)) {
                 log.info("Get reservation OK");
                 return responseBody;
             } else {
-                log.warn("Get reservation FAIL: {}", deterMessage);
-                throw new DeterLabOperationFailedException(deterMessage);
+                log.warn("Get reservation FAIL: {}", status);
+                throw new DeterLabOperationFailedException(status);
             }
 
         } catch (ResourceAccessException rae) {
@@ -1236,16 +1236,9 @@ public class AdapterDeterLab {
 
         try {
             response = restTemplate.exchange(properties.releaseNodes(), HttpMethod.POST, request, String.class);
-            String responseBody = response.getBody().toString();
-            String deterMessage = new JSONObject(responseBody).getString("msg");
 
-            if ("release reservation OK".equals(deterMessage)) {
-                log.info("release reservation OK");
-                return responseBody;
-            } else {
-                log.warn("release reservation FAIL: {}", deterMessage);
-                throw new DeterLabOperationFailedException(deterMessage);
-            }
+            // return regardless of success / fail
+            return response.getBody().toString();
 
         } catch (ResourceAccessException rae) {
             log.warn("release reservation: {}", rae);
