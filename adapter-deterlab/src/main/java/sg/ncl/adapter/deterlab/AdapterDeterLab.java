@@ -1276,10 +1276,10 @@ public class AdapterDeterLab {
             return response.getBody().toString();
 
         } catch (ResourceAccessException rae) {
-            log.warn("release reservation: {}", rae);
+            log.warn("node reservation: {}", rae);
             throw new AdapterConnectionException(rae.getMessage());
         } catch (HttpServerErrorException hsee) {
-            log.warn("release reservation error: Adapter DeterLab internal server error {}", hsee);
+            log.warn("node reservation error: Adapter DeterLab internal server error {}", hsee);
             throw new AdapterInternalErrorException();
         }
     }

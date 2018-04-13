@@ -438,6 +438,7 @@ public class TeamServiceImpl implements TeamService {
 
     @Override
     public String reserveNodes(String teamId, Integer numNodes, String machineType) {
+        log.info("reserve nodes");
         return adapterDeterLab.reserveNodes(teamId, numNodes, machineType);
     }
 
