@@ -18,6 +18,7 @@ import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import static sg.ncl.common.validation.Validator.checkAdmin;
 import static sg.ncl.common.validation.Validator.checkClaimsType;
 import static sg.ncl.service.team.validations.Validator.isAdmin;
 import static sg.ncl.service.team.web.TeamsController.PATH;
@@ -165,19 +166,24 @@ public class TeamsController {
 
     @GetMapping(path = "/{id}/reservations")
     @ResponseStatus(HttpStatus.OK)
-    public String getReservationStatus(@PathVariable final String id) {
+    public String getReservationStatus(@PathVariable final String id, @AuthenticationPrincipal final Object claims) {
+        checkClaimsType(claims);
         return teamService.getReservationStatus(id);
     }
 
     @DeleteMapping(path = "/{id}/reservations")
     @ResponseStatus(HttpStatus.OK)
-    public String releaseNodes(@PathVariable final String id, @RequestParam(value = "numNodes", required = false) String numNodes) {
+    public String releaseNodes(@PathVariable final String id, @RequestParam(value = "numNodes", required = false) String numNodes, @AuthenticationPrincipal final Object claims) {
+        checkClaimsType(claims);
+        checkAdmin((Claims) claims);
         return teamService.releaseNodes(id, numNodes);
     }
 
     @PostMapping(path = "/{id}/reservations")
     @ResponseStatus(HttpStatus.OK)
-    public String reserveNodes(@PathVariable final String id, @RequestParam(value = "numNodes", required = true) Integer numNodes, @RequestParam(value = "machineType", required = false) String machineType) {
+    public String reserveNodes(@PathVariable final String id, @RequestParam(value = "numNodes", required = true) Integer numNodes, @RequestParam(value = "machineType", required = false) String machineType, @AuthenticationPrincipal final Object claims) {
+        checkClaimsType(claims);
+        checkAdmin((Claims) claims);
         return teamService.reserveNodes(id, numNodes, machineType);
     }
 }
