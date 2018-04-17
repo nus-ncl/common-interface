@@ -1180,9 +1180,23 @@ public class AdapterDeterLab {
         return jsonObject.toString();
     }
 
+    /**
+     * Retrieve the list of nodes reserved for a team
+     * @param teamId e.g. F12345-G12345-H12345
+     * @return  a json string in the format:
+     *   {
+     *       'status' : 'ok/fail'
+     *       'reservation'
+     *       {
+     *           'all' : [node_id_list],
+     *           'in_use' : [node_id_list],
+     *           'reload' : [node_id_list],
+     *           'free' : [node_id_list]
+     *       }
+     *   }
+     */
     public String getReservationStatus(String teamId) {
         final String pid = getDeterProjectIdByNclTeamId(teamId);
-        log.info("Get reservation status: pid {}", pid);
 
         JSONObject json = new JSONObject();
         json.put("pid", pid);
@@ -1215,9 +1229,18 @@ public class AdapterDeterLab {
         }
     }
 
+    /**
+     * Release all the nodes or a specific numbers of nodes
+     * @param teamId e.g. F12345-G12345-H12345
+     * @param numNodes optional; will attempt to release all the nodes if not specify
+     * @return  a json string in the format:
+     *   {
+     *       'status' : 'ok/fail'
+     *       'message' : 'error message' / [node_id_list]
+     *   }
+     */
     public String releaseNodes(String teamId, String numNodes) {
         final String pid = getDeterProjectIdByNclTeamId(teamId);
-        log.info("Get reservation status: pid {}", pid);
 
         JSONObject json = new JSONObject();
         json.put("pid", pid);
@@ -1249,9 +1272,19 @@ public class AdapterDeterLab {
         }
     }
 
+    /**
+     * Reserve a specific number of nodes or a particular node type
+     * @param teamId e.g. F12345-G12345-H12345
+     * @param numNodes required
+     * @param machineType optional; will attempt to reserve X number of nodes with this machine type if specify
+     * @return  a json string in the format:
+     *   {
+     *       'status' : 'ok/fail'
+     *       'message' : 'error message' / [node_id_list]
+     *   }
+     */
     public String reserveNodes(String teamId, Integer numNodes, String machineType) {
         final String pid = getDeterProjectIdByNclTeamId(teamId);
-        log.info("Get reservation status: pid {}", pid);
 
         JSONObject json = new JSONObject();
         json.put("pid", pid);

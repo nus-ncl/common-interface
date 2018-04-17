@@ -426,16 +426,52 @@ public class TeamServiceImpl implements TeamService {
         return 1;
     }
 
+    /**
+     * Retrieve the list of nodes reserved for a team
+     * @param teamId e.g. F12345-G12345-H12345
+     * @return  a json string in the format:
+     *   {
+     *       'status' : 'ok/fail'
+     *       'reservation'
+     *       {
+     *           'all' : [node_id_list],
+     *           'in_use' : [node_id_list],
+     *           'reload' : [node_id_list],
+     *           'free' : [node_id_list]
+     *       }
+     *   }
+     */
     @Override
     public String getReservationStatus(@NotNull String teamId) {
         return adapterDeterLab.getReservationStatus(teamId);
     }
 
+    /**
+     * Release all the nodes or a specific numbers of nodes
+     * @param teamId e.g. F12345-G12345-H12345
+     * @param numNodes optional; will attempt to release all the nodes if not specify
+     * @return  a json string in the format:
+     *   {
+     *       'status' : 'ok/fail'
+     *       'message' : 'error message' / [node_id_list]
+     *   }
+     */
     @Override
     public String releaseNodes(String teamId, String numNodes) {
         return adapterDeterLab.releaseNodes(teamId, numNodes);
     }
 
+    /**
+     * Reserve a specific number of nodes or a particular node type
+     * @param teamId e.g. F12345-G12345-H12345
+     * @param numNodes required
+     * @param machineType optional; will attempt to reserve X number of nodes with this machine type if specify
+     * @return  a json string in the format:
+     *   {
+     *       'status' : 'ok/fail'
+     *       'message' : 'error message' / [node_id_list]
+     *   }
+     */
     @Override
     public String reserveNodes(String teamId, Integer numNodes, String machineType) {
         log.info("reserve nodes");
