@@ -1239,7 +1239,7 @@ public class AdapterDeterLab {
      *       'message' : 'error message' / [node_id_list]
      *   }
      */
-    public String releaseNodes(String teamId, String numNodes) {
+    public String releaseNodes(String teamId, Integer numNodes) {
         final String pid = getDeterProjectIdByNclTeamId(teamId);
 
         JSONObject json = new JSONObject();
