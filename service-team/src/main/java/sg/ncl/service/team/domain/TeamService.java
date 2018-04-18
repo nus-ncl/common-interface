@@ -45,7 +45,7 @@ public interface TeamService {
 
     String getReservationStatus(String teamId);
 
-    String releaseNodes(String teamId, String numNodes);
+    String releaseNodes(String teamId, Integer numNodes);
 
     String reserveNodes(String id, Integer numNodes, String machineType);
 }
