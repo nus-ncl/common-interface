@@ -38,6 +38,9 @@ public class AdapterDeterLab {
     private ConnectionProperties properties;
     private RestTemplate restTemplate;
 
+    private static final String NUM_NODES = "numNodes";
+    private static final String STATUS = "status";
+
     @Inject
     public AdapterDeterLab(DeterLabUserRepository repository, DeterLabProjectRepository deterLabProjectRepository, ConnectionProperties connectionProperties, RestTemplate restTemplate) {
         this.deterLabUserRepository = repository;
@@ -460,7 +463,7 @@ public class AdapterDeterLab {
         }
 
         log.info("Stop experiment request submitted to deterlab");
-        String expStatus = new JSONObject(response.getBody().toString()).getString("status");
+        String expStatus = new JSONObject(response.getBody().toString()).getString(STATUS);
 
         if (!"swapped".equals(expStatus)) {
             log.warn("Fail to stop experiment at deterlab {}", jsonString);
@@ -501,7 +504,7 @@ public class AdapterDeterLab {
         }
 
         log.info("Delete experiment request submitted to deterlab");
-        String expStatus = new JSONObject(response.getBody().toString()).getString("status");
+        String expStatus = new JSONObject(response.getBody().toString()).getString(STATUS);
 
         if (!"no experiment found".equals(expStatus)) {
             log.warn("Fail to delete experiment at deterlab {}", jsonString);
@@ -1210,7 +1213,7 @@ public class AdapterDeterLab {
         try {
             response = restTemplate.exchange(properties.getReservationStatus(), HttpMethod.POST, request, String.class);
             String responseBody = response.getBody().toString();
-            String status = new JSONObject(responseBody).getString("status");
+            String status = new JSONObject(responseBody).getString(STATUS);
 
             if ("get reservation OK".equals(status)) {
                 log.info("Get reservation OK");
@@ -1246,9 +1249,9 @@ public class AdapterDeterLab {
         json.put("pid", pid);
 
         if (numNodes != null) {
-            json.put("numNodes", numNodes);
+            json.put(NUM_NODES, numNodes);
         } else {
-            json.put("numNodes", "");
+            json.put(NUM_NODES, "");
         }
 
         HttpHeaders headers = new HttpHeaders();
@@ -1288,7 +1291,7 @@ public class AdapterDeterLab {
 
         JSONObject json = new JSONObject();
         json.put("pid", pid);
-        json.put("numNodes", numNodes);
+        json.put(NUM_NODES, numNodes);
 
         if (machineType != null) {
             json.put("machineType", machineType);
