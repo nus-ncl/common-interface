@@ -1193,7 +1193,7 @@ public class AdapterDeterLab {
      *       {
      *           'all' : [node_id_list],
      *           'in_use' : [node_id_list],
-     *           'reload' : [node_id_list],
+     *           'reloading' : [node_id_list],
      *           'free' : [node_id_list]
      *       }
      *   }
