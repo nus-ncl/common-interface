@@ -1156,7 +1156,7 @@ public class AdapterDeterLab {
         }
     }
 
-    public String addMemberByEmail(String nclTeamId, String[] emails){
+    public String addMemberByEmail(String nclTeamId, String emails){
         String pid = getDeterProjectIdByNclTeamId(nclTeamId) ;
         log.info("Adding members by emails to team {}", pid);
 
@@ -1171,7 +1171,7 @@ public class AdapterDeterLab {
         ResponseEntity responseEntity;
 
         try {
-            responseEntity = restTemplate.exchange(properties.addMembersByEmails(), HttpMethod.POST,request, String.class);
+            responseEntity = restTemplate.exchange(properties.addMemberByEmail(), HttpMethod.POST,request, String.class);
         }catch (ResourceAccessException resourceAccessException) {
             log.warn("Add members by emails to team {}: {}", pid, resourceAccessException);
             throw new AdapterConnectionException(resourceAccessException.getMessage());

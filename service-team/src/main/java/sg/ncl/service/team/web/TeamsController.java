@@ -2,6 +2,7 @@ package sg.ncl.service.team.web;
 
 import io.jsonwebtoken.Claims;
 import lombok.extern.slf4j.Slf4j;
+import org.json.JSONArray;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -164,14 +165,18 @@ public class TeamsController {
     }
 
     // add members by emails
-    @PostMapping(path ="/{id}/addMembers")
+    @PostMapping(path ="/{teamId}/addMembers")
     @ResponseStatus(HttpStatus.OK)
-    public Team addMemberByEmail(@PathVariable final String teamId, @RequestBody final String[] emails,@AuthenticationPrincipal final Object claims) {
+    public Team addMemberByEmail(@PathVariable final String teamId, @RequestBody final String emails, @AuthenticationPrincipal final Object claims) {
         String userId = ((Claims) claims).getSubject();
         if (!teamService.isOwner(teamId, userId)) {
             log.warn("Access denied for {} : /teams/addMember POST", userId, teamId);
             throw new ForbiddenException();
         }
+        log.info("{}",  emails);
+        //JSONArray jsonArray = new JSONArray(emails);
+
+
         return new TeamInfo(teamService.addMemberByEmail(teamId, emails));
     }
 }

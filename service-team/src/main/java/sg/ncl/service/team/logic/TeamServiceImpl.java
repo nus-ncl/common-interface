@@ -428,7 +428,7 @@ public class TeamServiceImpl implements TeamService {
     }
 
     @Override
-    public Team addMemberByEmail(String teamId, String[] emails) {
+    public Team addMemberByEmail(String teamId, String emails) {
         Team team = getTeamById(teamId);
         log.info("Adding members by emails to team {}", team.getName());
         adapterDeterLab.addMemberByEmail(teamId, emails);
