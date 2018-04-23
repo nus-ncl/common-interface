@@ -10,6 +10,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.client.HttpServerErrorException;
 import org.springframework.web.client.ResourceAccessException;
 import org.springframework.web.client.RestClientException;
@@ -1153,6 +1154,34 @@ public class AdapterDeterLab {
             log.warn("Remove user from team: Adapter DeterLab internal server error {}", hsee);
             throw new AdapterInternalErrorException();
         }
+    }
+
+    public String addMemberByEmail(String nclTeamId, String[] emails){
+        String pid = getDeterProjectIdByNclTeamId(nclTeamId) ;
+        log.info("Adding members by emails to team {}", pid);
+
+        JSONObject jsonObject = new JSONObject();
+        jsonObject.put("pid", pid);
+        jsonObject.put("emails", emails);
+
+        HttpHeaders header = new HttpHeaders();
+        header.setContentType(MediaType.APPLICATION_JSON);
+        HttpEntity<String> request = new HttpEntity<>(jsonObject.toString(), header);
+
+        ResponseEntity responseEntity;
+
+        try {
+            responseEntity = restTemplate.exchange(properties.addMembersByEmails(), HttpMethod.POST,request, String.class);
+        }catch (ResourceAccessException resourceAccessException) {
+            log.warn("Add members by emails to team {}: {}", pid, resourceAccessException);
+            throw new AdapterConnectionException(resourceAccessException.getMessage());
+        } catch (HttpServerErrorException httpServerErrorException) {
+            log.warn("Add members by emails to team {}: {}", pid, httpServerErrorException);
+            throw new AdapterInternalErrorException();
+        }
+
+
+        return responseEntity.getBody().toString();
     }
 
     /**

@@ -395,6 +395,7 @@ public class RegistrationServiceImpl implements RegistrationService {
         JSONObject one = new JSONObject();
         one.put("pid", team.getName());
         one.put("uid", adapterDeterLab.getDeterUserIdByNclUserId(ownerId));
+        one.put("isClass", team.getIsClass());
 
         String adapterResult;
         if (status.equals(TeamStatus.APPROVED)) {

@@ -162,4 +162,16 @@ public class TeamsController {
         checkClaimsType(claims);
         return new TeamInfo(teamService.removeMember(id, teamMember, ((Claims) claims).getSubject()));
     }
+
+    // add members by emails
+    @PostMapping(path ="/{id}/addMembers")
+    @ResponseStatus(HttpStatus.OK)
+    public Team addMemberByEmail(@PathVariable final String teamId, @RequestBody final String[] emails,@AuthenticationPrincipal final Object claims) {
+        String userId = ((Claims) claims).getSubject();
+        if (!teamService.isOwner(teamId, userId)) {
+            log.warn("Access denied for {} : /teams/addMember POST", userId, teamId);
+            throw new ForbiddenException();
+        }
+        return new TeamInfo(teamService.addMemberByEmail(teamId, emails));
+    }
 }
