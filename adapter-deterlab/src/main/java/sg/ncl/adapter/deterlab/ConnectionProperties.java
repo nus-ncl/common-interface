@@ -153,4 +153,7 @@ public class ConnectionProperties {
         return HTTP_MODE + ip + ":" + port + "/removeUserFromTeam";
     }
 
+    public String addPublicKey() {
+        return HTTP_MODE + ip + ":" + port + "/addPublicKey";
+    }
 }
