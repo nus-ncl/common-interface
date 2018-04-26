@@ -3,6 +3,7 @@ package sg.ncl.service.user.logic;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.springframework.stereotype.Service;
+import sg.ncl.adapter.deterlab.AdapterDeterLab;
 import sg.ncl.service.authentication.domain.CredentialsService;
 import sg.ncl.service.user.data.jpa.UserDetailsEntity;
 import sg.ncl.service.user.data.jpa.UserEntity;
@@ -29,11 +30,15 @@ public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
     private final CredentialsService credentialsService;
+    private final AdapterDeterLab adapterDeterLab;
 
     @Inject
-    UserServiceImpl(final UserRepository userRepository, final CredentialsService credentialsService) {
+    UserServiceImpl(final UserRepository userRepository,
+                    final CredentialsService credentialsService,
+                    final AdapterDeterLab adapterDeterLab) {
         this.userRepository = userRepository;
         this.credentialsService = credentialsService;
+        this.adapterDeterLab = adapterDeterLab;
     }
 
     @Transactional
@@ -237,7 +242,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Transactional
-    private User updateUserStatusInternal(UserEntity user, UserStatus status) {
+    public User updateUserStatusInternal(UserEntity user, UserStatus status) {
         UserStatus oldStatus = user.getStatus();
         user.setStatus(status);
         UserEntity savedUser = userRepository.save(user);
@@ -265,5 +270,14 @@ public class UserServiceImpl implements UserService {
 
         userRepository.delete(id);
         return one;
+    }
+
+    @Override
+    public String addPublicKey(final String publicKey, final String password, final String userId) {
+        if (!credentialsService.verifyPassword(userId, password)) {
+            log.warn("Verification password {} mismatch for user {}.", password, userId);
+            throw new VerificationPasswordNotMatchException("Cannot verify password");
+        }
+        return adapterDeterLab.addPublicKey(userId, publicKey, password);
     }
 }

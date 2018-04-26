@@ -355,6 +355,16 @@ public class CredentialsServiceImpl implements CredentialsService {
         throw new PasswordNullOrEmptyException();
     }
 
+    @Override
+    public boolean verifyPassword(@NotNull final String id, @NotNull final String password) {
+        CredentialsEntity entity = findCredentials(id);
+        if (entity == null) {
+            log.warn("Credentials for id '{}' not found", id);
+            throw new CredentialsNotFoundException(id);
+        }
+        return passwordEncoder.matches(password, entity.getPassword());
+    }
+
     private static String generateShaHash(String str) {
         MessageDigest md = null;
         try {

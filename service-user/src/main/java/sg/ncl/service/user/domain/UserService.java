@@ -26,4 +26,6 @@ public interface UserService {
 
     User removeUser(String id);
 
+    String addPublicKey(final String publicKey, final String password, final String userId);
+
 }
