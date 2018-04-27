@@ -1180,6 +1180,30 @@ public class AdapterDeterLab {
         return jsonObject.toString();
     }
 
+    public String getPublicKeys(String nclUserId) {
+        final String uid = getDeterUserIdByNclUserId(nclUserId);
+
+        JSONObject jsonObject = new JSONObject();
+        jsonObject.put("uid", uid);
+
+        HttpHeaders httpHeaders = new HttpHeaders();
+        httpHeaders.setContentType(MediaType.APPLICATION_JSON);
+        HttpEntity<String> request = new HttpEntity<>(jsonObject.toString(), httpHeaders);
+
+        try {
+            ResponseEntity responseEntity = restTemplate.exchange(properties.getPublicKeys(), HttpMethod.POST, request, String.class);
+            String responseBody = responseEntity.getBody().toString();
+            log.info("getPubKeys: {}", responseBody);
+            return responseBody;
+        } catch (ResourceAccessException rae) {
+            log.warn("Get ssh public keys: {}", rae);
+            throw new AdapterConnectionException(rae.getMessage());
+        } catch (HttpServerErrorException hsee) {
+            log.warn("Get ssh public keys: Adapter DeterLab internal server error {}", hsee);
+            throw new AdapterInternalErrorException();
+        }
+    }
+
     public String addPublicKey(String nclUserId, String pubkey, String passwd) {
         final String uid = getDeterUserIdByNclUserId(nclUserId);
 
@@ -1188,7 +1212,7 @@ public class AdapterDeterLab {
         jsonObject.put("pubkey", pubkey);
         jsonObject.put("passwd", passwd);
 
-        HttpHeaders httpHeaders= new HttpHeaders();
+        HttpHeaders httpHeaders = new HttpHeaders();
         httpHeaders.setContentType(MediaType.APPLICATION_JSON);
         HttpEntity<String> request = new HttpEntity<>(jsonObject.toString(), httpHeaders);
 

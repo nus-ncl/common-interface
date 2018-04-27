@@ -79,7 +79,13 @@ public class UsersController {
         return String.valueOf(userService.removeUser(id));
     }
 
-    @PostMapping(path = "/publicKey", consumes = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(path = "/publicKeys")
+    @ResponseStatus(HttpStatus.OK)
+    public String getPublicKeys(@AuthenticationPrincipal final Object claims) {
+        return userService.getPublicKeys(((Claims) claims).getSubject());
+    }
+
+    @PostMapping(path = "/publicKeys", consumes = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.CREATED)
     public String addPublicKey(@AuthenticationPrincipal final Object claims, @RequestBody PublicKeyInfo info) {
         checkClaimsType(claims);

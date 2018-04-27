@@ -273,6 +273,11 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    public String getPublicKeys(final String userId) {
+        return adapterDeterLab.getPublicKeys(userId);
+    }
+
+    @Override
     public String addPublicKey(final String publicKey, final String password, final String userId) {
         if (!credentialsService.verifyPassword(userId, password)) {
             log.warn("Verification password {} mismatch for user {}.", password, userId);
