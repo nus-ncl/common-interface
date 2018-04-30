@@ -177,6 +177,6 @@ public class TeamsController {
         //JSONArray jsonArray = new JSONArray(emails);
 
 
-        return new TeamInfo(teamService.addMemberByEmail(teamId, emails));
+        return new TeamInfo(teamService.addMemberByEmail(teamId, userId, emails));
     }
 }

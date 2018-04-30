@@ -1156,23 +1156,30 @@ public class AdapterDeterLab {
         }
     }
 
-    public String addMemberByEmail(String nclTeamId, String emails){
-        String pid = getDeterProjectIdByNclTeamId(nclTeamId) ;
+    public String addMemberByEmail(String nclTeamId, String nclUserId, String emails){
+        final String pid = getDeterProjectIdByNclTeamId(nclTeamId) ;
+        final String uid = getDeterUserIdByNclUserId(nclUserId);
+
         log.info("Adding members by emails to team {}", pid);
+        String my_emails = new JSONObject(emails).getString("emails");
+        log.info("{}", my_emails);
 
         JSONObject jsonObject = new JSONObject();
         jsonObject.put("pid", pid);
-        jsonObject.put("emails", emails);
+        jsonObject.put("uid", uid);
+        jsonObject.put("emails", my_emails);
 
-        HttpHeaders header = new HttpHeaders();
-        header.setContentType(MediaType.APPLICATION_JSON);
-        HttpEntity<String> request = new HttpEntity<>(jsonObject.toString(), header);
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        HttpEntity<String> request = new HttpEntity<>(jsonObject.toString(), headers);
 
-        ResponseEntity responseEntity;
+        ResponseEntity responseEntity = null;
 
         try {
-            responseEntity = restTemplate.exchange(properties.addMemberByEmail(), HttpMethod.POST,request, String.class);
-        }catch (ResourceAccessException resourceAccessException) {
+            responseEntity = restTemplate.exchange(properties.addMemberByEmail(), HttpMethod.POST, request, String.class);
+            String responseBody = responseEntity.getBody().toString();
+            String deterMessage = new JSONObject(responseBody).getString("msg");
+       } catch (ResourceAccessException resourceAccessException) {
             log.warn("Add members by emails to team {}: {}", pid, resourceAccessException);
             throw new AdapterConnectionException(resourceAccessException.getMessage());
         } catch (HttpServerErrorException httpServerErrorException) {
