@@ -16,7 +16,7 @@ import javax.validation.constraints.NotNull;
 import java.util.List;
 
 import static sg.ncl.common.validation.Validator.checkClaimsType;
-import static sg.ncl.service.user.validations.Validator.isAdmin;
+import static sg.ncl.common.validation.Validator.checkAdmin;
 
 /**
  * @author Christopher Zhong
@@ -67,7 +67,7 @@ public class UsersController {
             @PathVariable final String id,
             @PathVariable final String status) {
         checkClaimsType(claims);
-        isAdmin((Claims) claims);
+        checkAdmin((Claims) claims);
         return new UserInfo(userService.updateUserStatus(id, UserStatus.valueOf(status)));
     }
 
@@ -75,19 +75,20 @@ public class UsersController {
     @ResponseStatus(HttpStatus.OK)
     public String removeUser(@AuthenticationPrincipal final Object claims, @PathVariable String id) {
         checkClaimsType(claims);
-        isAdmin((Claims) claims);
+        checkAdmin((Claims) claims);
         return String.valueOf(userService.removeUser(id));
     }
 
-    @GetMapping(path = "/publicKeys")
+    @GetMapping(path = "/{id}/publicKeys")
     @ResponseStatus(HttpStatus.OK)
-    public String getPublicKeys(@AuthenticationPrincipal final Object claims) {
+    public String getPublicKeys(@AuthenticationPrincipal final Object claims, @PathVariable String id) {
+        checkClaimsType(claims);
         return userService.getPublicKeys(((Claims) claims).getSubject());
     }
 
-    @PostMapping(path = "/publicKeys", consumes = MediaType.APPLICATION_JSON_VALUE)
+    @PostMapping(path = "/{id}/publicKeys", consumes = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.CREATED)
-    public String addPublicKey(@AuthenticationPrincipal final Object claims, @RequestBody PublicKeyInfo info) {
+    public String addPublicKey(@AuthenticationPrincipal final Object claims, @PathVariable String id, @RequestBody PublicKeyInfo info) {
         checkClaimsType(claims);
         return userService.addPublicKey(info.getPublicKey(), info.getPassword(), ((Claims) claims).getSubject());
     }
