@@ -14,6 +14,7 @@ import sg.ncl.service.user.exceptions.UserNotFoundException;
 import javax.inject.Inject;
 import javax.validation.constraints.NotNull;
 import java.util.List;
+import java.util.Map;
 
 import static sg.ncl.common.validation.Validator.checkClaimsType;
 import static sg.ncl.common.validation.Validator.checkAdmin;
@@ -81,7 +82,7 @@ public class UsersController {
 
     @GetMapping(path = "/{id}/publicKeys")
     @ResponseStatus(HttpStatus.OK)
-    public String getPublicKeys(@AuthenticationPrincipal final Object claims, @PathVariable String id) {
+    public Map<String, String> getPublicKeys(@AuthenticationPrincipal final Object claims, @PathVariable String id) {
         checkClaimsType(claims);
         return userService.getPublicKeys(((Claims) claims).getSubject());
     }

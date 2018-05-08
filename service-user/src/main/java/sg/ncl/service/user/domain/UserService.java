@@ -2,6 +2,7 @@ package sg.ncl.service.user.domain;
 
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author Christopher Zhong
@@ -26,7 +27,7 @@ public interface UserService {
 
     User removeUser(String id);
 
-    String getPublicKeys(final String userId);
+    Map<String, String> getPublicKeys(final String userId);
 
     String addPublicKey(final String publicKey, final String password, final String userId);
 

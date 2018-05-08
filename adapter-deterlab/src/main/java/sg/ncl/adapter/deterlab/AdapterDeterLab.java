@@ -1192,9 +1192,7 @@ public class AdapterDeterLab {
 
         try {
             ResponseEntity responseEntity = restTemplate.exchange(properties.getPublicKeys(), HttpMethod.POST, request, String.class);
-            String responseBody = responseEntity.getBody().toString();
-            log.info("getPubKeys: {}", responseBody);
-            return responseBody;
+            return responseEntity.getBody().toString();
         } catch (ResourceAccessException rae) {
             log.warn("Get ssh public keys: {}", rae);
             throw new AdapterConnectionException(rae.getMessage());
@@ -1218,9 +1216,7 @@ public class AdapterDeterLab {
 
         try {
             ResponseEntity responseEntity = restTemplate.exchange(properties.addPublicKey(), HttpMethod.POST, request, String.class);
-            String responseBody = responseEntity.getBody().toString();
-            log.info("addPubKey: {}", responseBody);
-            return responseBody;
+            return responseEntity.getBody().toString();
         } catch (ResourceAccessException rae) {
             log.warn("Add ssh public key: {}", rae);
             throw new AdapterConnectionException(rae.getMessage());

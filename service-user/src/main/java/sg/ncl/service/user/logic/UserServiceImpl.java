@@ -18,7 +18,9 @@ import javax.inject.Inject;
 import javax.transaction.Transactional;
 import javax.validation.constraints.NotNull;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 /**
@@ -273,15 +275,17 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public String getPublicKeys(final String userId) {
-        return adapterDeterLab.getPublicKeys(userId);
+    public Map<String, String> getPublicKeys(final String userId) {
+        Map<String, String> publicKeys = new HashMap<>();
+        publicKeys.put("keys", adapterDeterLab.getPublicKeys(userId));
+        return publicKeys;
     }
 
     @Override
     public String addPublicKey(final String publicKey, final String password, final String userId) {
         if (!credentialsService.verifyPassword(userId, password)) {
-            log.warn("Verification password {} mismatch for user {}.", password, userId);
-            throw new VerificationPasswordNotMatchException("Cannot verify password");
+            log.warn("Verification password mismatch for user {}.", userId);
+            throw new VerificationPasswordNotMatchException("Verification password is invalid");
         }
         return adapterDeterLab.addPublicKey(userId, publicKey, password);
     }
