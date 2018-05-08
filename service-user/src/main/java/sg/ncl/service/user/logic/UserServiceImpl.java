@@ -18,9 +18,7 @@ import javax.inject.Inject;
 import javax.transaction.Transactional;
 import javax.validation.constraints.NotNull;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
 
 /**
@@ -275,10 +273,8 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public Map<String, String> getPublicKeys(final String userId) {
-        Map<String, String> publicKeys = new HashMap<>();
-        publicKeys.put("keys", adapterDeterLab.getPublicKeys(userId));
-        return publicKeys;
+    public String getPublicKeys(final String userId) {
+        return adapterDeterLab.getPublicKeys(userId);
     }
 
     @Override
