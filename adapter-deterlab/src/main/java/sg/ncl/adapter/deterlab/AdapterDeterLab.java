@@ -1238,7 +1238,7 @@ public class AdapterDeterLab {
         HttpEntity<String> request = new HttpEntity<>(jsonObject.toString(), httpHeaders);
 
         try {
-            ResponseEntity responseEntity = restTemplate.exchange(properties.deletePublicKey(), HttpMethod.POST, request, String.class);
+            ResponseEntity responseEntity = restTemplate.exchange(properties.deletePublicKey(), HttpMethod.DELETE, request, String.class);
             return responseEntity.getBody().toString();
         } catch (ResourceAccessException rae) {
             log.warn("Delete ssh public key: {}", rae);
