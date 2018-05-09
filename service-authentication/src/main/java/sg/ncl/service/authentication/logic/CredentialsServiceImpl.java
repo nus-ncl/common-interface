@@ -259,7 +259,7 @@ public class CredentialsServiceImpl implements CredentialsService {
         passwordResetRequestEntity.setTime(ZonedDateTime.now());
         passwordResetRequestEntity.setUsername(username);
         passwordResetRepository.save(passwordResetRequestEntity);
-        log.info("Password reset request saved: {}", passwordResetRequestEntity.toString());
+        log.info("Password reset request saved: {}", passwordResetRequestEntity);
 
         sendPasswordResetEmail(username, key);
     }
@@ -358,10 +358,6 @@ public class CredentialsServiceImpl implements CredentialsService {
     @Override
     public boolean verifyPassword(@NotNull final String id, @NotNull final String password) {
         CredentialsEntity entity = findCredentials(id);
-        if (entity == null) {
-            log.warn("Credentials for id '{}' not found", id);
-            throw new CredentialsNotFoundException(id);
-        }
         return passwordEncoder.matches(password, entity.getPassword());
     }
 

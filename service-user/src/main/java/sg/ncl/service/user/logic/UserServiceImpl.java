@@ -84,7 +84,7 @@ public class UserServiceImpl implements UserService {
                     ", received: " + email);
         }
 
-        if (key == null || user.getVerificationKey() == null || !key.equals(user.getVerificationKey())) {
+        if (user.getVerificationKey() == null || !key.equals(user.getVerificationKey())) {
             log.warn("Verification key mismatch. Expected: {}, received: {}", user.getVerificationKey(), key);
             throw new VerificationKeyNotMatchException("expected: " + user.getVerificationKey() +
                     ", received: " + key);
@@ -144,35 +144,38 @@ public class UserServiceImpl implements UserService {
         final Address userAddress = user.getUserDetails().getAddress();
 
         if (userAddress != null) {
-
-            if (userAddress.getAddress1() != null) {
-                one.getUserDetails().getAddress().setAddress1(userAddress.getAddress1());
-            }
-
-            if (userAddress.getAddress2() != null) {
-                one.getUserDetails().getAddress().setAddress2(userAddress.getAddress2());
-            }
-
-            if (userAddress.getCountry() != null) {
-                one.getUserDetails().getAddress().setCountry(userAddress.getCountry());
-            }
-
-            if (userAddress.getCity() != null) {
-                one.getUserDetails().getAddress().setCity(userAddress.getCity());
-            }
-
-            if (userAddress.getRegion() != null) {
-                one.getUserDetails().getAddress().setRegion(userAddress.getRegion());
-            }
-
-            if (userAddress.getZipCode() != null) {
-                one.getUserDetails().getAddress().setZipCode((userAddress.getZipCode()));
-            }
+            updateAddress(one, userAddress);
         }
 
         final User saved = userRepository.save(one);
         log.info("User details updated: {}", saved.getUserDetails());
         return saved;
+    }
+
+    private void updateAddress(UserEntity one, Address userAddress) {
+        if (userAddress.getAddress1() != null) {
+            one.getUserDetails().getAddress().setAddress1(userAddress.getAddress1());
+        }
+
+        if (userAddress.getAddress2() != null) {
+            one.getUserDetails().getAddress().setAddress2(userAddress.getAddress2());
+        }
+
+        if (userAddress.getCountry() != null) {
+            one.getUserDetails().getAddress().setCountry(userAddress.getCountry());
+        }
+
+        if (userAddress.getCity() != null) {
+            one.getUserDetails().getAddress().setCity(userAddress.getCity());
+        }
+
+        if (userAddress.getRegion() != null) {
+            one.getUserDetails().getAddress().setRegion(userAddress.getRegion());
+        }
+
+        if (userAddress.getZipCode() != null) {
+            one.getUserDetails().getAddress().setZipCode((userAddress.getZipCode()));
+        }
     }
 
     @Transactional

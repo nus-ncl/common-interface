@@ -1080,23 +1080,14 @@ public class AdapterDeterLab {
                 log.info("Deleting image '{}' from uid '{}' of pid '{}' : {} ", imageName, uid, pid, deterMessage);
                 return responseBody;
 
-            } else if ("not the creator".equals(deterMessage)) {
+            } else if ("not the creator".equals(deterMessage) ||
+                    "no permission to delete the imageid when executing Curl command".equals(deterMessage)) {
                 log.warn(errorMessage , uid, pid, imageName, deterMessage);
                 throw new InsufficientPermissionException(exceptionMessage);
 
-            } else if ("no permission to delete the imageid when executing Curl command".equals(deterMessage)) {
-                log.warn(errorMessage , uid, pid, imageName, deterMessage);
-                throw new InsufficientPermissionException(exceptionMessage);
-
-            } else if ("required image id is not found when querying database".equals(deterMessage)) {
-                log.warn(errorMessage , uid, pid, imageName, deterMessage);
-                throw new ImageNotFoundException(exceptionMessage);
-
-            } else if ("no creator found when querying database".equals(deterMessage)) {
-                log.warn(errorMessage , uid, pid, imageName, deterMessage);
-                throw new ImageNotFoundException(exceptionMessage);
-
-            } else if ("imageid could not be found when executing Curl command".equals(deterMessage)) {
+            } else if ("required image id is not found when querying database".equals(deterMessage) ||
+                    "no creator found when querying database".equals(deterMessage) ||
+                    "imageid could not be found when executing Curl command".equals(deterMessage)) {
                 log.warn(errorMessage , uid, pid, imageName, deterMessage);
                 throw new ImageNotFoundException(exceptionMessage);
 
