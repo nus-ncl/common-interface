@@ -160,4 +160,8 @@ public class ConnectionProperties {
     public String addPublicKey() {
         return HTTP_MODE + ip + ":" + port + "/addPublicKey";
     }
+
+    public String deletePublicKey() {
+        return HTTP_MODE + ip + ":" + port + "/deletePublicKey";
+    }
 }

@@ -92,4 +92,11 @@ public class UsersController {
         checkClaimsType(claims);
         return userService.addPublicKey(info.getPublicKey(), info.getPassword(), ((Claims) claims).getSubject());
     }
+
+    @DeleteMapping(path = "/{userid}/publicKeys/{keyid}")
+    @ResponseStatus(HttpStatus.OK)
+    public String deletePublicKey(@AuthenticationPrincipal final Object claims, @PathVariable String userid, @PathVariable String keyid) {
+        checkClaimsType(claims);
+        return userService.deletePublicKey(keyid, ((Claims) claims).getSubject());
+    }
 }

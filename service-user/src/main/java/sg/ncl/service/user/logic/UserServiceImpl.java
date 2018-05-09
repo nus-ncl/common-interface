@@ -285,4 +285,9 @@ public class UserServiceImpl implements UserService {
         }
         return adapterDeterLab.addPublicKey(userId, publicKey, password);
     }
+
+    @Override
+    public String deletePublicKey(final String keyId, final String userId) {
+        return adapterDeterLab.deletePublicKey(userId, keyId);
+    }
 }
