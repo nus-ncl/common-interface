@@ -795,6 +795,7 @@ public class RegistrationServiceImpl implements RegistrationService {
 
         String adapter_result = adapterDeterLab.addMemberByEmail(teamId, leaderId, emails);
 
+
         return adapter_result;
     }
 }

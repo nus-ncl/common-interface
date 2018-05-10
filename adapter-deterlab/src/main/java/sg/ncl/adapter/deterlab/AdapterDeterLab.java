@@ -1187,7 +1187,6 @@ public class AdapterDeterLab {
             throw new AdapterInternalErrorException();
         }
 
-
         return responseEntity.getBody().toString();
     }
 

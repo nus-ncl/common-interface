@@ -30,4 +30,6 @@ public interface CredentialsService {
     void addPasswordResetRequest(String jsonString);
 
     Credentials resetPassword(String jsonString);
+
+    void SendEmailToClassMember(String username);
 }
