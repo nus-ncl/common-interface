@@ -105,4 +105,5 @@ public class UserDetailsEntity extends AbstractEntity implements UserDetails {
                 ", institutionWeb='" + institutionWeb + '\'' +
                 "} " + super.toString();
     }
+
 }

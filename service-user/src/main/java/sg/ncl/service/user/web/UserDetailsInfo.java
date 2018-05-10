@@ -3,6 +3,7 @@ package sg.ncl.service.user.web;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Getter;
+import lombok.Setter;
 import sg.ncl.service.user.domain.UserDetails;
 
 /**
@@ -57,5 +58,6 @@ public class UserDetailsInfo implements UserDetails {
                 userDetails.getInstitutionWeb()
         );
     }
+
 
 }

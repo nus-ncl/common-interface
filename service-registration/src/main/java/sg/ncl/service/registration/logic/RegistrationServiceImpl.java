@@ -3,6 +3,7 @@ package sg.ncl.service.registration.logic;
 import freemarker.template.Template;
 import freemarker.template.TemplateException;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.tomcat.util.codec.binary.Base64;
 import org.json.JSONObject;
 import org.springframework.stereotype.Service;
@@ -11,6 +12,8 @@ import org.springframework.ui.freemarker.FreeMarkerTemplateUtils;
 import sg.ncl.adapter.deterlab.AdapterDeterLab;
 import sg.ncl.common.DomainProperties;
 import sg.ncl.common.authentication.Role;
+import sg.ncl.common.exception.base.ForbiddenException;
+import sg.ncl.service.authentication.data.jpa.CredentialsEntity;
 import sg.ncl.service.authentication.domain.Credentials;
 import sg.ncl.service.authentication.domain.CredentialsService;
 import sg.ncl.service.authentication.domain.CredentialsStatus;
@@ -25,6 +28,8 @@ import sg.ncl.service.team.data.jpa.TeamMemberEntity;
 import sg.ncl.service.team.domain.*;
 import sg.ncl.service.team.exceptions.TeamNotFoundException;
 import sg.ncl.service.team.web.TeamMemberInfo;
+import sg.ncl.service.user.data.jpa.UserDetailsEntity;
+import sg.ncl.service.user.data.jpa.UserEntity;
 import sg.ncl.service.user.domain.User;
 import sg.ncl.service.user.domain.UserService;
 import sg.ncl.service.user.domain.UserStatus;
@@ -722,5 +727,70 @@ public class RegistrationServiceImpl implements RegistrationService {
             log.warn("Team name is null or empty: {}", name);
             throw new TeamNameNullOrEmptyException();
         }
+    }
+
+
+    @Override
+    public String addMemberByEmail(String teamId, String userId, String emails) {
+        if (!teamService.isOwner(teamId, userId)) {
+            log.warn("Access denied for {} : /teams/addMember POST", userId, teamId);
+            throw new ForbiddenException();
+        }
+
+        Team team = teamService.getTeamById(teamId);
+        log.info("Adding members by emails to team {}", team.getName());
+
+        String my_emails = new JSONObject(emails).getString("emails");
+        int size = my_emails.length();
+        my_emails = my_emails.substring(1,size-1);
+        String[] emails_split = my_emails.split(",");
+
+        UserEntity leader = (UserEntity)userService.getUser(userId);
+
+        for (int i = 0; i< emails_split.length; i++) {
+            //create new member
+            UserEntity new_member = new UserEntity();
+            new_member.setApplicationDate(ZonedDateTime.now());
+            new_member.setEmailVerified(false);
+            new_member.setProcessedDate(null);
+
+            UserDetailsEntity userDetailsEntity = new UserDetailsEntity();
+            userDetailsEntity.setAddress(leader.getUserDetails().getAddress());
+            userDetailsEntity.setFirstName(leader.getUserDetails().getFirstName());
+            userDetailsEntity.setLastName(leader.getUserDetails().getLastName());
+            userDetailsEntity.setInstitution(leader.getUserDetails().getInstitution());
+            userDetailsEntity.setInstitutionAbbreviation(leader.getUserDetails().getInstitutionAbbreviation());
+            userDetailsEntity.setInstitutionWeb(leader.getUserDetails().getInstitutionWeb());
+            userDetailsEntity.setJobTitle(leader.getUserDetails().getJobTitle());
+            userDetailsEntity.setPhone(leader.getUserDetails().getPhone());
+            userDetailsEntity.setEmail(emails_split[i]);
+
+            new_member.setUserDetails(userDetailsEntity);
+
+            userService.createUser(new_member);
+            log.info("Adding members by emails: created new member {}", new_member.getId());
+
+            // add credentials
+            CredentialsEntity credentialsEntity =  new CredentialsEntity();
+            String randomPassword =  RandomStringUtils.randomAlphanumeric(20);
+            final CredentialsInfo credentialsInfo = new CredentialsInfo(userId, emails_split[i], randomPassword, CredentialsStatus.ACTIVE, new HashSet<>(Arrays.asList(Role.USER)));
+            credentialsService.addCredentials(credentialsInfo);
+
+            //add team
+            userService.addTeam(new_member.getId(), teamId);
+
+            //add member
+            TeamMemberEntity teamMemberEntity = new TeamMemberEntity();
+            teamMemberEntity.setUserId(new_member.getId());
+            teamMemberEntity.setJoinedDate(ZonedDateTime.now());
+            teamMemberEntity.setMemberType( MemberType.MEMBER);
+            TeamMemberInfo teamMemberInfo = new TeamMemberInfo(teamMemberEntity);
+
+            teamService.addMember(teamId, teamMemberInfo);
+        }
+
+        adapterDeterLab.addMemberByEmail(teamId, userId, emails);
+
+        return null;
     }
 }

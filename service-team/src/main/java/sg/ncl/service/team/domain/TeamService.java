@@ -43,5 +43,4 @@ public interface TeamService {
 
     Boolean isMember(String teamId, String userId);
 
-    Team addMemberByEmail(String teamId, String userId, String emails);
 }

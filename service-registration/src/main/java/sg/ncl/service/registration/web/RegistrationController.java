@@ -1,13 +1,18 @@
 package sg.ncl.service.registration.web;
 
+import io.jsonwebtoken.Claims;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.tomcat.util.codec.binary.Base64;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
+import sg.ncl.common.exception.base.ForbiddenException;
 import sg.ncl.service.registration.domain.Registration;
 import sg.ncl.service.registration.domain.RegistrationService;
+import sg.ncl.service.team.domain.Team;
 import sg.ncl.service.team.domain.TeamStatus;
+import sg.ncl.service.team.web.TeamInfo;
 import sg.ncl.service.user.domain.UserStatus;
 import sg.ncl.service.user.web.VerificationKeyInfo;
 
@@ -103,5 +108,14 @@ public class RegistrationController {
     public boolean verifyEmail(@PathVariable String id, @PathVariable String emailBase64, @RequestBody VerificationKeyInfo keyInfo) {
         final String email = new String(Base64.decodeBase64(emailBase64));
         return registrationService.verifyEmail(id, email, keyInfo.getKey());
+    }
+
+    // add members by emails
+    @PostMapping(path ="/{teamId}/addMembers")
+    @ResponseStatus(HttpStatus.OK)
+    public String addMemberByEmail(@PathVariable final String teamId, @RequestBody final String emails, @AuthenticationPrincipal final Object claims) {
+        String leaderId = ((Claims) claims).getSubject();
+
+        return registrationService.addMemberByEmail(teamId, leaderId, emails);
     }
 }
