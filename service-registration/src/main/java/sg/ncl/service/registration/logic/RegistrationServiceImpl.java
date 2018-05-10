@@ -731,23 +731,25 @@ public class RegistrationServiceImpl implements RegistrationService {
 
 
     @Override
-    public String addMemberByEmail(String teamId, String userId, String emails) {
-        if (!teamService.isOwner(teamId, userId)) {
-            log.warn("Access denied for {} : /teams/addMember POST", userId, teamId);
-            throw new ForbiddenException();
-        }
-
+    public String addMemberByEmail(String teamId, String leaderId, String emails) {
         Team team = teamService.getTeamById(teamId);
         log.info("Adding members by emails to team {}", team.getName());
+
+        if (!teamService.isOwner(teamId, leaderId)) {
+            log.warn("Access denied for {} : /teams/addMember POST", leaderId, teamId);
+            throw new ForbiddenException();
+        }
 
         String my_emails = new JSONObject(emails).getString("emails");
         int size = my_emails.length();
         my_emails = my_emails.substring(1,size-1);
         String[] emails_split = my_emails.split(",");
 
-        UserEntity leader = (UserEntity)userService.getUser(userId);
+        UserEntity leader = (UserEntity)userService.getUser(leaderId);
 
         for (int i = 0; i< emails_split.length; i++) {
+
+            String new_email = emails_split[i].substring(1, emails_split[i].length() - 1);
             //create new member
             UserEntity new_member = new UserEntity();
             new_member.setApplicationDate(ZonedDateTime.now());
@@ -763,34 +765,36 @@ public class RegistrationServiceImpl implements RegistrationService {
             userDetailsEntity.setInstitutionWeb(leader.getUserDetails().getInstitutionWeb());
             userDetailsEntity.setJobTitle(leader.getUserDetails().getJobTitle());
             userDetailsEntity.setPhone(leader.getUserDetails().getPhone());
-            userDetailsEntity.setEmail(emails_split[i]);
+            userDetailsEntity.setEmail(new_email);
 
             new_member.setUserDetails(userDetailsEntity);
 
-            userService.createUser(new_member);
-            log.info("Adding members by emails: created new member {}", new_member.getId());
+            User created_User = userService.createUser(new_member);
+            log.info("Adding members by emails: created new member {}", created_User.getId());
 
             // add credentials
-            CredentialsEntity credentialsEntity =  new CredentialsEntity();
             String randomPassword =  RandomStringUtils.randomAlphanumeric(20);
-            final CredentialsInfo credentialsInfo = new CredentialsInfo(userId, emails_split[i], randomPassword, CredentialsStatus.ACTIVE, new HashSet<>(Arrays.asList(Role.USER)));
+            final CredentialsInfo credentialsInfo = new CredentialsInfo(created_User.getId(), new_email, randomPassword, CredentialsStatus.ACTIVE, new HashSet<>(Arrays.asList(Role.USER)));
             credentialsService.addCredentials(credentialsInfo);
+            log.info("Adding members by emails: created new member credentials {}", created_User.getId());
 
             //add team
-            userService.addTeam(new_member.getId(), teamId);
+            userService.addTeam(created_User .getId(), teamId);
 
             //add member
             TeamMemberEntity teamMemberEntity = new TeamMemberEntity();
-            teamMemberEntity.setUserId(new_member.getId());
+            teamMemberEntity.setUserId(created_User.getId());
             teamMemberEntity.setJoinedDate(ZonedDateTime.now());
             teamMemberEntity.setMemberType( MemberType.MEMBER);
             TeamMemberInfo teamMemberInfo = new TeamMemberInfo(teamMemberEntity);
 
             teamService.addMember(teamId, teamMemberInfo);
+            log.info("Adding members by emails: added new member {} to team {}", created_User.getId(), team.getName());
+
         }
 
-        adapterDeterLab.addMemberByEmail(teamId, userId, emails);
+        String adapter_result = adapterDeterLab.addMemberByEmail(teamId, leaderId, emails);
 
-        return null;
+        return adapter_result;
     }
 }
