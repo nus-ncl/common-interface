@@ -1,9 +1,12 @@
 package sg.ncl.service.user.logic;
 
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.springframework.stereotype.Service;
 import sg.ncl.adapter.deterlab.AdapterDeterLab;
+import sg.ncl.common.exception.base.BadRequestException;
 import sg.ncl.service.authentication.domain.CredentialsService;
 import sg.ncl.service.user.data.jpa.UserDetailsEntity;
 import sg.ncl.service.user.data.jpa.UserEntity;
@@ -17,8 +20,12 @@ import sg.ncl.service.user.exceptions.*;
 import javax.inject.Inject;
 import javax.transaction.Transactional;
 import javax.validation.constraints.NotNull;
+import javax.xml.ws.WebServiceException;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 /**
@@ -286,7 +293,31 @@ public class UserServiceImpl implements UserService {
             log.warn("Verification password mismatch for user {}.", userId);
             throw new VerificationPasswordNotMatchException("Verification password is invalid");
         }
-        return adapterDeterLab.addPublicKey(userId, publicKey, password);
+
+        Map<String, String> errors;
+        String feedback = adapterDeterLab.addPublicKey(userId, publicKey, password);
+        ObjectMapper mapper = new ObjectMapper();
+        try {
+            errors = mapper.readValue(feedback, new TypeReference<Map<String, String>>() {});
+            Optional<Map.Entry<String, String>> opt = errors.entrySet().stream().findAny();
+            if (opt.isPresent()) {
+                Map.Entry<String, String> entry = opt.get();
+                switch (entry.getKey()) {
+                    case "Pubkey Format":
+                        throw new InvalidPublicKeyFormatException(entry.getValue());
+                    case "PubKey File":
+                        throw new InvalidPublicKeyFileException(entry.getValue());
+                    case "Password":
+                        throw new VerificationPasswordNotMatchException(entry.getValue());
+                    default:
+                        throw new BadRequestException(entry.getValue());
+                }
+            }
+        } catch (IOException ioe) {
+            throw new WebServiceException();
+        }
+
+        return feedback;
     }
 
     @Override
