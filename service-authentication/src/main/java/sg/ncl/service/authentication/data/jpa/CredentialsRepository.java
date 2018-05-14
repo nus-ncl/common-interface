@@ -12,6 +12,8 @@ public interface CredentialsRepository extends JpaRepository<CredentialsEntity, 
 
     CredentialsEntity findByUsername(String username);
 
+    CredentialsEntity findByUid(String uid);
+
     List<CredentialsEntity> findByStatus(CredentialsStatus status);
 
 }

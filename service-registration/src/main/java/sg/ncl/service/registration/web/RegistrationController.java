@@ -8,6 +8,9 @@ import org.springframework.http.MediaType;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import sg.ncl.common.exception.base.ForbiddenException;
+import sg.ncl.service.authentication.domain.Credentials;
+import sg.ncl.service.authentication.domain.CredentialsService;
+import sg.ncl.service.authentication.web.CredentialsInfo;
 import sg.ncl.service.registration.domain.Registration;
 import sg.ncl.service.registration.domain.RegistrationService;
 import sg.ncl.service.team.domain.Team;
@@ -20,6 +23,8 @@ import javax.inject.Inject;
 import javax.validation.constraints.NotNull;
 import java.util.HashMap;
 import java.util.Map;
+
+import static sg.ncl.service.authentication.validation.Validator.checkClaimsType;
 
 /**
  * @author Te Ye & Desmond
@@ -117,5 +122,13 @@ public class RegistrationController {
         String leaderId = ((Claims) claims).getSubject();
 
         return registrationService.addMemberByEmail(teamId, leaderId, emails);
+    }
+
+    //activate new member
+    @PutMapping(path="/newMembers/{uid}")
+    @ResponseStatus(HttpStatus.OK)
+    public String activateNewClassMember(@PathVariable final String uid, @RequestBody final String jsonString, @AuthenticationPrincipal Object claims) {
+        checkClaimsType(claims);
+        return registrationService.activateNewClassMember(uid, jsonString);
     }
 }

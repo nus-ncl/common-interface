@@ -50,7 +50,7 @@ public class CredentialsServiceImpl implements CredentialsService {
     private final MailService mailService;
     private final DomainProperties domainProperties;
     private final Template passwordResetEmailTemplate;
-    private final Template newMemberResetPassword;
+    private final Template newClassMemberResetPasswordTemplate;
     private final PasswordResetRequestRepository passwordResetRepository;
 
     @Inject
@@ -62,7 +62,7 @@ public class CredentialsServiceImpl implements CredentialsService {
             @NotNull final DomainProperties domainProperties,
             @NotNull final PasswordResetRequestRepository passwordResetRepository,
             @NotNull @Named("passwordResetEmailTemplate") final Template passwordResetEmailTemplate,
-            @NotNull @Named("newMemberResetPassword") final Template newMemberResetPassword) {
+            @NotNull @Named("newClassMemberResetPasswordTemplate") final Template newClassMemberResetPasswordTemplate) {
         this.credentialsRepository = credentialsRepository;
         this.passwordEncoder = passwordEncoder;
         this.adapterDeterLab = adapterDeterLab;
@@ -70,7 +70,7 @@ public class CredentialsServiceImpl implements CredentialsService {
         this.domainProperties = domainProperties;
         this.passwordResetRepository = passwordResetRepository;
         this.passwordResetEmailTemplate = passwordResetEmailTemplate;
-        this.newMemberResetPassword = newMemberResetPassword;
+        this.newClassMemberResetPasswordTemplate = newClassMemberResetPasswordTemplate;
 
     }
 
@@ -379,15 +379,12 @@ public class CredentialsServiceImpl implements CredentialsService {
 
 
     /*
-        The function does 2 things
-            1) add password reser request
-            2) send email to new class member
+        The function adds password reset request
 
      */
     @Override
-    public void SendEmailToClassMember(String username) {
-        //
-        // final String username = new JSONObject(jsonString).getString("username");
+    @Transactional
+    public String addPasswordResetRequestForNewClassMember(String username){
         if (null == username || username.trim().isEmpty()) {
             log.warn("Username null or empty in password reset request");
             throw new UsernameNullOrEmptyException();
@@ -398,6 +395,8 @@ public class CredentialsServiceImpl implements CredentialsService {
             log.warn("User {} not found in password reset request", username);
             throw new CredentialsNotFoundException(username);
         }
+
+
         String key = RandomStringUtils.randomAlphanumeric(20);
 
         PasswordResetRequestEntity passwordResetRequestEntity = new PasswordResetRequestEntity();
@@ -407,19 +406,61 @@ public class CredentialsServiceImpl implements CredentialsService {
         passwordResetRepository.save(passwordResetRequestEntity);
         log.info("Password reset request saved: {}", passwordResetRequestEntity.toString());
 
+        return key;
+    }
+
+    @Override
+    public void sendEmailToClassMember(String username, String uid, String key, String projectName) {
+
         final Map<String, String> map = new HashMap<>();
         map.put("username", username);
         map.put("domain", domainProperties.getDomain());
         map.put("key", key);
+        map.put("project",projectName);
+        map.put("project", uid);
 
         try {
-            String msgText = FreeMarkerTemplateUtils.processTemplateIntoString(
-                    newMemberResetPassword, map);
-            mailService.send("NCL Testbed Ops <testbed-ops@ncl.sg>", username,
-                    "Reset Password", msgText, false, null, null);
+            String msgText = FreeMarkerTemplateUtils.processTemplateIntoString(newClassMemberResetPasswordTemplate, map);
+            mailService.send("NCL Testbed Ops <testbed-ops@ncl.sg>", username,"Reset Password For New Member", msgText, false, null, null);
             log.info("Password reset email sent: {}", msgText);
         } catch (IOException | TemplateException e) {
             log.warn("{}", e);
+        }
+    }
+
+    @Override
+    @Transactional
+    public Credentials newMemberResetPassword(String uid, String jsonString){
+        JSONObject jsonObjectFromAdapter = new JSONObject(jsonString);
+        String key = jsonObjectFromAdapter.getString("key");
+        String newPassword = jsonObjectFromAdapter.getString("newPassword");
+
+        CredentialsEntity credentialFromUid = credentialsRepository.findByUid(uid);
+        if(null ==  credentialFromUid) {
+            log.warn("New member password reset: credential from {} not found", uid);
+            throw new CredentialsNotFoundException(uid);
+        }
+
+        final String hashedId = generateShaHash(key);
+        PasswordResetRequestEntity  credentialFromKey = passwordResetRepository.findByHash(hashedId);
+        if(null ==  credentialFromKey) {
+            log.warn("New member password reset: credential from key {} NOT found", key);
+            throw new PasswordResetRequestNotFoundException(key);
+        }
+
+        if (!credentialFromUid.getUsername().equals(credentialFromKey.getUsername())) {
+            log.warn("New member password reset: credential from uid {} does not match key {}", uid, key);
+            throw new InvalidCredentialsException("Credentials do not match");
+        }
+
+        if (newPassword != null && !newPassword.trim().isEmpty()) {
+            hashPassword(credentialFromUid, newPassword);
+            final CredentialsEntity saved = credentialsRepository.save(credentialFromUid);
+            log.info("New member password reset for user {} is successful", credentialFromUid.getUsername());
+            return saved;
+        } else {
+            log.warn("New member password reset for user {}: Password null or empty in password reset!", credentialFromUid.getUsername() );
+            throw new PasswordNullOrEmptyException();
         }
     }
 

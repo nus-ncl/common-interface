@@ -28,4 +28,6 @@ public interface RegistrationService {
     boolean verifyEmail(final String uid, final String email, final String key);
 
     String addMemberByEmail(String teamId, String userId, String emails);
+
+    String activateNewClassMember(String uid, String jsonString);
 }

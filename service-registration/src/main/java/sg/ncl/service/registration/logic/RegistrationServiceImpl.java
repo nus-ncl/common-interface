@@ -17,6 +17,7 @@ import sg.ncl.service.authentication.data.jpa.CredentialsEntity;
 import sg.ncl.service.authentication.domain.Credentials;
 import sg.ncl.service.authentication.domain.CredentialsService;
 import sg.ncl.service.authentication.domain.CredentialsStatus;
+import sg.ncl.service.authentication.exceptions.CredentialsNotFoundException;
 import sg.ncl.service.authentication.web.CredentialsInfo;
 import sg.ncl.service.mail.domain.MailService;
 import sg.ncl.service.registration.data.jpa.RegistrationEntity;
@@ -793,9 +794,21 @@ public class RegistrationServiceImpl implements RegistrationService {
 
         }
 
-        String adapter_result = adapterDeterLab.addMemberByEmail(teamId, leaderId, emails);
-
-
-        return adapter_result;
+        return adapterDeterLab.addMemberByEmail(teamId, leaderId, emails);
     }
+
+    @Override
+    public String activateNewClassMember(String uid, String jsonString) {
+        log.info("Activating new class member {}: Updating password", uid);
+        credentialsService.newMemberResetPassword(uid, jsonString);
+        log.info("Activating new class member {}: password updated successful", uid);
+
+        log.info("Activating new class member {}: Updating first name, last name, phone", uid);
+        userService.updateInformationNewMember(uid, jsonString);
+        log.info("Activating new class member {}: information updated successful", uid);
+
+
+        return null;
+    }
+
 }

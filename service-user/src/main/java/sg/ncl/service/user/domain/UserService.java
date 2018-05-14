@@ -26,4 +26,6 @@ public interface UserService {
 
     User removeUser(String id);
 
+    User updateInformationNewMember(String uid, String jsonString);
+
 }

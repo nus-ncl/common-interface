@@ -75,4 +75,5 @@ public class CredentialsController {
     public Credentials resetPassword(@RequestBody final String jsonString) {
         return new CredentialsInfo(credentialsService.resetPassword(jsonString));
     }
+
 }

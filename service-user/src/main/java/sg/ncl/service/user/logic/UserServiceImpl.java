@@ -2,6 +2,7 @@ package sg.ncl.service.user.logic;
 
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.RandomStringUtils;
+import org.json.JSONObject;
 import org.springframework.stereotype.Service;
 import sg.ncl.service.authentication.domain.CredentialsService;
 import sg.ncl.service.user.data.jpa.UserDetailsEntity;
@@ -265,5 +266,37 @@ public class UserServiceImpl implements UserService {
 
         userRepository.delete(id);
         return one;
+    }
+
+    @Override
+    @Transactional
+    public User updateInformationNewMember(String uid, String jsonString){
+
+        final UserEntity one = findUser(uid);
+        if (one == null) {
+            log.warn("User not found when updating: {}",uid);
+            throw new UserNotFoundException(uid);
+        }
+
+        JSONObject jsonObjectFromAdapter = new JSONObject(jsonString);
+        String firstName = jsonObjectFromAdapter.getString("firstName");
+        String lastName = jsonObjectFromAdapter.getString("lastName");
+        String phone = jsonObjectFromAdapter.getString("phone");
+
+        if (firstName != null || !firstName.isEmpty()) {
+            one.getUserDetails().setFirstName(firstName);
+        }
+
+        if (lastName != null || !lastName.isEmpty()) {
+            one.getUserDetails().setFirstName(lastName);
+        }
+
+        if (phone != null || !phone.isEmpty()) {
+            one.getUserDetails().setFirstName(phone);
+        }
+
+        final User saved = userRepository.save(one);
+        log.info("Update Information New Member {}", saved.getId());
+        return saved;
     }
 }
