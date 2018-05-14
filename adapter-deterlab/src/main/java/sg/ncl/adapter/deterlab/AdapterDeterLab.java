@@ -1156,40 +1156,6 @@ public class AdapterDeterLab {
         }
     }
 
-    public String addMemberByEmail(String nclTeamId, String nclUserId, String emails){
-        final String pid = getDeterProjectIdByNclTeamId(nclTeamId) ;
-        final String uid = getDeterUserIdByNclUserId(nclUserId);
-
-        log.info("Adding members by emails to team {}", pid);
-        String my_emails = new JSONObject(emails).getString("emails");
-        log.info("{}", my_emails);
-
-        JSONObject jsonObject = new JSONObject();
-        jsonObject.put("pid", pid);
-        jsonObject.put("uid", uid);
-        jsonObject.put("emails", my_emails);
-
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_JSON);
-        HttpEntity<String> request = new HttpEntity<>(jsonObject.toString(), headers);
-
-        ResponseEntity responseEntity = null;
-
-        try {
-            responseEntity = restTemplate.exchange(properties.addMemberByEmail(), HttpMethod.POST, request, String.class);
-            String responseBody = responseEntity.getBody().toString();
-            String deterMessage = new JSONObject(responseBody).getString("msg");
-       } catch (ResourceAccessException resourceAccessException) {
-            log.warn("Add members by emails to team {}: {}", pid, resourceAccessException);
-            throw new AdapterConnectionException(resourceAccessException.getMessage());
-        } catch (HttpServerErrorException httpServerErrorException) {
-            log.warn("Add members by emails to team {}: {}", pid, httpServerErrorException);
-            throw new AdapterInternalErrorException();
-        }
-
-        return responseEntity.getBody().toString();
-    }
-
     /**
      * Crafts the JSON string for start/stop experiment
      * @param operation in or out, implies start or stop experiment respectively
@@ -1213,6 +1179,46 @@ public class AdapterDeterLab {
         jsonObject.put("eid", experimentName);
 
         return jsonObject.toString();
+    }
+
+    public String addMemberByEmail(String nclTeamId, String nclUserId, String emails){
+        final String pid = getDeterProjectIdByNclTeamId(nclTeamId) ;
+        final String uid = getDeterUserIdByNclUserId(nclUserId);
+
+        log.info("Adding members by emails to team {}", pid);
+        String my_emails = new JSONObject(emails).getString("emails");
+        log.info("{}", my_emails);
+
+        JSONObject jsonObject = new JSONObject();
+        jsonObject.put("pid", pid);
+        jsonObject.put("uid", uid);
+        jsonObject.put("emails", my_emails);
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        HttpEntity<String> request = new HttpEntity<>(jsonObject.toString(), headers);
+
+        ResponseEntity responseEntity = null;
+
+        try {
+            responseEntity = restTemplate.exchange(properties.addMemberByEmail(), HttpMethod.POST, request, String.class);
+            String responseBody = responseEntity.getBody().toString();
+            String deterMessage = new JSONObject(responseBody).getString("msg");
+        } catch (ResourceAccessException resourceAccessException) {
+            log.warn("Add members by emails to team {}: {}", pid, resourceAccessException);
+            throw new AdapterConnectionException(resourceAccessException.getMessage());
+        } catch (HttpServerErrorException httpServerErrorException) {
+            log.warn("Add members by emails to team {}: {}", pid, httpServerErrorException);
+            throw new AdapterInternalErrorException();
+        }
+
+        return responseEntity.getBody().toString();
+    }
+
+    public String changePasswordNewMember() {
+
+
+        return null;
     }
 
 }

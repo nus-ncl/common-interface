@@ -771,13 +771,13 @@ public class RegistrationServiceImpl implements RegistrationService {
             new_member.setUserDetails(userDetailsEntity);
 
             User created_User = userService.createUser(new_member);
-            log.info("Adding members by emails: created new member {}", created_User.getId());
+            log.info("Adding members by emails: created new member {} successful", created_User.getId());
 
             // add credentials
             String randomPassword =  RandomStringUtils.randomAlphanumeric(20);
             final CredentialsInfo credentialsInfo = new CredentialsInfo(created_User.getId(), new_email, randomPassword, CredentialsStatus.ACTIVE, new HashSet<>(Arrays.asList(Role.USER)));
             credentialsService.addCredentials(credentialsInfo);
-            log.info("Adding members by emails: created new member credentials {}", created_User.getId());
+            log.info("Adding members by emails: created new member credentials {} successful", created_User.getId());
 
             //add team
             userService.addTeam(created_User .getId(), teamId);
@@ -790,7 +790,7 @@ public class RegistrationServiceImpl implements RegistrationService {
             TeamMemberInfo teamMemberInfo = new TeamMemberInfo(teamMemberEntity);
 
             teamService.addMember(teamId, teamMemberInfo);
-            log.info("Adding members by emails: added new member {} to team {}", created_User.getId(), team.getName());
+            log.info("Adding members by emails: added new member {} to team {} successful", created_User.getId(), team.getName());
 
         }
 
@@ -799,6 +799,7 @@ public class RegistrationServiceImpl implements RegistrationService {
 
     @Override
     public String activateNewClassMember(String uid, String jsonString) {
+
         log.info("Activating new class member {}: Updating password", uid);
         credentialsService.newMemberResetPassword(uid, jsonString);
         log.info("Activating new class member {}: password updated successful", uid);
@@ -807,7 +808,8 @@ public class RegistrationServiceImpl implements RegistrationService {
         userService.updateInformationNewMember(uid, jsonString);
         log.info("Activating new class member {}: information updated successful", uid);
 
-
+        log.info("Activating new class member {}: Updating Deterlab", uid);
+        adapterDeterLab.changePasswordNewMember();
         return null;
     }
 

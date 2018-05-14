@@ -417,7 +417,7 @@ public class CredentialsServiceImpl implements CredentialsService {
         map.put("domain", domainProperties.getDomain());
         map.put("key", key);
         map.put("project",projectName);
-        map.put("project", uid);
+        map.put("uid", uid);
 
         try {
             String msgText = FreeMarkerTemplateUtils.processTemplateIntoString(newClassMemberResetPasswordTemplate, map);
@@ -435,7 +435,7 @@ public class CredentialsServiceImpl implements CredentialsService {
         String key = jsonObjectFromAdapter.getString("key");
         String newPassword = jsonObjectFromAdapter.getString("newPassword");
 
-        CredentialsEntity credentialFromUid = credentialsRepository.findByUid(uid);
+        CredentialsEntity credentialFromUid = credentialsRepository.findById(uid);
         if(null ==  credentialFromUid) {
             log.warn("New member password reset: credential from {} not found", uid);
             throw new CredentialsNotFoundException(uid);

@@ -18,8 +18,8 @@ spring:
   mail:
     host: smtp-relay.gmail.com
     port: 465
-    username: ${gmail.username:}
-    password: ${gmail.password:}
+    username: vutransingare@gmail.com
+    password: usacomputing^0123
     protocol: smtps
     properties:
       starttls:
