@@ -41,7 +41,7 @@ public class RegistrationController {
         this.registrationService = registrationService;
     }
 
-    // new user + join team
+    // new user + join team / create team
     @PostMapping
     @ResponseStatus(HttpStatus.OK)
     public Map<String, String> register(@RequestBody final RegistrationInfo registrationInfo) {

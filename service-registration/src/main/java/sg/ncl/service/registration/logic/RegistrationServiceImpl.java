@@ -417,6 +417,12 @@ public class RegistrationServiceImpl implements RegistrationService {
             // change team owner member status
             teamService.updateMemberStatus(teamId, ownerId, MemberStatus.APPROVED);
             adapterResult = adapterDeterLab.approveProject(one.toString());
+
+            // Tran: start to set up class if new project is class
+            if (team.getIsClass()) {
+                adapterDeterLab.setUpClass(ownerId, teamId);
+            }
+
             sendReplyCreateTeamEmail(user, team, status, reason);
         } else {
             // FIXME may need to be more specific and check if TeamStatus is REJECTED

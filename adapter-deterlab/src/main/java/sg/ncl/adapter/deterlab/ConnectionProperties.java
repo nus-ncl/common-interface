@@ -153,6 +153,10 @@ public class ConnectionProperties {
         return HTTP_MODE + ip + ":" + port + "/removeUserFromTeam";
     }
 
+    public String setUpClass() {
+        return HTTP_MODE + ip + ":" + port + "/setUpClass";
+    }
+
     public String addMemberByEmail() {
         return HTTP_MODE + ip + ":" + port + "/addMemberByEmail";
     }
