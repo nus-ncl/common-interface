@@ -738,6 +738,7 @@ public class RegistrationServiceImpl implements RegistrationService {
 
 
     @Override
+    @Transactional
     public String addMemberByEmail(String teamId, String leaderId, String emails) {
         Team team = teamService.getTeamById(teamId);
         log.info("Adding members by emails to team {}", team.getName());
@@ -756,12 +757,11 @@ public class RegistrationServiceImpl implements RegistrationService {
 
         for (int i = 0; i< emails_split.length; i++) {
 
-            String new_email = emails_split[i].substring(1, emails_split[i].length() - 1);
+            String newEmail = emails_split[i].substring(1, emails_split[i].length() - 1);
             //create new member
-            UserEntity new_member = new UserEntity();
-            new_member.setApplicationDate(ZonedDateTime.now());
-            new_member.setEmailVerified(false);
-            new_member.setProcessedDate(null);
+            UserEntity newMember = new UserEntity();
+            newMember.setApplicationDate(ZonedDateTime.now());
+            newMember.setProcessedDate(null);
 
             UserDetailsEntity userDetailsEntity = new UserDetailsEntity();
             userDetailsEntity.setAddress(leader.getUserDetails().getAddress());
@@ -772,35 +772,53 @@ public class RegistrationServiceImpl implements RegistrationService {
             userDetailsEntity.setInstitutionWeb(leader.getUserDetails().getInstitutionWeb());
             userDetailsEntity.setJobTitle(leader.getUserDetails().getJobTitle());
             userDetailsEntity.setPhone(leader.getUserDetails().getPhone());
-            userDetailsEntity.setEmail(new_email);
+            userDetailsEntity.setEmail(newEmail);
 
-            new_member.setUserDetails(userDetailsEntity);
+            newMember.setUserDetails(userDetailsEntity);
 
-            User created_User = userService.createUser(new_member);
-            log.info("Adding members by emails: created new member {} successful", created_User.getId());
+            User unverifiedUser = userService.createUser(newMember);
+            //log.info("debug: {}", (UserEntity)created_User.getIs
+            log.info("Adding members by emails: created new member {} successful", unverifiedUser.getId());
 
             // add credentials
             String randomPassword =  RandomStringUtils.randomAlphanumeric(20);
-            final CredentialsInfo credentialsInfo = new CredentialsInfo(created_User.getId(), new_email, randomPassword, CredentialsStatus.ACTIVE, new HashSet<>(Arrays.asList(Role.USER)));
+            final CredentialsInfo credentialsInfo = new CredentialsInfo(unverifiedUser.getId(), newEmail, randomPassword, CredentialsStatus.ACTIVE, new HashSet<>(Arrays.asList(Role.USER)));
             credentialsService.addCredentials(credentialsInfo);
-            log.info("Adding members by emails: created new member credentials {} successful", created_User.getId());
+            log.info("Adding members by emails: created new member credentials {} successful", unverifiedUser.getId());
 
             //add team
-            userService.addTeam(created_User .getId(), teamId);
+            userService.addTeam(unverifiedUser.getId(), teamId);
 
             //add member
             TeamMemberEntity teamMemberEntity = new TeamMemberEntity();
-            teamMemberEntity.setUserId(created_User.getId());
+            teamMemberEntity.setUserId(unverifiedUser.getId());
             teamMemberEntity.setJoinedDate(ZonedDateTime.now());
             teamMemberEntity.setMemberType( MemberType.MEMBER);
             TeamMemberInfo teamMemberInfo = new TeamMemberInfo(teamMemberEntity);
 
             teamService.addMember(teamId, teamMemberInfo);
-            log.info("Adding members by emails: added new member {} to team {} successful", created_User.getId(), team.getName());
+            log.info("Adding members by emails: added new member {} to team {} successful", unverifiedUser.getId(), team.getName());
 
+            // update member status to approved - class members are automatically approved
+            log.info("debug: {}", unverifiedUser.getId());
+            User verifiedUser = userService.verifyUserEmail(unverifiedUser.getId(), unverifiedUser.getUserDetails().getEmail(), unverifiedUser.getVerificationKey());
+            approveNewMember(teamId, verifiedUser.getId(), leader);
+            log.info("Adding members by emails: approve new member {} to team {} in sio database successful", verifiedUser.getId(), team.getName());
         }
 
-        return adapterDeterLab.addMemberByEmail(teamId, leaderId, emails);
+        adapterDeterLab.addMemberByEmail(teamId, leaderId, emails);
+
+        // TODo: save the mapping between deter an sio user id
+
+        // if everything is fine , now start to send email
+        for (int i = 0; i < emails_split.length; i++) {
+            String newEmail = emails_split[i].substring(1, emails_split[i].length() - 1);
+            //email is username in credentials table
+            credentialsService.addPasswordResetRequestForNewClassMember(newEmail, team.getName());
+            log.info("Adding members to {} by emails: sending email to {} successful",team.getName(), newEmail);
+        }
+
+        return "success";
     }
 
     @Override
@@ -815,8 +833,34 @@ public class RegistrationServiceImpl implements RegistrationService {
         log.info("Activating new class member {}: information updated successful", uid);
 
         log.info("Activating new class member {}: Updating Deterlab", uid);
-        adapterDeterLab.changePasswordNewMember();
-        return null;
+        adapterDeterLab.newMemberResetPassword(uid, jsonString);
+
+        return "success";
+    }
+
+    // this function is used to approve new member only in SIO database and not deterlab
+    @Transactional
+    private void approveNewMember(String teamId, String userId, User approver) {
+        User user = userService.getUser(userId);
+        if (!user.isEmailVerified()) {
+            log.warn("Email not verified for {}", user.getId());
+            throw new EmailNotVerifiedException(user.getId());
+        }
+        if (!teamService.isOwner(teamId, approver.getId())) {
+            log.warn("User {} is not a team owner of Team {}", approver.getId(), teamId);
+            throw new UserIsNotTeamOwnerException();
+        }
+        Team team = teamService.getTeamById(teamId);
+        if (team == null) {
+            log.warn("Team NOT found, TeamId {}", teamId);
+            throw new TeamNotFoundException(teamId);
+        }
+        String pid = team.getName();
+
+        if ((UserStatus.PENDING).equals(user.getStatus())) {
+            userService.updateUserStatus(userId, UserStatus.APPROVED);
+        }
+        teamService.updateMemberStatus(teamId, userId, MemberStatus.APPROVED);
     }
 
 }

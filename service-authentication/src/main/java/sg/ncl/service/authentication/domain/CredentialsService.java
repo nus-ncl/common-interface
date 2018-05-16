@@ -31,9 +31,7 @@ public interface CredentialsService {
 
     Credentials resetPassword(String jsonString);
 
-    String addPasswordResetRequestForNewClassMember(String username);
+    void addPasswordResetRequestForNewClassMember(String username, String projectName);
 
-    void sendEmailToClassMember(String username, String uid, String key, String projectName);
-
-    Credentials newMemberResetPassword(String uid, String jsonString);
+    void newMemberResetPassword(String uid, String jsonString);
 }

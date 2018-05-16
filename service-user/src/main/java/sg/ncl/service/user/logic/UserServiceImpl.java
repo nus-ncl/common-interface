@@ -270,7 +270,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @Transactional
-    public User updateInformationNewMember(String uid, String jsonString){
+    public void updateInformationNewMember(String uid, String jsonString){
 
         final UserEntity one = findUser(uid);
         if (one == null) {
@@ -297,6 +297,5 @@ public class UserServiceImpl implements UserService {
 
         final User saved = userRepository.save(one);
         log.info("Update Information New Member {}", saved.getId());
-        return saved;
     }
 }

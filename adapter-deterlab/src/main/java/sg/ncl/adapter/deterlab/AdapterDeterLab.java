@@ -1258,8 +1258,11 @@ public class AdapterDeterLab {
         return responseEntity.getBody().toString();
     }
 
-    public String changePasswordNewMember() {
+    public String newMemberResetPassword(String uid, String jsonString) {
 
+        JSONObject jsonObjectFromAdapter = new JSONObject(jsonString);
+        String key = jsonObjectFromAdapter.getString("key");
+        String newPassword = jsonObjectFromAdapter.getString("newPassword");
 
         return null;
     }

@@ -125,10 +125,9 @@ public class RegistrationController {
     }
 
     //activate new member
-    @PutMapping(path="/newMembers/{uid}")
+    @PutMapping(path="/activateMember/{uid}")
     @ResponseStatus(HttpStatus.OK)
-    public String activateNewClassMember(@PathVariable final String uid, @RequestBody final String jsonString, @AuthenticationPrincipal Object claims) {
-        checkClaimsType(claims);
+    public String activateNewClassMember(@PathVariable final String uid, @RequestBody final String jsonString) {
         return registrationService.activateNewClassMember(uid, jsonString);
     }
 }
