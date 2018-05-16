@@ -1183,7 +1183,7 @@ public class AdapterDeterLab {
     }
 
     public void setUpClass(String nclUserId, String nclTeamId) {
-        log.info("Setting Up Class for project {}", nclTeamId);
+        log.info("Setting up class for project {}", nclTeamId);
         final String deterlabPid = getDeterProjectIdByNclTeamId(nclTeamId) ;
         final String deterlabUid = getDeterUserIdByNclUserId(nclUserId);
 
@@ -1201,6 +1201,7 @@ public class AdapterDeterLab {
             responseEntity = restTemplate.exchange(properties.setUpClass(), HttpMethod.POST, request, String.class);
             String responseBody = responseEntity.getBody().toString();
             String deterMessage = new JSONObject(responseBody).getString("msg");
+            log.info("debug: deter message is {}", deterMessage);
 
             if (!"success".equals(deterMessage)) {
                 log.warn("Error in det Up Class for project {} : {} ", nclTeamId, deterMessage);
@@ -1238,7 +1239,11 @@ public class AdapterDeterLab {
             responseEntity = restTemplate.exchange(properties.addMemberByEmail(), HttpMethod.POST, request, String.class);
             String responseBody = responseEntity.getBody().toString();
             String deterMessage = new JSONObject(responseBody).getString("msg");
-            if (!"success".equals(deterMessage)) {
+            if ("Invalid address".equals(deterMessage)) {
+                log.warn("Error in adding members by emails to team {}: {}", nclTeamId, deterMessage);
+                throw new InvalidEmailAddressException();
+            }
+            else if (!"success".equals(deterMessage)) {
                 log.warn("Error in adding members by emails to team {}: {}", nclTeamId, deterMessage);
                 throw new DeterLabOperationFailedException(deterMessage);
             }
