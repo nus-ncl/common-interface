@@ -56,7 +56,8 @@ public class RegistrationController {
     @PostMapping(path = "/newTeam/{nclUserId}")
     // FIXME: the path is wrong, there should not be multiple paths for different registrations; status should be ACCEPTED
     @ResponseStatus(HttpStatus.CREATED)
-    public Map<String, String> registerRequestToApplyTeam(@PathVariable String nclUserId, @RequestBody RegistrationInfo registrationInfo) {
+    public Map<String, String> registerRequestToApplyTeam(@PathVariable String nclUserId,
+                                                          @RequestBody RegistrationInfo registrationInfo) {
         Map<String, String> map = new HashMap<>();
         Registration one = registrationService.registerRequestToApplyTeam(nclUserId, registrationInfo.getTeam());
         if (one != null) {
@@ -81,7 +82,8 @@ public class RegistrationController {
     @PostMapping(path = "/teams/{teamId}/members/{userId}")
     // FIXME: the path is wrong, there should not be multiple paths for different registrations; status should be ACCEPTED
     @ResponseStatus(HttpStatus.ACCEPTED)
-    public String approveJoinRequest(@PathVariable String teamId, @PathVariable String userId, @RequestBody RegistrationInfo registrationInfo) {
+    public String approveJoinRequest(@PathVariable String teamId, @PathVariable String userId,
+                                     @RequestBody RegistrationInfo registrationInfo) {
         return
                 registrationService.approveJoinRequest(teamId, userId, registrationInfo.getUser());
     }
@@ -89,7 +91,8 @@ public class RegistrationController {
     @DeleteMapping(path = "/teams/{teamId}/members/{userId}")
     // FIXME: the path is wrong, there should not be multiple paths for different registrations; status should be OK
     @ResponseStatus(HttpStatus.ACCEPTED)
-    public String rejectJoinRequest(@PathVariable String teamId, @PathVariable String userId, @RequestBody RegistrationInfo registrationInfo) {
+    public String rejectJoinRequest(@PathVariable String teamId, @PathVariable String userId,
+                                    @RequestBody RegistrationInfo registrationInfo) {
         return
                 registrationService.rejectJoinRequest(teamId, userId, registrationInfo.getUser());
     }
@@ -110,7 +113,8 @@ public class RegistrationController {
     }
 
     @PutMapping(path = "/users/{id}/emails/{emailBase64}", consumes = MediaType.APPLICATION_JSON_VALUE)
-    public boolean verifyEmail(@PathVariable String id, @PathVariable String emailBase64, @RequestBody VerificationKeyInfo keyInfo) {
+    public boolean verifyEmail(@PathVariable String id, @PathVariable String emailBase64,
+                               @RequestBody VerificationKeyInfo keyInfo) {
         final String email = new String(Base64.decodeBase64(emailBase64));
         return registrationService.verifyEmail(id, email, keyInfo.getKey());
     }
@@ -118,7 +122,9 @@ public class RegistrationController {
     // add members by emails
     @PostMapping(path ="/{teamId}/addMembers")
     @ResponseStatus(HttpStatus.OK)
-    public String addMemberByEmail(@PathVariable final String teamId, @RequestBody final String emails, @AuthenticationPrincipal final Object claims) {
+    public String addMemberByEmail(@PathVariable final String teamId,
+                                   @RequestBody final String emails,
+                                   @AuthenticationPrincipal final Object claims) {
         String leaderId = ((Claims) claims).getSubject();
 
         return registrationService.addMemberByEmail(teamId, leaderId, emails);
@@ -127,7 +133,14 @@ public class RegistrationController {
     //activate new member
     @PutMapping(path="/activateMember/{uid}")
     @ResponseStatus(HttpStatus.OK)
-    public String activateNewClassMember(@PathVariable final String uid, @RequestBody final String jsonString) {
-        return registrationService.activateNewClassMember(uid, jsonString);
+    public String activateNewClassMember(@PathVariable String uid,
+                                         @RequestBody NewMemberResetPasswordInfo newMemberResetPasswordInfo) {
+        String firstName = newMemberResetPasswordInfo.getFirstName();
+        String lastName = newMemberResetPasswordInfo.getLastName();
+        String phone = newMemberResetPasswordInfo.getPhone();
+        String key = newMemberResetPasswordInfo.getKey();
+        String newPassword = newMemberResetPasswordInfo.getNewPassword();
+
+        return registrationService.activateNewClassMember(uid, firstName, lastName, phone, key, newPassword);
     }
 }

@@ -47,6 +47,7 @@ ncl:
       '/registrations': POST # for apply/join new teams
       '/users/(\w|-)+': GET # for retrieving public teams' owner info
       '/registrations/users/(\w|-)+/emails/\w+=*': PUT # for email verifications
+      '/registrations/activateMember/(\w|-)+': PUT
       '/teams\?visibility=PUBLIC': GET # for retrieving public teams
       '/teams\?name=(\w|-)+': GET # for retrieving teams by name
       '/credentials/password/resets': POST

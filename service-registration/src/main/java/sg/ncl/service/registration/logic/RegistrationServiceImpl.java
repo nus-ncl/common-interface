@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.ui.freemarker.FreeMarkerTemplateUtils;
 import sg.ncl.adapter.deterlab.AdapterDeterLab;
+import sg.ncl.adapter.deterlab.exceptions.DeterLabOperationFailedException;
 import sg.ncl.common.DomainProperties;
 import sg.ncl.common.authentication.Role;
 import sg.ncl.common.exception.base.ForbiddenException;
@@ -755,6 +756,7 @@ public class RegistrationServiceImpl implements RegistrationService {
 
         UserEntity leader = (UserEntity)userService.getUser(leaderId);
 
+        Map <String, String> listOfSioUid = new HashMap<String, String>();
         for (int i = 0; i< emails_split.length; i++) {
 
             String newEmail = emails_split[i].substring(1, emails_split[i].length() - 1);
@@ -800,15 +802,32 @@ public class RegistrationServiceImpl implements RegistrationService {
             log.info("Adding members by emails: added new member {} to team {} successful", unverifiedUser.getId(), team.getName());
 
             // update member status to approved - class members are automatically approved
-            log.info("debug: {}", unverifiedUser.getId());
             User verifiedUser = userService.verifyUserEmail(unverifiedUser.getId(), unverifiedUser.getUserDetails().getEmail(), unverifiedUser.getVerificationKey());
             approveNewMember(teamId, verifiedUser.getId(), leader);
             log.info("Adding members by emails: approve new member {} to team {} in sio database successful", verifiedUser.getId(), team.getName());
+            listOfSioUid.put(newEmail, verifiedUser.getId());
         }
 
-        adapterDeterLab.addMemberByEmail(teamId, leaderId, emails);
+
+        String  listOfDeterUid= adapterDeterLab.addMemberByEmail(teamId, leaderId, emails);
+        log.info("Adding members by emails to team {}: Send deterlab request successful", team.getName());
+
 
         // TODo: save the mapping between deter an sio user id
+        JSONObject responseJsonObject = new JSONObject(listOfDeterUid);
+        for (int i = 0; i < emails_split.length; i++) {
+            String newEmail = emails_split[i].substring(1, emails_split[i].length() - 1);
+            if (responseJsonObject.has(newEmail)) {
+                String deterUid = responseJsonObject.getString(newEmail);
+                String nclUid = listOfSioUid.get(newEmail);
+                adapterDeterLab.saveDeterUserIdMapping(deterUid, nclUid);
+                log.info("Adding members by emails to team {}: Saved the mapping between deter and sio uid for email {} was successful", team.getName(), newEmail);
+            } else {
+                log.warn("Error in adding members by emails to team {}: user with email {} was not created", team.getName(), newEmail);
+                throw new DeterLabOperationFailedException("Error in adding members by emails to team " + team.getName() + ": user with email" + newEmail + "was not found");
+            }
+        }
+
 
         // if everything is fine , now start to send email
         for (int i = 0; i < emails_split.length; i++) {
@@ -822,20 +841,19 @@ public class RegistrationServiceImpl implements RegistrationService {
     }
 
     @Override
-    public String activateNewClassMember(String uid, String jsonString) {
+    @Transactional
+    public String activateNewClassMember(String uid, String firstName, String lastName, String phone, String key, String newPassword) {
 
         log.info("Activating new class member {}: Updating password", uid);
-        credentialsService.newMemberResetPassword(uid, jsonString);
+        credentialsService.newMemberResetPassword(uid, key, newPassword);
         log.info("Activating new class member {}: password updated successful", uid);
 
         log.info("Activating new class member {}: Updating first name, last name, phone", uid);
-        userService.updateInformationNewMember(uid, jsonString);
+        userService.updateInformationNewMember(uid, firstName, lastName, phone);
         log.info("Activating new class member {}: information updated successful", uid);
 
         log.info("Activating new class member {}: Updating Deterlab", uid);
-        adapterDeterLab.newMemberResetPassword(uid, jsonString);
-
-        return "success";
+        return  adapterDeterLab.newMemberResetPassword(uid, firstName, lastName, phone, newPassword);
     }
 
     // this function is used to approve new member only in SIO database and not deterlab

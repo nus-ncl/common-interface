@@ -385,6 +385,8 @@ public class CredentialsServiceImpl implements CredentialsService {
     @Override
     @Transactional
     public void addPasswordResetRequestForNewClassMember(String username, String projectName){
+        //email is username in credential table
+
         if (null == username || username.trim().isEmpty()) {
             log.warn("Username null or empty in password reset request");
             throw new UsernameNullOrEmptyException();
@@ -405,10 +407,10 @@ public class CredentialsServiceImpl implements CredentialsService {
         passwordResetRepository.save(passwordResetRequestEntity);
         log.info("Password reset request saved: {}", passwordResetRequestEntity.toString());
 
-        sendEmailToClassMember(one.getId(), key, projectName);
+        sendEmailToClassMember(one.getId(), key, projectName, username);
     }
 
-    private void sendEmailToClassMember(String uid, String key, String projectName) {
+    private void sendEmailToClassMember(String uid, String key, String projectName, String email) {
         final Map<String, String> map = new HashMap<>();
         map.put("domain", domainProperties.getDomain());
         map.put("key", key);
@@ -417,7 +419,7 @@ public class CredentialsServiceImpl implements CredentialsService {
 
         try {
             String msgText = FreeMarkerTemplateUtils.processTemplateIntoString(newClassMemberResetPasswordTemplate, map);
-            mailService.send("NCL Testbed Ops <testbed-ops@ncl.sg>", "New Member","Reset Password For New Member", msgText, false, null, null);
+            mailService.send("NCL Testbed Ops <testbed-ops@ncl.sg>", email,"Reset Password For New Member", msgText, false, null, null);
             log.info("Password reset email sent: {}", msgText);
         } catch (IOException | TemplateException e) {
             log.warn("{}", e);
@@ -426,10 +428,7 @@ public class CredentialsServiceImpl implements CredentialsService {
 
     @Override
     @Transactional
-    public void newMemberResetPassword(String uid, String jsonString){
-        JSONObject jsonObjectFromAdapter = new JSONObject(jsonString);
-        String key = jsonObjectFromAdapter.getString("key");
-        String newPassword = jsonObjectFromAdapter.getString("newPassword");
+    public void newMemberResetPassword(String uid, String key, String newPassword){
 
         CredentialsEntity credentialFromUid = credentialsRepository.findById(uid);
         if(null ==  credentialFromUid) {

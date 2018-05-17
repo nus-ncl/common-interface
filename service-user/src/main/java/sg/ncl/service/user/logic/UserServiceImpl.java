@@ -270,18 +270,13 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @Transactional
-    public void updateInformationNewMember(String uid, String jsonString){
+    public void updateInformationNewMember(String uid, String firstName, String lastName, String phone){
 
         final UserEntity one = findUser(uid);
         if (one == null) {
             log.warn("User not found when updating: {}",uid);
             throw new UserNotFoundException(uid);
         }
-
-        JSONObject jsonObjectFromAdapter = new JSONObject(jsonString);
-        String firstName = jsonObjectFromAdapter.getString("firstName");
-        String lastName = jsonObjectFromAdapter.getString("lastName");
-        String phone = jsonObjectFromAdapter.getString("phone");
 
         if (firstName != null || !firstName.isEmpty()) {
             one.getUserDetails().setFirstName(firstName);

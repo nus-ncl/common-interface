@@ -161,4 +161,9 @@ public class ConnectionProperties {
         return HTTP_MODE + ip + ":" + port + "/addMemberByEmail";
     }
 
+    public String resetPasswordNewMember() {
+        return HTTP_MODE + ip + ":" + port + "/resetPasswordNewMember";
+    }
+
+
 }

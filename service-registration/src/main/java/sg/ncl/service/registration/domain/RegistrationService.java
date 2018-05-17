@@ -29,5 +29,5 @@ public interface RegistrationService {
 
     String addMemberByEmail(String teamId, String userId, String emails);
 
-    String activateNewClassMember(String uid, String jsonString);
+    String activateNewClassMember(String uid, String firstName, String lastName, String phone, String key, String newPassword);
 }
