@@ -1290,7 +1290,8 @@ public class AdapterDeterLab {
         }
 
         log.info("Resetting password for new member {} is successful", deterUid);
-        return null;
+
+        return responseEntity.getBody().toString();
     }
 
 }

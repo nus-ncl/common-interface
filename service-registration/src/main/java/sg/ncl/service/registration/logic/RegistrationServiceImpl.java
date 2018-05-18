@@ -19,6 +19,8 @@ import sg.ncl.service.authentication.domain.Credentials;
 import sg.ncl.service.authentication.domain.CredentialsService;
 import sg.ncl.service.authentication.domain.CredentialsStatus;
 import sg.ncl.service.authentication.exceptions.CredentialsNotFoundException;
+import sg.ncl.service.authentication.exceptions.PasswordNullOrEmptyException;
+import sg.ncl.service.authentication.exceptions.PasswordResetRequestTimeoutException;
 import sg.ncl.service.authentication.web.CredentialsInfo;
 import sg.ncl.service.mail.domain.MailService;
 import sg.ncl.service.registration.data.jpa.RegistrationEntity;
@@ -842,18 +844,32 @@ public class RegistrationServiceImpl implements RegistrationService {
 
     @Override
     @Transactional
-    public String activateNewClassMember(String uid, String firstName, String lastName, String phone, String key, String newPassword) {
+    public void activateNewClassMember(String uid, String firstName, String lastName, String phone, String key, String newPassword) {
 
-        log.info("Activating new class member {}: Updating password", uid);
         credentialsService.newMemberResetPassword(uid, key, newPassword);
         log.info("Activating new class member {}: password updated successful", uid);
 
-        log.info("Activating new class member {}: Updating first name, last name, phone", uid);
         userService.updateInformationNewMember(uid, firstName, lastName, phone);
         log.info("Activating new class member {}: information updated successful", uid);
 
         log.info("Activating new class member {}: Updating Deterlab", uid);
-        return  adapterDeterLab.newMemberResetPassword(uid, firstName, lastName, phone, newPassword);
+        String responseBody = adapterDeterLab.newMemberResetPassword(uid, firstName, lastName, phone, newPassword);
+        JSONObject responseJsonObject = new JSONObject(responseBody);
+
+        if (responseJsonObject.has("error")) {
+            String deterError = responseJsonObject.getString("error");
+            log.warn("Error in activating new class member {}: {}", uid, deterError);
+
+            if ("Key has expired".equals(deterError)) {
+                throw new PasswordResetRequestTimeoutException(deterError);
+            } else if ("Password is not supplied".equals(deterError)) {
+                throw new PasswordNullOrEmptyException();
+            } else if ("First or last name is not valid".equals(deterError)) {
+                throw new InvalidUsernameException(deterError);
+            }
+        }
+
+        log.info("Activating new class member {}: Updating Deterlab sucessful", uid);
     }
 
     // this function is used to approve new member only in SIO database and not deterlab

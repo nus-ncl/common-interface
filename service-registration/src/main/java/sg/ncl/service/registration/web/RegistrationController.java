@@ -133,7 +133,7 @@ public class RegistrationController {
     //activate new member
     @PutMapping(path="/activateMember/{uid}")
     @ResponseStatus(HttpStatus.OK)
-    public String activateNewClassMember(@PathVariable String uid,
+    public void activateNewClassMember(@PathVariable String uid,
                                          @RequestBody NewMemberResetPasswordInfo newMemberResetPasswordInfo) {
         String firstName = newMemberResetPasswordInfo.getFirstName();
         String lastName = newMemberResetPasswordInfo.getLastName();
@@ -141,6 +141,6 @@ public class RegistrationController {
         String key = newMemberResetPasswordInfo.getKey();
         String newPassword = newMemberResetPasswordInfo.getNewPassword();
 
-        return registrationService.activateNewClassMember(uid, firstName, lastName, phone, key, newPassword);
+        registrationService.activateNewClassMember(uid, firstName, lastName, phone, key, newPassword);
     }
 }
