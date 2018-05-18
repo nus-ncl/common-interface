@@ -7,4 +7,5 @@ import org.springframework.data.jpa.repository.JpaRepository;
  */
 public interface PasswordResetRequestRepository extends JpaRepository<PasswordResetRequestEntity, Long> {
     PasswordResetRequestEntity findByHash(String hash);
+    PasswordResetRequestEntity findByUsername(String username);
 }

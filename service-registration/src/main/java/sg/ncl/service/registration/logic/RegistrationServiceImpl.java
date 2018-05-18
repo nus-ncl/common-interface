@@ -844,7 +844,7 @@ public class RegistrationServiceImpl implements RegistrationService {
 
     @Override
     @Transactional
-    public void activateNewClassMember(String uid, String firstName, String lastName, String phone, String key, String newPassword) {
+    public void resetPasswordNewMember(String uid, String firstName, String lastName, String phone, String key, String newPassword) {
 
         credentialsService.newMemberResetPassword(uid, key, newPassword);
         log.info("Activating new class member {}: password updated successful", uid);
@@ -853,22 +853,7 @@ public class RegistrationServiceImpl implements RegistrationService {
         log.info("Activating new class member {}: information updated successful", uid);
 
         log.info("Activating new class member {}: Updating Deterlab", uid);
-        String responseBody = adapterDeterLab.newMemberResetPassword(uid, firstName, lastName, phone, newPassword);
-        JSONObject responseJsonObject = new JSONObject(responseBody);
-
-        if (responseJsonObject.has("error")) {
-            String deterError = responseJsonObject.getString("error");
-            log.warn("Error in activating new class member {}: {}", uid, deterError);
-
-            if ("Key has expired".equals(deterError)) {
-                throw new PasswordResetRequestTimeoutException(deterError);
-            } else if ("Password is not supplied".equals(deterError)) {
-                throw new PasswordNullOrEmptyException();
-            } else if ("First or last name is not valid".equals(deterError)) {
-                throw new InvalidUsernameException(deterError);
-            }
-        }
-
+        adapterDeterLab.newMemberResetPassword(uid, firstName, lastName, phone, newPassword);
         log.info("Activating new class member {}: Updating Deterlab sucessful", uid);
     }
 

@@ -34,4 +34,6 @@ public interface CredentialsService {
     void addPasswordResetRequestForNewClassMember(String username, String projectName);
 
     void newMemberResetPassword(String uid, String key, String newPassword);
+
+    void resetKey(String uid);
 }

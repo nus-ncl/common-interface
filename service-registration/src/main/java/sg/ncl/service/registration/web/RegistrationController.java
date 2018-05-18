@@ -131,9 +131,9 @@ public class RegistrationController {
     }
 
     //activate new member
-    @PutMapping(path="/activateMember/{uid}")
+    @PutMapping(path="{uid}/resetPasswordNewMember")
     @ResponseStatus(HttpStatus.OK)
-    public void activateNewClassMember(@PathVariable String uid,
+    public void resetPasswordNewMember(@PathVariable String uid,
                                          @RequestBody NewMemberResetPasswordInfo newMemberResetPasswordInfo) {
         String firstName = newMemberResetPasswordInfo.getFirstName();
         String lastName = newMemberResetPasswordInfo.getLastName();
@@ -141,6 +141,6 @@ public class RegistrationController {
         String key = newMemberResetPasswordInfo.getKey();
         String newPassword = newMemberResetPasswordInfo.getNewPassword();
 
-        registrationService.activateNewClassMember(uid, firstName, lastName, phone, key, newPassword);
+        registrationService.resetPasswordNewMember(uid, firstName, lastName, phone, key, newPassword);
     }
 }

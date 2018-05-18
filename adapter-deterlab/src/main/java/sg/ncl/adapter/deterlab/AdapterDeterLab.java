@@ -1242,11 +1242,10 @@ public class AdapterDeterLab {
 
             if (responseJsonObject.has("error")) {
                 String deterError = responseJsonObject.getString("error");
+                log.warn("Error in adding members by emails to team {}: {}", nclTeamId, deterError);
                 if ("Invalid address".equals(deterError)) {
-                    log.warn("Error in adding members by emails to team {}: {}", nclTeamId, deterError);
                     throw new InvalidEmailAddressException();
                 } else  {
-                    log.warn("Error in adding members by emails to team {}: {}", nclTeamId, deterError);
                     throw new DeterLabOperationFailedException(deterError);
                 }
             }
@@ -1262,7 +1261,7 @@ public class AdapterDeterLab {
         return responseBody;
     }
 
-    public String newMemberResetPassword(String nclUid, String firstName, String lastName, String phone, String newPassword) {
+    public void newMemberResetPassword(String nclUid, String firstName, String lastName, String phone, String newPassword) {
 
         final String deterUid = getDeterUserIdByNclUserId(nclUid);
 
@@ -1278,9 +1277,23 @@ public class AdapterDeterLab {
         headers.setContentType(MediaType.APPLICATION_JSON);
         HttpEntity<String> request = new HttpEntity<>(jsonObject.toString(), headers);
         ResponseEntity responseEntity = null;
-
+        String responseBody;
         try {
             responseEntity = restTemplate.exchange(properties.resetPasswordNewMember(), HttpMethod.POST, request, String.class);
+            responseBody = responseEntity.getBody().toString();
+            JSONObject responseJsonObject = new JSONObject(responseBody);
+
+            if (responseJsonObject.has("error")) {
+                String deterError = responseJsonObject.getString("error");
+                log.warn("Error in resetting password for new member {}: {}", deterUid, deterError);
+                if ("Password is not supplied".equals(deterError)) {
+                    throw new InvalidPasswordException();
+                } else if ("First or last name is not valid".equals(deterError)) {
+                    throw new InvalidUsernameException(deterError);
+                } else {
+                    throw new DeterLabOperationFailedException(deterError);
+                }
+            }
         }  catch (ResourceAccessException resourceAccessException) {
             log.warn("Error in resetting password for new member {}: {}", deterUid, resourceAccessException);
             throw new AdapterConnectionException(resourceAccessException.getMessage());
@@ -1291,7 +1304,6 @@ public class AdapterDeterLab {
 
         log.info("Resetting password for new member {} is successful", deterUid);
 
-        return responseEntity.getBody().toString();
     }
 
 }
