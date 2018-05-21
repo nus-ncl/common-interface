@@ -43,7 +43,7 @@ import static sg.ncl.service.authentication.validation.Validator.*;
 public class CredentialsServiceImpl implements CredentialsService {
 
     private static final int PASSWORD_RESET_REQUEST_TIMEOUT_HOUR = 24;
-    private static final int NEW_MEMBER_PASSWORD_RESET_TIMEOUT_HOUR = 72;
+    private static final int NEW_MEMBER_PW_RESET_TIMEOUT_HOUR = 72;
 
 
     private final CredentialsRepository credentialsRepository;
@@ -451,7 +451,7 @@ public class CredentialsServiceImpl implements CredentialsService {
 
         // check whether the request has timed out or not
         ZonedDateTime now = ZonedDateTime.now();
-        if(now.isAfter(credentialFromKey.getTime().plusHours(NEW_MEMBER_PASSWORD_RESET_TIMEOUT_HOUR))) {
+        if(now.isAfter(credentialFromKey.getTime().plusHours(NEW_MEMBER_PW_RESET_TIMEOUT_HOUR))) {
             log.warn("New member password reset: Password reset request timeout: request date {}, now {}", credentialFromKey.getTime(), now);
             throw new PasswordResetRequestTimeoutException("requested on " + credentialFromKey.getTime() + ", now " + now);
         }
