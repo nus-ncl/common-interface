@@ -6,7 +6,6 @@ import io.jsonwebtoken.Claims;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.json.JSONObject;
-import org.springframework.security.core.userdetails.User;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.ui.freemarker.FreeMarkerTemplateUtils;
@@ -408,7 +407,7 @@ public class CredentialsServiceImpl implements CredentialsService {
         passwordResetRequestEntity.setTime(ZonedDateTime.now());
         passwordResetRequestEntity.setUsername(username);
         passwordResetRepository.save(passwordResetRequestEntity);
-        log.info("Password reset request saved: {}", passwordResetRequestEntity.toString());
+        log.info("Password reset request saved: {}", passwordResetRequestEntity);
 
         sendEmailToClassMember(one.getId(), key, username);
     }
@@ -459,9 +458,8 @@ public class CredentialsServiceImpl implements CredentialsService {
 
         if (newPassword != null && !newPassword.trim().isEmpty()) {
             hashPassword(credentialFromUid, newPassword);
-            final CredentialsEntity saved = credentialsRepository.save(credentialFromUid);
+            credentialsRepository.save(credentialFromUid);
             log.info("New member password reset for user {} is successful", credentialFromUid.getUsername());
-            //return saved;
         } else {
             log.warn("New member password reset for user {}: Password null or empty in password reset!", credentialFromUid.getUsername() );
             throw new PasswordNullOrEmptyException();

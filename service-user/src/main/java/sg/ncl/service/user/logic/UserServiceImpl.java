@@ -2,7 +2,6 @@ package sg.ncl.service.user.logic;
 
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.RandomStringUtils;
-import org.json.JSONObject;
 import org.springframework.stereotype.Service;
 import sg.ncl.service.authentication.domain.CredentialsService;
 import sg.ncl.service.user.data.jpa.UserDetailsEntity;

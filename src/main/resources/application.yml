@@ -61,7 +61,7 @@ ncl:
   deterlab:
     adapter:
       ip: 172.18.178.5
-      port: 46000
+      port: 8080
       bossUrl: ${deterlab.boss:}
       userUrl: ${deterlab.user:}
       enabled: true

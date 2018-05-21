@@ -14,13 +14,9 @@ import sg.ncl.adapter.deterlab.exceptions.DeterLabOperationFailedException;
 import sg.ncl.common.DomainProperties;
 import sg.ncl.common.authentication.Role;
 import sg.ncl.common.exception.base.ForbiddenException;
-import sg.ncl.service.authentication.data.jpa.CredentialsEntity;
 import sg.ncl.service.authentication.domain.Credentials;
 import sg.ncl.service.authentication.domain.CredentialsService;
 import sg.ncl.service.authentication.domain.CredentialsStatus;
-import sg.ncl.service.authentication.exceptions.CredentialsNotFoundException;
-import sg.ncl.service.authentication.exceptions.PasswordNullOrEmptyException;
-import sg.ncl.service.authentication.exceptions.PasswordResetRequestTimeoutException;
 import sg.ncl.service.authentication.web.CredentialsInfo;
 import sg.ncl.service.mail.domain.MailService;
 import sg.ncl.service.registration.data.jpa.RegistrationEntity;
@@ -751,14 +747,14 @@ public class RegistrationServiceImpl implements RegistrationService {
             throw new ForbiddenException();
         }
 
-        String my_emails = new JSONObject(emails).getString("emails");
-        int size = my_emails.length();
-        my_emails = my_emails.substring(1,size-1);
-        String[] emails_split = my_emails.split(",");
+        String listOfEmails = new JSONObject(emails).getString("emails");
+        int size = listOfEmails.length();
+        listOfEmails = listOfEmails.substring(1,size-1);
+        String[] emails_split = listOfEmails.split(",");
 
         UserEntity leader = (UserEntity)userService.getUser(leaderId);
 
-        Map <String, String> listOfSioUid = new HashMap<String, String>();
+        Map <String, String> listOfSioUid = new HashMap();
         for (int i = 0; i< emails_split.length; i++) {
 
             String newEmail = emails_split[i].substring(1, emails_split[i].length() - 1);
@@ -815,7 +811,7 @@ public class RegistrationServiceImpl implements RegistrationService {
         log.info("Adding members by emails to team {}: Send deterlab request successful", team.getName());
 
 
-        // TODo: save the mapping between deter an sio user id
+        // save the mapping between deter an sio user id
         JSONObject responseJsonObject = new JSONObject(listOfDeterUid);
         for (int i = 0; i < emails_split.length; i++) {
             String newEmail = emails_split[i].substring(1, emails_split[i].length() - 1);
@@ -858,7 +854,6 @@ public class RegistrationServiceImpl implements RegistrationService {
     }
 
     // this function is used to approve new member only in SIO database and not deterlab
-    @Transactional
     private void approveNewMember(String teamId, String userId, User approver) {
         User user = userService.getUser(userId);
         if (!user.isEmailVerified()) {
@@ -874,7 +869,6 @@ public class RegistrationServiceImpl implements RegistrationService {
             log.warn("Team NOT found, TeamId {}", teamId);
             throw new TeamNotFoundException(teamId);
         }
-        String pid = team.getName();
 
         if ((UserStatus.PENDING).equals(user.getStatus())) {
             userService.updateUserStatus(userId, UserStatus.APPROVED);

@@ -2,35 +2,21 @@ package sg.ncl.service.team.logic;
 
 
 import lombok.extern.slf4j.Slf4j;
-import org.json.JSONArray;
-import org.json.JSONObject;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import sg.ncl.adapter.deterlab.AdapterDeterLab;
 import sg.ncl.common.AccountingProperties;
-import sg.ncl.common.authentication.Role;
 import sg.ncl.service.analytics.domain.AnalyticsService;
-import sg.ncl.service.authentication.data.jpa.CredentialsEntity;
-import sg.ncl.service.authentication.domain.CredentialsService;
-import sg.ncl.service.authentication.domain.CredentialsStatus;
-import sg.ncl.service.authentication.web.CredentialsInfo;
 import sg.ncl.service.team.data.jpa.*;
 import sg.ncl.service.team.domain.*;
 import sg.ncl.service.team.exceptions.*;
-import sg.ncl.service.team.web.TeamMemberInfo;
-import sg.ncl.service.user.data.jpa.UserDetailsEntity;
-import sg.ncl.service.user.data.jpa.UserEntity;
-import sg.ncl.service.user.domain.User;
 import sg.ncl.service.user.domain.UserService;
 
 import javax.inject.Inject;
 import javax.validation.constraints.NotNull;
 import java.math.BigDecimal;
 import java.time.ZonedDateTime;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashSet;
 import java.util.List;
 import java.util.stream.Collectors;
 

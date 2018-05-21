@@ -7,16 +7,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
-import sg.ncl.common.exception.base.ForbiddenException;
-import sg.ncl.service.authentication.domain.Credentials;
-import sg.ncl.service.authentication.domain.CredentialsService;
-import sg.ncl.service.authentication.web.CredentialsInfo;
 import sg.ncl.service.registration.domain.Registration;
 import sg.ncl.service.registration.domain.RegistrationService;
-import sg.ncl.service.team.domain.Team;
 import sg.ncl.service.team.domain.TeamStatus;
-import sg.ncl.service.team.web.TeamInfo;
-import sg.ncl.service.user.domain.UserStatus;
 import sg.ncl.service.user.web.VerificationKeyInfo;
 
 import javax.inject.Inject;

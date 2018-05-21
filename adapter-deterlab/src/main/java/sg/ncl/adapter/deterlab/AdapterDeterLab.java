@@ -10,7 +10,6 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.client.HttpServerErrorException;
 import org.springframework.web.client.ResourceAccessException;
 import org.springframework.web.client.RestClientException;
@@ -38,6 +37,8 @@ public class AdapterDeterLab {
     private DeterLabUserRepository deterLabUserRepository;
     private ConnectionProperties properties;
     private RestTemplate restTemplate;
+
+    private static final String ERROR_IN_ADDING_MEMBERS_BY_EMAILS = "Error in adding members by emails to team {}: {}";
 
     @Inject
     public AdapterDeterLab(DeterLabUserRepository repository, DeterLabProjectRepository deterLabProjectRepository, ConnectionProperties connectionProperties, RestTemplate restTemplate) {
@@ -1221,12 +1222,12 @@ public class AdapterDeterLab {
         final String deterUid = getDeterUserIdByNclUserId(nclUserId);
 
         log.info("Adding members by emails to project {}", deterPid);
-        String my_emails = new JSONObject(emails).getString("emails");
+        String listOfEmails = new JSONObject(emails).getString("emails");
 
         JSONObject jsonObject = new JSONObject();
         jsonObject.put("pid", deterPid);
         jsonObject.put("uid", deterUid);
-        jsonObject.put("emails", my_emails);
+        jsonObject.put("emails", listOfEmails);
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
@@ -1242,7 +1243,7 @@ public class AdapterDeterLab {
 
             if (responseJsonObject.has("error")) {
                 String deterError = responseJsonObject.getString("error");
-                log.warn("Error in adding members by emails to team {}: {}", nclTeamId, deterError);
+                log.warn(ERROR_IN_ADDING_MEMBERS_BY_EMAILS, nclTeamId, deterError);
                 if ("Invalid address".equals(deterError)) {
                     throw new InvalidEmailAddressException();
                 } else  {
@@ -1251,10 +1252,10 @@ public class AdapterDeterLab {
             }
 
         } catch (ResourceAccessException resourceAccessException) {
-            log.warn("Error in adding members by emails to team {}: {}", deterPid, resourceAccessException);
+            log.warn(ERROR_IN_ADDING_MEMBERS_BY_EMAILS, deterPid, resourceAccessException);
             throw new AdapterConnectionException(resourceAccessException.getMessage());
         } catch (HttpServerErrorException httpServerErrorException) {
-            log.warn("Error in adding members by emails to team {}: {}", deterPid , httpServerErrorException);
+            log.warn(ERROR_IN_ADDING_MEMBERS_BY_EMAILS, deterPid , httpServerErrorException);
             throw new AdapterInternalErrorException();
         }
         log.info("Adding members by emails to project {} successful", deterPid);
