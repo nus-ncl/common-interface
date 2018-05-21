@@ -1200,13 +1200,13 @@ public class AdapterDeterLab {
         try {
             responseEntity = restTemplate.exchange(properties.setUpClass(), HttpMethod.POST, request, String.class);
             String responseBody = responseEntity.getBody().toString();
-            String deterMessage = new JSONObject(responseBody).getString("msg");
-            log.info("debug: deter message is {}", deterMessage);
+            JSONObject responseJsonObject = new JSONObject(responseBody);
 
-            if (!"success".equals(deterMessage)) {
-                log.warn("Error in setting up class for project {} : {} ", nclTeamId, deterMessage);
-                throw new DeterLabOperationFailedException(deterMessage);
+            if (!responseJsonObject.has("msg")) {
+                log.warn("Error in setting up class for project {} : {} ", nclTeamId, "Unknown error");
+                throw new DeterLabOperationFailedException("Unknown error");
             }
+
         } catch (ResourceAccessException resourceAccessException) {
             log.warn("Error in setting up class for project {}: {}", nclTeamId, resourceAccessException);
             throw new AdapterConnectionException(resourceAccessException.getMessage());
@@ -1278,9 +1278,11 @@ public class AdapterDeterLab {
         HttpEntity<String> request = new HttpEntity<>(jsonObject.toString(), headers);
         ResponseEntity responseEntity = null;
         String responseBody;
+
         try {
             responseEntity = restTemplate.exchange(properties.resetPasswordNewMember(), HttpMethod.POST, request, String.class);
             responseBody = responseEntity.getBody().toString();
+
             JSONObject responseJsonObject = new JSONObject(responseBody);
 
             if (responseJsonObject.has("error")) {

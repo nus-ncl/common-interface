@@ -844,7 +844,7 @@ public class RegistrationServiceImpl implements RegistrationService {
 
     @Override
     @Transactional
-    public void resetPasswordNewMember(String uid, String firstName, String lastName, String phone, String key, String newPassword) {
+    public String resetPasswordNewMember(String uid, String firstName, String lastName, String phone, String key, String newPassword) {
 
         credentialsService.newMemberResetPassword(uid, key, newPassword);
         log.info("Activating new class member {}: password updated successful", uid);
@@ -852,9 +852,9 @@ public class RegistrationServiceImpl implements RegistrationService {
         userService.updateInformationNewMember(uid, firstName, lastName, phone);
         log.info("Activating new class member {}: information updated successful", uid);
 
-        log.info("Activating new class member {}: Updating Deterlab", uid);
         adapterDeterLab.newMemberResetPassword(uid, firstName, lastName, phone, newPassword);
         log.info("Activating new class member {}: Updating Deterlab sucessful", uid);
+        return "success";
     }
 
     // this function is used to approve new member only in SIO database and not deterlab

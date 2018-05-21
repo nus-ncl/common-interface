@@ -29,5 +29,5 @@ public interface RegistrationService {
 
     String addMemberByEmail(String teamId, String userId, String emails);
 
-    void resetPasswordNewMember(String uid, String firstName, String lastName, String phone, String key, String newPassword);
+    String resetPasswordNewMember(String uid, String firstName, String lastName, String phone, String key, String newPassword);
 }
