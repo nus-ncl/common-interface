@@ -1183,39 +1183,13 @@ public class AdapterDeterLab {
         return jsonObject.toString();
     }
 
-    public void setUpClass(String nclUserId, String nclTeamId) {
-        log.info("Setting up class for project {}", nclTeamId);
-        final String deterlabPid = getDeterProjectIdByNclTeamId(nclTeamId) ;
-        final String deterlabUid = getDeterUserIdByNclUserId(nclUserId);
-
-        JSONObject jsonObject = new JSONObject();
-        jsonObject.put("pid", deterlabPid);
-        jsonObject.put("uid", deterlabUid);
-
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_JSON);
-        HttpEntity<String> request = new HttpEntity<>(jsonObject.toString(), headers);
-
-        ResponseEntity responseEntity = null;
-
-        try {
-            responseEntity = restTemplate.exchange(properties.setUpClass(), HttpMethod.POST, request, String.class);
-            String responseBody = responseEntity.getBody().toString();
-            JSONObject responseJsonObject = new JSONObject(responseBody);
-
-            if (!responseJsonObject.has("msg")) {
-                log.warn("Error in setting up class for project {} : {} ", nclTeamId, "Unknown error");
-                throw new DeterLabOperationFailedException("Unknown error");
-            }
-
-        } catch (ResourceAccessException resourceAccessException) {
-            log.warn("Error in setting up class for project {}: {}", nclTeamId, resourceAccessException);
-            throw new AdapterConnectionException(resourceAccessException.getMessage());
-        } catch (HttpServerErrorException httpServerErrorException) {
-            log.warn("Error in setting up class for project {}: {}", nclTeamId, httpServerErrorException);
-            throw new AdapterInternalErrorException();
-        }
-    }
+    /**
+     *Sending request to deterlab to add members by emails
+     * @param nclTeamId
+     * @param nclUserId
+     * @param emails
+     * @return dictionary with keys are emails and values are newly created deterlab UID
+     */
 
     public String addMemberByEmail(String nclTeamId, String nclUserId, String emails){
         final String deterPid = getDeterProjectIdByNclTeamId(nclTeamId) ;
@@ -1261,6 +1235,56 @@ public class AdapterDeterLab {
         log.info("Adding members by emails to project {} successful", deterPid);
         return responseBody;
     }
+
+    /**
+     *set Up Class for new members
+     * @param nclUserId
+     * @param nclTeamId
+     * @return void
+     */
+
+    public void setUpClass(String nclUserId, String nclTeamId) {
+        log.info("Setting up class for project {}", nclTeamId);
+        final String deterlabPid = getDeterProjectIdByNclTeamId(nclTeamId) ;
+        final String deterlabUid = getDeterUserIdByNclUserId(nclUserId);
+
+        JSONObject jsonObject = new JSONObject();
+        jsonObject.put("pid", deterlabPid);
+        jsonObject.put("uid", deterlabUid);
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        HttpEntity<String> request = new HttpEntity<>(jsonObject.toString(), headers);
+
+        ResponseEntity responseEntity = null;
+
+        try {
+            responseEntity = restTemplate.exchange(properties.setUpClass(), HttpMethod.POST, request, String.class);
+            String responseBody = responseEntity.getBody().toString();
+            JSONObject responseJsonObject = new JSONObject(responseBody);
+
+            if (!responseJsonObject.has("msg")) {
+                log.warn("Error in setting up class for project {} : {} ", nclTeamId, "Unknown error");
+                throw new DeterLabOperationFailedException("Unknown error");
+            }
+
+        } catch (ResourceAccessException resourceAccessException) {
+            log.warn("Error in setting up class for project {}: {}", nclTeamId, resourceAccessException);
+            throw new AdapterConnectionException(resourceAccessException.getMessage());
+        } catch (HttpServerErrorException httpServerErrorException) {
+            log.warn("Error in setting up class for project {}: {}", nclTeamId, httpServerErrorException);
+            throw new AdapterInternalErrorException();
+        }
+    }
+
+    /**
+     * Send deterlab request to reset password , phone, first and last name when user click on the "Reset password" link in email
+     * @param nclUid
+     * @param firstName
+     * @param phone
+     * @param newPassword
+     * @return void
+     */
 
     public void newMemberResetPassword(String nclUid, String firstName, String lastName, String phone, String newPassword) {
 
