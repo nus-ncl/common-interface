@@ -110,7 +110,7 @@ public class RegistrationServiceImpl implements RegistrationService {
 
     @Override
     @Transactional
-    // FIXME: the return type should be a proper Registration
+    // FIX ME: the return type should be a proper Registration
     // for existing users to create a new team
     public Registration registerRequestToApplyTeam(String nclUserId, Team team) {
 
@@ -360,7 +360,7 @@ public class RegistrationServiceImpl implements RegistrationService {
                 log.info("Reject join request from User {}, Team {}", member.getUserId(), teamId);
                 userService.removeTeam(userId, teamId);
                 teamService.removeMember(teamId, member);
-                // FIXME call adapter deterlab
+                // FIX ME call adapter deterlab
                 JSONObject object = new JSONObject();
                 object.put("approverUid", adapterDeterLab.getDeterUserIdByNclUserId(approver.getId()));
                 object.put("uid", adapterDeterLab.getDeterUserIdByNclUserId(userId));
@@ -384,7 +384,7 @@ public class RegistrationServiceImpl implements RegistrationService {
             final TeamStatus status,
             final String reason
     ) {
-        // FIXME required additional parameters to validate if approver is of admin or ordinary user
+        // FIX ME required additional parameters to validate if approver is of admin or ordinary user
 
         checkTeamId(teamId);
         checkUserId(ownerId);
@@ -398,7 +398,7 @@ public class RegistrationServiceImpl implements RegistrationService {
         // invoked method already ensure there is at least a team member of type owner
         Team team = teamService.updateTeamStatus(teamId, status);
 
-        // FIXME adapter deterlab call here
+        // FIX ME adapter deterlab call here
         JSONObject one = new JSONObject();
         one.put("pid", team.getName());
         one.put("uid", adapterDeterLab.getDeterUserIdByNclUserId(ownerId));
@@ -426,7 +426,7 @@ public class RegistrationServiceImpl implements RegistrationService {
 
             sendReplyCreateTeamEmail(user, team, status, reason);
         } else {
-            // FIXME may need to be more specific and check if TeamStatus is REJECTED
+            // FIX ME may need to be more specific and check if TeamStatus is REJECTED
             Team existingTeam = teamService.getTeamById(teamId);
             List<? extends TeamMember> existingMembersList = existingTeam.getMembers();
             for (TeamMember member : existingMembersList) {
@@ -573,7 +573,7 @@ public class RegistrationServiceImpl implements RegistrationService {
         JSONObject jsonObjectFromAdapter = new JSONObject(resultJSON);
         String uid = jsonObjectFromAdapter.getString("uid");
 
-        // FIXME ncl pid may be different from deter pid
+        // FIX ME ncl pid may be different from deter pid
         RegistrationEntity registrationEntity = new RegistrationEntity();
         registrationEntity.setPid(team.getId());
         registrationEntity.setUid(uid);

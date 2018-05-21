@@ -47,7 +47,7 @@ public class RegistrationController {
     }
 
     @PostMapping(path = "/newTeam/{nclUserId}")
-    // FIXME: the path is wrong, there should not be multiple paths for different registrations; status should be ACCEPTED
+    // FIX ME: the path is wrong, there should not be multiple paths for different registrations; status should be ACCEPTED
     @ResponseStatus(HttpStatus.CREATED)
     public Map<String, String> registerRequestToApplyTeam(@PathVariable String nclUserId,
                                                           @RequestBody RegistrationInfo registrationInfo) {
@@ -61,7 +61,7 @@ public class RegistrationController {
 
     // old user + join team
     @PostMapping(path = "/joinApplications")
-    // FIXME: the path is wrong, there should not be multiple paths for different registrations; status should be ACCEPTED
+    // FIX ME: the path is wrong, there should not be multiple paths for different registrations; status should be ACCEPTED
     @ResponseStatus(HttpStatus.ACCEPTED)
     public Map<String, String> registerRequestToJoinTeam(@RequestBody RegistrationInfo registrationInfo) {
         Map<String, String> map = new HashMap<>();
@@ -73,7 +73,7 @@ public class RegistrationController {
     }
 
     @PostMapping(path = "/teams/{teamId}/members/{userId}")
-    // FIXME: the path is wrong, there should not be multiple paths for different registrations; status should be ACCEPTED
+    // FIX ME: the path is wrong, there should not be multiple paths for different registrations; status should be ACCEPTED
     @ResponseStatus(HttpStatus.ACCEPTED)
     public String approveJoinRequest(@PathVariable String teamId, @PathVariable String userId,
                                      @RequestBody RegistrationInfo registrationInfo) {
@@ -82,7 +82,7 @@ public class RegistrationController {
     }
 
     @DeleteMapping(path = "/teams/{teamId}/members/{userId}")
-    // FIXME: the path is wrong, there should not be multiple paths for different registrations; status should be OK
+    // FIX ME: the path is wrong, there should not be multiple paths for different registrations; status should be OK
     @ResponseStatus(HttpStatus.ACCEPTED)
     public String rejectJoinRequest(@PathVariable String teamId, @PathVariable String userId,
                                     @RequestBody RegistrationInfo registrationInfo) {
@@ -91,7 +91,7 @@ public class RegistrationController {
     }
 
     @PostMapping(path = "/teams/{teamId}/owner/{ownerId}", params = {"status"})
-    // FIXME: the path is wrong, there should not be multiple paths for different registrations
+    // FIX ME: the path is wrong, there should not be multiple paths for different registrations
     @ResponseStatus(HttpStatus.OK)
     public String approveOrRejectNewTeam(@PathVariable String teamId, @PathVariable String ownerId, @RequestParam("status") final TeamStatus teamStatus, @RequestBody(required=false) String reason) {
         // need to specify to deterlab who is the owner so that they can set it as project_root
