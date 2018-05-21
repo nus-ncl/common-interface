@@ -277,7 +277,7 @@ public class UserServiceImpl implements UserService {
             throw new UserNotFoundException(uid);
         }
 
-        
+
         if (firstName == null) {
             throw new NullPointerException();
         } else if (!firstName.isEmpty()) {
