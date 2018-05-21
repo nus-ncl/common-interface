@@ -63,6 +63,8 @@ public class RegistrationServiceImpl implements RegistrationService {
     private static final String COUNTRY = "country";
     private static final String ADMIN_EMAIL = "ncl-admin@ncl.sg";
     private static final String TESTBED_EMAIL = "NCL Testbed Ops <testbed-ops@ncl.sg>";
+    private static final String USER_IN_NOT_A_TEAM_OWNER = "User {} is not a team owner of Team {}";
+    private static final String TEAM_NOT_FOUND = "Team {} NOT found";
 
     private final CredentialsService credentialsService;
     private final TeamService teamService;
@@ -256,14 +258,14 @@ public class RegistrationServiceImpl implements RegistrationService {
         userObject.put("jobTitle", user.getUserDetails().getJobTitle());
         userObject.put("password", credentials.getPassword()); // cannot get from credentialsEntity else will be hashed
         userObject.put("email", user.getUserDetails().getEmail());
-        userObject.put("phone", user.getUserDetails().getPhone());
-        userObject.put("institution", user.getUserDetails().getInstitution());
+        userObject.put(PHONE, user.getUserDetails().getPhone());
+        userObject.put(INSTITUTION, user.getUserDetails().getInstitution());
         userObject.put("institutionAbbreviation", user.getUserDetails().getInstitutionAbbreviation());
         userObject.put("institutionWeb", user.getUserDetails().getInstitutionWeb());
 
         userObject.put("address1", user.getUserDetails().getAddress().getAddress1());
         userObject.put("address2", user.getUserDetails().getAddress().getAddress2());
-        userObject.put("country", user.getUserDetails().getAddress().getCountry());
+        userObject.put(COUNTRY, user.getUserDetails().getAddress().getCountry());
         userObject.put("region", user.getUserDetails().getAddress().getRegion());
         userObject.put("city", user.getUserDetails().getAddress().getCity());
         userObject.put("zipCode", user.getUserDetails().getAddress().getZipCode());
@@ -309,12 +311,12 @@ public class RegistrationServiceImpl implements RegistrationService {
             throw new EmailNotVerifiedException(user.getId());
         }
         if (!teamService.isOwner(teamId, approver.getId())) {
-            log.warn("User {} is not a team owner of Team {}", approver.getId(), teamId);
+            log.warn(USER_IN_NOT_A_TEAM_OWNER, approver.getId(), teamId);
             throw new UserIsNotTeamOwnerException();
         }
         Team team = teamService.getTeamById(teamId);
         if (team == null) {
-            log.warn("Team NOT found, TeamId {}", teamId);
+            log.warn(TEAM_NOT_FOUND, teamId);
             throw new TeamNotFoundException(teamId);
         }
         String pid = team.getName();
@@ -338,12 +340,12 @@ public class RegistrationServiceImpl implements RegistrationService {
     @Transactional
     public String rejectJoinRequest(String teamId, String userId, User approver) {
         if (!teamService.isOwner(teamId, approver.getId())) {
-            log.warn("User {} is not a team owner of Team {}", approver.getId(), teamId);
+            log.warn(USER_IN_NOT_A_TEAM_OWNER, approver.getId(), teamId);
             throw new UserIsNotTeamOwnerException();
         }
         Team one = teamService.getTeamById(teamId);
         if (one == null) {
-            log.warn("Team NOT found, TeamId {}", teamId);
+            log.warn(TEAM_NOT_FOUND, teamId);
             throw new TeamNotFoundException(teamId);
         }
         String pid = one.getName();
@@ -750,14 +752,14 @@ public class RegistrationServiceImpl implements RegistrationService {
         String listOfEmails = new JSONObject(emails).getString("emails");
         int size = listOfEmails.length();
         listOfEmails = listOfEmails.substring(1,size-1);
-        String[] emails_split = listOfEmails.split(",");
+        String[] emailsSplit = listOfEmails.split(",");
 
         UserEntity leader = (UserEntity)userService.getUser(leaderId);
 
         Map <String, String> listOfSioUid = new HashMap();
-        for (int i = 0; i< emails_split.length; i++) {
+        for (int i = 0; i< emailsSplit.length; i++) {
 
-            String newEmail = emails_split[i].substring(1, emails_split[i].length() - 1);
+            String newEmail =emailsSplit[i].substring(1, emailsSplit[i].length() - 1);
             //create new member
             UserEntity newMember = new UserEntity();
             newMember.setApplicationDate(ZonedDateTime.now());
@@ -813,8 +815,8 @@ public class RegistrationServiceImpl implements RegistrationService {
 
         // save the mapping between deter an sio user id
         JSONObject responseJsonObject = new JSONObject(listOfDeterUid);
-        for (int i = 0; i < emails_split.length; i++) {
-            String newEmail = emails_split[i].substring(1, emails_split[i].length() - 1);
+        for (int i = 0; i < emailsSplit.length; i++) {
+            String newEmail = emailsSplit[i].substring(1, emailsSplit[i].length() - 1);
             if (responseJsonObject.has(newEmail)) {
                 String deterUid = responseJsonObject.getString(newEmail);
                 String nclUid = listOfSioUid.get(newEmail);
@@ -828,8 +830,8 @@ public class RegistrationServiceImpl implements RegistrationService {
 
 
         // if everything is fine , now start to send email
-        for (int i = 0; i < emails_split.length; i++) {
-            String newEmail = emails_split[i].substring(1, emails_split[i].length() - 1);
+        for (int i = 0; i < emailsSplit.length; i++) {
+            String newEmail = emailsSplit[i].substring(1, emailsSplit[i].length() - 1);
             //email is username in credentials table
             credentialsService.addPasswordResetRequestForNewClassMember(newEmail, team.getName());
             log.info("Adding members to {} by emails: sending email to {} successful",team.getName(), newEmail);
@@ -856,17 +858,14 @@ public class RegistrationServiceImpl implements RegistrationService {
     // this function is used to approve new member only in SIO database and not deterlab
     private void approveNewMember(String teamId, String userId, User approver) {
         User user = userService.getUser(userId);
-        if (!user.isEmailVerified()) {
-            log.warn("Email not verified for {}", user.getId());
-            throw new EmailNotVerifiedException(user.getId());
-        }
+
         if (!teamService.isOwner(teamId, approver.getId())) {
-            log.warn("User {} is not a team owner of Team {}", approver.getId(), teamId);
+            log.warn(USER_IN_NOT_A_TEAM_OWNER, approver.getId(), teamId);
             throw new UserIsNotTeamOwnerException();
         }
         Team team = teamService.getTeamById(teamId);
         if (team == null) {
-            log.warn("Team NOT found, TeamId {}", teamId);
+            log.warn(TEAM_NOT_FOUND, teamId);
             throw new TeamNotFoundException(teamId);
         }
 

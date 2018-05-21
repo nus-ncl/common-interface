@@ -39,7 +39,7 @@ public class AdapterDeterLab {
     private RestTemplate restTemplate;
 
     private static final String ERROR_IN_ADDING_MEMBERS_BY_EMAILS = "Error in adding members by emails to team {}: {}";
-
+    private static final String ERROR = "error";
     @Inject
     public AdapterDeterLab(DeterLabUserRepository repository, DeterLabProjectRepository deterLabProjectRepository, ConnectionProperties connectionProperties, RestTemplate restTemplate) {
         this.deterLabUserRepository = repository;
@@ -1241,8 +1241,8 @@ public class AdapterDeterLab {
             responseBody = responseEntity.getBody().toString();
             JSONObject responseJsonObject = new JSONObject(responseBody);
 
-            if (responseJsonObject.has("error")) {
-                String deterError = responseJsonObject.getString("error");
+            if (responseJsonObject.has(ERROR)) {
+                String deterError = responseJsonObject.getString(ERROR);
                 log.warn(ERROR_IN_ADDING_MEMBERS_BY_EMAILS, nclTeamId, deterError);
                 if ("Invalid address".equals(deterError)) {
                     throw new InvalidEmailAddressException();
@@ -1286,8 +1286,8 @@ public class AdapterDeterLab {
 
             JSONObject responseJsonObject = new JSONObject(responseBody);
 
-            if (responseJsonObject.has("error")) {
-                String deterError = responseJsonObject.getString("error");
+            if (responseJsonObject.has(ERROR)) {
+                String deterError = responseJsonObject.getString(ERROR);
                 log.warn("Error in resetting password for new member {}: {}", deterUid, deterError);
                 if ("Password is not supplied".equals(deterError)) {
                     throw new InvalidPasswordException();

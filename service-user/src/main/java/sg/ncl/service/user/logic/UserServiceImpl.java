@@ -277,15 +277,22 @@ public class UserServiceImpl implements UserService {
             throw new UserNotFoundException(uid);
         }
 
-        if (firstName != null || !firstName.isEmpty()) {
+        
+        if (firstName == null) {
+            throw new NullPointerException();
+        } else if (!firstName.isEmpty()) {
             one.getUserDetails().setFirstName(firstName);
         }
 
-        if (lastName != null || !lastName.isEmpty()) {
+        if (lastName == null) {
+            throw new NullPointerException();
+        } else if (!lastName.isEmpty()) {
             one.getUserDetails().setFirstName(lastName);
         }
 
-        if (phone != null || !phone.isEmpty()) {
+        if (phone == null) {
+            throw new NullPointerException();
+        } else if (!phone.isEmpty()) {
             one.getUserDetails().setFirstName(phone);
         }
 
