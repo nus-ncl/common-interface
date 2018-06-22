@@ -75,4 +75,12 @@ public class CredentialsController {
     public Credentials resetPassword(@RequestBody final String jsonString) {
         return new CredentialsInfo(credentialsService.resetPassword(jsonString));
     }
+
+    @PutMapping(path = "/resetKey/{uid}")
+    @ResponseStatus(HttpStatus.OK)
+    public String newMemberResetKey(@PathVariable final String uid) {
+        credentialsService.resetKey(uid);
+        return "Success";
+    }
+
 }

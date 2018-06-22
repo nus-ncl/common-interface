@@ -162,4 +162,6 @@ public class TeamsController {
         checkClaimsType(claims);
         return new TeamInfo(teamService.removeMember(id, teamMember, ((Claims) claims).getSubject()));
     }
+
+
 }

@@ -1,20 +1,23 @@
 package sg.ncl.service.registration.web;
 
+import io.jsonwebtoken.Claims;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.tomcat.util.codec.binary.Base64;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import sg.ncl.service.registration.domain.Registration;
 import sg.ncl.service.registration.domain.RegistrationService;
 import sg.ncl.service.team.domain.TeamStatus;
-import sg.ncl.service.user.domain.UserStatus;
 import sg.ncl.service.user.web.VerificationKeyInfo;
 
 import javax.inject.Inject;
 import javax.validation.constraints.NotNull;
 import java.util.HashMap;
 import java.util.Map;
+
+import static sg.ncl.service.authentication.validation.Validator.checkClaimsType;
 
 /**
  * @author Te Ye & Desmond
@@ -31,7 +34,7 @@ public class RegistrationController {
         this.registrationService = registrationService;
     }
 
-    // new user + join team
+    // new user + join team / create team
     @PostMapping
     @ResponseStatus(HttpStatus.OK)
     public Map<String, String> register(@RequestBody final RegistrationInfo registrationInfo) {
@@ -44,9 +47,10 @@ public class RegistrationController {
     }
 
     @PostMapping(path = "/newTeam/{nclUserId}")
-    // FIXME: the path is wrong, there should not be multiple paths for different registrations; status should be ACCEPTED
+    // FIX ME: the path is wrong, there should not be multiple paths for different registrations; status should be ACCEPTED
     @ResponseStatus(HttpStatus.CREATED)
-    public Map<String, String> registerRequestToApplyTeam(@PathVariable String nclUserId, @RequestBody RegistrationInfo registrationInfo) {
+    public Map<String, String> registerRequestToApplyTeam(@PathVariable String nclUserId,
+                                                          @RequestBody RegistrationInfo registrationInfo) {
         Map<String, String> map = new HashMap<>();
         Registration one = registrationService.registerRequestToApplyTeam(nclUserId, registrationInfo.getTeam());
         if (one != null) {
@@ -57,7 +61,7 @@ public class RegistrationController {
 
     // old user + join team
     @PostMapping(path = "/joinApplications")
-    // FIXME: the path is wrong, there should not be multiple paths for different registrations; status should be ACCEPTED
+    // FIX ME: the path is wrong, there should not be multiple paths for different registrations; status should be ACCEPTED
     @ResponseStatus(HttpStatus.ACCEPTED)
     public Map<String, String> registerRequestToJoinTeam(@RequestBody RegistrationInfo registrationInfo) {
         Map<String, String> map = new HashMap<>();
@@ -69,23 +73,25 @@ public class RegistrationController {
     }
 
     @PostMapping(path = "/teams/{teamId}/members/{userId}")
-    // FIXME: the path is wrong, there should not be multiple paths for different registrations; status should be ACCEPTED
+    // FIX ME: the path is wrong, there should not be multiple paths for different registrations; status should be ACCEPTED
     @ResponseStatus(HttpStatus.ACCEPTED)
-    public String approveJoinRequest(@PathVariable String teamId, @PathVariable String userId, @RequestBody RegistrationInfo registrationInfo) {
+    public String approveJoinRequest(@PathVariable String teamId, @PathVariable String userId,
+                                     @RequestBody RegistrationInfo registrationInfo) {
         return
                 registrationService.approveJoinRequest(teamId, userId, registrationInfo.getUser());
     }
 
     @DeleteMapping(path = "/teams/{teamId}/members/{userId}")
-    // FIXME: the path is wrong, there should not be multiple paths for different registrations; status should be OK
+    // FIX ME: the path is wrong, there should not be multiple paths for different registrations; status should be OK
     @ResponseStatus(HttpStatus.ACCEPTED)
-    public String rejectJoinRequest(@PathVariable String teamId, @PathVariable String userId, @RequestBody RegistrationInfo registrationInfo) {
+    public String rejectJoinRequest(@PathVariable String teamId, @PathVariable String userId,
+                                    @RequestBody RegistrationInfo registrationInfo) {
         return
                 registrationService.rejectJoinRequest(teamId, userId, registrationInfo.getUser());
     }
 
     @PostMapping(path = "/teams/{teamId}/owner/{ownerId}", params = {"status"})
-    // FIXME: the path is wrong, there should not be multiple paths for different registrations
+    // FIX ME: the path is wrong, there should not be multiple paths for different registrations
     @ResponseStatus(HttpStatus.OK)
     public String approveOrRejectNewTeam(@PathVariable String teamId, @PathVariable String ownerId, @RequestParam("status") final TeamStatus teamStatus, @RequestBody(required=false) String reason) {
         // need to specify to deterlab who is the owner so that they can set it as project_root
@@ -100,8 +106,34 @@ public class RegistrationController {
     }
 
     @PutMapping(path = "/users/{id}/emails/{emailBase64}", consumes = MediaType.APPLICATION_JSON_VALUE)
-    public boolean verifyEmail(@PathVariable String id, @PathVariable String emailBase64, @RequestBody VerificationKeyInfo keyInfo) {
+    public boolean verifyEmail(@PathVariable String id, @PathVariable String emailBase64,
+                               @RequestBody VerificationKeyInfo keyInfo) {
         final String email = new String(Base64.decodeBase64(emailBase64));
         return registrationService.verifyEmail(id, email, keyInfo.getKey());
+    }
+
+    // add members by emails
+    @PostMapping(path ="/{teamId}/addMembers")
+    @ResponseStatus(HttpStatus.OK)
+    public String addMemberByEmail(@PathVariable final String teamId,
+                                   @RequestBody final String emails,
+                                   @AuthenticationPrincipal final Object claims) {
+        String leaderId = ((Claims) claims).getSubject();
+
+        return registrationService.addMemberByEmail(teamId, leaderId, emails);
+    }
+
+    //activate new member
+    @PutMapping(path="{uid}/resetPasswordNewMember")
+    @ResponseStatus(HttpStatus.OK)
+    public String resetPasswordNewMember(@PathVariable String uid,
+                                         @RequestBody NewMemberResetPasswordInfo newMemberResetPasswordInfo) {
+        String firstName = newMemberResetPasswordInfo.getFirstName();
+        String lastName = newMemberResetPasswordInfo.getLastName();
+        String phone = newMemberResetPasswordInfo.getPhone();
+        String key = newMemberResetPasswordInfo.getKey();
+        String newPassword = newMemberResetPasswordInfo.getNewPassword();
+
+        return registrationService.resetPasswordNewMember(uid, firstName, lastName, phone, key, newPassword);
     }
 }

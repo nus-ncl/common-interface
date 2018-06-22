@@ -26,4 +26,8 @@ public interface RegistrationService {
     String getDeterUid(String id);
 
     boolean verifyEmail(final String uid, final String email, final String key);
+
+    String addMemberByEmail(String teamId, String userId, String emails);
+
+    String resetPasswordNewMember(String uid, String firstName, String lastName, String phone, String key, String newPassword);
 }

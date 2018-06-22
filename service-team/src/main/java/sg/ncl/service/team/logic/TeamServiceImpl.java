@@ -38,7 +38,8 @@ public class TeamServiceImpl implements TeamService {
     private final AccountingProperties accountingProperties;
 
     @Inject
-    TeamServiceImpl(final AdapterDeterLab adapterDeterLab, final TeamRepository teamRepository, final UserService userService, final TeamQuotaRepository teamQuotaRepository, @NotNull final AnalyticsService analyticsService, @NotNull final AccountingProperties accountingProperties) {
+    TeamServiceImpl(final AdapterDeterLab adapterDeterLab, final TeamRepository teamRepository, final UserService userService, final TeamQuotaRepository teamQuotaRepository,
+                    @NotNull final AnalyticsService analyticsService, @NotNull final AccountingProperties accountingProperties) {
         this.adapterDeterLab = adapterDeterLab;
         this.teamRepository = teamRepository;
         this.userService = userService;
@@ -74,6 +75,7 @@ public class TeamServiceImpl implements TeamService {
         entity.setOrganisationType(team.getOrganisationType());
         entity.setWebsite(team.getWebsite());
         entity.setVisibility(team.getVisibility());
+        entity.setIsClass(team.getIsClass());
         entity.setStatus(TeamStatus.PENDING);
 
         final Team savedTeam = teamRepository.save(entity);
@@ -425,5 +427,6 @@ public class TeamServiceImpl implements TeamService {
 
         return 1;
     }
+
 
 }

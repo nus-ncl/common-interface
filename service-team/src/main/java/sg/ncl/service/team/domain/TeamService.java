@@ -42,4 +42,5 @@ public interface TeamService {
     int checkTeamQuota(String teamName);
 
     Boolean isMember(String teamId, String userId);
+
 }

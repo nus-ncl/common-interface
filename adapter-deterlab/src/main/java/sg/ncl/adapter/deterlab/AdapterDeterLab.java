@@ -38,6 +38,8 @@ public class AdapterDeterLab {
     private ConnectionProperties properties;
     private RestTemplate restTemplate;
 
+    private static final String ERROR_IN_ADDING_MEMBERS_BY_EMAILS = "Error in adding members by emails to team {}: {}";
+    private static final String ERROR = "error";
     @Inject
     public AdapterDeterLab(DeterLabUserRepository repository, DeterLabProjectRepository deterLabProjectRepository, ConnectionProperties connectionProperties, RestTemplate restTemplate) {
         this.deterLabUserRepository = repository;
@@ -129,6 +131,7 @@ public class AdapterDeterLab {
             log.warn("Error parsing response code new user apply project: {}", responseBody);
             throw e;
         }
+
     }
 
     /**
@@ -1239,4 +1242,154 @@ public class AdapterDeterLab {
             throw new AdapterInternalErrorException();
         }
     }
+    /**
+     *Sending request to deterlab to add members by emails
+     * @param nclTeamId
+     * @param nclUserId
+     * @param emails
+     * @return dictionary with keys are emails and values are newly created deterlab UID
+     */
+
+    public String addMemberByEmail(String nclTeamId, String nclUserId, String emails){
+        final String deterPid = getDeterProjectIdByNclTeamId(nclTeamId) ;
+        final String deterUid = getDeterUserIdByNclUserId(nclUserId);
+
+        log.info("Adding members by emails to project {}", deterPid);
+        String listOfEmails = new JSONObject(emails).getString("emails");
+
+        JSONObject jsonObject = new JSONObject();
+        jsonObject.put("pid", deterPid);
+        jsonObject.put("uid", deterUid);
+        jsonObject.put("emails", listOfEmails);
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        HttpEntity<String> request = new HttpEntity<>(jsonObject.toString(), headers);
+
+        ResponseEntity responseEntity = null;
+        String responseBody = null;
+
+        try {
+            responseEntity = restTemplate.exchange(properties.addMemberByEmail(), HttpMethod.POST, request, String.class);
+            responseBody = responseEntity.getBody().toString();
+            JSONObject responseJsonObject = new JSONObject(responseBody);
+
+            if (responseJsonObject.has(ERROR)) {
+                String deterError = responseJsonObject.getString(ERROR);
+                log.warn(ERROR_IN_ADDING_MEMBERS_BY_EMAILS, nclTeamId, deterError);
+                if ("Invalid address".equals(deterError)) {
+                    throw new InvalidEmailAddressException();
+                } else  {
+                    throw new DeterLabOperationFailedException(deterError);
+                }
+            }
+
+        } catch (ResourceAccessException resourceAccessException) {
+            log.warn(ERROR_IN_ADDING_MEMBERS_BY_EMAILS, deterPid, resourceAccessException);
+            throw new AdapterConnectionException(resourceAccessException.getMessage());
+        } catch (HttpServerErrorException httpServerErrorException) {
+            log.warn(ERROR_IN_ADDING_MEMBERS_BY_EMAILS, deterPid , httpServerErrorException);
+            throw new AdapterInternalErrorException();
+        }
+        log.info("Adding members by emails to project {} successful", deterPid);
+        return responseBody;
+    }
+
+    /**
+     *set Up Class for new members
+     * @param nclUserId
+     * @param nclTeamId
+     * @return void
+     */
+
+    public void setUpClass(String nclUserId, String nclTeamId) {
+        log.info("Setting up class for project {}", nclTeamId);
+        final String deterlabPid = getDeterProjectIdByNclTeamId(nclTeamId) ;
+        final String deterlabUid = getDeterUserIdByNclUserId(nclUserId);
+
+        JSONObject jsonObject = new JSONObject();
+        jsonObject.put("pid", deterlabPid);
+        jsonObject.put("uid", deterlabUid);
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        HttpEntity<String> request = new HttpEntity<>(jsonObject.toString(), headers);
+
+        ResponseEntity responseEntity = null;
+
+        try {
+            responseEntity = restTemplate.exchange(properties.setUpClass(), HttpMethod.POST, request, String.class);
+            String responseBody = responseEntity.getBody().toString();
+            JSONObject responseJsonObject = new JSONObject(responseBody);
+
+            if (!responseJsonObject.has("msg")) {
+                log.warn("Error in setting up class for project {} : {} ", nclTeamId, "Unknown error");
+                throw new DeterLabOperationFailedException("Unknown error");
+            }
+
+        } catch (ResourceAccessException resourceAccessException) {
+            log.warn("Error in setting up class for project {}: {}", nclTeamId, resourceAccessException);
+            throw new AdapterConnectionException(resourceAccessException.getMessage());
+        } catch (HttpServerErrorException httpServerErrorException) {
+            log.warn("Error in setting up class for project {}: {}", nclTeamId, httpServerErrorException);
+            throw new AdapterInternalErrorException();
+        }
+    }
+
+    /**
+     * Send deterlab request to reset password , phone, first and last name when user click on the "Reset password" link in email
+     * @param nclUid
+     * @param firstName
+     * @param phone
+     * @param newPassword
+     * @return void
+     */
+
+    public void newMemberResetPassword(String nclUid, String firstName, String lastName, String phone, String newPassword) {
+
+        final String deterUid = getDeterUserIdByNclUserId(nclUid);
+
+        log.info("Resetting password for new member {}", deterUid);
+        JSONObject jsonObject = new JSONObject();
+        jsonObject.put("uid", deterUid);
+        jsonObject.put("newPassword", newPassword);
+        jsonObject.put("firstName", firstName);
+        jsonObject.put("lastName", lastName);
+        jsonObject.put("phone", phone);
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        HttpEntity<String> request = new HttpEntity<>(jsonObject.toString(), headers);
+        ResponseEntity responseEntity = null;
+        String responseBody;
+
+        try {
+            responseEntity = restTemplate.exchange(properties.resetPasswordNewMember(), HttpMethod.POST, request, String.class);
+            responseBody = responseEntity.getBody().toString();
+
+            JSONObject responseJsonObject = new JSONObject(responseBody);
+
+            if (responseJsonObject.has(ERROR)) {
+                String deterError = responseJsonObject.getString(ERROR);
+                log.warn("Error in resetting password for new member {}: {}", deterUid, deterError);
+                if ("Password is not supplied".equals(deterError)) {
+                    throw new InvalidPasswordException();
+                } else if ("First or last name is not valid".equals(deterError)) {
+                    throw new InvalidUsernameException(deterError);
+                } else {
+                    throw new DeterLabOperationFailedException(deterError);
+                }
+            }
+        }  catch (ResourceAccessException resourceAccessException) {
+            log.warn("Error in resetting password for new member {}: {}", deterUid, resourceAccessException);
+            throw new AdapterConnectionException(resourceAccessException.getMessage());
+        } catch (HttpServerErrorException httpServerErrorException) {
+            log.warn("Error in resetting password for new member {}}: {}", deterUid, httpServerErrorException);
+            throw new AdapterInternalErrorException();
+        }
+
+        log.info("Resetting password for new member {} is successful", deterUid);
+
+    }
+
 }

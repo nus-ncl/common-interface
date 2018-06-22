@@ -164,4 +164,17 @@ public class ConnectionProperties {
     public String deletePublicKey() {
         return HTTP_MODE + ip + ":" + port + "/deletePublicKey";
     }
+    public String setUpClass() {
+        return HTTP_MODE + ip + ":" + port + "/setUpClass";
+    }
+
+    public String addMemberByEmail() {
+        return HTTP_MODE + ip + ":" + port + "/addMemberByEmail";
+    }
+
+    public String resetPasswordNewMember() {
+        return HTTP_MODE + ip + ":" + port + "/resetPasswordNewMember";
+    }
+
+
 }
