@@ -1083,23 +1083,14 @@ public class AdapterDeterLab {
                 log.info("Deleting image '{}' from uid '{}' of pid '{}' : {} ", imageName, uid, pid, deterMessage);
                 return responseBody;
 
-            } else if ("not the creator".equals(deterMessage)) {
+            } else if ("not the creator".equals(deterMessage) ||
+                    "no permission to delete the imageid when executing Curl command".equals(deterMessage)) {
                 log.warn(errorMessage , uid, pid, imageName, deterMessage);
                 throw new InsufficientPermissionException(exceptionMessage);
 
-            } else if ("no permission to delete the imageid when executing Curl command".equals(deterMessage)) {
-                log.warn(errorMessage , uid, pid, imageName, deterMessage);
-                throw new InsufficientPermissionException(exceptionMessage);
-
-            } else if ("required image id is not found when querying database".equals(deterMessage)) {
-                log.warn(errorMessage , uid, pid, imageName, deterMessage);
-                throw new ImageNotFoundException(exceptionMessage);
-
-            } else if ("no creator found when querying database".equals(deterMessage)) {
-                log.warn(errorMessage , uid, pid, imageName, deterMessage);
-                throw new ImageNotFoundException(exceptionMessage);
-
-            } else if ("imageid could not be found when executing Curl command".equals(deterMessage)) {
+            } else if ("required image id is not found when querying database".equals(deterMessage) ||
+                    "no creator found when querying database".equals(deterMessage) ||
+                    "imageid could not be found when executing Curl command".equals(deterMessage)) {
                 log.warn(errorMessage , uid, pid, imageName, deterMessage);
                 throw new ImageNotFoundException(exceptionMessage);
 
@@ -1183,6 +1174,74 @@ public class AdapterDeterLab {
         return jsonObject.toString();
     }
 
+    public String getPublicKeys(String nclUserId) {
+        final String uid = getDeterUserIdByNclUserId(nclUserId);
+
+        JSONObject jsonObject = new JSONObject();
+        jsonObject.put("uid", uid);
+
+        HttpHeaders httpHeaders = new HttpHeaders();
+        httpHeaders.setContentType(MediaType.APPLICATION_JSON);
+        HttpEntity<String> request = new HttpEntity<>(jsonObject.toString(), httpHeaders);
+
+        try {
+            ResponseEntity responseEntity = restTemplate.exchange(properties.getPublicKeys(), HttpMethod.POST, request, String.class);
+            return responseEntity.getBody().toString();
+        } catch (ResourceAccessException rae) {
+            log.warn("Get ssh public keys: {}", rae);
+            throw new AdapterConnectionException(rae.getMessage());
+        } catch (HttpServerErrorException hsee) {
+            log.warn("Get ssh public keys: Adapter DeterLab internal server error {}", hsee);
+            throw new AdapterInternalErrorException();
+        }
+    }
+
+    public String addPublicKey(String nclUserId, String pubkey, String passwd) {
+        final String uid = getDeterUserIdByNclUserId(nclUserId);
+
+        JSONObject jsonObject = new JSONObject();
+        jsonObject.put("uid", uid);
+        jsonObject.put("pubkey", pubkey);
+        jsonObject.put("passwd", passwd);
+
+        HttpHeaders httpHeaders = new HttpHeaders();
+        httpHeaders.setContentType(MediaType.APPLICATION_JSON);
+        HttpEntity<String> request = new HttpEntity<>(jsonObject.toString(), httpHeaders);
+
+        try {
+            ResponseEntity responseEntity = restTemplate.exchange(properties.addPublicKey(), HttpMethod.POST, request, String.class);
+            return responseEntity.getBody().toString();
+        } catch (ResourceAccessException rae) {
+            log.warn("Add ssh public key: {}", rae);
+            throw new AdapterConnectionException(rae.getMessage());
+        } catch (HttpServerErrorException hsee) {
+            log.warn("Add ssh public key: Adapter DeterLab internal server error {}", hsee);
+            throw new AdapterInternalErrorException();
+        }
+    }
+
+    public String deletePublicKey(String nclUserId, String publicKeyId) {
+        final String uid = getDeterUserIdByNclUserId(nclUserId);
+
+        JSONObject jsonObject = new JSONObject();
+        jsonObject.put("uid", uid);
+        jsonObject.put("kid", publicKeyId);
+
+        HttpHeaders httpHeaders = new HttpHeaders();
+        httpHeaders.setContentType(MediaType.APPLICATION_JSON);
+        HttpEntity<String> request = new HttpEntity<>(jsonObject.toString(), httpHeaders);
+
+        try {
+            ResponseEntity responseEntity = restTemplate.exchange(properties.deletePublicKey(), HttpMethod.DELETE, request, String.class);
+            return responseEntity.getBody().toString();
+        } catch (ResourceAccessException rae) {
+            log.warn("Delete ssh public key: {}", rae);
+            throw new AdapterConnectionException(rae.getMessage());
+        } catch (HttpServerErrorException hsee) {
+            log.warn("Delete ssh public key: Adapter DeterLab internal server error {}", hsee);
+            throw new AdapterInternalErrorException();
+        }
+    }
     /**
      *Sending request to deterlab to add members by emails
      * @param nclTeamId

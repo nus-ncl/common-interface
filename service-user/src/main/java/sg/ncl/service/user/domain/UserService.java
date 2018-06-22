@@ -26,6 +26,12 @@ public interface UserService {
 
     User removeUser(String id);
 
+    String getPublicKeys(final String userId);
+
+    String addPublicKey(final String publicKey, final String password, final String userId);
+
+    String deletePublicKey(final String keyId, final String userId);
+
     void updateInformationNewMember(String uid, String firstName, String lastName, String phone);
 
 }

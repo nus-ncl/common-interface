@@ -317,7 +317,7 @@ public class UsersControllerTest {
         when(authentication.getPrincipal()).thenReturn(null);
 
         mockMvc.perform(put(UsersController.PATH + "/id/status/" + UserStatus.CLOSED).contentType(MediaType.APPLICATION_JSON).content(content))
-                .andExpect(status().isUnauthorized());
+                .andExpect(status().isForbidden());
     }
 
     @Test

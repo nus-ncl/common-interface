@@ -2,12 +2,10 @@ package sg.ncl.service.user.web;
 
 import io.jsonwebtoken.Claims;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.tomcat.util.codec.binary.Base64;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
-import sg.ncl.common.exception.base.UnauthorizedException;
 import sg.ncl.service.user.domain.User;
 import sg.ncl.service.user.domain.UserService;
 import sg.ncl.service.user.domain.UserStatus;
@@ -17,7 +15,8 @@ import javax.inject.Inject;
 import javax.validation.constraints.NotNull;
 import java.util.List;
 
-import static sg.ncl.service.user.validations.Validator.isAdmin;
+import static sg.ncl.common.validation.Validator.checkClaimsType;
+import static sg.ncl.common.validation.Validator.checkAdmin;
 
 /**
  * @author Christopher Zhong
@@ -67,24 +66,37 @@ public class UsersController {
             @AuthenticationPrincipal final Object claims,
             @PathVariable final String id,
             @PathVariable final String status) {
-        if (claims == null || !(claims instanceof Claims)) {
-            throw new UnauthorizedException();
-        }
-
-        isAdmin((Claims) claims);
-
+        checkClaimsType(claims);
+        checkAdmin((Claims) claims);
         return new UserInfo(userService.updateUserStatus(id, UserStatus.valueOf(status)));
     }
 
     @DeleteMapping(path = "/{id}")
+    @ResponseStatus(HttpStatus.OK)
     public String removeUser(@AuthenticationPrincipal final Object claims, @PathVariable String id) {
-        if (claims == null || !(claims instanceof Claims)) {
-            throw new UnauthorizedException();
-        }
-
-        isAdmin((Claims) claims);
-
+        checkClaimsType(claims);
+        checkAdmin((Claims) claims);
         return String.valueOf(userService.removeUser(id));
     }
 
+    @GetMapping(path = "/{id}/publicKeys")
+    @ResponseStatus(HttpStatus.OK)
+    public String getPublicKeys(@AuthenticationPrincipal final Object claims, @PathVariable String id) {
+        checkClaimsType(claims);
+        return userService.getPublicKeys(((Claims) claims).getSubject());
+    }
+
+    @PostMapping(path = "/{id}/publicKeys", consumes = MediaType.APPLICATION_JSON_VALUE)
+    @ResponseStatus(HttpStatus.CREATED)
+    public String addPublicKey(@AuthenticationPrincipal final Object claims, @PathVariable String id, @RequestBody PublicKeyInfo info) {
+        checkClaimsType(claims);
+        return userService.addPublicKey(info.getPublicKey(), info.getPassword(), ((Claims) claims).getSubject());
+    }
+
+    @DeleteMapping(path = "/{userid}/publicKeys/{keyid}")
+    @ResponseStatus(HttpStatus.OK)
+    public String deletePublicKey(@AuthenticationPrincipal final Object claims, @PathVariable String userid, @PathVariable String keyid) {
+        checkClaimsType(claims);
+        return userService.deletePublicKey(keyid, ((Claims) claims).getSubject());
+    }
 }
