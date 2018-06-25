@@ -26,7 +26,7 @@ public class TeamInfo implements Team {
     private final String organisationType;
     private final TeamVisibility visibility;
     private final TeamPrivacy privacy;
-    private final boolean isClass;
+    private final Boolean isClass;
     private final TeamStatus status;
     private final ZonedDateTime applicationDate;
     private final ZonedDateTime processedDate;
@@ -60,9 +60,6 @@ public class TeamInfo implements Team {
         this.processedDate = processedDate;
         this.members = members.stream().map(TeamMemberInfo::new).collect(Collectors.toList());
     }
-
-    @Override
-    public  boolean getIsClass() {return isClass;}
 
 
     public TeamInfo(final Team team) {

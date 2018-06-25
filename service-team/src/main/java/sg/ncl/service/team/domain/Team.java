@@ -52,7 +52,7 @@ public interface Team {
      */
     TeamVisibility getVisibility();
 
-    boolean getIsClass();
+    Boolean getIsClass();
     /**
      * Returns the {@link TeamPrivacy} of this {@link Team}.
      *

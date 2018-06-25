@@ -50,7 +50,7 @@ public class TeamEntity extends AbstractEntity implements Team {
 
     @Column(name = "class", nullable = false)
     @Type(type = "yes_no")
-    private boolean isClass = false;
+    private Boolean isClass = false;
 
     @Column(name = "privacy", nullable = false)
     @Enumerated(EnumType.STRING)
@@ -77,9 +77,6 @@ public class TeamEntity extends AbstractEntity implements Team {
     public List<TeamMemberEntity> getMembers() {
         return new ArrayList<>(members.values());
     }
-
-    public boolean getIsClass() {return isClass;}
-    public void setIsClass(boolean isClass) {this.isClass = isClass;}
 
     public TeamMember addMember(final TeamMember member) {
         final String userId = member.getUserId();
