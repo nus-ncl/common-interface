@@ -345,13 +345,13 @@ public class UserServiceImpl implements UserService {
         if (lastName == null) {
             throw new NullPointerException();
         } else if (!lastName.isEmpty()) {
-            one.getUserDetails().setFirstName(lastName);
+            one.getUserDetails().setLastName(lastName);
         }
 
         if (phone == null) {
             throw new NullPointerException();
         } else if (!phone.isEmpty()) {
-            one.getUserDetails().setFirstName(phone);
+            one.getUserDetails().setPhone(phone);
         }
 
         final User saved = userRepository.save(one);

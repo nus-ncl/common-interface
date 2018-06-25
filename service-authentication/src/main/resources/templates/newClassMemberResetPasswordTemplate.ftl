@@ -1,6 +1,6 @@
 Dear new member,
 
-You have been added to a Deterlab Project.
+You have been added to a NCL Project.
 
 To set a password on your account, paste this URL into a browser:
 

@@ -78,9 +78,7 @@ public class TeamEntity extends AbstractEntity implements Team {
         return new ArrayList<>(members.values());
     }
 
-    @Override
     public boolean getIsClass() {return isClass;}
-
     public void setIsClass(boolean isClass) {this.isClass = isClass;}
 
     public TeamMember addMember(final TeamMember member) {

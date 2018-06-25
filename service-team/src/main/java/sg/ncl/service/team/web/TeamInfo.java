@@ -64,6 +64,7 @@ public class TeamInfo implements Team {
     @Override
     public  boolean getIsClass() {return isClass;}
 
+
     public TeamInfo(final Team team) {
         this(
                 team.getId(),
