@@ -112,7 +112,7 @@ bintray {
     pkg {
         repo = 'generic'
         name = 'services-in-one'
-        userOrg = 'nus-ncl'
+        userOrg = 'ncl'
         desc = 'All NCL services running together'
         websiteUrl = 'https://github.com/nus-ncl/services-in-one'
         issueTrackerUrl = 'https://github.com/nus-ncl/services-in-one/issues'

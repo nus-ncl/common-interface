@@ -38,6 +38,8 @@ public class AdapterDeterLab {
     private ConnectionProperties properties;
     private RestTemplate restTemplate;
 
+    private static String UID = "uid";
+
     @Inject
     public AdapterDeterLab(DeterLabUserRepository repository, DeterLabProjectRepository deterLabProjectRepository, ConnectionProperties connectionProperties, RestTemplate restTemplate) {
         this.deterLabUserRepository = repository;
@@ -292,7 +294,7 @@ public class AdapterDeterLab {
         }
 
         JSONObject adapterObject = new JSONObject();
-        adapterObject.put("uid", getDeterUserIdByNclUserId(nclUserId));
+        adapterObject.put(UID, getDeterUserIdByNclUserId(nclUserId));
         adapterObject.put("password", password);
 
         log.info("Logging into DeterLab");
@@ -614,7 +616,7 @@ public class AdapterDeterLab {
         }
         String pid = request.getString("pid");
         String approverUid = request.getString("approverUid");
-        String uid = request.getString("uid");
+        String uid = request.getString(UID);
         String gid = request.getString("gid");
         String action = request.getString("action");
         log.info("Processing join request: team {}, requester {}, approver {}, group {}, action {}",
@@ -1010,7 +1012,7 @@ public class AdapterDeterLab {
 
         JSONObject json = new JSONObject();
         json.put("pid", pid);
-        json.put("uid", uid);
+        json.put(UID, uid);
         json.put("nodeId", nodeId);
         json.put("imageName", imageName);
 
@@ -1050,7 +1052,7 @@ public class AdapterDeterLab {
         log.info("Deleting image '{}' from uid '{}' of pid '{}'", imageName, uid, pid);
         JSONObject jsonObject = new JSONObject();
         jsonObject.put("pid", pid);
-        jsonObject.put("uid", uid);
+        jsonObject.put(UID, uid);
         jsonObject.put("imageName", imageName);
 
         if (imageCreator) {
@@ -1175,7 +1177,7 @@ public class AdapterDeterLab {
         final String uid = getDeterUserIdByNclUserId(nclUserId);
 
         JSONObject jsonObject = new JSONObject();
-        jsonObject.put("uid", uid);
+        jsonObject.put(UID, uid);
 
         HttpHeaders httpHeaders = new HttpHeaders();
         httpHeaders.setContentType(MediaType.APPLICATION_JSON);
@@ -1197,7 +1199,7 @@ public class AdapterDeterLab {
         final String uid = getDeterUserIdByNclUserId(nclUserId);
 
         JSONObject jsonObject = new JSONObject();
-        jsonObject.put("uid", uid);
+        jsonObject.put(UID, uid);
         jsonObject.put("pubkey", pubkey);
         jsonObject.put("passwd", passwd);
 
@@ -1221,7 +1223,7 @@ public class AdapterDeterLab {
         final String uid = getDeterUserIdByNclUserId(nclUserId);
 
         JSONObject jsonObject = new JSONObject();
-        jsonObject.put("uid", uid);
+        jsonObject.put(UID, uid);
         jsonObject.put("kid", publicKeyId);
 
         HttpHeaders httpHeaders = new HttpHeaders();
