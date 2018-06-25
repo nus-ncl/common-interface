@@ -41,7 +41,7 @@ public class TeamInfo implements Team {
             @JsonProperty("website") final String website,
             @JsonProperty("organisationType") final String organisationType,
             @JsonProperty("visibility") final TeamVisibility visibility,
-            @JsonProperty("isClass") final boolean isClass,
+            @JsonProperty("isClass") final Boolean isClass,
             @JsonProperty("privacy") final TeamPrivacy privacy,
             @JsonProperty("status") final TeamStatus status,
             @JsonProperty("applicationDate") final ZonedDateTime applicationDate,
