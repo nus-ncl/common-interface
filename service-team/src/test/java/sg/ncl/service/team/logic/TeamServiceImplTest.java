@@ -585,4 +585,49 @@ public class TeamServiceImplTest {
         int quota = teamService.checkTeamQuota(teamEntity.getName());
         assertThat(quota).isEqualTo(1);
     }
+
+    @Test
+    public void testUpdateMemberPrivilegeEmptyUserId() {
+        TeamEntity entity = getTeamEntityWithId();
+        TeamMember member = getTeamMemberInfo(MemberType.MEMBER, MemberPrivilege.USER);
+        entity.addMember(member);
+        when(teamRepository.findOne(anyString())).thenReturn(entity);
+        exception.expect(TeamMemberNotFoundException.class);
+        teamService.updateMemberPrivilege(teamEntity.getId(), "", MemberPrivilege.LOCAL_ROOT);
+    }
+
+    @Test
+    public void testUpdateMemberPrivilegeEmptyTeamId() {
+        exception.expect(TeamNotFoundException.class);
+        teamService.updateMemberPrivilege("", teamMemberInfo.getUserId(), MemberPrivilege.LOCAL_ROOT);
+    }
+
+    @Test
+    public void testUpdateMemberPrivilegeUnknownTeamId() {
+        when(teamRepository.findOne(anyString())).thenReturn(null);
+        exception.expect(TeamNotFoundException.class);
+        teamService.updateMemberPrivilege(teamEntity.getId(), teamMemberInfo.getUserId(), MemberPrivilege.LOCAL_ROOT);
+    }
+
+    @Test
+    public void testUpdateMemberPrivilegeUnknownUserId() {
+        TeamEntity entity = getTeamEntityWithId();
+        TeamMember member = getTeamMemberInfo(MemberType.MEMBER, MemberPrivilege.USER);
+        entity.addMember(member);
+        when(teamRepository.findOne(anyString())).thenReturn(entity);
+        exception.expect(TeamMemberNotFoundException.class);
+        teamService.updateMemberPrivilege(teamEntity.getId(), teamMemberInfo.getUserId(), MemberPrivilege.LOCAL_ROOT);
+    }
+
+    @Test
+    public void testUpdateMemberPrivilegeKnownUserId() {
+        TeamEntity entity = getTeamEntityWithId();
+        TeamMember member = getTeamMemberInfo(MemberType.MEMBER, MemberPrivilege.USER);
+        entity.addMember(member);
+        when(teamRepository.findOne(anyString())).thenReturn(entity);
+        TeamMember updatedMember = teamService.updateMemberPrivilege(entity.getId(), member.getUserId(), MemberPrivilege.LOCAL_ROOT);
+
+        assertThat(updatedMember.getMemberPrivilege()).isEqualTo(MemberPrivilege.LOCAL_ROOT);
+    }
+
 }

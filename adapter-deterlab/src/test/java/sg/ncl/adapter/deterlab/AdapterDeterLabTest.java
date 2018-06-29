@@ -980,6 +980,7 @@ public class AdapterDeterLabTest {
         myobject.put("uid", "");
         myobject.put("gid", "");
         myobject.put("action", "approve");
+        myobject.put("privilege", "");
 
         exception.expect(AdapterConnectionException.class);
         when(restTemplate.exchange(anyString(),eq(HttpMethod.POST),anyObject(),eq(String.class)))
@@ -1000,6 +1001,7 @@ public class AdapterDeterLabTest {
         myobject.put("uid", "");
         myobject.put("gid", "");
         myobject.put("action", "approve");
+        myobject.put("privilege", "");
         myobject.put("msg", "process join request not OK");
 
         exception.expect( DeterLabOperationFailedException.class);
@@ -1023,6 +1025,7 @@ public class AdapterDeterLabTest {
         myobject.put("uid", "");
         myobject.put("gid", "");
         myobject.put("action", "approve");
+        myobject.put("privilege", "");
         myobject.put("msg", "process join request OK");
 
         exception.expect(JSONException.class);
@@ -1046,6 +1049,7 @@ public class AdapterDeterLabTest {
         myobject.put("uid", "");
         myobject.put("gid", "");
         myobject.put("action", "approve");
+        myobject.put("privilege", "");
         myobject.put("msg", "process join OK");
 
         exception.expect(JSONException.class);
@@ -1070,6 +1074,7 @@ public class AdapterDeterLabTest {
         myobject.put("uid", "");
         myobject.put("gid", "");
         myobject.put("action", "deny");
+        myobject.put("privilege", "");
 
         exception.expect(AdapterConnectionException.class);
         when(restTemplate.exchange(anyString(),eq(HttpMethod.POST),anyObject(),eq(String.class)))
@@ -1090,6 +1095,7 @@ public class AdapterDeterLabTest {
         myobject.put("uid", "");
         myobject.put("gid", "");
         myobject.put("action", "deny");
+        myobject.put("privilege", "");
         myobject.put("msg", "process join request not OK");
 
         exception.expect(DeterLabOperationFailedException.class);
@@ -1113,6 +1119,7 @@ public class AdapterDeterLabTest {
         myobject.put("uid", "");
         myobject.put("gid", "");
         myobject.put("action", "deny");
+        myobject.put("privilege", "");
         myobject.put("msg", "process join request OK");
 
         exception.expect(JSONException.class);
@@ -1136,6 +1143,7 @@ public class AdapterDeterLabTest {
         myobject.put("uid", "");
         myobject.put("gid", "");
         myobject.put("action", "deny");
+        myobject.put("privilege", "");
         myobject.put("msg", "process join request OK");
 
         when(restTemplate.exchange(anyString(),eq(HttpMethod.POST),anyObject(),eq(String.class)))
@@ -1160,6 +1168,7 @@ public class AdapterDeterLabTest {
         myobject.put("uid", "");
         myobject.put("gid", "");
         myobject.put("action", "approve");
+        myobject.put("privilege", "");
         myobject.put("msg", "user is already an approved member in the project");
 
         when(restTemplate.exchange(anyString(),eq(HttpMethod.POST),anyObject(),eq(String.class)))
@@ -1184,6 +1193,7 @@ public class AdapterDeterLabTest {
         myobject.put("uid", "");
         myobject.put("gid", "");
         myobject.put("action", "deny");
+        myobject.put("privilege", "");
         myobject.put("msg", "user is already an approved member in the project");
 
         exception.expect(DeterLabOperationFailedException.class);
@@ -1209,6 +1219,7 @@ public class AdapterDeterLabTest {
         myobject.put("uid", "");
         myobject.put("gid", "");
         myobject.put("action", "deny");
+        myobject.put("privilege", "");
         myobject.put("msg", "no join request found");
 
         when(restTemplate.exchange(anyString(),eq(HttpMethod.POST),anyObject(),eq(String.class)))
@@ -1233,6 +1244,7 @@ public class AdapterDeterLabTest {
         myobject.put("uid", "");
         myobject.put("gid", "");
         myobject.put("action", "approve");
+        myobject.put("privilege", "");
         myobject.put("msg", "no join request found");
 
         exception.expect(DeterLabOperationFailedException.class);

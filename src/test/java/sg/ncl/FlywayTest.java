@@ -1085,7 +1085,7 @@ public class FlywayTest {
     public void testTeamMembersTable() throws Exception {
         // make sure 'team_members' table has expected number of columns
         List<Map<String, Object>> teamMembersTable = this.template.queryForList("SHOW COLUMNS FROM " + SCHEMA + "." + TEAM_MEMBERS);
-        assertThat(teamMembersTable.size()).isEqualTo(9);
+        assertThat(teamMembersTable.size()).isEqualTo(10);
 
         // make sure 'team_members' table has expected column name and type
         assertThat((String) teamMembersTable.get(0).get("FIELD")).isEqualTo("id");
@@ -1132,6 +1132,11 @@ public class FlywayTest {
         assertThat((String) teamMembersTable.get(8).get("TYPE")).isEqualTo("varchar(255)");
         assertThat((String) teamMembersTable.get(8).get("NULL")).isEqualTo("NO");
         assertThat((String) teamMembersTable.get(8).get("KEY")).isEqualTo("UNI");
+
+        assertThat((String) teamMembersTable.get(9).get("FIELD")).isEqualTo("member_privilege");
+        assertThat((String) teamMembersTable.get(9).get("TYPE")).isEqualTo("varchar(255)");
+        assertThat((String) teamMembersTable.get(9).get("NULL")).isEqualTo("NO");
+        assertThat((String) teamMembersTable.get(9).get("KEY")).isEmpty();
 
         List<Map<String, Object>> teamMembersConstraints = this.template.queryForList("SELECT * FROM INFORMATION_SCHEMA.CONSTRAINTS WHERE TABLE_NAME = 'team_members'");
 

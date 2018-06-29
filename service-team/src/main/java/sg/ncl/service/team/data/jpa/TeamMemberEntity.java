@@ -3,6 +3,7 @@ package sg.ncl.service.team.data.jpa;
 import lombok.Getter;
 import lombok.Setter;
 import sg.ncl.common.jpa.AbstractEntity;
+import sg.ncl.service.team.domain.MemberPrivilege;
 import sg.ncl.service.team.domain.MemberStatus;
 import sg.ncl.service.team.domain.MemberType;
 import sg.ncl.service.team.domain.TeamMember;
@@ -42,6 +43,10 @@ public class TeamMemberEntity extends AbstractEntity implements TeamMember {
 
     @Column(name = "joined_date", nullable = false)
     private ZonedDateTime joinedDate;
+
+    @Column(name = "member_privilege", nullable = false)
+    @Enumerated(EnumType.STRING)
+    private MemberPrivilege memberPrivilege = MemberPrivilege.LOCAL_ROOT;
 
     @Column(name = "member_type", nullable = false)
     @Enumerated(EnumType.STRING)

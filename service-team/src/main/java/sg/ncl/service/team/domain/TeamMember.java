@@ -31,6 +31,13 @@ public interface TeamMember {
     ZonedDateTime getJoinedDate();
 
     /**
+     * Returns the associated team member permission.
+     *
+     * @return the associated team member permission.
+     */
+    MemberPrivilege getMemberPrivilege();
+
+    /**
      * Returns the associated team membership.
      *
      * @return the associated team membership.

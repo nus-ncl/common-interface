@@ -23,6 +23,7 @@ import sg.ncl.service.registration.domain.RegistrationService;
 import sg.ncl.service.registration.exceptions.*;
 import sg.ncl.service.team.data.jpa.TeamMemberEntity;
 import sg.ncl.service.team.domain.*;
+import sg.ncl.service.registration.exceptions.InvalidTeamMemberPrivilegeException;
 import sg.ncl.service.team.exceptions.TeamNotFoundException;
 import sg.ncl.service.team.web.TeamMemberInfo;
 import sg.ncl.service.user.domain.User;
@@ -295,7 +296,7 @@ public class RegistrationServiceImpl implements RegistrationService {
 
     @Override
     @Transactional
-    public String approveJoinRequest(String teamId, String userId, User approver) {
+    public String approveJoinRequest(String teamId, String userId, MemberPrivilege privilege, User approver) {
         User user = userService.getUser(userId);
         if (!user.isEmailVerified()) {
             log.warn("Email not verified for {}", user.getId());
@@ -310,6 +311,12 @@ public class RegistrationServiceImpl implements RegistrationService {
             log.warn("Team NOT found, TeamId {}", teamId);
             throw new TeamNotFoundException(teamId);
         }
+
+        if (privilege == null || !(privilege.equals(MemberPrivilege.LOCAL_ROOT) || privilege.equals(MemberPrivilege.USER)) ) {
+            log.warn("User {} is assigned an invalid privilege {}", userId, privilege);
+            throw new InvalidTeamMemberPrivilegeException();
+        }
+
         String pid = team.getName();
         // already add to user side when request to join
         JSONObject one = new JSONObject();
@@ -317,11 +324,13 @@ public class RegistrationServiceImpl implements RegistrationService {
         one.put("uid", adapterDeterLab.getDeterUserIdByNclUserId(userId));
         one.put("pid", pid);
         one.put("gid", pid);
+        one.put("privilege", privilege.name().toLowerCase());
         one.put("action", "approve");
         if ((UserStatus.PENDING).equals(user.getStatus())) {
             userService.updateUserStatus(userId, UserStatus.APPROVED);
         }
         teamService.updateMemberStatus(teamId, userId, MemberStatus.APPROVED);
+        teamService.updateMemberPrivilege(teamId, userId, privilege);
         String adapterResult = adapterDeterLab.processJoinRequest(one.toString());
         sendReplyJoinTeamEmail(user, team, TeamStatus.APPROVED);
         return adapterResult;
@@ -329,6 +338,7 @@ public class RegistrationServiceImpl implements RegistrationService {
 
     @Override
     @Transactional
+    // the user privilege is define as local_root but doesn't matter here as adapter will define it as local_root by default
     public String rejectJoinRequest(String teamId, String userId, User approver) {
         if (!teamService.isOwner(teamId, approver.getId())) {
             log.warn("User {} is not a team owner of Team {}", approver.getId(), teamId);
@@ -357,6 +367,7 @@ public class RegistrationServiceImpl implements RegistrationService {
                 object.put("uid", adapterDeterLab.getDeterUserIdByNclUserId(userId));
                 object.put("pid", pid);
                 object.put("gid", pid);
+                object.put("privilege", MemberPrivilege.LOCAL_ROOT);
                 object.put("action", "deny");
                 String adapterResult = adapterDeterLab.processJoinRequest(object.toString());
                 sendReplyJoinTeamEmail(userService.getUser(userId), one, TeamStatus.REJECTED);
@@ -405,8 +416,10 @@ public class RegistrationServiceImpl implements RegistrationService {
             if ((UserStatus.PENDING).equals(user.getStatus())) {
                 userService.updateUserStatus(ownerId, UserStatus.APPROVED);
             }
-            // change team owner member status
+            // change team owner member status and privilege
+            // team owner privilege is automatically assigned on deter side, here is to update NCL database
             teamService.updateMemberStatus(teamId, ownerId, MemberStatus.APPROVED);
+            teamService.updateMemberPrivilege(teamId, ownerId, MemberPrivilege.PROJECT_ROOT);
             adapterResult = adapterDeterLab.approveProject(one.toString());
             sendReplyCreateTeamEmail(user, team, status, reason);
         } else {

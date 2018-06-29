@@ -378,7 +378,7 @@ public class RegistrationServiceImplTest {
         when(teamService.isOwner(anyString(), anyString())).thenReturn(false);
 
         exception.expect(UserIsNotTeamOwnerException.class);
-        registrationService.approveJoinRequest(createdTeam.getId(), createdUser.getId(), createdUser);
+        registrationService.approveJoinRequest(createdTeam.getId(), createdUser.getId(), MemberPrivilege.USER, createdUser);
     }
 
     @Test
@@ -391,7 +391,7 @@ public class RegistrationServiceImplTest {
         when(teamService.getTeamById(anyString())).thenReturn(null);
 
         exception.expect(TeamNotFoundException.class);
-        registrationService.approveJoinRequest(createdTeam.getId(), createdUser.getId(), createdUser);
+        registrationService.approveJoinRequest(createdTeam.getId(), createdUser.getId(), MemberPrivilege.USER, createdUser);
     }
 
     @Test
@@ -404,9 +404,83 @@ public class RegistrationServiceImplTest {
         when(adapterDeterLab.getDeterUserIdByNclUserId(anyString())).thenReturn(RandomStringUtils.randomAlphanumeric(20));
         when(userService.getUser(anyString())).thenReturn(createdUser);
 
-        registrationService.approveJoinRequest(createdTeam.getId(), createdUser.getId(), createdUser);
+        registrationService.approveJoinRequest(createdTeam.getId(), createdUser.getId(), MemberPrivilege.USER, createdUser);
 
         verify(userService, times(1)).updateUserStatus(anyString(), any(UserStatus.class));
+    }
+
+    @Test
+    public void testApproveJoinRequestEmailNotVerified()  {
+        UserEntity userEntity = Util.getUserEntity();
+        userEntity.setEmailVerified(false);
+
+        when(userService.getUser(anyString())).thenReturn(userEntity);
+
+        exception.expect(EmailNotVerifiedException.class);
+
+        registrationService.approveJoinRequest("teamId", userEntity.getId(), MemberPrivilege.USER, userEntity);
+    }
+
+    @Test
+    public void testApproveJoinRequestNullPrivilege() {
+        Team createdTeam = Util.getTeamEntity();
+        User createdUser = Util.getUserEntity();
+
+        when(teamService.isOwner(anyString(), anyString())).thenReturn(true);
+        when(teamService.getTeamById(anyString())).thenReturn(createdTeam);
+        when(adapterDeterLab.getDeterUserIdByNclUserId(anyString())).thenReturn(RandomStringUtils.randomAlphanumeric(20));
+        when(userService.getUser(anyString())).thenReturn(createdUser);
+
+        exception.expect(InvalidTeamMemberPrivilegeException.class);
+
+        registrationService.approveJoinRequest(createdTeam.getId(), createdUser.getId(), null, createdUser);
+    }
+
+    @Test
+    public void testApproveJoinRequestUnknownPrivilege() {
+        Team createdTeam = Util.getTeamEntity();
+        User createdUser = Util.getUserEntity();
+
+        when(teamService.isOwner(anyString(), anyString())).thenReturn(true);
+        when(teamService.getTeamById(anyString())).thenReturn(createdTeam);
+        when(adapterDeterLab.getDeterUserIdByNclUserId(anyString())).thenReturn(RandomStringUtils.randomAlphanumeric(20));
+        when(userService.getUser(anyString())).thenReturn(createdUser);
+
+        exception.expect(InvalidTeamMemberPrivilegeException.class);
+
+        registrationService.approveJoinRequest(createdTeam.getId(), createdUser.getId(), MemberPrivilege.PROJECT_ROOT, createdUser);
+    }
+
+    @Test
+    public void testApproveJoinRequestUpdateMemberPrivilege() {
+        Team createdTeam = Util.getTeamEntity();
+        User createdUser = Util.getUserEntity();
+
+        when(teamService.isOwner(anyString(), anyString())).thenReturn(true);
+        when(teamService.getTeamById(anyString())).thenReturn(createdTeam);
+        when(adapterDeterLab.getDeterUserIdByNclUserId(anyString())).thenReturn(RandomStringUtils.randomAlphanumeric(20));
+        when(userService.getUser(anyString())).thenReturn(createdUser);
+
+
+        registrationService.approveJoinRequest(createdTeam.getId(), createdUser.getId(), MemberPrivilege.LOCAL_ROOT, createdUser);
+
+        verify(teamService, times(1)).updateMemberPrivilege(anyString(), anyString(), eq(MemberPrivilege.LOCAL_ROOT));
+    }
+
+    @Test
+    public void testApproveJoinRequestUpdateMemberPrivilege2() {
+        Team createdTeam = Util.getTeamEntity();
+        User createdUser = Util.getUserEntity();
+
+        when(teamService.isOwner(anyString(), anyString())).thenReturn(true);
+        when(teamService.getTeamById(anyString())).thenReturn(createdTeam);
+        when(adapterDeterLab.getDeterUserIdByNclUserId(anyString())).thenReturn(RandomStringUtils.randomAlphanumeric(20));
+        when(userService.getUser(anyString())).thenReturn(createdUser);
+
+
+        registrationService.approveJoinRequest(createdTeam.getId(), createdUser.getId(), MemberPrivilege.USER, createdUser);
+
+        verify(teamService, times(1)).updateMemberPrivilege(anyString(), anyString(), eq(MemberPrivilege.USER));
     }
 
     @Test
@@ -538,6 +612,8 @@ public class RegistrationServiceImplTest {
 
         verify(userService, times(1)).updateUserStatus(anyString(), any(UserStatus.class));
         verify(teamService, times(1)).updateMemberStatus(anyString(), anyString(), any(MemberStatus.class));
+        verify(teamService, never()).updateMemberPrivilege(anyString(), anyString(), eq(MemberPrivilege.LOCAL_ROOT));
+        verify(teamService, times(1)).updateMemberPrivilege(anyString(), anyString(), eq(MemberPrivilege.PROJECT_ROOT));
         verify(adapterDeterLab, times(1)).approveProject(anyString());
     }
 
