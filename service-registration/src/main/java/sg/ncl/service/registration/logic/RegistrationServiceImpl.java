@@ -141,7 +141,7 @@ public class RegistrationServiceImpl implements RegistrationService {
         mainObject.put("projWeb", team.getWebsite());
         mainObject.put("projOrg", team.getOrganisationType());
         mainObject.put("projPublic", team.getVisibility());
-        mainObject.put("projClass", team.getIsClass());
+        mainObject.put("projResearchType", team.getIsClass() ? "Class" : "Other");
 
         userService.addTeam(nclUserId, createdTeam.getId());
         teamService.addMember(createdTeam.getId(), teamMemberInfo);
@@ -281,7 +281,7 @@ public class RegistrationServiceImpl implements RegistrationService {
             userObject.put("projWeb", teamEntity.getWebsite());
             userObject.put("projOrg", teamEntity.getOrganisationType());
             userObject.put("projPublic", teamEntity.getVisibility());
-            userObject.put("projClass", teamEntity.getIsClass());
+            userObject.put("projResearchType", teamEntity.getIsClass() ? "Class" : "Other");
             resultJSON = adapterDeterLab.applyProjectNewUsers(userObject.toString());
         }
 
