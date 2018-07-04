@@ -1188,14 +1188,9 @@ public class AdapterDeterLab {
      * @param teamId e.g. F12345-G12345-H12345
      * @return  a json string in the format:
      *   {
-     *       'status' : 'ok/fail'
-     *       'reservation'
-     *       {
-     *           'all' : [node_id_list],
-     *           'in_use' : [node_id_list],
-     *           'reloading' : [node_id_list],
-     *           'free' : [node_id_list]
-     *       }
+     *       "status" : "ok/fail",
+     *       "reserved": ["pc1", "pc4", "pc2"],
+     *       "in_use": [["pc4", "ncltest01", "vnctest"], ["pc2", "testbed-ncl", "thales-poc"]]
      *   }
      */
     public String getReservationStatus(String teamId) {
@@ -1215,11 +1210,11 @@ public class AdapterDeterLab {
             String responseBody = response.getBody().toString();
             String status = new JSONObject(responseBody).getString(STATUS);
 
-            if ("get reservation OK".equals(status)) {
-                log.info("Get reservation OK");
+            if ("OK".equals(status)) {
+                log.info("Get reservation for team {} OK", teamId);
                 return responseBody;
             } else {
-                log.warn("Get reservation FAIL: {}", status);
+                log.warn("Get reservation for team {} FAIL: {}", teamId, status);
                 throw new DeterLabOperationFailedException(status);
             }
 
@@ -1247,12 +1242,8 @@ public class AdapterDeterLab {
 
         JSONObject json = new JSONObject();
         json.put("pid", pid);
+        json.put(NUM_NODES, numNodes);
 
-        if (numNodes != null) {
-            json.put(NUM_NODES, numNodes);
-        } else {
-            json.put(NUM_NODES, "");
-        }
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);

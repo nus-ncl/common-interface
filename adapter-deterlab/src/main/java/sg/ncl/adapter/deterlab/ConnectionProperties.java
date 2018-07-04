@@ -158,10 +158,10 @@ public class ConnectionProperties {
     }
 
     public String releaseNodes() {
-        return HTTP_MODE + ip + ":" + port + "/releaseReservation";
+        return HTTP_MODE + ip + ":" + port + "/releaseNodes";
     }
 
     public String reserveNodes() {
-        return HTTP_MODE + ip + ":" + port + "/reserveReservation";
+        return HTTP_MODE + ip + ":" + port + "/reserveNodes";
     }
 }
