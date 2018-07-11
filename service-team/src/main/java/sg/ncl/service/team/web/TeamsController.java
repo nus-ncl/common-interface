@@ -173,7 +173,7 @@ public class TeamsController {
 
     @DeleteMapping(path = "/{id}/reservations")
     @ResponseStatus(HttpStatus.OK)
-    public String releaseNodes(@PathVariable final String id, @RequestParam(value = "numNodes", required = false) Integer numNodes, @AuthenticationPrincipal final Object claims) {
+    public String releaseNodes(@PathVariable final String id, @RequestParam(value = "numNodes") Integer numNodes, @AuthenticationPrincipal final Object claims) {
         checkClaimsType(claims);
         checkAdmin((Claims) claims);
         return teamService.releaseNodes(id, numNodes);

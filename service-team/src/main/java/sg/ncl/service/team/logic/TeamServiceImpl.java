@@ -431,14 +431,9 @@ public class TeamServiceImpl implements TeamService {
      * @param teamId e.g. F12345-G12345-H12345
      * @return  a json string in the format:
      *   {
-     *       'status' : 'ok/fail'
-     *       'reservation'
-     *       {
-     *           'all' : [node_id_list],
-     *           'in_use' : [node_id_list],
-     *           'reloading' : [node_id_list],
-     *           'free' : [node_id_list]
-     *       }
+     *       "status" : "ok/fail",
+     *       "reserved": ["pc1", "pc4", "pc2"],
+     *       "in_use": [["pc4", "ncltest01", "vnctest"], ["pc2", "testbed-ncl", "thales-poc"]]
      *   }
      */
     @Override
@@ -447,13 +442,13 @@ public class TeamServiceImpl implements TeamService {
     }
 
     /**
-     * Release all the nodes or a specific numbers of nodes
+     * Release all the nodes or a specific number of nodes
      * @param teamId e.g. F12345-G12345-H12345
-     * @param numNodes optional; will attempt to release all the nodes if not specify
+     * @param numNodes no. of nodes to release; -1 means release all the nodes
      * @return  a json string in the format:
      *   {
      *       'status' : 'ok/fail'
-     *       'message' : 'error message' / [node_id_list]
+     *       'released' : [node_id_list]
      *   }
      */
     @Override
@@ -464,12 +459,13 @@ public class TeamServiceImpl implements TeamService {
     /**
      * Reserve a specific number of nodes or a particular node type
      * @param teamId e.g. F12345-G12345-H12345
-     * @param numNodes required
-     * @param machineType optional; will attempt to reserve X number of nodes with this machine type if specify
+     * @param numNodes no. of nodes to reserve; required
+     * @param machineType optional; will attempt to reserve X number of nodes with this machine type if specified
      * @return  a json string in the format:
      *   {
      *       'status' : 'ok/fail'
-     *       'message' : 'error message' / [node_id_list]
+     *       'message' : 'error message'
+     *       'reserved' : [node_id_list]
      *   }
      */
     @Override

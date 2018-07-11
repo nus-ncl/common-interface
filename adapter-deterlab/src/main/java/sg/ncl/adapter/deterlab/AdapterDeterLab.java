@@ -40,6 +40,8 @@ public class AdapterDeterLab {
 
     private static final String NUM_NODES = "numNodes";
     private static final String STATUS = "status";
+    private static final String PID = "pid";
+    private static final String MACHINE_TYPE = "machineType";
 
     @Inject
     public AdapterDeterLab(DeterLabUserRepository repository, DeterLabProjectRepository deterLabProjectRepository, ConnectionProperties connectionProperties, RestTemplate restTemplate) {
@@ -1197,7 +1199,7 @@ public class AdapterDeterLab {
         final String pid = getDeterProjectIdByNclTeamId(teamId);
 
         JSONObject json = new JSONObject();
-        json.put("pid", pid);
+        json.put(PID, pid);
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
@@ -1228,20 +1230,20 @@ public class AdapterDeterLab {
     }
 
     /**
-     * Release all the nodes or a specific numbers of nodes
+     * Release all the nodes or a specific number of nodes
      * @param teamId e.g. F12345-G12345-H12345
-     * @param numNodes optional; will attempt to release all the nodes if not specify
+     * @param numNodes no. of nodes to release; -1 means release all the nodes
      * @return  a json string in the format:
      *   {
      *       'status' : 'ok/fail'
-     *       'message' : 'error message' / [node_id_list]
+     *       'released' : [node_id_list]
      *   }
      */
     public String releaseNodes(String teamId, Integer numNodes) {
         final String pid = getDeterProjectIdByNclTeamId(teamId);
 
         JSONObject json = new JSONObject();
-        json.put("pid", pid);
+        json.put(PID, pid);
         json.put(NUM_NODES, numNodes);
 
 
@@ -1253,7 +1255,6 @@ public class AdapterDeterLab {
 
         try {
             response = restTemplate.exchange(properties.releaseNodes(), HttpMethod.POST, request, String.class);
-
             // return regardless of success / fail
             return response.getBody().toString();
 
@@ -1269,26 +1270,22 @@ public class AdapterDeterLab {
     /**
      * Reserve a specific number of nodes or a particular node type
      * @param teamId e.g. F12345-G12345-H12345
-     * @param numNodes required
-     * @param machineType optional; will attempt to reserve X number of nodes with this machine type if specify
+     * @param numNodes no. of nodes to reserve; required
+     * @param machineType optional; will attempt to reserve X number of nodes with this machine type if specified
      * @return  a json string in the format:
      *   {
      *       'status' : 'ok/fail'
-     *       'message' : 'error message' / [node_id_list]
+     *       'message' : 'error message'
+     *       'reserved' : [node_id_list]
      *   }
      */
     public String reserveNodes(String teamId, Integer numNodes, String machineType) {
         final String pid = getDeterProjectIdByNclTeamId(teamId);
 
         JSONObject json = new JSONObject();
-        json.put("pid", pid);
+        json.put(PID, pid);
         json.put(NUM_NODES, numNodes);
-
-        if (machineType != null) {
-            json.put("machineType", machineType);
-        } else {
-            json.put("machineType", "");
-        }
+        json.put(MACHINE_TYPE, (machineType != null) ? machineType : "");
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
@@ -1298,7 +1295,6 @@ public class AdapterDeterLab {
 
         try {
             response = restTemplate.exchange(properties.reserveNodes(), HttpMethod.POST, request, String.class);
-
             // return regardless of success / fail
             return response.getBody().toString();
 
