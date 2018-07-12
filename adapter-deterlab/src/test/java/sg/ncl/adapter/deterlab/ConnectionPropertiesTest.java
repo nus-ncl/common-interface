@@ -250,13 +250,13 @@ public class ConnectionPropertiesTest {
     @Test
     public void releaseNodes() throws Exception {
         assertThat(connectionProperties.releaseNodes()).isNotNull();
-        assertThat(connectionProperties.releaseNodes()).isEqualTo("http://127.0.0.1:22/releaseReservation");
+        assertThat(connectionProperties.releaseNodes()).isEqualTo("http://127.0.0.1:22/releaseNodes");
     }
 
     @Test
     public void reserveNodes() throws Exception {
         assertThat(connectionProperties.reserveNodes()).isNotNull();
-        assertThat(connectionProperties.reserveNodes()).isEqualTo("http://127.0.0.1:22/reserveReservation");
+        assertThat(connectionProperties.reserveNodes()).isEqualTo("http://127.0.0.1:22/reserveNodes");
     }
 
 }

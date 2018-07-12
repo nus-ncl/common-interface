@@ -9,6 +9,7 @@ import org.junit.rules.ExpectedException;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
+import sg.ncl.adapter.deterlab.AdapterDeterLab;
 import sg.ncl.service.authentication.domain.CredentialsService;
 import sg.ncl.service.user.data.jpa.UserDetailsEntity;
 import sg.ncl.service.user.data.jpa.UserEntity;
@@ -39,6 +40,9 @@ public class UserServiceImplTest {
     public ExpectedException exception = ExpectedException.none();
 
     @Mock
+    private AdapterDeterLab adapterDeterLab;
+
+    @Mock
     private CredentialsService credentialsService;
 
     @Mock
@@ -49,7 +53,7 @@ public class UserServiceImplTest {
     @Before
     public void setup() {
         assertThat(mockingDetails(userRepository).isMock()).isTrue();
-        userServiceImpl = new UserServiceImpl(userRepository, credentialsService);
+        userServiceImpl = new UserServiceImpl(userRepository, credentialsService, adapterDeterLab);
     }
 
     //throw UsernameAlreadyExistsException

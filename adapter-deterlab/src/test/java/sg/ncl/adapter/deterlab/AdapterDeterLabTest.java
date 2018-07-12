@@ -1909,7 +1909,7 @@ public class AdapterDeterLabTest {
     public void getReservationStatusGood() {
         DeterLabProjectEntity deterLabProjectEntity = new DeterLabProjectEntity();
         JSONObject myobject = new JSONObject();
-        myobject.put("status", "get reservation OK");
+        myobject.put("status", "OK");
 
         when(restTemplate.exchange(anyString(),eq(HttpMethod.POST),anyObject(),eq(String.class))).thenReturn(response);
         when(response.getBody()).thenReturn(myobject);
@@ -1927,7 +1927,7 @@ public class AdapterDeterLabTest {
         exception.expect(DeterLabOperationFailedException.class);
         DeterLabProjectEntity deterLabProjectEntity = new DeterLabProjectEntity();
         JSONObject myobject = new JSONObject();
-        myobject.put("status", "get reservation FAIL");
+        myobject.put("status", "FAIL");
 
         when(restTemplate.exchange(anyString(),eq(HttpMethod.POST),anyObject(),eq(String.class))).thenReturn(response);
         when(response.getBody()).thenReturn(myobject);

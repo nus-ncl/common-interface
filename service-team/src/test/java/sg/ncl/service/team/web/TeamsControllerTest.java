@@ -544,7 +544,7 @@ public class TeamsControllerTest {
 
     @Test
     public void releaseNodesGood() throws Exception {
-        String reservation = "{ \"status\" : \"good\", \"msg\" : [\"pcA\"] }";
+        String reservation = "{ \"status\" : \"good\", \"released\" : [\"pcA\"] }";
         final byte[] content = mapper.writeValueAsBytes(reservation);
 
         final List<String> roles = new ArrayList<>();
@@ -554,12 +554,12 @@ public class TeamsControllerTest {
         when(claims.get(JwtToken.KEY)).thenReturn(roles);
         when(teamService.releaseNodes(anyString(), anyInt())).thenReturn(reservation);
 
-        mockMvc.perform(delete(TeamsController.PATH + "/id/reservations").contentType(MediaType.APPLICATION_JSON).content(content))
+        mockMvc.perform(delete(TeamsController.PATH + "/id/reservations?numNodes=-1").contentType(MediaType.APPLICATION_JSON).content(content))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$", hasKey("status")))
                 .andExpect(jsonPath("$.status", is(equalTo("good"))))
-                .andExpect(jsonPath("$", hasKey("msg")))
-                .andExpect(jsonPath("$.msg[0]", is(equalTo("pcA"))));
+                .andExpect(jsonPath("$", hasKey("released")))
+                .andExpect(jsonPath("$.released[0]", is(equalTo("pcA"))));
     }
 
     @Test
