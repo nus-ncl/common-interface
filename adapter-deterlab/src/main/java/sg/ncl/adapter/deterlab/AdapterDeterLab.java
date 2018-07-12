@@ -335,7 +335,6 @@ public class AdapterDeterLab {
         deterLabUserRepository.save(deterLabUserEntity);
     }
 
-    @Transactional
     public String getDeterUserIdByNclUserId(String nclUserId) {
         DeterLabUserEntity deterLabUserEntity = deterLabUserRepository.findByNclUserId(nclUserId);
         if (deterLabUserEntity == null) {
@@ -353,7 +352,6 @@ public class AdapterDeterLab {
         return deterLabProjectRepository.save(deterLabProjectEntity);
     }
 
-    @Transactional
     public String getDeterProjectIdByNclTeamId(String nclTeamId) {
         DeterLabProjectEntity deterLabProjectEntity = deterLabProjectRepository.findByNclTeamId(nclTeamId);
         if (deterLabProjectEntity == null) {
