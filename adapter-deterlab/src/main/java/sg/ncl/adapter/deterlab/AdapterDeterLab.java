@@ -38,7 +38,11 @@ public class AdapterDeterLab {
     private ConnectionProperties properties;
     private RestTemplate restTemplate;
 
-    private static String UID = "uid";
+    private static final String PID = "pid";
+    private static final String UID = "uid";
+    private static final String NUM_NODES = "numNodes";
+    private static final String STATUS = "status";
+    private static final String MACHINE_TYPE = "machineType";
 
     @Inject
     public AdapterDeterLab(DeterLabUserRepository repository, DeterLabProjectRepository deterLabProjectRepository, ConnectionProperties connectionProperties, RestTemplate restTemplate) {
@@ -331,7 +335,6 @@ public class AdapterDeterLab {
         deterLabUserRepository.save(deterLabUserEntity);
     }
 
-    @Transactional
     public String getDeterUserIdByNclUserId(String nclUserId) {
         DeterLabUserEntity deterLabUserEntity = deterLabUserRepository.findByNclUserId(nclUserId);
         if (deterLabUserEntity == null) {
@@ -349,7 +352,6 @@ public class AdapterDeterLab {
         return deterLabProjectRepository.save(deterLabProjectEntity);
     }
 
-    @Transactional
     public String getDeterProjectIdByNclTeamId(String nclTeamId) {
         DeterLabProjectEntity deterLabProjectEntity = deterLabProjectRepository.findByNclTeamId(nclTeamId);
         if (deterLabProjectEntity == null) {
@@ -462,7 +464,7 @@ public class AdapterDeterLab {
         }
 
         log.info("Stop experiment request submitted to deterlab");
-        String expStatus = new JSONObject(response.getBody().toString()).getString("status");
+        String expStatus = new JSONObject(response.getBody().toString()).getString(STATUS);
 
         if (!"swapped".equals(expStatus)) {
             log.warn("Fail to stop experiment at deterlab {}", jsonString);
@@ -503,7 +505,7 @@ public class AdapterDeterLab {
         }
 
         log.info("Delete experiment request submitted to deterlab");
-        String expStatus = new JSONObject(response.getBody().toString()).getString("status");
+        String expStatus = new JSONObject(response.getBody().toString()).getString(STATUS);
 
         if (!"no experiment found".equals(expStatus)) {
             log.warn("Fail to delete experiment at deterlab {}", jsonString);
@@ -1238,6 +1240,128 @@ public class AdapterDeterLab {
             throw new AdapterConnectionException(rae.getMessage());
         } catch (HttpServerErrorException hsee) {
             log.warn("Delete ssh public key: Adapter DeterLab internal server error {}", hsee);
+            throw new AdapterInternalErrorException();
+        }
+    }
+
+    /**
+     * Retrieve the list of nodes reserved for a team
+     * @param teamId e.g. F12345-G12345-H12345
+     * @return  a json string in the format:
+     *   {
+     *       "status" : "ok/fail",
+     *       "reserved": ["pc1", "pc4", "pc2"],
+     *       "in_use": [["pc4", "ncltest01", "vnctest"], ["pc2", "testbed-ncl", "thales-poc"]]
+     *   }
+     */
+    public String getReservationStatus(String teamId) {
+        final String pid = getDeterProjectIdByNclTeamId(teamId);
+
+        JSONObject json = new JSONObject();
+        json.put(PID, pid);
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        HttpEntity<String> request = new HttpEntity<>(json.toString(), headers);
+
+        ResponseEntity response;
+
+        try {
+            response = restTemplate.exchange(properties.getReservationStatus(), HttpMethod.POST, request, String.class);
+            String responseBody = response.getBody().toString();
+            String status = new JSONObject(responseBody).getString(STATUS);
+
+            if ("OK".equals(status)) {
+                log.info("Get reservation for team {} OK", teamId);
+                return responseBody;
+            } else {
+                log.warn("Get reservation for team {} FAIL: {}", teamId, status);
+                throw new DeterLabOperationFailedException(status);
+            }
+
+        } catch (ResourceAccessException rae) {
+            log.warn("Get reservation: {}", rae);
+            throw new AdapterConnectionException(rae.getMessage());
+        } catch (HttpServerErrorException hsee) {
+            log.warn("Get reservation error: Adapter DeterLab internal server error {}", hsee);
+            throw new AdapterInternalErrorException();
+        }
+    }
+
+    /**
+     * Release all the nodes or a specific number of nodes
+     * @param teamId e.g. F12345-G12345-H12345
+     * @param numNodes no. of nodes to release; -1 means release all the nodes
+     * @return  a json string in the format:
+     *   {
+     *       'status' : 'ok/fail'
+     *       'released' : [node_id_list]
+     *   }
+     */
+    public String releaseNodes(String teamId, Integer numNodes) {
+        final String pid = getDeterProjectIdByNclTeamId(teamId);
+
+        JSONObject json = new JSONObject();
+        json.put(PID, pid);
+        json.put(NUM_NODES, numNodes);
+
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        HttpEntity<String> request = new HttpEntity<>(json.toString(), headers);
+
+        ResponseEntity response;
+
+        try {
+            response = restTemplate.exchange(properties.releaseNodes(), HttpMethod.POST, request, String.class);
+            // return regardless of success / fail
+            return response.getBody().toString();
+
+        } catch (ResourceAccessException rae) {
+            log.warn("release reservation: {}", rae);
+            throw new AdapterConnectionException(rae.getMessage());
+        } catch (HttpServerErrorException hsee) {
+            log.warn("release reservation error: Adapter DeterLab internal server error {}", hsee);
+            throw new AdapterInternalErrorException();
+        }
+    }
+
+    /**
+     * Reserve a specific number of nodes or a particular node type
+     * @param teamId e.g. F12345-G12345-H12345
+     * @param numNodes no. of nodes to reserve; required
+     * @param machineType optional; will attempt to reserve X number of nodes with this machine type if specified
+     * @return  a json string in the format:
+     *   {
+     *       'status' : 'ok/fail'
+     *       'message' : 'error message'
+     *       'reserved' : [node_id_list]
+     *   }
+     */
+    public String reserveNodes(String teamId, Integer numNodes, String machineType) {
+        final String pid = getDeterProjectIdByNclTeamId(teamId);
+
+        JSONObject json = new JSONObject();
+        json.put(PID, pid);
+        json.put(NUM_NODES, numNodes);
+        json.put(MACHINE_TYPE, (machineType != null) ? machineType : "");
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        HttpEntity<String> request = new HttpEntity<>(json.toString(), headers);
+
+        ResponseEntity response;
+
+        try {
+            response = restTemplate.exchange(properties.reserveNodes(), HttpMethod.POST, request, String.class);
+            // return regardless of success / fail
+            return response.getBody().toString();
+
+        } catch (ResourceAccessException rae) {
+            log.warn("node reservation: {}", rae);
+            throw new AdapterConnectionException(rae.getMessage());
+        } catch (HttpServerErrorException hsee) {
+            log.warn("node reservation error: Adapter DeterLab internal server error {}", hsee);
             throw new AdapterInternalErrorException();
         }
     }

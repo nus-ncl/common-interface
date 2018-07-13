@@ -241,4 +241,22 @@ public class ConnectionPropertiesTest {
         assertThat(connectionProperties.removeUserFromTeam()).isEqualTo("http://127.0.0.1:22/removeUserFromTeam");
     }
 
+    @Test
+    public void getReservationStatus() throws Exception {
+        assertThat(connectionProperties.getReservationStatus()).isNotNull();
+        assertThat(connectionProperties.getReservationStatus()).isEqualTo("http://127.0.0.1:22/getReservation");
+    }
+
+    @Test
+    public void releaseNodes() throws Exception {
+        assertThat(connectionProperties.releaseNodes()).isNotNull();
+        assertThat(connectionProperties.releaseNodes()).isEqualTo("http://127.0.0.1:22/releaseNodes");
+    }
+
+    @Test
+    public void reserveNodes() throws Exception {
+        assertThat(connectionProperties.reserveNodes()).isNotNull();
+        assertThat(connectionProperties.reserveNodes()).isEqualTo("http://127.0.0.1:22/reserveNodes");
+    }
+
 }

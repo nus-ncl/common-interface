@@ -164,4 +164,16 @@ public class ConnectionProperties {
     public String deletePublicKey() {
         return HTTP_MODE + ip + ":" + port + "/deletePublicKey";
     }
+
+    public String getReservationStatus() {
+        return HTTP_MODE + ip + ":" + port + "/getReservation";
+    }
+
+    public String releaseNodes() {
+        return HTTP_MODE + ip + ":" + port + "/releaseNodes";
+    }
+
+    public String reserveNodes() {
+        return HTTP_MODE + ip + ":" + port + "/reserveNodes";
+    }
 }
