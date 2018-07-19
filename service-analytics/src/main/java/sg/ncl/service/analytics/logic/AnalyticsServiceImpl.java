@@ -3,11 +3,13 @@ package sg.ncl.service.analytics.logic;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
+import org.json.JSONObject;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.stereotype.Service;
 import sg.ncl.adapter.deterlab.AdapterDeterLab;
 import sg.ncl.service.analytics.AnalyticsProperties;
 import sg.ncl.service.analytics.data.jpa.*;
+import sg.ncl.service.analytics.data.pojo.TeamUsage;
 import sg.ncl.service.analytics.domain.AnalyticsService;
 import sg.ncl.service.analytics.domain.DataDownload;
 import sg.ncl.service.analytics.domain.DataPublicDownload;
@@ -25,10 +27,7 @@ import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.List;
+import java.util.*;
 import java.util.regex.Pattern;
 
 /**
@@ -176,6 +175,47 @@ public class AnalyticsServiceImpl implements AnalyticsService {
         String end = endDate.format(formatter);
         log.info("Getting usage statistics for team {}, start {}, end {}", teamId, start, end);
         return adapterDeterLab.getUsageStatistics(teamId, start, end);
+    }
+
+    @Override
+    public List<Long> getTeamUsage(String teamId, ZonedDateTime startDate, ZonedDateTime endDate) {
+        if (startDate.isAfter(endDate))
+            throw new StartDateAfterEndDateException();
+
+        List<TeamUsage> usageList = new ArrayList<>();
+        Map<String, TeamUsage> usages = new HashMap<>();
+        String jsonString = adapterDeterLab.getTeamUsage(teamId);
+        JSONObject jsonObject = new JSONObject(jsonString);
+
+        for (int i = 1; i < jsonObject.length(); i++) {
+            JSONObject object = jsonObject.getJSONObject(Integer.toString(i));
+            String action = object.getString("action");
+            if (action.equals("swapin")) {
+                TeamUsage usage = new TeamUsage();
+                usage.setExptIdx(object.getString("exptidx"));
+                usage.setSwapIn(object.getString("start_time"));
+                usage.setPnodes(Integer.valueOf(object.getString("pnodes")));
+                usages.put(object.getString("exptidx"), usage);
+                usageList.add(usage);
+            } else if (action.equals("swapout")) {
+                TeamUsage usage = usages.get(object.getString("exptidx"));
+                usage.setSwapOut(object.getString("start_time"));
+            }
+        }
+
+        usageList.removeIf( u -> u.getSwapOut() != null && u.getSwapOut().isBefore(startDate) );
+        Map<String, Long> dayUsage = new HashMap<>();
+        usageList.forEach( usage -> usage.computeNodeUsageByDay(dayUsage, endDate) );
+        List<Long> nodeUsage = new ArrayList<>();
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+        ZonedDateTime currentDate = startDate.plusDays(0);
+        while (currentDate.isBefore(endDate)) {
+            Long value = dayUsage.get(formatter.format(currentDate));
+            log.info("Date: {}, Mins: {}", formatter.format(currentDate), value == null ? 0 : value);
+            nodeUsage.add(value == null ? 0 : value);
+            currentDate = currentDate.plusDays(1);
+        }
+        return nodeUsage;
     }
 
     @Override

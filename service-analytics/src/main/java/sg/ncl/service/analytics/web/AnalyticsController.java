@@ -52,7 +52,7 @@ public class AnalyticsController {
                                                                    @RequestParam(value = "id", required = false) Long id,
                                                                    @RequestParam(value = "startDate", required = false) String startDate,
                                                                    @RequestParam(value = "endDate", required = false) String endDate) {
-        if (claims == null || !(claims instanceof Claims)) {
+        if (!(claims instanceof Claims)) {
             log.warn("Access denied for: /analytics/datasets/downloads/public GET");
             throw new UnauthorizedException();
         }
@@ -68,7 +68,7 @@ public class AnalyticsController {
                                                              @RequestParam(value = "id", required = false) Long id,
                                                              @RequestParam(value = "startDate", required = false) String startDate,
                                                              @RequestParam(value = "endDate", required = false) String endDate) {
-        if (claims == null || !(claims instanceof Claims)) {
+        if (!(claims instanceof Claims)) {
             log.warn("Access denied for: /analytics/datasets/downloads GET");
             throw new UnauthorizedException();
         }
@@ -100,11 +100,11 @@ public class AnalyticsController {
 
     @GetMapping("/usage/teams/{id}")
     @ResponseStatus(HttpStatus.OK)
-    public String getUsageStatistics(@AuthenticationPrincipal Object claims,
+    public List<Long> getUsageStatistics(@AuthenticationPrincipal Object claims,
                                      @PathVariable final String id,
                                      @RequestParam(value = "startDate", required = false) String startDate,
                                      @RequestParam(value = "endDate", required = false) String endDate) {
-        if (claims == null || !(claims instanceof Claims)) {
+        if (!(claims instanceof Claims)) {
             log.warn("Access denied for: /analytics/usage/teams GET");
             throw new UnauthorizedException();
         }
@@ -117,7 +117,8 @@ public class AnalyticsController {
         if (end == null)
             end = now.with(lastDayOfMonth());
 
-        return analyticsService.getUsageStatistics(id, start, end);
+        // return analyticsService.getUsageStatistics(id, start, end);
+        return analyticsService.getTeamUsage(id, start, end);
     }
 
     @GetMapping("/energy")

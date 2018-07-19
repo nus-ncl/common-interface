@@ -1365,4 +1365,23 @@ public class AdapterDeterLab {
             throw new AdapterInternalErrorException();
         }
     }
+
+    public String getTeamUsage(String teamId) {
+        JSONObject jsonObject = new JSONObject();
+        jsonObject.put("pid", getDeterProjectIdByNclTeamId(teamId));
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        HttpEntity<String> request = new HttpEntity<>(jsonObject.toString(), headers);
+        ResponseEntity response;
+
+        try {
+            response = restTemplate.exchange(properties.getTeamUsage(), HttpMethod.POST, request, String.class);
+        } catch (RestClientException e) {
+            log.warn("DeterLab connection error get usage statistics: {}", e);
+            return "?";
+        }
+
+        return response.getBody().toString();
+    }
 }

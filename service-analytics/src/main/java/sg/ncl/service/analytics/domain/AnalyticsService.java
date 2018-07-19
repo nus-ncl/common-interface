@@ -24,4 +24,6 @@ public interface AnalyticsService {
 
     List<Double> getEnergyStatistics(ZonedDateTime startDate, ZonedDateTime endDate);
 
+    List<Long> getTeamUsage(String teamId, ZonedDateTime startDate, ZonedDateTime endDate);
+
 }

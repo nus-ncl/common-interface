@@ -176,4 +176,8 @@ public class ConnectionProperties {
     public String reserveNodes() {
         return HTTP_MODE + ip + ":" + port + "/reserveNodes";
     }
+
+    public String getTeamUsage() {
+        return HTTP_MODE + ip + ":" + port + "/getTeamUsage";
+    }
 }
