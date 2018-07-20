@@ -211,10 +211,12 @@ public class AnalyticsServiceImpl implements AnalyticsService {
         ZonedDateTime currentDate = startDate.plusDays(0);
         while (currentDate.isBefore(endDate)) {
             Long value = dayUsage.get(formatter.format(currentDate));
-            log.info("Date: {}, Mins: {}", formatter.format(currentDate), value == null ? 0 : value);
             nodeUsage.add(value == null ? 0 : value);
             currentDate = currentDate.plusDays(1);
         }
+        Long value = dayUsage.get(formatter.format(currentDate));
+        nodeUsage.add(value == null ? 0 : value);
+
         return nodeUsage;
     }
 
