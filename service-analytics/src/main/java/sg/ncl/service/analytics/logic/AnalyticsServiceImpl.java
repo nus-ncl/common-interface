@@ -38,6 +38,7 @@ import java.util.regex.Pattern;
 @Slf4j
 @EnableConfigurationProperties(AnalyticsProperties.class)
 public class AnalyticsServiceImpl implements AnalyticsService {
+    private static final String EXPTIDX = "exptidx";
 
     private final DataPublicDownloadRepository dataPublicDownloadRepository;
 
@@ -192,13 +193,13 @@ public class AnalyticsServiceImpl implements AnalyticsService {
             String action = object.getString("action");
             if (action.equals("swapin")) {
                 TeamUsage usage = new TeamUsage();
-                usage.setExptIdx(object.getString("exptidx"));
+                usage.setExptIdx(object.getString(EXPTIDX));
                 usage.setSwapIn(object.getString("start_time"));
                 usage.setPnodes(Integer.valueOf(object.getString("pnodes")));
-                usages.put(object.getString("exptidx"), usage);
+                usages.put(object.getString(EXPTIDX), usage);
                 usageList.add(usage);
             } else if (action.equals("swapout")) {
-                TeamUsage usage = usages.get(object.getString("exptidx"));
+                TeamUsage usage = usages.get(object.getString(EXPTIDX));
                 usage.setSwapOut(object.getString("start_time"));
             }
         }

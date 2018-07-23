@@ -14,6 +14,8 @@ import java.util.Map;
 @Setter
 @Slf4j
 public class TeamUsage {
+    private static final String ZONE = "Asia/Singapore";
+    
     private String exptIdx;
     private ZonedDateTime swapIn;
     private ZonedDateTime swapOut;
@@ -22,14 +24,14 @@ public class TeamUsage {
     public void setSwapIn(String datetime) {
         if (datetime != null) {
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
-            swapIn = ZonedDateTime.parse(datetime, formatter.withZone(ZoneId.of("Asia/Singapore")));
+            swapIn = ZonedDateTime.parse(datetime, formatter.withZone(ZoneId.of(ZONE)));
         }
     }
 
     public void setSwapOut(String datetime) {
         if (datetime != null) {
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
-            swapOut = ZonedDateTime.parse(datetime, formatter.withZone(ZoneId.of("Asia/Singapore")));
+            swapOut = ZonedDateTime.parse(datetime, formatter.withZone(ZoneId.of(ZONE)));
         }
     }
 
@@ -41,6 +43,10 @@ public class TeamUsage {
             cutoff = dayEnd.plusDays(1);
         }
 
+        computeNodeUsage(dayUsage, cutoff);
+    }
+
+    private void computeNodeUsage(Map<String, Long> dayUsage, ZonedDateTime cutoff) {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
         if (swapIn.getYear() == cutoff.getYear() && swapIn.getDayOfYear() == cutoff.getDayOfYear()) {
             String key = formatter.format(swapIn);
@@ -49,7 +55,7 @@ public class TeamUsage {
         } else {
             ZonedDateTime today = ZonedDateTime.of(
                     swapIn.getYear(), swapIn.getMonthValue(), swapIn.getDayOfMonth(),
-                    0, 0, 0, 0, ZoneId.of("Asia/Singapore"));
+                    0, 0, 0, 0, ZoneId.of(ZONE));
             ZonedDateTime tomorrow = today.plusDays(1);
             String key = formatter.format(swapIn);
             Long value = dayUsage.get(key) == null ? 0L : dayUsage.get(key);
