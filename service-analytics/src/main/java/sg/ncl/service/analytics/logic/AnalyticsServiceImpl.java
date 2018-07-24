@@ -191,7 +191,7 @@ public class AnalyticsServiceImpl implements AnalyticsService {
         for (int i = 1; i < jsonObject.length(); i++) {
             JSONObject object = jsonObject.getJSONObject(Integer.toString(i));
             String action = object.getString("action");
-            if (action.equals("swapin")) {
+            if (action.equals("swapin") || action.equals("start")) {
                 TeamUsage usage = new TeamUsage();
                 usage.setExptIdx(object.getString(EXPTIDX));
                 usage.setSwapIn(object.getString("start_time"));
