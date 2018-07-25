@@ -779,7 +779,7 @@ public class RegistrationServiceImpl implements RegistrationService {
 
             UserDetailsEntity userDetailsEntity = new UserDetailsEntity();
             userDetailsEntity.setAddress(AddressEntity.get(leader.getUserDetails().getAddress()));
-            userDetailsEntity.setFirstName(email.substring(0, email.indexOf("@")));
+            userDetailsEntity.setFirstName(email.substring(0, email.indexOf('@')));
             userDetailsEntity.setLastName(team.getName());
             userDetailsEntity.setInstitution(leader.getUserDetails().getInstitution());
             userDetailsEntity.setInstitutionAbbreviation(leader.getUserDetails().getInstitutionAbbreviation());

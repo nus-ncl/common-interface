@@ -1444,6 +1444,7 @@ public class AdapterDeterLab {
         HttpEntity<String> request = new HttpEntity<>(jsonObject.toString(), headers);
         ResponseEntity responseEntity;
         String responseBody;
+        String errorMessage = "Error in resetting password for student {}: {}";
 
         try {
             responseEntity = restTemplate.exchange(properties.changePasswordStudent(), HttpMethod.POST, request, String.class);
@@ -1453,17 +1454,17 @@ public class AdapterDeterLab {
 
             if (responseJsonObject.has(ERROR)) {
                 String deterError = responseJsonObject.getString(ERROR);
-                log.warn("Error in resetting password for student {}: {}", nclUid, deterError);
+                log.warn(errorMessage, nclUid, deterError);
                 throw new DeterLabOperationFailedException(deterError);
             }
 
             log.info("Password for student {} was reset", nclUid);
 
         }  catch (ResourceAccessException resourceAccessException) {
-            log.warn("Error in resetting password for student {}: {}", nclUid, resourceAccessException);
+            log.warn(errorMessage, nclUid, resourceAccessException);
             throw new AdapterConnectionException(resourceAccessException.getMessage());
         } catch (HttpServerErrorException httpServerErrorException) {
-            log.warn("Error in resetting password for student {}: {}", nclUid, httpServerErrorException);
+            log.warn(errorMessage, nclUid, httpServerErrorException);
             throw new AdapterInternalErrorException();
         }
     }
