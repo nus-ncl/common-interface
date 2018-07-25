@@ -79,7 +79,7 @@ public class TeamServiceImpl implements TeamService {
         entity.setStatus(TeamStatus.PENDING);
 
         final Team savedTeam = teamRepository.save(entity);
-        log.info("New team created and saved: {}", savedTeam);
+        log.info("New team created and saved: {}", savedTeam.getId());
 
         return savedTeam;
     }

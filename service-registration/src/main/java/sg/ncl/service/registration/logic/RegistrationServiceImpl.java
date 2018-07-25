@@ -28,6 +28,7 @@ import sg.ncl.service.team.data.jpa.TeamMemberEntity;
 import sg.ncl.service.team.domain.*;
 import sg.ncl.service.team.exceptions.TeamNotFoundException;
 import sg.ncl.service.team.web.TeamMemberInfo;
+import sg.ncl.service.user.data.jpa.AddressEntity;
 import sg.ncl.service.user.data.jpa.UserDetailsEntity;
 import sg.ncl.service.user.data.jpa.UserEntity;
 import sg.ncl.service.user.domain.User;
@@ -62,9 +63,10 @@ public class RegistrationServiceImpl implements RegistrationService {
     private static final String INSTITUTION = "institution";
     private static final String COUNTRY = "country";
     private static final String ADMIN_EMAIL = "ncl-admin@ncl.sg";
-    private static final String TESTBED_EMAIL = "NCL Testbed Ops <testbed-ops@ncl.sg>";
+    private static final String TESTBED_EMAIL = "NCL Operations <testbed-ops@ncl.sg>";
     private static final String USER_IN_NOT_A_TEAM_OWNER = "User {} is not a team owner of Team {}";
     private static final String TEAM_NOT_FOUND = "Team {} NOT found";
+    private static final String USER_NOT_FOUND = "User {} NOT found";
 
     private final CredentialsService credentialsService;
     private final TeamService teamService;
@@ -419,11 +421,6 @@ public class RegistrationServiceImpl implements RegistrationService {
             teamService.updateMemberStatus(teamId, ownerId, MemberStatus.APPROVED);
             adapterResult = adapterDeterLab.approveProject(one.toString());
 
-            // Tran: start to set up class if new project is class
-            if (team.getIsClass()) {
-                adapterDeterLab.setUpClass(ownerId, teamId);
-            }
-
             sendReplyCreateTeamEmail(user, team, status, reason);
         } else {
             // FIX ME may need to be more specific and check if TeamStatus is REJECTED
@@ -717,162 +714,128 @@ public class RegistrationServiceImpl implements RegistrationService {
     }
 
     private static void checkUserId(final String id) {
-        if(id == null || id.trim().isEmpty()) {
+        if (id == null || id.trim().isEmpty()) {
             log.warn("User ID is null or empty: {}", id);
             throw new UserIdNullOrEmptyException();
         }
     }
 
     private static void checkTeamId(final String id) {
-        if(id == null || id.trim().isEmpty()) {
+        if (id == null || id.trim().isEmpty()) {
             log.warn("Team ID is null or empty: {}", id);
             throw new TeamIdNullOrEmptyException();
         }
     }
 
-    private static void checkTeamName (final String name) {
-        if(name == null || name.trim().isEmpty()) {
+    private static void checkTeamName(final String name) {
+        if (name == null || name.trim().isEmpty()) {
             log.warn("Team name is null or empty: {}", name);
             throw new TeamNameNullOrEmptyException();
         }
     }
 
-
+    /**
+     * register a number of student members to the specified team
+     * this function only works for class project
+     * need to be invoked by the project/team leader
+     *
+     * @param teamId   team id, e.g., efa8bd9c-07da-4e31-8586-540f63c0fc81
+     * @param leaderId team leader id, e.g., 187e266e-5a30-43a5-abad-3010e19bdc6a
+     * @param emails   a String in the format "hello+111-25@gmail.com\r\nhello-111.25@gmail.com\r\nhello.111_25@gmail.com"
+     * @return
+     */
     @Override
     @Transactional
-    public String addMemberByEmail(String teamId, String leaderId, String emails) {
-        Team team = teamService.getTeamById(teamId);
-        log.info("Adding members by emails to team {}", team.getName());
+    public void addStudentsByEmail(String teamId, String leaderId, String emails) {
 
         if (!teamService.isOwner(teamId, leaderId)) {
-            log.warn("Access denied for {} : /teams/addMember POST", leaderId, teamId);
+            log.warn("Access denied for {} : /registrations/teams/{}/students POST", leaderId, teamId);
             throw new ForbiddenException();
         }
 
-        String listOfEmails = new JSONObject(emails).getString("emails");
-        int size = listOfEmails.length();
-        listOfEmails = listOfEmails.substring(1,size-1);
-        String[] emailsSplit = listOfEmails.split(",");
-
-        UserEntity leader = (UserEntity)userService.getUser(leaderId);
-
-        Map <String, String> listOfSioUid = new HashMap();
-        for (int i = 0; i< emailsSplit.length; i++) {
-
-            String newEmail =emailsSplit[i].substring(1, emailsSplit[i].length() - 1);
-            //create new member
-            UserEntity newMember = new UserEntity();
-            newMember.setApplicationDate(ZonedDateTime.now());
-            newMember.setProcessedDate(null);
-
-            UserDetailsEntity userDetailsEntity = new UserDetailsEntity();
-            userDetailsEntity.setAddress(leader.getUserDetails().getAddress());
-            userDetailsEntity.setFirstName(leader.getUserDetails().getFirstName());
-            userDetailsEntity.setLastName(leader.getUserDetails().getLastName());
-            userDetailsEntity.setInstitution(leader.getUserDetails().getInstitution());
-            userDetailsEntity.setInstitutionAbbreviation(leader.getUserDetails().getInstitutionAbbreviation());
-            userDetailsEntity.setInstitutionWeb(leader.getUserDetails().getInstitutionWeb());
-            userDetailsEntity.setJobTitle(leader.getUserDetails().getJobTitle());
-            userDetailsEntity.setPhone(leader.getUserDetails().getPhone());
-            userDetailsEntity.setEmail(newEmail);
-
-            newMember.setUserDetails(userDetailsEntity);
-
-            User unverifiedUser = userService.createUser(newMember);
-            //log.info("debug: {}", (UserEntity)created_User.getIs
-            log.info("Adding members by emails: created new member {} successful", unverifiedUser.getId());
-
-            // add credentials
-            String randomPassword =  RandomStringUtils.randomAlphanumeric(20);
-            final CredentialsInfo credentialsInfo = new CredentialsInfo(unverifiedUser.getId(), newEmail, randomPassword, CredentialsStatus.ACTIVE, new HashSet<>(Arrays.asList(Role.USER)));
-            credentialsService.addCredentials(credentialsInfo);
-            log.info("Adding members by emails: created new member credentials {} successful", unverifiedUser.getId());
-
-            //add team
-            userService.addTeam(unverifiedUser.getId(), teamId);
-
-            //add member
-            TeamMemberEntity teamMemberEntity = new TeamMemberEntity();
-            teamMemberEntity.setUserId(unverifiedUser.getId());
-            teamMemberEntity.setJoinedDate(ZonedDateTime.now());
-            teamMemberEntity.setMemberType( MemberType.MEMBER);
-            TeamMemberInfo teamMemberInfo = new TeamMemberInfo(teamMemberEntity);
-
-            teamService.addMember(teamId, teamMemberInfo);
-            log.info("Adding members by emails: added new member {} to team {} successful", unverifiedUser.getId(), team.getName());
-
-            // update member status to approved - class members are automatically approved
-            User verifiedUser = userService.verifyUserEmail(unverifiedUser.getId(), unverifiedUser.getUserDetails().getEmail(), unverifiedUser.getVerificationKey());
-            approveNewMember(teamId, verifiedUser.getId(), leader);
-            log.info("Adding members by emails: approve new member {} to team {} in sio database successful", verifiedUser.getId(), team.getName());
-            listOfSioUid.put(newEmail, verifiedUser.getId());
-        }
-
-
-        String  listOfDeterUid= adapterDeterLab.addMemberByEmail(teamId, leaderId, emails);
-        log.info("Adding members by emails to team {}: Send deterlab request successful", team.getName());
-
-
-        // save the mapping between deter an sio user id
-        JSONObject responseJsonObject = new JSONObject(listOfDeterUid);
-        for (int i = 0; i < emailsSplit.length; i++) {
-            String newEmail = emailsSplit[i].substring(1, emailsSplit[i].length() - 1);
-            if (responseJsonObject.has(newEmail)) {
-                String deterUid = responseJsonObject.getString(newEmail);
-                String nclUid = listOfSioUid.get(newEmail);
-                adapterDeterLab.saveDeterUserIdMapping(deterUid, nclUid);
-                log.info("Adding members by emails to team {}: Saved the mapping between deter and sio uid for email {} was successful", team.getName(), newEmail);
-            } else {
-                log.warn("Error in adding members by emails to team {}: user with email {} was not created", team.getName(), newEmail);
-                throw new DeterLabOperationFailedException("Error in adding members by emails to team " + team.getName() + ": user with email" + newEmail + "was not found");
-            }
-        }
-
-
-        // if everything is fine , now start to send email
-        for (int i = 0; i < emailsSplit.length; i++) {
-            String newEmail = emailsSplit[i].substring(1, emailsSplit[i].length() - 1);
-            //email is username in credentials table
-            credentialsService.addPasswordResetRequestForNewClassMember(newEmail, team.getName());
-            log.info("Adding members to {} by emails: sending email to {} successful",team.getName(), newEmail);
-        }
-
-        return "success";
-    }
-
-    @Override
-    @Transactional
-    public String resetPasswordNewMember(String uid, String firstName, String lastName, String phone, String key, String newPassword) {
-
-        credentialsService.newMemberResetPassword(uid, key, newPassword);
-        log.info("Activating new class member {}: password updated successful", uid);
-
-        userService.updateInformationNewMember(uid, firstName, lastName, phone);
-        log.info("Activating new class member {}: information updated successful", uid);
-
-        adapterDeterLab.newMemberResetPassword(uid, firstName, lastName, phone, newPassword);
-        log.info("Activating new class member {}: Updating Deterlab sucessful", uid);
-        return "success";
-    }
-
-    // this function is used to approve new member only in SIO database and not deterlab
-    private void approveNewMember(String teamId, String userId, User approver) {
-        User user = userService.getUser(userId);
-
-        if (!teamService.isOwner(teamId, approver.getId())) {
-            log.warn(USER_IN_NOT_A_TEAM_OWNER, approver.getId(), teamId);
-            throw new UserIsNotTeamOwnerException();
-        }
         Team team = teamService.getTeamById(teamId);
         if (team == null) {
             log.warn(TEAM_NOT_FOUND, teamId);
             throw new TeamNotFoundException(teamId);
         }
 
-        if ((UserStatus.PENDING).equals(user.getStatus())) {
-            userService.updateUserStatus(userId, UserStatus.APPROVED);
+        User leader = userService.getUser(leaderId);
+        if (leader == null) {
+            log.warn(USER_NOT_FOUND, leaderId);
+            throw new UserNotFoundException(leaderId);
         }
-        teamService.updateMemberStatus(teamId, userId, MemberStatus.APPROVED);
+
+        String[] emailsSplit = emails.split("\\r?\\n");
+        Map<String, String> listOfSioUid = new HashMap();
+
+        for (int i = 0; i < emailsSplit.length; i++) {
+
+            String email = emailsSplit[i];
+
+            //create new user
+            UserEntity userEntity = new UserEntity();
+            userEntity.setApplicationDate(ZonedDateTime.now());
+            userEntity.setProcessedDate(ZonedDateTime.now());
+
+            UserDetailsEntity userDetailsEntity = new UserDetailsEntity();
+            userDetailsEntity.setAddress(AddressEntity.get(leader.getUserDetails().getAddress()));
+            userDetailsEntity.setFirstName(email.substring(0, email.indexOf("@")));
+            userDetailsEntity.setLastName(team.getName());
+            userDetailsEntity.setInstitution(leader.getUserDetails().getInstitution());
+            userDetailsEntity.setInstitutionAbbreviation(leader.getUserDetails().getInstitutionAbbreviation());
+            userDetailsEntity.setInstitutionWeb(leader.getUserDetails().getInstitutionWeb());
+            userDetailsEntity.setJobTitle("Student");
+            userDetailsEntity.setPhone(leader.getUserDetails().getPhone());
+            userDetailsEntity.setEmail(email);
+
+            userEntity.setUserDetails(userDetailsEntity);
+
+            User createdUser = userService.createUser(userEntity);
+            userService.verifyUserEmail(createdUser.getId(), email, createdUser.getVerificationKey());
+            userService.updateUserStatus(createdUser.getId(), UserStatus.APPROVED);
+            userService.addTeam(createdUser.getId(), teamId);
+
+            // add credentials
+            String randomPassword = RandomStringUtils.randomAlphanumeric(20);
+            final CredentialsInfo credentialsInfo = new CredentialsInfo(createdUser.getId(), email, randomPassword, CredentialsStatus.ACTIVE, new HashSet<>(Arrays.asList(Role.USER)));
+            credentialsService.addCredentials(credentialsInfo);
+
+            //add member
+            TeamMemberEntity teamMemberEntity = new TeamMemberEntity();
+            teamMemberEntity.setUserId(createdUser.getId());
+            teamMemberEntity.setJoinedDate(ZonedDateTime.now());
+            teamMemberEntity.setMemberType(MemberType.MEMBER);
+            teamMemberEntity.setMemberStatus(MemberStatus.APPROVED);
+            TeamMemberInfo teamMemberInfo = new TeamMemberInfo(teamMemberEntity);
+
+            teamService.addMember(teamId, teamMemberInfo);
+
+            listOfSioUid.put(email, createdUser.getId());
+        }
+
+        // add the new members on DeterLab
+        String listOfDeterUid = adapterDeterLab.addStudentsByEmail(teamId, leaderId, emails);
+
+        // save the mapping between deter an sio user id
+        JSONObject responseJsonObject = new JSONObject(listOfDeterUid);
+        for (int i = 0; i < emailsSplit.length; i++) {
+            String email = emailsSplit[i];
+            if (responseJsonObject.has(email)) {
+                String deterUid = responseJsonObject.getString(email);
+                String nclUid = listOfSioUid.get(email);
+                adapterDeterLab.saveDeterUserIdMapping(deterUid, nclUid);
+            } else {
+                log.warn("Error in adding students to team {}: user {} was not created", team.getName(), email);
+                throw new DeterLabOperationFailedException("User " + email + " was not created");
+            }
+        }
+
+        // if everything is fine , now start to send email
+        for (int i = 0; i < emailsSplit.length; i++) {
+            String email = emailsSplit[i];
+            //email is username in credentials table
+            credentialsService.addPasswordResetRequestForStudent(email, team.getName());
+        }
     }
 
 }

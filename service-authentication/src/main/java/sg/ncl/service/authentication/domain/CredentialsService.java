@@ -33,9 +33,9 @@ public interface CredentialsService {
 
     boolean verifyPassword(String id, String password);
 
-    void addPasswordResetRequestForNewClassMember(String username, String projectName);
+    void addPasswordResetRequestForStudent(String username, String projectName);
 
-    void newMemberResetPassword(String uid, String key, String newPassword);
+    void changePasswordStudent(String uid, String key, String newPassword);
 
-    void resetKey(String uid);
+    void resetKeyStudent(String uid);
 }

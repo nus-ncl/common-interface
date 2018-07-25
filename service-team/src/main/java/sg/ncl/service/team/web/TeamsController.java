@@ -105,9 +105,16 @@ public class TeamsController {
 
     @PutMapping(path = "/{id}")
     @ResponseStatus(HttpStatus.OK)
-    public Team updateTeam(@PathVariable final String id, @RequestBody final TeamInfo team) {
+    public Team updateTeam(@PathVariable final String id, @RequestBody final TeamInfo team,
+                           @AuthenticationPrincipal final Object claims) {
         if (SecurityContextHolder.getContext().getAuthentication() == null) {
             log.warn("Access denied for: /teams/{} PUT", id);
+            throw new ForbiddenException();
+        }
+        //check if team owner
+        String userId = ((Claims) claims).getSubject();
+        if (!teamService.isOwner(id, userId)) {
+            log.warn("Access denied for {} : /teams/{} PUT", userId, id);
             throw new ForbiddenException();
         }
         return new TeamInfo(teamService.updateTeam(id, team));

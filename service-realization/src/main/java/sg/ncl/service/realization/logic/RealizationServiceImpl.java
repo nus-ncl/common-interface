@@ -84,7 +84,7 @@ public class RealizationServiceImpl implements RealizationService {
         RealizationEntity realizationEntity = realizationRepository.findByExperimentId(experimentId);
 
         if (realizationEntity != null && realizationEntity.getId() > 0) {
-            log.info("Retrieved realization entity: {}", realizationEntity);
+            log.info("Retrieved realization entity {}", realizationEntity.getId());
             String result = adapterDeterLab.getExperimentStatus(teamName, realizationEntity.getExperimentName());
 
             log.info("Retrieved deterlab exp status...Exp: {} State: {}", realizationEntity.getExperimentName(), result);

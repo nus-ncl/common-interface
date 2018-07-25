@@ -40,7 +40,8 @@ public class AdapterDeterLab {
 
     private static final String ERROR_IN_ADDING_MEMBERS_BY_EMAILS = "Error in adding members by emails to team {}: {}";
     private static final String ERROR = "error";
-    private static String UID = "uid";
+    private static final String PID = "pid";
+    private static final String UID = "uid";
     @Inject
     public AdapterDeterLab(DeterLabUserRepository repository, DeterLabProjectRepository deterLabProjectRepository, ConnectionProperties connectionProperties, RestTemplate restTemplate) {
         this.deterLabUserRepository = repository;
@@ -365,7 +366,7 @@ public class AdapterDeterLab {
      * @param jsonString Contains id, userId, teamId, teamName, name (experiment name), description, nsFile, nsFileContent, idleSwap, maxDuration, deterLogin (deter userId), userServerUri
      */
     public void createExperiment(String jsonString) {
-        log.info("Creating experiment to {} at {}: {}", properties.getIp(), properties.getPort(), jsonString);
+        // log.info("Creating experiment to {} at {}: {}", properties.getIp(), properties.getPort(), jsonString);
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
@@ -585,7 +586,7 @@ public class AdapterDeterLab {
      */
     public String getExperimentStatus(String teamName, String experimentName) {
         JSONObject jsonObject = new JSONObject();
-        jsonObject.put("pid", teamName);
+        jsonObject.put(PID, teamName);
         jsonObject.put("eid", experimentName);
         String jsonString = jsonObject.toString();
 
@@ -615,7 +616,7 @@ public class AdapterDeterLab {
             log.warn("NOT enough inputs: {}", jsonString);
             throw new IllegalArgumentException();
         }
-        String pid = request.getString("pid");
+        String pid = request.getString(PID);
         String approverUid = request.getString("approverUid");
         String uid = request.getString(UID);
         String gid = request.getString("gid");
@@ -663,7 +664,7 @@ public class AdapterDeterLab {
 
     public String approveProject(String jsonString) {
         // for ncl admins to approve teams
-        String pid = new JSONObject(jsonString).getString("pid");
+        String pid = new JSONObject(jsonString).getString(PID);
         log.info("Approving team {}: {}", pid, jsonString);
 
         HttpHeaders headers = new HttpHeaders();
@@ -694,7 +695,7 @@ public class AdapterDeterLab {
 
     public String rejectProject(String jsonString) {
         // for ncl admins to reject teams
-        String pid = new JSONObject(jsonString).getString("pid");
+        String pid = new JSONObject(jsonString).getString(PID);
         log.info("Rejecting team {}: {}", pid, jsonString);
 
         HttpHeaders headers = new HttpHeaders();
@@ -786,7 +787,7 @@ public class AdapterDeterLab {
         log.info("Getting list of experiments for project: {}", pid);
 
         JSONObject json = new JSONObject();
-        json.put("pid", pid);
+        json.put(PID, pid);
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
@@ -820,7 +821,7 @@ public class AdapterDeterLab {
         log.info("Getting experiment status for {}/{}", pid, expName);
 
         JSONObject json = new JSONObject();
-        json.put("pid", pid);
+        json.put(PID, pid);
         json.put("eid", expName);
 
         HttpHeaders headers = new HttpHeaders();
@@ -946,7 +947,7 @@ public class AdapterDeterLab {
         // start : mm/dd/yy
         // end : mm/dd/yy
         JSONObject tmp = new JSONObject();
-        tmp.put("pid", deterLabProjectRepository.findByNclTeamId(teamId).getDeterProjectId());
+        tmp.put(PID, deterLabProjectRepository.findByNclTeamId(teamId).getDeterProjectId());
         tmp.put("start", startDate);
         tmp.put("end", endDate);
 
@@ -986,7 +987,7 @@ public class AdapterDeterLab {
         log.info("Getting list of saved images for project: {}", pid);
 
         JSONObject json = new JSONObject();
-        json.put("pid", pid);
+        json.put(PID, pid);
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
@@ -1012,7 +1013,7 @@ public class AdapterDeterLab {
         log.info("Saving image: pid {}, uid {}, node ID {}, image name {}", pid, uid, nodeId, imageName);
 
         JSONObject json = new JSONObject();
-        json.put("pid", pid);
+        json.put(PID, pid);
         json.put(UID, uid);
         json.put("nodeId", nodeId);
         json.put("imageName", imageName);
@@ -1052,7 +1053,7 @@ public class AdapterDeterLab {
 
         log.info("Deleting image '{}' from uid '{}' of pid '{}'", imageName, uid, pid);
         JSONObject jsonObject = new JSONObject();
-        jsonObject.put("pid", pid);
+        jsonObject.put(PID, pid);
         jsonObject.put(UID, uid);
         jsonObject.put("imageName", imageName);
 
@@ -1117,7 +1118,7 @@ public class AdapterDeterLab {
         log.info("Removing user {} from team {} requested by owner {}", uid, pid, ownerUid);
 
         JSONObject json = new JSONObject();
-        json.put("pid", pid);
+        json.put(PID, pid);
         json.put("uidToBeRemoved", uid);
         json.put("ownerUid", ownerUid);
 
@@ -1168,7 +1169,7 @@ public class AdapterDeterLab {
         JSONObject jsonObject = new JSONObject();
         jsonObject.put("httpCommand", httpCommand.toString());
         jsonObject.put("deterLogin", getDeterUserIdByNclUserId(nclUserId));
-        jsonObject.put("pid", teamName);
+        jsonObject.put(PID, teamName);
         jsonObject.put("eid", experimentName);
 
         return jsonObject.toString();
@@ -1243,46 +1244,42 @@ public class AdapterDeterLab {
         }
     }
     /**
-     *Sending request to deterlab to add members by emails
+     *Sending request to deterlab to add student members by email
+     *
      * @param nclTeamId
      * @param nclUserId
      * @param emails
      * @return dictionary with keys are emails and values are newly created deterlab UID
      */
 
-    public String addMemberByEmail(String nclTeamId, String nclUserId, String emails){
+    public String addStudentsByEmail(String nclTeamId, String nclUserId, String emails) {
+
+        log.info("Adding members to team {}", nclTeamId);
         final String deterPid = getDeterProjectIdByNclTeamId(nclTeamId) ;
         final String deterUid = getDeterUserIdByNclUserId(nclUserId);
 
-        log.info("Adding members by emails to project {}", deterPid);
-        String listOfEmails = new JSONObject(emails).getString("emails");
-
         JSONObject jsonObject = new JSONObject();
-        jsonObject.put("pid", deterPid);
-        jsonObject.put("uid", deterUid);
-        jsonObject.put("emails", listOfEmails);
+        jsonObject.put(PID, deterPid);
+        jsonObject.put(UID, deterUid);
+        jsonObject.put("emails", emails);
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
         HttpEntity<String> request = new HttpEntity<>(jsonObject.toString(), headers);
 
-        ResponseEntity responseEntity = null;
-        String responseBody = null;
-
         try {
-            responseEntity = restTemplate.exchange(properties.addMemberByEmail(), HttpMethod.POST, request, String.class);
-            responseBody = responseEntity.getBody().toString();
+            ResponseEntity responseEntity = restTemplate.exchange(properties.addStudentsByEmail(), HttpMethod.POST, request, String.class);
+            String responseBody = responseEntity.getBody().toString();
             JSONObject responseJsonObject = new JSONObject(responseBody);
 
             if (responseJsonObject.has(ERROR)) {
                 String deterError = responseJsonObject.getString(ERROR);
                 log.warn(ERROR_IN_ADDING_MEMBERS_BY_EMAILS, nclTeamId, deterError);
-                if ("Invalid address".equals(deterError)) {
-                    throw new InvalidEmailAddressException();
-                } else  {
-                    throw new DeterLabOperationFailedException(deterError);
-                }
+                throw new DeterLabOperationFailedException(deterError);
             }
+
+            log.info("Adding members to team {} succeeded", nclTeamId);
+            return responseBody;
 
         } catch (ResourceAccessException resourceAccessException) {
             log.warn(ERROR_IN_ADDING_MEMBERS_BY_EMAILS, deterPid, resourceAccessException);
@@ -1291,68 +1288,28 @@ public class AdapterDeterLab {
             log.warn(ERROR_IN_ADDING_MEMBERS_BY_EMAILS, deterPid , httpServerErrorException);
             throw new AdapterInternalErrorException();
         }
-        log.info("Adding members by emails to project {} successful", deterPid);
-        return responseBody;
+
     }
 
     /**
-     *set Up Class for new members
-     * @param nclUserId
-     * @param nclTeamId
-     * @return void
-     */
-
-    public void setUpClass(String nclUserId, String nclTeamId) {
-        log.info("Setting up class for project {}", nclTeamId);
-        final String deterlabPid = getDeterProjectIdByNclTeamId(nclTeamId) ;
-        final String deterlabUid = getDeterUserIdByNclUserId(nclUserId);
-
-        JSONObject jsonObject = new JSONObject();
-        jsonObject.put("pid", deterlabPid);
-        jsonObject.put("uid", deterlabUid);
-
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_JSON);
-        HttpEntity<String> request = new HttpEntity<>(jsonObject.toString(), headers);
-
-        ResponseEntity responseEntity = null;
-
-        try {
-            responseEntity = restTemplate.exchange(properties.setUpClass(), HttpMethod.POST, request, String.class);
-            String responseBody = responseEntity.getBody().toString();
-            JSONObject responseJsonObject = new JSONObject(responseBody);
-
-            if (!responseJsonObject.has("msg")) {
-                log.warn("Error in setting up class for project {} : {} ", nclTeamId, "Unknown error");
-                throw new DeterLabOperationFailedException("Unknown error");
-            }
-
-        } catch (ResourceAccessException resourceAccessException) {
-            log.warn("Error in setting up class for project {}: {}", nclTeamId, resourceAccessException);
-            throw new AdapterConnectionException(resourceAccessException.getMessage());
-        } catch (HttpServerErrorException httpServerErrorException) {
-            log.warn("Error in setting up class for project {}: {}", nclTeamId, httpServerErrorException);
-            throw new AdapterInternalErrorException();
-        }
-    }
-
-    /**
-     * Send deterlab request to reset password , phone, first and last name when user click on the "Reset password" link in email
+     * Send request to DeterLab reset password, phone, first and last name when student click on the "Reset password" link in email
+     *
      * @param nclUid
      * @param firstName
      * @param phone
-     * @param newPassword
+     * @param password
      * @return void
      */
 
-    public void newMemberResetPassword(String nclUid, String firstName, String lastName, String phone, String newPassword) {
+    public void changePasswordStudent(String nclUid, String firstName, String lastName, String phone, String password) {
+
+        log.info("Resetting password for student {}", nclUid);
 
         final String deterUid = getDeterUserIdByNclUserId(nclUid);
 
-        log.info("Resetting password for new member {}", deterUid);
         JSONObject jsonObject = new JSONObject();
         jsonObject.put("uid", deterUid);
-        jsonObject.put("newPassword", newPassword);
+        jsonObject.put("password", password);
         jsonObject.put("firstName", firstName);
         jsonObject.put("lastName", lastName);
         jsonObject.put("phone", phone);
@@ -1360,36 +1317,30 @@ public class AdapterDeterLab {
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
         HttpEntity<String> request = new HttpEntity<>(jsonObject.toString(), headers);
-        ResponseEntity responseEntity = null;
+        ResponseEntity responseEntity;
         String responseBody;
 
         try {
-            responseEntity = restTemplate.exchange(properties.resetPasswordNewMember(), HttpMethod.POST, request, String.class);
+            responseEntity = restTemplate.exchange(properties.changePasswordStudent(), HttpMethod.POST, request, String.class);
             responseBody = responseEntity.getBody().toString();
 
             JSONObject responseJsonObject = new JSONObject(responseBody);
 
             if (responseJsonObject.has(ERROR)) {
                 String deterError = responseJsonObject.getString(ERROR);
-                log.warn("Error in resetting password for new member {}: {}", deterUid, deterError);
-                if ("Password is not supplied".equals(deterError)) {
-                    throw new InvalidPasswordException();
-                } else if ("First or last name is not valid".equals(deterError)) {
-                    throw new InvalidUsernameException(deterError);
-                } else {
-                    throw new DeterLabOperationFailedException(deterError);
-                }
+                log.warn("Error in resetting password for student {}: {}", nclUid, deterError);
+                throw new DeterLabOperationFailedException(deterError);
             }
+
+            log.info("Password for student {} was reset", nclUid);
+
         }  catch (ResourceAccessException resourceAccessException) {
-            log.warn("Error in resetting password for new member {}: {}", deterUid, resourceAccessException);
+            log.warn("Error in resetting password for student {}: {}", nclUid, resourceAccessException);
             throw new AdapterConnectionException(resourceAccessException.getMessage());
         } catch (HttpServerErrorException httpServerErrorException) {
-            log.warn("Error in resetting password for new member {}}: {}", deterUid, httpServerErrorException);
+            log.warn("Error in resetting password for student {}: {}", nclUid, httpServerErrorException);
             throw new AdapterInternalErrorException();
         }
-
-        log.info("Resetting password for new member {} is successful", deterUid);
-
     }
 
 }

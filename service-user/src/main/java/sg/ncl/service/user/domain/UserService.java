@@ -34,4 +34,6 @@ public interface UserService {
 
     void updateInformationNewMember(String uid, String firstName, String lastName, String phone);
 
+    User changePasswordStudent(final String uid, final String firstName, final String lastName, final String phone, final String password, final String key);
+
 }

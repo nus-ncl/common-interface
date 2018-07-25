@@ -33,7 +33,7 @@ import java.io.IOException;
 public class AuthenticationApplication {
 
     private static final String RESET_EMAIL_TEMPLATE_NAME = "passwordResetEmailTemplate.ftl";
-    private static final String NEW_CLASS_MEMBER_RESET_PW_TEMPLATE= "newClassMemberResetPasswordTemplate.ftl";
+    private static final String STUDENT_RESET_PW_TEMPLATE = "studentResetPasswordTemplate.ftl";
 
 
     public static void main(final String[] args) {
@@ -48,8 +48,8 @@ public class AuthenticationApplication {
     }
 
     @Bean
-    Template newClassMemberResetPasswordTemplate(final Configuration configuration)throws IOException {
-        return configuration.getTemplate(NEW_CLASS_MEMBER_RESET_PW_TEMPLATE);
+    Template studentResetPasswordTemplate(final Configuration configuration)throws IOException {
+        return configuration.getTemplate(STUDENT_RESET_PW_TEMPLATE);
     }
 
 }

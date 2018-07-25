@@ -7,6 +7,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
+import sg.ncl.common.exception.base.BadRequestException;
+import sg.ncl.common.exception.base.ForbiddenException;
 import sg.ncl.service.registration.domain.Registration;
 import sg.ncl.service.registration.domain.RegistrationService;
 import sg.ncl.service.team.domain.TeamStatus;
@@ -16,8 +18,6 @@ import javax.inject.Inject;
 import javax.validation.constraints.NotNull;
 import java.util.HashMap;
 import java.util.Map;
-
-import static sg.ncl.service.authentication.validation.Validator.checkClaimsType;
 
 /**
  * @author Te Ye & Desmond
@@ -112,28 +112,33 @@ public class RegistrationController {
         return registrationService.verifyEmail(id, email, keyInfo.getKey());
     }
 
-    // add members by emails
-    @PostMapping(path ="/{teamId}/addMembers")
+    /**
+     * register a number of student members to the specified team
+     * this function only works for class project
+     * need to be invoked by the project/team leader
+     *
+     * @param id team id, e.g., efa8bd9c-07da-4e31-8586-540f63c0fc81
+     * @param emails a String in the format "hello+111-25@gmail.com\r\nhello-111.25@gmail.com\r\nhello.111_25@gmail.com"
+     * @param claims
+     * @return
+     */
+    @PostMapping(path ="/teams/{id}/students")
     @ResponseStatus(HttpStatus.OK)
-    public String addMemberByEmail(@PathVariable final String teamId,
-                                   @RequestBody final String emails,
-                                   @AuthenticationPrincipal final Object claims) {
+    public void addStudentsByEmail(@PathVariable final String id,
+                                     @RequestBody final String emails,
+                                     @AuthenticationPrincipal final Object claims) {
+        if (!(claims instanceof Claims)) {
+            // throw forbidden
+            log.warn("Invalid authentication principal: {}", claims);
+            throw new ForbiddenException();
+        }
+
         String leaderId = ((Claims) claims).getSubject();
+        if (leaderId == null || leaderId.isEmpty()) {
+            log.warn("Team leader ID is not supplied");
+            throw new BadRequestException("Team leader ID is not supplied");
+        }
 
-        return registrationService.addMemberByEmail(teamId, leaderId, emails);
-    }
-
-    //activate new member
-    @PutMapping(path="{uid}/resetPasswordNewMember")
-    @ResponseStatus(HttpStatus.OK)
-    public String resetPasswordNewMember(@PathVariable String uid,
-                                         @RequestBody NewMemberResetPasswordInfo newMemberResetPasswordInfo) {
-        String firstName = newMemberResetPasswordInfo.getFirstName();
-        String lastName = newMemberResetPasswordInfo.getLastName();
-        String phone = newMemberResetPasswordInfo.getPhone();
-        String key = newMemberResetPasswordInfo.getKey();
-        String newPassword = newMemberResetPasswordInfo.getNewPassword();
-
-        return registrationService.resetPasswordNewMember(uid, firstName, lastName, phone, key, newPassword);
+        registrationService.addStudentsByEmail(id, leaderId, emails);
     }
 }
