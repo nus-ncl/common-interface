@@ -585,4 +585,41 @@ public class TeamServiceImplTest {
         int quota = teamService.checkTeamQuota(teamEntity.getName());
         assertThat(quota).isEqualTo(1);
     }
+
+    @Test
+    public void getReservationStatus() {
+        String teamId = RandomStringUtils.randomAlphanumeric(20);
+        String reservation = RandomStringUtils.randomAlphanumeric(20);
+
+        when(adapterDeterLab.getReservationStatus(teamId)).thenReturn(reservation);
+
+        String result = teamService.getReservationStatus(teamId);
+        assertThat(result).isEqualTo(reservation);
+    }
+
+    @Test
+    public void releaseNodes() {
+        String teamId = RandomStringUtils.randomAlphanumeric(20);
+        String reservation = RandomStringUtils.randomAlphanumeric(20);
+        int numNodes = Integer.parseInt(RandomStringUtils.randomNumeric(3));
+
+        when(adapterDeterLab.releaseNodes(teamId, numNodes)).thenReturn(reservation);
+
+        String result = teamService.releaseNodes(teamId, numNodes);
+        assertThat(result).isEqualTo(reservation);
+    }
+
+    @Test
+    public void reserveNodes() {
+        String teamId = RandomStringUtils.randomAlphanumeric(20);
+        String reservation = RandomStringUtils.randomAlphanumeric(20);
+        String machineType = RandomStringUtils.randomAlphanumeric(20);
+        int numNodes = Integer.parseInt(RandomStringUtils.randomNumeric(3));
+
+        when(adapterDeterLab.reserveNodes(teamId, numNodes, machineType)).thenReturn(reservation);
+
+        String result = teamService.reserveNodes(teamId, numNodes, machineType);
+        assertThat(result).isEqualTo(reservation);
+    }
+
 }

@@ -41,6 +41,7 @@ import java.util.List;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.*;
 import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyInt;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.mockingDetails;
 import static org.mockito.Mockito.when;
@@ -516,6 +517,142 @@ public class TeamsControllerTest {
                 .andExpect(jsonPath("$.privacy", is(equalTo(team.getPrivacy().name()))))
                 .andExpect(jsonPath("$.status", is(equalTo(team.getStatus().name()))))
                 .andExpect(jsonPath("$.members", is(equalTo(team.getMembers()))));
+    }
+
+    @Test
+    public void getReservationStatusGood() throws Exception {
+        String reservation = "{ \"status\" : \"good\", \"msg\" : [\"pcA\"] }";
+        final byte[] content = mapper.writeValueAsBytes(reservation);
+
+        when(securityContext.getAuthentication()).thenReturn(authentication);
+        when(teamService.getReservationStatus(anyString())).thenReturn(reservation);
+
+        mockMvc.perform(get(TeamsController.PATH + "/id/reservations").contentType(MediaType.APPLICATION_JSON).content(content))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$", hasKey("status")))
+                .andExpect(jsonPath("$.status", is(equalTo("good"))))
+                .andExpect(jsonPath("$", hasKey("msg")))
+                .andExpect(jsonPath("$.msg[0]", is(equalTo("pcA"))));
+    }
+
+    @Test
+    public void getReservationStatusForbidden() throws Exception {
+        when(securityContext.getAuthentication()).thenReturn(null);
+
+        mockMvc.perform(get(TeamsController.PATH + "/id/reservations").contentType(MediaType.APPLICATION_JSON).content(""))
+                .andExpect(status().isForbidden());
+    }
+
+    @Test
+    public void releaseNodesGood() throws Exception {
+        String reservation = "{ \"status\" : \"good\", \"released\" : [\"pcA\"] }";
+        final byte[] content = mapper.writeValueAsBytes(reservation);
+
+        final List<String> roles = new ArrayList<>();
+        roles.add(Role.ADMIN.getAuthority());
+
+        when(securityContext.getAuthentication()).thenReturn(authentication);
+        when(claims.get(JwtToken.KEY)).thenReturn(roles);
+        when(teamService.releaseNodes(anyString(), anyInt())).thenReturn(reservation);
+
+        mockMvc.perform(delete(TeamsController.PATH + "/id/reservations?numNodes=-1").contentType(MediaType.APPLICATION_JSON).content(content))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$", hasKey("status")))
+                .andExpect(jsonPath("$.status", is(equalTo("good"))))
+                .andExpect(jsonPath("$", hasKey("released")))
+                .andExpect(jsonPath("$.released[0]", is(equalTo("pcA"))));
+    }
+
+    @Test
+    public void releaseNodesGoodNumNodes() throws Exception {
+        String reservation = "{ \"status\" : \"good\", \"msg\" : [\"pcA\"] }";
+        final byte[] content = mapper.writeValueAsBytes(reservation);
+
+        final List<String> roles = new ArrayList<>();
+        roles.add(Role.ADMIN.getAuthority());
+
+        when(securityContext.getAuthentication()).thenReturn(authentication);
+        when(claims.get(JwtToken.KEY)).thenReturn(roles);
+        when(teamService.releaseNodes(anyString(), anyInt())).thenReturn(reservation);
+
+        mockMvc.perform(delete(TeamsController.PATH + "/id/reservations?numNodes=1").contentType(MediaType.APPLICATION_JSON).content(content))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$", hasKey("status")))
+                .andExpect(jsonPath("$.status", is(equalTo("good"))))
+                .andExpect(jsonPath("$", hasKey("msg")))
+                .andExpect(jsonPath("$.msg[0]", is(equalTo("pcA"))));
+    }
+
+    @Test
+    public void releaseNodesForbidden() throws Exception {
+        when(securityContext.getAuthentication()).thenReturn(null);
+
+        mockMvc.perform(delete(TeamsController.PATH + "/id/reservations?numNodes=1").contentType(MediaType.APPLICATION_JSON).content(""))
+                .andExpect(status().isForbidden());
+    }
+
+    @Test
+    public void releaseNodesNotAdmin() throws Exception {
+        when(securityContext.getAuthentication()).thenReturn(authentication);
+
+        mockMvc.perform(delete(TeamsController.PATH + "/id/reservations?numNodes=1").contentType(MediaType.APPLICATION_JSON).content(""))
+                .andExpect(status().isForbidden());
+    }
+
+    @Test
+    public void reserveNodesGood() throws Exception {
+        String reservation = "{ \"status\" : \"good\", \"msg\" : [\"pcA\"] }";
+        final byte[] content = mapper.writeValueAsBytes(reservation);
+
+        final List<String> roles = new ArrayList<>();
+        roles.add(Role.ADMIN.getAuthority());
+
+        when(securityContext.getAuthentication()).thenReturn(authentication);
+        when(claims.get(JwtToken.KEY)).thenReturn(roles);
+        when(teamService.reserveNodes(anyString(), anyInt(), anyString())).thenReturn(reservation);
+
+        mockMvc.perform(post(TeamsController.PATH + "/id/reservations?numNodes=1").contentType(MediaType.APPLICATION_JSON).content(content))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$", hasKey("status")))
+                .andExpect(jsonPath("$.status", is(equalTo("good"))))
+                .andExpect(jsonPath("$", hasKey("msg")))
+                .andExpect(jsonPath("$.msg[0]", is(equalTo("pcA"))));
+    }
+
+    @Test
+    public void reserveNodesGoodMachineType() throws Exception {
+        String reservation = "{ \"status\" : \"good\", \"msg\" : [\"pcA\"] }";
+        final byte[] content = mapper.writeValueAsBytes(reservation);
+
+        final List<String> roles = new ArrayList<>();
+        roles.add(Role.ADMIN.getAuthority());
+
+        when(securityContext.getAuthentication()).thenReturn(authentication);
+        when(claims.get(JwtToken.KEY)).thenReturn(roles);
+        when(teamService.reserveNodes(anyString(), anyInt(), anyString())).thenReturn(reservation);
+
+        mockMvc.perform(post(TeamsController.PATH + "/id/reservations?numNodes=1&machineType=machine").contentType(MediaType.APPLICATION_JSON).content(content))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$", hasKey("status")))
+                .andExpect(jsonPath("$.status", is(equalTo("good"))))
+                .andExpect(jsonPath("$", hasKey("msg")))
+                .andExpect(jsonPath("$.msg[0]", is(equalTo("pcA"))));
+    }
+
+    @Test
+    public void reserveNodesForbidden() throws Exception {
+        when(securityContext.getAuthentication()).thenReturn(null);
+
+        mockMvc.perform(post(TeamsController.PATH + "/id/reservations?numNodes=1&machineType=machine").contentType(MediaType.APPLICATION_JSON).content(""))
+                .andExpect(status().isForbidden());
+    }
+
+    @Test
+    public void reserveNodesNotAdmin() throws Exception {
+        when(securityContext.getAuthentication()).thenReturn(authentication);
+
+        mockMvc.perform(delete(TeamsController.PATH + "/id/reservations?numNodes=1&machineType=machine").contentType(MediaType.APPLICATION_JSON).content(""))
+                .andExpect(status().isForbidden());
     }
 
 }

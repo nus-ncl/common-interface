@@ -43,4 +43,9 @@ public interface TeamService {
 
     Boolean isMember(String teamId, String userId);
 
+    String getReservationStatus(String teamId);
+
+    String releaseNodes(String teamId, Integer numNodes);
+
+    String reserveNodes(String id, Integer numNodes, String machineType);
 }

@@ -1905,4 +1905,187 @@ public class AdapterDeterLabTest {
         assertThat(result).isEqualTo("0");
     }
 
+    @Test
+    public void getReservationStatusGood() {
+        DeterLabProjectEntity deterLabProjectEntity = new DeterLabProjectEntity();
+        JSONObject myobject = new JSONObject();
+        myobject.put("status", "OK");
+
+        when(restTemplate.exchange(anyString(),eq(HttpMethod.POST),anyObject(),eq(String.class))).thenReturn(response);
+        when(response.getBody()).thenReturn(myobject);
+        when(deterLabProjectRepository.findByNclTeamId(anyString())).thenReturn(deterLabProjectEntity);
+
+        String result = adapterDeterLab.getReservationStatus("teamId");
+
+        verify(restTemplate,times(1)).exchange(anyString(),eq(HttpMethod.POST),anyObject(),eq(String.class));
+        verify(properties,times(1)).getReservationStatus();
+        assertThat(result).isEqualTo(myobject.toString());
+    }
+
+    @Test
+    public void getReservationStatusDeterLabOperationFailed() {
+        exception.expect(DeterLabOperationFailedException.class);
+        DeterLabProjectEntity deterLabProjectEntity = new DeterLabProjectEntity();
+        JSONObject myobject = new JSONObject();
+        myobject.put("status", "FAIL");
+
+        when(restTemplate.exchange(anyString(),eq(HttpMethod.POST),anyObject(),eq(String.class))).thenReturn(response);
+        when(response.getBody()).thenReturn(myobject);
+        when(deterLabProjectRepository.findByNclTeamId(anyString())).thenReturn(deterLabProjectEntity);
+
+        adapterDeterLab.getReservationStatus("teamId");
+        verify(restTemplate,times(1)).exchange(anyString(),eq(HttpMethod.POST),anyObject(),eq(String.class));
+        verify(properties,times(1)).getReservationStatus();
+    }
+
+    @Test
+    public void getReservationStatusAdapterConnectionFailed() {
+        exception.expect(AdapterConnectionException.class);
+
+        DeterLabProjectEntity deterLabProjectEntity = new DeterLabProjectEntity();
+
+        when(restTemplate.exchange(anyString(),eq(HttpMethod.POST),anyObject(),eq(String.class))).thenThrow(new ResourceAccessException(""));
+        when(deterLabProjectRepository.findByNclTeamId(anyString())).thenReturn(deterLabProjectEntity);
+
+        adapterDeterLab.getReservationStatus("teamId");
+        verify(restTemplate,times(1)).exchange(anyString(),eq(HttpMethod.POST),anyObject(),eq(String.class));
+        verify(properties,times(1)).getReservationStatus();
+    }
+
+    @Test
+    public void getReservationStatusAdapterInternalError() {
+        exception.expect(AdapterInternalErrorException.class);
+
+        DeterLabProjectEntity deterLabProjectEntity = new DeterLabProjectEntity();
+
+        when(restTemplate.exchange(anyString(),eq(HttpMethod.POST),anyObject(),eq(String.class))).thenThrow(new HttpServerErrorException(HttpStatus.INTERNAL_SERVER_ERROR));
+        when(deterLabProjectRepository.findByNclTeamId(anyString())).thenReturn(deterLabProjectEntity);
+
+        adapterDeterLab.getReservationStatus("teamId");
+        verify(restTemplate,times(1)).exchange(anyString(),eq(HttpMethod.POST),anyObject(),eq(String.class));
+        verify(properties,times(1)).getReservationStatus();
+    }
+
+    @Test
+    public void releaseNodesGood() {
+        DeterLabProjectEntity deterLabProjectEntity = new DeterLabProjectEntity();
+        JSONObject myobject = new JSONObject();
+        myobject.put("status", "release nodes");
+
+        when(restTemplate.exchange(anyString(),eq(HttpMethod.POST),anyObject(),eq(String.class))).thenReturn(response);
+        when(response.getBody()).thenReturn(myobject);
+        when(deterLabProjectRepository.findByNclTeamId(anyString())).thenReturn(deterLabProjectEntity);
+
+        String result = adapterDeterLab.releaseNodes("teamId", 1);
+
+        verify(restTemplate,times(1)).exchange(anyString(),eq(HttpMethod.POST),anyObject(),eq(String.class));
+        verify(properties,times(1)).releaseNodes();
+        assertThat(result).isEqualTo(myobject.toString());
+    }
+
+    @Test
+    public void releaseNodesGoodNumNodesNull() {
+        DeterLabProjectEntity deterLabProjectEntity = new DeterLabProjectEntity();
+        JSONObject myobject = new JSONObject();
+        myobject.put("status", "release nodes");
+
+        when(restTemplate.exchange(anyString(),eq(HttpMethod.POST),anyObject(),eq(String.class))).thenReturn(response);
+        when(response.getBody()).thenReturn(myobject);
+        when(deterLabProjectRepository.findByNclTeamId(anyString())).thenReturn(deterLabProjectEntity);
+
+        String result = adapterDeterLab.releaseNodes("teamId", null);
+
+        verify(restTemplate,times(1)).exchange(anyString(),eq(HttpMethod.POST),anyObject(),eq(String.class));
+        verify(properties,times(1)).releaseNodes();
+        assertThat(result).isEqualTo(myobject.toString());
+    }
+
+    @Test
+    public void releaseNodesAdapterConnectionFailed() {
+        exception.expect(AdapterConnectionException.class);
+        DeterLabProjectEntity deterLabProjectEntity = new DeterLabProjectEntity();
+
+        when(restTemplate.exchange(anyString(),eq(HttpMethod.POST),anyObject(),eq(String.class))).thenThrow(new ResourceAccessException(""));
+        when(deterLabProjectRepository.findByNclTeamId(anyString())).thenReturn(deterLabProjectEntity);
+
+        adapterDeterLab.releaseNodes("teamId", 1);
+        verify(restTemplate,times(1)).exchange(anyString(),eq(HttpMethod.POST),anyObject(),eq(String.class));
+        verify(properties,times(1)).releaseNodes();
+    }
+
+    @Test
+    public void releaseNodesAdapterInternalError() {
+        exception.expect(AdapterInternalErrorException.class);
+
+        DeterLabProjectEntity deterLabProjectEntity = new DeterLabProjectEntity();
+
+        when(restTemplate.exchange(anyString(),eq(HttpMethod.POST),anyObject(),eq(String.class))).thenThrow(new HttpServerErrorException(HttpStatus.INTERNAL_SERVER_ERROR));
+        when(deterLabProjectRepository.findByNclTeamId(anyString())).thenReturn(deterLabProjectEntity);
+
+        adapterDeterLab.releaseNodes("teamId", 1);
+        verify(restTemplate,times(1)).exchange(anyString(),eq(HttpMethod.POST),anyObject(),eq(String.class));
+        verify(properties,times(1)).releaseNodes();
+    }
+
+    @Test
+    public void reserveNodesGood() {
+        DeterLabProjectEntity deterLabProjectEntity = new DeterLabProjectEntity();
+        JSONObject myobject = new JSONObject();
+        myobject.put("status", "reserve nodes");
+
+        when(restTemplate.exchange(anyString(),eq(HttpMethod.POST),anyObject(),eq(String.class))).thenReturn(response);
+        when(response.getBody()).thenReturn(myobject);
+        when(deterLabProjectRepository.findByNclTeamId(anyString())).thenReturn(deterLabProjectEntity);
+
+        String result = adapterDeterLab.reserveNodes("teamId", 1, "machine");
+
+        verify(restTemplate,times(1)).exchange(anyString(),eq(HttpMethod.POST),anyObject(),eq(String.class));
+        verify(properties,times(1)).reserveNodes();
+        assertThat(result).isEqualTo(myobject.toString());
+    }
+
+    @Test
+    public void reserveNodesGoodMachineTypeNull() {
+        DeterLabProjectEntity deterLabProjectEntity = new DeterLabProjectEntity();
+        JSONObject myobject = new JSONObject();
+        myobject.put("status", "reserve nodes");
+
+        when(restTemplate.exchange(anyString(),eq(HttpMethod.POST),anyObject(),eq(String.class))).thenReturn(response);
+        when(response.getBody()).thenReturn(myobject);
+        when(deterLabProjectRepository.findByNclTeamId(anyString())).thenReturn(deterLabProjectEntity);
+
+        String result = adapterDeterLab.reserveNodes("teamId", 1, null);
+
+        verify(restTemplate,times(1)).exchange(anyString(),eq(HttpMethod.POST),anyObject(),eq(String.class));
+        verify(properties,times(1)).reserveNodes();
+        assertThat(result).isEqualTo(myobject.toString());
+    }
+
+    @Test
+    public void reserveNodesAdapterConnectionFailed() {
+        exception.expect(AdapterConnectionException.class);
+        DeterLabProjectEntity deterLabProjectEntity = new DeterLabProjectEntity();
+
+        when(restTemplate.exchange(anyString(),eq(HttpMethod.POST),anyObject(),eq(String.class))).thenThrow(new ResourceAccessException(""));
+        when(deterLabProjectRepository.findByNclTeamId(anyString())).thenReturn(deterLabProjectEntity);
+
+        adapterDeterLab.reserveNodes("teamId", 1, "machine");
+        verify(restTemplate,times(1)).exchange(anyString(),eq(HttpMethod.POST),anyObject(),eq(String.class));
+        verify(properties,times(1)).reserveNodes();
+    }
+
+    @Test
+    public void reserveNodesAdapterInternalError() {
+        exception.expect(AdapterInternalErrorException.class);
+
+        DeterLabProjectEntity deterLabProjectEntity = new DeterLabProjectEntity();
+
+        when(restTemplate.exchange(anyString(),eq(HttpMethod.POST),anyObject(),eq(String.class))).thenThrow(new HttpServerErrorException(HttpStatus.INTERNAL_SERVER_ERROR));
+        when(deterLabProjectRepository.findByNclTeamId(anyString())).thenReturn(deterLabProjectEntity);
+
+        adapterDeterLab.reserveNodes("teamId", 1, "machine");
+        verify(restTemplate,times(1)).exchange(anyString(),eq(HttpMethod.POST),anyObject(),eq(String.class));
+        verify(properties,times(1)).reserveNodes();
+    }
+
 }
