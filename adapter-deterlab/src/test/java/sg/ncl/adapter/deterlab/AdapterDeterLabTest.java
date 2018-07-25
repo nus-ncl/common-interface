@@ -520,8 +520,8 @@ public class AdapterDeterLabTest {
 
         verify(restTemplate,times(1)).exchange(anyString(),eq(HttpMethod.POST),anyObject(),eq(String.class));
         verify(properties,times(1)).getCreateExperiment();
-        verify(properties,times(1)).getIp();
-        verify(properties,times(1)).getPort();
+        //verify(properties,times(1)).getIp();
+        //verify(properties,times(1)).getPort();
     }
 
     //throw AdapterConnectionException

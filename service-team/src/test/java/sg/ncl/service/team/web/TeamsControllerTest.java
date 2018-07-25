@@ -290,6 +290,7 @@ public class TeamsControllerTest {
         final byte[] content = mapper.writeValueAsBytes(teamInfo);
 
         when(securityContext.getAuthentication()).thenReturn(authentication);
+        when(teamService.isOwner(anyString(),anyString())).thenReturn(true);
         when(teamService.updateTeam(anyString(), any(Team.class))).thenReturn(teamInfo);
 
         mockMvc.perform(put(TeamsController.PATH + "/id").contentType(MediaType.APPLICATION_JSON).content(content))
