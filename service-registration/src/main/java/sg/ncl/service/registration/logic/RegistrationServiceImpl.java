@@ -9,6 +9,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.ui.freemarker.FreeMarkerTemplateUtils;
 import sg.ncl.adapter.deterlab.AdapterDeterLab;
+import sg.ncl.adapter.openstack.AdapterOpenStack;
+import sg.ncl.adapter.openstack.exceptions.OpenStackProjectNotFoundException;
 import sg.ncl.common.DomainProperties;
 import sg.ncl.common.authentication.Role;
 import sg.ncl.service.authentication.domain.Credentials;
@@ -39,7 +41,7 @@ import java.time.ZonedDateTime;
 import java.util.*;
 
 /**
- * @author Christopher Zhong
+ * @authors Christopher Zhong, Tran Ly Vu
  */
 @Service
 @Slf4j
@@ -47,7 +49,7 @@ public class RegistrationServiceImpl implements RegistrationService {
 
     private static final String USER = "User";
     private static final String TEAM = "Team";
-    private static final String NOT_FOUND = "not found";
+    private static final String NOT_FOUND = " not found";
     private static final String FIRST_NAME = "firstname";
     private static final String TEAM_NAME = "teamname";
     private static final String FULL_NAME = "fullname";
@@ -58,6 +60,9 @@ public class RegistrationServiceImpl implements RegistrationService {
     private static final String COUNTRY = "country";
     private static final String ADMIN_EMAIL = "ncl-admin@ncl.sg";
     private static final String TESTBED_EMAIL = "NCL Testbed Ops <testbed-ops@ncl.sg>";
+    private static final String OPENSTACK_USER = "OpenStack User ";
+    private static final String OPENSTACK_PROJECT = "OpenStack Project ";
+    private static final String ALREADY_EXIST = " already exists";
 
     private final CredentialsService credentialsService;
     private final TeamService teamService;
@@ -65,6 +70,7 @@ public class RegistrationServiceImpl implements RegistrationService {
     private final RegistrationRepository registrationRepository;
     private final MailService mailService;
     private final AdapterDeterLab adapterDeterLab;
+    private final AdapterOpenStack adapterOpenStack;
     private final Template emailValidationTemplate;
     private final Template applyCreateTeamRequestTemplate;
     private final Template replyCreateTeamRequestTemplate;
@@ -79,6 +85,7 @@ public class RegistrationServiceImpl implements RegistrationService {
             @NotNull final UserService userService,
             @NotNull final RegistrationRepository registrationRepository,
             @NotNull final AdapterDeterLab adapterDeterLab,
+            @NotNull final AdapterOpenStack adapterOpenStack,
             @NotNull final MailService mailService,
             @NotNull final DomainProperties domainProperties,
             @NotNull @Named("emailValidationTemplate") final Template emailValidationTemplate,
@@ -92,6 +99,7 @@ public class RegistrationServiceImpl implements RegistrationService {
         this.userService = userService;
         this.registrationRepository = registrationRepository;
         this.adapterDeterLab = adapterDeterLab;
+        this.adapterOpenStack = adapterOpenStack;
         this.mailService = mailService;
         this.domainProperties = domainProperties;
         this.emailValidationTemplate = emailValidationTemplate;
@@ -113,7 +121,24 @@ public class RegistrationServiceImpl implements RegistrationService {
 
         if (userService.getUser(nclUserId) == null) {
             log.warn("User not found: {}", nclUserId);
-            throw new UserNotFoundException(USER + " " + nclUserId + " " + NOT_FOUND);
+            throw new UserNotFoundException(USER + " " + nclUserId + NOT_FOUND);
+        }
+
+        if (adapterOpenStack.isOpenStackEnable()) {
+
+            //check if openstack project already exists
+            if (adapterOpenStack.isProjectNameAlreadyExist(team.getName())) {
+                log.warn("Error existing user request to apply team: OpenStack project name {} already exists", team.getName());
+                throw new OpenStackProjectNameAlreadyExistsException(OPENSTACK_PROJECT + team.getName() + ALREADY_EXIST);
+            }
+
+            // check if we can find OpenStack user
+            String userEmail = userService.getUser(nclUserId).getUserDetails().getEmail(); //we use email as Openstack name
+            if (!adapterOpenStack.isUserNameAlreadyExist(userEmail)) {
+                log.warn("Error register to apply new team: OpenStack user {} not found", userEmail);
+                throw new UserNotFoundException(OPENSTACK_USER + userEmail + NOT_FOUND);
+            }
+
         }
 
         // no problem with the team, create the team
@@ -139,6 +164,12 @@ public class RegistrationServiceImpl implements RegistrationService {
         teamService.addMember(createdTeam.getId(), teamMemberInfo);
         adapterDeterLab.applyProject(mainObject.toString());
 
+        if (adapterOpenStack.isOpenStackEnable()) {
+            log.info("Starting to create new OpenStack Project {}", team.getName());
+            adapterOpenStack.createOpenStackProject(team.getName(), team.getDescription());
+            log.info("Succesfully create new OpenStack Project", team.getName());
+
+        }
         sendApplyCreateTeamEmail(userService.getUser(nclUserId), createdTeam);
         return null;
     }
@@ -160,6 +191,22 @@ public class RegistrationServiceImpl implements RegistrationService {
         if (teamEntity == null) {
             log.warn("Team not found: {}", team.getName());
             throw new TeamNotFoundException(TEAM + " " + team.getName() + " " + NOT_FOUND);
+        }
+
+        if (adapterOpenStack.isOpenStackEnable()) {
+            //check if we can find OpenStack team
+            if (!adapterOpenStack.isProjectNameAlreadyExist(team.getName())) {
+                log.warn("Error existing user request to join team: OpenStack project {} not found", teamEntity.getName());
+                throw new OpenStackProjectNotFoundException(OPENSTACK_PROJECT + team.getName() + NOT_FOUND);
+            }
+
+            // check if we can find OpenStack user
+            String userEmail = userService.getUser(nclUserId).getUserDetails().getEmail(); //we use email as OpenStack name
+            if (!adapterOpenStack.isUserNameAlreadyExist(userEmail)) {
+                log.warn("Error register to apply new team: OpenStack user {} not found", userEmail);
+                throw new UserNotFoundException(OPENSTACK_USER + userEmail + " " + NOT_FOUND);
+            }
+
         }
 
         String teamId = teamEntity.getId();
@@ -199,12 +246,23 @@ public class RegistrationServiceImpl implements RegistrationService {
                 log.warn("Apply to join team: Team ID is null or empty!");
                 throw new IncompleteRegistrationFormException();
             }
+
+
         } else {
             if (team.getName() == null || team.getName().isEmpty()) {
                 log.warn("Apply to create team: Team name is null or empty!");
                 throw new IncompleteRegistrationFormException();
             }
             checkTeamNameDuplicate(team.getName());
+
+            if (adapterOpenStack.isOpenStackEnable()) {
+                //check team name for OpenStack already exists
+                log.info("Apply to create team: Start checking if OpenStack project name is already exists");
+                if (adapterOpenStack.isProjectNameAlreadyExist(team.getName())) {
+                    log.warn("Apply to create team: OpenStack project name is already exists");
+                    throw new OpenStackProjectNameAlreadyExistsException(OPENSTACK_PROJECT + team.getName() + ALREADY_EXIST);
+                }
+            }
         }
 
         String teamId;
@@ -216,6 +274,15 @@ public class RegistrationServiceImpl implements RegistrationService {
             teamEntity = teamService.getTeamById(team.getId());
             teamId = teamEntity.getId();
             log.info("Register new user: join Team {}", teamEntity.getName());
+
+            if (adapterOpenStack.isOpenStackEnable()) {
+                log.info("Apply to join team: Start checking if OpenStack project {} can be found", teamEntity.getName());
+                if (!adapterOpenStack.isProjectNameAlreadyExist(teamEntity.getName())) {
+                    log.warn("Apply to join team: OpenStack project {} not found", teamEntity.getName());
+                    throw new OpenStackProjectNotFoundException(OPENSTACK_PROJECT + teamEntity.getName() + NOT_FOUND);
+                }
+            }
+
         } else {
             // apply for new team
             // check if team already exists
@@ -223,6 +290,15 @@ public class RegistrationServiceImpl implements RegistrationService {
             teamId = teamEntity.getId();
             addNclTeamIdMapping(teamEntity.getName(), teamId);
             log.info("Register new user: apply new Team {}", teamEntity.getName());
+        }
+
+        if (adapterOpenStack.isOpenStackEnable()) {
+            // Check if openstack user already exists before adding user to SIO database
+            String userEmail = user.getUserDetails().getEmail();
+            if (adapterOpenStack.isUserNameAlreadyExist(userEmail)) {
+                log.warn("Apply to create team: OpenStack user {} already exists", userEmail);
+                throw new OpenStackUserNameAlreadyExistsException(OPENSTACK_USER + userEmail + ALREADY_EXIST);
+            }
         }
 
         // accept user data from form
@@ -265,6 +341,7 @@ public class RegistrationServiceImpl implements RegistrationService {
         if (isJoinTeam) {
             userObject.put("pid", teamEntity.getName());
             resultJSON = adapterDeterLab.joinProjectNewUsers(userObject.toString());
+
         } else {
             // call python script to apply for new project
             userObject.put("projName", teamEntity.getName());
@@ -274,6 +351,13 @@ public class RegistrationServiceImpl implements RegistrationService {
             userObject.put("projOrg", teamEntity.getOrganisationType());
             userObject.put("projPublic", teamEntity.getVisibility());
             resultJSON = adapterDeterLab.applyProjectNewUsers(userObject.toString());
+
+            if (adapterOpenStack.isOpenStackEnable()) {
+                // create openstack project
+                log.info("Starting to create new OpenStack Project");
+                adapterOpenStack.createOpenStackProject(teamEntity.getName(), teamEntity.getDescription());
+                log.info("Sucessfully create new OpenStack Project {} ", teamEntity.getName());
+            }
         }
 
         if ("user is created".equals(getUserCreationStatus(resultJSON))) {
@@ -281,8 +365,15 @@ public class RegistrationServiceImpl implements RegistrationService {
             Registration one = addUserToRegistrationRepository(resultJSON, user, teamEntity);
             // call deterlab adapter to store ncluid to deteruid mapping
             addNclUserIdMapping(resultJSON, userId);
-            log.info("Register new user OK: uid {}, pid {}", one.getUid(), one.getPid());
+            log.info("Register new Deterlab user OK: uid {}, pid {}", one.getUid(), one.getPid());
 
+            if (adapterOpenStack.isOpenStackEnable()) {
+                // starting to create OpenStack user and project but its not enable until email is verified
+                log.info("Starting to create new OpenStack User");
+                adapterOpenStack.createOpenStackUser(user.getUserDetails().getEmail(), credentials.getPassword());
+                log.info("Sucessfully create new OpenStack User {}", user.getUserDetails().getEmail());
+
+            }
             // send verification email
             sendVerificationEmail(createdUser);
 
@@ -310,6 +401,8 @@ public class RegistrationServiceImpl implements RegistrationService {
             log.warn("Team NOT found, TeamId {}", teamId);
             throw new TeamNotFoundException(teamId);
         }
+
+
         String pid = team.getName();
         // already add to user side when request to join
         JSONObject one = new JSONObject();
@@ -318,11 +411,31 @@ public class RegistrationServiceImpl implements RegistrationService {
         one.put("pid", pid);
         one.put("gid", pid);
         one.put("action", "approve");
+        String openStackUserId;
         if ((UserStatus.PENDING).equals(user.getStatus())) {
             userService.updateUserStatus(userId, UserStatus.APPROVED);
+
+            if (adapterOpenStack.isOpenStackEnable()) {
+                // Enable OpenStack User , this is when team leader approve joining team for new User
+                log.info("Start to enable OpenStack User {}", user.getUserDetails().getEmail());
+                openStackUserId = adapterOpenStack.retrieveOpenStackUserId(user.getUserDetails().getEmail());
+                adapterOpenStack.enableOpenStackUser(openStackUserId);
+                log.info("Successfully enable OpenStack User {}", user.getUserDetails().getEmail());
+            }
         }
+
         teamService.updateMemberStatus(teamId, userId, MemberStatus.APPROVED);
         String adapterResult = adapterDeterLab.processJoinRequest(one.toString());
+
+        if (adapterOpenStack.isOpenStackEnable()) {
+            //Add OpenStack into existing project , at this point project must have been already enabled
+            log.info("Start to add OpenStack User {} to Project {}", user.getUserDetails().getEmail(), team.getName());
+            openStackUserId = adapterOpenStack.retrieveOpenStackUserId(user.getUserDetails().getEmail());
+            String openStackProjectId = adapterOpenStack.retrieveOpenStackProjectId(team.getName());
+            adapterOpenStack.addUserToProject(openStackUserId, openStackProjectId);
+            log.info("Successfully add OpenStack User {} to Project {}", user.getUserDetails().getEmail(), team.getName());
+        }
+
         sendReplyJoinTeamEmail(user, team, TeamStatus.APPROVED);
         return adapterResult;
     }
@@ -359,6 +472,9 @@ public class RegistrationServiceImpl implements RegistrationService {
                 object.put("gid", pid);
                 object.put("action", "deny");
                 String adapterResult = adapterDeterLab.processJoinRequest(object.toString());
+
+                // Tran Ly Vu note: OpenStack will not need to do anything if request join team is rejected
+
                 sendReplyJoinTeamEmail(userService.getUser(userId), one, TeamStatus.REJECTED);
                 return adapterResult;
             }
@@ -379,6 +495,7 @@ public class RegistrationServiceImpl implements RegistrationService {
 
         checkTeamId(teamId);
         checkUserId(ownerId);
+
 
         if (status == null ||
                 !(status.equals(TeamStatus.APPROVED) || status.equals(TeamStatus.REJECTED))) {
@@ -402,16 +519,30 @@ public class RegistrationServiceImpl implements RegistrationService {
                 log.warn("Email not verified for {}", user.getId());
                 throw new EmailNotVerifiedException(user.getId());
             }
-            if ((UserStatus.PENDING).equals(user.getStatus())) {
-                userService.updateUserStatus(ownerId, UserStatus.APPROVED);
-            }
+
+            updateUserStatusPendingToApproved(user, ownerId);
+
             // change team owner member status
             teamService.updateMemberStatus(teamId, ownerId, MemberStatus.APPROVED);
             adapterResult = adapterDeterLab.approveProject(one.toString());
+
+            if (adapterOpenStack.isOpenStackEnable()) {
+                log.info("Start to add OpenStack User {} to Project {}", user.getUserDetails().getEmail(), team.getName());
+                String openStackUserId = adapterOpenStack.retrieveOpenStackUserId(user.getUserDetails().getEmail());
+                // Approve OpenStack team : enable project when project is first created + add user
+                String openStackProjectId = adapterOpenStack.retrieveOpenStackProjectId(team.getName());
+                adapterOpenStack.enableOpenStackProject(openStackProjectId);
+                adapterOpenStack.addUserToProject(openStackUserId, openStackProjectId);
+                log.info("Succesfully add OpenStack User {} to Project {}", user.getUserDetails().getEmail(), team.getName());
+            }
+
+            // now send mail
             sendReplyCreateTeamEmail(user, team, status, reason);
         } else {
             // FIXME may need to be more specific and check if TeamStatus is REJECTED
             Team existingTeam = teamService.getTeamById(teamId);
+
+            // now we can remove SIO database
             List<? extends TeamMember> existingMembersList = existingTeam.getMembers();
             for (TeamMember member : existingMembersList) {
                 // remove from user side
@@ -420,9 +551,36 @@ public class RegistrationServiceImpl implements RegistrationService {
             // remove from team side
             teamService.removeTeam(teamId);
             adapterResult = adapterDeterLab.rejectProject(one.toString());
+
+            if (adapterOpenStack.isOpenStackEnable()) {
+                log.info("Start to delete OpenStack project {}", existingTeam.getName());
+                // Delete OpenStack team here is ok as team info still in memory
+                // TO DO: CHECK if there is bug here that caused OpenStack admin project deleted on 25 Jan 2018
+                String openStackProjectId = adapterOpenStack.retrieveOpenStackProjectId(existingTeam.getName());
+                adapterOpenStack.deleteOpenStackProject(openStackProjectId);
+                log.info("Sucessfully delete OpenStack project {}", existingTeam.getName());
+            }
+
             sendReplyCreateTeamEmail(userService.getUser(ownerId), team, status, reason);
         }
         return adapterResult;
+    }
+
+
+    private void updateUserStatusPendingToApproved(User user, String ownerId) {
+
+        if ((UserStatus.PENDING).equals(user.getStatus())) {
+            userService.updateUserStatus(ownerId, UserStatus.APPROVED);
+
+            if (adapterOpenStack.isOpenStackEnable()) {
+                log.info("Start to enable OpenStack user ", user.getUserDetails().getEmail());
+                // Enable OpenStack User , this is when admin approve new team
+                String openStackUserId = adapterOpenStack.retrieveOpenStackUserId(user.getUserDetails().getEmail());
+                adapterOpenStack.enableOpenStackUser(openStackUserId);
+                log.info("Succesfully enable OpenStack user ", user.getUserDetails().getEmail());
+            }
+        }
+
     }
 
     private boolean userFormFieldsHasErrors(User user) {
@@ -586,7 +744,7 @@ public class RegistrationServiceImpl implements RegistrationService {
         Team one = teamService.getTeamByName(teamName);
         if (one != null) {
             log.warn("Team name duplicate entry found: {}", teamName);
-            throw new TeamNameAlreadyExistsException(TEAM + " " + teamName + " already exists");
+            throw new TeamNameAlreadyExistsException(TEAM + " " + teamName + ALREADY_EXIST);
         }
     }
 

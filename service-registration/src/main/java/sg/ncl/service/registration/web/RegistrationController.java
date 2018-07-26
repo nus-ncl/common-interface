@@ -8,16 +8,14 @@ import org.springframework.web.bind.annotation.*;
 import sg.ncl.service.registration.domain.Registration;
 import sg.ncl.service.registration.domain.RegistrationService;
 import sg.ncl.service.team.domain.TeamStatus;
-import sg.ncl.service.user.domain.UserStatus;
 import sg.ncl.service.user.web.VerificationKeyInfo;
-
 import javax.inject.Inject;
 import javax.validation.constraints.NotNull;
 import java.util.HashMap;
 import java.util.Map;
 
 /**
- * @author Te Ye & Desmond
+ * @author: Te Ye, Desmond, Tran Ly Vu
  */
 @Slf4j
 @RestController
@@ -72,16 +70,14 @@ public class RegistrationController {
     // FIXME: the path is wrong, there should not be multiple paths for different registrations; status should be ACCEPTED
     @ResponseStatus(HttpStatus.ACCEPTED)
     public String approveJoinRequest(@PathVariable String teamId, @PathVariable String userId, @RequestBody RegistrationInfo registrationInfo) {
-        return
-                registrationService.approveJoinRequest(teamId, userId, registrationInfo.getUser());
+        return registrationService.approveJoinRequest(teamId, userId, registrationInfo.getUser());
     }
 
     @DeleteMapping(path = "/teams/{teamId}/members/{userId}")
     // FIXME: the path is wrong, there should not be multiple paths for different registrations; status should be OK
     @ResponseStatus(HttpStatus.ACCEPTED)
     public String rejectJoinRequest(@PathVariable String teamId, @PathVariable String userId, @RequestBody RegistrationInfo registrationInfo) {
-        return
-                registrationService.rejectJoinRequest(teamId, userId, registrationInfo.getUser());
+        return registrationService.rejectJoinRequest(teamId, userId, registrationInfo.getUser());
     }
 
     @PostMapping(path = "/teams/{teamId}/owner/{ownerId}", params = {"status"})

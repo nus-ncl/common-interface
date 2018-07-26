@@ -12,6 +12,7 @@ import org.mockito.Mockito;
 import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
 import sg.ncl.adapter.deterlab.AdapterDeterLab;
+import sg.ncl.adapter.openstack.AdapterOpenStack;
 import sg.ncl.adapter.deterlab.ConnectionProperties;
 import sg.ncl.adapter.deterlab.data.jpa.DeterLabUserRepository;
 import sg.ncl.common.DomainProperties;
@@ -65,6 +66,8 @@ public class RegistrationServiceImplTest {
     @Mock
     private AdapterDeterLab adapterDeterLab;
     @Mock
+    private AdapterOpenStack adapterOpenStack;
+    @Mock
     private MailService mailService;
     @Mock
     private DomainProperties domainProperties;
@@ -89,10 +92,11 @@ public class RegistrationServiceImplTest {
         assertThat(mockingDetails(userService).isMock()).isTrue();
         assertThat(mockingDetails(registrationRepository).isMock()).isTrue();
         assertThat(mockingDetails(adapterDeterLab).isMock()).isTrue();
+        assertThat(mockingDetails(adapterOpenStack).isMock()).isTrue();
         assertThat(mockingDetails(mailService).isMock()).isTrue();
 
         registrationService = new RegistrationServiceImpl(
-                credentialsService, teamService, userService, registrationRepository, adapterDeterLab, mailService, domainProperties,
+                credentialsService, teamService, userService, registrationRepository, adapterDeterLab, adapterOpenStack, mailService, domainProperties,
                 emailValidationTemplate, applyTeamRequestTemplate, replyTeamRequestTemplate, applyJoinTeamRequestTemplate, replyJoinTeamRequestTemplate);
     }
 
@@ -150,7 +154,8 @@ public class RegistrationServiceImplTest {
         when(userService.getUser(anyString())).thenReturn(userEntity);
         when(teamService.getTeamByName(anyString())).thenReturn(null);
         when(teamService.createTeam(any(Team.class))).thenReturn(teamEntity);
-
+        when(adapterOpenStack.isProjectNameAlreadyExist(anyString())).thenReturn(false);
+        when(adapterOpenStack.isUserNameAlreadyExist(anyString())).thenReturn(true);
         registrationService.registerRequestToApplyTeam(userEntity.getId(), teamEntity);
 
         verify(teamService, times(1)).createTeam(any(Team.class));
@@ -169,7 +174,8 @@ public class RegistrationServiceImplTest {
 
         when(userService.getUser(anyString())).thenReturn(userEntity);
         when(teamService.createTeam(any(Team.class))).thenReturn(teamEntity);
-
+        when(adapterOpenStack.isProjectNameAlreadyExist(anyString())).thenReturn(false);
+        when(adapterOpenStack.isUserNameAlreadyExist(anyString())).thenReturn(true);
         exception.expect(TeamIdNullOrEmptyException.class);
 
         registrationService.registerRequestToApplyTeam(userEntity.getId(), teamEntity);
@@ -216,7 +222,10 @@ public class RegistrationServiceImplTest {
         when(teamService.getTeamByName(anyString())).thenReturn(teamEntity);
         UserEntity userEntity = Util.getUserEntity();
         when(userService.getUser(anyString())).thenReturn(userEntity);
+        when(adapterOpenStack.isUserNameAlreadyExist(anyString())).thenReturn(true);
+        when(adapterOpenStack.isProjectNameAlreadyExist(anyString())).thenReturn(true);
         registrationService.registerRequestToJoinTeam(uid, teamEntity);
+
 
         verify(adapterDeterLab, times(1)).getDeterUserIdByNclUserId(anyString());
         verify(userService, times(1)).addTeam(anyString(), anyString());
@@ -298,6 +307,7 @@ public class RegistrationServiceImplTest {
         Mockito.doReturn(userWithId).when(userService).createUser(any(User.class));
         Mockito.doReturn(predefinedResultJson.toString()).when(adapterDeterLab).joinProjectNewUsers(anyString());
         Mockito.doReturn(registrationEntity).when(registrationRepository).save(any(RegistrationEntity.class));
+        Mockito.doReturn(true).when(adapterOpenStack).isProjectNameAlreadyExist(anyString());
 
         Registration result = registrationService.register(credentialsEntity, user, team, isJoinTeam);
 
@@ -323,6 +333,7 @@ public class RegistrationServiceImplTest {
         Mockito.doReturn(userWithId).when(userService).createUser(any(User.class));
         Mockito.doReturn(predefinedResultJson.toString()).when(adapterDeterLab).joinProjectNewUsers(anyString());
         Mockito.doReturn(registrationEntity).when(registrationRepository).save(any(RegistrationEntity.class));
+        Mockito.doReturn(true).when(adapterOpenStack).isProjectNameAlreadyExist(anyString());
 
         Registration result = registrationService.register(credentialsEntity, user, team, isJoinTeam);
 
@@ -348,6 +359,7 @@ public class RegistrationServiceImplTest {
         Mockito.doReturn(userEntity).when(userService).createUser(any(User.class));
         Mockito.doReturn(predefinedResultJson.toString()).when(adapterDeterLab).applyProjectNewUsers(anyString());
         Mockito.doReturn(registrationEntity).when(registrationRepository).save(any(RegistrationEntity.class));
+        Mockito.doReturn(false).when(adapterOpenStack).isProjectNameAlreadyExist(anyString());
 
         Registration result = registrationService.register(credentialsEntity, userEntity, teamEntity, isJoinTeam);
         assertThat(result.getId()).isEqualTo(registrationEntity.getId());
@@ -363,6 +375,7 @@ public class RegistrationServiceImplTest {
         isJoinTeam = false;
 
         Mockito.doReturn(teamEntity).when(teamService).createTeam(any(Team.class));
+        Mockito.doReturn(false).when(adapterOpenStack).isProjectNameAlreadyExist(anyString());
 
         exception.expect(TeamIdNullOrEmptyException.class);
 
@@ -403,6 +416,7 @@ public class RegistrationServiceImplTest {
         when(teamService.getTeamById(anyString())).thenReturn(createdTeam);
         when(adapterDeterLab.getDeterUserIdByNclUserId(anyString())).thenReturn(RandomStringUtils.randomAlphanumeric(20));
         when(userService.getUser(anyString())).thenReturn(createdUser);
+        Mockito.doReturn(false).when(adapterOpenStack).isProjectNameAlreadyExist(anyString());
 
         registrationService.approveJoinRequest(createdTeam.getId(), createdUser.getId(), createdUser);
 

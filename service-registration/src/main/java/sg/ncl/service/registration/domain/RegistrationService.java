@@ -4,7 +4,6 @@ import sg.ncl.service.authentication.domain.Credentials;
 import sg.ncl.service.team.domain.Team;
 import sg.ncl.service.team.domain.TeamStatus;
 import sg.ncl.service.user.domain.User;
-import sg.ncl.service.user.domain.UserStatus;
 
 /**
  * @author Christopher Zhong

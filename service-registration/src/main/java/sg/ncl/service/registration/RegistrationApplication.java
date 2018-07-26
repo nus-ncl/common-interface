@@ -8,6 +8,7 @@ import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Import;
 import sg.ncl.adapter.deterlab.DeterLabAutoConfiguration;
+import sg.ncl.adapter.openstack.OpenStackAutoConfiguration;
 import sg.ncl.common.DomainProperties;
 import sg.ncl.common.jpa.UseJpa;
 import sg.ncl.service.authentication.AuthenticationApplication;
@@ -18,7 +19,7 @@ import sg.ncl.service.user.UserApplication;
 import java.io.IOException;
 
 /**
- * @author Christopher Zhong
+ * @author Christopher Zhong, Tran Ly Vu
  */
 @SpringBootApplication
 @UseJpa
@@ -27,6 +28,7 @@ import java.io.IOException;
         TeamApplication.class,
         UserApplication.class,
         DeterLabAutoConfiguration.class,
+        OpenStackAutoConfiguration.class,
         MailApplication.class,
         DomainProperties.class
 })
