@@ -325,39 +325,6 @@ public class UserServiceImpl implements UserService {
         return adapterDeterLab.deletePublicKey(userId, keyId);
     }
 
-    @Override
-    @Transactional
-    public void updateInformationNewMember(String uid, String firstName, String lastName, String phone){
-
-        final UserEntity one = findUser(uid);
-        if (one == null) {
-            log.warn("User not found when updating: {}",uid);
-            throw new UserNotFoundException(uid);
-        }
-
-
-        if (firstName == null) {
-            throw new NullPointerException();
-        } else if (!firstName.isEmpty()) {
-            one.getUserDetails().setFirstName(firstName);
-        }
-
-        if (lastName == null) {
-            throw new NullPointerException();
-        } else if (!lastName.isEmpty()) {
-            one.getUserDetails().setLastName(lastName);
-        }
-
-        if (phone == null) {
-            throw new NullPointerException();
-        } else if (!phone.isEmpty()) {
-            one.getUserDetails().setPhone(phone);
-        }
-
-        final User saved = userRepository.save(one);
-        log.info("Update Information New Member {}", saved.getId());
-    }
-
     /**
      * For a new student member to update his own info including first name, last name, phone and password
      * when he/she first time logs into the testbed

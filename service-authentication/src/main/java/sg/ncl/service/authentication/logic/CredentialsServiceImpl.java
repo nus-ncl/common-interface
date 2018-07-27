@@ -414,7 +414,7 @@ public class CredentialsServiceImpl implements CredentialsService {
         passwordResetRequestEntity.setTime(ZonedDateTime.now());
         passwordResetRequestEntity.setUsername(userName);
         passwordResetRepository.save(passwordResetRequestEntity);
-        log.info("Password reset request saved: {}", passwordResetRequestEntity);
+        log.info("Password reset request saved: {}", passwordResetRequestEntity.getId());
 
         final String message = "You have been added to a NCL Project (Name: " + projectName + ").";
         sendPasswordResetEmailToStudent(one.getId(), key, userName, message);

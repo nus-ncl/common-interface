@@ -145,7 +145,7 @@ public class TeamServiceImpl implements TeamService {
         }
 
         final Team updatedTeam = teamRepository.save(entity);
-        log.info("Team profile updated: {}", updatedTeam);
+        log.info("Team profile updated for {}", updatedTeam.getId());
 
         return updatedTeam;
     }
