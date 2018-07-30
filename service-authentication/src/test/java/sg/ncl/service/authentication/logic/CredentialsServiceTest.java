@@ -70,8 +70,9 @@ public class CredentialsServiceTest {
     @Mock
     private PasswordResetRequestRepository passwordResetRequestRepository;
     @Mock
+    private Template newClassMemberResetPasswordTemplate;
+    @Mock
     private Template passwordResetEmailTemplate;
-
     private CredentialsService credentialsService;
 
     @Before
@@ -81,7 +82,7 @@ public class CredentialsServiceTest {
         assertThat(mockingDetails(credentialsRepository).isMock()).isTrue();
 
         credentialsService = new CredentialsServiceImpl(credentialsRepository, passwordEncoder, adapterDeterLab,
-                mailService, domainProperties, passwordResetRequestRepository, passwordResetEmailTemplate);
+                mailService, domainProperties, passwordResetRequestRepository, passwordResetEmailTemplate, newClassMemberResetPasswordTemplate);
     }
 
     @Test

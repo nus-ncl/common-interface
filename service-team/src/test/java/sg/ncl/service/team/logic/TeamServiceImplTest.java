@@ -76,56 +76,56 @@ public class TeamServiceImplTest {
 
     @Test
     public void testCreateTeamNullName() {
-        final TeamInfo teamInfo = new TeamInfo("id", null, "description", "website", "organisationType", null, null, null, null, null, members);
+        final TeamInfo teamInfo = new TeamInfo("id", null, "description", "website", "organisationType", null,false, null, null, null, null, members);
         exception.expect(TeamNameNullOrEmptyException.class);
         teamService.createTeam(teamInfo);
     }
 
     @Test
     public void testCreateTeamEmptyName() {
-        final TeamInfo teamInfo = new TeamInfo("id", "", "description", "website", "organisationType", null, null, null, null, null, members);
+        final TeamInfo teamInfo = new TeamInfo("id", "", "description", "website", "organisationType", null, false,null, null, null, null, members);
         exception.expect(TeamNameNullOrEmptyException.class);
         teamService.createTeam(teamInfo);
     }
 
     @Test
     public void testCreateTeamTooShortName() {
-        final TeamInfo teamInfo = new TeamInfo("id", "a", "description", "website", "organisationType", null, null, null, null, null, members);
+        final TeamInfo teamInfo = new TeamInfo("id", "a", "description", "website", "organisationType", null,false, null, null, null, null, members);
         exception.expect(InvalidTeamNameException.class);
         teamService.createTeam(teamInfo);
     }
 
     @Test
     public void testCreateTeamNameStartingWithDash() {
-        final TeamInfo teamInfo = new TeamInfo("id", "-a", "description", "website", "organisationType", null, null, null, null, null, members);
+        final TeamInfo teamInfo = new TeamInfo("id", "-a", "description", "website", "organisationType", null, false,null, null, null, null, members);
         exception.expect(InvalidTeamNameException.class);
         teamService.createTeam(teamInfo);
     }
 
     @Test
     public void testCreateTeamTooLongName() {
-        final TeamInfo teamInfo = new TeamInfo("id", "qwertyuiopasdfg", "description", "website", "organisationType", null, null, null, null, null, members);
+        final TeamInfo teamInfo = new TeamInfo("id", "qwertyuiopasdfg", "description", "website", "organisationType", null, false,null, null, null, null, members);
         exception.expect(InvalidTeamNameException.class);
         teamService.createTeam(teamInfo);
     }
 
     @Test
     public void testCreateTeamNameHasWhiteSpace() {
-        final TeamInfo teamInfo = new TeamInfo("id", "ncl ncl", "description", "website", "organisationType", null, null, null, null, null, members);
+        final TeamInfo teamInfo = new TeamInfo("id", "ncl ncl", "description", "website", "organisationType", null,false, null, null, null, null, members);
         exception.expect(InvalidTeamNameException.class);
         teamService.createTeam(teamInfo);
     }
 
     @Test
     public void testCreateTeamNameHasSpecialCharacters() {
-        final TeamInfo teamInfo = new TeamInfo("id", "ncl#ncl", "description", "website", "organisationType", null, null, null, null, null, members);
+        final TeamInfo teamInfo = new TeamInfo("id", "ncl#ncl", "description", "website", "organisationType", null,false, null, null, null, null, members);
         exception.expect(InvalidTeamNameException.class);
         teamService.createTeam(teamInfo);
     }
 
     @Test
     public void testCreateTeamAlreadyExist() {
-        final TeamInfo teamInfo = new TeamInfo("id", "ncl-team", "description", "website", "organisationType", null, null, null, null, null, members);
+        final TeamInfo teamInfo = new TeamInfo("id", "ncl-team", "description", "website", "organisationType", null, false,null, null, null, null, members);
         when(teamRepository.findByName(anyString())).thenReturn(teamEntity);
         exception.expect(TeamNameAlreadyExistsException.class);
         teamService.createTeam(teamInfo);
@@ -133,7 +133,7 @@ public class TeamServiceImplTest {
 
     @Test
     public void testCreateTeamGoodName() {
-        final TeamInfo teamInfo = new TeamInfo("id", "ncl-team", "description", "website", "organisationType", null, null, null, null, null, members);
+        final TeamInfo teamInfo = new TeamInfo("id", "ncl-team", "description", "website", "organisationType", null,false, null, null, null, null, members);
         when(teamRepository.save(any(TeamEntity.class))).thenAnswer(i -> i.getArgumentAt(0, TeamEntity.class));
         final Team team = teamService.createTeam(teamInfo);
 
@@ -146,7 +146,7 @@ public class TeamServiceImplTest {
 
     @Test
     public void testCreateTeamGoodName2() {
-        final TeamInfo teamInfo = new TeamInfo("id", "n-", "description", "website", "organisationType", null, null, null, null, null, members);
+        final TeamInfo teamInfo = new TeamInfo("id", "n-", "description", "website", "organisationType", null, false,null, null, null, null, members);
         when(teamRepository.save(any(TeamEntity.class))).thenAnswer(i -> i.getArgumentAt(0, TeamEntity.class));
         final Team team = teamService.createTeam(teamInfo);
 

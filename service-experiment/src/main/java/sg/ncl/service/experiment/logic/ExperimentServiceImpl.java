@@ -107,7 +107,7 @@ public class ExperimentServiceImpl implements ExperimentService {
         }
 
         ExperimentEntity savedExperimentEntity = experimentRepository.save(setupEntity(experiment, fileName));
-        log.info("Experiment saved: {}", savedExperimentEntity);
+        log.info("Experiment {} saved", savedExperimentEntity.getId());
 
         RealizationEntity realizationEntity = new RealizationEntity();
         realizationEntity.setExperimentId(savedExperimentEntity.getId());
@@ -188,7 +188,7 @@ public class ExperimentServiceImpl implements ExperimentService {
      * @param experiment the experiment object
      */
     private void createExperimentInDeter(Experiment experiment) {
-        log.info("Begin creating experiment: {} for team: {}", experiment.getName(), experiment.getTeamName());
+        log.info("Begin creating experiment {}/{} on DeterLab", experiment.getTeamName(), experiment.getName());
 
         JSONObject userObject = new JSONObject();
         userObject.put("id", experiment.getId().toString());
@@ -206,7 +206,7 @@ public class ExperimentServiceImpl implements ExperimentService {
 
         adapterDeterLab.createExperiment(userObject.toString());
 
-        log.info("Create experiment : {}, success", experiment);
+        log.info("Experiment {}/{} created on DeterLab", experiment.getTeamName(), experiment.getName());
     }
 
     /**

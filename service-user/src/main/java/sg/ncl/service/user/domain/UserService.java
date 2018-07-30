@@ -31,4 +31,7 @@ public interface UserService {
     String addPublicKey(final String publicKey, final String password, final String userId);
 
     String deletePublicKey(final String keyId, final String userId);
+
+    User changePasswordStudent(final String uid, final String firstName, final String lastName, final String phone, final String password, final String key);
+
 }

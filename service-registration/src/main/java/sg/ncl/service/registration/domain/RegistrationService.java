@@ -26,4 +26,7 @@ public interface RegistrationService {
     String getDeterUid(String id);
 
     boolean verifyEmail(final String uid, final String email, final String key);
+
+    void addStudentsByEmail(String teamId, String userId, String emails);
+
 }

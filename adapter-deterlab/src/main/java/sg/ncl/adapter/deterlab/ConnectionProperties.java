@@ -180,4 +180,12 @@ public class ConnectionProperties {
     public String getTeamUsage() {
         return HTTP_MODE + ip + ":" + port + "/getTeamUsage";
     }
+
+    public String addStudentsByEmail() {
+        return HTTP_MODE + ip + ":" + port + "/addStudentsByEmail";
+    }
+
+    public String changePasswordStudent() {
+        return HTTP_MODE + ip + ":" + port + "/changePasswordStudent";
+    }
 }

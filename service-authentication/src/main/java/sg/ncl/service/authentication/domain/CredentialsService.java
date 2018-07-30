@@ -32,4 +32,10 @@ public interface CredentialsService {
     Credentials resetPassword(String jsonString);
 
     boolean verifyPassword(String id, String password);
+
+    void addPasswordResetRequestForStudent(String username, String projectName);
+
+    void changePasswordStudent(String uid, String key, String newPassword);
+
+    void resetKeyStudent(String uid);
 }

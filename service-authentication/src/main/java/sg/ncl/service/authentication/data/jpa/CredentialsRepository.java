@@ -11,6 +11,7 @@ import java.util.List;
 public interface CredentialsRepository extends JpaRepository<CredentialsEntity, String> {
 
     CredentialsEntity findByUsername(String username);
+    CredentialsEntity findById(String uid);
 
     List<CredentialsEntity> findByStatus(CredentialsStatus status);
 

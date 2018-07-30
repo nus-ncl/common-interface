@@ -42,7 +42,9 @@ import static sg.ncl.service.authentication.validation.Validator.*;
 @Slf4j
 public class CredentialsServiceImpl implements CredentialsService {
 
-    private static final int PASSWORD_RESET_REQUEST_TIMEOUT_HOUR = 24;
+    private static final int PASSWORD_RESET_REQUEST_TIMEOUT_HOUR = 72;
+
+    private static final String TESTBED_OPS_EMAIL = "NCL Operations <testbed-ops@ncl.sg>";
 
     private final CredentialsRepository credentialsRepository;
     private final PasswordEncoder passwordEncoder;
@@ -50,6 +52,7 @@ public class CredentialsServiceImpl implements CredentialsService {
     private final MailService mailService;
     private final DomainProperties domainProperties;
     private final Template passwordResetEmailTemplate;
+    private final Template studentResetPasswordTemplate;
     private final PasswordResetRequestRepository passwordResetRepository;
 
     @Inject
@@ -60,7 +63,8 @@ public class CredentialsServiceImpl implements CredentialsService {
             @NotNull final MailService mailService,
             @NotNull final DomainProperties domainProperties,
             @NotNull final PasswordResetRequestRepository passwordResetRepository,
-            @NotNull @Named("passwordResetEmailTemplate") final Template passwordResetEmailTemplate) {
+            @NotNull @Named("passwordResetEmailTemplate") final Template passwordResetEmailTemplate,
+            @NotNull @Named("studentResetPasswordTemplate") final Template studentResetPasswordTemplate) {
         this.credentialsRepository = credentialsRepository;
         this.passwordEncoder = passwordEncoder;
         this.adapterDeterLab = adapterDeterLab;
@@ -68,6 +72,8 @@ public class CredentialsServiceImpl implements CredentialsService {
         this.domainProperties = domainProperties;
         this.passwordResetRepository = passwordResetRepository;
         this.passwordResetEmailTemplate = passwordResetEmailTemplate;
+        this.studentResetPasswordTemplate = studentResetPasswordTemplate;
+
     }
 
     @Transactional
@@ -91,7 +97,7 @@ public class CredentialsServiceImpl implements CredentialsService {
                 entity.setStatus(CredentialsStatus.ACTIVE);
                 entity.addRole(Role.USER);
                 final CredentialsEntity saved = credentialsRepository.save(entity);
-                log.info("Credentials created: {}", saved);
+                log.info("Credentials created for {}", saved.getId());
                 return saved;
             }
             log.warn("Username '{}' is already associated with a credentials", credentials.getUsername());
@@ -259,7 +265,7 @@ public class CredentialsServiceImpl implements CredentialsService {
         passwordResetRequestEntity.setTime(ZonedDateTime.now());
         passwordResetRequestEntity.setUsername(username);
         passwordResetRepository.save(passwordResetRequestEntity);
-        log.info("Password reset request saved: {}", passwordResetRequestEntity);
+        log.info("Password reset request saved: {}", passwordResetRequestEntity.getId());
 
         sendPasswordResetEmail(username, key);
     }
@@ -284,7 +290,7 @@ public class CredentialsServiceImpl implements CredentialsService {
         try {
             String msgText = FreeMarkerTemplateUtils.processTemplateIntoString(
                     passwordResetEmailTemplate, map);
-            mailService.send("NCL Testbed Ops <testbed-ops@ncl.sg>", username,
+            mailService.send(TESTBED_OPS_EMAIL, username,
                     "Your Request To Reset Password", msgText, false, null, null);
             log.info("Password reset email sent: {}", msgText);
         } catch (IOException | TemplateException e) {
@@ -378,4 +384,118 @@ public class CredentialsServiceImpl implements CredentialsService {
         }
         return sb.toString();
     }
+
+    /**
+     * used when a project leader tries to add students into his project
+     * a password reset request will be created for the student who is then informed via email
+     *
+     * @param userName email address used to login to the web portal
+     * @param projectName name of the project/team in which the member is added
+     */
+    @Override
+    @Transactional
+    public void addPasswordResetRequestForStudent(String userName, String projectName){
+
+        if (null == userName || userName.trim().isEmpty()) {
+            log.warn("Username null or empty in password reset request");
+            throw new UsernameNullOrEmptyException();
+        }
+
+        final Credentials one = credentialsRepository.findByUsername(userName);
+        if (null == one) {
+            log.warn("User {} not found in credentials database", userName);
+            throw new CredentialsNotFoundException(userName);
+        }
+
+        String key = RandomStringUtils.randomAlphanumeric(20);
+
+        PasswordResetRequestEntity passwordResetRequestEntity = new PasswordResetRequestEntity();
+        passwordResetRequestEntity.setHash(generateShaHash(key));
+        passwordResetRequestEntity.setTime(ZonedDateTime.now());
+        passwordResetRequestEntity.setUsername(userName);
+        passwordResetRepository.save(passwordResetRequestEntity);
+        log.info("Password reset request saved: {}", passwordResetRequestEntity.getId());
+
+        final String message = "You have been added to a NCL Project (Name: " + projectName + ").";
+        sendPasswordResetEmailToStudent(one.getId(), key, userName, message);
+    }
+
+    private void sendPasswordResetEmailToStudent(String uid, String key, String email, String message) {
+        final Map<String, String> map = new HashMap<>();
+        map.put("member", email);
+        map.put("message", message);
+        map.put("domain", domainProperties.getDomain());
+        map.put("key", key);
+        map.put("uid", uid);
+
+        try {
+            String msgText = FreeMarkerTemplateUtils.processTemplateIntoString(studentResetPasswordTemplate, map);
+            mailService.send(TESTBED_OPS_EMAIL, email, "Reset Password For New Student Member", msgText, false, null, null);
+            //log.info("Password reset email sent: {}", msgText);
+        } catch (IOException | TemplateException e) {
+            log.warn("{}", e);
+        }
+    }
+
+    /**
+     * New student member needs to set/reset his password when he first login
+     *
+     * @param uid uuid of the new student member
+     * @param key the randomly generated key for reset the password
+     * @param password new password
+     */
+    @Override
+    @Transactional
+    public void changePasswordStudent(String uid, String key, String password){
+
+        CredentialsEntity credentialFromUid = credentialsRepository.findById(uid);
+        if(null ==  credentialFromUid) {
+            log.warn("Student password reset: credentials from {} not found", uid);
+            throw new CredentialsNotFoundException(uid);
+        }
+
+        CredentialsEntity credentialFromKey = verifyPasswordResetRequestTimeout(key);
+
+        if (!credentialFromKey.getId().equals(uid)) {
+            log.warn("Student password reset: uid {} and key {} do not match", uid, key);
+            throw new PasswordResetRequestNotMatchException("Password reset request does not match with the user!");
+        }
+
+        if (password != null && !password.trim().isEmpty()) {
+            hashPassword(credentialFromUid, password);
+            credentialsRepository.save(credentialFromUid);
+            log.info("Student password reset for {} is successful", credentialFromUid.getUsername());
+        } else {
+            log.warn("Student password reset for {}: Password null or empty!", credentialFromUid.getUsername() );
+            throw new PasswordNullOrEmptyException();
+        }
+    }
+
+    @Override
+    public void resetKeyStudent(String uid) {
+
+        CredentialsEntity credentialFromUid = credentialsRepository.findById(uid);
+        if(null ==  credentialFromUid) {
+            log.warn("Student password key reset: credential from {} not found", uid);
+            throw new CredentialsNotFoundException(uid);
+        }
+        String username = credentialFromUid.getUsername();
+
+        List<PasswordResetRequestEntity>  passwordResetRequestEntityList = passwordResetRepository.findByUsername(username);
+        if(passwordResetRequestEntityList.isEmpty()) {
+            log.warn("Student password key reset: password reset request for {} not found", uid);
+            throw new PasswordResetRequestNotFoundException(uid);
+        }
+
+        String key = RandomStringUtils.randomAlphanumeric(20);
+        PasswordResetRequestEntity passwordResetRequestEntity = new PasswordResetRequestEntity();
+        passwordResetRequestEntity.setHash(generateShaHash(key));
+        passwordResetRequestEntity.setTime(ZonedDateTime.now());
+        passwordResetRequestEntity.setUsername(username);
+        PasswordResetRequestEntity saved = passwordResetRepository.save(passwordResetRequestEntity);
+        log.info("New password key was generated for {}: {}", uid, saved.getId());
+
+        sendPasswordResetEmailToStudent(uid, key, username, "Your key has been reset!");
+    }
+
 }
