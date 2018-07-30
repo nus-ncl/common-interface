@@ -52,6 +52,7 @@ public interface Team {
      */
     TeamVisibility getVisibility();
 
+    Boolean getIsClass();
     /**
      * Returns the {@link TeamPrivacy} of this {@link Team}.
      *

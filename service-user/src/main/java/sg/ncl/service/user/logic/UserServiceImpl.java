@@ -155,7 +155,7 @@ public class UserServiceImpl implements UserService {
         }
 
         final User saved = userRepository.save(one);
-        log.info("User details updated: {}", saved.getUserDetails());
+        log.info("User details updated for {}", saved.getId());
         return saved;
     }
 
@@ -323,5 +323,45 @@ public class UserServiceImpl implements UserService {
     @Override
     public String deletePublicKey(final String keyId, final String userId) {
         return adapterDeterLab.deletePublicKey(userId, keyId);
+    }
+
+    /**
+     * For a new student member to update his own info including first name, last name, phone and password
+     * when he/she first time logs into the testbed
+     *
+     * 1. Update user's password in CredentialsService
+     * 2. Update user's name and phone in UserService
+     * 3. Change user's password on DeterLab
+     *
+     * @param uid
+     * @param firstName
+     * @param lastName
+     * @param phone
+     * @param password
+     * @param key the key will become invalid once the password is successfully reset
+     * @return
+     */
+    @Override
+    @Transactional
+    public User changePasswordStudent(String uid, String firstName, String lastName, String phone, String password, String key) {
+
+        // 1. Update user's password in CredentialsService
+        credentialsService.changePasswordStudent(uid, key, password);
+
+        // 2. Update user's name and phone in UserService
+        UserDetailsEntity userDetailsEntity = new UserDetailsEntity();
+        userDetailsEntity.setFirstName(firstName);
+        userDetailsEntity.setLastName(lastName);
+        userDetailsEntity.setPhone(phone);
+
+        UserEntity userEntity = new UserEntity();
+        userEntity.setUserDetails(userDetailsEntity);
+
+        User updatedUser = updateUser(uid, userEntity);
+
+        // 3. Change user's password on DeterLab
+        adapterDeterLab.changePasswordStudent(uid, firstName, lastName, phone, password);
+
+        return updatedUser;
     }
 }

@@ -27,6 +27,7 @@ public class Util {
         entity.setWebsite("http://" + RandomStringUtils.randomAlphanumeric(20) + ".com");
         entity.setOrganisationType(RandomStringUtils.randomAlphanumeric(20));
         entity.setApplicationDate(ZonedDateTime.now());
+        entity.setIsClass(false);
         return entity;
     }
 

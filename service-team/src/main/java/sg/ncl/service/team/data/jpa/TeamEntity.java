@@ -48,6 +48,10 @@ public class TeamEntity extends AbstractEntity implements Team {
     @Enumerated(EnumType.STRING)
     private TeamVisibility visibility = TeamVisibility.PUBLIC;
 
+    @Column(name = "class", nullable = false)
+    @Type(type = "yes_no")
+    private Boolean isClass = false;
+
     @Column(name = "privacy", nullable = false)
     @Enumerated(EnumType.STRING)
     private TeamPrivacy privacy = TeamPrivacy.OPEN;
@@ -153,6 +157,7 @@ public class TeamEntity extends AbstractEntity implements Team {
                 ", website='" + website + '\'' +
                 ", organisationType='" + organisationType + '\'' +
                 ", visibility=" + visibility +
+                ", isClass=" + isClass +
                 ", privacy=" + privacy +
                 ", status=" + status +
                 ", applicationDate=" + applicationDate +

@@ -176,4 +176,14 @@ public class ConnectionProperties {
     public String reserveNodes() {
         return HTTP_MODE + ip + ":" + port + "/reserveNodes";
     }
+
+    public String addStudentsByEmail() {
+        return HTTP_MODE + ip + ":" + port + "/addStudentsByEmail";
+    }
+
+    public String changePasswordStudent() {
+        return HTTP_MODE + ip + ":" + port + "/changePasswordStudent";
+    }
+
+
 }

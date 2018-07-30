@@ -6,6 +6,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
+import sg.ncl.common.exception.base.BadRequestException;
 import sg.ncl.service.user.domain.User;
 import sg.ncl.service.user.domain.UserService;
 import sg.ncl.service.user.domain.UserStatus;
@@ -98,5 +99,31 @@ public class UsersController {
     public String deletePublicKey(@AuthenticationPrincipal final Object claims, @PathVariable String userid, @PathVariable String keyid) {
         checkClaimsType(claims);
         return userService.deletePublicKey(keyid, ((Claims) claims).getSubject());
+    }
+
+    /**
+     * For a new student member to update his info including first name, last name, phone and password
+     * when the student first time logs in
+     *
+     * @param id uuid of the user
+     * @param studentInfo including first name, last name, phone, password and the key
+     * @return the updated user
+     */
+    @PutMapping(path = "/{id}/studentInfo", consumes = MediaType.APPLICATION_JSON_VALUE)
+    @ResponseStatus(HttpStatus.OK)
+    public User changePasswordStudent(@PathVariable String id, @RequestBody StudentInfo studentInfo) {
+        final String firstName = studentInfo.getFirstName();
+        final String lastName = studentInfo.getLastName();
+        final String phone = studentInfo.getPhone();
+        final String password = studentInfo.getPassword();
+        final String key = studentInfo.getKey();
+
+        if (firstName == null || firstName.isEmpty() || lastName == null || lastName.isEmpty() ||
+                phone == null || phone.isEmpty() || password == null || password.isEmpty() ||
+                key == null || key.isEmpty()) {
+            log.warn("Error access /users/{}/studentInfo: Bad Request", id);
+            throw new BadRequestException(studentInfo.toString());
+        }
+        return new UserInfo(userService.changePasswordStudent(id, firstName, lastName, phone, password, key));
     }
 }

@@ -4,7 +4,7 @@ server:
   port: 8080
 spring:
   datasource:
-    url: ${jdbc.url:} # e.g., jdbc:mysql://localhost:3306/ncl?useSSL=false
+    url: ${jdbc.url:} # e.g., jdbc:mysql://localhost:3306/prod?useSSL=false
     username: ${jdbc.username:}
     password: ${jdbc.password:}
   jpa:
@@ -18,8 +18,8 @@ spring:
   mail:
     host: smtp-relay.gmail.com
     port: 465
-    username: ${gmail.username:}
-    password: ${gmail.password:}
+    username: ${gmail.username}
+    password: ${gmail.password}
     protocol: smtps
     properties:
       starttls:
@@ -29,7 +29,7 @@ flyway:
   # baseline-version: 1.1
   # baseline-on-migrate: true # for cases when the schema is non-empty and there is no metadata table
   schemas: flyway, prod
-  url: ${db.url:} # e.g., jdbc:mysql://localhost:3306?useSSL=false
+  url:  ${db.url:} # e.g., jdbc:mysql://localhost:3306?useSSL=false
   user: ${db.user:}
   password: ${db.password:}
 ncl:
@@ -47,10 +47,12 @@ ncl:
       '/registrations': POST # for apply/join new teams
       '/users/(\w|-)+': GET # for retrieving public teams' owner info
       '/registrations/users/(\w|-)+/emails/\w+=*': PUT # for email verifications
+      '/users/(\w|-)+/studentInfo': PUT # for new student member to reset password, name and phone
       '/teams\?visibility=PUBLIC': GET # for retrieving public teams
       '/teams\?name=(\w|-)+': GET # for retrieving teams by name
       '/credentials/password/resets': POST
       '/credentials/password': PUT
+      '/credentials/(\w|-)+/keys': PUT # for student to reset password key after it expires
       '/telemetry/nodes/counts\?type=FREE': GET # for retrieving free nodes count
       '/telemetry/nodes/counts\?type=TOTAL': GET # for retrieving total nodes count
       '/telemetry/nodes/status': GET # for retrieving all nodes' statuses

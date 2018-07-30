@@ -3,14 +3,17 @@ package sg.ncl.service.registration.logic;
 import freemarker.template.Template;
 import freemarker.template.TemplateException;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.tomcat.util.codec.binary.Base64;
 import org.json.JSONObject;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.ui.freemarker.FreeMarkerTemplateUtils;
 import sg.ncl.adapter.deterlab.AdapterDeterLab;
+import sg.ncl.adapter.deterlab.exceptions.DeterLabOperationFailedException;
 import sg.ncl.common.DomainProperties;
 import sg.ncl.common.authentication.Role;
+import sg.ncl.common.exception.base.ForbiddenException;
 import sg.ncl.service.authentication.domain.Credentials;
 import sg.ncl.service.authentication.domain.CredentialsService;
 import sg.ncl.service.authentication.domain.CredentialsStatus;
@@ -25,6 +28,9 @@ import sg.ncl.service.team.data.jpa.TeamMemberEntity;
 import sg.ncl.service.team.domain.*;
 import sg.ncl.service.team.exceptions.TeamNotFoundException;
 import sg.ncl.service.team.web.TeamMemberInfo;
+import sg.ncl.service.user.data.jpa.AddressEntity;
+import sg.ncl.service.user.data.jpa.UserDetailsEntity;
+import sg.ncl.service.user.data.jpa.UserEntity;
 import sg.ncl.service.user.domain.User;
 import sg.ncl.service.user.domain.UserService;
 import sg.ncl.service.user.domain.UserStatus;
@@ -57,7 +63,10 @@ public class RegistrationServiceImpl implements RegistrationService {
     private static final String INSTITUTION = "institution";
     private static final String COUNTRY = "country";
     private static final String ADMIN_EMAIL = "ncl-admin@ncl.sg";
-    private static final String TESTBED_EMAIL = "NCL Testbed Ops <testbed-ops@ncl.sg>";
+    private static final String TESTBED_EMAIL = "NCL Operations <testbed-ops@ncl.sg>";
+    private static final String USER_IN_NOT_A_TEAM_OWNER = "User {} is not a team owner of Team {}";
+    private static final String TEAM_NOT_FOUND = "Team {} NOT found";
+    private static final String USER_NOT_FOUND = "User {} NOT found";
 
     private final CredentialsService credentialsService;
     private final TeamService teamService;
@@ -103,7 +112,7 @@ public class RegistrationServiceImpl implements RegistrationService {
 
     @Override
     @Transactional
-    // FIXME: the return type should be a proper Registration
+    // FIX ME: the return type should be a proper Registration
     // for existing users to create a new team
     public Registration registerRequestToApplyTeam(String nclUserId, Team team) {
 
@@ -134,6 +143,7 @@ public class RegistrationServiceImpl implements RegistrationService {
         mainObject.put("projWeb", team.getWebsite());
         mainObject.put("projOrg", team.getOrganisationType());
         mainObject.put("projPublic", team.getVisibility());
+        mainObject.put("projResearchType", team.getIsClass() ? "Class" : "Other");
 
         userService.addTeam(nclUserId, createdTeam.getId());
         teamService.addMember(createdTeam.getId(), teamMemberInfo);
@@ -250,14 +260,14 @@ public class RegistrationServiceImpl implements RegistrationService {
         userObject.put("jobTitle", user.getUserDetails().getJobTitle());
         userObject.put("password", credentials.getPassword()); // cannot get from credentialsEntity else will be hashed
         userObject.put("email", user.getUserDetails().getEmail());
-        userObject.put("phone", user.getUserDetails().getPhone());
-        userObject.put("institution", user.getUserDetails().getInstitution());
+        userObject.put(PHONE, user.getUserDetails().getPhone());
+        userObject.put(INSTITUTION, user.getUserDetails().getInstitution());
         userObject.put("institutionAbbreviation", user.getUserDetails().getInstitutionAbbreviation());
         userObject.put("institutionWeb", user.getUserDetails().getInstitutionWeb());
 
         userObject.put("address1", user.getUserDetails().getAddress().getAddress1());
         userObject.put("address2", user.getUserDetails().getAddress().getAddress2());
-        userObject.put("country", user.getUserDetails().getAddress().getCountry());
+        userObject.put(COUNTRY, user.getUserDetails().getAddress().getCountry());
         userObject.put("region", user.getUserDetails().getAddress().getRegion());
         userObject.put("city", user.getUserDetails().getAddress().getCity());
         userObject.put("zipCode", user.getUserDetails().getAddress().getZipCode());
@@ -273,6 +283,7 @@ public class RegistrationServiceImpl implements RegistrationService {
             userObject.put("projWeb", teamEntity.getWebsite());
             userObject.put("projOrg", teamEntity.getOrganisationType());
             userObject.put("projPublic", teamEntity.getVisibility());
+            userObject.put("projResearchType", teamEntity.getIsClass() ? "Class" : "Other");
             resultJSON = adapterDeterLab.applyProjectNewUsers(userObject.toString());
         }
 
@@ -302,12 +313,12 @@ public class RegistrationServiceImpl implements RegistrationService {
             throw new EmailNotVerifiedException(user.getId());
         }
         if (!teamService.isOwner(teamId, approver.getId())) {
-            log.warn("User {} is not a team owner of Team {}", approver.getId(), teamId);
+            log.warn(USER_IN_NOT_A_TEAM_OWNER, approver.getId(), teamId);
             throw new UserIsNotTeamOwnerException();
         }
         Team team = teamService.getTeamById(teamId);
         if (team == null) {
-            log.warn("Team NOT found, TeamId {}", teamId);
+            log.warn(TEAM_NOT_FOUND, teamId);
             throw new TeamNotFoundException(teamId);
         }
         String pid = team.getName();
@@ -331,12 +342,12 @@ public class RegistrationServiceImpl implements RegistrationService {
     @Transactional
     public String rejectJoinRequest(String teamId, String userId, User approver) {
         if (!teamService.isOwner(teamId, approver.getId())) {
-            log.warn("User {} is not a team owner of Team {}", approver.getId(), teamId);
+            log.warn(USER_IN_NOT_A_TEAM_OWNER, approver.getId(), teamId);
             throw new UserIsNotTeamOwnerException();
         }
         Team one = teamService.getTeamById(teamId);
         if (one == null) {
-            log.warn("Team NOT found, TeamId {}", teamId);
+            log.warn(TEAM_NOT_FOUND, teamId);
             throw new TeamNotFoundException(teamId);
         }
         String pid = one.getName();
@@ -351,7 +362,7 @@ public class RegistrationServiceImpl implements RegistrationService {
                 log.info("Reject join request from User {}, Team {}", member.getUserId(), teamId);
                 userService.removeTeam(userId, teamId);
                 teamService.removeMember(teamId, member);
-                // FIXME call adapter deterlab
+                // FIX ME call adapter deterlab
                 JSONObject object = new JSONObject();
                 object.put("approverUid", adapterDeterLab.getDeterUserIdByNclUserId(approver.getId()));
                 object.put("uid", adapterDeterLab.getDeterUserIdByNclUserId(userId));
@@ -375,7 +386,7 @@ public class RegistrationServiceImpl implements RegistrationService {
             final TeamStatus status,
             final String reason
     ) {
-        // FIXME required additional parameters to validate if approver is of admin or ordinary user
+        // FIX ME required additional parameters to validate if approver is of admin or ordinary user
 
         checkTeamId(teamId);
         checkUserId(ownerId);
@@ -389,10 +400,11 @@ public class RegistrationServiceImpl implements RegistrationService {
         // invoked method already ensure there is at least a team member of type owner
         Team team = teamService.updateTeamStatus(teamId, status);
 
-        // FIXME adapter deterlab call here
+        // FIX ME adapter deterlab call here
         JSONObject one = new JSONObject();
         one.put("pid", team.getName());
         one.put("uid", adapterDeterLab.getDeterUserIdByNclUserId(ownerId));
+        one.put("isClass", team.getIsClass());
 
         String adapterResult;
         if (status.equals(TeamStatus.APPROVED)) {
@@ -408,9 +420,10 @@ public class RegistrationServiceImpl implements RegistrationService {
             // change team owner member status
             teamService.updateMemberStatus(teamId, ownerId, MemberStatus.APPROVED);
             adapterResult = adapterDeterLab.approveProject(one.toString());
+
             sendReplyCreateTeamEmail(user, team, status, reason);
         } else {
-            // FIXME may need to be more specific and check if TeamStatus is REJECTED
+            // FIX ME may need to be more specific and check if TeamStatus is REJECTED
             Team existingTeam = teamService.getTeamById(teamId);
             List<? extends TeamMember> existingMembersList = existingTeam.getMembers();
             for (TeamMember member : existingMembersList) {
@@ -557,7 +570,7 @@ public class RegistrationServiceImpl implements RegistrationService {
         JSONObject jsonObjectFromAdapter = new JSONObject(resultJSON);
         String uid = jsonObjectFromAdapter.getString("uid");
 
-        // FIXME ncl pid may be different from deter pid
+        // FIX ME ncl pid may be different from deter pid
         RegistrationEntity registrationEntity = new RegistrationEntity();
         registrationEntity.setPid(team.getId());
         registrationEntity.setUid(uid);
@@ -701,23 +714,128 @@ public class RegistrationServiceImpl implements RegistrationService {
     }
 
     private static void checkUserId(final String id) {
-        if(id == null || id.trim().isEmpty()) {
+        if (id == null || id.trim().isEmpty()) {
             log.warn("User ID is null or empty: {}", id);
             throw new UserIdNullOrEmptyException();
         }
     }
 
     private static void checkTeamId(final String id) {
-        if(id == null || id.trim().isEmpty()) {
+        if (id == null || id.trim().isEmpty()) {
             log.warn("Team ID is null or empty: {}", id);
             throw new TeamIdNullOrEmptyException();
         }
     }
 
-    private static void checkTeamName (final String name) {
-        if(name == null || name.trim().isEmpty()) {
+    private static void checkTeamName(final String name) {
+        if (name == null || name.trim().isEmpty()) {
             log.warn("Team name is null or empty: {}", name);
             throw new TeamNameNullOrEmptyException();
         }
     }
+
+    /**
+     * register a number of student members to the specified team
+     * this function only works for class project
+     * need to be invoked by the project/team leader
+     *
+     * @param teamId   team id, e.g., efa8bd9c-07da-4e31-8586-540f63c0fc81
+     * @param leaderId team leader id, e.g., 187e266e-5a30-43a5-abad-3010e19bdc6a
+     * @param emails   a String in the format "hello+111-25@gmail.com\r\nhello-111.25@gmail.com\r\nhello.111_25@gmail.com"
+     * @return
+     */
+    @Override
+    @Transactional
+    public void addStudentsByEmail(String teamId, String leaderId, String emails) {
+
+        if (!teamService.isOwner(teamId, leaderId)) {
+            log.warn("Access denied for {} : /registrations/teams/{}/students POST", leaderId, teamId);
+            throw new ForbiddenException();
+        }
+
+        Team team = teamService.getTeamById(teamId);
+        if (team == null) {
+            log.warn(TEAM_NOT_FOUND, teamId);
+            throw new TeamNotFoundException(teamId);
+        }
+
+        User leader = userService.getUser(leaderId);
+        if (leader == null) {
+            log.warn(USER_NOT_FOUND, leaderId);
+            throw new UserNotFoundException(leaderId);
+        }
+
+        String[] emailsSplit = emails.split("\\r?\\n");
+        Map<String, String> listOfSioUid = new HashMap();
+
+        for (int i = 0; i < emailsSplit.length; i++) {
+
+            String email = emailsSplit[i];
+
+            //create new user
+            UserEntity userEntity = new UserEntity();
+            userEntity.setApplicationDate(ZonedDateTime.now());
+            userEntity.setProcessedDate(ZonedDateTime.now());
+
+            UserDetailsEntity userDetailsEntity = new UserDetailsEntity();
+            userDetailsEntity.setAddress(AddressEntity.get(leader.getUserDetails().getAddress()));
+            userDetailsEntity.setFirstName(email.substring(0, email.indexOf('@')));
+            userDetailsEntity.setLastName(team.getName());
+            userDetailsEntity.setInstitution(leader.getUserDetails().getInstitution());
+            userDetailsEntity.setInstitutionAbbreviation(leader.getUserDetails().getInstitutionAbbreviation());
+            userDetailsEntity.setInstitutionWeb(leader.getUserDetails().getInstitutionWeb());
+            userDetailsEntity.setJobTitle("Student");
+            userDetailsEntity.setPhone(leader.getUserDetails().getPhone());
+            userDetailsEntity.setEmail(email);
+
+            userEntity.setUserDetails(userDetailsEntity);
+
+            User createdUser = userService.createUser(userEntity);
+            userService.verifyUserEmail(createdUser.getId(), email, createdUser.getVerificationKey());
+            userService.updateUserStatus(createdUser.getId(), UserStatus.APPROVED);
+            userService.addTeam(createdUser.getId(), teamId);
+
+            // add credentials
+            String randomPassword = RandomStringUtils.randomAlphanumeric(20);
+            final CredentialsInfo credentialsInfo = new CredentialsInfo(createdUser.getId(), email, randomPassword, CredentialsStatus.ACTIVE, new HashSet<>(Arrays.asList(Role.USER)));
+            credentialsService.addCredentials(credentialsInfo);
+
+            //add member
+            TeamMemberEntity teamMemberEntity = new TeamMemberEntity();
+            teamMemberEntity.setUserId(createdUser.getId());
+            teamMemberEntity.setJoinedDate(ZonedDateTime.now());
+            teamMemberEntity.setMemberType(MemberType.MEMBER);
+            teamMemberEntity.setMemberStatus(MemberStatus.APPROVED);
+            TeamMemberInfo teamMemberInfo = new TeamMemberInfo(teamMemberEntity);
+
+            teamService.addMember(teamId, teamMemberInfo);
+
+            listOfSioUid.put(email, createdUser.getId());
+        }
+
+        // add the new members on DeterLab
+        String listOfDeterUid = adapterDeterLab.addStudentsByEmail(teamId, leaderId, emails);
+
+        // save the mapping between deter an sio user id
+        JSONObject responseJsonObject = new JSONObject(listOfDeterUid);
+        for (int i = 0; i < emailsSplit.length; i++) {
+            String email = emailsSplit[i];
+            if (responseJsonObject.has(email)) {
+                String deterUid = responseJsonObject.getString(email);
+                String nclUid = listOfSioUid.get(email);
+                adapterDeterLab.saveDeterUserIdMapping(deterUid, nclUid);
+            } else {
+                log.warn("Error in adding students to team {}: user {} was not created", team.getName(), email);
+                throw new DeterLabOperationFailedException("User " + email + " was not created");
+            }
+        }
+
+        // if everything is fine , now start to send email
+        for (int i = 0; i < emailsSplit.length; i++) {
+            String email = emailsSplit[i];
+            //email is username in credentials table
+            credentialsService.addPasswordResetRequestForStudent(email, team.getName());
+        }
+    }
+
 }
