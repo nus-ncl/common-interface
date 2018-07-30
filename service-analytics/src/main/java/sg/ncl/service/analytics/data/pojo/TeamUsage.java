@@ -16,7 +16,7 @@ import java.util.Map;
 public class TeamUsage {
     private static final String ZONE = "Asia/Singapore";
     
-    private String exptIdx;
+    private Integer exptIdx;
     private ZonedDateTime swapIn;
     private ZonedDateTime swapOut;
     private Integer pnodes;

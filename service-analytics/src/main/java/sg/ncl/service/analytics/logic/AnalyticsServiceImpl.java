@@ -184,7 +184,7 @@ public class AnalyticsServiceImpl implements AnalyticsService {
             throw new StartDateAfterEndDateException();
 
         List<TeamUsage> usageList = new ArrayList<>();
-        Map<String, TeamUsage> usages = new HashMap<>();
+        Map<Integer, TeamUsage> usages = new HashMap<>();
         String jsonString = adapterDeterLab.getTeamUsage(teamId);
         JSONObject jsonObject = new JSONObject(jsonString);
 
@@ -193,13 +193,13 @@ public class AnalyticsServiceImpl implements AnalyticsService {
             String action = object.getString("action");
             if (action.equals("swapin") || action.equals("start")) {
                 TeamUsage usage = new TeamUsage();
-                usage.setExptIdx(object.getString(EXPTIDX));
+                usage.setExptIdx(object.getInt(EXPTIDX));
                 usage.setSwapIn(object.getString("start_time"));
-                usage.setPnodes(Integer.valueOf(object.getString("pnodes")));
-                usages.put(object.getString(EXPTIDX), usage);
+                usage.setPnodes(object.getInt("pnodes"));
+                usages.put(object.getInt(EXPTIDX), usage);
                 usageList.add(usage);
             } else if (action.equals("swapout")) {
-                TeamUsage usage = usages.get(object.getString(EXPTIDX));
+                TeamUsage usage = usages.get(object.getInt(EXPTIDX));
                 usage.setSwapOut(object.getString("start_time"));
             }
         }
