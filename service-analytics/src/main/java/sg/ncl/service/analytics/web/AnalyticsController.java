@@ -111,11 +111,13 @@ public class AnalyticsController {
 
         ZonedDateTime start = getZonedDateTime(startDate);
         ZonedDateTime end = getZonedDateTime(endDate);
-        ZonedDateTime now = ZonedDateTime.now();
+        ZonedDateTime now = ZonedDateTime.now().withHour(0).withMinute(0).withSecond(0).withNano(0);
         if (start == null)
             start = now.with(firstDayOfMonth());
         if (end == null)
             end = now.with(lastDayOfMonth());
+        if (end.isAfter(now))
+            end = now;
 
         // return analyticsService.getUsageStatistics(id, start, end);
         return analyticsService.getTeamUsage(id, start, end);

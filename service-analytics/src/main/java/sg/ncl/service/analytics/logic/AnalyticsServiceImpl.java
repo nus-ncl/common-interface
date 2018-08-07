@@ -215,8 +215,13 @@ public class AnalyticsServiceImpl implements AnalyticsService {
             nodeUsage.add(value == null ? 0 : value);
             currentDate = currentDate.plusDays(1);
         }
-        Long value = dayUsage.get(formatter.format(currentDate));
-        nodeUsage.add(value == null ? 0 : value);
+        ZonedDateTime nowDate = ZonedDateTime.now().withHour(0).withMinute(0).withSecond(0).withNano(0);
+        if (currentDate.isBefore(nowDate)) {
+            Long value = dayUsage.get(formatter.format(currentDate));
+            nodeUsage.add(value == null ? 0 : value);
+        } else {
+            nodeUsage.add(0L);
+        }
 
         return nodeUsage;
     }
