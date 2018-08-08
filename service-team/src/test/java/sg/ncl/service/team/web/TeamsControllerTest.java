@@ -27,9 +27,7 @@ import sg.ncl.common.jwt.JwtToken;
 import sg.ncl.service.analytics.domain.AnalyticsService;
 import sg.ncl.service.team.data.jpa.TeamEntity;
 import sg.ncl.service.team.data.jpa.TeamQuotaEntity;
-import sg.ncl.service.team.data.jpa.TeamRepository;
 import sg.ncl.service.team.domain.*;
-import sg.ncl.service.team.exceptions.TeamNotFoundException;
 import sg.ncl.service.team.exceptions.TeamQuotaOutOfRangeException;
 
 import javax.inject.Inject;
@@ -41,8 +39,7 @@ import java.util.List;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.*;
 import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyInt;
-import static org.mockito.Matchers.anyString;
+import static org.mockito.Matchers.*;
 import static org.mockito.Mockito.mockingDetails;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
@@ -308,21 +305,24 @@ public class TeamsControllerTest {
 
     @Test
     public void testGetTeamQuotaByTeamId() throws Exception {
-        final String randomUsage = RandomStringUtils.randomNumeric(10);
+        final Long randomUsage = Long.valueOf(RandomStringUtils.randomNumeric(10));
+        List<Long> usages = new ArrayList<>();
+        usages.add(randomUsage);
+
         TeamQuota teamQuota = getTeamQuotaEntity();
-        TeamQuotaInfo teamQuotaInfo = new TeamQuotaInfo(teamQuota,randomUsage);
+        TeamQuotaInfo teamQuotaInfo = new TeamQuotaInfo(teamQuota, String.format("%.2f", randomUsage.doubleValue() / 60));
         final byte[] content = mapper.writeValueAsBytes(teamQuotaInfo);
 
         TeamEntity team = getTeamEntityWithId();
         when(teamService.getTeamQuotaByTeamId(anyString())).thenReturn(teamQuota);
         when(teamService.getTeamById(anyString())).thenReturn(team);
-        when(analyticsService.getUsageStatistics(anyString(), any(ZonedDateTime.class), any(ZonedDateTime.class))).thenReturn(randomUsage);
+        when(analyticsService.getTeamUsage(anyString(), any(ZonedDateTime.class), any(ZonedDateTime.class))).thenReturn(usages);
 
         mockMvc.perform(get(TeamsController.PATH + "/teamId/quota").contentType(MediaType.APPLICATION_JSON).content(content))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.teamId", is(equalTo(teamQuotaInfo.getTeamId()))))
                 .andExpect(jsonPath("$.quota", is(equalTo(teamQuotaInfo.getQuota().intValue()))))
-                .andExpect(jsonPath("$.usage", is(equalTo(randomUsage))));
+                .andExpect(jsonPath("$.usage", is(equalTo(teamQuotaInfo.getUsage()))));
     }
 
     @Test
