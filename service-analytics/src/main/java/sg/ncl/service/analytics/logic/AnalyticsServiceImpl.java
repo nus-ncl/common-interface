@@ -167,6 +167,7 @@ public class AnalyticsServiceImpl implements AnalyticsService {
         return flags;
     }
 
+    // no longer in use; it has been replaced by getTeamExptStats() below
     @Override
     public String getUsageStatistics(String teamId, ZonedDateTime startDate, ZonedDateTime endDate) {
         if (startDate.isAfter(endDate))
@@ -185,7 +186,7 @@ public class AnalyticsServiceImpl implements AnalyticsService {
 
         List<TeamUsage> usageList = new ArrayList<>();
         Map<Integer, TeamUsage> usages = new HashMap<>();
-        String jsonString = adapterDeterLab.getTeamUsage(teamId);
+        String jsonString = adapterDeterLab.getTeamExptStats(teamId);
         JSONObject jsonObject = new JSONObject(jsonString);
 
         for (int i = 1; i < jsonObject.length(); i++) {

@@ -177,8 +177,8 @@ public class ConnectionProperties {
         return HTTP_MODE + ip + ":" + port + "/reserveNodes";
     }
 
-    public String getTeamUsage() {
-        return HTTP_MODE + ip + ":" + port + "/getTeamUsage";
+    public String getTeamExptStats() {
+        return HTTP_MODE + ip + ":" + port + "/getTeamExptStats";
     }
 
     public String addStudentsByEmail() {
