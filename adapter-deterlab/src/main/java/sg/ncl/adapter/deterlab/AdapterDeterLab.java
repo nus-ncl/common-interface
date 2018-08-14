@@ -944,6 +944,7 @@ public class AdapterDeterLab {
         return response.getBody().toString();
     }
 
+    // no longer in use; it has been replaced by getTeamExptStats()
     public String getUsageStatistics(String teamId, String startDate, String endDate) {
         // start : mm/dd/yy
         // end : mm/dd/yy
@@ -1365,6 +1366,26 @@ public class AdapterDeterLab {
             log.warn("node reservation error: Adapter DeterLab internal server error {}", hsee);
             throw new AdapterInternalErrorException();
         }
+    }
+
+    // return all experiment swap-in and swap-out records for a project
+    public String getTeamExptStats(String teamId) {
+        JSONObject jsonObject = new JSONObject();
+        jsonObject.put("pid", getDeterProjectIdByNclTeamId(teamId));
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        HttpEntity<String> request = new HttpEntity<>(jsonObject.toString(), headers);
+        ResponseEntity response;
+
+        try {
+            response = restTemplate.exchange(properties.getTeamExptStats(), HttpMethod.POST, request, String.class);
+        } catch (RestClientException e) {
+            log.warn("DeterLab connection error get usage statistics: {}", e);
+            return "?";
+        }
+
+        return response.getBody().toString();
     }
 
     /**

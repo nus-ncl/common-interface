@@ -3,11 +3,13 @@ package sg.ncl.service.analytics.logic;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
+import org.json.JSONObject;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.stereotype.Service;
 import sg.ncl.adapter.deterlab.AdapterDeterLab;
 import sg.ncl.service.analytics.AnalyticsProperties;
 import sg.ncl.service.analytics.data.jpa.*;
+import sg.ncl.service.analytics.data.pojo.TeamUsage;
 import sg.ncl.service.analytics.domain.AnalyticsService;
 import sg.ncl.service.analytics.domain.DataDownload;
 import sg.ncl.service.analytics.domain.DataPublicDownload;
@@ -25,10 +27,7 @@ import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.List;
+import java.util.*;
 import java.util.regex.Pattern;
 
 /**
@@ -39,6 +38,7 @@ import java.util.regex.Pattern;
 @Slf4j
 @EnableConfigurationProperties(AnalyticsProperties.class)
 public class AnalyticsServiceImpl implements AnalyticsService {
+    private static final String EXPTIDX = "exptidx";
 
     private final DataPublicDownloadRepository dataPublicDownloadRepository;
 
@@ -167,6 +167,7 @@ public class AnalyticsServiceImpl implements AnalyticsService {
         return flags;
     }
 
+    // no longer in use; it has been replaced by getTeamExptStats() below
     @Override
     public String getUsageStatistics(String teamId, ZonedDateTime startDate, ZonedDateTime endDate) {
         if (startDate.isAfter(endDate))
@@ -176,6 +177,63 @@ public class AnalyticsServiceImpl implements AnalyticsService {
         String end = endDate.format(formatter);
         log.info("Getting usage statistics for team {}, start {}, end {}", teamId, start, end);
         return adapterDeterLab.getUsageStatistics(teamId, start, end);
+    }
+
+    /**
+     * Get a team's daily usage for a given period from startDate to endDate (both inclusive)
+     * @param teamId
+     * @param startDate e.g., 2018-08-01T00:00+08:00[Asia/Singapore]
+     * @param endDate e.g., 2018-08-14T00:00+08:00[Asia/Singapore], inclusive
+     * @return daily usage in node-minutes
+     */
+    @Override
+    public List<Long> getTeamUsage(String teamId, ZonedDateTime startDate, ZonedDateTime endDate) {
+        if (startDate.isAfter(endDate))
+            throw new StartDateAfterEndDateException();
+
+        log.info("Getting usage stats for {} from {} to {}", teamId, startDate, endDate);
+
+        List<TeamUsage> usageList = new ArrayList<>();
+        Map<Integer, TeamUsage> usages = new HashMap<>();
+        String jsonString = adapterDeterLab.getTeamExptStats(teamId);
+        JSONObject jsonObject = new JSONObject(jsonString);
+
+        for (int i = 1; i < jsonObject.length(); i++) {
+            JSONObject object = jsonObject.getJSONObject(Integer.toString(i));
+            String action = object.getString("action");
+            if (action.equals("swapin") || action.equals("start")) {
+                TeamUsage usage = new TeamUsage();
+                usage.setExptIdx(object.getInt(EXPTIDX));
+                usage.setSwapIn(object.getString("start_time"));
+                usage.setPnodes(object.getInt("pnodes"));
+                usages.put(object.getInt(EXPTIDX), usage);
+                usageList.add(usage);
+            } else if (action.equals("swapout")) {
+                TeamUsage usage = usages.get(object.getInt(EXPTIDX));
+                usage.setSwapOut(object.getString("start_time"));
+            }
+        }
+
+        usageList.removeIf( u -> u.getSwapOut() != null && u.getSwapOut().isBefore(startDate) );
+        Map<String, Long> dayUsage = new HashMap<>();
+        usageList.forEach( usage -> usage.computeNodeUsageByDay(dayUsage, endDate) );
+        List<Long> nodeUsage = new ArrayList<>();
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+        ZonedDateTime currentDate = startDate.plusDays(0);
+        while (currentDate.isBefore(endDate)) {
+            Long value = dayUsage.get(formatter.format(currentDate));
+            nodeUsage.add(value == null ? 0 : value);
+            currentDate = currentDate.plusDays(1);
+        }
+        ZonedDateTime nowDate = ZonedDateTime.now().withHour(0).withMinute(0).withSecond(0).withNano(0);
+        if (currentDate.isBefore(nowDate)) {
+            Long value = dayUsage.get(formatter.format(currentDate));
+            nodeUsage.add(value == null ? 0 : value);
+        } else {
+            nodeUsage.add(0L);
+        }
+
+        return nodeUsage;
     }
 
     @Override

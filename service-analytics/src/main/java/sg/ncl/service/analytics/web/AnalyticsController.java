@@ -52,7 +52,7 @@ public class AnalyticsController {
                                                                    @RequestParam(value = "id", required = false) Long id,
                                                                    @RequestParam(value = "startDate", required = false) String startDate,
                                                                    @RequestParam(value = "endDate", required = false) String endDate) {
-        if (claims == null || !(claims instanceof Claims)) {
+        if (!(claims instanceof Claims)) {
             log.warn("Access denied for: /analytics/datasets/downloads/public GET");
             throw new UnauthorizedException();
         }
@@ -68,7 +68,7 @@ public class AnalyticsController {
                                                              @RequestParam(value = "id", required = false) Long id,
                                                              @RequestParam(value = "startDate", required = false) String startDate,
                                                              @RequestParam(value = "endDate", required = false) String endDate) {
-        if (claims == null || !(claims instanceof Claims)) {
+        if (!(claims instanceof Claims)) {
             log.warn("Access denied for: /analytics/datasets/downloads GET");
             throw new UnauthorizedException();
         }
@@ -98,26 +98,29 @@ public class AnalyticsController {
         return null;
     }
 
+    /**
+     * Get a team's daily usage for a given period from startDate to endDate (both inclusive)
+     * @param id
+     * @param startDate e.g., 2018-08-01
+     * @param endDate e.g., 2018-08-14
+     * @return daily usage in node-minutes
+     */
     @GetMapping("/usage/teams/{id}")
     @ResponseStatus(HttpStatus.OK)
-    public String getUsageStatistics(@AuthenticationPrincipal Object claims,
+    public List<Long> getUsageStatistics(@AuthenticationPrincipal Object claims,
                                      @PathVariable final String id,
                                      @RequestParam(value = "startDate", required = false) String startDate,
                                      @RequestParam(value = "endDate", required = false) String endDate) {
-        if (claims == null || !(claims instanceof Claims)) {
+        if (!(claims instanceof Claims)) {
             log.warn("Access denied for: /analytics/usage/teams GET");
             throw new UnauthorizedException();
         }
 
-        ZonedDateTime start = getZonedDateTime(startDate);
-        ZonedDateTime end = getZonedDateTime(endDate);
-        ZonedDateTime now = ZonedDateTime.now();
-        if (start == null)
-            start = now.with(firstDayOfMonth());
-        if (end == null)
-            end = now.with(lastDayOfMonth());
+        ZonedDateTime now = ZonedDateTime.now().withHour(0).withMinute(0).withSecond(0).withNano(0);
+        ZonedDateTime start = (startDate == null) ? now.with(firstDayOfMonth()) : getZonedDateTime(startDate);
+        ZonedDateTime end = (endDate == null) ? now : getZonedDateTime(endDate);
 
-        return analyticsService.getUsageStatistics(id, start, end);
+        return analyticsService.getTeamUsage(id, start, end);
     }
 
     @GetMapping("/energy")
