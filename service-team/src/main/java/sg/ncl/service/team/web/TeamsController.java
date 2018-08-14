@@ -97,7 +97,7 @@ public class TeamsController {
         TeamQuota teamQuota = teamService.getTeamQuotaByTeamId(teamId);
 
         Team team = teamService.getTeamById(teamId);
-        ZonedDateTime startDate = team.getApplicationDate();
+        ZonedDateTime startDate = team.getApplicationDate().withHour(0).withMinute(0).withSecond(0).withNano(0);
         ZonedDateTime endDate = ZonedDateTime.now().withHour(0).withMinute(0).withSecond(0).withNano(0);
         List<Long> usages = analyticsService.getTeamUsage(teamId, startDate, endDate);
         Long usage = usages.stream().mapToLong(i -> i).sum();
@@ -135,7 +135,7 @@ public class TeamsController {
         TeamQuota teamQuota = teamService.updateTeamQuota(teamId, teamQuotaInfo);
 
         Team team = teamService.getTeamById(teamId);
-        ZonedDateTime startDate = team.getApplicationDate();
+        ZonedDateTime startDate = team.getApplicationDate().withHour(0).withMinute(0).withSecond(0).withNano(0);
         ZonedDateTime endDate = ZonedDateTime.now().withHour(0).withMinute(0).withSecond(0).withNano(0);
         List<Long> usages = analyticsService.getTeamUsage(teamId, startDate, endDate);
         Long usage = usages.stream().mapToLong(i -> i).sum();

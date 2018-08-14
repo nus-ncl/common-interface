@@ -98,6 +98,13 @@ public class AnalyticsController {
         return null;
     }
 
+    /**
+     * Get a team's daily usage for a given period from startDate to endDate (both inclusive)
+     * @param id
+     * @param startDate e.g., 2018-08-01
+     * @param endDate e.g., 2018-08-14
+     * @return daily usage in node-minutes
+     */
     @GetMapping("/usage/teams/{id}")
     @ResponseStatus(HttpStatus.OK)
     public List<Long> getUsageStatistics(@AuthenticationPrincipal Object claims,
@@ -109,17 +116,10 @@ public class AnalyticsController {
             throw new UnauthorizedException();
         }
 
-        ZonedDateTime start = getZonedDateTime(startDate);
-        ZonedDateTime end = getZonedDateTime(endDate);
         ZonedDateTime now = ZonedDateTime.now().withHour(0).withMinute(0).withSecond(0).withNano(0);
-        if (start == null)
-            start = now.with(firstDayOfMonth());
-        if (end == null)
-            end = now.with(lastDayOfMonth());
-        if (end.isAfter(now))
-            end = now;
+        ZonedDateTime start = (startDate == null) ? now.with(firstDayOfMonth()) : getZonedDateTime(startDate);
+        ZonedDateTime end = (endDate == null) ? now : getZonedDateTime(endDate);
 
-        // return analyticsService.getUsageStatistics(id, start, end);
         return analyticsService.getTeamUsage(id, start, end);
     }
 

@@ -179,10 +179,19 @@ public class AnalyticsServiceImpl implements AnalyticsService {
         return adapterDeterLab.getUsageStatistics(teamId, start, end);
     }
 
+    /**
+     * Get a team's daily usage for a given period from startDate to endDate (both inclusive)
+     * @param teamId
+     * @param startDate e.g., 2018-08-01T00:00+08:00[Asia/Singapore]
+     * @param endDate e.g., 2018-08-14T00:00+08:00[Asia/Singapore], inclusive
+     * @return daily usage in node-minutes
+     */
     @Override
     public List<Long> getTeamUsage(String teamId, ZonedDateTime startDate, ZonedDateTime endDate) {
         if (startDate.isAfter(endDate))
             throw new StartDateAfterEndDateException();
+
+        log.info("Getting usage stats for {} from {} to {}", teamId, startDate, endDate);
 
         List<TeamUsage> usageList = new ArrayList<>();
         Map<Integer, TeamUsage> usages = new HashMap<>();

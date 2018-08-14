@@ -413,7 +413,7 @@ public class TeamServiceImpl implements TeamService {
 
         //getting usage , if quota is null => unlimited quota
         if (quota != null) {
-            ZonedDateTime startDate = team.getApplicationDate();
+            ZonedDateTime startDate = team.getApplicationDate().withHour(0).withMinute(0).withSecond(0).withNano(0);
             ZonedDateTime endDate = ZonedDateTime.now().withHour(0).withMinute(0).withSecond(0).withNano(0);
             List<Long> usages = analyticsService.getTeamUsage(teamId, startDate, endDate);
             Long usage = usages.stream().mapToLong(i -> i).sum();
