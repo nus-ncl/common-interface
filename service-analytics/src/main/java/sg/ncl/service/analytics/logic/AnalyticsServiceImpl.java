@@ -210,7 +210,9 @@ public class AnalyticsServiceImpl implements AnalyticsService {
                 usageList.add(usage);
             } else if (action.equals("swapout")) {
                 TeamUsage usage = usages.get(object.getInt(EXPTIDX));
-                usage.setSwapOut(object.getString("start_time"));
+                if (usage != null) {
+                    usage.setSwapOut(object.getString("start_time"));
+                }
             }
         }
 
