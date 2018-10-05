@@ -1,6 +1,7 @@
 package sg.ncl.service.analytics.logic;
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import sg.ncl.service.analytics.data.jpa.ProjectDetailsEntity;
 import sg.ncl.service.analytics.data.jpa.ProjectDetailsRepository;
@@ -19,6 +20,7 @@ import javax.validation.constraints.NotNull;
 import java.util.ArrayList;
 import java.util.List;
 
+@Service
 @Slf4j
 public class ProjectServiceImpl implements ProjectService {
 

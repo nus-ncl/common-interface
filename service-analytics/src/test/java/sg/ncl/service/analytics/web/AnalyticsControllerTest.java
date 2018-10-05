@@ -21,7 +21,6 @@ import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
-
 import sg.ncl.common.authentication.Role;
 import sg.ncl.common.exception.ExceptionAutoConfiguration;
 import sg.ncl.common.exception.GlobalExceptionHandler;
@@ -29,24 +28,23 @@ import sg.ncl.common.exception.base.UnauthorizedException;
 import sg.ncl.common.jwt.JwtToken;
 import sg.ncl.service.analytics.data.jpa.DataDownloadStatistics;
 import sg.ncl.service.analytics.domain.AnalyticsService;
-import sg.ncl.service.analytics.exceptions.StartDateAfterEndDateException;
-
+import sg.ncl.service.analytics.domain.ProjectDetails;
+import sg.ncl.service.analytics.domain.ProjectService;
+import sg.ncl.service.analytics.util.TestUtil;
 
 import javax.inject.Inject;
-
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyLong;
-import static org.mockito.Matchers.anyString;
+import static org.mockito.Matchers.*;
 import static org.mockito.Mockito.mockingDetails;
 import static org.mockito.Mockito.when;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 /**
  * @Author Tran Ly Vu
@@ -75,7 +73,8 @@ public class AnalyticsControllerTest {
 
     @MockBean
     private AnalyticsService analyticsService;
-
+    @MockBean
+    private ProjectService projectService;
 
     @Before
     public void before() {
@@ -148,7 +147,6 @@ public class AnalyticsControllerTest {
                 .andExpect(status().isOk());
     }
 
-
     @Test
     public void testGetEnergyStatistics() throws Exception {
         final List<String> roles = new ArrayList<>();
@@ -157,7 +155,7 @@ public class AnalyticsControllerTest {
 
         List<Double> randomList = new ArrayList<>();
         Random rand = new Random();
-        int randomSize = rand.nextInt(10) + 1;;
+        int randomSize = rand.nextInt(10) + 1;
 
         for (int i =0; i <  randomSize; i++) {
             double randomEnergy = Double.parseDouble(RandomStringUtils.randomNumeric(10));
@@ -180,5 +178,26 @@ public class AnalyticsControllerTest {
 
         mockMvc.perform(get(AnalyticsController.PATH + "/energy"))
                 .andExpect(status().isForbidden());
+    }
+
+    @Test
+    public void testGetAllProjectDetails() throws Exception {
+        final List<String> roles = new ArrayList<>();
+        roles.add(Role.ADMIN.getAuthority());
+        when(claims.get(JwtToken.KEY)).thenReturn(roles);
+
+        List<ProjectDetails> projectDetailsList = new ArrayList<>();
+        Random rand = new Random();
+        int randomSize = rand.nextInt(10) + 1;
+
+        for (int i =0; i <  randomSize; i++) {
+            projectDetailsList.add(TestUtil.getProjectDetailsEntity());
+        }
+
+        when(projectService.getAllProjectDetails()).thenReturn(projectDetailsList);
+
+        mockMvc.perform(get(AnalyticsController.PATH + "/usage/projects"))
+                .andExpect(status().isOk())
+                .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON));
     }
 }
