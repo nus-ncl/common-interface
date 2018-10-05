@@ -12,9 +12,14 @@ import org.mockito.junit.MockitoRule;
 import org.springframework.test.context.TestPropertySource;
 import sg.ncl.service.analytics.data.jpa.ProjectDetailsEntity;
 import sg.ncl.service.analytics.data.jpa.ProjectDetailsRepository;
+import sg.ncl.service.analytics.data.jpa.ProjectUsageEntity;
+import sg.ncl.service.analytics.domain.ProjectDetails;
 import sg.ncl.service.analytics.domain.ProjectService;
+import sg.ncl.service.analytics.domain.ProjectUsage;
 import sg.ncl.service.analytics.exceptions.ProjectDetailsNotFoundException;
 import sg.ncl.service.analytics.exceptions.ProjectNameAlreadyExistsException;
+import sg.ncl.service.analytics.exceptions.ProjectUsageAlreadyExistsException;
+import sg.ncl.service.analytics.exceptions.ProjectUsageNotFoundException;
 import sg.ncl.service.analytics.util.TestUtil;
 
 import java.util.ArrayList;
@@ -100,5 +105,109 @@ public class ProjectServiceImplTest {
         when(projectDetailsRepository.getOne(anyLong())).thenReturn(detailsEntity);
         projectService.deleteProjectDetails(detailsEntity.getId());
         verify(projectDetailsRepository, times(1)).delete(anyLong());
+    }
+
+    @Test
+    public void testFindProjectUsageByIdNotFound() {
+        ProjectDetailsEntity detailsEntity = TestUtil.getProjectDetailsEntity();
+        exception.expect(ProjectDetailsNotFoundException.class);
+        projectService.findProjectUsageById(detailsEntity.getId(), TestUtil.getProjectUsageIdentity());
+    }
+
+    @Test
+    public void testFindProjectUsageByIdFound() {
+        ProjectDetailsEntity detailsEntity = TestUtil.getProjectDetailsEntity();
+        List<ProjectUsageEntity> usageEntityList = new ArrayList<>();
+        ProjectUsageEntity usageEntity = TestUtil.getProjectUsageEntity();
+        usageEntityList.add(usageEntity);
+        detailsEntity.setProjectUsages(usageEntityList);
+
+        when(projectDetailsRepository.getOne(anyLong())).thenReturn(detailsEntity);
+        ProjectUsage projectUsage = projectService.findProjectUsageById(detailsEntity.getId(), usageEntity.getId());
+        assertThat(projectUsage).isEqualTo(detailsEntity.getProjectUsages().get(0));
+    }
+
+    @Test
+    public void testFindProjectUsageNull() {
+        ProjectDetailsEntity detailsEntity = TestUtil.getProjectDetailsEntity();
+        List<ProjectUsageEntity> usageEntityList = new ArrayList<>();
+        ProjectUsageEntity usageEntity = TestUtil.getProjectUsageEntity();
+        usageEntityList.add(usageEntity);
+        detailsEntity.setProjectUsages(usageEntityList);
+
+        when(projectDetailsRepository.getOne(anyLong())).thenReturn(detailsEntity);
+        exception.expect(ProjectUsageNotFoundException.class);
+        projectService.findProjectUsageById(detailsEntity.getId(), TestUtil.getProjectUsageIdentity());
+    }
+
+    @Test
+    public void testSaveProjectUsageAlreadyExist() {
+        ProjectDetailsEntity detailsEntity = TestUtil.getProjectDetailsEntity();
+        ProjectUsageEntity usageEntity = TestUtil.getProjectUsageEntity();
+        detailsEntity.addProjectUsage(usageEntity);
+
+        when(projectDetailsRepository.getOne(anyLong())).thenReturn(detailsEntity);
+        exception.expect(ProjectUsageAlreadyExistsException.class);
+        projectService.createProjectUsage(detailsEntity.getId(), usageEntity);
+    }
+
+    @Test
+    public void testSaveProjectUsage() {
+        ProjectDetailsEntity detailsEntity = TestUtil.getProjectDetailsEntity();
+        ProjectUsageEntity usageEntity = TestUtil.getProjectUsageEntity();
+
+        when(projectDetailsRepository.getOne(anyLong())).thenReturn(detailsEntity);
+        projectService.createProjectUsage(detailsEntity.getId(), usageEntity);
+        verify(projectDetailsRepository, times(1)).save(any(ProjectDetailsEntity.class));
+    }
+
+    @Test
+    public void testDeleteProjectUsage() {
+        ProjectDetailsEntity detailsEntity = TestUtil.getProjectDetailsEntity();
+        List<ProjectUsageEntity> usageEntityList = new ArrayList<>();
+        ProjectUsageEntity usageEntity = TestUtil.getProjectUsageEntity();
+        usageEntityList.add(usageEntity);
+        detailsEntity.setProjectUsages(usageEntityList);
+
+        when(projectDetailsRepository.getOne(anyLong())).thenReturn(detailsEntity);
+        projectService.deleteProjectUsage(detailsEntity.getId(), usageEntity.getId());
+        verify(projectDetailsRepository, times(1)).save(any(ProjectDetailsEntity.class));
+    }
+
+    @Test
+    public void testUpdateProjectUsage() {
+        ProjectDetailsEntity detailsEntity = TestUtil.getProjectDetailsEntity();
+        List<ProjectUsageEntity> usageEntityList = new ArrayList<>();
+        ProjectUsageEntity usageEntity = TestUtil.getProjectUsageEntity();
+        usageEntityList.add(usageEntity);
+        detailsEntity.setProjectUsages(usageEntityList);
+
+        ProjectUsageEntity updatedUsageEntity = TestUtil.getProjectUsageEntity();
+        updatedUsageEntity.setId(usageEntity.getId());
+        updatedUsageEntity.setMonthlyUsage(usageEntity.getMonthlyUsage() + 1000);
+
+        when(projectDetailsRepository.getOne(anyLong())).thenReturn(detailsEntity);
+        when(projectDetailsRepository.save(any(ProjectDetailsEntity.class))).thenReturn(detailsEntity);
+
+        ProjectDetails result = projectService.updateProjectUsage(detailsEntity.getId(), updatedUsageEntity);
+        verify(projectDetailsRepository, times(1)).save(any(ProjectDetailsEntity.class));
+        assertThat(result.getProjectUsages()).isNotEmpty();
+        assertThat(result.getProjectUsages().get(0).getMonthlyUsage()).isEqualTo(updatedUsageEntity.getMonthlyUsage());
+    }
+
+    @Test
+    public void testUpdateProjectUsageNotFound() {
+        ProjectDetailsEntity detailsEntity = TestUtil.getProjectDetailsEntity();
+        List<ProjectUsageEntity> usageEntityList = new ArrayList<>();
+        ProjectUsageEntity usageEntity = TestUtil.getProjectUsageEntity();
+        usageEntityList.add(usageEntity);
+        detailsEntity.setProjectUsages(usageEntityList);
+
+        ProjectUsageEntity updatedUsageEntity = TestUtil.getProjectUsageEntity();
+        updatedUsageEntity.setMonthlyUsage(usageEntity.getMonthlyUsage() + 1000);
+
+        when(projectDetailsRepository.getOne(anyLong())).thenReturn(detailsEntity);
+        exception.expect(ProjectUsageNotFoundException.class);
+        projectService.updateProjectUsage(detailsEntity.getId(), updatedUsageEntity);
     }
 }
