@@ -82,6 +82,7 @@ public class AnalyticsControllerTest {
         assertThat(mockingDetails(securityContext).isMock()).isTrue();
         assertThat(mockingDetails(authentication).isMock()).isTrue();
         assertThat(mockingDetails(analyticsService).isMock()).isTrue();
+        assertThat(mockingDetails(projectService).isMock()).isTrue();
 
         when(securityContext.getAuthentication()).thenReturn(authentication);
         SecurityContextHolder.setContext(securityContext);

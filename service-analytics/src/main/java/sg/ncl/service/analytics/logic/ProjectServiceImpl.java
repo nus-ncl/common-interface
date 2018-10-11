@@ -45,13 +45,13 @@ public class ProjectServiceImpl implements ProjectService {
             detailsEntity = projectDetailsEntities[0];
         } else {
             detailsEntity = new ProjectDetailsEntity();
-            detailsEntity.setDateCreated(projectDetails.getDateCreated());
         }
 
         detailsEntity.setOrganisationType(projectDetails.getOrganisationType());
         detailsEntity.setOrganisationName(projectDetails.getOrganisationName());
         detailsEntity.setProjectName(projectDetails.getProjectName());
         detailsEntity.setOwner(projectDetails.getOwner());
+        detailsEntity.setDateCreated(projectDetails.getDateCreated());
         detailsEntity.setEducation(projectDetails.isEducation());
         detailsEntity.setServiceTool(projectDetails.isServiceTool());
         detailsEntity.setSupportedBy(projectDetails.getSupportedBy());
