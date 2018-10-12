@@ -87,7 +87,7 @@ public class ProjectDetailsEntity extends AbstractEntity implements ProjectDetai
                 return projectUsageEntity;
             }
         }
-        log.info("Project usage {} not in the list for project details {}", inputProjectUsage, id);
+        log.info("Project usage {} not in the list for project details {}", inputProjectUsage.getId(), id);
         return null;
     }
 
