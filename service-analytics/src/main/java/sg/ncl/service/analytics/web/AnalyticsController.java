@@ -196,11 +196,11 @@ public class AnalyticsController {
     @ResponseStatus(HttpStatus.OK)
     public ProjectUsage getProjectUsage(@AuthenticationPrincipal Object claims,
                                         @PathVariable Long id,
-                                        @PathVariable Integer month) {
+                                        @PathVariable String month) {
         checkAdmin((Claims) claims);
         ProjectUsageIdentity identity = new ProjectUsageIdentity();
         identity.setProjectDetailsId(id);
-        identity.setMonth(month);
+        identity.setMonthYear(month);
         return new ProjectUsageInfo(projectService.findProjectUsageById(id, identity));
     }
 
@@ -208,29 +208,33 @@ public class AnalyticsController {
     @ResponseStatus(HttpStatus.CREATED)
     public ProjectDetails addProjectUsage(@AuthenticationPrincipal Object claims,
                                           @PathVariable Long id,
-                                          @RequestBody @Valid ProjectUsageInfo projectUsageInfo) {
+                                          @RequestBody @Valid ProjectUsageReq projectUsageReq) {
         checkAdmin((Claims) claims);
-        return new ProjectDetailsInfo(projectService.createProjectUsage(id, projectUsageInfo));
+        return new ProjectDetailsInfo(projectService.createProjectUsage(
+                id, new ProjectUsageInfo(projectUsageReq.getIdentity(), projectUsageReq.getUsage())
+        ));
     }
 
     @PutMapping("/usage/projects/{id}/months")
     @ResponseStatus(HttpStatus.OK)
     public ProjectDetails updateProjectUsage(@AuthenticationPrincipal Object claims,
                                              @PathVariable Long id,
-                                             @RequestBody @Valid ProjectUsageInfo projectUsageInfo) {
+                                             @RequestBody @Valid ProjectUsageReq projectUsageReq) {
         checkAdmin((Claims) claims);
-        return new ProjectDetailsInfo(projectService.updateProjectUsage(id, projectUsageInfo));
+        return new ProjectDetailsInfo(projectService.updateProjectUsage(
+                id, new ProjectUsageInfo(projectUsageReq.getIdentity(), projectUsageReq.getUsage())
+        ));
     }
 
     @DeleteMapping("/usage/projects/{id}/months/{month}")
     @ResponseStatus(HttpStatus.OK)
     public ProjectDetails removeProjectUsage(@AuthenticationPrincipal Object claims,
                                              @PathVariable Long id,
-                                             @PathVariable Integer month) {
+                                             @PathVariable String month) {
         checkAdmin((Claims) claims);
         ProjectUsageIdentity identity = new ProjectUsageIdentity();
         identity.setProjectDetailsId(id);
-        identity.setMonth(month);
+        identity.setMonthYear(month);
         return new ProjectDetailsInfo(projectService.deleteProjectUsage(id, identity));
     }
 }

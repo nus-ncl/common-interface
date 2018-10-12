@@ -18,14 +18,14 @@ public class ProjectUsageIdentity implements Serializable {
     private Long projectDetailsId;
 
     @NotNull
-    @Column(name = "month")
-    private Integer month;
+    @Column(name = "month_year")
+    private String monthYear;
 
     @Override
     public String toString() {
         return "ProjectUsageIdentity{" +
                 "projectDetailsId=" + projectDetailsId +
-                ", month='" + month +
+                ", month='" + monthYear +
                 "} " + super.toString();
     }
 
@@ -36,11 +36,11 @@ public class ProjectUsageIdentity implements Serializable {
         if (o == null || getClass() != o.getClass())
             return false;
         ProjectUsageIdentity that = (ProjectUsageIdentity) o;
-        return (projectDetailsId.equals(that.getProjectDetailsId()) && month.equals(that.getMonth()));
+        return (projectDetailsId.equals(that.getProjectDetailsId()) && monthYear.equals(that.getMonthYear()));
     }
 
     @Override
     public int hashCode() {
-        return (projectDetailsId.hashCode() + month.hashCode());
+        return (projectDetailsId.hashCode() + monthYear.hashCode());
     }
 }

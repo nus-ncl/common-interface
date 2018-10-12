@@ -27,9 +27,9 @@ CREATE TABLE IF NOT EXISTS `prod`.`project_usage` (
   `last_modified_date` DATETIME     NOT NULL,
   `version`            BIGINT(20)   NOT NULL,
   `project_details_id` BIGINT(20)   NOT NULL,
-  `month`              INT          NOT NULL,
+  `month_year`         VARCHAR(255) NOT NULL,
   `monthly_usage`      INT          NOT NULL,
-  PRIMARY KEY (`project_details_id`, `month`),
+  PRIMARY KEY (`project_details_id`, `month_year`),
   CONSTRAINT project_usage_project_details_id_fk
   FOREIGN KEY (`project_details_id`) REFERENCES project_details (`id`)
 )

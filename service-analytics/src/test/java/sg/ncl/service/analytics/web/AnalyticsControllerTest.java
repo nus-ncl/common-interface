@@ -92,7 +92,7 @@ public class AnalyticsControllerTest {
     }
 
     @Test
-    public void getDataDownloadCountUnauthorizedException() throws Exception {
+    public void getDataDownloadCountUnauthorizedException() {
         when(authentication.getPrincipal()).thenReturn(claims);
 
         try {
@@ -107,7 +107,7 @@ public class AnalyticsControllerTest {
 
         List<DataDownloadStatistics> randomList = new ArrayList<>();
         Random rand = new Random();
-        int randomSize = rand.nextInt(10) + 1;;
+        int randomSize = rand.nextInt(10) + 1;
 
         for (int i =0; i <  randomSize; i++) {
             Long randomId =  new Random().nextLong();
@@ -125,7 +125,7 @@ public class AnalyticsControllerTest {
     }
 
     @Test
-    public void testGetUsageStatisticsUnauthorizedException() throws Exception {
+    public void testGetUsageStatisticsUnauthorizedException() {
         when(authentication.getPrincipal()).thenReturn(claims);
 
         try {
