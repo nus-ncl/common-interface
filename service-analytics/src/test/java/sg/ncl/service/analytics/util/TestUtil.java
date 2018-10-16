@@ -9,17 +9,17 @@ import java.time.ZonedDateTime;
 
 public class TestUtil {
 
-    public static ProjectUsageIdentity getProjectUsageIdentity(Long details_id, Integer month) {
+    public static ProjectUsageIdentity getProjectUsageIdentity(Long detailsId, String monthYear) {
         final ProjectUsageIdentity identity = new ProjectUsageIdentity();
-        identity.setProjectDetailsId(details_id);
-        identity.setMonth(month);
+        identity.setProjectDetailsId(detailsId);
+        identity.setMonthYear(monthYear);
         return identity;
     }
 
     public static ProjectUsageIdentity getProjectUsageIdentity() {
         return getProjectUsageIdentity(
                 Long.parseLong(RandomStringUtils.randomNumeric(10)),
-                Integer.parseInt(RandomStringUtils.randomNumeric(1)));
+                RandomStringUtils.randomAlphanumeric(10));
     }
 
     public static ProjectUsageEntity getProjectUsageEntity(ProjectUsageIdentity identity, Integer monthlyUsage) {

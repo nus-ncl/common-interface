@@ -18,12 +18,12 @@ public class ProjectUsageEntityTest {
         ProjectUsageEntity entity = new ProjectUsageEntity();
         ProjectUsageIdentity identity = new ProjectUsageIdentity();
         Long id = Long.parseLong(RandomStringUtils.randomNumeric(10));
-        Integer month = 12;
+        String month = RandomStringUtils.randomAlphanumeric(10);
         identity.setProjectDetailsId(id);
-        identity.setMonth(month);
+        identity.setMonthYear(month);
         entity.setId(identity);
         assertThat(entity.getId().getProjectDetailsId()).isEqualTo(id);
-        assertThat(entity.getId().getMonth()).isEqualTo(month);
+        assertThat(entity.getId().getMonthYear()).isEqualTo(month);
     }
 
     @Test
