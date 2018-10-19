@@ -13,7 +13,7 @@ CREATE TABLE IF NOT EXISTS `prod`.`project_details` (
   `date_created`       DATETIME     NOT NULL,
   `is_education`       CHAR(1)      NOT NULL DEFAULT 'N',
   `is_service_tool`    CHAR(1)      NOT NULL DEFAULT 'N',
-  `supported_by`       TEXT         NOT NULL
+  `supported_by`       TEXT         NOT NULL,
   PRIMARY KEY (`id`)
 )
   ENGINE = InnoDB
