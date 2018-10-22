@@ -92,7 +92,7 @@ public class ProjectServiceImpl implements ProjectService {
             for (ProjectDetailsEntity detailsEntity : detailsEntities) {
                 if (detailsEntity.getProjectName().equals(projectDetails.getProjectName())) {
                     log.warn("Project name is in use: {}", projectDetails.getProjectName());
-                    throw new ProjectNameAlreadyExistsException(("Project name is in use: " + projectDetails.getProjectName()));
+                    throw new ProjectNameAlreadyExistsException("Project name is in use: " + projectDetails.getProjectName());
                 }
             }
         }
