@@ -41,6 +41,8 @@ public class FlywayTest {
     private static final String IMAGES = "images";
     private static final String LOGIN_ACTIVITIES = "login_activities";
     private static final String PASSWORD_RESET_REQUESTS = "password_reset_requests";
+    private static final String PROJECT_DETAILS = "project_details";
+    private static final String PROJECT_USAGE = "project_usage";
     private static final String REALIZATIONS = "realizations";
     private static final String REGISTRATIONS = "registrations";
     private static final String TEAM_MEMBERS = "team_members";
@@ -85,6 +87,8 @@ public class FlywayTest {
         this.tables.add(IMAGES);
         this.tables.add(LOGIN_ACTIVITIES);
         this.tables.add(PASSWORD_RESET_REQUESTS);
+        this.tables.add(PROJECT_DETAILS);
+        this.tables.add(PROJECT_USAGE);
         this.tables.add(REALIZATIONS);
         this.tables.add(REGISTRATIONS);
         this.tables.add(TEAM_MEMBERS);
