@@ -109,7 +109,7 @@ public class DataAccessRequestServiceImpl implements DataAccessRequestService {
             String[] cc = new String[1];
             cc[0] = "support@ncl.sg";
             String msgText = FreeMarkerTemplateUtils.processTemplateIntoString(requestAccessTemplate, map);
-            mailService.send("NCL Testbed Ops <testbed-ops@ncl.sg>", to, "Pending Dataset Access Request", msgText, false, cc, null);
+            mailService.send("NCL Operations <testbed-ops@ncl.sg>", to, "Pending Dataset Access Request", msgText, false, cc, null);
             log.debug("Email sent: {}", msgText);
         } catch (IOException | TemplateException e) {
             log.warn("{}", e);
@@ -155,7 +155,7 @@ public class DataAccessRequestServiceImpl implements DataAccessRequestService {
             cc[0] = owner.getUserDetails().getEmail();
             cc[1] = "support@ncl.sg";
             String msgText = FreeMarkerTemplateUtils.processTemplateIntoString(approvedAccessTemplate, map);
-            mailService.send("NCL Testbed Ops <testbed-ops@ncl.sg>", to, "Dataset Access Request Approved", msgText, false, cc, null);
+            mailService.send("NCL Operations <testbed-ops@ncl.sg>", to, "Dataset Access Request Approved", msgText, false, cc, null);
             log.debug("Email sent: {}", msgText);
         } catch (IOException | TemplateException e) {
             log.warn("{}", e);

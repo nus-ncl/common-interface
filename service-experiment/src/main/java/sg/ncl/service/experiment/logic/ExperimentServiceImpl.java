@@ -332,9 +332,9 @@ public class ExperimentServiceImpl implements ExperimentService {
         Experiment experimentEntity = experimentRepository.getOne(expId);
         String teamName = experimentEntity.getTeamName();
         String experimentName = experimentEntity.getName();
-        String userID = experimentEntity.getUserId();
+        //String userID = experimentEntity.getUserId(); // this is ID of the user who created this experiment
 
-        User requester = userService.getUser(userID);
+        User requester = userService.getUser(claims.getSubject());
 
         String requesterName = requester.getUserDetails().getFirstName() + " " + requester.getUserDetails().getLastName();
 
@@ -345,7 +345,7 @@ public class ExperimentServiceImpl implements ExperimentService {
         map.put("reason", reason);
 
         try {
-            String from = "NCL Testbed Ops <testbed-ops@ncl.sg>";
+            String from = "NCL Operations <testbed-ops@ncl.sg>";
 
             String[] to = new String[1];
             to[0] = "support@ncl.sg";
