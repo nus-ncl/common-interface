@@ -25,7 +25,7 @@ public class ProjectUsageIdentity implements Serializable {
     public String toString() {
         return "ProjectUsageIdentity{" +
                 "projectDetailsId=" + projectDetailsId +
-                ", month='" + monthYear +
+                ", month=" + monthYear +
                 "} " + super.toString();
     }
 

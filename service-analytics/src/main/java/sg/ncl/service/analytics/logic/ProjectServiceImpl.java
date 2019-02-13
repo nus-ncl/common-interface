@@ -63,6 +63,8 @@ public class ProjectServiceImpl implements ProjectService {
         ProjectUsageEntity usageEntity = new ProjectUsageEntity();
         usageEntity.setId(projectUsage.getId());
         usageEntity.setMonthlyUsage(projectUsage.getMonthlyUsage());
+        usageEntity.setIncurred(projectUsage.getIncurred());
+        usageEntity.setWaived(projectUsage.getWaived());
         return usageEntity;
     }
 
