@@ -83,6 +83,8 @@ public class ProjectDetailsEntity extends AbstractEntity implements ProjectDetai
         for (ProjectUsageEntity projectUsageEntity : projectUsages) {
             if (projectUsageEntity.getId().equals(inputProjectUsage.getId())) {
                 projectUsageEntity.setMonthlyUsage(inputProjectUsage.getMonthlyUsage());
+                projectUsageEntity.setIncurred(inputProjectUsage.getIncurred());
+                projectUsageEntity.setWaived(inputProjectUsage.getWaived());
                 log.info("Project usage {} is updated for project details {}", projectUsageEntity, id);
                 return projectUsageEntity;
             }
