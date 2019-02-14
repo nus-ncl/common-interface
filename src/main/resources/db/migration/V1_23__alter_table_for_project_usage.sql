@@ -3,5 +3,7 @@
 -- Add columns incurred and waived
 -- -----------------------------------------------------
 ALTER TABLE `prod`.`project_usage`
-  ADD COLUMN `incurred` NUMERIC(10,2) NOT NULL,
+  ADD COLUMN `incurred` NUMERIC(10,2) NOT NULL;
+
+ALTER TABLE `prod`.`project_usage`
   ADD COLUMN `waived` NUMERIC(10,2) NOT NULL;
