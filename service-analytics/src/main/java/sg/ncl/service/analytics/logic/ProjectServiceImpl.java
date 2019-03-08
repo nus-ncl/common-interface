@@ -215,10 +215,7 @@ public class ProjectServiceImpl implements ProjectService {
             // reserve nodes in new table - Nodes Reservation//
             NodesReservationEntity nodesReservationEntity = new NodesReservationEntity();
             nodesReservationEntity.setProjectId(Long.parseLong(projectId));
-            log.info("nodesResInfo.getStartDate()>>>>> ----------------------------->"+nodesResInfo.getStartDate());
-            log.info("nodesResInfo.getEndDate()>>>> ----------------------------->"+nodesResInfo.getEndDate());
-            log.info("nodesResInfo.getNumNodes()>>>>> ----------------------------->"+nodesResInfo.getNumNodes());
-            ZonedDateTime startDate = getZonedDateTime(nodesResInfo.getStartDate());
+             ZonedDateTime startDate = getZonedDateTime(nodesResInfo.getStartDate());
             ZonedDateTime endDate = getZonedDateTime(nodesResInfo.getEndDate());
             nodesReservationEntity.setStartDate(startDate);
             nodesReservationEntity.setEndDate(endDate);
