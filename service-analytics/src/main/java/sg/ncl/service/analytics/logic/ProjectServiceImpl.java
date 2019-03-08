@@ -3,10 +3,9 @@ package sg.ncl.service.analytics.logic;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import sg.ncl.service.analytics.data.jpa.ProjectDetailsEntity;
-import sg.ncl.service.analytics.data.jpa.ProjectDetailsRepository;
-import sg.ncl.service.analytics.data.jpa.ProjectUsageEntity;
-import sg.ncl.service.analytics.data.jpa.ProjectUsageIdentity;
+import sg.ncl.common.exception.base.BadRequestException;
+import sg.ncl.service.analytics.data.jpa.*;
+import sg.ncl.service.analytics.domain.NodesReservation;
 import sg.ncl.service.analytics.domain.ProjectDetails;
 import sg.ncl.service.analytics.domain.ProjectService;
 import sg.ncl.service.analytics.domain.ProjectUsage;
@@ -14,9 +13,12 @@ import sg.ncl.service.analytics.exceptions.ProjectDetailsNotFoundException;
 import sg.ncl.service.analytics.exceptions.ProjectNameAlreadyExistsException;
 import sg.ncl.service.analytics.exceptions.ProjectUsageAlreadyExistsException;
 import sg.ncl.service.analytics.exceptions.ProjectUsageNotFoundException;
-
+import sg.ncl.service.analytics.web.NodesReservationInfo;
+import sg.ncl.service.analytics.data.jpa.NodesReservationRepository;
 import javax.inject.Inject;
 import javax.validation.constraints.NotNull;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -28,14 +30,17 @@ public class ProjectServiceImpl implements ProjectService {
     private static final String WARN_TEXT = "Project usage not found.";
 
     private final ProjectDetailsRepository projectDetailsRepository;
+    private final NodesReservationRepository nodesReservationRepository;
 
     public ProjectServiceImpl() {
         projectDetailsRepository = null;
+        nodesReservationRepository=null;
     }
 
     @Inject
-    ProjectServiceImpl(@NotNull ProjectDetailsRepository projectDetailsRepository) {
+    ProjectServiceImpl(@NotNull ProjectDetailsRepository projectDetailsRepository, NodesReservationRepository nodesReservationRepository) {
         this.projectDetailsRepository = projectDetailsRepository;
+        this.nodesReservationRepository = nodesReservationRepository;
     }
 
     private ProjectDetailsEntity setUpProjectDetailsEntity(ProjectDetails projectDetails, ProjectDetailsEntity... projectDetailsEntities) {
@@ -186,4 +191,64 @@ public class ProjectServiceImpl implements ProjectService {
         }
         return projectUsage;
     }
+
+    /**
+     * Reserve a specified number of nodes for a team in calender
+     * from the given start and end date
+     * This is not physical reservation of nodes in deterlab,
+     * this reservation is only for keeping reservation status for records
+     *   }
+     */
+    @Override
+    @Transactional
+    public NodesReservation applyNodesReserve(String projectId, NodesReservationInfo nodesResInfo, String requesterId){
+
+        // check that this team already exist if yes then make reservation
+        ProjectDetailsEntity detailsEntity = (ProjectDetailsEntity) getProjectDetails(Long.parseLong(projectId));
+        if (detailsEntity == null) {
+            log.warn("applyNodesReserve error: project {} not found", projectId);
+            throw new ProjectDetailsNotFoundException("Project details not found.");
+        }
+
+        else
+        {
+            // reserve nodes in new table - Nodes Reservation//
+            NodesReservationEntity nodesReservationEntity = new NodesReservationEntity();
+            nodesReservationEntity.setProjectId(Long.parseLong(projectId));
+            log.info("nodesResInfo.getStartDate()>>>>> ----------------------------->"+nodesResInfo.getStartDate());
+            log.info("nodesResInfo.getEndDate()>>>> ----------------------------->"+nodesResInfo.getEndDate());
+            log.info("nodesResInfo.getNumNodes()>>>>> ----------------------------->"+nodesResInfo.getNumNodes());
+            ZonedDateTime startDate = getZonedDateTime(nodesResInfo.getStartDate());
+            ZonedDateTime endDate = getZonedDateTime(nodesResInfo.getEndDate());
+            nodesReservationEntity.setStartDate(startDate);
+            nodesReservationEntity.setEndDate(endDate);
+            nodesReservationEntity.setNoNodes(nodesResInfo.getNumNodes());
+            final NodesReservation savedTeamNodesReservation = nodesReservationRepository.save(nodesReservationEntity);
+            log.info("Nodes Reservation done for the team: {}", savedTeamNodesReservation.getId());
+            return savedTeamNodesReservation ;
+        }
+
+    }
+
+    /**
+     * Get simple ZonedDateTime from date string in the format 'YYYY-MM-DD'.
+     *
+     * @param date  date string to convert
+     * @return      ZonedDateTime of
+     */
+    private ZonedDateTime getZonedDateTime(String date) {
+        if (date != null) {
+            String[] result = date.split("-");
+            if (result.length != 3) {
+                throw new BadRequestException();
+            }
+            return ZonedDateTime.of(
+                    Integer.parseInt(result[0]),
+                    Integer.parseInt(result[1]),
+                    Integer.parseInt(result[2]),
+                    0, 0, 0, 0, ZoneId.of("Asia/Singapore"));
+        }
+        return null;
+    }
+
 }

@@ -1,6 +1,7 @@
 package sg.ncl.service.analytics.domain;
 
 import sg.ncl.service.analytics.data.jpa.ProjectUsageIdentity;
+import sg.ncl.service.analytics.web.NodesReservationInfo;
 
 import java.util.List;
 
@@ -23,5 +24,7 @@ public interface ProjectService {
     ProjectDetails deleteProjectUsage(Long id, ProjectUsageIdentity identity);
 
     ProjectUsage findProjectUsageById(Long id, ProjectUsageIdentity identity);
+
+    NodesReservation applyNodesReserve(String projectId, NodesReservationInfo nodesResInfo, String requesterId);
 
 }

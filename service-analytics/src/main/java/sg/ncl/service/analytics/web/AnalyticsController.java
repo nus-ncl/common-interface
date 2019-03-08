@@ -10,10 +10,7 @@ import sg.ncl.common.exception.base.BadRequestException;
 import sg.ncl.common.exception.base.UnauthorizedException;
 import sg.ncl.service.analytics.data.jpa.DataDownloadStatistics;
 import sg.ncl.service.analytics.data.jpa.ProjectUsageIdentity;
-import sg.ncl.service.analytics.domain.AnalyticsService;
-import sg.ncl.service.analytics.domain.ProjectDetails;
-import sg.ncl.service.analytics.domain.ProjectService;
-import sg.ncl.service.analytics.domain.ProjectUsage;
+import sg.ncl.service.analytics.domain.*;
 
 import javax.inject.Inject;
 import javax.validation.Valid;
@@ -26,6 +23,7 @@ import java.util.stream.Collectors;
 import static java.time.temporal.TemporalAdjusters.firstDayOfMonth;
 import static java.time.temporal.TemporalAdjusters.lastDayOfMonth;
 import static sg.ncl.common.validation.Validator.checkAdmin;
+import static sg.ncl.common.validation.Validator.checkClaimsType;
 
 /**
  * @author: Tran Ly Vu, James Ng
@@ -237,4 +235,13 @@ public class AnalyticsController {
         identity.setMonthYear(month);
         return new ProjectDetailsInfo(projectService.deleteProjectUsage(id, identity));
     }
+    // for Nodes Reservation/Booking in advance
+    @PutMapping(path = "/{id}/nodesreservations")
+    @ResponseStatus(HttpStatus.OK)
+    public NodesReservation applyNodesReserve(@PathVariable final String id, @RequestBody final NodesReservationInfo nodesResInfo, @AuthenticationPrincipal final Object claims) {
+        checkClaimsType(claims);
+        checkAdmin((Claims) claims);
+        return projectService.applyNodesReserve(id, nodesResInfo, ((Claims) claims).getSubject());
+    }
+
 }
