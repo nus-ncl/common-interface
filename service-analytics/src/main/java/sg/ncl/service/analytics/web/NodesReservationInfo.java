@@ -3,36 +3,31 @@ package sg.ncl.service.analytics.web;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Getter;
-import sg.ncl.service.analytics.domain.NodesReserv;
-
+import sg.ncl.service.analytics.domain.NodesReservation;
 
 import java.time.ZonedDateTime;
-@Getter
-public class NodesReservationInfo implements NodesReserv {
 
-    private final String teamId;
-    private final Integer numNodes;
-    private final  String startDate;
-    private final String endDate;
+@Getter
+public class NodesReservationInfo implements NodesReservation {
+
+    private Long id;
+    private Long projectId;
+    private ZonedDateTime startDate;
+    private ZonedDateTime endDate;
+    private Integer noNodes;
 
     @JsonCreator
     public NodesReservationInfo(
-           @JsonProperty("teamId") final String teamId,
-            @JsonProperty("numNodes") final int numNodes,
-            @JsonProperty("startDate") final String startDate,
-            @JsonProperty("endDate") final String endDate) {
-        this.teamId = teamId;
-        this.numNodes = numNodes;
+            @JsonProperty("id") final Long id,
+            @JsonProperty("projectId") final Long projectId,
+            @JsonProperty("startDate") final ZonedDateTime startDate,
+            @JsonProperty("endDate") final ZonedDateTime endDate,
+            @JsonProperty("noNodes") final Integer noNodes
+    ) {
+        this.id = id;
+        this.projectId = projectId;
         this.startDate = startDate;
         this.endDate = endDate;
-
-    }
-
-    public NodesReservationInfo(final NodesReserv nodesReserv) {
-        this(
-                nodesReserv.getTeamId(),
-                nodesReserv.getNumNodes(),
-                nodesReserv.getStartDate(),
-                nodesReserv.getEndDate());
+        this.noNodes = noNodes;
     }
 }

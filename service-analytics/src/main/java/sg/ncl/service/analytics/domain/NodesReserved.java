@@ -2,13 +2,13 @@ package sg.ncl.service.analytics.domain;
 
 import java.time.ZonedDateTime;
 
-public interface NodesReserv {
+public interface NodesReserved {
 
     String getTeamId();
 
-    String getStartDate();
+    ZonedDateTime getStartDate();
 
-    String getEndDate();
+    ZonedDateTime getEndDate();
 
     Integer getNumNodes();
 }

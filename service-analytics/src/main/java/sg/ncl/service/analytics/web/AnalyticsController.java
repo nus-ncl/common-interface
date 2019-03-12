@@ -235,13 +235,15 @@ public class AnalyticsController {
         identity.setMonthYear(month);
         return new ProjectDetailsInfo(projectService.deleteProjectUsage(id, identity));
     }
+
     // for Nodes Reservation/Booking in advance
-    @PutMapping(path = "/{id}/nodesreservations")
+    @PutMapping(path = "/usage/projects/{id}/nodesreservations")
     @ResponseStatus(HttpStatus.OK)
-    public NodesReservation applyNodesReserve(@PathVariable final String id, @RequestBody final NodesReservationInfo nodesResInfo, @AuthenticationPrincipal final Object claims) {
+    public NodesReservation applyNodesReserve(@PathVariable Long id,
+                                              @RequestBody @Valid NodesReservedInfo nodesResInfo,
+                                              @AuthenticationPrincipal Object claims) {
         checkClaimsType(claims);
         checkAdmin((Claims) claims);
         return projectService.applyNodesReserve(id, nodesResInfo, ((Claims) claims).getSubject());
     }
-
 }
