@@ -5,10 +5,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import sg.ncl.service.analytics.data.jpa.*;
 import sg.ncl.service.analytics.domain.*;
-import sg.ncl.service.analytics.exceptions.ProjectDetailsNotFoundException;
-import sg.ncl.service.analytics.exceptions.ProjectNameAlreadyExistsException;
-import sg.ncl.service.analytics.exceptions.ProjectUsageAlreadyExistsException;
-import sg.ncl.service.analytics.exceptions.ProjectUsageNotFoundException;
+import sg.ncl.service.analytics.exceptions.*;
 
 import javax.inject.Inject;
 import javax.validation.constraints.NotNull;
@@ -195,21 +192,30 @@ public class ProjectServiceImpl implements ProjectService {
     @Override
     @Transactional
     public NodesReservation applyNodesReserve(Long projectId, NodesReserved nodesRes, String requesterId){
+        // check that the start date is before the end date
+        if (nodesRes.getStartDate().isAfter(nodesRes.getEndDate()))
+            throw new StartDateAfterEndDateException();
+
         // check that this team already exist if yes then make reservation
-        ProjectDetailsEntity detailsEntity = (ProjectDetailsEntity) getProjectDetails(projectId);
-        if (detailsEntity == null) {
+        if (getProjectDetails(projectId) == null) {
             log.warn("applyNodesReserve error: project {} not found", projectId);
             throw new ProjectDetailsNotFoundException("Project details not found.");
-        } else {
-            // reserve nodes in new table - Nodes Reservation//
-            NodesReservationEntity nodesReservationEntity = new NodesReservationEntity();
-            nodesReservationEntity.setProjectId(projectId);
-            nodesReservationEntity.setStartDate(nodesRes.getStartDate());
-            nodesReservationEntity.setEndDate(nodesRes.getEndDate());
-            nodesReservationEntity.setNoNodes(nodesRes.getNumNodes());
-            final NodesReservation savedTeamNodesReservation = nodesReservationRepository.save(nodesReservationEntity);
-            log.info("Nodes Reservation done for the team: {}", savedTeamNodesReservation.getId());
-            return savedTeamNodesReservation ;
         }
+
+        // check that nodes reservation does not overlapped existing reservations of the same project
+        if (nodesReservationRepository.existsByOverlappedDates(projectId, nodesRes.getStartDate(), nodesRes.getEndDate())) {
+            log.warn("applyNodesReserve error: project {} already has reservations within the period.", projectId);
+            throw new NodesReservationAlreadyExistsException("Project already has reservations within the period.");
+        }
+
+        // reserve nodes in new table - Nodes Reservation//
+        NodesReservationEntity nodesReservationEntity = new NodesReservationEntity();
+        nodesReservationEntity.setProjectId(projectId);
+        nodesReservationEntity.setStartDate(nodesRes.getStartDate());
+        nodesReservationEntity.setEndDate(nodesRes.getEndDate());
+        nodesReservationEntity.setNoNodes(nodesRes.getNumNodes());
+        final NodesReservation savedTeamNodesReservation = nodesReservationRepository.save(nodesReservationEntity);
+        log.info("Nodes Reservation done for the team: {}", savedTeamNodesReservation.getId());
+        return savedTeamNodesReservation ;
     }
 }
