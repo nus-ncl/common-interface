@@ -237,7 +237,7 @@ public class AnalyticsController {
     }
 
     // for Nodes Reservation/Booking in advance
-    @PutMapping(path = "/usage/projects/{id}/nodesreservations")
+    @PostMapping(path = "/usage/projects/{id}/nodesreservations")
     @ResponseStatus(HttpStatus.OK)
     public NodesReservation applyNodesReserve(@PathVariable Long id,
                                               @RequestBody @Valid NodesReservedInfo nodesResInfo,
