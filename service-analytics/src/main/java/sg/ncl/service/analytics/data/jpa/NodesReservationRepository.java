@@ -8,8 +8,8 @@ import java.time.ZonedDateTime;
 
 public interface NodesReservationRepository extends JpaRepository<NodesReservationEntity, Long> {
 
-    @Query("SELECT CASE WHEN count(n) > 0 THEN true ELSE false END FROM NodesReservation n " +
-                "WHERE n.projectId = :projectId AND (n.startDate <= :endDate OR n.endDate >= :startDate)")
+    @Query(value = "SELECT CASE WHEN count(n) > 0 THEN true ELSE false END FROM NodesReservationEntity n " +
+                   "WHERE n.projectId = :projectId AND (n.startDate <= :endDate OR n.endDate >= :startDate)")
     boolean existsByOverlappedDates(@Param("projectId") Long projectId,
                                     @Param("startDate") ZonedDateTime startDate,
                                     @Param("endDate") ZonedDateTime endDate);
