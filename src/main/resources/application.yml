@@ -57,6 +57,7 @@ ncl:
       '/telemetry/nodes/counts\?type=TOTAL': GET # for retrieving total nodes count
       '/telemetry/nodes/status': GET # for retrieving all nodes' statuses
       '/telemetry/testbed/stats': GET # for retrieving number of logged in users and running experiments
+      '/analytics/usage/calendar\?startDate=\d{4}-\d{2}-\d{2}\&endDate=\d{4}-\d{2}-\d{2}': GET # for retrieving nodes usage reservations for calendar
   domain: dev.ncl.sg
   deterlab:
     adapter:

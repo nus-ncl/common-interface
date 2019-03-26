@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.*;
 import sg.ncl.common.exception.base.BadRequestException;
 import sg.ncl.common.exception.base.UnauthorizedException;
 import sg.ncl.service.analytics.data.jpa.DataDownloadStatistics;
+import sg.ncl.service.analytics.data.jpa.NodesReservationEntry;
 import sg.ncl.service.analytics.data.jpa.ProjectUsageIdentity;
 import sg.ncl.service.analytics.domain.*;
 
@@ -17,9 +18,13 @@ import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
+import static java.time.temporal.ChronoUnit.DAYS;
 import static java.time.temporal.TemporalAdjusters.firstDayOfMonth;
 import static java.time.temporal.TemporalAdjusters.lastDayOfMonth;
 import static sg.ncl.common.validation.Validator.checkAdmin;
@@ -245,5 +250,20 @@ public class AnalyticsController {
         checkClaimsType(claims);
         checkAdmin((Claims) claims);
         return projectService.applyNodesReserve(id, nodesResInfo, ((Claims) claims).getSubject());
+    }
+
+    @GetMapping(path = "/usage/calendar", params = {"startDate", "endDate"})
+    @ResponseStatus(HttpStatus.OK)
+    public Map<String, List<Integer>> getCalendar(@RequestParam("startDate") final String startDate,
+                                                  @RequestParam("endDate") final String endDate) {
+        Map<String, List<Integer>> usageCal = new HashMap<>();
+        ZonedDateTime start = getZonedDateTime(startDate);
+        ZonedDateTime end = getZonedDateTime(endDate);
+        List<NodesReservationEntry> entries = projectService.getNodesReserve(start, end);
+        for (NodesReservationEntry entry : entries) {
+            usageCal.putIfAbsent(entry.getProject(), new ArrayList<>((int) DAYS.between(start, end)));
+            entry.computeNodesReserveByDay(usageCal.get(entry.getProject()), start, end);
+        }
+        return usageCal;
     }
 }

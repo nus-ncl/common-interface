@@ -1,7 +1,9 @@
 package sg.ncl.service.analytics.domain;
 
+import sg.ncl.service.analytics.data.jpa.NodesReservationEntry;
 import sg.ncl.service.analytics.data.jpa.ProjectUsageIdentity;
 
+import java.time.ZonedDateTime;
 import java.util.List;
 
 public interface ProjectService {
@@ -26,4 +28,5 @@ public interface ProjectService {
 
     NodesReservation applyNodesReserve(Long projectId, NodesReserved nodesRes, String requesterId);
 
+    List<NodesReservationEntry> getNodesReserve(ZonedDateTime startDate, ZonedDateTime endDate);
 }

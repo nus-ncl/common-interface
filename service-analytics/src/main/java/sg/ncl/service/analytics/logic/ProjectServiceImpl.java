@@ -9,6 +9,7 @@ import sg.ncl.service.analytics.exceptions.*;
 
 import javax.inject.Inject;
 import javax.validation.constraints.NotNull;
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -217,5 +218,14 @@ public class ProjectServiceImpl implements ProjectService {
         final NodesReservation savedTeamNodesReservation = nodesReservationRepository.save(nodesReservationEntity);
         log.info("Nodes Reservation done for the team: {}", savedTeamNodesReservation.getId());
         return savedTeamNodesReservation ;
+    }
+
+    @Override
+    public List<NodesReservationEntry> getNodesReserve(ZonedDateTime startDate, ZonedDateTime endDate) {
+        // check that the start date is before the end date
+        if (startDate.isAfter(endDate))
+            throw new StartDateAfterEndDateException();
+
+        return nodesReservationRepository.findNodesReservationOverlappedDates(startDate, endDate);
     }
 }

@@ -96,8 +96,6 @@ sonarqube {
                 property 'sonar.github.repository', System.getenv('TRAVIS_REPO_SLUG')
                 property 'sonar.github.oauth', System.getenv('GITHUB_TOKEN')
             }
-        } else {
-            property 'sonar.analysis.mode', 'issues'
         }
     }
 }
