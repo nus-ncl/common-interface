@@ -1,6 +1,6 @@
 package sg.ncl.service.analytics.domain;
 
-import sg.ncl.service.analytics.data.jpa.NodeUsageInfo;
+import sg.ncl.service.analytics.web.NodeUsageInfo;
 import sg.ncl.service.analytics.data.jpa.NodesReservationEntity;
 import sg.ncl.service.analytics.data.jpa.NodesReservationEntry;
 import sg.ncl.service.analytics.data.jpa.ProjectUsageIdentity;

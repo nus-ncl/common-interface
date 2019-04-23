@@ -10,17 +10,19 @@ import sg.ncl.common.exception.base.BadRequestException;
 import sg.ncl.common.exception.base.UnauthorizedException;
 import sg.ncl.service.analytics.data.jpa.DataDownloadStatistics;
 import sg.ncl.service.analytics.data.jpa.NodesReservationEntry;
-import sg.ncl.service.analytics.data.jpa.NodeUsageInfo;
 import sg.ncl.service.analytics.data.jpa.ProjectUsageIdentity;
 import sg.ncl.service.analytics.domain.*;
 
 import javax.inject.Inject;
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
-import java.time.OffsetDateTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
-import java.util.*;
+import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 import static java.time.temporal.ChronoUnit.DAYS;
@@ -28,8 +30,6 @@ import static java.time.temporal.TemporalAdjusters.firstDayOfMonth;
 import static java.time.temporal.TemporalAdjusters.lastDayOfMonth;
 import static sg.ncl.common.validation.Validator.checkAdmin;
 import static sg.ncl.common.validation.Validator.checkClaimsType;
-import java.time.format.DateTimeFormatter;
-import java.time.format.DateTimeFormatterBuilder;
 
 /**
  * @author: Tran Ly Vu, James Ng
@@ -97,7 +97,6 @@ public class AnalyticsController {
      * @return      ZonedDateTime of
      */
     private ZonedDateTime getZonedDateTime(String date) {
-        log.info("getZonedDateTime----------------------------->"+date);
         if (date != null) {
             String[] result = date.split("-");
             if (result.length != 3) {
@@ -269,7 +268,6 @@ public class AnalyticsController {
         return usageCal;
     }
 
-
     @PostMapping(path = "/usage/nodes/{id}/reservationInfo")
     @ResponseStatus(HttpStatus.OK)
     public  Map<Long, List<String>> getProjNodeReservationInfo(@PathVariable Long id,
@@ -277,19 +275,17 @@ public class AnalyticsController {
         checkClaimsType(claims);
         checkAdmin((Claims) claims);
         ZonedDateTime now = ZonedDateTime.now().withHour(0).withMinute(0).withSecond(0).withNano(0);
-        List<NodeUsageInfo> lstNodeUsageInfo= projectService.getProjNodesUsageInfo(id,now, ((Claims) claims).getSubject());
+        List<NodeUsageInfo> lstNodeUsageInfo = projectService.getProjNodesUsageInfo(id,now, ((Claims) claims).getSubject());
         Map<Long, List<String>> mapNodeReservationInfo=new HashMap<>();
         for (NodeUsageInfo entry : lstNodeUsageInfo) {
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-            String strDt=entry.getStartDate().format(formatter);
-            List<String> tmpList = new ArrayList();
-
+            String strDt = entry.getStartDate().format(formatter);
+            List<String> tmpList = new ArrayList<>();
 
             tmpList.add(entry.getStartDate().format(formatter));
             tmpList.add(entry.getEndDate().format(formatter));
             tmpList.add(entry.getNoNodes().toString());
             mapNodeReservationInfo.put(entry.getId(),tmpList);
-
         }
         return mapNodeReservationInfo;
     }
@@ -299,13 +295,9 @@ public class AnalyticsController {
     public NodesReservation editNodesReserve(@PathVariable Long id,
                                               @RequestBody @Valid NodesReservationInfo nodesResInfo,
                                               @AuthenticationPrincipal Object claims) {
-
         checkClaimsType(claims);
         checkAdmin((Claims) claims);
 
         return projectService.editNodesReserve(id, nodesResInfo, ((Claims) claims).getSubject());
     }
-
-
-
 }

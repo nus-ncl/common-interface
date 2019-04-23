@@ -6,6 +6,7 @@ import org.springframework.transaction.annotation.Transactional;
 import sg.ncl.service.analytics.data.jpa.*;
 import sg.ncl.service.analytics.domain.*;
 import sg.ncl.service.analytics.exceptions.*;
+import sg.ncl.service.analytics.web.NodeUsageInfo;
 import sg.ncl.service.analytics.web.NodesReservationInfo;
 
 import javax.inject.Inject;
@@ -230,11 +231,9 @@ public class ProjectServiceImpl implements ProjectService {
         return nodesReservationRepository.findNodesReservationOverlappedDates(startDate, endDate);
     }
 
-
-
     @Override
     @Transactional
-    public List<NodeUsageInfo> getProjNodesUsageInfo(Long projectId,ZonedDateTime currentDate, String requesterId){
+    public List<NodeUsageInfo> getProjNodesUsageInfo(Long projectId, ZonedDateTime currentDate, String requesterId){
 
         final List<NodeUsageInfo> nodeReservationList = nodesReservationRepository.getProjNodesUsageInfo(projectId,currentDate);
         return nodeReservationList ;
@@ -243,7 +242,6 @@ public class ProjectServiceImpl implements ProjectService {
     @Override
     @Transactional
     public NodesReservation editNodesReserve(Long reservationId, NodesReservationInfo nodesRes, String requesterId){
-
         // check that the start date is before the end date
         if (nodesRes.getStartDate().isAfter(nodesRes.getEndDate()))
             throw new StartDateAfterEndDateException();
@@ -254,18 +252,14 @@ public class ProjectServiceImpl implements ProjectService {
         if (nodesReservationEntity == null) {
             log.warn("editNodesReserve error: reservation {} not found", reservationId);
             throw new NodesReservationNotFoundException("Node Reservation details not found.");
-        }
-
-        else
-        {
-
+        } else {
             // check that nodes reservation does not overlapped existing reservations of the same project
             if (nodesReservationRepository.existsByOverlappedDatesNotSameReservId(nodesRes.getProjectId(),reservationId, nodesRes.getStartDate(), nodesRes.getEndDate())) {
                 log.warn("editNodesReserve error: project {} already has other reservations within the period.", nodesRes.getProjectId());
                 throw new NodesReservationAlreadyExistsException("Project already has other reservations within the period.");
             }
-            // edit nodes reservation - Nodes Reservation//
 
+            // edit nodes reservation - Nodes Reservation//
             nodesReservationEntity.setStartDate(nodesRes.getStartDate());
             nodesReservationEntity.setEndDate(nodesRes.getEndDate());
             nodesReservationEntity.setNoNodes(nodesRes.getNoNodes());
@@ -273,7 +267,6 @@ public class ProjectServiceImpl implements ProjectService {
             log.info("Nodes Reservation edited for the project: ", savedNodesReservation.getProjectId());
             return savedNodesReservation ;
         }
-
     }
 
     @Override
@@ -282,6 +275,6 @@ public class ProjectServiceImpl implements ProjectService {
         if (nodesReservationEntity == null) {
             throw new NodesReservationNotFoundException("Node Reservation details not found.");
         }
-        return  nodesReservationEntity;
+        return nodesReservationEntity;
     }
 }
