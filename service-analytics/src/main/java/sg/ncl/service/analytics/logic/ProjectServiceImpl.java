@@ -6,7 +6,6 @@ import org.springframework.transaction.annotation.Transactional;
 import sg.ncl.service.analytics.data.jpa.*;
 import sg.ncl.service.analytics.domain.*;
 import sg.ncl.service.analytics.exceptions.*;
-import sg.ncl.service.analytics.web.NodeUsageInfo;
 import sg.ncl.service.analytics.web.NodesReservationInfo;
 
 import javax.inject.Inject;
@@ -233,10 +232,9 @@ public class ProjectServiceImpl implements ProjectService {
 
     @Override
     @Transactional
-    public List<NodeUsageInfo> getProjNodesUsageInfo(Long projectId, ZonedDateTime currentDate, String requesterId){
-
-        final List<NodeUsageInfo> nodeReservationList = nodesReservationRepository.getProjNodesUsageInfo(projectId,currentDate);
-        return nodeReservationList ;
+    public List<NodeUsageEntry> getProjNodesUsageInfo(Long projectId, ZonedDateTime currentDate, String requesterId){
+        final List<NodeUsageEntry> nodeReservationList = nodesReservationRepository.getProjNodesUsageInfo(projectId,currentDate);
+        return nodeReservationList;
     }
 
     @Override

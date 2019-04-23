@@ -8,9 +8,7 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import sg.ncl.common.exception.base.BadRequestException;
 import sg.ncl.common.exception.base.UnauthorizedException;
-import sg.ncl.service.analytics.data.jpa.DataDownloadStatistics;
-import sg.ncl.service.analytics.data.jpa.NodesReservationEntry;
-import sg.ncl.service.analytics.data.jpa.ProjectUsageIdentity;
+import sg.ncl.service.analytics.data.jpa.*;
 import sg.ncl.service.analytics.domain.*;
 
 import javax.inject.Inject;
@@ -275,9 +273,9 @@ public class AnalyticsController {
         checkClaimsType(claims);
         checkAdmin((Claims) claims);
         ZonedDateTime now = ZonedDateTime.now().withHour(0).withMinute(0).withSecond(0).withNano(0);
-        List<NodeUsageInfo> lstNodeUsageInfo = projectService.getProjNodesUsageInfo(id,now, ((Claims) claims).getSubject());
-        Map<Long, List<String>> mapNodeReservationInfo=new HashMap<>();
-        for (NodeUsageInfo entry : lstNodeUsageInfo) {
+        List<NodeUsageEntry> lstNodeUsageEntry = projectService.getProjNodesUsageInfo(id,now, ((Claims) claims).getSubject());
+        Map<Long, List<String>> mapNodeReservationInfo = new HashMap<>();
+        for (NodeUsageEntry entry : lstNodeUsageEntry) {
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
             String strDt = entry.getStartDate().format(formatter);
             List<String> tmpList = new ArrayList<>();

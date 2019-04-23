@@ -1,6 +1,6 @@
 package sg.ncl.service.analytics.domain;
 
-import sg.ncl.service.analytics.web.NodeUsageInfo;
+import sg.ncl.service.analytics.data.jpa.NodeUsageEntry;
 import sg.ncl.service.analytics.data.jpa.NodesReservationEntity;
 import sg.ncl.service.analytics.data.jpa.NodesReservationEntry;
 import sg.ncl.service.analytics.data.jpa.ProjectUsageIdentity;
@@ -33,7 +33,7 @@ public interface ProjectService {
 
     List<NodesReservationEntry> getNodesReserve(ZonedDateTime startDate, ZonedDateTime endDate);
 
-    List<NodeUsageInfo> getProjNodesUsageInfo(Long projectId, ZonedDateTime currentDate, String requesterId);
+    List<NodeUsageEntry> getProjNodesUsageInfo(Long projectId, ZonedDateTime currentDate, String requesterId);
 
     NodesReservation editNodesReserve(Long reservationId, NodesReservationInfo nodesRes, String requesterId);
 

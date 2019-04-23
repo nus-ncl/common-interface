@@ -1,18 +1,18 @@
-package sg.ncl.service.analytics.web;
+package sg.ncl.service.analytics.data.jpa;
 
 import lombok.Getter;
 
 import java.time.ZonedDateTime;
 
 @Getter
-public class NodeUsageInfo {
+public class NodeUsageEntry {
 
     private Long id;
     private ZonedDateTime startDate;
     private ZonedDateTime endDate;
     private Integer noNodes;
 
-    public NodeUsageInfo(Long id, ZonedDateTime startDate, ZonedDateTime endDate, Integer noNodes) {
+    public NodeUsageEntry(Long id, ZonedDateTime startDate, ZonedDateTime endDate, Integer noNodes) {
         this.id = id;
         this.startDate = startDate;
         this.endDate = endDate;
