@@ -33,9 +33,11 @@ public interface ProjectService {
 
     List<NodesReservationEntry> getNodesReserve(ZonedDateTime startDate, ZonedDateTime endDate);
 
-    List<NodeUsageEntry> getProjNodesUsageInfo(Long projectId, ZonedDateTime currentDate, String requesterId);
+    List<NodeUsageEntry> getNodesReserveByProject(Long projectId, ZonedDateTime currentDate, String requesterId);
 
     NodesReservation editNodesReserve(Long reservationId, NodesReservationInfo nodesRes, String requesterId);
 
     NodesReservationEntity getNodeReservationDetails(Long id);
+
+    NodesReservation deleteNodesReserve(Long reservationId);
 }

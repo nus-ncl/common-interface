@@ -24,8 +24,8 @@ public interface NodesReservationRepository extends JpaRepository<NodesReservati
     @Query(value = "SELECT NEW sg.ncl.service.analytics.data.jpa.NodeUsageEntry(n.id, n.startDate, n.endDate, n.noNodes) " +
                     "FROM NodesReservationEntity n WHERE n.projectId = :projectId " +
                     "AND (n.endDate > :currentDate)")
-    List<NodeUsageEntry> getProjNodesUsageInfo(@Param("projectId") Long projectId,
-                                              @Param("currentDate") ZonedDateTime currentDate);
+    List<NodeUsageEntry> getNodesReserveByProject(@Param("projectId") Long projectId,
+                                                  @Param("currentDate") ZonedDateTime currentDate);
 
     @Query(value = "SELECT CASE WHEN count(n) > 0 THEN true ELSE false END FROM NodesReservationEntity n " +
                     "WHERE n.projectId = :projectId AND NOT (n.startDate > :endDate OR n.endDate < :startDate  ) AND (n.id <> :reserveId)")

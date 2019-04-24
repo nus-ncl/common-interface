@@ -232,8 +232,8 @@ public class ProjectServiceImpl implements ProjectService {
 
     @Override
     @Transactional
-    public List<NodeUsageEntry> getProjNodesUsageInfo(Long projectId, ZonedDateTime currentDate, String requesterId){
-        final List<NodeUsageEntry> nodeReservationList = nodesReservationRepository.getProjNodesUsageInfo(projectId,currentDate);
+    public List<NodeUsageEntry> getNodesReserveByProject(Long projectId, ZonedDateTime currentDate, String requesterId){
+        final List<NodeUsageEntry> nodeReservationList = nodesReservationRepository.getNodesReserveByProject(projectId,currentDate);
         return nodeReservationList;
     }
 
@@ -252,7 +252,7 @@ public class ProjectServiceImpl implements ProjectService {
             throw new NodesReservationNotFoundException("Node Reservation details not found.");
         } else {
             // check that nodes reservation does not overlapped existing reservations of the same project
-            if (nodesReservationRepository.existsByOverlappedDatesNotSameReservId(nodesRes.getProjectId(),reservationId, nodesRes.getStartDate(), nodesRes.getEndDate())) {
+            if (nodesReservationRepository.existsByOverlappedDatesNotSameReservId(nodesRes.getProjectId(), reservationId, nodesRes.getStartDate(), nodesRes.getEndDate())) {
                 log.warn("editNodesReserve error: project {} already has other reservations within the period.", nodesRes.getProjectId());
                 throw new NodesReservationAlreadyExistsException("Project already has other reservations within the period.");
             }
@@ -274,5 +274,16 @@ public class ProjectServiceImpl implements ProjectService {
             throw new NodesReservationNotFoundException("Node Reservation details not found.");
         }
         return nodesReservationEntity;
+    }
+
+    @Override
+    @Transactional
+    public NodesReservation deleteNodesReserve(Long reservationId) {
+        NodesReservationEntity entity = nodesReservationRepository.getOne(reservationId);
+        if (entity == null) {
+            throw new NodesReservationNotFoundException("Nodes reservation not found.");
+        }
+        nodesReservationRepository.delete(reservationId);
+        return entity;
     }
 }

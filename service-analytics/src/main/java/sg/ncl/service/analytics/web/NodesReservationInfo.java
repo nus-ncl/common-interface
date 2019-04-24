@@ -30,4 +30,12 @@ public class NodesReservationInfo implements NodesReservation {
         this.endDate = endDate;
         this.noNodes = noNodes;
     }
+
+    public NodesReservationInfo(final NodesReservation nodesReservation) {
+        this.id = nodesReservation.getId();
+        this.projectId = nodesReservation.getProjectId();
+        this.startDate = nodesReservation.getStartDate();
+        this.endDate = nodesReservation.getEndDate();
+        this.noNodes = nodesReservation.getNoNodes();
+    }
 }
