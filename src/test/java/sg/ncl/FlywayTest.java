@@ -51,6 +51,7 @@ public class FlywayTest {
     private static final String USER_DETAILS = "user_details";
     private static final String USERS = "users";
     private static final String USERS_TEAMS = "users_teams";
+    private static final String NODES_USAGE_RESERVATION = "nodes_usage_reservation";
     private static final String SCHEMA = "prod";
 
     private DataSource dataSource;
@@ -86,6 +87,7 @@ public class FlywayTest {
         this.tables.add(EXPERIMENTS);
         this.tables.add(IMAGES);
         this.tables.add(LOGIN_ACTIVITIES);
+        this.tables.add(NODES_USAGE_RESERVATION);
         this.tables.add(PASSWORD_RESET_REQUESTS);
         this.tables.add(PROJECT_DETAILS);
         this.tables.add(PROJECT_USAGE);
@@ -97,6 +99,7 @@ public class FlywayTest {
         this.tables.add(USER_DETAILS);
         this.tables.add(USERS);
         this.tables.add(USERS_TEAMS);
+
     }
 
     @Test

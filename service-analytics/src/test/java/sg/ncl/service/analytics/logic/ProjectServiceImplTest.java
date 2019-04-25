@@ -10,6 +10,7 @@ import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
 import org.springframework.test.context.TestPropertySource;
+import sg.ncl.service.analytics.data.jpa.NodesReservationRepository;
 import sg.ncl.service.analytics.data.jpa.ProjectDetailsEntity;
 import sg.ncl.service.analytics.data.jpa.ProjectDetailsRepository;
 import sg.ncl.service.analytics.data.jpa.ProjectUsageEntity;
@@ -40,13 +41,14 @@ public class ProjectServiceImplTest {
 
     @Mock
     private ProjectDetailsRepository projectDetailsRepository;
-
+    @Mock
+    private NodesReservationRepository nodesReservationRepository;
     private ProjectService projectService;
 
     @Before
     public void before() {
         assertThat(mockingDetails(projectDetailsRepository).isMock()).isTrue();
-        projectService = new ProjectServiceImpl(projectDetailsRepository);
+        projectService = new ProjectServiceImpl(projectDetailsRepository,nodesReservationRepository);
     }
 
     @Test

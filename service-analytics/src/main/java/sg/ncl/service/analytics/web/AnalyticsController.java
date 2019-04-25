@@ -8,24 +8,26 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import sg.ncl.common.exception.base.BadRequestException;
 import sg.ncl.common.exception.base.UnauthorizedException;
-import sg.ncl.service.analytics.data.jpa.DataDownloadStatistics;
-import sg.ncl.service.analytics.data.jpa.ProjectUsageIdentity;
-import sg.ncl.service.analytics.domain.AnalyticsService;
-import sg.ncl.service.analytics.domain.ProjectDetails;
-import sg.ncl.service.analytics.domain.ProjectService;
-import sg.ncl.service.analytics.domain.ProjectUsage;
+import sg.ncl.service.analytics.data.jpa.*;
+import sg.ncl.service.analytics.domain.*;
 
 import javax.inject.Inject;
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
+import static java.time.temporal.ChronoUnit.DAYS;
 import static java.time.temporal.TemporalAdjusters.firstDayOfMonth;
 import static java.time.temporal.TemporalAdjusters.lastDayOfMonth;
 import static sg.ncl.common.validation.Validator.checkAdmin;
+import static sg.ncl.common.validation.Validator.checkClaimsType;
 
 /**
  * @author: Tran Ly Vu, James Ng
@@ -236,5 +238,69 @@ public class AnalyticsController {
         identity.setProjectDetailsId(id);
         identity.setMonthYear(month);
         return new ProjectDetailsInfo(projectService.deleteProjectUsage(id, identity));
+    }
+
+    // for Nodes Reservation/Booking in advance
+    @PostMapping(path = "/usage/projects/{id}/nodesreservations")
+    @ResponseStatus(HttpStatus.OK)
+    public NodesReservation applyNodesReserve(@PathVariable Long id,
+                                              @RequestBody @Valid NodesReservedInfo nodesResInfo,
+                                              @AuthenticationPrincipal Object claims) {
+        checkClaimsType(claims);
+        checkAdmin((Claims) claims);
+        return projectService.applyNodesReserve(id, nodesResInfo, ((Claims) claims).getSubject());
+    }
+
+    @GetMapping(path = "/usage/calendar", params = {"startDate", "endDate"})
+    @ResponseStatus(HttpStatus.OK)
+    public Map<String, List<Integer>> getCalendar(@RequestParam("startDate") final String startDate,
+                                                  @RequestParam("endDate") final String endDate) {
+        Map<String, List<Integer>> usageCal = new HashMap<>();
+        ZonedDateTime start = getZonedDateTime(startDate);
+        ZonedDateTime end = getZonedDateTime(endDate);
+        List<NodesReservationEntry> entries = projectService.getNodesReserve(start, end);
+        for (NodesReservationEntry entry : entries) {
+            usageCal.putIfAbsent(entry.getProject(), new ArrayList<>((int) DAYS.between(start, end)));
+            entry.computeNodesReserveByDay(usageCal.get(entry.getProject()), start, end);
+        }
+        return usageCal;
+    }
+
+    @GetMapping(path = "/usage/projects/{id}/nodesreservations")
+    @ResponseStatus(HttpStatus.OK)
+    public Map<Long, List<String>> getNodesReserveByProject(@PathVariable Long id,
+                                                            @AuthenticationPrincipal Object claims) {
+        checkClaimsType(claims);
+        checkAdmin((Claims) claims);
+        ZonedDateTime now = ZonedDateTime.now().withHour(0).withMinute(0).withSecond(0).withNano(0);
+        List<NodeUsageEntry> lstNodeUsageEntry = projectService.getNodesReserveByProject(id, now, ((Claims) claims).getSubject());
+        Map<Long, List<String>> mapNodeReservationInfo = new HashMap<>();
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+        for (NodeUsageEntry entry : lstNodeUsageEntry) {
+            List<String> tmpList = new ArrayList<>();
+            tmpList.add(entry.getStartDate().format(formatter));
+            tmpList.add(entry.getEndDate().format(formatter));
+            tmpList.add(entry.getNoNodes().toString());
+            mapNodeReservationInfo.put(entry.getId(), tmpList);
+        }
+        return mapNodeReservationInfo;
+    }
+
+    @PostMapping(path = "/usage/nodesreservations/{id}")
+    @ResponseStatus(HttpStatus.OK)
+    public NodesReservation editNodesReserve(@PathVariable Long id,
+                                             @RequestBody @Valid NodesReservationInfo nodesResInfo,
+                                             @AuthenticationPrincipal Object claims) {
+        checkClaimsType(claims);
+        checkAdmin((Claims) claims);
+        return projectService.editNodesReserve(id, nodesResInfo, ((Claims) claims).getSubject());
+    }
+
+    @DeleteMapping(path = "/usage/nodesreservations/{id}")
+    @ResponseStatus(HttpStatus.OK)
+    public NodesReservation removeNodesReserve(@PathVariable Long id, @AuthenticationPrincipal Object claims) {
+        checkClaimsType(claims);
+        checkAdmin((Claims) claims);
+        return new NodesReservationInfo(projectService.deleteNodesReserve(id));
     }
 }
