@@ -213,7 +213,12 @@ public class AnalyticsController {
                                           @RequestBody @Valid ProjectUsageReq projectUsageReq) {
         checkAdmin((Claims) claims);
         return new ProjectDetailsInfo(projectService.createProjectUsage(
-                id, new ProjectUsageInfo(projectUsageReq.getIdentity(), projectUsageReq.getUsage())
+                id, new ProjectUsageInfo(
+                        projectUsageReq.getIdentity(),
+                        projectUsageReq.getUsage(),
+                        projectUsageReq.getIncurred(),
+                        projectUsageReq.getWaived()
+                )
         ));
     }
 
@@ -224,7 +229,12 @@ public class AnalyticsController {
                                              @RequestBody @Valid ProjectUsageReq projectUsageReq) {
         checkAdmin((Claims) claims);
         return new ProjectDetailsInfo(projectService.updateProjectUsage(
-                id, new ProjectUsageInfo(projectUsageReq.getIdentity(), projectUsageReq.getUsage())
+                id, new ProjectUsageInfo(
+                        projectUsageReq.getIdentity(),
+                        projectUsageReq.getUsage(),
+                        projectUsageReq.getIncurred(),
+                        projectUsageReq.getWaived()
+                )
         ));
     }
 

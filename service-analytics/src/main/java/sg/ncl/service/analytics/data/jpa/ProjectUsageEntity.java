@@ -6,6 +6,7 @@ import sg.ncl.common.jpa.AbstractEntity;
 import sg.ncl.service.analytics.domain.ProjectUsage;
 
 import javax.persistence.*;
+import java.math.BigDecimal;
 
 @Getter
 @Setter
@@ -19,6 +20,12 @@ public class ProjectUsageEntity extends AbstractEntity implements ProjectUsage {
     @Column(name = "monthly_usage")
     private Integer monthlyUsage;
 
+    @Column(name = "incurred")
+    private BigDecimal incurred;
+
+    @Column(name = "waived")
+    private BigDecimal waived;
+
     @ManyToOne
     @JoinColumn(name = "project_details_id", insertable = false, updatable = false)
     private ProjectDetailsEntity projectDetailsEntity;
@@ -27,7 +34,9 @@ public class ProjectUsageEntity extends AbstractEntity implements ProjectUsage {
     public String toString() {
         return "ProjectUsageEntity{" +
                 "id=" + id.toString() +
-                ", monthlyUsage='" + monthlyUsage +
+                ", monthlyUsage=" + monthlyUsage +
+                ", incurred=" + incurred +
+                ", waived=" + waived +
                 "} " + super.toString();
     }
 
