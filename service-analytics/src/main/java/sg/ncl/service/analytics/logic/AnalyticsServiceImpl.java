@@ -3,12 +3,14 @@ package sg.ncl.service.analytics.logic;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.json.JSONObject;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.stereotype.Service;
 import sg.ncl.adapter.deterlab.AdapterDeterLab;
 import sg.ncl.service.analytics.AnalyticsProperties;
 import sg.ncl.service.analytics.data.jpa.*;
+import sg.ncl.service.analytics.data.pojo.DiskSpace;
 import sg.ncl.service.analytics.data.pojo.TeamUsage;
 import sg.ncl.service.analytics.domain.AnalyticsService;
 import sg.ncl.service.analytics.domain.DataDownload;
@@ -17,10 +19,7 @@ import sg.ncl.service.analytics.exceptions.StartDateAfterEndDateException;
 
 import javax.inject.Inject;
 import javax.validation.constraints.NotNull;
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileReader;
-import java.io.IOException;
+import java.io.*;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.ZoneId;
@@ -256,13 +255,12 @@ public class AnalyticsServiceImpl implements AnalyticsService {
         List<Energy> energyList = getEnergyList(start, end);
 
         //if every files are missing
-        if (energyList.isEmpty() || energyList == null) {
+        if (energyList == null || energyList.isEmpty()) {
             int numberOfDays = (int)ChronoUnit.DAYS.between(startDate, realEndDate);
             for (int i =0; i< numberOfDays; i++) {
                 energyStatistics.add(0.00);
             }
         } else {
-
             //sort energy list based on file name
             energyList.sort(
                     (Energy energy1, Energy energy2) -> energy1.filename.compareTo(energy2.filename)
@@ -275,7 +273,6 @@ public class AnalyticsServiceImpl implements AnalyticsService {
                 energyStatistics.add(0.00);
                 dateToStartCount = dateToStartCount.plusDays(1);
             }
-
 
             // list of energy up to the last file that is available
             for (int i = 0; i < energyList.size() - 1; i++) {
@@ -399,4 +396,27 @@ public class AnalyticsServiceImpl implements AnalyticsService {
         }
     }
 
+    @Override
+    public Map<String, List<DiskSpace>> getDiskStatistics() {
+        Map<String, List<DiskSpace>> statistics = new HashMap<>();
+        List<DiskSpace> diskSpaces = new ArrayList<>();
+        Path path = Paths.get(System.getProperty("user.home"));
+        File file = new File(Paths.get(path.getRoot().toString(), analyticsProperties.getDiskUsageFile()).toString());
+        try (BufferedReader br = new BufferedReader(new FileReader(file))) {
+            String timestamp;
+            if ((timestamp = br.readLine()) != null) {
+                String line;
+                while ((line = br.readLine()) != null) {
+                    if (!line.isEmpty()) {
+                        String[] splitted = StringUtils.split(line);
+                        diskSpaces.add(new DiskSpace(splitted[0], splitted[1]));
+                    }
+                }
+                statistics.put(timestamp, diskSpaces);
+            }
+        } catch (IOException ioe) {
+            log.error(ioe.toString());
+        }
+        return statistics;
+    }
 }

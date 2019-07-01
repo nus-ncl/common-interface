@@ -15,4 +15,5 @@ import org.springframework.context.annotation.Configuration;
 @Setter
 public class AnalyticsProperties {
     private String energyDir;
+    private String diskUsageFile;
 }

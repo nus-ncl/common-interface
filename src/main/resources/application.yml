@@ -76,6 +76,7 @@ ncl:
     charges: 0.12
   analytics:
     energyDir: home/sio/energylog
+    diskUsageFile: mnt/production_logs/diskspace.txt
 deterurl:
   bossurl: 172.18.178.10
   userurl: 172.18.178.11
