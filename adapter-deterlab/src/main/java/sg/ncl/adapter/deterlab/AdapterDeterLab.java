@@ -336,6 +336,14 @@ public class AdapterDeterLab {
         deterLabUserRepository.save(deterLabUserEntity);
     }
 
+    public String getNclUserIdByDeterUserId(String deterUserId) {
+        DeterLabUserEntity deterLabUserEntity = deterLabUserRepository.findByDeterUserId(deterUserId);
+        if (deterLabUserEntity == null) {
+            throw new UserNotFoundException(deterUserId);
+        }
+        return deterLabUserEntity.getNclUserId();
+    }
+
     public String getDeterUserIdByNclUserId(String nclUserId) {
         DeterLabUserEntity deterLabUserEntity = deterLabUserRepository.findByNclUserId(nclUserId);
         if (deterLabUserEntity == null) {
@@ -351,6 +359,14 @@ public class AdapterDeterLab {
         deterLabProjectEntity.setNclTeamId(nclTeamId);
         deterLabProjectEntity.setDeterProjectId(deterProjectId);
         return deterLabProjectRepository.save(deterLabProjectEntity);
+    }
+
+    public String getNclTeamIdByDeterProjectId(String deterProjectId) {
+        DeterLabProjectEntity deterLabProjectEntity = deterLabProjectRepository.findByDeterProjectId(deterProjectId);
+        if (deterLabProjectEntity == null) {
+            throw new TeamNotFoundException(deterProjectId);
+        }
+        return deterLabProjectEntity.getNclTeamId();
     }
 
     public String getDeterProjectIdByNclTeamId(String nclTeamId) {

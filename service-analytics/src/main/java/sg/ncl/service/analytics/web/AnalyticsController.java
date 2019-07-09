@@ -158,7 +158,7 @@ public class AnalyticsController {
 
     @GetMapping("/diskspace")
     @ResponseStatus(HttpStatus.OK)
-    public Map<String, List<DiskSpace>> getDiskStatistics(@AuthenticationPrincipal Object claims) {
+    public Map<String, Map<String, List<DiskSpace>>> getDiskStatistics(@AuthenticationPrincipal Object claims) {
         //check admin using validator class from common
         checkAdmin((Claims) claims);
         return analyticsService.getDiskStatistics();

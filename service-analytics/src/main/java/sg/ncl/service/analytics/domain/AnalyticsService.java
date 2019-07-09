@@ -25,7 +25,7 @@ public interface AnalyticsService {
 
     List<Double> getEnergyStatistics(ZonedDateTime startDate, ZonedDateTime endDate);
 
-    Map<String, List<DiskSpace>> getDiskStatistics();
+    Map<String, Map<String, List<DiskSpace>>> getDiskStatistics();
 
     List<Long> getTeamUsage(String teamId, ZonedDateTime startDate, ZonedDateTime endDate);
 

@@ -19,7 +19,10 @@ import sg.ncl.service.analytics.exceptions.StartDateAfterEndDateException;
 
 import javax.inject.Inject;
 import javax.validation.constraints.NotNull;
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
+import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.ZoneId;
@@ -397,9 +400,11 @@ public class AnalyticsServiceImpl implements AnalyticsService {
     }
 
     @Override
-    public Map<String, List<DiskSpace>> getDiskStatistics() {
-        Map<String, List<DiskSpace>> statistics = new HashMap<>();
-        List<DiskSpace> diskSpaces = new ArrayList<>();
+    public Map<String, Map<String, List<DiskSpace>>> getDiskStatistics() {
+        Map<String, Map<String, List<DiskSpace>>> statistics = new HashMap<>();
+        Map<String, List<DiskSpace>> diskSpaces = new HashMap<>();
+        List<DiskSpace> userSpaces = new ArrayList<>();
+        List<DiskSpace> projSpaces = new ArrayList<>();
         Path path = Paths.get(System.getProperty("user.home"));
         File file = new File(Paths.get(path.getRoot().toString(), analyticsProperties.getDiskUsageFile()).toString());
         try (BufferedReader br = new BufferedReader(new FileReader(file))) {
@@ -409,11 +414,29 @@ public class AnalyticsServiceImpl implements AnalyticsService {
                 while ((line = br.readLine()) != null) {
                     if (!line.isEmpty()) {
                         String[] splitted = StringUtils.split(line);
-                        diskSpaces.add(new DiskSpace(splitted[0], splitted[1]));
+                        if (splitted[1].contains("/big/users/")) {
+                            String deterUserId = StringUtils.substringAfter(splitted[1], "/big/users/");
+                            try {
+                                String nclUserId = adapterDeterLab.getNclUserIdByDeterUserId(deterUserId);
+                                userSpaces.add(new DiskSpace(splitted[0], splitted[1], nclUserId));
+                            } catch (Exception e) {
+                                userSpaces.add(new DiskSpace(splitted[0], splitted[1]));
+                            }
+                        } else if (splitted[1].contains("/big/proj/")) {
+                            String deterProjectId = StringUtils.substringAfter(splitted[1], "/big/proj/");
+                            try {
+                                String nclTeamId = adapterDeterLab.getNclTeamIdByDeterProjectId(deterProjectId);
+                                projSpaces.add(new DiskSpace(splitted[0], splitted[1], nclTeamId));
+                            } catch (Exception e) {
+                                projSpaces.add(new DiskSpace(splitted[0], splitted[1]));
+                            }
+                        }
                     }
                 }
-                statistics.put(timestamp, diskSpaces);
+                diskSpaces.put("userSpaces", userSpaces);
+                diskSpaces.put("projSpaces", projSpaces);
             }
+            statistics.put(timestamp, diskSpaces);
         } catch (IOException ioe) {
             log.error(ioe.toString());
         }
