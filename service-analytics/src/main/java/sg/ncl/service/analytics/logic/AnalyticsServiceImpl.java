@@ -8,6 +8,7 @@ import org.json.JSONObject;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.stereotype.Service;
 import sg.ncl.adapter.deterlab.AdapterDeterLab;
+import sg.ncl.common.exception.base.NotFoundException;
 import sg.ncl.service.analytics.AnalyticsProperties;
 import sg.ncl.service.analytics.data.jpa.*;
 import sg.ncl.service.analytics.data.pojo.DiskSpace;
@@ -439,7 +440,57 @@ public class AnalyticsServiceImpl implements AnalyticsService {
             statistics.put(timestamp, diskSpaces);
         } catch (IOException ioe) {
             log.error(ioe.toString());
+            throw new NotFoundException();
         }
         return statistics;
+    }
+
+    @Override
+    public DiskSpace getUserDiskUsage(String userId) {
+        DiskSpace diskSpace = null;
+        String deterUserId = adapterDeterLab.getDeterUserIdByNclUserId(userId);
+        Path path = Paths.get(System.getProperty("user.home"));
+        File file = new File(Paths.get(path.getRoot().toString(), analyticsProperties.getDiskUsageFile()).toString());
+        try (BufferedReader br = new BufferedReader(new FileReader(file))) {
+            String line;
+            while ((line = br.readLine()) != null) {
+                if (!line.isEmpty()) {
+                    String[] splitted = StringUtils.split(line);
+                    if (splitted[1].contains(deterUserId)) {
+                        diskSpace = new DiskSpace(splitted[0], splitted[1], userId);
+                        diskSpace.setAlert(determineAlert(splitted[0]));
+                        diskSpace.setQuota(analyticsProperties.getDiskSpaceThreshold().get("danger"));
+                        break;
+                    }
+                }
+            }
+        } catch (IOException ioe) {
+            log.error(ioe.toString());
+            throw new NotFoundException();
+        }
+        return diskSpace;
+    }
+
+    private String determineAlert(String usage) {
+        String alert = "info";
+        double usageSize = parseDiskSize(usage);
+        double dangerSize = parseDiskSize(analyticsProperties.getDiskSpaceThreshold().get("danger"));
+        double warningSize = parseDiskSize(analyticsProperties.getDiskSpaceThreshold().get("warning"));
+        if (usageSize > dangerSize) {
+            alert = "danger";
+        } else if (usageSize > warningSize) {
+            alert = "warning";
+        }
+        return alert;
+    }
+
+    private double parseDiskSize(String sizeStr) {
+        double size = Double.parseDouble(sizeStr.replaceFirst(".$",""));
+        if (sizeStr.endsWith("G")) {
+            size = size * 1000 * 1000;
+        } else if (sizeStr.endsWith("M")) {
+            size = size * 1000;
+        }
+        return size;
     }
 }

@@ -164,6 +164,13 @@ public class AnalyticsController {
         return analyticsService.getDiskStatistics();
     }
 
+    @GetMapping("/diskspace/users/{id}")
+    @ResponseStatus(HttpStatus.OK)
+    public DiskSpace getUserDiskUsage(@AuthenticationPrincipal Object claims, @PathVariable String id) {
+        checkClaimsType(claims);
+        return analyticsService.getUserDiskUsage(id);
+    }
+
     @GetMapping("/usage/projects")
     @ResponseStatus(HttpStatus.OK)
     public List<ProjectDetails> getAllProjectDetails(@AuthenticationPrincipal Object claims) {

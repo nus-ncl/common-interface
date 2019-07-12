@@ -11,6 +11,8 @@ public class DiskSpace {
     private String spaceSize;
     private String directory;
     private String nclId;
+    private String alert;
+    private String quota;
 
     public DiskSpace(String spaceSize, String directory) {
         this(spaceSize, directory, "");

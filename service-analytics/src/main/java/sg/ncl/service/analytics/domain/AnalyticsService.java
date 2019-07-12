@@ -27,6 +27,8 @@ public interface AnalyticsService {
 
     Map<String, Map<String, List<DiskSpace>>> getDiskStatistics();
 
+    DiskSpace getUserDiskUsage(String userId);
+
     List<Long> getTeamUsage(String teamId, ZonedDateTime startDate, ZonedDateTime endDate);
 
 }

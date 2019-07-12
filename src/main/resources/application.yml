@@ -77,6 +77,9 @@ ncl:
   analytics:
     energyDir: home/sio/energylog
     diskUsageFile: mnt/production_logs/diskspace.txt
+    diskSpaceThreshold: # diskspace threshold alert (value in G, M or K)
+      warning: 20G
+      danger: 25G
 deterurl:
   bossurl: 172.18.178.10
   userurl: 172.18.178.11
