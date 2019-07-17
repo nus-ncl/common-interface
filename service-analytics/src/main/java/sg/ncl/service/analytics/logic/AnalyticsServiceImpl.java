@@ -1,13 +1,18 @@
 package sg.ncl.service.analytics.logic;
 
+import freemarker.template.Template;
+import freemarker.template.TemplateException;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.json.JSONObject;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
+import org.springframework.ui.freemarker.FreeMarkerTemplateUtils;
 import sg.ncl.adapter.deterlab.AdapterDeterLab;
+import sg.ncl.common.DomainProperties;
 import sg.ncl.common.exception.base.NotFoundException;
 import sg.ncl.service.analytics.AnalyticsProperties;
 import sg.ncl.service.analytics.data.jpa.*;
@@ -17,8 +22,10 @@ import sg.ncl.service.analytics.domain.AnalyticsService;
 import sg.ncl.service.analytics.domain.DataDownload;
 import sg.ncl.service.analytics.domain.DataPublicDownload;
 import sg.ncl.service.analytics.exceptions.StartDateAfterEndDateException;
+import sg.ncl.service.mail.domain.MailService;
 
 import javax.inject.Inject;
+import javax.inject.Named;
 import javax.validation.constraints.NotNull;
 import java.io.BufferedReader;
 import java.io.File;
@@ -41,32 +48,41 @@ import java.util.regex.Pattern;
 @Slf4j
 @EnableConfigurationProperties(AnalyticsProperties.class)
 public class AnalyticsServiceImpl implements AnalyticsService {
+
     private static final String EXPTIDX = "exptidx";
-
     private final DataPublicDownloadRepository dataPublicDownloadRepository;
-
     private final DataDownloadRepository dataDownloadRepository;
-
     private final AdapterDeterLab adapterDeterLab;
-
     private final AnalyticsProperties analyticsProperties;
+    private final DomainProperties domainProperties;
+    private final MailService mailService;
+    private final Template alertDiskUsageTemplate;
 
     public AnalyticsServiceImpl( ) {
         dataPublicDownloadRepository = null;
         dataDownloadRepository = null;
         adapterDeterLab = null;
         analyticsProperties = null;
+        domainProperties = null;
+        mailService = null;
+        alertDiskUsageTemplate = null;
     }
 
     @Inject
     AnalyticsServiceImpl(@NotNull DataPublicDownloadRepository dataPublicDownloadRepository,
                          @NotNull DataDownloadRepository dataDownloadRepository,
                          @NotNull final AdapterDeterLab adapterDeterLab,
-                         @NotNull final AnalyticsProperties analyticsProperties) {
+                         @NotNull final AnalyticsProperties analyticsProperties,
+                         @NotNull final DomainProperties domainProperties,
+                         @NotNull final MailService mailService,
+                         @NotNull @Named("alertDiskUsageTemplate") final Template alertDiskUsageTemplate) {
         this.dataPublicDownloadRepository = dataPublicDownloadRepository;
         this.dataDownloadRepository = dataDownloadRepository;
         this.adapterDeterLab = adapterDeterLab;
         this.analyticsProperties = analyticsProperties;
+        this.domainProperties = domainProperties;
+        this.mailService = mailService;
+        this.alertDiskUsageTemplate = alertDiskUsageTemplate;
     }
 
     @Override
@@ -406,8 +422,7 @@ public class AnalyticsServiceImpl implements AnalyticsService {
         Map<String, List<DiskSpace>> diskSpaces = new HashMap<>();
         List<DiskSpace> userSpaces = new ArrayList<>();
         List<DiskSpace> projSpaces = new ArrayList<>();
-        Path path = Paths.get(System.getProperty("user.home"));
-        File file = new File(Paths.get(path.getRoot().toString(), analyticsProperties.getDiskUsageFile()).toString());
+        File file = getDiskSpaceFile();
         try (BufferedReader br = new BufferedReader(new FileReader(file))) {
             String timestamp;
             if ((timestamp = br.readLine()) != null) {
@@ -449,8 +464,7 @@ public class AnalyticsServiceImpl implements AnalyticsService {
     public DiskSpace getUserDiskUsage(String userId) {
         DiskSpace diskSpace = null;
         String deterUserId = adapterDeterLab.getDeterUserIdByNclUserId(userId);
-        Path path = Paths.get(System.getProperty("user.home"));
-        File file = new File(Paths.get(path.getRoot().toString(), analyticsProperties.getDiskUsageFile()).toString());
+        File file = getDiskSpaceFile();
         try (BufferedReader br = new BufferedReader(new FileReader(file))) {
             String line;
             while ((line = br.readLine()) != null) {
@@ -492,5 +506,58 @@ public class AnalyticsServiceImpl implements AnalyticsService {
             size = size * 1000;
         }
         return size;
+    }
+
+    private File getDiskSpaceFile() {
+        Path path = Paths.get(System.getProperty("user.home"));
+        return new File(Paths.get(path.getRoot().toString(), analyticsProperties.getDiskUsageFile()).toString());
+    }
+
+    @Scheduled(cron = "${ncl.analytics.diskUsageEmail.schedule}")
+    @Override
+    public void emailDiskUsageScheduled() {
+        String timestamp = "";
+        List<DiskSpace> userSpaces = new ArrayList<>();
+        List<DiskSpace> projSpaces = new ArrayList<>();
+        File file = getDiskSpaceFile();
+        try (BufferedReader br = new BufferedReader(new FileReader(file))) {
+            if ((timestamp = br.readLine()) != null) {
+                String line;
+                while ((line = br.readLine()) != null) {
+                    if (!line.isEmpty()) {
+                        String[] splitted = StringUtils.split(line);
+                        DiskSpace diskSpace = new DiskSpace(splitted[0], splitted[1]);
+                        diskSpace.setAlert(determineAlert(splitted[0]));
+                        if (diskSpace.getAlert().equals("danger")) {
+                            if (splitted[1].contains("/big/users/")) {
+                                userSpaces.add(diskSpace);
+                            } else if (splitted[1].contains("/big/proj/")) {
+                                projSpaces.add(diskSpace);
+                            }
+                        }
+                    }
+                }
+            }
+        } catch (IOException ioe) {
+            log.error(ioe.toString());
+        }
+
+        final Map<String, Object> map = new HashMap<>();
+        map.put("dangerThreshold", analyticsProperties.getDiskSpaceThreshold().get("danger"));
+        map.put("timestamp", timestamp);
+        map.put("userSpaces", userSpaces);
+        map.put("projSpaces", projSpaces);
+        try {
+            String from = "NCL Operations <testbed-ops@ncl.sg>";
+            String[] to = new String[1];
+            to[0] = "support@ncl.sg";
+            String subject = (domainProperties.getDomain().equals("dev.ncl.sg") ? "[DEV]" : "[PROD]") + " Disk Space Usage Alert";
+            String msgText = FreeMarkerTemplateUtils.processTemplateIntoString(alertDiskUsageTemplate, map);
+            if (!userSpaces.isEmpty() || !projSpaces.isEmpty()) {
+                mailService.send(from, to, subject, msgText, false, null, null);
+            }
+        } catch (IOException | TemplateException e) {
+            log.warn("Error sending email for disk usage alert: {}", e);
+        }
     }
 }

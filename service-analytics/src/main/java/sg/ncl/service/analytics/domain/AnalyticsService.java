@@ -31,4 +31,6 @@ public interface AnalyticsService {
 
     List<Long> getTeamUsage(String teamId, ZonedDateTime startDate, ZonedDateTime endDate);
 
+    void emailDiskUsageScheduled();
+
 }

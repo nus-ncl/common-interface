@@ -26,7 +26,7 @@ import java.io.IOException;
 })
 public class ExperimentApplication {
 
-    private static final String INTERNET_REQUEST_TEMPLATE = "internetRequestTemplate.tfl";
+    private static final String INTERNET_REQUEST_TEMPLATE = "internetRequestTemplate.ftl";
 
     public static void main(final String[] args) {
         try (final ConfigurableApplicationContext context = SpringApplication.run(ExperimentApplication.class, args)) {
