@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.*;
 import sg.ncl.common.exception.base.BadRequestException;
 import sg.ncl.common.exception.base.UnauthorizedException;
 import sg.ncl.service.analytics.data.jpa.*;
+import sg.ncl.service.analytics.data.pojo.DiskSpace;
 import sg.ncl.service.analytics.domain.*;
 
 import javax.inject.Inject;
@@ -153,6 +154,21 @@ public class AnalyticsController {
             end = now.with(lastDayOfMonth());
         }
         return analyticsService.getEnergyStatistics(start, end);
+    }
+
+    @GetMapping("/diskspace")
+    @ResponseStatus(HttpStatus.OK)
+    public Map<String, Map<String, List<DiskSpace>>> getDiskStatistics(@AuthenticationPrincipal Object claims) {
+        //check admin using validator class from common
+        checkAdmin((Claims) claims);
+        return analyticsService.getDiskStatistics();
+    }
+
+    @GetMapping("/diskspace/users/{id}")
+    @ResponseStatus(HttpStatus.OK)
+    public DiskSpace getUserDiskUsage(@AuthenticationPrincipal Object claims, @PathVariable String id) {
+        checkClaimsType(claims);
+        return analyticsService.getUserDiskUsage(id);
     }
 
     @GetMapping("/usage/projects")

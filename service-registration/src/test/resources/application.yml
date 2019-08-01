@@ -34,3 +34,6 @@ ncl:
       ip: localhost
       port: 8181
   domain: dev.ncl.sg
+  analytics:
+    diskUsageEmail:
+      schedule: 0 0 12 ? * ?

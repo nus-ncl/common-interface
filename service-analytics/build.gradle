@@ -3,6 +3,8 @@ version '1.0-SNAPSHOT'
 dependencies {
     compile project(':common')
     compile project(':adapter-deterlab')
+    compile project(':service-mail')
+    compile project(':service-user')
     compile('org.apache.commons:commons-lang3:3.4')
 
     runtime 'mysql:mysql-connector-java'

@@ -1,5 +1,6 @@
 package sg.ncl.service.analytics.logic;
 
+import freemarker.template.Template;
 import mockit.MockUp;
 import mockit.integration.junit4.JMockit;
 import org.apache.commons.lang3.RandomStringUtils;
@@ -14,6 +15,7 @@ import org.mockito.junit.MockitoRule;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.test.context.TestPropertySource;
 import sg.ncl.adapter.deterlab.AdapterDeterLab;
+import sg.ncl.common.DomainProperties;
 import sg.ncl.service.analytics.AnalyticsProperties;
 import sg.ncl.service.analytics.data.jpa.DataDownloadEntity;
 import sg.ncl.service.analytics.data.jpa.DataDownloadRepository;
@@ -21,6 +23,7 @@ import sg.ncl.service.analytics.data.jpa.DataDownloadStatistics;
 import sg.ncl.service.analytics.data.jpa.DataPublicDownloadRepository;
 import sg.ncl.service.analytics.domain.AnalyticsService;
 import sg.ncl.service.analytics.exceptions.StartDateAfterEndDateException;
+import sg.ncl.service.mail.domain.MailService;
 
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
@@ -53,11 +56,16 @@ public class AnalyticsServiceImplTest {
     private DataDownloadRepository dataDownloadRepository;
     @Mock
     private AdapterDeterLab adapterDeterLab;
-
-    private AnalyticsService analyticsService;
-
     @Mock
     private AnalyticsProperties analyticsProperties;
+    @Mock
+    private DomainProperties domainProperties;
+    @Mock
+    private MailService mailService;
+    @Mock
+    private Template alertDiskUsageTemplate;
+
+    private AnalyticsService analyticsService;
 
     @Before
     public void before() {
@@ -65,7 +73,15 @@ public class AnalyticsServiceImplTest {
         assertThat(mockingDetails(dataDownloadRepository).isMock()).isTrue();
         assertThat(mockingDetails(adapterDeterLab).isMock()).isTrue();
         assertThat(mockingDetails(analyticsProperties).isMock()).isTrue();
-        analyticsService = new AnalyticsServiceImpl(dataPublicDownloadRepository, dataDownloadRepository, adapterDeterLab, analyticsProperties);
+        assertThat(mockingDetails(domainProperties).isMock()).isTrue();
+        analyticsService = new AnalyticsServiceImpl(
+                dataPublicDownloadRepository,
+                dataDownloadRepository,
+                adapterDeterLab,
+                analyticsProperties,
+                domainProperties,
+                mailService,
+                alertDiskUsageTemplate);
     }
 
     @Test

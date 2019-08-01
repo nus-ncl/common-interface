@@ -5,8 +5,10 @@ import lombok.Setter;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
 
+import java.util.Map;
+
 /**
- * @Author: Tran Ly Vu
+ * @Author: Tran Ly Vu, James Ng
  */
 
 @Configuration
@@ -15,4 +17,6 @@ import org.springframework.context.annotation.Configuration;
 @Setter
 public class AnalyticsProperties {
     private String energyDir;
+    private String diskUsageFile;
+    private Map<String, String> diskSpaceThreshold;
 }

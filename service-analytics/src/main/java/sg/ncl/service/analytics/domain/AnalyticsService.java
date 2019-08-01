@@ -1,9 +1,10 @@
 package sg.ncl.service.analytics.domain;
 
 import sg.ncl.service.analytics.data.jpa.DataDownloadStatistics;
+import sg.ncl.service.analytics.data.pojo.DiskSpace;
 
 import java.time.ZonedDateTime;
-import java.util.List;
+import java.util.*;
 
 /**
  * @author: Tran Ly Vu
@@ -24,6 +25,12 @@ public interface AnalyticsService {
 
     List<Double> getEnergyStatistics(ZonedDateTime startDate, ZonedDateTime endDate);
 
+    Map<String, Map<String, List<DiskSpace>>> getDiskStatistics();
+
+    DiskSpace getUserDiskUsage(String userId);
+
     List<Long> getTeamUsage(String teamId, ZonedDateTime startDate, ZonedDateTime endDate);
+
+    void emailDiskUsageScheduled();
 
 }
