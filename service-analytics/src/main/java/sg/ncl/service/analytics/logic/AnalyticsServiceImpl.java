@@ -7,6 +7,7 @@ import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.json.JSONObject;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
@@ -513,51 +514,56 @@ public class AnalyticsServiceImpl implements AnalyticsService {
         return new File(Paths.get(path.getRoot().toString(), analyticsProperties.getDiskUsageFile()).toString());
     }
 
-    @Scheduled(cron = "${ncl.analytics.diskUsageEmail.schedule}")
+    @Value("${ncl.analytics.diskUsageEmail.enabled:false}")
+    private boolean isEnabled;
+
+    @Scheduled(cron = "${ncl.analytics.diskUsageEmail.schedule:-}")
     @Override
     public void emailDiskUsageScheduled() {
-        String timestamp = "";
-        List<DiskSpace> userSpaces = new ArrayList<>();
-        List<DiskSpace> projSpaces = new ArrayList<>();
-        File file = getDiskSpaceFile();
-        try (BufferedReader br = new BufferedReader(new FileReader(file))) {
-            if ((timestamp = br.readLine()) != null) {
-                String line;
-                while ((line = br.readLine()) != null) {
-                    if (!line.isEmpty()) {
-                        String[] splitted = StringUtils.split(line);
-                        DiskSpace diskSpace = new DiskSpace(splitted[0], splitted[1]);
-                        diskSpace.setAlert(determineAlert(splitted[0]));
-                        if (diskSpace.getAlert().equals("danger")) {
-                            if (splitted[1].contains("/big/users/")) {
-                                userSpaces.add(diskSpace);
-                            } else if (splitted[1].contains("/big/proj/")) {
-                                projSpaces.add(diskSpace);
+        if (isEnabled) {
+            String timestamp = "";
+            List<DiskSpace> userSpaces = new ArrayList<>();
+            List<DiskSpace> projSpaces = new ArrayList<>();
+            File file = getDiskSpaceFile();
+            try (BufferedReader br = new BufferedReader(new FileReader(file))) {
+                if ((timestamp = br.readLine()) != null) {
+                    String line;
+                    while ((line = br.readLine()) != null) {
+                        if (!line.isEmpty()) {
+                            String[] splitted = StringUtils.split(line);
+                            DiskSpace diskSpace = new DiskSpace(splitted[0], splitted[1]);
+                            diskSpace.setAlert(determineAlert(splitted[0]));
+                            if (diskSpace.getAlert().equals("danger")) {
+                                if (splitted[1].contains("/big/users/")) {
+                                    userSpaces.add(diskSpace);
+                                } else if (splitted[1].contains("/big/proj/")) {
+                                    projSpaces.add(diskSpace);
+                                }
                             }
                         }
                     }
                 }
+            } catch (IOException ioe) {
+                log.error(ioe.toString());
             }
-        } catch (IOException ioe) {
-            log.error(ioe.toString());
-        }
 
-        final Map<String, Object> map = new HashMap<>();
-        map.put("dangerThreshold", analyticsProperties.getDiskSpaceThreshold().get("danger"));
-        map.put("timestamp", timestamp);
-        map.put("userSpaces", userSpaces);
-        map.put("projSpaces", projSpaces);
-        try {
-            String from = "NCL Operations <testbed-ops@ncl.sg>";
-            String[] to = new String[1];
-            to[0] = "support@ncl.sg";
-            String subject = (domainProperties.getDomain().equals("dev.ncl.sg") ? "[DEV]" : "[PROD]") + " Disk Space Usage Alert";
-            String msgText = FreeMarkerTemplateUtils.processTemplateIntoString(alertDiskUsageTemplate, map);
-            if (!userSpaces.isEmpty() || !projSpaces.isEmpty()) {
-                mailService.send(from, to, subject, msgText, false, null, null);
+            final Map<String, Object> map = new HashMap<>();
+            map.put("dangerThreshold", analyticsProperties.getDiskSpaceThreshold().get("danger"));
+            map.put("timestamp", timestamp);
+            map.put("userSpaces", userSpaces);
+            map.put("projSpaces", projSpaces);
+            try {
+                String from = "NCL Operations <testbed-ops@ncl.sg>";
+                String[] to = new String[1];
+                to[0] = "support@ncl.sg";
+                String subject = (domainProperties.getDomain().equals("dev.ncl.sg") ? "[DEV]" : "[PROD]") + " Disk Space Usage Alert";
+                String msgText = FreeMarkerTemplateUtils.processTemplateIntoString(alertDiskUsageTemplate, map);
+                if (!userSpaces.isEmpty() || !projSpaces.isEmpty()) {
+                    mailService.send(from, to, subject, msgText, false, null, null);
+                }
+            } catch (IOException | TemplateException e) {
+                log.warn("Error sending email for disk usage alert: {}", e);
             }
-        } catch (IOException | TemplateException e) {
-            log.warn("Error sending email for disk usage alert: {}", e);
         }
     }
 }
