@@ -10,7 +10,9 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.util.UriUtils;
 import sg.ncl.common.exception.base.NotFoundException;
 import sg.ncl.common.exception.base.UnauthorizedException;
+import sg.ncl.service.transmission.DirectoryProperties;
 import sg.ncl.service.transmission.domain.DownloadService;
+import sg.ncl.service.transmission.util.HttpUtils;
 
 import javax.inject.Inject;
 import javax.servlet.http.HttpServletResponse;
@@ -31,18 +33,28 @@ public class DownloadController {
     static final String PATH = "/downloads";
 
     private final DownloadService downloadService;
+    private final DirectoryProperties properties;
 
     @Inject
-    DownloadController(@NotNull final DownloadService downloadService) {
+    DownloadController(@NotNull final DownloadService downloadService, final DirectoryProperties properties) {
         this.downloadService = downloadService;
+        this.properties = properties;
     }
+
 
     @GetMapping(params = {"filename"})
     public void getFile(@AuthenticationPrincipal Object claims, @RequestParam("filename") String filename, HttpServletResponse response) {
         if (claims == null || !(claims instanceof Claims)) {
             throw new UnauthorizedException();
         }
+
         try {
+            String decodeFileName = UriUtils.decode(filename, "UTF-8");
+
+            if (HttpUtils.isFilePathUnsafe(properties, decodeFileName)) {
+                throw new UnauthorizedException("Unauthorized");
+            }
+
             downloadService.getChunks(response, null, null, UriUtils.decode(filename, "UTF-8"));
         } catch (IOException e) {
             log.error("Unable to download file: {}", e);

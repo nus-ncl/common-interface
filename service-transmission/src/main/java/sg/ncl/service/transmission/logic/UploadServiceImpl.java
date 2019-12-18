@@ -3,7 +3,9 @@ package sg.ncl.service.transmission.logic;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.tomcat.util.codec.binary.Base64;
 import org.springframework.stereotype.Service;
+import org.springframework.web.util.UriUtils;
 import sg.ncl.common.exception.base.BadRequestException;
+import sg.ncl.common.exception.base.UnauthorizedException;
 import sg.ncl.service.transmission.DirectoryProperties;
 import sg.ncl.service.transmission.data.ResumableEntity;
 import sg.ncl.service.transmission.data.ResumableStorage;
@@ -77,6 +79,23 @@ public class UploadServiceImpl implements UploadService {
 
     @Override
     public UploadStatus addChunk(ResumableInfo resumableInfo, int resumableChunkNumber, String subDirKey, String preDir) {
+
+        try{
+            String decodeFileName = UriUtils.decode(resumableInfo.getResumableFilename(), "UTF-8");
+            if (HttpUtils.isFilePathUnsafe(properties, decodeFileName)) {
+                throw new UnauthorizedException("Unauthorized path");
+            }
+
+            String decodeIdentifier = UriUtils.decode(resumableInfo.getResumableIdentifier(), "UTF-8");
+            if (HttpUtils.isFilePathUnsafe(properties, decodeIdentifier)) {
+                throw new UnauthorizedException("Unauthorized identifier");
+            }
+
+        }catch (IOException e) {
+            log.error("Unable to decode addChunk filename: {}", e);
+            throw new BadRequestException();
+        }
+
         Path path = HttpUtils.getPath(properties, subDirKey, preDir);
 
         boolean isFilePathSafe = HttpUtils.isFilePathSafe(properties , resumableInfo.getResumableFilename());
