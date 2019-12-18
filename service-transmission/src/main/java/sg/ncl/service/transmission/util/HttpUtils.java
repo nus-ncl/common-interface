@@ -74,6 +74,25 @@ public class HttpUtils {
         return Paths.get(path.getRoot().toString(), baseDir);
     }
 
+    public static boolean isFilePathUnsafe(DirectoryProperties properties, String filename){
+        boolean unsafePath = false;
+        String baseDir = properties.getBaseDir();
+
+        if(filename.contains("../") || filename.contains("./") || filename.contains("..")){
+            unsafePath = true;
+        }
+
+        Path baseDirPath = Paths.get(baseDir);
+        Path userPath = Paths.get(filename);
+        final Path resolvedPath = baseDirPath.resolve(userPath).normalize();
+        if (!resolvedPath.startsWith(baseDirPath)) {
+            unsafePath = true;
+        }
+
+        return unsafePath;
+    }
+
+
     public static void removeDirectory(File dir) {
         boolean deleted;
         if (dir.isDirectory()) {
