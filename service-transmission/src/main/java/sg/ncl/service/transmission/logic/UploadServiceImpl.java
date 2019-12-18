@@ -80,27 +80,11 @@ public class UploadServiceImpl implements UploadService {
     @Override
     public UploadStatus addChunk(ResumableInfo resumableInfo, int resumableChunkNumber, String subDirKey, String preDir) {
 
-        try{
-            String decodeFileName = UriUtils.decode(resumableInfo.getResumableFilename(), "UTF-8");
-            if (HttpUtils.isFilePathUnsafe(properties, decodeFileName)) {
-                throw new UnauthorizedException("Unauthorized path");
-            }
-
-            String decodeIdentifier = UriUtils.decode(resumableInfo.getResumableIdentifier(), "UTF-8");
-            if (HttpUtils.isFilePathUnsafe(properties, decodeIdentifier)) {
-                throw new UnauthorizedException("Unauthorized identifier");
-            }
-
-        }catch (IOException e) {
-            log.error("Unable to decode addChunk filename: {}", e);
-            throw new BadRequestException();
-        }
-
-        Path path = HttpUtils.getPath(properties, subDirKey, preDir);
-
         boolean isFilePathSafe = HttpUtils.isFilePathSafe(properties , resumableInfo.getResumableFilename());
 
         if(isFilePathSafe){
+
+            Path path = HttpUtils.getPath(properties, subDirKey, preDir);
             createDirectoryOrCheckFileExists(path, resumableInfo);
 
             //Here we add a ".temp" to every transmission file to indicate NON-FINISHED

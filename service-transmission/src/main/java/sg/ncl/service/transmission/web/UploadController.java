@@ -6,12 +6,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.util.UriUtils;
 import sg.ncl.common.exception.base.BadRequestException;
 import sg.ncl.common.exception.base.UnauthorizedException;
-import sg.ncl.service.transmission.DirectoryProperties;
 import sg.ncl.service.transmission.domain.UploadService;
-import sg.ncl.service.transmission.util.HttpUtils;
 
 import javax.inject.Inject;
 import javax.validation.Valid;
@@ -32,13 +29,10 @@ public class UploadController {
     static final String PATH = "/uploads";
 
     private final UploadService uploadService;
-    private final DirectoryProperties properties;
-
 
     @Inject
-    UploadController(@NotNull final UploadService uploadService, final DirectoryProperties properties) {
+    UploadController(@NotNull final UploadService uploadService) {
         this.uploadService = uploadService;
-        this.properties = properties;
     }
 
     @GetMapping(params = {"filename"})
@@ -47,12 +41,6 @@ public class UploadController {
             throw new UnauthorizedException();
         }
         try {
-            String decodeFileName = UriUtils.decode(filename, "UTF-8");
-
-            if (HttpUtils.isFilePathUnsafe(properties, decodeFileName)) {
-                throw new UnauthorizedException("Unauthorized arbitrary file delete");
-            }
-
             if (uploadService.deleteUpload("", "", filename)) {
                 log.info("File {} deleted.", filename);
                 return "Deleted";
