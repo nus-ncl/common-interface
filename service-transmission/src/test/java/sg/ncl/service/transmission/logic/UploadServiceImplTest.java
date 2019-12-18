@@ -77,6 +77,13 @@ public class UploadServiceImplTest extends AbstractTest {
     }
 
     @Test
+    public void testFileTraversalDeleteUpload() throws IOException {
+        when(properties.getBaseDir()).thenReturn(tempFolder);
+        boolean result = uploadService.deleteUpload(null, null, "../test.txt");
+        assertThat(result).isFalse();
+    }
+
+    @Test
     public void testCheckChunkUploaded() {
         final ResumableEntity entity = new ResumableEntity();
         final int resumableChunkNumber = (new Random()).nextInt();

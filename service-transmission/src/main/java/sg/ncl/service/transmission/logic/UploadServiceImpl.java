@@ -12,6 +12,7 @@ import sg.ncl.service.transmission.data.ResumableStorage;
 import sg.ncl.service.transmission.domain.UploadService;
 import sg.ncl.service.transmission.domain.UploadStatus;
 import sg.ncl.service.transmission.exceptions.UploadAlreadyExistsException;
+import sg.ncl.service.transmission.exceptions.UploadOutOfBaseDirException;
 import sg.ncl.service.transmission.util.HttpUtils;
 import sg.ncl.service.transmission.web.ResumableInfo;
 
@@ -49,10 +50,21 @@ public class UploadServiceImpl implements UploadService {
 
     @Override
     public boolean deleteUpload(String subDirKey, String preDir, String fileName) throws IOException {
+
         Path path = HttpUtils.getPath(properties, subDirKey, preDir);
         String filePath = path.toString() + "/" + fileName;
-        File file = new File(filePath);
-        return Files.deleteIfExists(file.toPath());
+
+        boolean isFilePathSafe = HttpUtils.isFilePathSafe(properties , fileName);
+
+        if(isFilePathSafe)
+        {
+            File file = new File(filePath);
+            return Files.deleteIfExists(file.toPath());
+        }
+        else
+        {
+            return false;
+        }
     }
 
     @Override
@@ -85,65 +97,91 @@ public class UploadServiceImpl implements UploadService {
         }
 
         Path path = HttpUtils.getPath(properties, subDirKey, preDir);
-        createDirectoryOrCheckFileExists(path, resumableInfo);
 
-        //Here we add a ".temp" to every transmission file to indicate NON-FINISHED
-        String resumableFilePath = path.toString() + "/" + resumableInfo.getResumableFilename() + ".temp";
+        boolean isFilePathSafe = HttpUtils.isFilePathSafe(properties , resumableInfo.getResumableFilename());
 
-        ResumableEntity entity = storage.get(
-                resumableInfo.getResumableChunkSize(),
-                resumableInfo.getResumableTotalSize(),
-                resumableInfo.getResumableIdentifier(),
-                resumableInfo.getResumableFilename(),
-                resumableInfo.getResumableRelativePath(),
-                resumableFilePath);
+        if(isFilePathSafe){
+            createDirectoryOrCheckFileExists(path, resumableInfo);
 
-        if (!entity.valid()) {
-            storage.remove(entity);
-            log.error("Invalid resumable");
-            throw new BadRequestException();
+            //Here we add a ".temp" to every transmission file to indicate NON-FINISHED
+            String resumableFilePath = path.toString() + "/" + resumableInfo.getResumableFilename() + ".temp";
+
+            ResumableEntity entity = storage.get(
+                    resumableInfo.getResumableChunkSize(),
+                    resumableInfo.getResumableTotalSize(),
+                    resumableInfo.getResumableIdentifier(),
+                    resumableInfo.getResumableFilename(),
+                    resumableInfo.getResumableRelativePath(),
+                    resumableFilePath);
+
+            if (!entity.valid()) {
+                storage.remove(entity);
+                log.error("Invalid resumable");
+                throw new BadRequestException();
+            }
+
+            writeChunk(entity, resumableChunkNumber, resumableInfo);
+
+            //Mark as uploaded.
+            entity.uploadedChunks.add(new ResumableEntity.ResumableChunkNumber(resumableChunkNumber));
+            if (entity.checkIfUploadFinished()) { //Check if all chunks uploaded, and change filename
+                storage.remove(entity);
+                return UploadStatus.FINISHED;
+            } else {
+                return UploadStatus.UPLOAD;
+            }
+        }
+        else{
+            return UploadStatus.NOT_FOUND;
         }
 
-        writeChunk(entity, resumableChunkNumber, resumableInfo);
-
-        //Mark as uploaded.
-        entity.uploadedChunks.add(new ResumableEntity.ResumableChunkNumber(resumableChunkNumber));
-        if (entity.checkIfUploadFinished()) { //Check if all chunks uploaded, and change filename
-            storage.remove(entity);
-            return UploadStatus.FINISHED;
-        } else {
-            return UploadStatus.UPLOAD;
-        }
     }
     
     private void createDirectoryOrCheckFileExists(Path path, ResumableInfo resumableInfo) {
-        //if directory exists?
-        if (!path.toFile().exists()) {
-            try {
-                Files.createDirectories(path);
-            } catch (IOException e) {
-                log.error("Unable to create directory path: {}", e);
-                throw new BadRequestException();
+        boolean isFilePathSafe = HttpUtils.isFilePathSafe(properties , resumableInfo.getResumableFilename());
+
+        if(isFilePathSafe) {
+            //if directory exists?
+            if (!path.toFile().exists()) {
+                try {
+                    Files.createDirectories(path);
+                } catch (IOException e) {
+                    log.error("Unable to create directory path: {}", e);
+                    throw new BadRequestException();
+                }
+            } else {
+                File file = new File(path.toString() + "/" + resumableInfo.getResumableFilename());
+                if (file.exists()) {
+                    throw new UploadAlreadyExistsException("Upload file already exist in directory.");
+                }
             }
-        } else {
-            File file = new File(path.toString() + "/" + resumableInfo.getResumableFilename());
-            if (file.exists()) {
-                throw new UploadAlreadyExistsException("Upload file already exist in directory.");
-            }
+        }
+        else
+        {
+            throw new UploadOutOfBaseDirException("Arbitrary File Write via Path Traversal.");
         }
     }
 
     private void writeChunk(ResumableEntity entity, int resumableChunkNumber, ResumableInfo resumableInfo) {
-        try (RandomAccessFile raf = new RandomAccessFile(entity.getResumableFilePath(), "rw")) {
-            //Seek to position
-            log.info("resumableChunkNumber: " + resumableChunkNumber + " resumableChunkSize: " + entity.getResumableChunkSize());
-            raf.seek((resumableChunkNumber - 1) * (long) entity.getResumableChunkSize());
-            //Save to file
-            byte[] bytes = Base64.decodeBase64(resumableInfo.getResumableChunk());
-            raf.write(bytes);
-        } catch (Exception e) {
-            log.error("Error saving chunk: {}", e);
-            throw new BadRequestException();
+
+        boolean isFilePathSafe = HttpUtils.isFilePathSafe(properties , resumableInfo.getResumableFilename());
+
+        if(isFilePathSafe) {
+            try (RandomAccessFile raf = new RandomAccessFile(entity.getResumableFilePath(), "rw")) {
+                //Seek to position
+                log.info("resumableChunkNumber: " + resumableChunkNumber + " resumableChunkSize: " + entity.getResumableChunkSize());
+                raf.seek((resumableChunkNumber - 1) * (long) entity.getResumableChunkSize());
+                //Save to file
+                byte[] bytes = Base64.decodeBase64(resumableInfo.getResumableChunk());
+                raf.write(bytes);
+            } catch (Exception e) {
+                log.error("Error saving chunk: {}", e);
+                throw new BadRequestException();
+            }
+        }
+        else
+        {
+            throw new UploadOutOfBaseDirException("Arbitrary File Write via Path Traversal.");
         }
     }
 
