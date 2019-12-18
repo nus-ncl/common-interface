@@ -51,11 +51,14 @@ public class DownloadController {
         try {
             String decodeFileName = UriUtils.decode(filename, "UTF-8");
 
-            if (HttpUtils.isFilePathUnsafe(properties, decodeFileName)) {
+            if (HttpUtils.isFilePathSafe(properties, decodeFileName)) {
+                downloadService.getChunks(response, null, null, UriUtils.decode(filename, "UTF-8"));
+            }
+            else
+            {
                 throw new UnauthorizedException("Unauthorized");
             }
 
-            downloadService.getChunks(response, null, null, UriUtils.decode(filename, "UTF-8"));
         } catch (IOException e) {
             log.error("Unable to download file: {}", e);
             throw new NotFoundException();
