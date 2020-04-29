@@ -83,10 +83,8 @@ public class ProjectServiceImpl implements ProjectService {
     @Override
     public ProjectDetails createProjectDetails(ProjectDetails projectDetails) {
         log.info("Save project details");
-
         // check if project name already exists
         List<ProjectDetailsEntity> detailsEntities = projectDetailsRepository.findByProjectName(projectDetails.getProjectName());
-
         if (detailsEntities != null) {
             for (ProjectDetailsEntity detailsEntity : detailsEntities) {
                 if (detailsEntity.getProjectName().equals(projectDetails.getProjectName())) {
@@ -95,7 +93,6 @@ public class ProjectServiceImpl implements ProjectService {
                 }
             }
         }
-
         ProjectDetailsEntity savedDetailsEntity = projectDetailsRepository.save(setUpProjectDetailsEntity(projectDetails));
         log.info(INFO_TEXT, savedDetailsEntity);
         return savedDetailsEntity;
@@ -195,7 +192,7 @@ public class ProjectServiceImpl implements ProjectService {
      */
     @Override
     @Transactional
-    public NodesReservation applyNodesReserve(Long projectId, NodesReserved nodesRes, String requesterId){
+    public NodesReservation applyNodesReserve(Long projectId, NodesReserved nodesRes){
         // check that the start date is before the end date
         if (nodesRes.getStartDate().isAfter(nodesRes.getEndDate()))
             throw new StartDateAfterEndDateException();
@@ -234,14 +231,15 @@ public class ProjectServiceImpl implements ProjectService {
 
     @Override
     @Transactional
-    public List<NodeUsageEntry> getNodesReserveByProject(Long projectId, ZonedDateTime currentDate, String requesterId){
+    public List<NodeUsageEntry> getNodesReserveByProject(Long projectId, ZonedDateTime currentDate){
         final List<NodeUsageEntry> nodeReservationList = nodesReservationRepository.getNodesReserveByProject(projectId,currentDate);
         return nodeReservationList;
     }
 
     @Override
     @Transactional
-    public NodesReservation editNodesReserve(Long reservationId, NodesReservationInfo nodesRes, String requesterId){
+    //public NodesReservation editNodesReserve(Long reservationId, NodesReservationInfo nodesRes, String requesterId){
+    public NodesReservation editNodesReserve(Long reservationId, NodesReservationInfo nodesRes){
         // check that the start date is before the end date
         if (nodesRes.getStartDate().isAfter(nodesRes.getEndDate()))
             throw new StartDateAfterEndDateException();
