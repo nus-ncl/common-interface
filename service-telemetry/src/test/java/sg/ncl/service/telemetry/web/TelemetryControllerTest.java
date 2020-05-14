@@ -13,6 +13,7 @@ import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
+import sg.ncl.service.analytics.domain.ProjectService;
 import sg.ncl.service.telemetry.domain.NodeType;
 import sg.ncl.service.telemetry.domain.TelemetryService;
 
@@ -46,9 +47,13 @@ public class TelemetryControllerTest {
     @MockBean
     private TelemetryService telemetryService;
 
+    @MockBean
+    private ProjectService projectService;
+
     @Before
     public void before() {
         assertThat(mockingDetails(telemetryService).isMock()).isTrue();
+        assertThat(mockingDetails(projectService).isMock()).isTrue();
 
         mockMvc = MockMvcBuilders.webAppContextSetup(webApplicationContext).build();
     }
