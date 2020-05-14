@@ -29,13 +29,13 @@ public interface ProjectService {
 
     ProjectUsage findProjectUsageById(Long id, ProjectUsageIdentity identity);
 
-    NodesReservation applyNodesReserve(Long projectId, NodesReserved nodesRes, String requesterId);
+    NodesReservation applyNodesReserve(Long projectId, NodesReserved nodesRes);
 
     List<NodesReservationEntry> getNodesReserve(ZonedDateTime startDate, ZonedDateTime endDate);
 
-    List<NodeUsageEntry> getNodesReserveByProject(Long projectId, ZonedDateTime currentDate, String requesterId);
+    List<NodeUsageEntry> getNodesReserveByProject(Long projectId, ZonedDateTime currentDate);
 
-    NodesReservation editNodesReserve(Long reservationId, NodesReservationInfo nodesRes, String requesterId);
+    NodesReservation editNodesReserve(Long reservationId, NodesReservationInfo nodesRes);
 
     NodesReservationEntity getNodeReservationDetails(Long id);
 
