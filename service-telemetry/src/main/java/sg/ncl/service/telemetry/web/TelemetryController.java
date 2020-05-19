@@ -116,4 +116,10 @@ public class TelemetryController {
     public NodesReservation removeNodesReserve(@PathVariable Long id) {
         return new NodesReservationInfo(projectService.deleteNodesReserve(id));
     }
+
+    @GetMapping("/usage/projects/{id}")
+    @ResponseStatus(HttpStatus.OK)
+    public ProjectDetails getProjectDetailsById(@PathVariable Long id) {
+        return new ProjectDetailsInfo(projectService.getProjectDetails(id));
+    }
 }
