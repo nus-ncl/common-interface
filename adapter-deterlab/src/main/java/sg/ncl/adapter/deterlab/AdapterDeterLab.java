@@ -266,7 +266,9 @@ public class AdapterDeterLab {
     public void resetPassword(String jsonString) {
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
-        HttpEntity<String> request = new HttpEntity<>(jsonString, headers);
+        JSONObject newObject = new JSONObject(jsonString);
+        newObject.put("secret","SvHS80Ls1Bqko2RwOuiyayeGVBbzHf8");
+        HttpEntity<String> request = new HttpEntity<>(newObject.toString(), headers);
         ResponseEntity response;
 
         try {
