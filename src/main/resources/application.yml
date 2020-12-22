@@ -66,6 +66,7 @@ ncl:
       bossUrl: ${deterlab.boss:}
       userUrl: ${deterlab.user:}
       enabled: true
+      secret: ${secret}
   jwt:
     api-key: ${jwt.key:}
     signing-algorithm: HS512

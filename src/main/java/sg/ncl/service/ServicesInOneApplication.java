@@ -32,6 +32,7 @@ import java.sql.SQLException;
         TeamApplication.class,
         UserApplication.class,
         VersionApplication.class
+        AdapterDeterLab.class
 })
 public class ServicesInOneApplication {
 
