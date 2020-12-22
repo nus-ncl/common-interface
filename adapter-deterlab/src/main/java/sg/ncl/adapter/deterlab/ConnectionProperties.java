@@ -188,4 +188,8 @@ public class ConnectionProperties {
     public String changePasswordStudent() {
         return HTTP_MODE + ip + ":" + port + "/changePasswordStudent";
     }
+
+    public String getAPISecret() {
+        return secret;
+    }
 }
