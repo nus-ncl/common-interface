@@ -22,6 +22,7 @@ public class ConnectionProperties {
     private String bossUrl;
     private String userUrl;
     private boolean enabled = false;
+    private String secret;
 
     public String login() {
         return HTTP_MODE + ip + ":" + port + "/login";
@@ -187,5 +188,9 @@ public class ConnectionProperties {
 
     public String changePasswordStudent() {
         return HTTP_MODE + ip + ":" + port + "/changePasswordStudent";
+    }
+
+    public String getAPISecret() {
+        return secret;
     }
 }
