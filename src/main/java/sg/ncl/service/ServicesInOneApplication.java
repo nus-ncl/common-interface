@@ -15,6 +15,7 @@ import sg.ncl.service.registration.RegistrationApplication;
 import sg.ncl.service.team.TeamApplication;
 import sg.ncl.service.user.UserApplication;
 import sg.ncl.service.version.VersionApplication;
+import sg.ncl.adapter.deterlab.AdapterDeterLab;
 
 import java.sql.SQLException;
 
