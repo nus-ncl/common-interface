@@ -4,6 +4,7 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.system.ApplicationPidFileWriter;
 import org.springframework.context.annotation.Import;
+import sg.ncl.adapter.deterlab.AdapterDeterLab;
 import sg.ncl.service.authentication.AuthenticationApplication;
 import sg.ncl.service.data.DataApplication;
 import sg.ncl.service.experiment.ExperimentApplication;
@@ -31,7 +32,7 @@ import java.sql.SQLException;
         RegistrationApplication.class,
         TeamApplication.class,
         UserApplication.class,
-        VersionApplication.class
+        VersionApplication.class,
         AdapterDeterLab.class
 })
 public class ServicesInOneApplication {
