@@ -34,6 +34,7 @@ import java.sql.SQLException;
         TeamApplication.class,
         UserApplication.class,
         VersionApplication.class,
+        // add AdapterDeterLab class
         AdapterDeterLab.class
 })
 public class ServicesInOneApplication {

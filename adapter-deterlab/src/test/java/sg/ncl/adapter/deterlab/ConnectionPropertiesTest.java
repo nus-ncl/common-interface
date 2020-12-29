@@ -259,10 +259,11 @@ public class ConnectionPropertiesTest {
         assertThat(connectionProperties.reserveNodes()).isNotNull();
         assertThat(connectionProperties.reserveNodes()).isEqualTo("http://127.0.0.1:22/reserveNodes");
     }
-
+//    add test
     @Test
     public void TestGetAPISecret() throws Exception {
         assertThat(connectionProperties.getAPISecret()).isNotNull();
         assertThat(connectionProperties.getAPISecret()).isEqualTo("hkwany");
     }
+
 }

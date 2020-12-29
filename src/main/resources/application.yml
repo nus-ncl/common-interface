@@ -66,6 +66,7 @@ ncl:
       bossUrl: ${deterlab.boss:}
       userUrl: ${deterlab.user:}
       enabled: true
+#      add secret
       secret: ${secret}
   jwt:
     api-key: ${jwt.key:}

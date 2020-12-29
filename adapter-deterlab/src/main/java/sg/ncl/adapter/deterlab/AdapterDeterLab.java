@@ -267,6 +267,7 @@ public class AdapterDeterLab {
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
         JSONObject newObject = new JSONObject(jsonString);
+//      Add secret
         newObject.put("secret",properties.getAPISecret());
         HttpEntity<String> request = new HttpEntity<>(newObject.toString(), headers);
         ResponseEntity response;
