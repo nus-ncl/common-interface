@@ -62,7 +62,8 @@ public class AdapterDeterLab {
      */
     public String joinProjectNewUsers(String jsonString) {
         log.debug("Joining project as new user: {}", jsonString);
-
+        log.warn("---------starting---------");
+        log.warn("jsonString: {}", jsonString);
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
         HttpEntity<String> request = new HttpEntity<>(jsonString, headers);
@@ -77,14 +78,17 @@ public class AdapterDeterLab {
             log.warn("New user join project error: Adapter DeterLab internal server error {}", hsee);
             throw hsee;
         }
+        log.warn("response: {}", response);
         // Will get the following JSON:
         // msg: join project request new users fail
         // msg: no user created, uid: xxx
         // msg: user is created, uid: xxx
         // msg: user not found, uid: xxx
         String responseBody = response.getBody().toString();
+        log.warn("responseBody: {}", responseBody);
         try {
             String deterMessage = new JSONObject(responseBody).getString("msg");
+            log.warn("deterMessage: {}", deterMessage);
             if("user is created".equalsIgnoreCase(deterMessage)) {
                 log.info("Join project as new user to DeterLab OK");
                 return responseBody;
@@ -93,6 +97,7 @@ public class AdapterDeterLab {
             throw new DeterLabOperationFailedException(deterMessage);
         } catch (JSONException e) {
             log.warn("Error parsing response code new user join project: {}", responseBody);
+            log.warn("---------end---------");
             throw e;
         }
     }
@@ -124,7 +129,6 @@ public class AdapterDeterLab {
         // msg: user not found, uid: xxx
         String responseBody = response.getBody().toString();
         try {
-
             String deterMessage = new JSONObject(responseBody).getString("msg");
             if("user is created".equalsIgnoreCase(deterMessage)) {
                 log.info("Apply project as new user to DeterLab OK");
