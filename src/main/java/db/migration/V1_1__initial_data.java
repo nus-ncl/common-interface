@@ -2,6 +2,8 @@ package db.migration;
 
 import lombok.extern.slf4j.Slf4j;
 import org.flywaydb.core.api.migration.spring.SpringJdbcMigration;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.support.ClassPathXmlApplicationContext;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
@@ -202,5 +204,11 @@ public class V1_1__initial_data implements SpringJdbcMigration {
         final int i = jdbcTemplate.update(SQL_INSERT_DETERLAB_PROJECT, now, now, version, name, teamId);
         log.info("Inserted {} deter project entry: created_date={}, last_modified_date={}, version={}, deter_project_id={}, ncl_team_id={}", i, now, now, version, name, teamId);
     }
-
+    public static void main(String[] args) throws Exception {
+//        System.out.println("hello");
+        V1_1__initial_data obj = new V1_1__initial_data();
+        ApplicationContext ctx = new ClassPathXmlApplicationContext("application.xml");
+        JdbcTemplate jdbcTemplate = (JdbcTemplate) ctx.getBean("jdbcTemplate");
+        obj.migrate(jdbcTemplate);
+    }
 }

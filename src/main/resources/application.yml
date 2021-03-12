@@ -4,9 +4,9 @@ server:
   port: 8080
 spring:
   datasource:
-    url: ${jdbc.url:} # e.g., jdbc:mysql://localhost:3306/prod?useSSL=false
-    username: ${jdbc.username:}
-    password: ${jdbc.password:}
+    url: jdbc:mysql://localhost:3306 # e.g., jdbc:mysql://localhost:3306/prod?useSSL=false
+    username: root
+    password: root
   jpa:
     hibernate:
       ddl-auto: validate
