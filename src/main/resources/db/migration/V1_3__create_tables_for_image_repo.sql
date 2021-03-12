@@ -15,4 +15,4 @@ CREATE TABLE IF NOT EXISTS `prod`.`images` (
   UNIQUE INDEX `UK_krxed372ocm2ni4s42df6hji9` (`id` ASC),
   INDEX `IDXkrxed372ocm2ni4s42df6hji9` (`id` ASC)
 )
-ENGINE = InnoDB
+ENGINE = InnoDB;

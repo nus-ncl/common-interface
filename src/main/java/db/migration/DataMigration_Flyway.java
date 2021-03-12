@@ -4,7 +4,7 @@ import org.flywaydb.core.Flyway;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.datasource.SimpleDriverDataSource;
 
-public class DataMigration {
+public class DataMigration_Flyway {
     public void main(String[] args) throws Exception {
         V1_1__initial_data initialData = new V1_1__initial_data();
         JdbcTemplate database = new JdbcTemplate(createDataSource());

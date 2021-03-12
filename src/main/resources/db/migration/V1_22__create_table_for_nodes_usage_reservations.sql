@@ -14,4 +14,4 @@ CREATE TABLE IF NOT EXISTS `prod`.`nodes_usage_reservation` (
   FOREIGN KEY (`project_id`)
   REFERENCES `prod`.`project_details` (`id`)
   )
-ENGINE = InnoDB
+ENGINE = InnoDB;
