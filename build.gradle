@@ -12,7 +12,7 @@ plugins {
     id 'eclipse'
     id 'idea'
     id 'com.github.kt3k.coveralls' version '2.6.3'
-    id 'org.sonarqube' version '2.7'
+    id 'org.sonarqube' version '3.1.1'
     id 'com.jfrog.bintray' version '1.7.1'
     id 'org.tenne.rest' version '0.4.2'
 }
@@ -31,11 +31,12 @@ allprojects {
 
     version "1-${hash}"
 
-    sourceCompatibility = JavaVersion.VERSION_1_8
-    targetCompatibility = JavaVersion.VERSION_1_8
+    sourceCompatibility = JavaVersion.VERSION_11
+    targetCompatibility = JavaVersion.VERSION_11
 
     repositories {
         jcenter()
+        mavenCentral()
     }
 
     dependencyManagement {
@@ -51,6 +52,16 @@ allprojects {
         }
     }
 
+    dependencies {
+//        choose one of two lines below
+//        compile 'javax.xml.ws:jaxws-api:2.3.0'
+        implementation group: 'javax.xml.ws', name: 'jaxws-api', version: '2.3.1'
+        compileOnly 'org.projectlombok:lombok:1.18.20'
+        annotationProcessor 'org.projectlombok:lombok:1.18.20'
+
+        testCompileOnly 'org.projectlombok:lombok:1.18.20'
+        testAnnotationProcessor 'org.projectlombok:lombok:1.18.20'
+    }
     compileJava {
         dependsOn(processResources)
     }
@@ -73,9 +84,9 @@ dependencies {
 
 jacocoTestReport {
     dependsOn subprojects.jacocoTestReport
-    sourceDirectories = files(allprojects.sourceSets.main.java.srcDirs)
-    classDirectories = files(allprojects.sourceSets.main.output.classesDir)
-    executionData = files(allprojects.jacocoTestReport.executionData).filter { it.exists() }
+    sourceDirectories.from = files(allprojects.sourceSets.main.java.srcDirs)
+    classDirectories.from = files(allprojects.sourceSets.main.output.classesDirs)
+    executionData.from = files(allprojects.jacocoTestReport.executionData).filter { it.exists() }
 }
 
 coveralls {
@@ -138,36 +149,44 @@ task bamboo(type: org._10ne.gradle.rest.RestTask) {
     }
 }
 
-task triggerBamboo << {
-    if (System.getenv('TRAVIS_BRANCH') == 'master' && System.getenv('TRAVIS_PULL_REQUEST') == 'false') {
-        println 'Triggering Bamboo Build:'
-        tasks.bamboo.execute()
-    } else {
-        println 'Is not on master branch or is a pull request: branch = ' + System.getenv('TRAVIS_BRANCH') + ', pull request = ' + System.getenv('TRAVIS_PULL_REQUEST')
-    }
-}
-
-task printInfo << {
-    println "  - project: ${project.name}"
-    println "  - archive artifacts: ${project.configurations.archives.allArtifacts.size()}"
-    project.configurations.archives.artifacts.files.each {
-        println "    - ${it.name}"
-    }
-    println "  - group: ${project.group}"
-    println "  - version: ${project.version}"
-    println "  - ${subprojects.size()} subprojects:"
-    subprojects.each {
-        println "    - ${it.name}:"
-        println "      - archive artifacts: ${it.configurations.archives.allArtifacts.size()}"
-        it.configurations.archives.artifacts.files.each {
-            println "        - ${it.name}"
+task triggerBamboo {
+    doLast {
+        if (System.getenv('TRAVIS_BRANCH') == 'master' && System.getenv('TRAVIS_PULL_REQUEST') == 'false') {
+            println 'Triggering Bamboo Build:'
+            tasks.bamboo.execute()
+        } else {
+            println 'Is not on master branch or is a pull request: branch = ' + System.getenv('TRAVIS_BRANCH') + ', pull request = ' + System.getenv('TRAVIS_PULL_REQUEST')
         }
-        println "      - group: ${it.group}"
-        println "      - version: ${it.version}"
     }
 }
 
-task wrapper(type: Wrapper) {
-    gradleVersion '3.0'
+task printInfo {
+    doLast{
+        println "  - project: ${project.name}"
+        println "  - archive artifacts: ${project.configurations.archives.allArtifacts.size()}"
+        project.configurations.archives.artifacts.files.each {
+            println "    - ${it.name}"
+        }
+        println "  - group: ${project.group}"
+        println "  - version: ${project.version}"
+        println "  - ${subprojects.size()} subprojects:"
+        subprojects.each {
+            println "    - ${it.name}:"
+            println "      - archive artifacts: ${it.configurations.archives.allArtifacts.size()}"
+            it.configurations.archives.artifacts.files.each {
+                println "        - ${it.name}"
+            }
+            println "      - group: ${it.group}"
+            println "      - version: ${it.version}"
+        }
+    }
+}
+
+wrapper{
+    gradleVersion '6.8.3'
     distributionUrl "https://services.gradle.org/distributions/gradle-${gradleVersion}-all.zip"
+}
+
+springBoot {
+    mainClass = 'sg.ncl.service.ServicesInOneApplication'
 }

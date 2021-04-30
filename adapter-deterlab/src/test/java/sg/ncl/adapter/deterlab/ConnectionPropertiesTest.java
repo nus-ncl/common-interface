@@ -24,6 +24,7 @@ import static org.assertj.core.api.Assertions.assertThat;
         "ncl.deterlab.adapter.port=22",
         "ncl.deterlab.adapter.bossUrl=boss.ncl.sg",
         "ncl.deterlab.adapter.userUrl=users.ncl.sg",
+        "ncl.deterlab.adapter.secret=hkwany"
 })
 
 public class ConnectionPropertiesTest {
@@ -257,6 +258,12 @@ public class ConnectionPropertiesTest {
     public void reserveNodes() throws Exception {
         assertThat(connectionProperties.reserveNodes()).isNotNull();
         assertThat(connectionProperties.reserveNodes()).isEqualTo("http://127.0.0.1:22/reserveNodes");
+    }
+//    add test
+    @Test
+    public void TestGetAPISecret() throws Exception {
+        assertThat(connectionProperties.getAPISecret()).isNotNull();
+        assertThat(connectionProperties.getAPISecret()).isEqualTo("hkwany");
     }
 
 }
