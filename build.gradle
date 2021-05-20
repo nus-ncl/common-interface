@@ -68,11 +68,11 @@ allprojects {
         dependsOn(processResources)
     }
 
-    jacocoTestReport {
-        reports {
-            xml.enabled true
-        }
-    }
+//    jacocoTestReport {
+//        reports {
+//            xml.enabled true
+//        }
+//    }
 }
 
 dependencies {
@@ -83,13 +83,18 @@ dependencies {
 
     testCompile project(':common-test')
 }
-
-jacocoTestReport {
-    dependsOn subprojects.jacocoTestReport
-    sourceDirectories.from = files(allprojects.sourceSets.main.java.srcDirs)
-    classDirectories.from = files(allprojects.sourceSets.main.output.classesDirs)
-    executionData.from = files(allprojects.jacocoTestReport.executionData).filter { it.exists() }
+tasks.jacocoTestReport {
+    reports {
+        xml.enabled true
+    }
 }
+
+//jacocoTestReport {
+//    dependsOn subprojects.jacocoTestReport
+//    sourceDirectories.from = files(allprojects.sourceSets.main.java.srcDirs)
+//    classDirectories.from = files(allprojects.sourceSets.main.output.classesDirs)
+//    executionData.from = files(allprojects.jacocoTestReport.executionData).filter { it.exists() }
+//}
 
 coveralls {
     sourceDirs = allprojects.sourceSets.main.java.srcDirs.flatten()
