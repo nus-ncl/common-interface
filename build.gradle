@@ -4,7 +4,7 @@ buildscript {
     }
 
     dependencies {
-        classpath 'org.springframework.boot:spring-boot-gradle-plugin:1.4.0.RELEASE'
+        classpath 'org.springframework.boot:spring-boot-gradle-plugin:1.5.2.RELEASE'
     }
 }
 
@@ -202,4 +202,8 @@ jar {
     manifest {
         attributes 'Main-Class': appMainClass
     }
+}
+
+bootRepackage {
+    mainClass = appMainClass
 }
