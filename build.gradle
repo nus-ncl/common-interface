@@ -31,6 +31,8 @@ allprojects {
 
     version "1-${hash}"
 
+//    sourceCompatibility = JavaVersion.VERSION_1_8
+//    targetCompatibility = JavaVersion.VERSION_1_8
     sourceCompatibility = JavaVersion.VERSION_11
     targetCompatibility = JavaVersion.VERSION_11
 
@@ -153,7 +155,8 @@ task triggerBamboo {
     doLast {
         if (System.getenv('TRAVIS_BRANCH') == 'master' && System.getenv('TRAVIS_PULL_REQUEST') == 'false') {
             println 'Triggering Bamboo Build:'
-            tasks.bamboo.execute()
+//            tasks.bamboo.execute()
+            tasks.bamboo.finalizedBy()
         } else {
             println 'Is not on master branch or is a pull request: branch = ' + System.getenv('TRAVIS_BRANCH') + ', pull request = ' + System.getenv('TRAVIS_PULL_REQUEST')
         }
@@ -189,4 +192,16 @@ wrapper{
 
 springBoot {
     mainClass = 'sg.ncl.service.ServicesInOneApplication'
+}
+bootRepackage {
+    mainClass = 'sg.ncl.service.ServicesInOneApplication'
+}
+def appMainClass = 'ServicesInOneApplication'
+jar {
+    from {
+        configurations.runtime.collect{zipTree(it)}
+    }
+    manifest {
+        attributes 'Main-Class': appMainClass
+    }
 }
