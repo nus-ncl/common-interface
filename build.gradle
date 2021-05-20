@@ -50,7 +50,7 @@ allprojects {
             dependency 'org.apache.commons:commons-lang3:3.4'
             dependency 'io.jsonwebtoken:jjwt:0.6.0'
             dependency 'org.jmockit:jmockit:1.25'
-            dependency 'org.projectlombok:lombok:1.16.10'
+            dependency 'org.projectlombok:lombok:1.18.20'
         }
     }
 
@@ -58,11 +58,11 @@ allprojects {
 //        choose one of two lines below
 //        compile 'javax.xml.ws:jaxws-api:2.3.0'
         implementation group: 'javax.xml.ws', name: 'jaxws-api', version: '2.3.1'
-        compileOnly 'org.projectlombok:lombok:1.18.20'
-        annotationProcessor 'org.projectlombok:lombok:1.18.20'
+        compileOnly group: 'org.projectlombok', name: 'lombok', version: '1.18.20'
+        annotationProcessor group: 'org.projectlombok', name: 'lombok', version: '1.18.20'
 
-        testCompileOnly 'org.projectlombok:lombok:1.18.20'
-        testAnnotationProcessor 'org.projectlombok:lombok:1.18.20'
+        testCompileOnly group: 'org.projectlombok', name: 'lombok', version: '1.18.20'
+        testAnnotationProcessor group: 'org.projectlombok', name: 'lombok', version: '1.18.20'
     }
     compileJava {
         dependsOn(processResources)
@@ -193,9 +193,7 @@ wrapper{
 springBoot {
     mainClass = 'sg.ncl.service.ServicesInOneApplication'
 }
-bootRepackage {
-    mainClass = 'sg.ncl.service.ServicesInOneApplication'
-}
+
 def appMainClass = 'ServicesInOneApplication'
 jar {
     from {
