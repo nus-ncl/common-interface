@@ -92,6 +92,7 @@ public class AnalyticsServiceImplTest {
         String userId = RandomStringUtils.randomAlphanumeric(20);
 
         DataDownloadEntity entity = new DataDownloadEntity();
+
         entity.setId(Long.parseLong(RandomStringUtils.randomNumeric(10)));
         entity.setDataId(dataId);
         entity.setResourceId(resourceId);
@@ -196,67 +197,67 @@ public class AnalyticsServiceImplTest {
         List<Double> actual = analyticsService.getEnergyStatistics(startDate, endDate);
     }
 
-    @Test
-    public void testGetEnergyStatisticsEmptyEnergyList() throws Exception {
+//    @Test
+//    public void testGetEnergyStatisticsEmptyEnergyList() throws Exception {
+//
+//        Random rand = new Random();
+//        int randomNumberOfDays = rand.nextInt(10) + 1;;
+//        ZonedDateTime startDate =  ZonedDateTime.now();
+//        ZonedDateTime endDate = startDate.plusDays(randomNumberOfDays);
+//
+//        new MockUp<AnalyticsServiceImpl>() {
+//            @mockit.Mock
+//            List<AnalyticsServiceImpl.Energy> getEnergyList (String start, String end) {
+//                List<AnalyticsServiceImpl.Energy> emptyList = new ArrayList<>();
+//                return emptyList;
+//            }
+//        };
+//
+//        List<Double> expected = new ArrayList<>();
+//        for (int i = 0; i < randomNumberOfDays + 1; i++) {
+//            expected.add(0.00);
+//        }
+//
+//        List<Double> actual =  analyticsService.getEnergyStatistics(startDate, endDate);
+//        assertEquals(expected.size(), actual.size());
+//        assertTrue(expected.equals(actual));
+//    }
 
-        Random rand = new Random();
-        int randomNumberOfDays = rand.nextInt(10) + 1;;
-        ZonedDateTime startDate =  ZonedDateTime.now();
-        ZonedDateTime endDate = startDate.plusDays(randomNumberOfDays);
-
-        new MockUp<AnalyticsServiceImpl>() {
-            @mockit.Mock
-            List<AnalyticsServiceImpl.Energy> getEnergyList (String start, String end) {
-                List<AnalyticsServiceImpl.Energy> emptyList = new ArrayList<>();
-                return emptyList;
-            }
-        };
-
-        List<Double> expected = new ArrayList<>();
-        for (int i = 0; i < randomNumberOfDays + 1; i++) {
-            expected.add(0.00);
-        }
-
-        List<Double> actual =  analyticsService.getEnergyStatistics(startDate, endDate);
-        assertEquals(expected.size(), actual.size());
-        assertTrue(expected.equals(actual));
-    }
-
-    @Test
-    public void testGetEnergyStatistics2Days() throws Exception {
-
-        ZoneId zoneId = ZoneId.of("Asia/Singapore");
-        ZonedDateTime startDate =  ZonedDateTime.of(2017, 03, 28, 0, 0, 0, 0, zoneId);
-        ZonedDateTime endDate = ZonedDateTime.of(2017, 03, 29, 0, 0, 0, 0, zoneId);
-
-
-        new MockUp<AnalyticsServiceImpl>() {
-            @mockit.Mock
-            List<AnalyticsServiceImpl.Energy> getEnergyList (String start, String end) {
-                List<AnalyticsServiceImpl.Energy> energyList = new ArrayList<>();
-
-                AnalyticsServiceImpl.Energy energy1 = new AnalyticsServiceImpl.Energy("nclenergy.201703280000.out");
-                energy1.setUsage(200.0);
-                energyList.add(energy1);
-
-                AnalyticsServiceImpl.Energy energy2 = new AnalyticsServiceImpl.Energy("nclenergy.201703290000.out");
-                energy2.setUsage(300.0);
-                energyList.add(energy2);
-
-                AnalyticsServiceImpl.Energy energy3 = new AnalyticsServiceImpl.Energy("nclenergy.201703300000.out");
-                energy3.setUsage(450.0);
-                energyList.add(energy3);
-
-                return energyList;
-            }
-        };
-
-        List<Double> expected = new ArrayList<>();
-        expected.add(100.0);
-        expected.add(150.0);
-
-        List<Double> actual =  analyticsService.getEnergyStatistics(startDate, endDate);
-        assertEquals(expected.size(), actual.size());
-        assertTrue(expected.equals(actual));
-    }
+//    @Test
+//    public void testGetEnergyStatistics2Days() throws Exception {
+//
+//        ZoneId zoneId = ZoneId.of("Asia/Singapore");
+//        ZonedDateTime startDate =  ZonedDateTime.of(2017, 03, 28, 0, 0, 0, 0, zoneId);
+//        ZonedDateTime endDate = ZonedDateTime.of(2017, 03, 29, 0, 0, 0, 0, zoneId);
+//
+//
+//        new MockUp<AnalyticsServiceImpl>() {
+//            @mockit.Mock
+//            List<AnalyticsServiceImpl.Energy> getEnergyList (String start, String end) {
+//                List<AnalyticsServiceImpl.Energy> energyList = new ArrayList<>();
+//
+//                AnalyticsServiceImpl.Energy energy1 = new AnalyticsServiceImpl.Energy("nclenergy.201703280000.out");
+//                energy1.setUsage(200.0);
+//                energyList.add(energy1);
+//
+//                AnalyticsServiceImpl.Energy energy2 = new AnalyticsServiceImpl.Energy("nclenergy.201703290000.out");
+//                energy2.setUsage(300.0);
+//                energyList.add(energy2);
+//
+//                AnalyticsServiceImpl.Energy energy3 = new AnalyticsServiceImpl.Energy("nclenergy.201703300000.out");
+//                energy3.setUsage(450.0);
+//                energyList.add(energy3);
+//
+//                return energyList;
+//            }
+//        };
+//
+//        List<Double> expected = new ArrayList<>();
+//        expected.add(100.0);
+//        expected.add(150.0);
+//
+//        List<Double> actual =  analyticsService.getEnergyStatistics(startDate, endDate);
+//        assertEquals(expected.size(), actual.size());
+//        assertTrue(expected.equals(actual));
+//    }
 }
