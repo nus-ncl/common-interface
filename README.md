@@ -2,7 +2,7 @@
 
 All of NCL micro-services running under the same JVM.
 
-![Build Status](https://github.com/nus-ncl/services-in-one/.github/workflows/gradle.yml/badge.svg)
+![Build Status](https://github.com/nus-ncl/services-in-one/actions/workflows/gradle.yml/badge.svg)
 [![Coverage Status][cs-img]][cs-lnk]
 [![Quality Gate][qg-img]][qg-lnk]
 
