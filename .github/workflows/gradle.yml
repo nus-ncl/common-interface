@@ -1,0 +1,71 @@
+# This workflow will build a Java project with Gradle
+# For more information see: https://help.github.com/actions/language-and-framework-guides/building-and-testing-java-with-gradle
+#
+# Updated on July 2021
+#
+
+name: Java CI with Gradle
+
+on:
+  push:
+    branches: [ master ]
+
+  pull_request:
+    branches: [ master ]
+
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Set up JDK 11
+      uses: actions/setup-java@v2
+      with:
+        java-version: '11'
+        distribution: 'adopt'
+    - name: Remove existing build cache
+      run: rm -f  $HOME/.gradle/caches/modules-2/modules-2.lock ; rm -fr $HOME/.gradle/caches/*/plugin-resolution/
+    - name: Grant execute permission for gradlew
+      run: chmod +x gradlew
+    - name: Install with Gradle
+      run: ./gradlew --stacktrace printInfo
+    - name: Build with Gradle
+      run: ./gradlew --continue --stacktrace --profile build
+    - name: Run some code test
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+      run: ./gradlew --stacktrace -Djdk.tls.client.protocols="TLSv1,TLSv1.1,TLSv1.2" sonarqube jacocoTestReport coveralls
+    - name: Publish package
+      run: ./gradlew publish
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    - name: Set COMMIT_ID env var
+      id: vars
+      run: echo "::set-output name=COMMIT_ID::$(git rev-parse --short=7 HEAD)"
+    - name: Create Release
+      id: create_release
+      uses: actions/create-release@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        tag_name: release-${{ steps.vars.outputs.COMMIT_ID }}
+        release_name: release-${{ steps.vars.outputs.COMMIT_ID }}
+        draft: false
+        prerelease: false
+    - name: Upload Release Asset
+      id: upload-release-asset
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ steps.create_release.outputs.upload_url }}
+        asset_path: build/libs/services-in-one-${{ steps.vars.outputs.COMMIT_ID }}.jar
+        asset_name: services-in-one-${{ steps.vars.outputs.COMMIT_ID }}.jar
+        asset_content_type: application/jar
+    - name: trigger bamboo
+      env:
+        BAMBOO_CREDENTIALS: ${{ secrets.BAMBOO_CREDENTIALS }}
+      run: ./gradlew --stacktrace triggerBamboo
