@@ -24,5 +24,5 @@ With Gradle, it is possible to run all services together in one process or just 
 
 [cs-img]: https://coveralls.io/repos/github/nus-ncl/services-in-one/badge.svg?branch=master
 [cs-lnk]: https://coveralls.io/github/nus-ncl/services-in-one?branch=master
-[qg-img]: https://sonarqube.com/api/badges/gate?key=nus-ncl:services-in-one
-[qg-lnk]: https://sonarqube.com/dashboard/index/nus-ncl:services-in-one
+[qg-img]: https://sonarcloud.io/api/project_badges/measure?project=nus-ncl_services-in-one&metric=alert_status
+[qg-lnk]: https://sonarcloud.io/dashboard?id=nus-ncl_services-in-one
