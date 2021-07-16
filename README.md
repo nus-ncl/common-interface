@@ -2,8 +2,7 @@
 
 All of NCL micro-services running under the same JVM.
 
-[![Download][bt-img]][bt-lnk]
-[![Build Status][bs-img]][bs-lnk]
+![Build Status](https://github.com/nus-ncl/services-in-one/actions/workflows/gradle.yml/badge.svg)
 [![Coverage Status][cs-img]][cs-lnk]
 [![Quality Gate][qg-img]][qg-lnk]
 
@@ -23,11 +22,7 @@ With Gradle, it is possible to run all services together in one process or just 
 2. Type `./gradlew :service-<name>:bootRun` (where `<name>` is the name of the service)
 3. The application should start up with the selected service
 
-[bt-img]: https://api.bintray.com/packages/nus-ncl/generic/services-in-one/images/download.svg
-[bt-lnk]: https://bintray.com/nus-ncl/generic/services-in-one/_latestVersion
-[bs-img]: https://travis-ci.org/nus-ncl/services-in-one.svg?branch=master
-[bs-lnk]: https://travis-ci.org/nus-ncl/services-in-one
 [cs-img]: https://coveralls.io/repos/github/nus-ncl/services-in-one/badge.svg?branch=master
 [cs-lnk]: https://coveralls.io/github/nus-ncl/services-in-one?branch=master
-[qg-img]: https://sonarqube.com/api/badges/gate?key=nus-ncl:services-in-one
-[qg-lnk]: https://sonarqube.com/dashboard/index/nus-ncl:services-in-one
+[qg-img]: https://sonarcloud.io/api/project_badges/measure?project=nus-ncl_services-in-one&metric=alert_status
+[qg-lnk]: https://sonarcloud.io/dashboard?id=nus-ncl_services-in-one
